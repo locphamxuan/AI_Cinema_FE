@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
+import LandingFooter from './LandingFooter';
 
 const mockBackdropPosters = [
   'https://picsum.photos/seed/aicinema1/300/450',
@@ -140,6 +141,9 @@ export default function LandingHero() {
           </div>
         </div>
       </div>
+
+      {/* Netflix-style Footer */}
+      <LandingFooter />
     </div>
   );
 }
