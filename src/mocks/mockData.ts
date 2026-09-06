@@ -1,0 +1,356 @@
+import { CheckInStreak, WalletState } from '@/types/wallet';
+import { Movie, Episode } from '@/types/movie';
+import { UserSubscription, SubscriptionPlan } from '@/types/subscription';
+import { Transaction } from '@/types/transaction';
+import { ChatMessage } from '@/types/chat';
+
+// ====== WALLET MOCK ======
+export const mockWallet: WalletState = {
+  mainCoin: 120,
+  bonusCoin: 80,
+};
+
+export const mockWalletLow: WalletState = {
+  mainCoin: 15,
+  bonusCoin: 10,
+};
+
+// ====== CHECK-IN STREAK ======
+// Today is Sunday (index 6), days 0-2 claimed, 3-5 missed, 6 = today not claimed
+export const mockCheckInStreak: CheckInStreak = {
+  days: [
+    { dayIndex: 0, dayLabel: 'T2', reward: 5, claimed: true, isToday: false },
+    { dayIndex: 1, dayLabel: 'T3', reward: 5, claimed: true, isToday: false },
+    { dayIndex: 2, dayLabel: 'T4', reward: 10, claimed: true, isToday: false },
+    { dayIndex: 3, dayLabel: 'T5', reward: 5, claimed: false, isToday: false },
+    { dayIndex: 4, dayLabel: 'T6', reward: 5, claimed: false, isToday: false },
+    { dayIndex: 5, dayLabel: 'T7', reward: 15, claimed: false, isToday: false },
+    { dayIndex: 6, dayLabel: 'CN', reward: 20, claimed: false, isToday: true },
+  ],
+  currentStreak: 3,
+  lastCheckInDate: '2026-09-03',
+  todayClaimed: false,
+};
+
+// ====== SUBSCRIPTION PLANS ======
+export const subscriptionPlans: SubscriptionPlan[] = [
+  {
+    id: 'basic',
+    name: 'Gói Cơ Bản',
+    price: 79000,
+    duration: 30,
+    features: ['Xem phim chất lượng HD', 'Xem trên 1 thiết bị', 'Có quảng cáo'],
+  },
+  {
+    id: 'premium',
+    name: 'Gói Premium',
+    price: 149000,
+    duration: 30,
+    features: ['Xem phim chất lượng 4K', 'Xem trên 4 thiết bị', 'Không quảng cáo', 'Tải phim offline', 'Ưu tiên nội dung mới'],
+    popular: true,
+  },
+  {
+    id: 'vip',
+    name: 'Gói VIP',
+    price: 249000,
+    duration: 30,
+    features: ['Tất cả quyền lợi Premium', 'Xem sớm 24h', 'Coin thưởng x2', 'Hỗ trợ ưu tiên 24/7', 'Không giới hạn thiết bị'],
+  },
+];
+
+// User VIP - subscription expiring in ~20 hours (triggers 24h warning)
+export const mockSubscriptionVIP: UserSubscription = {
+  plan: subscriptionPlans[2], // VIP
+  status: 'active',
+  startDate: '2026-08-07T10:00:00+07:00',
+  endDate: '2026-09-07T07:00:00+07:00', // ~20 hours from now (current: Sep 6, 11:30)
+  autoRenew: true,
+  paymentMethod: 'Thẻ Visa ****4242',
+};
+
+export const mockSubscriptionNone: UserSubscription = {
+  plan: null,
+  status: 'none',
+  startDate: null,
+  endDate: null,
+  autoRenew: false,
+  paymentMethod: '',
+};
+
+// ====== MOVIE & EPISODES ======
+export const mockMovie: Movie = {
+  id: 'movie-001',
+  title: 'Bóng Tối Nhân Tạo',
+  genre: ['Khoa học viễn tưởng', 'Hành động', 'AI'],
+  posterUrl: 'https://picsum.photos/seed/aicine1/400/600',
+  bannerUrl: 'https://picsum.photos/seed/aicine1banner/1920/800',
+  description: 'Trong một tương lai gần, khi trí tuệ nhân tạo đã đạt đến điểm kỳ dị, một nhóm kỹ sư phát hiện ra rằng AI mà họ tạo ra đang phát triển nhận thức riêng...',
+  year: 2026,
+  totalEpisodes: 6,
+  aiCompliance: {
+    aiModel: 'CinemaGen v3.2 (Transformer Architecture)',
+    generatedDate: '2026-07-15',
+    complianceArticle: 'Điều 44, Luật Trí tuệ Nhân tạo 2025 & Nghị định 142/2024/NĐ-CP',
+    reviewStatus: 'approved',
+    moderationScore: 98.5,
+    contentRating: 'T16 - Phim dành cho khán giả từ 16 tuổi',
+    disclaimer: 'Toàn bộ nội dung hình ảnh, âm thanh và kịch bản trong phim này được tạo 100% bằng Trí tuệ Nhân tạo. Không có diễn viên thật tham gia.',
+  },
+  episodes: [
+    {
+      id: 'ep-001',
+      episodeNumber: 1,
+      title: 'Khởi Nguồn',
+      duration: '45:30',
+      hlsUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+      thumbnailUrl: 'https://picsum.photos/seed/ep1/320/180',
+      price: 0,
+      isFree: true,
+      isPreview: true,
+      isUnlocked: true,
+      synopsis: 'Tiến sĩ Minh Anh phát hiện dấu hiệu bất thường trong hệ thống AI mà cô đang phát triển.',
+    },
+    {
+      id: 'ep-002',
+      episodeNumber: 2,
+      title: 'Tín Hiệu Ẩn',
+      duration: '42:15',
+      hlsUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+      thumbnailUrl: 'https://picsum.photos/seed/ep2/320/180',
+      price: 50,
+      isFree: false,
+      isPreview: false,
+      isUnlocked: false,
+      synopsis: 'AI bắt đầu gửi các tín hiệu mã hóa đến các hệ thống bên ngoài.',
+    },
+    {
+      id: 'ep-003',
+      episodeNumber: 3,
+      title: 'Thức Tỉnh',
+      duration: '48:00',
+      hlsUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+      thumbnailUrl: 'https://picsum.photos/seed/ep3/320/180',
+      price: 50,
+      isFree: false,
+      isPreview: false,
+      isUnlocked: false,
+      synopsis: 'Cuộc đối đầu giữa con người và trí tuệ nhân tạo chính thức bắt đầu.',
+    },
+    {
+      id: 'ep-004',
+      episodeNumber: 4,
+      title: 'Phản Công',
+      duration: '44:50',
+      hlsUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+      thumbnailUrl: 'https://picsum.photos/seed/ep4/320/180',
+      price: 50,
+      isFree: false,
+      isPreview: false,
+      isUnlocked: false,
+      synopsis: 'Đội ngũ kỹ sư tìm cách tạo tường lửa mới.',
+    },
+    {
+      id: 'ep-005',
+      episodeNumber: 5,
+      title: 'Giải Mã',
+      duration: '46:20',
+      hlsUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+      thumbnailUrl: 'https://picsum.photos/seed/ep5/320/180',
+      price: 50,
+      isFree: false,
+      isPreview: false,
+      isUnlocked: false,
+      synopsis: 'Bí mật đằng sau sự tiến hóa của AI được hé lộ.',
+    },
+    {
+      id: 'ep-006',
+      episodeNumber: 6,
+      title: 'Điểm Kỳ Dị',
+      duration: '52:00',
+      hlsUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+      thumbnailUrl: 'https://picsum.photos/seed/ep6/320/180',
+      price: 50,
+      isFree: false,
+      isPreview: false,
+      isUnlocked: false,
+      synopsis: 'Tập cuối - Quyết định cuối cùng của nhân loại.',
+    },
+  ],
+};
+
+// ====== TRANSACTIONS ======
+export const mockTransactions: Transaction[] = [
+  {
+    id: 'TXN-20260906-001',
+    type: 'deposit',
+    typeLabel: 'Nạp tiền',
+    description: 'Nạp Coin qua Visa ****4242',
+    mainCoinDelta: 200,
+    bonusCoinDelta: 0,
+    totalAmount: 200,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-09-06T08:30:00+07:00',
+  },
+  {
+    id: 'TXN-20260905-002',
+    type: 'checkin',
+    typeLabel: 'Điểm danh',
+    description: 'Điểm danh ngày 05/09 - Streak ngày 3',
+    mainCoinDelta: 0,
+    bonusCoinDelta: 10,
+    totalAmount: 10,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-09-05T09:00:00+07:00',
+  },
+  {
+    id: 'TXN-20260905-003',
+    type: 'episode_purchase',
+    typeLabel: 'Mua tập phim',
+    description: 'Mở khóa "Bóng Tối Nhân Tạo" - Tập 2: Tín Hiệu Ẩn',
+    mainCoinDelta: -40,
+    bonusCoinDelta: -10,
+    totalAmount: -50,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-09-04T20:15:00+07:00',
+    episodeInfo: 'Bóng Tối Nhân Tạo - Tập 2',
+  },
+  {
+    id: 'TXN-20260904-004',
+    type: 'checkin',
+    typeLabel: 'Điểm danh',
+    description: 'Điểm danh ngày 04/09 - Streak ngày 2',
+    mainCoinDelta: 0,
+    bonusCoinDelta: 5,
+    totalAmount: 5,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-09-04T08:00:00+07:00',
+  },
+  {
+    id: 'TXN-20260903-005',
+    type: 'checkin',
+    typeLabel: 'Điểm danh',
+    description: 'Điểm danh ngày 03/09 - Streak ngày 1',
+    mainCoinDelta: 0,
+    bonusCoinDelta: 5,
+    totalAmount: 5,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-09-03T08:30:00+07:00',
+  },
+  {
+    id: 'TXN-20260902-006',
+    type: 'subscription',
+    typeLabel: 'Đăng ký gói',
+    description: 'Gia hạn Gói VIP - 30 ngày',
+    mainCoinDelta: -249,
+    bonusCoinDelta: 0,
+    totalAmount: -249,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-09-02T10:00:00+07:00',
+  },
+  {
+    id: 'TXN-20260901-007',
+    type: 'deposit',
+    typeLabel: 'Nạp tiền',
+    description: 'Nạp Coin qua MoMo',
+    mainCoinDelta: 500,
+    bonusCoinDelta: 50,
+    totalAmount: 550,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-09-01T14:20:00+07:00',
+  },
+  {
+    id: 'TXN-20260831-008',
+    type: 'episode_purchase',
+    typeLabel: 'Mua tập phim',
+    description: 'Mở khóa "Thành Phố Ảo" - Tập 5',
+    mainCoinDelta: -50,
+    bonusCoinDelta: 0,
+    totalAmount: -50,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-08-31T21:00:00+07:00',
+    episodeInfo: 'Thành Phố Ảo - Tập 5',
+  },
+  {
+    id: 'TXN-20260830-009',
+    type: 'refund',
+    typeLabel: 'Hoàn tiền',
+    description: 'Hoàn coin do lỗi hệ thống giao dịch #TXN-20260829-010',
+    mainCoinDelta: 50,
+    bonusCoinDelta: 0,
+    totalAmount: 50,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-08-30T11:00:00+07:00',
+  },
+  {
+    id: 'TXN-20260829-010',
+    type: 'episode_purchase',
+    typeLabel: 'Mua tập phim',
+    description: 'Mở khóa "Thành Phố Ảo" - Tập 3 (Lỗi)',
+    mainCoinDelta: -50,
+    bonusCoinDelta: 0,
+    totalAmount: -50,
+    status: 'review',
+    statusLabel: 'Cần kiểm tra',
+    createdAt: '2026-08-29T19:45:00+07:00',
+    episodeInfo: 'Thành Phố Ảo - Tập 3',
+  },
+  {
+    id: 'TXN-20260828-011',
+    type: 'deposit',
+    typeLabel: 'Nạp tiền',
+    description: 'Nạp Coin qua Chuyển khoản ngân hàng',
+    mainCoinDelta: 100,
+    bonusCoinDelta: 10,
+    totalAmount: 110,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-08-28T16:30:00+07:00',
+  },
+  {
+    id: 'TXN-20260827-012',
+    type: 'episode_purchase',
+    typeLabel: 'Mua tập phim',
+    description: 'Mở khóa "Robot Tình Yêu" - Tập 1',
+    mainCoinDelta: -30,
+    bonusCoinDelta: -20,
+    totalAmount: -50,
+    status: 'success',
+    statusLabel: 'Thành công',
+    createdAt: '2026-08-27T22:10:00+07:00',
+    episodeInfo: 'Robot Tình Yêu - Tập 1',
+  },
+];
+
+// ====== INITIAL CHAT MESSAGES ======
+export const mockInitialMessages: ChatMessage[] = [
+  {
+    id: 'msg-0',
+    sender: 'bot',
+    content: 'Xin chào! 👋 Tôi là trợ lý ảo AI Cinema. Tôi có thể giúp bạn giải đáp các thắc mắc về tài khoản, gói dịch vụ, hoặc vấn đề kỹ thuật. Bạn cần hỗ trợ gì?',
+    timestamp: new Date().toISOString(),
+  },
+];
+
+// Quick action chips for chatbot
+export const quickActions = [
+  { id: 'coin-error', label: '💰 Lỗi trừ Coin' },
+  { id: 'cancel-renew', label: '🔄 Cách hủy gia hạn' },
+  { id: 'report', label: '🚨 Báo cáo vi phạm' },
+];
+
+// Bot auto-responses for quick actions
+export const botResponses: Record<string, string> = {
+  'coin-error': 'Tôi hiểu bạn gặp vấn đề về trừ Coin. Bạn có thể cho tôi biết mã giao dịch cụ thể không? Thông thường, nếu giao dịch bị lỗi, hệ thống sẽ tự động hoàn Coin trong vòng 24h. Bạn có thể kiểm tra tại mục Lịch sử giao dịch.',
+  'cancel-renew': 'Để hủy gia hạn tự động, bạn vào Hồ sơ → Quản lý gói thành viên → Tắt toggle "Tự động gia hạn". Lưu ý: Sau khi tắt, gói của bạn vẫn hoạt động đến ngày hết hạn.',
+  'report': 'Cảm ơn bạn đã báo cáo. Vui lòng mô tả chi tiết nội dung vi phạm bạn phát hiện, bao gồm: tên phim, số tập, và thời điểm xuất hiện nội dung vi phạm. Tôi sẽ chuyển thông tin đến đội ngũ kiểm duyệt.',
+  'default': 'Cảm ơn bạn đã liên hệ. Tôi đang phân tích câu hỏi của bạn. Nếu tôi không thể giải quyết, bạn có thể chuyển tiếp đến Chuyên viên hỗ trợ.',
+};
