@@ -8,6 +8,24 @@ export interface AIComplianceInfo {
   disclaimer: string;
 }
 
+export type VersionStatus = 'published' | 'archived' | 'in_review';
+
+export interface EpisodeVersion {
+  id: string;
+  versionNumber: string; // 'v1.2.0', 'v1.1.0', 'v1.0.0'
+  versionTitle: string;  // 'Bản Remaster 4K & Sửa khẩu hình AI'
+  releaseDate: string;   // ISO date string
+  author: string;        // 'Đạo diễn AI / Studio'
+  aiModel: string;       // 'CinemaGen v3.2 + ElevenLabs HD'
+  status: VersionStatus;
+  statusLabel: string;   // 'Đang phát hành', 'Đã lưu trữ', 'Đang duyệt'
+  isCurrent: boolean;    // true nếu là bản mới nhất đang phát
+  moderationScore: number; // 98.5
+  changelog: string[];   // Các điểm hiệu chỉnh
+  hlsUrl: string;        // URL stream của bản này
+  duration: string;
+}
+
 export interface Episode {
   id: string;
   episodeNumber: number;
@@ -20,6 +38,8 @@ export interface Episode {
   isPreview: boolean;
   isUnlocked: boolean;
   synopsis: string;
+  currentVersion?: string; // 'v1.2.0'
+  versions?: EpisodeVersion[]; // Danh sách các phiên bản sau mỗi lần hiệu chỉnh
 }
 
 export interface Movie {
