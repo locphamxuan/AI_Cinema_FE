@@ -20,16 +20,12 @@ const mockBackdropPosters = [
 ];
 
 export default function LandingHero() {
-  const { openAuthModal, login } = useAppStore();
+  const { openAuthModal } = useAppStore();
   const [emailInput, setEmailInput] = useState('');
 
   const handleGetStarted = (e: React.FormEvent) => {
     e.preventDefault();
     openAuthModal('register', emailInput);
-  };
-
-  const handleQuickDemoLogin = () => {
-    login('userdemo@gmail.com', '1');
   };
 
   return (
@@ -92,24 +88,8 @@ export default function LandingHero() {
           </button>
         </form>
 
-        {/* Fast Test Action with Mock Account */}
-        <div className="flex flex-wrap items-center justify-center gap-3 animate-fade-in">
-          <button
-            onClick={handleQuickDemoLogin}
-            className="px-5 py-2.5 rounded-xl bg-neon/20 border border-neon/40 text-neon hover:bg-neon/30 text-xs sm:text-sm font-bold flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-neon/20"
-          >
-            <span>⚡ Đăng nhập nhanh Mock (userdemo@gmail.com / 1)</span>
-          </button>
-          <button
-            onClick={() => openAuthModal('login')}
-            className="px-4 py-2.5 rounded-xl glass-card-sm text-foreground/90 hover:text-foreground text-xs sm:text-sm font-medium transition-all"
-          >
-            Đăng nhập tài khoản khác
-          </button>
-        </div>
-
         {/* 3 Core Value Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-20 w-full text-left">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 w-full text-left">
           <div className="glass-card p-5 border border-white/10 hover:border-coin/40 transition-colors">
             <div className="w-10 h-10 rounded-xl bg-coin/20 border border-coin/30 flex items-center justify-center text-xl mb-3">
               🟡

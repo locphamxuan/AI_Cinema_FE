@@ -141,7 +141,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       return { success: true };
     }
 
-    return { success: false, error: 'Email hoặc mật khẩu không chính xác! (Gợi ý: userdemo@gmail.com / 1)' };
+    return { success: false, error: 'Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại!' };
   },
 
   register: (name, email, password) => {
