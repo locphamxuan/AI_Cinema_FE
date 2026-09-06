@@ -25,8 +25,19 @@ interface UserProfile {
 }
 
 interface AppState {
-  // User
-  user: UserProfile;
+  // Auth
+  isAuthenticated: boolean;
+  user: UserProfile | null;
+  login: (email: string, password: string) => { success: boolean; error?: string };
+  register: (name: string, email: string, password: string) => { success: boolean; error?: string };
+  logout: () => void;
+  isAuthModalOpen: boolean;
+  authModalMode: 'login' | 'register';
+  initialAuthEmail: string;
+  openAuthModal: (mode?: 'login' | 'register', email?: string) => void;
+  closeAuthModal: () => void;
+
+  // VIP Mode
   isVIPMode: boolean;
   toggleVIPMode: () => void;
 
@@ -72,21 +83,126 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
-  // ===== USER =====
-  user: {
-    id: 'user-001',
-    name: 'Phạm Xuân Lộc',
-    email: 'loc.pham@example.com',
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=loc',
-    isVIP: true,
+  // ===== AUTH & USER =====
+  isAuthenticated: false, // Bắt đầu ở trạng thái chưa đăng nhập để thấy landing page Netflix style
+  user: null,
+  isAuthModalOpen: false,
+  authModalMode: 'login',
+  initialAuthEmail: '',
+
+  openAuthModal: (mode = 'login', email = '') =>
+    set({ isAuthModalOpen: true, authModalMode: mode, initialAuthEmail: email }),
+
+  closeAuthModal: () => set({ isAuthModalOpen: false }),
+
+  login: (email, password) => {
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    // Kiểm tra tài khoản mock demo
+    if (trimmedEmail === 'userdemo@gmail.com' && password === '1') {
+      const demoUser: UserProfile = {
+        id: 'user-demo-001',
+        name: 'Phạm Xuân Lộc (Demo User)',
+        email: 'userdemo@gmail.com',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=locdemo',
+        isVIP: true,
+      };
+
+      set({
+        isAuthenticated: true,
+        user: demoUser,
+        isVIPMode: true,
+        isAuthModalOpen: false,
+        subscription: mockSubscriptionVIP,
+        wallet: mockWallet,
+      });
+
+      return { success: true };
+    }
+
+    // Cho phép đăng nhập với email bất kỳ khác nếu hợp lệ
+    if (trimmedEmail && password) {
+      const customUser: UserProfile = {
+        id: `user-${Date.now()}`,
+        name: trimmedEmail.split('@')[0] || 'Khán giả AI',
+        email: trimmedEmail,
+        avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${trimmedEmail}`,
+        isVIP: false,
+      };
+
+      set({
+        isAuthenticated: true,
+        user: customUser,
+        isVIPMode: false,
+        isAuthModalOpen: false,
+        wallet: { mainCoin: 50, bonusCoin: 20 },
+      });
+
+      return { success: true };
+    }
+
+    return { success: false, error: 'Email hoặc mật khẩu không chính xác! (Gợi ý: userdemo@gmail.com / 1)' };
   },
+
+  register: (name, email, password) => {
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedName = name.trim();
+
+    if (!trimmedEmail || !password || !trimmedName) {
+      return { success: false, error: 'Vui lòng điền đầy đủ thông tin đăng ký!' };
+    }
+
+    const newUser: UserProfile = {
+      id: `user-reg-${Date.now()}`,
+      name: trimmedName,
+      email: trimmedEmail,
+      avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(trimmedName)}`,
+      isVIP: false,
+    };
+
+    // Tặng 50 Coin thưởng chào mừng thành viên mới
+    set((s) => ({
+      isAuthenticated: true,
+      user: newUser,
+      isVIPMode: false,
+      isAuthModalOpen: false,
+      wallet: {
+        mainCoin: 0,
+        bonusCoin: 50, // Quà tặng đăng ký mới
+      },
+    }));
+
+    // Thêm giao dịch tặng coin chào mừng
+    get().addTransaction({
+      type: 'checkin',
+      typeLabel: 'Quà tân thủ',
+      description: 'Tặng 50 Coin Thưởng chào mừng thành viên mới AI Cinema',
+      mainCoinDelta: 0,
+      bonusCoinDelta: 50,
+      totalAmount: 50,
+      status: 'success',
+      statusLabel: 'Thành công',
+    });
+
+    return { success: true };
+  },
+
+  logout: () => {
+    set({
+      isAuthenticated: false,
+      user: null,
+      isVIPMode: false,
+    });
+  },
+
+  // ===== VIP MODE =====
   isVIPMode: true,
   toggleVIPMode: () =>
     set((state) => {
       const newIsVIP = !state.isVIPMode;
       return {
         isVIPMode: newIsVIP,
-        user: { ...state.user, isVIP: newIsVIP },
+        user: state.user ? { ...state.user, isVIP: newIsVIP } : null,
         subscription: newIsVIP ? mockSubscriptionVIP : {
           plan: null,
           status: 'none' as const,
