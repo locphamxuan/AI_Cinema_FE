@@ -33,12 +33,6 @@ export default function AuthModal() {
 
   if (!isAuthModalOpen) return null;
 
-  const handleQuickFill = () => {
-    setEmail('userdemo@gmail.com');
-    setPassword('1');
-    setError(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -96,27 +90,6 @@ export default function AuthModal() {
               : 'Đăng ký ngay để nhận 50 Coin Thưởng tân thủ miễn phí'}
           </p>
         </div>
-
-        {/* Quick Demo Fill Helper */}
-        {mode === 'login' && (
-          <div className="mb-5 p-3 rounded-xl bg-neon/15 border border-neon/30 flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-neon flex items-center gap-1.5">
-                ⚡ Tài khoản Mock Test:
-              </p>
-              <p className="text-[11px] text-foreground/80 mt-0.5 font-mono">
-                userdemo@gmail.com | MK: 1
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={handleQuickFill}
-              className="px-3 py-1.5 rounded-lg bg-neon text-white text-xs font-semibold hover:bg-neon-dark active:scale-95 transition-all shadow-sm shadow-neon/20"
-            >
-              Điền nhanh
-            </button>
-          </div>
-        )}
 
         {/* Mode Tabs */}
         <div className="flex bg-white/5 rounded-xl p-1 mb-5 border border-white/10">
@@ -199,7 +172,7 @@ export default function AuthModal() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={mode === 'login' ? 'Nhập mật khẩu (demo: 1)' : 'Tạo mật khẩu...'}
+              placeholder={mode === 'login' ? 'Nhập mật khẩu...' : 'Tạo mật khẩu...'}
               className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all"
             />
           </div>
