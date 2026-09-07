@@ -119,13 +119,18 @@ export default function AuthModal() {
           onClick={closeAuthModal}
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-muted-light hover:text-foreground transition-colors cursor-pointer"
         >
-          ✕
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-ruby/10 border border-ruby/30 mb-3 text-2xl shadow-lg shadow-ruby/10">
-            🎬
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-ruby via-ruby-dark to-black border border-ruby/40 mb-3 shadow-xl shadow-ruby/25 ring-4 ring-ruby/10">
+            <div className="flex flex-col items-center justify-center leading-none">
+              <span className="text-sm font-black text-white tracking-wider">AI</span>
+              <span className="text-[8px] font-black text-ruby-light tracking-widest uppercase">CINEMA</span>
+            </div>
           </div>
           <h2 className="text-2xl font-bold text-foreground">
             {mode === 'login' ? 'Đăng Nhập AI Cinema' : 'Tạo Tài Khoản Mới'}
@@ -172,7 +177,9 @@ export default function AuthModal() {
         {/* Error Message */}
         {error && (
           <div className="mb-4 p-3 rounded-xl bg-danger/15 border border-danger/30 text-danger text-xs flex items-center gap-2 animate-bounce-in">
-            <span>⚠️</span>
+            <svg className="w-4 h-4 text-danger shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
             <span>{error}</span>
           </div>
         )}
@@ -217,9 +224,24 @@ export default function AuthModal() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-[11px] text-muted-light hover:text-white transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-[11px] text-muted-light hover:text-white transition-colors cursor-pointer"
               >
-                {showPassword ? '🙈 Ẩn' : '👁️ Hiện'}
+                {showPassword ? (
+                  <>
+                    <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                    </svg>
+                    <span>Ẩn</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    <span>Hiện</span>
+                  </>
+                )}
               </button>
             </div>
             <div className="relative">
@@ -261,8 +283,12 @@ export default function AuthModal() {
           </div>
 
           {mode === 'register' && (
-            <div className="p-2.5 rounded-lg bg-coin/10 border border-coin/20 flex items-center gap-2">
-              <span className="text-base">🎁</span>
+            <div className="p-2.5 rounded-lg bg-coin/10 border border-coin/20 flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-md bg-purple-500/20 flex items-center justify-center shrink-0">
+                <svg className="w-3.5 h-3.5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V4a2 2 0 10-4 0v4m4 0V4a2 2 0 114 0v4m-8 0h8m-10 4h12a2 2 0 012 2v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5a2 2 0 012-2z" />
+                </svg>
+              </div>
               <p className="text-[11px] text-coin font-medium">
                 Đăng ký ngay tặng <strong>+50 Coin Thưởng</strong> vào ví để mở khóa tập phim!
               </p>
