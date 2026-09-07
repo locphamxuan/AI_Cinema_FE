@@ -87,20 +87,34 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             <div className="flex items-center gap-3 sm:gap-4">
               {isAuthenticated && user ? (
                 <>
-                  {/* VIP Mode Quick Indicator */}
+                  {/* VIP Mode Quick Sticker Tag */}
                   <button
                     onClick={toggleVIPMode}
-                    className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[5px] text-[11px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer select-none group relative overflow-hidden ${
                       isVIPMode
-                        ? 'bg-gradient-to-r from-amber-500/20 via-amber-400/20 to-amber-600/20 text-amber-300 border border-amber-400/40 hover:border-amber-400/70 shadow-sm shadow-amber-500/20'
-                        : 'bg-white/[0.04] text-zinc-400 border border-white/10 hover:text-white hover:bg-white/10'
+                        ? 'bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 text-neutral-950 shadow-[0_2px_10px_rgba(245,158,11,0.35)] border border-yellow-100/80 -rotate-1 hover:rotate-0 hover:scale-105 active:scale-95'
+                        : 'bg-neutral-800/90 text-neutral-400 border border-neutral-700/80 hover:text-neutral-200 hover:border-neutral-500 hover:scale-105 active:scale-95 shadow-sm'
                     }`}
-                    title="Chuyển đổi trạng thái VIP để kiểm thử"
+                    title="Bấm để chuyển đổi trạng thái VIP (Demo)"
                   >
-                    <svg className={`w-3.5 h-3.5 ${isVIPMode ? 'text-amber-400' : 'text-zinc-400'}`} viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V17H19V19Z" />
-                    </svg>
-                    <span>{isVIPMode ? 'VIP MEMBER' : 'STANDARD'}</span>
+                    {/* Glossy light streak across the sticker */}
+                    {isVIPMode && (
+                      <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
+                    )}
+
+                    {isVIPMode ? (
+                      <>
+                        <svg className="w-3 h-3 fill-neutral-950 shrink-0" viewBox="0 0 24 24">
+                          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
+                        </svg>
+                        <span className="font-extrabold tracking-widest leading-none">VIP PASS</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-500 group-hover:bg-neutral-300 transition-colors" />
+                        <span className="font-semibold tracking-wider leading-none text-[10px]">FREE TIER</span>
+                      </>
+                    )}
                   </button>
 
                   {/* Wallet Badge */}
