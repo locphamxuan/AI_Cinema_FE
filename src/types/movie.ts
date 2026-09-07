@@ -53,4 +53,9 @@ export interface Movie {
   episodes: Episode[];
   aiCompliance: AIComplianceInfo;
   totalEpisodes: number;
+  matchScore?: number; // Ví dụ: 98 (98% Phù hợp)
+  quality?: string;    // '4K UHD', 'HD'
+  audioQuality?: string; // 'Dolby Atmos', 'Spatial Audio'
+  ageRating?: string;  // 'T16', 'T18', 'P'
+  badge?: string;      // 'Mới', 'Thịnh hành', 'Độc quyền AI'
 }
