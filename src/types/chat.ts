@@ -8,6 +8,12 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export interface QuickReply {
+  id: string;
+  text: string;
+  payload: string;
+}
+
 export interface SupportTicket {
   id: string;
   summary: string;
