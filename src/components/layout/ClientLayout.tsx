@@ -9,6 +9,7 @@ import DailyCheckInModal from '@/components/wallet/DailyCheckInModal';
 import UnlockEpisodeModal from '@/components/watch/UnlockEpisodeModal';
 import SupportChatWidget from '@/components/chat/SupportChatWidget';
 import AuthModal from '@/components/auth/AuthModal';
+import DemoControlPanel from '@/components/home/DemoControlPanel';
 
 const navLinks = [
   { href: '/', label: 'Trang chủ', icon: '🏠' },
@@ -209,7 +210,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <DailyCheckInModal />
       <UnlockEpisodeModal />
 
-      {/* Support Chat */}
+      {/* Global Floating Controls */}
+      <DemoControlPanel />
       <SupportChatWidget />
     </>
   );
