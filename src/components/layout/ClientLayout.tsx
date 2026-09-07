@@ -90,14 +90,17 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                   {/* VIP Mode Quick Indicator */}
                   <button
                     onClick={toggleVIPMode}
-                    className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
                       isVIPMode
-                        ? 'bg-coin/20 text-coin border border-coin/35 hover:bg-coin/30 shadow-sm shadow-coin/10'
-                        : 'bg-white/5 text-muted-light border border-white/10 hover:text-white hover:bg-white/10'
+                        ? 'bg-gradient-to-r from-amber-500/20 via-amber-400/20 to-amber-600/20 text-amber-300 border border-amber-400/40 hover:border-amber-400/70 shadow-sm shadow-amber-500/20'
+                        : 'bg-white/[0.04] text-zinc-400 border border-white/10 hover:text-white hover:bg-white/10'
                     }`}
                     title="Chuyển đổi trạng thái VIP để kiểm thử"
                   >
-                    <span>{isVIPMode ? 'VIP' : 'Standard'}</span>
+                    <svg className={`w-3.5 h-3.5 ${isVIPMode ? 'text-amber-400' : 'text-zinc-400'}`} viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V17H19V19Z" />
+                    </svg>
+                    <span>{isVIPMode ? 'VIP MEMBER' : 'STANDARD'}</span>
                   </button>
 
                   {/* Wallet Badge */}
