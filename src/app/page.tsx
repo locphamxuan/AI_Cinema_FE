@@ -6,7 +6,6 @@ import HeroBanner from '@/components/home/HeroBanner';
 import CategoryPills from '@/components/home/CategoryPills';
 import MovieRow from '@/components/home/MovieRow';
 import TopTenRow from '@/components/home/TopTenRow';
-import DemoControlPanel from '@/components/home/DemoControlPanel';
 import { trendingMovies, recommendedMovies, top10Movies, allMockMovies } from '@/mocks/mockData';
 
 export default function HomePage() {
@@ -55,9 +54,6 @@ export default function HomePage() {
         movies={allMockMovies}
         exploreHref="/watch/ep-001"
       />
-
-      {/* 7. Collapsible Demo Control Panel for Grading/Testing */}
-      <DemoControlPanel />
     </div>
   );
 }

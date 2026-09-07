@@ -1,133 +1,173 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import Link from 'next/link';
 
 export default function DemoControlPanel() {
-  const { user, isVIPMode, wallet, toggleVIPMode, setWalletBalance, logout } = useAppStore();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const { user, isVIPMode, wallet, toggleVIPMode, setWalletBalance, isAuthenticated } = useAppStore();
+  const [isOpen, setIsOpen] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  if (!isAuthenticated) return null;
 
   return (
-    <div className="glass-card border border-white/15 overflow-hidden transition-all duration-300">
-      {/* Header bar with collapse toggle */}
-      <div
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="px-5 py-3.5 flex items-center justify-between cursor-pointer bg-white/[0.02] hover:bg-white/5 transition-colors border-b border-white/10"
-      >
-        <div className="flex items-center gap-2.5">
-          <span className="text-xl">🎮</span>
-          <div>
-            <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-              <span>Bảng Điều Khiển Kiểm Thử Đồ Án (Demo Panel)</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-neon/20 text-neon font-mono font-bold">
-                1-Click Test
-              </span>
-            </h3>
-            <p className="text-[11px] text-muted-light hidden sm:block">
-              Thay đổi nhanh trạng thái tài khoản, ví kép & quyền truy cập
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-light font-medium">
-            {isExpanded ? 'Thu gọn' : 'Mở rộng'}
-          </span>
-          <span className={`text-xs text-muted transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-            ▼
-          </span>
-        </div>
-      </div>
-
-      {/* Expandable Body */}
-      {isExpanded && (
-        <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-fade-in bg-black/20">
-          {/* 1. User Status */}
-          <div className="glass-card-sm p-3.5 border border-white/10">
-            <p className="text-[10px] text-muted-light uppercase tracking-wider font-bold mb-2">
-              Tài khoản hiện tại
-            </p>
+    <div ref={panelRef} className="fixed bottom-6 left-4 sm:left-6 z-40">
+      {/* Popover Control Center (Apple / Glassmorphism Style) */}
+      {isOpen && (
+        <div className="absolute bottom-16 left-0 w-[340px] sm:w-[380px] max-w-[calc(100vw-2rem)] glass-card p-5 border border-white/20 shadow-2xl shadow-black/80 rounded-2xl animate-scale-in z-50">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-white/10">
             <div className="flex items-center gap-2.5">
-              <img
-                src={user?.avatarUrl}
-                alt={user?.name || 'User'}
-                className="w-9 h-9 rounded-full bg-white/10 border border-white/20 object-cover"
-              />
-              <div className="min-w-0">
-                <p className="text-xs font-bold text-foreground truncate">{user?.name}</p>
-                <p className={`text-[11px] font-bold ${isVIPMode ? 'text-coin' : 'text-muted-light'}`}>
-                  {isVIPMode ? '👑 Hội viên VIP' : '👤 Tài khoản thường'}
-                </p>
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-ruby to-neon flex items-center justify-center text-sm shadow-md">
+                ⚡
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-white leading-none">Trung Tâm Hội Viên</h4>
+                <p className="text-[11px] text-muted-light mt-1">Trình diễn quyền lợi & ví tiền tệ kép</p>
               </div>
             </div>
-          </div>
-
-          {/* 2. VIP Toggle */}
-          <div className="glass-card-sm p-3.5 border border-white/10 flex flex-col justify-between">
-            <p className="text-[10px] text-muted-light uppercase tracking-wider font-bold mb-1.5">
-              Chế độ Hội viên VIP
-            </p>
             <button
-              onClick={toggleVIPMode}
-              className={`w-full py-2 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer ${
-                isVIPMode
-                  ? 'bg-coin/20 text-coin border border-coin/40 hover:bg-coin/30 shadow-md shadow-coin/10'
-                  : 'bg-white/10 text-muted-light hover:bg-white/15 hover:text-white'
-              }`}
+              onClick={() => setIsOpen(false)}
+              className="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 text-muted-light hover:text-white flex items-center justify-center text-xs transition-colors"
             >
-              {isVIPMode ? '👑 VIP (Bấm để chuyển Thường)' : '👤 Thường (Bấm bật VIP)'}
+              ✕
             </button>
-            <p className="text-[10px] text-muted mt-1.5 line-clamp-1">
-              {isVIPMode ? 'Xem tự do không trừ coin' : 'Mua tập khóa phân rã Coin'}
-            </p>
           </div>
 
-          {/* 3. Dual Wallet Presets */}
-          <div className="glass-card-sm p-3.5 border border-white/10">
-            <div className="flex items-center justify-between mb-1.5">
-              <p className="text-[10px] text-muted-light uppercase tracking-wider font-bold">
-                Ví kép: {wallet.mainCoin}🟡 + {wallet.bonusCoin}🎁
+          <div className="space-y-4">
+            {/* 1. iOS-style Segmented Mode Switcher */}
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-muted-light font-bold mb-2">
+                Hạng Tài Khoản
               </p>
+              <div className="flex bg-black/40 p-1 rounded-xl border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isVIPMode) toggleVIPMode();
+                  }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    !isVIPMode
+                      ? 'bg-white/15 text-white shadow-md'
+                      : 'text-muted-light hover:text-white'
+                  }`}
+                >
+                  <span>👤</span>
+                  <span>Thường (Mua lẻ)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isVIPMode) toggleVIPMode();
+                  }}
+                  className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    isVIPMode
+                      ? 'bg-gradient-to-r from-coin to-coin-dark text-black font-extrabold shadow-md shadow-coin/20'
+                      : 'text-muted-light hover:text-white'
+                  }`}
+                >
+                  <span>👑</span>
+                  <span>VIP (Trọn gói)</span>
+                </button>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setWalletBalance(120, 80)}
-                className="py-1.5 rounded-lg bg-verified/20 text-verified border border-verified/30 text-[11px] font-bold hover:bg-verified/30 transition-all active:scale-95"
-              >
-                💰 Đủ Coin (120+80)
-              </button>
-              <button
-                onClick={() => setWalletBalance(15, 10)}
-                className="py-1.5 rounded-lg bg-danger/20 text-danger border border-danger/30 text-[11px] font-bold hover:bg-danger/30 transition-all active:scale-95"
-              >
-                🪫 Thiếu Coin (15+10)
-              </button>
-            </div>
-          </div>
 
-          {/* 4. Quick Flow Actions */}
-          <div className="glass-card-sm p-3.5 border border-white/10 flex flex-col justify-between">
-            <p className="text-[10px] text-muted-light uppercase tracking-wider font-bold mb-1.5">
-              Luồng kiểm thử nhanh
-            </p>
-            <div className="flex gap-2">
-              <Link
-                href="/watch/ep-002"
-                className="flex-1 py-1.5 rounded-lg bg-ruby/20 text-ruby border border-ruby/30 text-[11px] font-bold text-center hover:bg-ruby/30 transition-all"
-              >
-                🔒 Tập 2 khóa
-              </Link>
-              <Link
-                href="/profile/transactions"
-                className="flex-1 py-1.5 rounded-lg bg-neon/20 text-neon border border-neon/30 text-[11px] font-bold text-center hover:bg-neon/30 transition-all"
-              >
-                📋 Sao kê ví
-              </Link>
+            {/* 2. Dual-Wallet Balance Preset Bar */}
+            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[11px] uppercase tracking-wider text-muted-light font-bold">
+                  Số Dư Ví Kép
+                </p>
+                <span className="text-[11px] font-mono text-white">
+                  {wallet.mainCoin} 🟡 + {wallet.bonusCoin} 🎁
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setWalletBalance(120, 80)}
+                  className="py-1.5 px-2 rounded-lg bg-verified/15 hover:bg-verified/25 text-verified border border-verified/30 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1"
+                >
+                  <span>💰</span>
+                  <span>Đầy đủ (120 + 80)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setWalletBalance(15, 10)}
+                  className="py-1.5 px-2 rounded-lg bg-danger/15 hover:bg-danger/25 text-danger border border-danger/30 text-xs font-bold transition-all active:scale-95 flex items-center justify-center gap-1"
+                >
+                  <span>🪫</span>
+                  <span>Thiếu Coin (15 + 10)</span>
+                </button>
+              </div>
+            </div>
+
+            {/* 3. Quick Navigation Shortcuts */}
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-muted-light font-bold mb-2">
+                Lối Tắt Nhanh
+              </p>
+              <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
+                <Link
+                  href="/watch/ep-002"
+                  onClick={() => setIsOpen(false)}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-ruby/20 border border-white/10 hover:border-ruby/40 text-foreground hover:text-white transition-all flex items-center gap-2"
+                >
+                  <span>🔒</span>
+                  <span className="truncate">Thử tập 2 khóa</span>
+                </Link>
+                <Link
+                  href="/profile/transactions"
+                  onClick={() => setIsOpen(false)}
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-neon/20 border border-white/10 hover:border-neon/40 text-foreground hover:text-white transition-all flex items-center gap-2"
+                >
+                  <span>📋</span>
+                  <span className="truncate">Sao kê lịch sử ví</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      {/* Floating Pill Trigger Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`px-4 py-2.5 rounded-full glass-card border border-white/20 text-xs font-bold text-white flex items-center gap-2.5 shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer ${
+          isOpen
+            ? 'bg-ruby/30 border-ruby/60 ring-2 ring-ruby/40 shadow-ruby/20'
+            : 'hover:border-neon/50 hover:shadow-neon/20'
+        }`}
+      >
+        <span className="relative flex h-2.5 w-2.5">
+          <span
+            className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+              isVIPMode ? 'bg-coin' : 'bg-verified'
+            }`}
+          />
+          <span
+            className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+              isVIPMode ? 'bg-coin' : 'bg-verified'
+            }`}
+          />
+        </span>
+        <span>{isVIPMode ? '👑 VIP Member' : '👤 Tài khoản thường'}</span>
+        <span className="text-white/40 font-mono">|</span>
+        <span className="text-coin">🟡 {wallet.mainCoin + wallet.bonusCoin}</span>
+        <span className="text-[10px] text-muted-light">⚙️</span>
+      </button>
     </div>
   );
 }
