@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 
+const STORAGE_KEY = 'aicinema_saved_credentials';
+
 export default function AuthModal() {
   const {
     isAuthModalOpen,
@@ -18,16 +20,39 @@ export default function AuthModal() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Load saved credentials or default demo pre-fill on mount / open
   useEffect(() => {
     if (isAuthModalOpen) {
       setMode(authModalMode);
+      setError(null);
+
+      // Check localStorage for saved credentials
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed.email && parsed.password) {
+            setEmail(parsed.email);
+            setPassword(parsed.password);
+            setRememberMe(true);
+            return;
+          }
+        }
+      } catch {}
+
+      // Default pre-fill if initialAuthEmail provided or default demo
       if (initialAuthEmail) {
         setEmail(initialAuthEmail);
+      } else {
+        setEmail('userdemo@gmail.com');
+        setPassword('1');
+        setRememberMe(true);
       }
-      setError(null);
     }
   }, [isAuthModalOpen, authModalMode, initialAuthEmail]);
 
@@ -38,17 +63,38 @@ export default function AuthModal() {
     setError(null);
     setLoading(true);
 
-    // Simulate light network delay
+    // Simulate network delay
     await new Promise((r) => setTimeout(r, 400));
 
     if (mode === 'login') {
       const res = login(email, password);
-      if (!res.success) {
+      if (res.success) {
+        // Save or clear credentials in localStorage
+        try {
+          if (rememberMe) {
+            localStorage.setItem(
+              STORAGE_KEY,
+              JSON.stringify({ email: email.trim(), password: password })
+            );
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
+        } catch {}
+      } else {
         setError(res.error || 'Đăng nhập thất bại');
       }
     } else {
       const res = register(name, email, password);
-      if (!res.success) {
+      if (res.success) {
+        try {
+          if (rememberMe) {
+            localStorage.setItem(
+              STORAGE_KEY,
+              JSON.stringify({ email: email.trim(), password: password })
+            );
+          }
+        } catch {}
+      } else {
         setError(res.error || 'Đăng ký thất bại');
       }
     }
@@ -58,11 +104,11 @@ export default function AuthModal() {
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={closeAuthModal}
     >
       <div
-        className="glass-card w-full max-w-md p-6 sm:p-8 animate-scale-in border border-white/15 relative overflow-hidden"
+        className="glass-card w-full max-w-md p-6 sm:p-8 animate-scale-in border border-white/15 relative overflow-hidden shadow-2xl shadow-black/80"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative Top Gradient Line */}
@@ -71,14 +117,14 @@ export default function AuthModal() {
         {/* Close Button */}
         <button
           onClick={closeAuthModal}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-muted-light hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-muted-light hover:text-foreground transition-colors cursor-pointer"
         >
           ✕
         </button>
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-ruby/10 border border-ruby/30 mb-3 text-2xl">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-ruby/10 border border-ruby/30 mb-3 text-2xl shadow-lg shadow-ruby/10">
             🎬
           </div>
           <h2 className="text-2xl font-bold text-foreground">
@@ -92,16 +138,16 @@ export default function AuthModal() {
         </div>
 
         {/* Mode Tabs */}
-        <div className="flex bg-white/5 rounded-xl p-1 mb-5 border border-white/10">
+        <div className="flex bg-black/40 rounded-xl p-1 mb-5 border border-white/10">
           <button
             type="button"
             onClick={() => {
               setMode('login');
               setError(null);
             }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               mode === 'login'
-                ? 'bg-ruby text-white shadow-md'
+                ? 'bg-ruby text-white shadow-md shadow-ruby/30'
                 : 'text-muted-light hover:text-foreground'
             }`}
           >
@@ -113,9 +159,9 @@ export default function AuthModal() {
               setMode('register');
               setError(null);
             }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               mode === 'register'
-                ? 'bg-ruby text-white shadow-md'
+                ? 'bg-ruby text-white shadow-md shadow-ruby/30'
                 : 'text-muted-light hover:text-foreground'
             }`}
           >
@@ -159,22 +205,59 @@ export default function AuthModal() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
-              className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all"
+              className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-muted-light mb-1">
-              Mật khẩu
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-medium text-muted-light">
+                Mật khẩu
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-[11px] text-muted-light hover:text-white transition-colors cursor-pointer"
+              >
+                {showPassword ? '🙈 Ẩn' : '👁️ Hiện'}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={mode === 'login' ? 'Nhập mật khẩu...' : 'Tạo mật khẩu...'}
+                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
+              />
+            </div>
+          </div>
+
+          {/* Remember Me Checkbox & Forgot Password */}
+          <div className="flex items-center justify-between text-xs pt-1">
+            <label className="flex items-center gap-2 cursor-pointer select-none text-muted-light hover:text-white transition-colors">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-white/20 bg-white/10 text-ruby focus:ring-ruby accent-ruby cursor-pointer"
+              />
+              <span>Ghi nhớ thông tin đăng nhập</span>
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder={mode === 'login' ? 'Nhập mật khẩu...' : 'Tạo mật khẩu...'}
-              className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all"
-            />
+
+            {mode === 'login' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('userdemo@gmail.com');
+                  setPassword('1');
+                }}
+                className="text-muted text-[11px] hover:text-ruby hover:underline transition-colors cursor-pointer"
+              >
+                Khôi phục mặc định
+              </button>
+            )}
           </div>
 
           {mode === 'register' && (
@@ -189,7 +272,7 @@ export default function AuthModal() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl font-bold text-white bg-gradient-to-r from-ruby to-ruby-dark hover:shadow-lg hover:shadow-ruby/30 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-ruby to-ruby-dark hover:shadow-xl hover:shadow-ruby/40 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-3 shadow-lg shadow-ruby/20 cursor-pointer"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -218,7 +301,7 @@ export default function AuthModal() {
                   setMode('register');
                   setError(null);
                 }}
-                className="text-ruby font-bold hover:underline"
+                className="text-ruby font-bold hover:underline cursor-pointer"
               >
                 Đăng ký ngay
               </button>
@@ -232,7 +315,7 @@ export default function AuthModal() {
                   setMode('login');
                   setError(null);
                 }}
-                className="text-ruby font-bold hover:underline"
+                className="text-ruby font-bold hover:underline cursor-pointer"
               >
                 Đăng nhập
               </button>
