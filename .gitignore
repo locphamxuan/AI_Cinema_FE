@@ -141,3 +141,13 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Claude Code local state (do not commit)
+.claude/settings.local.json
+.claude/mcp.local.json
+.claude/*.local.*
+.claude/cache/
+.claude-mem/
+
+# CodeGraph local index (machine-specific cache, do not commit)
+.codegraph/
