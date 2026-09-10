@@ -10,10 +10,12 @@ import UnlockEpisodeModal from '@/components/watch/UnlockEpisodeModal';
 import SupportChatWidget from '@/components/chat/SupportChatWidget';
 import AuthModal from '@/components/auth/AuthModal';
 import DemoControlPanel from '@/components/home/DemoControlPanel';
+import ThemeToggle from '@/components/theme/ThemeToggle';
 
 const navLinks = [
   { href: '/', label: 'Trang chủ' },
-  { href: '/watch/ep-001', label: 'Xem phim' },
+  { href: '/watch/1', label: 'Xem phim' },
+  { href: '/reviewer/projects/create', label: '🎬 Sản xuất phim AI' },
   { href: '/profile/subscription', label: 'Gói hội viên' },
   { href: '/profile/transactions', label: 'Lịch sử giao dịch' },
 ];
@@ -46,7 +48,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0B0C10]/90 backdrop-blur-2xl">
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 dark:border-white/10 bg-white/85 dark:bg-[#0B0C10]/90 backdrop-blur-2xl transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo + Clean Text Nav */}
@@ -55,7 +57,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ruby to-ruby-dark flex items-center justify-center text-white font-black text-sm shadow-md shadow-ruby/30 group-hover:scale-105 transition-transform">
                   AI
                 </div>
-                <span className="text-lg font-black tracking-tight text-white group-hover:text-ruby transition-colors">
+                <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white group-hover:text-ruby transition-colors">
                   CINEMA
                 </span>
               </Link>
@@ -183,10 +185,13 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                       </div>
                     )}
                   </div>
+                  {/* Theme Toggle */}
+                  <ThemeToggle />
                 </>
               ) : (
                 /* Unauthenticated Header State (Netflix Style) */
                 <div className="flex items-center gap-2 sm:gap-3">
+                  <ThemeToggle />
                   <button
                     onClick={() => openAuthModal('login')}
                     className="px-4 py-1.5 rounded-lg bg-ruby hover:bg-ruby-dark text-white text-xs sm:text-sm font-bold shadow-md shadow-ruby/20 transition-all active:scale-95 cursor-pointer"
@@ -195,7 +200,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                   </button>
                   <button
                     onClick={() => openAuthModal('register')}
-                    className="hidden sm:inline-block px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-foreground text-xs sm:text-sm font-medium transition-colors cursor-pointer"
+                    className="hidden sm:inline-block px-3 py-1.5 rounded-lg bg-slate-200/80 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/15 text-slate-800 dark:text-foreground text-xs sm:text-sm font-medium transition-colors cursor-pointer"
                   >
                     Đăng ký
                   </button>
