@@ -8,10 +8,10 @@ export default function LandingFooter() {
   const [language, setLanguage] = useState<'vi' | 'en'>('vi');
 
   return (
-    <footer className="relative z-20 w-full border-t border-white/10 bg-[#0B0C10]/95 backdrop-blur-lg pt-12 pb-16 px-4 sm:px-6 md:px-12 text-[#808080] text-xs">
+    <footer className="relative z-20 w-full border-t border-slate-200 dark:border-white/10 bg-slate-100/90 dark:bg-[#0B0C10]/95 backdrop-blur-lg pt-12 pb-16 px-4 sm:px-6 md:px-12 text-slate-600 dark:text-[#808080] text-xs">
       <div className="max-w-6xl mx-auto">
         {/* Contact Hotline / Inquiry */}
-        <p className="mb-8 text-sm text-[#808080]">
+        <p className="mb-8 text-sm text-slate-600 dark:text-[#808080]">
           Có thắc mắc?{' '}
           <a
             href="#support"
@@ -19,7 +19,7 @@ export default function LandingFooter() {
               e.preventDefault();
               openAuthModal('login');
             }}
-            className="hover:underline text-foreground/90 font-medium"
+            className="hover:underline text-slate-900 dark:text-foreground font-semibold"
           >
             Hãy liên hệ với chúng tôi qua Trợ lý AI hoặc Hotline 1800-8888 (Miễn phí)
           </a>
@@ -32,7 +32,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Câu hỏi thường gặp
               </button>
@@ -40,7 +40,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Quan hệ nhà đầu tư
               </button>
@@ -48,7 +48,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Quyền riêng tư & Bảo mật AI
               </button>
@@ -56,7 +56,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Kiểm tra tốc độ HLS
               </button>
@@ -68,7 +68,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Trung tâm trợ giúp
               </button>
@@ -76,7 +76,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Cơ hội việc làm Studio AI
               </button>
@@ -84,7 +84,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Tùy chọn Cookie
               </button>
@@ -92,7 +92,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Thông báo pháp lý (Điều 44 Luật AI)
               </button>
@@ -104,7 +104,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Tài khoản & Ví tiền tệ kép
               </button>
@@ -112,7 +112,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Các cách xem trên thiết bị
               </button>
@@ -120,7 +120,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Thông tin đồ án tốt nghiệp
               </button>
@@ -128,7 +128,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Chỉ có trên AI Cinema
               </button>
@@ -140,7 +140,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Trung tâm truyền thông
               </button>
@@ -148,7 +148,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Điều khoản sử dụng
               </button>
@@ -156,7 +156,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Liên hệ với chúng tôi
               </button>
@@ -164,7 +164,7 @@ export default function LandingFooter() {
             <li>
               <button
                 onClick={() => openAuthModal('login')}
-                className="hover:underline text-left text-[#808080] hover:text-foreground/90 transition-colors"
+                className="hover:underline text-left text-slate-600 dark:text-[#808080] hover:text-slate-900 dark:hover:text-foreground transition-colors cursor-pointer"
               >
                 Chứng chỉ kiểm duyệt Nghị định 142
               </button>
@@ -178,24 +178,24 @@ export default function LandingFooter() {
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value as 'vi' | 'en')}
-              className="appearance-none bg-black/80 border border-white/25 rounded-md px-8 py-2 text-foreground text-xs outline-none focus:border-white cursor-pointer pr-10"
+              className="appearance-none bg-white dark:bg-black/80 border border-slate-300 dark:border-white/25 rounded-md px-8 py-2 text-slate-800 dark:text-foreground text-xs outline-none focus:border-slate-500 dark:focus:border-white cursor-pointer pr-10 shadow-sm"
             >
               <option value="vi">🌐 Tiếng Việt</option>
               <option value="en">🌐 English</option>
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-white text-[10px]">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-600 dark:text-white text-[10px]">
               ▼
             </div>
           </div>
         </div>
 
         {/* Brand Copyright */}
-        <p className="text-[13px] text-[#808080] mb-2 font-medium">
+        <p className="text-[13px] text-slate-700 dark:text-[#808080] mb-2 font-bold">
           AI Cinema Việt Nam
         </p>
 
         {/* reCAPTCHA / Legal text */}
-        <p className="text-[10px] text-[#555555] leading-relaxed">
+        <p className="text-[10px] text-slate-500 dark:text-[#555555] leading-relaxed">
           Trang web này được xây dựng cho Đồ án Tốt nghiệp &quot;AI Cinema - Nền tảng OTT Streaming Phim AI kết hợp Ví tiền tệ kép&quot;. Toàn bộ nội dung số tuân thủ Điều 44 Luật Trí tuệ Nhân tạo 2025 và Nghị định 142/2024/NĐ-CP.
         </p>
       </div>

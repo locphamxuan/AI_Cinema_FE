@@ -47,7 +47,7 @@ export default function MovieRow({
 
         <Link
           href={exploreHref}
-          className="text-xs font-semibold text-neon hover:text-white transition-colors flex items-center gap-1 group/link"
+          className="text-xs font-semibold text-neon hover:text-neon-dark dark:hover:text-white transition-colors flex items-center gap-1 group/link"
         >
           <span>Xem tất cả</span>
           <span className="transition-transform group-hover/link:translate-x-1">›</span>
@@ -59,7 +59,7 @@ export default function MovieRow({
         {/* Left Arrow Button */}
         <button
           onClick={() => handleScroll('left')}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-40 w-10 h-24 bg-black/60 hover:bg-black/90 text-white rounded-r-xl opacity-0 group-hover/row:opacity-100 transition-all duration-300 backdrop-blur-md flex items-center justify-center border-y border-r border-white/10 hover:border-ruby shadow-xl"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-40 w-10 h-24 bg-slate-900/60 hover:bg-slate-900/90 dark:bg-black/60 dark:hover:bg-black/90 text-white rounded-r-xl opacity-0 group-hover/row:opacity-100 transition-all duration-300 backdrop-blur-md flex items-center justify-center border-y border-r border-white/10 hover:border-ruby shadow-xl"
           aria-label="Scroll left"
         >
           ‹
@@ -78,7 +78,7 @@ export default function MovieRow({
         {/* Right Arrow Button */}
         <button
           onClick={() => handleScroll('right')}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-40 w-10 h-24 bg-black/60 hover:bg-black/90 text-white rounded-l-xl opacity-0 group-hover/row:opacity-100 transition-all duration-300 backdrop-blur-md flex items-center justify-center border-y border-l border-white/10 hover:border-ruby shadow-xl"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-40 w-10 h-24 bg-slate-900/60 hover:bg-slate-900/90 dark:bg-black/60 dark:hover:bg-black/90 text-white rounded-l-xl opacity-0 group-hover/row:opacity-100 transition-all duration-300 backdrop-blur-md flex items-center justify-center border-y border-l border-white/10 hover:border-ruby shadow-xl"
           aria-label="Scroll right"
         >
           ›

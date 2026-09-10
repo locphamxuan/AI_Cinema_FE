@@ -221,7 +221,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                 <span>🗂️</span>
                 <span>
                   Phiên bản:{' '}
-                  <strong className="text-white underline decoration-neon">
+                  <strong className="text-slate-900 dark:text-white underline decoration-neon">
                     {activeVersion?.versionNumber || currentEpisode.currentVersion || 'v1.0.0'}
                   </strong>
                 </span>
@@ -232,23 +232,23 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             {currentMovie.title} - {currentEpisode.title}
           </h1>
 
           {/* Active Version Changelog Snippet */}
           {activeVersion && (
-            <div className="p-3 rounded-xl bg-white/[0.03] border border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 rounded bg-neon/20 text-neon font-bold font-mono text-[11px]">
                   {activeVersion.versionNumber}
                 </span>
-                <span className="text-white font-medium">{activeVersion.versionTitle}</span>
-                <span className="text-muted text-[11px]">({activeVersion.aiModel})</span>
+                <span className="text-slate-800 dark:text-white font-medium">{activeVersion.versionTitle}</span>
+                <span className="text-slate-500 dark:text-muted text-[11px]">({activeVersion.aiModel})</span>
               </div>
               <button
                 onClick={() => setShowVersionDrawer(true)}
-                className="text-neon hover:underline text-[11px] font-semibold flex items-center gap-1"
+                className="text-neon hover:underline text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
               >
                 <span>Xem chi tiết hiệu chỉnh</span>
                 <span>→</span>
@@ -256,13 +256,13 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
             </div>
           )}
 
-          <p className="text-muted-light text-sm leading-relaxed">{currentEpisode.synopsis}</p>
+          <p className="text-slate-600 dark:text-muted-light text-sm leading-relaxed">{currentEpisode.synopsis}</p>
 
-          <div className="flex flex-wrap gap-2 pt-3 border-t border-white/5">
+          <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-200 dark:border-white/5">
             {currentMovie.genre.map((g) => (
               <span
                 key={g}
-                className="px-3 py-1 rounded-lg bg-white/5 border border-white/5 text-xs text-muted-light font-medium"
+                className="px-3 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-xs text-slate-600 dark:text-muted-light font-medium"
               >
                 {g}
               </span>
@@ -281,18 +281,18 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
           isOpen={showVersionDrawer}
           onClose={() => setShowVersionDrawer(false)}
           episode={currentEpisode}
-          activeVersionId={activeVersion?.id || ''}
+          activeVersionId={activeVersion?.id || 'v-001'}
           onSelectVersion={handleSelectVersion}
         />
       </div>
 
-      {/* Episode Playlist Sidebar */}
+      {/* RIGHT: Episode List / Playlist */}
       <div className="w-full lg:w-88 shrink-0 space-y-3">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm font-bold text-muted-light uppercase tracking-wider">
+          <h3 className="text-sm font-bold text-slate-700 dark:text-muted-light uppercase tracking-wider">
             Danh sách tập ({currentMovie.totalEpisodes} tập)
           </h3>
-          <span className="text-xs text-neon font-mono">HLS Audio Synced</span>
+          <span className="text-xs text-neon font-mono font-semibold">HLS Audio Synced</span>
         </div>
 
         <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1 no-scrollbar">
@@ -306,12 +306,12 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                 onClick={() => handleEpisodeClick(ep)}
                 className={`w-full flex items-center gap-3.5 p-3 rounded-2xl text-left transition-all cursor-pointer border ${
                   isActive
-                    ? 'glass-card border-ruby/60 bg-ruby/[0.08] shadow-lg shadow-ruby/15 ring-1 ring-ruby/30'
-                    : 'bg-white/[0.02] hover:bg-white/5 border-white/5 hover:border-white/10'
+                    ? 'bg-white dark:bg-ruby/[0.08] border-ruby/60 shadow-lg shadow-ruby/15 ring-1 ring-ruby/30'
+                    : 'bg-white dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 shadow-sm'
                 }`}
               >
                 {/* Thumbnail */}
-                <div className="relative w-28 h-16 rounded-xl overflow-hidden shrink-0 bg-[#161922] border border-white/10">
+                <div className="relative w-28 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-200 dark:bg-[#161922] border border-slate-200 dark:border-white/10">
                   <img
                     src={ep.thumbnailUrl}
                     alt={ep.title}
@@ -345,7 +345,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                   <div className="flex items-center gap-2">
                     <span
                       className={`text-xs font-bold ${
-                        isActive ? 'text-ruby' : 'text-muted-light'
+                        isActive ? 'text-ruby' : 'text-slate-500 dark:text-muted-light'
                       }`}
                     >
                       Tập {ep.episodeNumber}
@@ -356,7 +356,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                       </span>
                     )}
                     {ep.versions && (
-                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-white/10 text-muted-light font-mono">
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-muted-light font-mono">
                         {ep.currentVersion || 'v1.0'}
                       </span>
                     )}
@@ -364,7 +364,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
 
                   <p
                     className={`text-sm truncate font-semibold mt-0.5 ${
-                      isActive ? 'text-white' : 'text-muted-light'
+                      isActive ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-muted-light'
                     }`}
                   >
                     {ep.title}

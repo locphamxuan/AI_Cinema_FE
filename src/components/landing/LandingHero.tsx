@@ -41,43 +41,43 @@ export default function LandingHero() {
         </div>
       </div>
 
-      {/* Radial and Linear Dark Overlays */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0B0C10] via-[#0B0C10]/80 to-[#0B0C10]/60" />
-      <div className="absolute inset-0 z-10 bg-radial from-transparent via-[#0B0C10]/60 to-[#0B0C10]" />
+      {/* Radial and Linear Background Overlays (Soft Slate in Light Mode, Cinema Dark in Dark Mode) */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-50 via-slate-50/85 to-slate-50/60 dark:from-[#0B0C10] dark:via-[#0B0C10]/80 dark:to-[#0B0C10]/60" />
+      <div className="absolute inset-0 z-10 bg-radial from-transparent via-slate-50/60 to-slate-50 dark:via-[#0B0C10]/60 dark:to-[#0B0C10]" />
 
       {/* Main Content Hero */}
-      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-24 text-center flex flex-col items-center">
+      <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-24 text-center flex flex-col items-center">
         {/* Compliance Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ruby/15 border border-ruby/30 text-ruby text-xs sm:text-sm font-semibold mb-6 animate-fade-in shadow-lg shadow-ruby/10">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-ruby/10 border border-ruby/25 text-ruby text-xs sm:text-sm font-semibold mb-6 animate-fade-in shadow-sm">
           <span className="w-2 h-2 rounded-full bg-ruby animate-pulse" />
           <span>Nền tảng OTT Streaming Phim AI • Tuân thủ Điều 44 Luật AI & Nghị định 142</span>
         </div>
 
         {/* Big Headline */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-foreground tracking-tight leading-tight sm:leading-tight mb-4 max-w-4xl">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-tight sm:leading-tight mb-4 max-w-4xl">
           Phim AI, Series & Tác Phẩm Số{' '}
           <span className="gradient-text-ruby">Không Giới Hạn</span>
         </h1>
 
         {/* Subhead */}
-        <p className="text-base sm:text-xl text-foreground/90 font-medium mb-2">
+        <p className="text-base sm:text-xl text-slate-700 dark:text-zinc-200 font-semibold mb-2">
           Mô hình Ví Tiền Tệ Kép (Dual-Wallet) độc quyền. Giá khởi điểm từ 79.000 đ.
         </p>
-        <p className="text-xs sm:text-sm text-muted-light mb-8 max-w-2xl">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-muted-light mb-8 max-w-2xl">
           Sẵn sàng thưởng thức các siêu phẩm tạo 100% bằng Trí tuệ Nhân tạo? Nhập email để bắt đầu trải nghiệm ngay.
         </p>
 
         {/* Email Call to Action */}
         <form
           onSubmit={handleGetStarted}
-          className="w-full max-w-xl flex flex-col sm:flex-row gap-2 sm:gap-0 mb-16 shadow-2xl rounded-2xl overflow-hidden"
+          className="w-full max-w-xl flex flex-col sm:flex-row gap-2 sm:gap-0 mb-16 shadow-xl shadow-slate-200/80 dark:shadow-2xl rounded-2xl overflow-hidden"
         >
           <input
             type="email"
             value={emailInput}
             onChange={(e) => setEmailInput(e.target.value)}
             placeholder="Nhập địa chỉ email của bạn..."
-            className="flex-1 bg-black/70 border border-white/20 sm:border-r-0 rounded-xl sm:rounded-r-none px-5 py-3.5 text-sm sm:text-base text-foreground placeholder-muted outline-none focus:ring-2 focus:ring-ruby backdrop-blur-md transition-all"
+            className="flex-1 bg-white dark:bg-black/70 border border-slate-300 dark:border-white/20 sm:border-r-0 rounded-xl sm:rounded-r-none px-5 py-3.5 text-sm sm:text-base text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:ring-2 focus:ring-ruby shadow-inner backdrop-blur-md transition-all font-medium"
           />
           <button
             type="submit"
@@ -91,29 +91,29 @@ export default function LandingHero() {
         {/* Netflix-Style "Reasons to Join" Bento Grid */}
         <div className="w-full text-left space-y-6">
           <div className="text-center sm:text-left">
-            <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
               Lý Do Nên Chọn AI Cinema
             </h2>
-            <p className="text-xs sm:text-sm text-muted-light mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-muted-light mt-1">
               Hệ sinh thái OTT thế hệ mới kết hợp trí tuệ nhân tạo và mô hình kinh tế số minh bạch
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Bento Card 1: 100% AI Movies */}
-            <div className="relative rounded-2xl p-6 bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 hover:border-ruby/40 transition-all duration-300 group hover:-translate-y-1 hover:shadow-2xl hover:shadow-ruby/10 flex flex-col justify-between overflow-hidden">
+            <div className="relative rounded-2xl p-6 bg-white dark:bg-gradient-to-b dark:from-white/[0.08] dark:to-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-ruby/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-xl hover:shadow-ruby/10 flex flex-col justify-between overflow-hidden shadow-sm">
               <div className="absolute top-0 right-0 w-28 h-28 bg-ruby/10 rounded-full blur-2xl pointer-events-none group-hover:bg-ruby/20 transition-colors" />
 
               <div>
-                <h3 className="text-base font-bold text-white group-hover:text-ruby transition-colors mb-2">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-ruby transition-colors mb-2">
                   Phim AI 4K Độc Quyền
                 </h3>
-                <p className="text-xs text-muted-light leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-muted-light leading-relaxed">
                   Toàn bộ kịch bản, hình ảnh và âm thanh được tạo 100% bởi các mô hình AI tiên tiến (Sora, Runway Gen-3) chuẩn 4K HDR.
                 </p>
               </div>
 
-              <div className="mt-6 flex items-center justify-between pt-4 border-t border-white/5">
+              <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
                 <span className="text-[11px] font-mono text-ruby font-bold">CinemaGen v3.2</span>
                 <div className="w-9 h-9 rounded-xl bg-ruby/15 border border-ruby/30 flex items-center justify-center text-ruby">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,19 +124,19 @@ export default function LandingHero() {
             </div>
 
             {/* Bento Card 2: Dual Wallet */}
-            <div className="relative rounded-2xl p-6 bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 hover:border-coin/40 transition-all duration-300 group hover:-translate-y-1 hover:shadow-2xl hover:shadow-coin/10 flex flex-col justify-between overflow-hidden">
+            <div className="relative rounded-2xl p-6 bg-white dark:bg-gradient-to-b dark:from-white/[0.08] dark:to-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-coin/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-xl hover:shadow-coin/10 flex flex-col justify-between overflow-hidden shadow-sm">
               <div className="absolute top-0 right-0 w-28 h-28 bg-coin/10 rounded-full blur-2xl pointer-events-none group-hover:bg-coin/20 transition-colors" />
 
               <div>
-                <h3 className="text-base font-bold text-white group-hover:text-coin transition-colors mb-2">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-coin transition-colors mb-2">
                   Ví Tiền Tệ Kép
                 </h3>
-                <p className="text-xs text-muted-light leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-muted-light leading-relaxed">
                   Tách biệt Coin Chính và Coin Thưởng từ điểm danh 7 ngày. Thuật toán tự động ưu tiên trừ coin chính trước, coin thưởng bù sau.
                 </p>
               </div>
 
-              <div className="mt-6 flex items-center justify-between pt-4 border-t border-white/5">
+              <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
                 <span className="text-[11px] font-mono text-coin font-bold">Dual-Wallet System</span>
                 <div className="w-9 h-9 rounded-xl bg-coin/15 border border-coin/30 flex items-center justify-center text-coin">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -147,19 +147,19 @@ export default function LandingHero() {
             </div>
 
             {/* Bento Card 3: Law Compliance */}
-            <div className="relative rounded-2xl p-6 bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 hover:border-verified/40 transition-all duration-300 group hover:-translate-y-1 hover:shadow-2xl hover:shadow-verified/10 flex flex-col justify-between overflow-hidden">
+            <div className="relative rounded-2xl p-6 bg-white dark:bg-gradient-to-b dark:from-white/[0.08] dark:to-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-verified/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-xl hover:shadow-verified/10 flex flex-col justify-between overflow-hidden shadow-sm">
               <div className="absolute top-0 right-0 w-28 h-28 bg-verified/10 rounded-full blur-2xl pointer-events-none group-hover:bg-verified/20 transition-colors" />
 
               <div>
-                <h3 className="text-base font-bold text-white group-hover:text-verified transition-colors mb-2">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-verified transition-colors mb-2">
                   Chuẩn Hóa Luật AI
                 </h3>
-                <p className="text-xs text-muted-light leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-muted-light leading-relaxed">
                   Mỗi tác phẩm đều có nhãn kiểm duyệt số, điểm an toàn nội dung và chứng chỉ tuân thủ Điều 44 Luật AI & Nghị định 142.
                 </p>
               </div>
 
-              <div className="mt-6 flex items-center justify-between pt-4 border-t border-white/5">
+              <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
                 <span className="text-[11px] font-mono text-verified font-bold">Điều 44 Approved</span>
                 <div className="w-9 h-9 rounded-xl bg-verified/15 border border-verified/30 flex items-center justify-center text-verified">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -170,19 +170,19 @@ export default function LandingHero() {
             </div>
 
             {/* Bento Card 4: Multi-device & Auto-Renew */}
-            <div className="relative rounded-2xl p-6 bg-gradient-to-b from-white/[0.08] to-white/[0.02] border border-white/10 hover:border-neon/40 transition-all duration-300 group hover:-translate-y-1 hover:shadow-2xl hover:shadow-neon/10 flex flex-col justify-between overflow-hidden">
+            <div className="relative rounded-2xl p-6 bg-white dark:bg-gradient-to-b dark:from-white/[0.08] dark:to-white/[0.02] border border-slate-200 dark:border-white/10 hover:border-neon/50 transition-all duration-300 group hover:-translate-y-1 hover:shadow-xl hover:shadow-neon/10 flex flex-col justify-between overflow-hidden shadow-sm">
               <div className="absolute top-0 right-0 w-28 h-28 bg-neon/10 rounded-full blur-2xl pointer-events-none group-hover:bg-neon/20 transition-colors" />
 
               <div>
-                <h3 className="text-base font-bold text-white group-hover:text-neon transition-colors mb-2">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-neon transition-colors mb-2">
                   Hội Viên & Cảnh Báo 24h
                 </h3>
-                <p className="text-xs text-muted-light leading-relaxed">
+                <p className="text-xs text-slate-600 dark:text-muted-light leading-relaxed">
                   Xem không giới hạn trên mọi thiết bị. Hệ thống tự động kích hoạt banner đếm ngược 24h trước khi gia hạn, không phí ẩn.
                 </p>
               </div>
 
-              <div className="mt-6 flex items-center justify-between pt-4 border-t border-white/5">
+              <div className="mt-6 flex items-center justify-between pt-4 border-t border-slate-100 dark:border-white/5">
                 <span className="text-[11px] font-mono text-neon font-bold">24h Alert Guard</span>
                 <div className="w-9 h-9 rounded-xl bg-neon/15 border border-neon/30 flex items-center justify-center text-neon">
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -195,7 +195,7 @@ export default function LandingHero() {
         </div>
       </div>
 
-      {/* Netflix-style Footer */}
+      {/* Footer */}
       <LandingFooter />
     </div>
   );
