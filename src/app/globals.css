@@ -283,13 +283,15 @@ body {
   font-size: 5.5rem;
   line-height: 1;
   font-weight: 900;
-  -webkit-text-stroke: 3px rgba(15, 23, 42, 0.3);
-  color: transparent;
+  color: #F1F5F9;
+  -webkit-text-stroke: 3px #94A3B8;
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.08);
 }
 
 .dark .top-10-rank-number {
-  -webkit-text-stroke: 4px rgba(255, 255, 255, 0.35);
-  color: transparent;
+  color: #0F172A;
+  -webkit-text-stroke: 3px rgba(255, 255, 255, 0.4);
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.5);
 }
 
 .quality-badge {
