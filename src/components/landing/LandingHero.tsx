@@ -29,24 +29,24 @@ export default function LandingHero() {
   };
 
   return (
-    <div className="relative w-full overflow-hidden bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-950">
+    <div className="relative w-full overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-950">
       {/* Ambient Lighting Streaks */}
-      <div className="absolute top-10 left-1/4 -translate-x-1/2 w-96 h-96 ambient-glow-neon pointer-events-none opacity-20 dark:opacity-40 -z-0" />
-      <div className="absolute top-10 right-1/4 translate-x-1/2 w-96 h-96 ambient-glow-ruby pointer-events-none opacity-20 dark:opacity-30 -z-0" />
+      <div className="absolute top-10 left-1/4 -translate-x-1/2 w-96 h-96 ambient-glow-neon pointer-events-none opacity-30 dark:opacity-40 -z-0" />
+      <div className="absolute top-10 right-1/4 translate-x-1/2 w-96 h-96 ambient-glow-ruby pointer-events-none opacity-30 dark:opacity-30 -z-0" />
 
-      {/* Background Poster Grid with Soft Subtle Vignette */}
-      <div className="absolute inset-0 z-0 opacity-10 dark:opacity-15 scale-105 pointer-events-none">
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 transform -rotate-6 translate-y-[-10%] translate-x-[-5%] filter blur-[1px]">
+      {/* Background Poster Grid with Clear Visibility in both Light & Dark modes */}
+      <div className="absolute inset-0 z-0 opacity-45 sm:opacity-55 dark:opacity-35 scale-105 pointer-events-none transition-opacity">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3.5 transform -rotate-6 translate-y-[-8%] translate-x-[-4%]">
           {mockBackdropPosters.concat(mockBackdropPosters).map((url, i) => (
-            <div key={i} className="aspect-[2/3] rounded-xl overflow-hidden shadow-sm">
+            <div key={i} className="aspect-[2/3] rounded-xl overflow-hidden shadow-md border border-slate-300/70 dark:border-white/10 bg-slate-200 dark:bg-slate-800">
               <img src={url} alt="Movie poster" className="w-full h-full object-cover" />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Subtle Light Overlays (Ensures pure white clarity in light mode) */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-white/95 via-white/85 to-white/60 dark:from-slate-900/95 dark:via-slate-900/80 dark:to-transparent" />
+      {/* Balanced Overlay (Ensures background posters are clearly visible while text remains high contrast) */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-b from-white/70 via-white/80 to-white/95 dark:from-slate-900/75 dark:via-slate-900/85 dark:to-slate-900" />
 
       {/* Main Content Hero */}
       <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-24 text-center flex flex-col items-center">
