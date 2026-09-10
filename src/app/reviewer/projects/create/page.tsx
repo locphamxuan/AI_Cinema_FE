@@ -99,7 +99,7 @@ export default function ReviewerProjectCreatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0C10] text-slate-900 dark:text-zinc-100 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-zinc-100 transition-colors">
       <ProductionHeader
         title="Quản Lý Kế Hoạch & Cấp Quota"
         subtitle="Dành cho Content Reviewer (Checker / Quản lý)"

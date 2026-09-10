@@ -29,21 +29,24 @@ export default function LandingHero() {
   };
 
   return (
-    <div className="relative -mt-6 -mx-4 sm:-mx-6 overflow-hidden">
-      {/* Background Poster Grid with Vignette */}
-      <div className="absolute inset-0 z-0 opacity-25 scale-105 pointer-events-none">
+    <div className="relative w-full overflow-hidden bg-gradient-to-b from-slate-50 via-white to-slate-100/90 dark:from-slate-900 dark:via-slate-900/95 dark:to-slate-950">
+      {/* Ambient Lighting Streaks */}
+      <div className="absolute top-10 left-1/4 -translate-x-1/2 w-96 h-96 ambient-glow-neon pointer-events-none opacity-40 -z-0" />
+      <div className="absolute top-10 right-1/4 translate-x-1/2 w-96 h-96 ambient-glow-ruby pointer-events-none opacity-30 -z-0" />
+
+      {/* Background Poster Grid with Soft Subtle Vignette */}
+      <div className="absolute inset-0 z-0 opacity-15 scale-105 pointer-events-none">
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 transform -rotate-6 translate-y-[-10%] translate-x-[-5%] filter blur-[1px]">
           {mockBackdropPosters.concat(mockBackdropPosters).map((url, i) => (
-            <div key={i} className="aspect-[2/3] rounded-xl overflow-hidden shadow-2xl">
+            <div key={i} className="aspect-[2/3] rounded-xl overflow-hidden shadow-md">
               <img src={url} alt="Movie poster" className="w-full h-full object-cover" />
             </div>
           ))}
         </div>
       </div>
 
-      {/* Radial and Linear Background Overlays (Soft Slate in Light Mode, Cinema Dark in Dark Mode) */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-50 via-slate-50/85 to-slate-50/60 dark:from-[#0B0C10] dark:via-[#0B0C10]/80 dark:to-[#0B0C10]/60" />
-      <div className="absolute inset-0 z-10 bg-radial from-transparent via-slate-50/60 to-slate-50 dark:via-[#0B0C10]/60 dark:to-[#0B0C10]" />
+      {/* Subtle Light Overlays (Ensures NO dark box anywhere) */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-t from-slate-50/95 via-white/80 to-transparent dark:from-slate-900/95 dark:via-slate-900/80 dark:to-transparent" />
 
       {/* Main Content Hero */}
       <div className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-24 text-center flex flex-col items-center">

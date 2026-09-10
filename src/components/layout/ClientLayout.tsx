@@ -48,7 +48,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <>
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200/80 dark:border-white/10 bg-white/85 dark:bg-[#0B0C10]/90 backdrop-blur-2xl transition-colors">
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo + Clean Text Nav */}
@@ -236,7 +236,9 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">{children}</main>
+      <main className={pathname === '/' && !isAuthenticated ? 'flex-1 w-full' : 'flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6'}>
+        {children}
+      </main>
 
       {/* Global Modals */}
       <AuthModal />

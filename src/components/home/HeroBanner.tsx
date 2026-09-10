@@ -14,9 +14,9 @@ export default function HeroBanner({ movie, isVIPMode }: HeroBannerProps) {
   const [isAdded, setIsAdded] = useState(false);
 
   return (
-    <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-[#0B0C10] group">
+    <div className="relative rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl bg-slate-900 group">
       {/* Ambient Aura Lighting Behind Banner */}
-      <div className="absolute -inset-4 ambient-glow-ruby -z-10 pointer-events-none opacity-50" />
+      <div className="absolute -inset-4 ambient-glow-ruby -z-10 pointer-events-none opacity-40" />
 
       {/* Background Image with Layered Vignettes */}
       <div className="relative h-[420px] sm:h-[500px] md:h-[560px] w-full overflow-hidden">
@@ -26,10 +26,10 @@ export default function HeroBanner({ movie, isVIPMode }: HeroBannerProps) {
           className="w-full h-full object-cover object-center scale-105 group-hover:scale-100 transition-transform duration-1000 ease-out"
         />
 
-        {/* Multi-gradient Vignettes for true Netflix cinematic feel */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0B0C10] via-[#0B0C10]/60 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0B0C10] via-[#0B0C10]/80 to-transparent w-full md:w-3/4" />
-        <div className="absolute inset-0 bg-radial from-transparent via-transparent to-[#0B0C10]/70" />
+        {/* Multi-gradient Vignettes for true cinematic feel */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent w-full md:w-3/4" />
+        <div className="absolute inset-0 bg-radial from-transparent via-transparent to-slate-950/70" />
       </div>
 
       {/* Main Banner Content */}

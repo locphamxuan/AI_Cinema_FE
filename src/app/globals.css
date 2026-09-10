@@ -5,21 +5,21 @@
   --foreground: #0F172A;
   --card: #FFFFFF;
   --card-hover: #F1F5F9;
-  --border-color: rgba(15, 23, 42, 0.1);
-  --border-strong-color: rgba(15, 23, 42, 0.2);
+  --border-color: rgba(15, 23, 42, 0.08);
+  --border-strong-color: rgba(15, 23, 42, 0.16);
   --muted-color: #64748B;
   --muted-light-color: #475569;
 }
 
 .dark {
-  --background: #0B0C10;
-  --foreground: #E8E8E8;
-  --card: #161922;
-  --card-hover: #1E2130;
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --card: #1E293B;
+  --card-hover: #334155;
   --border-color: rgba(255, 255, 255, 0.1);
   --border-strong-color: rgba(255, 255, 255, 0.2);
-  --muted-color: #6B7280;
-  --muted-light-color: #9CA3AF;
+  --muted-color: #94A3B8;
+  --muted-light-color: #CBD5E1;
 }
 
 @theme inline {
