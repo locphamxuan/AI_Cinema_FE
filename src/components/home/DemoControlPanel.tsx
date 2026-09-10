@@ -141,7 +141,10 @@ export default function DemoControlPanel() {
                   onClick={() => setIsOpen(false)}
                   className="p-2.5 rounded-xl bg-neon/10 hover:bg-neon/20 border border-neon/30 text-neon font-bold transition-all flex items-center gap-2"
                 >
-                  <span>✨</span>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <polygon points="23 7 16 12 23 17 23 7" />
+                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+                  </svg>
                   <span className="truncate">AI Studio Creator</span>
                 </Link>
                 <Link
