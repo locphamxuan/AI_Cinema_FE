@@ -11,7 +11,6 @@ export default function TopTenRow({ movies }: TopTenRowProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2 px-1">
-        <span className="text-xl">🏆</span>
         <h2 className="text-lg sm:text-xl font-bold text-foreground">
           Top 5 Phim AI Thịnh Hành Hôm Nay
         </h2>

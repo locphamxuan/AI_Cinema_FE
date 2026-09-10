@@ -278,18 +278,18 @@ export const mockMovie: Movie = {
   quality: '4K Ultra HD',
   audioQuality: 'Dolby Atmos',
   ageRating: 'T16',
-  badge: '🔥 Top 1 Xu Hướng',
+  badge: 'Top 1 Xu Hướng',
 };
 
 // ====== RICH OTT CATALOG DATA ======
 export const genreCategories = [
   'Tất cả',
-  '🔥 Thịnh hành',
-  '🤖 AI & Robot',
-  '🌆 Cyberpunk 2049',
-  '🚀 Khoa học Viễn tưởng',
-  '⚔️ Hành động Kịch tính',
-  '👁️ Tâm lý Kì dị',
+  'Thịnh hành',
+  'Khoa học Viễn tưởng',
+  'Cyberpunk 2049',
+  'Hành động Kịch tính',
+  'Trí tuệ Nhân tạo',
+  'Tâm lý & Bí ẩn',
 ];
 
 export const allMockMovies: Movie[] = [
