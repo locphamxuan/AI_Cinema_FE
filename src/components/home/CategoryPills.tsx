@@ -26,8 +26,8 @@ export default function CategoryPills({ onSelectCategory }: CategoryPillsProps) 
             onClick={() => handleSelect(cat)}
             className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
               isActive
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-black font-bold shadow-md scale-105'
-                : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:bg-white/5 dark:text-muted-light dark:hover:text-white dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 shadow-sm'
+                ? 'bg-ruby text-white font-bold shadow-md shadow-ruby/30 scale-105 border border-ruby'
+                : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:bg-white/5 dark:text-zinc-300 dark:hover:text-white dark:hover:bg-white/10 border border-slate-300 dark:border-white/10 shadow-sm'
             }`}
           >
             {cat}

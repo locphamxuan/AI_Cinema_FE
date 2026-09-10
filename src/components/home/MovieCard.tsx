@@ -48,11 +48,15 @@ export default function MovieCard({ movie }: MovieCardProps) {
           <div className="absolute inset-x-0 bottom-0 p-3 flex flex-col justify-end">
             {/* Match Score & Specs */}
             <div className="flex items-center gap-1.5 mb-1 text-[10px]">
-              <span className="text-verified font-bold">
+              <span className="text-emerald-400 font-bold">
                 {movie.matchScore || 98}% Phù hợp
               </span>
-              <span className="quality-badge">{movie.ageRating || 'T16'}</span>
-              <span className="quality-badge">{movie.quality || '4K'}</span>
+              <span className="px-1.5 py-0.5 rounded bg-white/20 border border-white/25 text-white/90 text-[10px] font-semibold">
+                {movie.ageRating || 'T16'}
+              </span>
+              <span className="px-1.5 py-0.5 rounded bg-white/20 border border-white/25 text-white/90 text-[10px] font-semibold">
+                {movie.quality || '4K'}
+              </span>
             </div>
 
             {/* Title */}
@@ -61,13 +65,13 @@ export default function MovieCard({ movie }: MovieCardProps) {
             </h3>
 
             {/* Genre list */}
-            <p className="text-[11px] text-muted-light line-clamp-1 mt-0.5">
+            <p className="text-[11px] text-slate-300 line-clamp-1 mt-0.5">
               {movie.genre.join(' • ')}
             </p>
 
             {/* Quick Action Bar (Revealed on Hover) */}
             <div
-              className={`flex items-center gap-2 mt-2 pt-2 border-t border-white/10 transition-all duration-200 ${
+              className={`flex items-center gap-2 mt-2 pt-2 border-t border-white/15 transition-all duration-200 ${
                 isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
               }`}
             >
@@ -88,7 +92,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 }}
                 className={`w-7 h-7 rounded-full border border-white/30 flex items-center justify-center text-xs transition-all backdrop-blur-md ${
                   isAddedToList
-                    ? 'bg-verified/20 border-verified text-verified'
+                    ? 'bg-emerald-500/30 border-emerald-400 text-emerald-300'
                     : 'bg-black/40 hover:bg-white/20 text-white'
                 }`}
                 title={isAddedToList ? 'Đã thêm vào danh sách' : 'Thêm vào danh sách'}
@@ -96,7 +100,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
                 {isAddedToList ? '✓' : '+'}
               </button>
 
-              <span className="text-[10px] text-muted ml-auto font-mono">
+              <span className="text-[10px] text-slate-300 ml-auto font-mono">
                 {movie.totalEpisodes} tập
               </span>
             </div>

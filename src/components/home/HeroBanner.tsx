@@ -40,20 +40,26 @@ export default function HeroBanner({ movie, isVIPMode }: HeroBannerProps) {
             {movie.badge || '🔥 Đề Xuất Số 1'}
           </span>
 
-          <span className="px-2 py-0.5 rounded bg-verified/20 border border-verified/30 text-verified text-xs font-bold">
+          <span className="px-2 py-0.5 rounded bg-verified/25 border border-verified/40 text-emerald-300 text-xs font-bold">
             {movie.matchScore || 99}% Match
           </span>
 
-          <span className="quality-badge">{movie.ageRating || 'T16'}</span>
-          <span className="quality-badge">{movie.quality || '4K Ultra HD'}</span>
-          <span className="quality-badge">{movie.audioQuality || 'Dolby Atmos'}</span>
+          <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md">
+            {movie.ageRating || 'T16'}
+          </span>
+          <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md">
+            {movie.quality || '4K Ultra HD'}
+          </span>
+          <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md">
+            {movie.audioQuality || 'Dolby Atmos'}
+          </span>
 
-          <span className="px-2 py-0.5 rounded bg-black/60 border border-white/20 text-white/90 text-xs font-semibold backdrop-blur-md">
+          <span className="px-2 py-0.5 rounded bg-black/60 border border-white/25 text-white/95 text-xs font-semibold backdrop-blur-md">
             🏷️ 100% AI • Điều 44
           </span>
 
           {isVIPMode && (
-            <span className="px-2 py-0.5 rounded bg-coin/20 border border-coin/30 text-coin text-xs font-bold">
+            <span className="px-2 py-0.5 rounded bg-amber-400/25 border border-amber-400/40 text-amber-300 text-xs font-bold">
               👑 Quyền VIP
             </span>
           )}
@@ -65,12 +71,12 @@ export default function HeroBanner({ movie, isVIPMode }: HeroBannerProps) {
         </h1>
 
         {/* Genre Tags */}
-        <p className="text-xs sm:text-sm text-neon font-medium mb-3">
+        <p className="text-xs sm:text-sm text-purple-300 font-semibold mb-3">
           {movie.genre.join(' • ')}
         </p>
 
         {/* Synopsis */}
-        <p className="text-muted-light text-xs sm:text-sm md:text-base line-clamp-3 mb-6 max-w-xl leading-relaxed">
+        <p className="text-slate-200 text-xs sm:text-sm md:text-base line-clamp-3 mb-6 max-w-xl leading-relaxed">
           {movie.description}
         </p>
 
@@ -86,7 +92,7 @@ export default function HeroBanner({ movie, isVIPMode }: HeroBannerProps) {
 
           <button
             onClick={() => setIsAdded(!isAdded)}
-            className="px-5 py-3.5 glass-card-sm hover:bg-white/15 text-white rounded-xl font-semibold text-sm flex items-center gap-2 transition-all active:scale-95 cursor-pointer border border-white/15"
+            className="px-5 py-3.5 bg-white/15 hover:bg-white/25 text-white rounded-xl font-semibold text-sm flex items-center gap-2 transition-all active:scale-95 cursor-pointer border border-white/25 backdrop-blur-md shadow-sm"
           >
             <span>{isAdded ? '✓' : '+'}</span>
             <span>{isAdded ? 'Đã thêm' : 'Danh sách của tôi'}</span>
@@ -94,7 +100,7 @@ export default function HeroBanner({ movie, isVIPMode }: HeroBannerProps) {
 
           <Link
             href="/profile/subscription"
-            className="px-4 py-3.5 glass-card-sm hover:bg-coin/20 text-coin rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all border border-coin/30"
+            className="px-4 py-3.5 bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 rounded-xl font-semibold text-sm flex items-center gap-1.5 transition-all border border-amber-400/40 backdrop-blur-md shadow-sm"
           >
             <span>👑</span>
             <span className="hidden sm:inline">Gói VIP</span>

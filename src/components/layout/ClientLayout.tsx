@@ -74,8 +74,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                       href={link.href}
                       className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all ${
                         isActive
-                          ? 'bg-slate-900 text-white dark:bg-white/10 dark:text-white font-bold shadow-sm'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-[#9CA3AF] dark:hover:text-white dark:hover:bg-white/5'
+                          ? 'bg-ruby text-white font-bold shadow-sm shadow-ruby/25'
+                          : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-300 dark:hover:text-white dark:hover:bg-white/5'
                       }`}
                     >
                       {link.label}
