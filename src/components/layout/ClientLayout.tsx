@@ -62,27 +62,29 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                 </span>
               </Link>
 
-              {/* Navigation Tabs (Clean typography like Netflix / Apple TV+) */}
-              <nav className="hidden md:flex items-center gap-1.5">
-                {navLinks.map((link) => {
-                  const isActive =
-                    pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+              {/* Navigation Tabs (Only visible when user is logged in) */}
+              {isAuthenticated && user && (
+                <nav className="hidden md:flex items-center gap-1.5">
+                  {navLinks.map((link) => {
+                    const isActive =
+                      pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
 
-                  return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all ${
-                        isActive
-                          ? 'bg-ruby text-white font-bold shadow-sm shadow-ruby/25'
-                          : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-300 dark:hover:text-white dark:hover:bg-white/5'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  );
-                })}
-              </nav>
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all ${
+                          isActive
+                            ? 'bg-ruby text-white font-bold shadow-sm shadow-ruby/25'
+                            : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-zinc-300 dark:hover:text-white dark:hover:bg-white/5'
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              )}
             </div>
 
             {/* Right side: Login Button OR User Controls */}
@@ -210,29 +212,31 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
-        {/* Mobile Nav */}
-        <div className="md:hidden border-t border-slate-200 dark:border-white/10">
-          <div className="flex overflow-x-auto px-2 py-1 gap-1 no-scrollbar">
-            {navLinks.map((link) => {
-              const isActive =
-                pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
+        {/* Mobile Nav (Only visible when user is logged in) */}
+        {isAuthenticated && user && (
+          <div className="md:hidden border-t border-slate-200 dark:border-white/10">
+            <div className="flex overflow-x-auto px-2 py-1 gap-1 no-scrollbar">
+              {navLinks.map((link) => {
+                const isActive =
+                  pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href));
 
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
-                    isActive
-                      ? 'bg-slate-900 text-white dark:bg-white/10 dark:text-white font-bold'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-muted-light dark:hover:text-white'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                      isActive
+                        ? 'bg-ruby text-white font-bold shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 dark:text-muted-light dark:hover:text-white'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </header>
 
       {/* Main Content */}
