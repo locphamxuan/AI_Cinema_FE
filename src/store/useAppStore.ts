@@ -37,6 +37,11 @@ interface AppState {
   openAuthModal: (mode?: 'login' | 'register', email?: string) => void;
   closeAuthModal: () => void;
 
+  // Theme
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
+
   // VIP Mode
   isVIPMode: boolean;
   toggleVIPMode: () => void;
@@ -193,6 +198,26 @@ export const useAppStore = create<AppState>((set, get) => ({
       user: null,
       isVIPMode: false,
     });
+  },
+
+  // ===== THEME (Default Light Mode) =====
+  theme: 'light',
+  setTheme: (theme) => {
+    if (typeof document !== 'undefined') {
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      try {
+        localStorage.setItem('ai_cinema_theme', theme);
+      } catch {}
+    }
+    set({ theme });
+  },
+  toggleTheme: () => {
+    const nextTheme = get().theme === 'dark' ? 'light' : 'dark';
+    get().setTheme(nextTheme);
   },
 
   // ===== VIP MODE =====

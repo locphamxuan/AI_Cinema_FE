@@ -121,17 +121,33 @@ export default function DemoControlPanel() {
               </p>
               <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
                 <Link
-                  href="/watch/ep-002"
+                  href="/watch/1"
                   onClick={() => setIsOpen(false)}
                   className="p-2.5 rounded-xl bg-white/5 hover:bg-ruby/20 border border-white/10 hover:border-ruby/40 text-foreground hover:text-white transition-all flex items-center gap-2"
                 >
-                  <span>🔒</span>
-                  <span className="truncate">Thử tập 2 khóa</span>
+                  <span>🎬</span>
+                  <span className="truncate">Xem phim 4K</span>
+                </Link>
+                <Link
+                  href="/reviewer/projects/create"
+                  onClick={() => setIsOpen(false)}
+                  className="p-2.5 rounded-xl bg-ruby/10 hover:bg-ruby/20 border border-ruby/30 text-ruby font-bold hover:text-white transition-all flex items-center gap-2"
+                >
+                  <span>🛡️</span>
+                  <span className="truncate">Reviewer Hub</span>
+                </Link>
+                <Link
+                  href="/creator/episodes/ep-prod-03/studio"
+                  onClick={() => setIsOpen(false)}
+                  className="p-2.5 rounded-xl bg-neon/10 hover:bg-neon/20 border border-neon/30 text-neon font-bold hover:text-white transition-all flex items-center gap-2"
+                >
+                  <span>✨</span>
+                  <span className="truncate">AI Studio Creator</span>
                 </Link>
                 <Link
                   href="/profile/transactions"
                   onClick={() => setIsOpen(false)}
-                  className="p-2.5 rounded-xl bg-white/5 hover:bg-neon/20 border border-white/10 hover:border-neon/40 text-foreground hover:text-white transition-all flex items-center gap-2"
+                  className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-foreground hover:text-white transition-all flex items-center gap-2"
                 >
                   <span>📋</span>
                   <span className="truncate">Sao kê lịch sử ví</span>
