@@ -147,10 +147,10 @@ export default function SceneEditorCard({
               <select
                 value={scene.voiceModel}
                 onChange={(e) => onUpdate(scene.id, { voiceModel: e.target.value })}
-                className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-white outline-none cursor-pointer"
+                className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-white outline-none cursor-pointer shadow-sm"
               >
                 {VOICE_MODELS.map((v) => (
-                  <option key={v} value={v} className="bg-slate-900 text-white">
+                  <option key={v} value={v} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                     {v.split('(')[0].trim()}
                   </option>
                 ))}
@@ -164,10 +164,10 @@ export default function SceneEditorCard({
               <select
                 value={scene.videoModel}
                 onChange={(e) => onUpdate(scene.id, { videoModel: e.target.value })}
-                className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-white outline-none cursor-pointer"
+                className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-white outline-none cursor-pointer shadow-sm"
               >
                 {VIDEO_MODELS.map((m) => (
-                  <option key={m} value={m} className="bg-slate-900 text-white">
+                  <option key={m} value={m} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
                     {m.split('(')[0].trim()}
                   </option>
                 ))}
