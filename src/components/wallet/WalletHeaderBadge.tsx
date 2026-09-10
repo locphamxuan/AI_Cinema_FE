@@ -24,7 +24,7 @@ export default function WalletHeaderBadge() {
   return (
     <div className="flex items-center">
       {/* Unified Frosted Glass Dual-Wallet Capsule */}
-      <div className="flex items-center rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/15 p-1 backdrop-blur-xl shadow-lg transition-all">
+      <div className="flex items-center rounded-full bg-slate-100/90 hover:bg-slate-200/80 dark:bg-white/[0.04] dark:hover:bg-white/[0.08] border border-slate-200 dark:border-white/15 p-0.5 backdrop-blur-xl shadow-xs transition-all">
         {/* 1. Main Coin Section */}
         <div
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${
@@ -33,30 +33,30 @@ export default function WalletHeaderBadge() {
           title="Coin Chính (Dùng để mở khóa tập phim & nâng cấp)"
         >
           {/* Gold Coin SVG */}
-          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
-            <span className="text-[10px] font-black text-black leading-none">C</span>
+          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 flex items-center justify-center shadow-xs shadow-amber-500/20 shrink-0">
+            <span className="text-[10px] font-black text-white leading-none">C</span>
           </div>
 
           <div className="flex items-baseline gap-1">
-            <span className="text-xs font-extrabold text-amber-400 font-mono tracking-tight">
+            <span className="text-xs font-black text-amber-600 dark:text-amber-400 font-mono tracking-tight">
               {wallet.mainCoin.toLocaleString()}
             </span>
           </div>
         </div>
 
         {/* Subtle Divider Line */}
-        <div className="h-3.5 w-[1px] bg-white/15 my-auto" />
+        <div className="h-3.5 w-[1px] bg-slate-300 dark:bg-white/15 my-auto" />
 
         {/* 2. Bonus Coin & Daily Check-in Button */}
         <button
           onClick={() => setCheckInModalOpen(true)}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full hover:bg-white/10 transition-all cursor-pointer group ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full hover:bg-slate-200/70 dark:hover:bg-white/10 transition-all cursor-pointer group ${
             coinAnimating ? 'animate-pulse-coin' : ''
           }`}
           title="Coin Thưởng • Bấm để điểm danh nhận quà hàng ngày"
         >
           {/* Purple Bonus Gift SVG */}
-          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 flex items-center justify-center shadow-md shadow-purple-500/20 shrink-0 group-hover:scale-110 transition-transform">
+          <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-500 via-purple-600 to-purple-700 flex items-center justify-center shadow-xs shadow-purple-500/20 shrink-0 group-hover:scale-110 transition-transform">
             <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -68,7 +68,7 @@ export default function WalletHeaderBadge() {
           </div>
 
           <div className="flex items-baseline gap-1">
-            <span className="text-xs font-extrabold text-purple-300 font-mono tracking-tight group-hover:text-white transition-colors">
+            <span className="text-xs font-black text-purple-600 dark:text-purple-300 font-mono tracking-tight group-hover:text-purple-800 dark:group-hover:text-white transition-colors">
               +{wallet.bonusCoin.toLocaleString()}
             </span>
           </div>

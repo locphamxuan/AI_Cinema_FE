@@ -10,13 +10,19 @@ export default function ThemeToggle() {
     // Read theme preference from localStorage or default to light
     try {
       const savedTheme = localStorage.getItem('ai_cinema_theme') as 'light' | 'dark' | null;
-      if (savedTheme) {
-        setTheme(savedTheme);
+      if (savedTheme === 'dark') {
+        setTheme('dark');
       } else {
         setTheme('light');
+        if (typeof document !== 'undefined') {
+          document.documentElement.classList.remove('dark');
+        }
       }
     } catch {
       setTheme('light');
+      if (typeof document !== 'undefined') {
+        document.documentElement.classList.remove('dark');
+      }
     }
   }, [setTheme]);
 
