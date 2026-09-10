@@ -32,7 +32,6 @@ export default function HomePage() {
       <MovieRow
         title="Phim AI Đang Thịnh Hành"
         subtitle="Các tác phẩm được cộng đồng xem nhiều nhất trong tuần"
-        icon="🔥"
         movies={trendingMovies}
         exploreHref="/watch/ep-001"
       />
@@ -41,7 +40,6 @@ export default function HomePage() {
       <MovieRow
         title="Gợi Ý Dành Riêng Cho Bạn"
         subtitle="Dựa trên thể loại AI & Cyberpunk bạn vừa xem"
-        icon="⭐"
         movies={recommendedMovies}
         exploreHref="/watch/ep-002"
       />
@@ -50,7 +48,6 @@ export default function HomePage() {
       <MovieRow
         title="Tác Phẩm Độc Quyền AI Cinema"
         subtitle="Sản xuất bằng mô hình Sora Vision Pro & CinemaGen v3.2"
-        icon="🏆"
         movies={allMockMovies}
         exploreHref="/watch/ep-001"
       />

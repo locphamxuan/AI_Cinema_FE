@@ -8,7 +8,7 @@ import Link from 'next/link';
 interface MovieRowProps {
   title: string;
   subtitle?: string;
-  icon?: string;
+  icon?: React.ReactNode;
   movies: Movie[];
   exploreHref?: string;
 }
@@ -16,7 +16,7 @@ interface MovieRowProps {
 export default function MovieRow({
   title,
   subtitle,
-  icon = '🎬',
+  icon,
   movies,
   exploreHref = '/watch/ep-001',
 }: MovieRowProps) {
@@ -39,7 +39,7 @@ export default function MovieRow({
       <div className="flex items-end justify-between px-1">
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-2 group-hover/row:text-ruby transition-colors">
-            <span>{icon}</span>
+            {icon && <span className="inline-flex items-center">{icon}</span>}
             <span>{title}</span>
           </h2>
           {subtitle && <p className="text-xs text-muted-light mt-0.5">{subtitle}</p>}

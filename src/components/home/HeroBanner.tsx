@@ -37,7 +37,7 @@ export default function HeroBanner({ movie, isVIPMode }: HeroBannerProps) {
         {/* Badges & Meta Specs */}
         <div className="flex flex-wrap items-center gap-2 mb-3">
           <span className="px-2.5 py-1 rounded-md bg-ruby text-white text-[11px] font-extrabold uppercase tracking-wider shadow-lg shadow-ruby/30">
-            {movie.badge || '🔥 Đề Xuất Số 1'}
+            {movie.badge || 'Đề Xuất Số 1'}
           </span>
 
           <span className="px-2 py-0.5 rounded bg-verified/25 border border-verified/40 text-emerald-300 text-xs font-bold">
@@ -55,12 +55,12 @@ export default function HeroBanner({ movie, isVIPMode }: HeroBannerProps) {
           </span>
 
           <span className="px-2 py-0.5 rounded bg-black/60 border border-white/25 text-white/95 text-xs font-semibold backdrop-blur-md">
-            🏷️ 100% AI • Điều 44
+            100% AI • Điều 44
           </span>
 
           {isVIPMode && (
             <span className="px-2 py-0.5 rounded bg-amber-400/25 border border-amber-400/40 text-amber-300 text-xs font-bold">
-              👑 Quyền VIP
+              Quyền VIP
             </span>
           )}
         </div>
