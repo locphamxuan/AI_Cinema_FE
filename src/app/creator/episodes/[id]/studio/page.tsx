@@ -71,7 +71,7 @@ export default function CreatorStudioPage({ params }: { params: Promise<{ id: st
   // If Not Unlocked (no quota yet)
   if (!isUnlocked) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-[#0B0C10] text-slate-900 dark:text-zinc-100 transition-colors">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-zinc-100 transition-colors">
         <ProductionHeader
           title={`AI Studio: ${episode.title}`}
           subtitle="Studio Biên Tập & Sinh Video AI"
@@ -116,7 +116,7 @@ export default function CreatorStudioPage({ params }: { params: Promise<{ id: st
   const isAllCompleted = episode.scenes.length > 0 && completedScenesCount === episode.scenes.length;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0C10] text-slate-900 dark:text-zinc-100 transition-colors">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-zinc-100 transition-colors">
       <ProductionHeader
         title={`AI Studio: ${episode.title}`}
         subtitle="Studio Biên Tập & Sinh Video AI"

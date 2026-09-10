@@ -24,7 +24,7 @@ export default function ProductionHeader({ title, subtitle }: ProductionHeaderPr
   const isCreatorRoute = pathname.startsWith('/creator');
 
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200/80 dark:border-white/10 bg-white/80 dark:bg-[#0B0C10]/85 backdrop-blur-2xl transition-colors">
+    <header className="sticky top-0 z-30 border-b border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-slate-900/85 backdrop-blur-2xl transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Brand & Module Label */}

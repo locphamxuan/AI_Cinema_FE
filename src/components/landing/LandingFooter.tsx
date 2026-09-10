@@ -8,7 +8,7 @@ export default function LandingFooter() {
   const [language, setLanguage] = useState<'vi' | 'en'>('vi');
 
   return (
-    <footer className="relative z-20 w-full border-t border-slate-200 dark:border-white/10 bg-slate-100/90 dark:bg-[#0B0C10]/95 backdrop-blur-lg pt-12 pb-16 px-4 sm:px-6 md:px-12 text-slate-600 dark:text-[#808080] text-xs">
+    <footer className="relative z-20 w-full border-t border-slate-200 dark:border-white/10 bg-slate-100/90 dark:bg-slate-900/95 backdrop-blur-lg pt-12 pb-16 px-4 sm:px-6 md:px-12 text-slate-600 dark:text-[#808080] text-xs">
       <div className="max-w-6xl mx-auto">
         {/* Contact Hotline / Inquiry */}
         <p className="mb-8 text-sm text-slate-600 dark:text-[#808080]">
