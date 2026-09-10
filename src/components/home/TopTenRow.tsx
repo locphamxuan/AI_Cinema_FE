@@ -35,7 +35,7 @@ export default function TopTenRow({ movies }: TopTenRowProps) {
               </div>
 
               {/* Poster Card */}
-              <div className="relative z-10 w-[130px] sm:w-[160px] aspect-[2/3] rounded-xl overflow-hidden bg-[#161922] border border-white/10 group-hover:border-ruby/60 group-hover:shadow-2xl group-hover:shadow-ruby/20 transition-all">
+              <div className="relative z-10 w-[130px] sm:w-[160px] aspect-[2/3] rounded-xl overflow-hidden bg-slate-100 dark:bg-[#161922] border border-slate-200 dark:border-white/10 group-hover:border-ruby/60 group-hover:shadow-2xl group-hover:shadow-ruby/20 transition-all shadow-sm">
                 <img
                   src={movie.posterUrl}
                   alt={movie.title}

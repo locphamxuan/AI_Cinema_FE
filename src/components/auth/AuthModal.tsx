@@ -104,11 +104,11 @@ export default function AuthModal() {
 
   return (
     <div
-      className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in"
+      className="fixed inset-0 bg-slate-900/60 dark:bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fade-in"
       onClick={closeAuthModal}
     >
       <div
-        className="glass-card w-full max-w-md p-6 sm:p-8 animate-scale-in border border-white/15 relative overflow-hidden shadow-2xl shadow-black/80"
+        className="bg-white dark:bg-[#161922] w-full max-w-md p-6 sm:p-8 animate-scale-in border border-slate-200 dark:border-white/15 rounded-3xl relative overflow-hidden shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Decorative Top Gradient Line */}
@@ -117,7 +117,7 @@ export default function AuthModal() {
         {/* Close Button */}
         <button
           onClick={closeAuthModal}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-muted-light hover:text-foreground transition-colors cursor-pointer"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/20 text-slate-500 hover:text-slate-900 dark:text-muted-light dark:hover:text-foreground transition-colors cursor-pointer"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -126,16 +126,16 @@ export default function AuthModal() {
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-ruby via-ruby-dark to-black border border-ruby/40 mb-3 shadow-xl shadow-ruby/25 ring-4 ring-ruby/10">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-ruby via-ruby-dark to-slate-950 border border-ruby/40 mb-3 shadow-xl shadow-ruby/25 ring-4 ring-ruby/10">
             <div className="flex flex-col items-center justify-center leading-none">
               <span className="text-sm font-black text-white tracking-wider">AI</span>
-              <span className="text-[8px] font-black text-ruby-light tracking-widest uppercase">CINEMA</span>
+              <span className="text-[8px] font-black text-rose-200 tracking-widest uppercase">CINEMA</span>
             </div>
           </div>
-          <h2 className="text-2xl font-bold text-foreground">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-foreground">
             {mode === 'login' ? 'Đăng Nhập AI Cinema' : 'Tạo Tài Khoản Mới'}
           </h2>
-          <p className="text-xs text-muted-light mt-1">
+          <p className="text-xs text-slate-500 dark:text-muted-light mt-1">
             {mode === 'login'
               ? 'Thưởng thức phim AI đỉnh cao với hệ thống ví tiền tệ kép'
               : 'Đăng ký ngay để nhận 50 Coin Thưởng tân thủ miễn phí'}
@@ -143,7 +143,7 @@ export default function AuthModal() {
         </div>
 
         {/* Mode Tabs */}
-        <div className="flex bg-black/40 rounded-xl p-1 mb-5 border border-white/10">
+        <div className="flex bg-slate-100 dark:bg-black/40 rounded-xl p-1 mb-5 border border-slate-200 dark:border-white/10">
           <button
             type="button"
             onClick={() => {
@@ -153,7 +153,7 @@ export default function AuthModal() {
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               mode === 'login'
                 ? 'bg-ruby text-white shadow-md shadow-ruby/30'
-                : 'text-muted-light hover:text-foreground'
+                : 'text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-foreground'
             }`}
           >
             Đăng Nhập
@@ -167,7 +167,7 @@ export default function AuthModal() {
             className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
               mode === 'register'
                 ? 'bg-ruby text-white shadow-md shadow-ruby/30'
-                : 'text-muted-light hover:text-foreground'
+                : 'text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-foreground'
             }`}
           >
             Đăng Ký
@@ -188,7 +188,7 @@ export default function AuthModal() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
             <div>
-              <label className="block text-xs font-medium text-muted-light mb-1">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-muted-light mb-1">
                 Họ và tên
               </label>
               <input
@@ -197,13 +197,13 @@ export default function AuthModal() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Nhập họ và tên..."
-                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all"
+                className="w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all"
               />
             </div>
           )}
 
           <div>
-            <label className="block text-xs font-medium text-muted-light mb-1">
+            <label className="block text-xs font-semibold text-slate-700 dark:text-muted-light mb-1">
               Địa chỉ Email
             </label>
             <input
@@ -212,30 +212,30 @@ export default function AuthModal() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="name@example.com"
-              className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
+              className="w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-medium text-muted-light">
+              <label className="block text-xs font-semibold text-slate-700 dark:text-muted-light">
                 Mật khẩu
               </label>
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="inline-flex items-center gap-1.5 text-[11px] text-muted-light hover:text-white transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
               >
                 {showPassword ? (
                   <>
-                    <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
                     </svg>
                     <span>Ẩn</span>
                   </>
                 ) : (
                   <>
-                    <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -251,19 +251,19 @@ export default function AuthModal() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={mode === 'login' ? 'Nhập mật khẩu...' : 'Tạo mật khẩu...'}
-                className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-foreground placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
+                className="w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
               />
             </div>
           </div>
 
           {/* Remember Me Checkbox & Forgot Password */}
           <div className="flex items-center justify-between text-xs pt-1">
-            <label className="flex items-center gap-2 cursor-pointer select-none text-muted-light hover:text-white transition-colors">
+            <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-white/20 bg-white/10 text-ruby focus:ring-ruby accent-ruby cursor-pointer"
+                className="w-4 h-4 rounded border-slate-300 dark:border-white/20 bg-slate-100 dark:bg-white/10 text-ruby focus:ring-ruby accent-ruby cursor-pointer"
               />
               <span>Ghi nhớ thông tin đăng nhập</span>
             </label>
@@ -275,7 +275,7 @@ export default function AuthModal() {
                   setEmail('userdemo@gmail.com');
                   setPassword('1');
                 }}
-                className="text-muted text-[11px] hover:text-ruby hover:underline transition-colors cursor-pointer"
+                className="text-slate-500 dark:text-muted text-[11px] hover:text-ruby hover:underline transition-colors cursor-pointer"
               >
                 Khôi phục mặc định
               </button>

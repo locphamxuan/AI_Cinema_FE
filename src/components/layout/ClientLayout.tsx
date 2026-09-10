@@ -74,8 +74,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                       href={link.href}
                       className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all ${
                         isActive
-                          ? 'bg-white/10 text-white font-bold shadow-sm'
-                          : 'text-[#9CA3AF] hover:text-white hover:bg-white/5'
+                          ? 'bg-slate-900 text-white dark:bg-white/10 dark:text-white font-bold shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-[#9CA3AF] dark:hover:text-white dark:hover:bg-white/5'
                       }`}
                     >
                       {link.label}
@@ -95,7 +95,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                     className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[5px] text-[11px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer select-none group relative overflow-hidden ${
                       isVIPMode
                         ? 'bg-gradient-to-r from-amber-400 via-yellow-200 to-amber-500 text-neutral-950 shadow-[0_2px_10px_rgba(245,158,11,0.35)] border border-yellow-100/80 -rotate-1 hover:rotate-0 hover:scale-105 active:scale-95'
-                        : 'bg-neutral-800/90 text-neutral-400 border border-neutral-700/80 hover:text-neutral-200 hover:border-neutral-500 hover:scale-105 active:scale-95 shadow-sm'
+                        : 'bg-slate-200 text-slate-700 dark:bg-neutral-800/90 dark:text-neutral-400 border border-slate-300 dark:border-neutral-700/80 hover:text-slate-900 dark:hover:text-neutral-200 hover:scale-105 active:scale-95 shadow-sm'
                     }`}
                     title="Bấm để chuyển đổi trạng thái VIP (Demo)"
                   >
@@ -113,7 +113,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                       </>
                     ) : (
                       <>
-                        <span className="w-1.5 h-1.5 rounded-full bg-neutral-500 group-hover:bg-neutral-300 transition-colors" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-neutral-500 group-hover:bg-slate-600 dark:group-hover:bg-neutral-300 transition-colors" />
                         <span className="font-semibold tracking-wider leading-none text-[10px]">FREE TIER</span>
                       </>
                     )}
@@ -131,20 +131,20 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                       <img
                         src={user.avatarUrl}
                         alt={user.name}
-                        className="w-8 h-8 rounded-full bg-white/10 border border-white/20 object-cover"
+                        className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/20 object-cover"
                       />
                     </button>
 
                     {isUserDropdownOpen && (
-                      <div className="absolute right-0 mt-2 w-64 glass-card p-3 shadow-2xl border border-white/15 animate-scale-in z-50">
-                        <div className="pb-3 mb-2 border-b border-white/10">
-                          <p className="text-sm font-bold text-foreground truncate">{user.name}</p>
-                          <p className="text-xs text-muted-light truncate">{user.email}</p>
+                      <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#161922] p-3 shadow-2xl border border-slate-200 dark:border-white/15 rounded-2xl animate-scale-in z-50">
+                        <div className="pb-3 mb-2 border-b border-slate-100 dark:border-white/10">
+                          <p className="text-sm font-bold text-slate-900 dark:text-foreground truncate">{user.name}</p>
+                          <p className="text-xs text-slate-500 dark:text-muted-light truncate">{user.email}</p>
                           <span
                             className={`inline-block mt-1.5 px-2 py-0.5 rounded text-[10px] font-bold ${
                               isVIPMode
                                 ? 'bg-coin/20 text-coin border border-coin/30'
-                                : 'bg-white/10 text-muted-light'
+                                : 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-muted-light'
                             }`}
                           >
                             {isVIPMode ? 'Hội viên VIP' : 'Tài khoản thường'}
@@ -155,22 +155,22 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                           <Link
                             href="/profile/subscription"
                             onClick={() => setIsUserDropdownOpen(false)}
-                            className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-foreground hover:bg-white/10 transition-colors"
+                            className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
                           >
                             <span>Gói dịch vụ hội viên</span>
-                            <span className="text-muted-light">›</span>
+                            <span className="text-slate-400 dark:text-muted-light">›</span>
                           </Link>
                           <Link
                             href="/profile/transactions"
                             onClick={() => setIsUserDropdownOpen(false)}
-                            className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-foreground hover:bg-white/10 transition-colors"
+                            className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
                           >
                             <span>Lịch sử giao dịch ví</span>
-                            <span className="text-muted-light">›</span>
+                            <span className="text-slate-400 dark:text-muted-light">›</span>
                           </Link>
                         </div>
 
-                        <div className="pt-2 mt-2 border-t border-white/10">
+                        <div className="pt-2 mt-2 border-t border-slate-100 dark:border-white/10">
                           <button
                             onClick={() => {
                               setIsUserDropdownOpen(false);
@@ -211,7 +211,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
         </div>
 
         {/* Mobile Nav */}
-        <div className="md:hidden border-t border-white/10">
+        <div className="md:hidden border-t border-slate-200 dark:border-white/10">
           <div className="flex overflow-x-auto px-2 py-1 gap-1 no-scrollbar">
             {navLinks.map((link) => {
               const isActive =
@@ -223,8 +223,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                   href={link.href}
                   className={`flex items-center px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
                     isActive
-                      ? 'bg-white/10 text-white font-bold'
-                      : 'text-muted-light hover:text-white'
+                      ? 'bg-slate-900 text-white dark:bg-white/10 dark:text-white font-bold'
+                      : 'text-slate-600 hover:text-slate-900 dark:text-muted-light dark:hover:text-white'
                   }`}
                 >
                   {link.label}

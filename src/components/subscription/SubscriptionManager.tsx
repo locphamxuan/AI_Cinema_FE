@@ -113,39 +113,39 @@ export default function SubscriptionManager() {
 
           {/* Plan Details Grid */}
           <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="p-3 rounded-xl bg-white/5">
-              <p className="text-[10px] text-muted-light uppercase">Ngày bắt đầu</p>
-              <p className="text-sm font-medium text-foreground">
+            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+              <p className="text-[10px] text-slate-500 dark:text-muted-light uppercase font-bold">Ngày bắt đầu</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-foreground">
                 {subscription.startDate
                   ? new Date(subscription.startDate).toLocaleDateString('vi-VN')
                   : '—'}
               </p>
             </div>
-            <div className="p-3 rounded-xl bg-white/5">
-              <p className="text-[10px] text-muted-light uppercase">Ngày hết hạn</p>
-              <p className="text-sm font-medium text-foreground">
+            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+              <p className="text-[10px] text-slate-500 dark:text-muted-light uppercase font-bold">Ngày hết hạn</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-foreground">
                 {subscription.endDate
                   ? new Date(subscription.endDate).toLocaleDateString('vi-VN')
                   : '—'}
               </p>
             </div>
-            <div className="p-3 rounded-xl bg-white/5">
-              <p className="text-[10px] text-muted-light uppercase">Thanh toán qua</p>
-              <p className="text-sm font-medium text-foreground">{subscription.paymentMethod || '—'}</p>
+            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+              <p className="text-[10px] text-slate-500 dark:text-muted-light uppercase font-bold">Thanh toán qua</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-foreground">{subscription.paymentMethod || '—'}</p>
             </div>
-            <div className="p-3 rounded-xl bg-white/5">
-              <p className="text-[10px] text-muted-light uppercase">Thời gian còn lại</p>
-              <p className="text-sm font-medium text-coin">{countdown || '—'}</p>
+            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+              <p className="text-[10px] text-slate-500 dark:text-muted-light uppercase font-bold">Thời gian còn lại</p>
+              <p className="text-sm font-bold text-coin">{countdown || '—'}</p>
             </div>
           </div>
 
           {/* Features */}
           <div className="mb-5">
-            <p className="text-xs text-muted-light uppercase tracking-wider mb-2">Quyền lợi gói</p>
+            <p className="text-xs text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold mb-2">Quyền lợi gói</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {subscription.plan.features.map((feature, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-foreground/80">
-                  <span className="text-verified">✓</span>
+                <div key={i} className="flex items-center gap-2 text-sm text-slate-700 dark:text-foreground/80">
+                  <span className="text-verified font-bold">✓</span>
                   {feature}
                 </div>
               ))}
@@ -153,10 +153,10 @@ export default function SubscriptionManager() {
           </div>
 
           {/* Auto-Renew Toggle */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-white/5">
+          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
             <div>
-              <p className="text-sm font-medium text-foreground">Tự động gia hạn (Auto-renewal)</p>
-              <p className="text-xs text-muted-light mt-0.5">
+              <p className="text-sm font-semibold text-slate-900 dark:text-foreground">Tự động gia hạn (Auto-renewal)</p>
+              <p className="text-xs text-slate-500 dark:text-muted-light mt-0.5">
                 {subscription.autoRenew
                   ? 'Gói sẽ tự động gia hạn khi hết hạn'
                   : 'Gói sẽ hết hạn và không gia hạn'}
@@ -173,14 +173,14 @@ export default function SubscriptionManager() {
         /* No Plan */
         <div className="glass-card p-8 text-center">
           <div className="text-5xl mb-4">🎬</div>
-          <h2 className="text-xl font-bold text-foreground">Bạn chưa có gói hội viên</h2>
-          <p className="text-muted-light text-sm mt-2">Đăng ký gói để xem phim không giới hạn và hưởng nhiều ưu đãi hấp dẫn</p>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-foreground">Bạn chưa có gói hội viên</h2>
+          <p className="text-slate-500 dark:text-muted-light text-sm mt-2">Đăng ký gói để xem phim không giới hạn và hưởng nhiều ưu đãi hấp dẫn</p>
         </div>
       )}
 
       {/* Available Plans */}
       <div>
-        <h3 className="text-lg font-bold text-foreground mb-4">📋 Các Gói Dịch Vụ</h3>
+        <h3 className="text-lg font-bold text-slate-900 dark:text-foreground mb-4">📋 Các Gói Dịch Vụ</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {subscriptionPlans.map((plan) => {
             const isCurrent = subscription.plan?.id === plan.id;
@@ -188,7 +188,7 @@ export default function SubscriptionManager() {
               <div
                 key={plan.id}
                 className={`glass-card p-5 relative transition-all hover:scale-[1.02] ${
-                  isCurrent ? 'border-coin/50 glow-coin' : ''
+                  isCurrent ? 'border-coin/50 glow-coin' : 'border-slate-200 dark:border-white/10'
                 } ${plan.popular ? 'border-neon/30' : ''}`}
               >
                 {plan.popular && (
@@ -202,14 +202,14 @@ export default function SubscriptionManager() {
                   </div>
                 )}
 
-                <h4 className="text-base font-bold text-foreground mt-2">{plan.name}</h4>
+                <h4 className="text-base font-bold text-slate-900 dark:text-foreground mt-2">{plan.name}</h4>
                 <p className="text-2xl font-bold gradient-text-coin mt-2">{plan.price.toLocaleString('vi-VN')}₫</p>
-                <p className="text-xs text-muted-light">/{plan.duration} ngày</p>
+                <p className="text-xs text-slate-500 dark:text-muted-light">/{plan.duration} ngày</p>
 
                 <ul className="mt-4 space-y-2">
                   {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-2 text-xs text-foreground/70">
-                      <span className="text-verified text-sm">✓</span>
+                    <li key={i} className="flex items-center gap-2 text-xs text-slate-600 dark:text-foreground/70">
+                      <span className="text-verified text-sm font-bold">✓</span>
                       {f}
                     </li>
                   ))}
@@ -218,10 +218,10 @@ export default function SubscriptionManager() {
                 <button
                   className={`w-full mt-4 py-2.5 rounded-xl font-bold text-sm transition-all ${
                     isCurrent
-                      ? 'bg-white/10 text-muted cursor-default'
+                      ? 'bg-slate-100 dark:bg-white/10 text-slate-400 dark:text-muted cursor-default'
                       : plan.popular
                         ? 'bg-gradient-to-r from-neon to-neon-dark text-white hover:shadow-lg hover:shadow-neon/30 active:scale-95'
-                        : 'bg-white/10 text-foreground hover:bg-white/15'
+                        : 'bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-white/10 dark:text-foreground dark:hover:bg-white/15'
                   }`}
                   disabled={isCurrent}
                 >
