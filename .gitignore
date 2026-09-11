@@ -41,3 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 next-env.d.ts
+
+# Local-only, machine-specific — not shared
+.claude/
+.claude-mem/
+CLAUDE.md
+TESTING.md
+.codegraph/
