@@ -354,4 +354,11 @@ body {
   pointer-events: none;
 }
 
+/* Hide Next.js dev indicator badge so it never covers logo / headers */
+nextjs-portal,
+[data-nextjs-dev-tools-button],
+[data-nextjs-route-announcer] {
+  display: none !important;
+}
+
 
