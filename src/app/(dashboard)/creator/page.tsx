@@ -148,9 +148,9 @@ export default function CreatorDashboardPage() {
   };
 
   const canEnterStudio =
-    currentPackage?.status === 'QUOTA_ALLOCATED' ||
+    currentPackage?.status === 'READY_FOR_PRODUCTION' ||
     currentPackage?.status === 'IN_PRODUCTION' ||
-    currentPackage?.status === 'EPISODE_SUBMITTED' ||
+    currentPackage?.status === 'CONTENT_REVIEW' ||
     currentPackage?.status === 'COMPLIANCE_PASSED' ||
     currentPackage?.status === 'PUBLISHED';
 
@@ -242,9 +242,9 @@ export default function CreatorDashboardPage() {
                       className={`w-2 h-2 rounded-full shrink-0 ${
                         ep.status === 'PUBLISHED'
                           ? 'bg-emerald-400'
-                          : ep.status === 'EPISODE_SUBMITTED'
+                          : ep.status === 'CONTENT_REVIEW' || ep.status === 'COMPLIANCE_REVIEW'
                           ? 'bg-purple-400'
-                          : ep.status === 'CHANGES_REQUESTED'
+                          : ep.status === 'CHANGES_REQUESTED' || ep.status === 'PLAN_CHANGES_REQUESTED' || ep.status === 'COMPLIANCE_CHANGES_REQUESTED'
                           ? 'bg-rose-400 animate-pulse'
                           : 'bg-amber-400'
                       }`}
@@ -489,6 +489,42 @@ export default function CreatorDashboardPage() {
                     <span>Trạng thái:</span>
                     <span className="text-emerald-400 font-medium">{currentPackage?.status}</span>
                   </p>
+                </div>
+              </div>
+
+              <div className="bg-[#161922] border border-white/10 rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Main Flow 1</p>
+                    <h3 className="text-lg font-black text-white mt-1">AI Movie Production & Publishing</h3>
+                  </div>
+                  <span className="text-xs text-slate-300 border border-white/10 bg-white/5 px-2.5 py-1 rounded-full">
+                    {currentPackage?.status}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
+                  {[
+                    { label: 'Create project', done: true },
+                    { label: 'Prepare plan', done: ['PLAN_REVIEW', 'PLAN_APPROVED', 'READY_FOR_PRODUCTION', 'IN_PRODUCTION', 'CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(currentPackage?.status ?? '') },
+                    { label: 'Review plan', done: ['PLAN_APPROVED', 'READY_FOR_PRODUCTION', 'IN_PRODUCTION', 'CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(currentPackage?.status ?? '') },
+                    { label: 'AI production', done: ['READY_FOR_PRODUCTION', 'IN_PRODUCTION', 'CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(currentPackage?.status ?? '') },
+                    { label: 'Final review', done: ['APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(currentPackage?.status ?? '') },
+                    { label: 'Publish', done: ['SCHEDULED', 'PUBLISHED'].includes(currentPackage?.status ?? '') },
+                  ].map((step, index) => (
+                    <div
+                      key={step.label}
+                      className={`rounded-xl border p-3 transition ${
+                        step.done ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-white/10 bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Step {index + 1}</span>
+                        <span className={`w-2 h-2 rounded-full ${step.done ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                      </div>
+                      <p className="text-xs font-semibold text-white leading-relaxed">{step.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
