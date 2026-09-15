@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
-import { Film, ShieldCheck, UserCheck, Sparkles, Check } from 'lucide-react';
 
 const STORAGE_KEY = 'aicinema_saved_credentials';
 
@@ -48,24 +47,18 @@ export default function AuthModal() {
         }
       } catch {}
 
-      // Default pre-fill if initialAuthEmail provided or default demo
+      // Default pre-fill if initialAuthEmail provided
       if (initialAuthEmail) {
         setEmail(initialAuthEmail);
       } else {
-        setEmail('creator@gmail.com');
-        setPassword('1');
+        setEmail('');
+        setPassword('');
         setRememberMe(true);
       }
     }
   }, [isAuthModalOpen, authModalMode, initialAuthEmail]);
 
   if (!isAuthModalOpen) return null;
-
-  const handleSelectPreset = (presetEmail: string) => {
-    setEmail(presetEmail);
-    setPassword('1');
-    setError(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +151,7 @@ export default function AuthModal() {
         </div>
 
         {/* Mode Tabs */}
-        <div className="flex bg-slate-100 dark:bg-black/40 rounded-xl p-1 mb-4 border border-slate-200 dark:border-white/10">
+        <div className="flex bg-slate-100 dark:bg-black/40 rounded-xl p-1 mb-5 border border-slate-200 dark:border-white/10">
           <button
             type="button"
             onClick={() => {
@@ -188,64 +181,6 @@ export default function AuthModal() {
             Đăng Ký
           </button>
         </div>
-
-        {/* Quick Role Presets for Maker & Checker */}
-        {mode === 'login' && (
-          <div className="mb-4 bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-2xl p-3 space-y-2">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-ruby" /> Chọn nhanh tài khoản Role (Mật khẩu: 1):
-              </span>
-              <span className="text-[10px] text-muted-light font-mono">1-Click Autofill</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              {/* Creator Maker */}
-              <button
-                type="button"
-                onClick={() => handleSelectPreset('creator@gmail.com')}
-                className={`p-2 rounded-xl border text-left flex items-start gap-2 transition cursor-pointer ${
-                  email.toLowerCase() === 'creator@gmail.com'
-                    ? 'bg-ruby/15 border-ruby/60 text-white'
-                    : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <div className="w-6 h-6 rounded-lg bg-ruby/20 flex items-center justify-center text-ruby shrink-0 mt-0.5">
-                  <Film className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xs font-bold text-white flex items-center gap-1">
-                    Creator (Maker)
-                    {email.toLowerCase() === 'creator@gmail.com' && <Check className="w-3 h-3 text-ruby" />}
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-mono truncate">creator@gmail.com</div>
-                </div>
-              </button>
-
-              {/* Reviewer Checker */}
-              <button
-                type="button"
-                onClick={() => handleSelectPreset('reviewer@gmail.com')}
-                className={`p-2 rounded-xl border text-left flex items-start gap-2 transition cursor-pointer ${
-                  email.toLowerCase() === 'reviewer@gmail.com'
-                    ? 'bg-[#8B5CF6]/15 border-[#8B5CF6]/60 text-white'
-                    : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <div className="w-6 h-6 rounded-lg bg-[#8B5CF6]/20 flex items-center justify-center text-[#8B5CF6] shrink-0 mt-0.5">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xs font-bold text-white flex items-center gap-1">
-                    Reviewer (Checker)
-                    {email.toLowerCase() === 'reviewer@gmail.com' && <Check className="w-3 h-3 text-[#8B5CF6]" />}
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-mono truncate">reviewer@gmail.com</div>
-                </div>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Error Message */}
         {error && (
@@ -329,7 +264,7 @@ export default function AuthModal() {
             </div>
           </div>
 
-          {/* Remember Me Checkbox & Forgot Password */}
+          {/* Remember Me Checkbox */}
           <div className="flex items-center justify-between text-xs pt-1">
             <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors">
               <input
@@ -340,19 +275,6 @@ export default function AuthModal() {
               />
               <span>Ghi nhớ thông tin đăng nhập</span>
             </label>
-
-            {mode === 'login' && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('userdemo@gmail.com');
-                  setPassword('1');
-                }}
-                className="text-slate-500 dark:text-muted text-[11px] hover:text-ruby hover:underline transition-colors cursor-pointer"
-              >
-                Khôi phục mặc định
-              </button>
-            )}
           </div>
 
           {mode === 'register' && (
