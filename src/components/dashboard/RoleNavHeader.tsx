@@ -7,10 +7,8 @@ import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { useAppStore } from '@/store/useAppStore';
 import {
   Film,
-  ShieldCheck,
   Zap,
   RotateCcw,
-  Layers,
   LogOut,
   Home,
 } from 'lucide-react';
@@ -18,7 +16,7 @@ import {
 export function RoleNavHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentRole, project, activePackageId, setActivePackage, resetDemoData } = useWorkflowStore();
+  const { currentRole, project, activePackageId, resetDemoData } = useWorkflowStore();
   const { user, logout, openAuthModal } = useAppStore();
 
   const handleLogout = () => {
@@ -28,8 +26,6 @@ export function RoleNavHeader() {
   };
 
   const isCreator = pathname.includes('/creator') || currentRole === 'creator';
-  const isReviewer = pathname.includes('/reviewer') || currentRole === 'reviewer';
-
   const currentPackage = project.episodes.find((e) => e.id === activePackageId) || project.episodes[0];
   const quotaPercent = project.allocated_tokens > 0 ? (project.consumed_tokens / project.allocated_tokens) * 100 : 0;
   const isQuotaWarning = quotaPercent >= 90;
@@ -37,163 +33,122 @@ export function RoleNavHeader() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'PLAN_DRAFT':
-        return { label: 'Bản Nháp Brief', color: 'bg-slate-800 text-slate-300 border-slate-700' };
+        return { label: 'Bản Nháp Brief', dot: 'bg-zinc-400', badge: 'bg-zinc-800/80 text-zinc-300 border-zinc-700/60' };
       case 'PLAN_PENDING':
-        return { label: 'Chờ Duyệt Kế Hoạch & Quota', color: 'bg-amber-500/20 text-amber-300 border-amber-500/30' };
+        return { label: 'Chờ Duyệt Quota', dot: 'bg-amber-400', badge: 'bg-amber-500/10 text-amber-300 border-amber-500/20' };
       case 'QUOTA_ALLOCATED':
-        return { label: 'Đã Cấp Quota AI', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' };
+        return { label: 'Đã Cấp Quota AI', dot: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
       case 'IN_PRODUCTION':
-        return { label: 'Đang Sản Xuất Studio', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+        return { label: 'Đang Sản Xuất', dot: 'bg-blue-400', badge: 'bg-blue-500/10 text-blue-300 border-blue-500/20' };
       case 'EPISODE_SUBMITTED':
-        return { label: 'Chờ Thẩm Định Video', color: 'bg-purple-500/20 text-purple-300 border-purple-500/30' };
+        return { label: 'Chờ Thẩm Định Video', dot: 'bg-purple-400', badge: 'bg-purple-500/10 text-purple-300 border-purple-500/20' };
       case 'CHANGES_REQUESTED':
-        return { label: 'Yêu Cầu Sửa Đổi', color: 'bg-red-500/20 text-red-300 border-red-500/30' };
+        return { label: 'Yêu Cầu Sửa Đổi', dot: 'bg-rose-400', badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' };
       case 'COMPLIANCE_PASSED':
-        return { label: 'Đạt Chuẩn Pháp Lý', color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' };
+        return { label: 'Đạt Chuẩn Pháp Lý', dot: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
       case 'PUBLISHED':
-        return { label: 'Đã Phát Hành OTT', color: 'bg-emerald-600/30 text-emerald-200 border-emerald-500/50' };
+        return { label: 'Đã Phát Hành', dot: 'bg-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
       default:
-        return { label: status, color: 'bg-slate-800 text-slate-300 border-slate-700' };
+        return { label: status, dot: 'bg-zinc-400', badge: 'bg-zinc-800 text-zinc-300 border-zinc-700' };
     }
   };
 
   const statusBadge = getStatusBadge(currentPackage?.status || 'PLAN_PENDING');
 
   return (
-    <div className="bg-[#11141D] border-b border-white/10 text-white sticky top-0 z-30 shadow-2xl backdrop-blur-xl w-full">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
-        {/* Top bar: Project Meta & Authenticated Role Indicator */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          {/* Left: Project title & Active Episode Selector */}
-          <div className="flex items-center gap-3 pl-2 sm:pl-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ruby via-ruby-dark to-purple-900 flex items-center justify-center shadow-lg shadow-ruby/20 border border-white/10 shrink-0">
-              <Film className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-ruby/20 text-ruby-light border border-ruby/40">
-                  Main Flow 1: Maker - Checker
-                </span>
-                <span className="text-xs text-slate-400 hidden sm:inline">•</span>
-                <span className="text-xs text-slate-400 hidden sm:inline font-mono">PostgreSQL Aligned</span>
-              </div>
-              <h2 className="text-base sm:text-lg font-black text-white tracking-tight flex items-center gap-2">
-                <span>{project.title}</span>
-              </h2>
-            </div>
+    <header className="bg-[#0C0E14] border-b border-white/[0.08] text-white sticky top-0 z-30 backdrop-blur-xl w-full">
+      <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+        {/* Left: Brand / Project Identity */}
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-ruby/15 border border-ruby/30 flex items-center justify-center shrink-0 shadow-sm">
+            <Film className="w-4 h-4 text-ruby-light" />
           </div>
-
-          {/* Center: Authenticated Role Identity (Non-clickable, cannot arbitrarily toggle) */}
-          <div className="flex items-center gap-2">
-            {isCreator ? (
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-ruby/15 border border-ruby/40 text-ruby-light text-xs font-bold shadow-sm">
-                <Film className="w-4 h-4 text-ruby" />
-                <span>Creator (Maker)</span>
-                <span className="text-slate-500">•</span>
-                <span className="text-white font-medium">{user?.name || project.creator_name}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#8B5CF6]/15 border border-[#8B5CF6]/40 text-[#8B5CF6] text-xs font-bold shadow-sm">
-                <ShieldCheck className="w-4 h-4 text-[#8B5CF6]" />
-                <span>Reviewer (Checker)</span>
-                <span className="text-slate-500">•</span>
-                <span className="text-white font-medium">{user?.name || project.reviewer_name}</span>
-              </div>
-            )}
-
-            <button
-              onClick={handleLogout}
-              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-red-500/15 text-slate-400 hover:text-red-400 border border-white/10 hover:border-red-500/30 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
-              title="Đăng xuất và mở hộp thoại đăng nhập"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Đăng xuất</span>
-            </button>
-
-            <Link
-              href="/"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 text-xs font-semibold transition"
-            >
-              <Home className="w-3.5 h-3.5" />
-              <span>Trang chủ OTT</span>
-            </Link>
-          </div>
-
-          {/* Right: Token Quota & Quick Reset */}
-          <div className="flex items-center gap-3">
-            <div className="bg-[#161922] px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <Zap className={`w-4 h-4 ${isQuotaWarning ? 'text-red-400 animate-pulse' : 'text-amber-400'}`} />
-                <div>
-                  <div className="flex items-center gap-1.5 text-[11px] font-bold">
-                    <span className="text-slate-400">Tokens:</span>
-                    <span className={isQuotaWarning ? 'text-red-400 font-mono' : 'text-amber-300 font-mono'}>
-                      {project.consumed_tokens} / {project.allocated_tokens}
-                    </span>
-                  </div>
-                  {/* Mini Progress Bar */}
-                  <div className="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden mt-0.5">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        isQuotaWarning ? 'bg-red-500' : 'bg-gradient-to-r from-amber-400 to-amber-500'
-                      }`}
-                      style={{ width: `${Math.min(100, quotaPercent)}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={resetDemoData}
-              title="Khôi phục dữ liệu mẫu ban đầu"
-              className="p-2 rounded-xl bg-[#161922] hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
+          <div className="min-w-0 flex items-center gap-2">
+            <h1 className="text-sm font-bold text-white tracking-tight truncate">
+              {project.title}
+            </h1>
+            <span className="hidden sm:inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/[0.06] text-zinc-400 border border-white/[0.08]">
+              {isCreator ? 'Maker Studio' : 'Checker Hub'}
+            </span>
           </div>
         </div>
 
-        {/* Bottom bar: Episode Pills & State tracker */}
-        <div className="mt-3 pt-2.5 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 overflow-x-auto no-scrollbar">
-          {/* Episode Tabs */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-slate-400 font-medium mr-1 flex items-center gap-1">
-              <Layers className="w-3.5 h-3.5" /> Tập phim:
+        {/* Center: Selected Episode Status Pill */}
+        {currentPackage && (
+          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs">
+            <span className="text-zinc-400 font-medium">Tập {currentPackage.episode_number}:</span>
+            <span className="text-white font-semibold truncate max-w-[140px]">{currentPackage.title}</span>
+            <span className="text-zinc-600">•</span>
+            <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border ${statusBadge.badge}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dot}`} />
+              {statusBadge.label}
             </span>
-            {project.episodes.map((ep) => {
-              const isSelected = ep.id === currentPackage?.id;
-              const epBadge = getStatusBadge(ep.status);
-
-              return (
-                <button
-                  key={ep.id}
-                  onClick={() => setActivePackage(ep.id)}
-                  className={`flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-semibold transition-all border cursor-pointer ${
-                    isSelected
-                      ? 'bg-white/15 border-white/30 text-white font-bold shadow-sm'
-                      : 'bg-white/5 border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/10'
-                  }`}
-                >
-                  <span>Tập {ep.episode_number}</span>
-                  <span className={`w-2 h-2 rounded-full ${ep.status === 'PUBLISHED' ? 'bg-emerald-400' : ep.status === 'EPISODE_SUBMITTED' ? 'bg-purple-400' : 'bg-amber-400'}`} />
-                </button>
-              );
-            })}
           </div>
+        )}
 
-          {/* Active Package Status Badge */}
-          {currentPackage && (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-400">Trạng thái tập đang chọn:</span>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${statusBadge.color}`}>
-                {statusBadge.label}
+        {/* Right: Tokens, Role Identity & Actions */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          {/* Token Counter */}
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.07] text-xs">
+            <Zap className={`w-3.5 h-3.5 ${isQuotaWarning ? 'text-rose-400 animate-pulse' : 'text-amber-400'}`} />
+            <div className="flex items-center gap-1">
+              <span className="text-zinc-400 text-[11px] hidden lg:inline">Tokens:</span>
+              <span className={`font-mono font-semibold text-[11px] ${isQuotaWarning ? 'text-rose-400' : 'text-zinc-200'}`}>
+                {project.consumed_tokens} <span className="text-zinc-500">/</span> {project.allocated_tokens}
               </span>
             </div>
-          )}
+          </div>
+
+          {/* Role badge */}
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.07] text-xs">
+            {isCreator ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-ruby" />
+                <span className="text-zinc-300 font-medium">Creator</span>
+              </>
+            ) : (
+              <>
+                <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
+                <span className="text-zinc-300 font-medium">Reviewer</span>
+              </>
+            )}
+            <span className="text-zinc-600">•</span>
+            <span className="text-zinc-400 text-[11px] truncate max-w-[100px]">
+              {user?.name?.split(' ')[0] || (isCreator ? 'Huy' : 'Bảo')}
+            </span>
+          </div>
+
+          {/* Reset button */}
+          <button
+            onClick={resetDemoData}
+            title="Khôi phục dữ liệu mẫu"
+            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+          </button>
+
+          {/* OTT Home Link */}
+          <Link
+            href="/"
+            title="Trang chủ OTT"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition"
+          >
+            <Home className="w-3.5 h-3.5" />
+            <span className="hidden xl:inline">Trang chủ</span>
+          </Link>
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-300 hover:text-rose-300 bg-white/[0.04] hover:bg-rose-500/10 border border-white/[0.07] hover:border-rose-500/20 transition cursor-pointer"
+            title="Đăng xuất"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Đăng xuất</span>
+          </button>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
 

@@ -205,47 +205,47 @@ export default function CreatorDashboardPage() {
         {/* ========================================================================= */}
         {/* LEFT SIDEBAR NAVIGATION                                                   */}
         {/* ========================================================================= */}
-        <aside className="w-full md:w-72 bg-[#12151E] border-r border-white/10 flex flex-col shrink-0">
+        <aside className="w-full md:w-64 lg:w-72 bg-[#0E1017] border-r border-white/[0.08] flex flex-col shrink-0">
           {/* Episode Quick Switcher */}
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-              <span className="font-bold uppercase tracking-wider flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-ruby" /> Danh Sách Tập Phim
+          <div className="p-4 border-b border-white/[0.08]">
+            <div className="flex items-center justify-between text-xs text-zinc-400 mb-2.5">
+              <span className="font-semibold uppercase tracking-wider text-[10px] flex items-center gap-1.5 text-zinc-400">
+                <Layers className="w-3.5 h-3.5 text-ruby-light" /> Danh Sách Tập Phim
               </span>
-              <span className="text-[10px] font-mono text-emerald-400">{project.episodes.length} Tập</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] text-zinc-300 border border-white/[0.06]">{project.episodes.length} Tập</span>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               {project.episodes.map((ep) => {
                 const isSelected = ep.id === currentPackage?.id;
                 return (
                   <button
                     key={ep.id}
                     onClick={() => setActivePackage(ep.id)}
-                    className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between transition cursor-pointer border ${
+                    className={`w-full px-3 py-2 rounded-lg text-left flex items-center justify-between transition cursor-pointer ${
                       isSelected
-                        ? 'bg-ruby/15 border-ruby/50 text-white shadow-md shadow-ruby/10'
-                        : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                        ? 'bg-white/[0.08] text-white border-l-2 border-ruby shadow-sm'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03]'
                     }`}
                   >
                     <div className="min-w-0 pr-2">
-                      <div className="text-xs font-bold truncate flex items-center gap-1.5">
-                        <Clapperboard className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-ruby' : 'text-slate-500'}`} />
+                      <div className="text-xs font-semibold truncate flex items-center gap-1.5">
+                        <Clapperboard className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-ruby-light' : 'text-zinc-500'}`} />
                         <span className="truncate">{ep.title}</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
+                      <div className="text-[10px] text-zinc-500 mt-0.5 font-mono">
                         {ep.actual_tokens_used > 0 ? `${ep.actual_tokens_used} Tokens` : 'Chưa dùng Token'}
                       </div>
                     </div>
 
                     <span
-                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                      className={`w-2 h-2 rounded-full shrink-0 ${
                         ep.status === 'PUBLISHED'
-                          ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]'
+                          ? 'bg-emerald-400'
                           : ep.status === 'EPISODE_SUBMITTED'
                           ? 'bg-purple-400'
                           : ep.status === 'CHANGES_REQUESTED'
-                          ? 'bg-red-400 animate-pulse'
+                          ? 'bg-rose-400 animate-pulse'
                           : 'bg-amber-400'
                       }`}
                     />
@@ -256,17 +256,17 @@ export default function CreatorDashboardPage() {
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="p-4 space-y-1.5 flex-1">
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">
-              Chức Năng Maker
+          <nav className="p-3 space-y-1 flex-1">
+            <div className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2 px-3 pt-2">
+              Menu Sáng Tạo
             </div>
 
             <button
               onClick={() => setActiveTab('overview')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2.5 transition cursor-pointer ${
                 activeTab === 'overview'
-                  ? 'bg-ruby text-white shadow-lg shadow-ruby/25'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-ruby/15 text-ruby-light border border-ruby/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
               <LayoutDashboard className="w-4 h-4" />
@@ -275,18 +275,18 @@ export default function CreatorDashboardPage() {
 
             <button
               onClick={() => setActiveTab('brief')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                 activeTab === 'brief'
-                  ? 'bg-ruby text-white shadow-lg shadow-ruby/25'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-ruby/15 text-ruby-light border border-ruby/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <FileText className="w-4 h-4" />
                 <span>Kế Hoạch & Kịch Bản</span>
               </div>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/40 text-slate-300 font-mono">
-                {scenes.length} cảnh
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/40 text-zinc-400 font-mono">
+                {scenes.length}
               </span>
             </button>
 
@@ -298,83 +298,83 @@ export default function CreatorDashboardPage() {
                   setActiveTab('studio');
                 }
               }}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                 activeTab === 'studio'
-                  ? 'bg-ruby text-white shadow-lg shadow-ruby/25'
+                  ? 'bg-ruby/15 text-ruby-light border border-ruby/30 font-semibold'
                   : canEnterStudio
-                  ? 'text-slate-300 hover:text-white hover:bg-white/5'
-                  : 'text-slate-400 hover:bg-white/5'
+                  ? 'text-zinc-300 hover:text-white hover:bg-white/[0.04]'
+                  : 'text-zinc-500 hover:bg-white/[0.02]'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <Video className="w-4 h-4 text-[#8B5CF6]" />
+              <div className="flex items-center gap-2.5">
+                <Video className="w-4 h-4 text-purple-400" />
                 <span>AI Production Studio</span>
               </div>
               {canEnterStudio ? (
-                <span className="text-[10px] text-emerald-400 font-semibold flex items-center gap-1">
+                <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-1">
                   Mở <ExternalLink className="w-3 h-3" />
                 </span>
               ) : (
-                <span className="text-[10px] text-amber-400 font-semibold">Khóa</span>
+                <span className="text-[10px] text-zinc-500 font-medium">Khóa</span>
               )}
             </button>
 
             <button
               onClick={() => setActiveTab('tokens')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                 activeTab === 'tokens'
-                  ? 'bg-ruby text-white shadow-lg shadow-ruby/25'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-ruby/15 text-ruby-light border border-ruby/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <Zap className="w-4 h-4 text-amber-400" />
                 <span>AI Token Quota</span>
               </div>
-              <span className="text-[10px] text-amber-300 font-mono">
+              <span className="text-[10px] text-amber-300/80 font-mono">
                 {currentPackage?.actual_tokens_used}/{currentPackage?.quota_allocated}
               </span>
             </button>
 
             <button
               onClick={() => setActiveTab('reviews')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                 activeTab === 'reviews'
-                  ? 'bg-ruby text-white shadow-lg shadow-ruby/25'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-ruby/15 text-ruby-light border border-ruby/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <MessageSquare className="w-4 h-4 text-blue-400" />
                 <span>Phản Hồi & Thẩm Định</span>
               </div>
               {latestFeedback && (
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
               )}
             </button>
           </nav>
 
           {/* Bottom Sidebar Token Card */}
-          <div className="p-4 border-t border-white/10 bg-black/20">
-            <div className="bg-[#161922] p-3 rounded-xl border border-white/10 space-y-2">
+          <div className="p-3 border-t border-white/[0.08] bg-black/30">
+            <div className="bg-white/[0.03] p-3 rounded-lg border border-white/[0.06] space-y-2">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400 font-bold">Quota Tập Hiện Tại:</span>
-                <span className="font-mono text-amber-400 font-bold">
+                <span className="text-zinc-400 text-[11px] font-medium">Quota Tập Đang Chọn:</span>
+                <span className="font-mono text-amber-300 font-semibold text-xs">
                   {currentPackage?.quota_allocated > 0 ? `${currentPackage.quota_allocated} T` : 'Chưa cấp'}
                 </span>
               </div>
-              <div className="w-full bg-black/50 h-2 rounded-full overflow-hidden border border-white/5">
+              <div className="w-full bg-zinc-800/80 h-1.5 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
-                    isQuotaWarning ? 'bg-red-500' : 'bg-gradient-to-r from-emerald-500 to-amber-500'
+                    isQuotaWarning ? 'bg-rose-500' : 'bg-gradient-to-r from-emerald-400 to-amber-400'
                   }`}
                   style={{
                     width: `${currentPackage?.quota_allocated > 0 ? Math.min(100, (currentPackage.actual_tokens_used / currentPackage.quota_allocated) * 100) : 0}%`,
                   }}
                 />
               </div>
-              <p className="text-[10px] text-slate-400 truncate">
-                Trạng thái: <strong className="text-white">{currentPackage?.status}</strong>
+              <p className="text-[10px] text-zinc-500 truncate">
+                Trạng thái: <strong className="text-zinc-300 font-medium">{currentPackage?.status}</strong>
               </p>
             </div>
           </div>
@@ -423,62 +423,71 @@ export default function CreatorDashboardPage() {
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* 4 Metric Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div className="bg-[#12141C] p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors relative overflow-hidden">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Dự án Tổng Thể</span>
-                    <Film className="w-4 h-4 text-ruby" />
+                    <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Dự án Tổng Thể</span>
+                    <div className="w-7 h-7 rounded-lg bg-ruby/10 border border-ruby/20 flex items-center justify-center">
+                      <Film className="w-3.5 h-3.5 text-ruby-light" />
+                    </div>
                   </div>
-                  <p className="text-lg font-black text-white mt-2 truncate">{project.title}</p>
-                  <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
+                  <p className="text-base font-bold text-white mt-2.5 truncate">{project.title}</p>
+                  <div className="flex items-center gap-2 mt-1.5 text-xs text-zinc-400">
                     <span>{project.total_episodes} Tập</span>
                     <span>•</span>
-                    <span className="text-emerald-400 font-semibold">{project.genre[0]}</span>
+                    <span className="text-zinc-300 font-medium">{project.genre[0]}</span>
                   </div>
                 </div>
 
-                <div className={`p-5 rounded-2xl border shadow-lg relative overflow-hidden ${
-                  isQuotaWarning ? 'bg-[#1C1418] border-red-500/40 shadow-red-900/20' : 'bg-[#161922] border-white/10'
+                <div className={`p-4 rounded-xl border transition-colors relative overflow-hidden ${
+                  isQuotaWarning ? 'bg-rose-950/20 border-rose-500/30' : 'bg-[#12141C] border-white/[0.08] hover:border-white/[0.14]'
                 }`}>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">AI Token Quota</span>
-                    <Zap className={`w-4 h-4 ${isQuotaWarning ? 'text-red-400' : 'text-amber-400'}`} />
+                    <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">AI Token Quota</span>
+                    <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                      <Zap className={`w-3.5 h-3.5 ${isQuotaWarning ? 'text-rose-400' : 'text-amber-400'}`} />
+                    </div>
                   </div>
-                  <div className="flex items-baseline gap-2 mt-2">
-                    <span className="text-2xl font-black text-white">{currentPackage?.actual_tokens_used}</span>
-                    <span className="text-xs text-slate-400">/ {currentPackage?.quota_allocated} Tokens</span>
+                  <div className="flex items-baseline gap-1.5 mt-2.5">
+                    <span className="text-xl font-bold font-mono text-white">{currentPackage?.actual_tokens_used}</span>
+                    <span className="text-xs text-zinc-500 font-mono">/ {currentPackage?.quota_allocated} T</span>
                   </div>
-                  <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
+                  <div className="w-full bg-zinc-800/80 h-1.5 rounded-full overflow-hidden mt-2">
                     <div
-                      className={`h-full rounded-full ${isQuotaWarning ? 'bg-red-500' : 'bg-amber-400'}`}
+                      className={`h-full rounded-full transition-all duration-500 ${isQuotaWarning ? 'bg-rose-500' : 'bg-amber-400'}`}
                       style={{ width: `${currentPackage?.quota_allocated > 0 ? Math.min(100, (currentPackage.actual_tokens_used / currentPackage.quota_allocated) * 100) : 0}%` }}
                     />
                   </div>
                 </div>
 
-                <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden">
+                <div className="bg-[#12141C] p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors relative overflow-hidden">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Kế Hoạch & Phân Cảnh</span>
-                    <Clock className="w-4 h-4 text-purple-400" />
+                    <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Kế Hoạch & Kịch Bản</span>
+                    <div className="w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                      <Clock className="w-3.5 h-3.5 text-purple-400" />
+                    </div>
                   </div>
-                  <p className="text-base font-black text-white mt-2">
-                    {scenes.length} Phân Cảnh
+                  <p className="text-xl font-bold font-mono text-white mt-2.5">
+                    {scenes.length} <span className="text-xs font-sans font-normal text-zinc-400">Phân Cảnh</span>
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Dự toán: <span className="text-purple-300 font-bold">{estimatedTokens} Tokens</span>
+                  <p className="text-xs text-zinc-400 mt-1">
+                    Dự toán: <span className="text-purple-300 font-mono font-medium">{estimatedTokens} Tokens</span>
                   </p>
                 </div>
 
-                <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden">
+                <div className="bg-[#12141C] p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors relative overflow-hidden">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tiến Độ Studio</span>
-                    <Video className="w-4 h-4 text-blue-400" />
+                    <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Tiến Độ Studio</span>
+                    <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                      <Video className="w-3.5 h-3.5 text-blue-400" />
+                    </div>
                   </div>
-                  <p className="text-base font-black text-white mt-2">
-                    {completedJobsCount}/{totalJobsCount} Phân Đoạn Hoàn Tất
+                  <p className="text-xl font-bold font-mono text-white mt-2.5">
+                    {completedJobsCount}/{totalJobsCount} <span className="text-xs font-sans font-normal text-zinc-400">Phân Đoạn</span>
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Trạng thái: <strong className="text-emerald-400">{currentPackage?.status}</strong>
+                  <p className="text-xs text-zinc-400 mt-1 flex items-center gap-1.5">
+                    <span>Trạng thái:</span>
+                    <span className="text-emerald-400 font-medium">{currentPackage?.status}</span>
                   </p>
                 </div>
               </div>

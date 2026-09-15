@@ -149,48 +149,48 @@ export default function ReviewerDashboardPage() {
         {/* ========================================================================= */}
         {/* LEFT SIDEBAR NAVIGATION                                                   */}
         {/* ========================================================================= */}
-        <aside className="w-full md:w-72 bg-[#12151E] border-r border-white/10 flex flex-col shrink-0">
+        <aside className="w-full md:w-64 lg:w-72 bg-[#0E1017] border-r border-white/[0.08] flex flex-col shrink-0">
           {/* Episode Quick Switcher */}
-          <div className="p-4 border-b border-white/10">
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-              <span className="font-bold uppercase tracking-wider flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-[#8B5CF6]" /> Tập Phim Cần Duyệt
+          <div className="p-4 border-b border-white/[0.08]">
+            <div className="flex items-center justify-between text-xs text-zinc-400 mb-2.5">
+              <span className="font-semibold uppercase tracking-wider text-[10px] flex items-center gap-1.5 text-zinc-400">
+                <Layers className="w-3.5 h-3.5 text-purple-400" /> Tập Phim Cần Duyệt
               </span>
-              <span className="text-[10px] font-mono text-neon-light">{project.episodes.length} Tập</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.05] text-zinc-300 border border-white/[0.06]">{project.episodes.length} Tập</span>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               {project.episodes.map((ep) => {
                 const isSelected = ep.id === currentPackage?.id;
                 return (
                   <button
                     key={ep.id}
                     onClick={() => setActivePackage(ep.id)}
-                    className={`w-full p-2.5 rounded-xl text-left flex items-center justify-between transition cursor-pointer border ${
+                    className={`w-full px-3 py-2 rounded-lg text-left flex items-center justify-between transition cursor-pointer ${
                       isSelected
-                        ? 'bg-[#8B5CF6]/15 border-[#8B5CF6]/50 text-white shadow-md shadow-[#8B5CF6]/10'
-                        : 'bg-white/5 border-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+                        ? 'bg-white/[0.08] text-white border-l-2 border-purple-500 shadow-sm'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.03]'
                     }`}
                   >
                     <div className="min-w-0 pr-2">
-                      <div className="text-xs font-bold truncate flex items-center gap-1.5">
-                        <Film className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-[#8B5CF6]' : 'text-slate-500'}`} />
+                      <div className="text-xs font-semibold truncate flex items-center gap-1.5">
+                        <Film className={`w-3.5 h-3.5 shrink-0 ${isSelected ? 'text-purple-400' : 'text-zinc-500'}`} />
                         <span className="truncate">{ep.title}</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5 font-mono">
+                      <div className="text-[10px] text-zinc-500 mt-0.5 font-mono">
                         {ep.status}
                       </div>
                     </div>
 
                     <span
-                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                      className={`w-2 h-2 rounded-full shrink-0 ${
                         ep.status === 'PUBLISHED'
-                          ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]'
+                          ? 'bg-emerald-400'
                           : ep.status === 'EPISODE_SUBMITTED'
                           ? 'bg-purple-400 animate-pulse'
                           : ep.status === 'PLAN_PENDING'
                           ? 'bg-amber-400'
-                          : 'bg-slate-500'
+                          : 'bg-zinc-600'
                       }`}
                     />
                   </button>
@@ -200,17 +200,17 @@ export default function ReviewerDashboardPage() {
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="p-4 space-y-1.5 flex-1">
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-2">
-              Chức Năng Checker
+          <nav className="p-3 space-y-1 flex-1">
+            <div className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider mb-2 px-3 pt-2">
+              Menu Thẩm Định
             </div>
 
             <button
               onClick={() => setActiveTab('overview')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2.5 transition cursor-pointer ${
                 activeTab === 'overview'
-                  ? 'bg-gradient-to-r from-purple-700 to-[#8B5CF6] text-white shadow-lg shadow-purple-900/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
               <LayoutDashboard className="w-4 h-4" />
@@ -219,18 +219,18 @@ export default function ReviewerDashboardPage() {
 
             <button
               onClick={() => setActiveTab('plans')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                 activeTab === 'plans'
-                  ? 'bg-gradient-to-r from-purple-700 to-[#8B5CF6] text-white shadow-lg shadow-purple-900/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <CheckSquare className="w-4 h-4 text-amber-400" />
                 <span>Duyệt Kế Hoạch & Quota</span>
               </div>
               {pendingPlanEpisodes.length > 0 && (
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-300 font-semibold border border-amber-500/20">
                   {pendingPlanEpisodes.length} chờ
                 </span>
               )}
@@ -238,18 +238,18 @@ export default function ReviewerDashboardPage() {
 
             <button
               onClick={() => setActiveTab('audits')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                 activeTab === 'audits'
-                  ? 'bg-gradient-to-r from-purple-700 to-[#8B5CF6] text-white shadow-lg shadow-purple-900/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <BadgeCheck className="w-4 h-4 text-emerald-400" />
                 <span>Kiểm Định Video & Pháp Lý</span>
               </div>
               {submittedEpisodes.length > 0 && (
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-purple-500/15 text-purple-300 font-semibold border border-purple-500/20">
                   {submittedEpisodes.length}
                 </span>
               )}
@@ -257,13 +257,13 @@ export default function ReviewerDashboardPage() {
 
             <button
               onClick={() => setActiveTab('projects')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                 activeTab === 'projects'
-                  ? 'bg-gradient-to-r from-purple-700 to-[#8B5CF6] text-white shadow-lg shadow-purple-900/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <Film className="w-4 h-4 text-blue-400" />
                 <span>Quản Lý Dự Án</span>
               </div>
@@ -271,29 +271,29 @@ export default function ReviewerDashboardPage() {
 
             <button
               onClick={() => setActiveTab('tokens')}
-              className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between transition cursor-pointer ${
+              className={`w-full px-3 py-2 rounded-lg text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                 activeTab === 'tokens'
-                  ? 'bg-gradient-to-r from-purple-700 to-[#8B5CF6] text-white shadow-lg shadow-purple-900/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-purple-500/15 text-purple-300 border border-purple-500/30 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
                 <Zap className="w-4 h-4 text-amber-400" />
                 <span>Ngân Sách AI Tokens</span>
               </div>
-              <span className="text-[10px] text-amber-300 font-mono">
+              <span className="text-[10px] text-amber-300/80 font-mono">
                 {project.allocated_tokens}/{project.total_budget_tokens}
               </span>
             </button>
           </nav>
 
           {/* Bottom Sidebar Action */}
-          <div className="p-4 border-t border-white/10 bg-black/20">
+          <div className="p-3 border-t border-white/[0.08] bg-black/30">
             <button
               onClick={() => setIsCreateProjectModalOpen(true)}
-              className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
+              className="w-full py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.07] text-zinc-300 hover:text-white font-medium text-xs flex items-center justify-center gap-2 transition cursor-pointer"
             >
-              <Plus className="w-4 h-4 text-neon" /> Khởi Tạo Dự Án Mới
+              <Plus className="w-3.5 h-3.5 text-purple-400" /> Khởi Tạo Dự Án Mới
             </button>
           </div>
         </aside>
@@ -339,51 +339,60 @@ export default function ReviewerDashboardPage() {
           {activeTab === 'overview' && (
             <div className="space-y-6">
               {/* 4 Metric Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-lg">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div className="bg-[#12141C] p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors relative overflow-hidden">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Kế Hoạch Chờ Duyệt</span>
-                    <Clock className="w-4 h-4 text-amber-400" />
+                    <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Kế Hoạch Chờ Duyệt</span>
+                    <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                      <Clock className="w-3.5 h-3.5 text-amber-400" />
+                    </div>
                   </div>
-                  <p className="text-2xl font-black text-amber-300 mt-2">
-                    {pendingPlanEpisodes.length} Tập
+                  <p className="text-xl font-bold font-mono text-amber-300 mt-2.5">
+                    {pendingPlanEpisodes.length} <span className="text-xs font-sans font-normal text-zinc-400">Tập</span>
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">Cần xem xét Content Brief</p>
+                  <p className="text-xs text-zinc-500 mt-1">Cần xem xét Content Brief</p>
                 </div>
 
-                <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-lg">
+                <div className="bg-[#12141C] p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors relative overflow-hidden">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Video Chờ Kiểm Toán</span>
-                    <BadgeCheck className="w-4 h-4 text-purple-400" />
+                    <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Video Chờ Kiểm Toán</span>
+                    <div className="w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                      <BadgeCheck className="w-3.5 h-3.5 text-purple-400" />
+                    </div>
                   </div>
-                  <p className="text-2xl font-black text-purple-300 mt-2">
-                    {submittedEpisodes.length} Tập
+                  <p className="text-xl font-bold font-mono text-purple-300 mt-2.5">
+                    {submittedEpisodes.length} <span className="text-xs font-sans font-normal text-zinc-400">Tập</span>
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">Đã render xong trong Studio</p>
+                  <p className="text-xs text-zinc-500 mt-1">Đã hoàn thành phân cảnh AI</p>
                 </div>
 
-                <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-lg">
+                <div className="bg-[#12141C] p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors relative overflow-hidden">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Quota Đã Phân Bổ</span>
-                    <Zap className="w-4 h-4 text-neon" />
+                    <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Quota Đã Phân Bổ</span>
+                    <div className="w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+                      <Zap className="w-3.5 h-3.5 text-purple-400" />
+                    </div>
                   </div>
-                  <p className="text-2xl font-black text-white mt-2">
-                    {project.allocated_tokens} <span className="text-xs font-normal text-slate-400">/ {project.total_budget_tokens} T</span>
-                  </p>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Maker đã dùng: <strong className="text-amber-300">{project.consumed_tokens} T</strong>
+                  <div className="flex items-baseline gap-1.5 mt-2.5">
+                    <span className="text-xl font-bold font-mono text-white">{project.allocated_tokens}</span>
+                    <span className="text-xs text-zinc-500 font-mono">/ {project.total_budget_tokens} T</span>
+                  </div>
+                  <p className="text-xs text-zinc-500 mt-1">
+                    Maker đã dùng: <span className="text-amber-300 font-mono font-medium">{project.consumed_tokens} T</span>
                   </p>
                 </div>
 
-                <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-lg">
+                <div className="bg-[#12141C] p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors relative overflow-hidden">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Đã Lên Sóng OTT</span>
-                    <Tv className="w-4 h-4 text-emerald-400" />
+                    <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">Đã Lên Sóng OTT</span>
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                      <Tv className="w-3.5 h-3.5 text-emerald-400" />
+                    </div>
                   </div>
-                  <p className="text-2xl font-black text-emerald-400 mt-2">
-                    {project.episodes.filter((e) => e.status === 'PUBLISHED').length} Tập
+                  <p className="text-xl font-bold font-mono text-emerald-400 mt-2.5">
+                    {project.episodes.filter((e) => e.status === 'PUBLISHED').length} <span className="text-xs font-sans font-normal text-zinc-400">Tập</span>
                   </p>
-                  <p className="text-xs text-slate-400 mt-1">Đạt chuẩn Điều 44 & NĐ 142</p>
+                  <p className="text-xs text-zinc-500 mt-1">Đạt chuẩn Điều 44 & NĐ 142</p>
                 </div>
               </div>
 
