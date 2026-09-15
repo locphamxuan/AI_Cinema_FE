@@ -33,41 +33,41 @@ export function RoleNavHeader() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'PLAN_DRAFT':
-        return { label: 'Bản Nháp Brief', dot: 'bg-zinc-400', badge: 'bg-zinc-800/80 text-zinc-300 border-zinc-700/60' };
+        return { label: 'Bản Nháp Brief', dot: 'bg-slate-400', badge: 'bg-slate-100 text-slate-700 border-slate-200' };
       case 'PLAN_PENDING':
-        return { label: 'Chờ Duyệt Quota', dot: 'bg-amber-400', badge: 'bg-amber-500/10 text-amber-300 border-amber-500/20' };
+        return { label: 'Chờ Duyệt Quota', dot: 'bg-amber-500', badge: 'bg-amber-50 text-amber-700 border-amber-200' };
       case 'QUOTA_ALLOCATED':
-        return { label: 'Đã Cấp Quota AI', dot: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
+        return { label: 'Đã Cấp Quota AI', dot: 'bg-emerald-500', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
       case 'IN_PRODUCTION':
-        return { label: 'Đang Sản Xuất', dot: 'bg-blue-400', badge: 'bg-blue-500/10 text-blue-300 border-blue-500/20' };
+        return { label: 'Đang Sản Xuất', dot: 'bg-blue-500', badge: 'bg-blue-50 text-blue-700 border-blue-200' };
       case 'EPISODE_SUBMITTED':
-        return { label: 'Chờ Thẩm Định Video', dot: 'bg-purple-400', badge: 'bg-purple-500/10 text-purple-300 border-purple-500/20' };
+        return { label: 'Chờ Thẩm Định Video', dot: 'bg-purple-500', badge: 'bg-purple-50 text-purple-700 border-purple-200' };
       case 'CHANGES_REQUESTED':
-        return { label: 'Yêu Cầu Sửa Đổi', dot: 'bg-rose-400', badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' };
+        return { label: 'Yêu Cầu Sửa Đổi', dot: 'bg-rose-500', badge: 'bg-rose-50 text-rose-700 border-rose-200' };
       case 'COMPLIANCE_PASSED':
-        return { label: 'Đạt Chuẩn Pháp Lý', dot: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
+        return { label: 'Đạt Chuẩn Pháp Lý', dot: 'bg-emerald-500', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200' };
       case 'PUBLISHED':
-        return { label: 'Đã Phát Hành', dot: 'bg-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
+        return { label: 'Đã Phát Hành', dot: 'bg-emerald-500', badge: 'bg-emerald-50 text-emerald-700 border-emerald-300' };
       default:
-        return { label: status, dot: 'bg-zinc-400', badge: 'bg-zinc-800 text-zinc-300 border-zinc-700' };
+        return { label: status, dot: 'bg-slate-400', badge: 'bg-slate-100 text-slate-700 border-slate-200' };
     }
   };
 
   const statusBadge = getStatusBadge(currentPackage?.status || 'PLAN_PENDING');
 
   return (
-    <header className="bg-[#0C0E14] border-b border-white/[0.08] text-white sticky top-0 z-30 backdrop-blur-xl w-full">
+    <header className="bg-white border-b border-slate-200 text-slate-800 sticky top-0 z-30 shadow-xs w-full">
       <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
         {/* Left: Brand / Project Identity */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-ruby/15 border border-ruby/30 flex items-center justify-center shrink-0 shadow-sm">
-            <Film className="w-4 h-4 text-ruby-light" />
+          <div className="w-8 h-8 rounded-lg bg-ruby/10 border border-ruby/20 flex items-center justify-center shrink-0">
+            <Film className="w-4 h-4 text-ruby" />
           </div>
           <div className="min-w-0 flex items-center gap-2">
-            <h1 className="text-sm font-bold text-white tracking-tight truncate">
+            <h1 className="text-sm font-bold text-slate-900 tracking-tight truncate">
               {project.title}
             </h1>
-            <span className="hidden sm:inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white/[0.06] text-zinc-400 border border-white/[0.08]">
+            <span className="hidden sm:inline-flex items-center text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
               {isCreator ? 'Maker Studio' : 'Checker Hub'}
             </span>
           </div>
@@ -75,10 +75,10 @@ export function RoleNavHeader() {
 
         {/* Center: Selected Episode Status Pill */}
         {currentPackage && (
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs">
-            <span className="text-zinc-400 font-medium">Tập {currentPackage.episode_number}:</span>
-            <span className="text-white font-semibold truncate max-w-[140px]">{currentPackage.title}</span>
-            <span className="text-zinc-600">•</span>
+          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-xs">
+            <span className="text-slate-500 font-medium">Tập {currentPackage.episode_number}:</span>
+            <span className="text-slate-900 font-semibold truncate max-w-[140px]">{currentPackage.title}</span>
+            <span className="text-slate-300">•</span>
             <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border ${statusBadge.badge}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dot}`} />
               {statusBadge.label}
@@ -89,31 +89,31 @@ export function RoleNavHeader() {
         {/* Right: Tokens, Role Identity & Actions */}
         <div className="flex items-center gap-2.5 shrink-0">
           {/* Token Counter */}
-          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.07] text-xs">
-            <Zap className={`w-3.5 h-3.5 ${isQuotaWarning ? 'text-rose-400 animate-pulse' : 'text-amber-400'}`} />
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-xs">
+            <Zap className={`w-3.5 h-3.5 ${isQuotaWarning ? 'text-rose-500 animate-pulse' : 'text-amber-500'}`} />
             <div className="flex items-center gap-1">
-              <span className="text-zinc-400 text-[11px] hidden lg:inline">Tokens:</span>
-              <span className={`font-mono font-semibold text-[11px] ${isQuotaWarning ? 'text-rose-400' : 'text-zinc-200'}`}>
-                {project.consumed_tokens} <span className="text-zinc-500">/</span> {project.allocated_tokens}
+              <span className="text-slate-500 text-[11px] hidden lg:inline">Tokens:</span>
+              <span className={`font-mono font-bold text-[11px] ${isQuotaWarning ? 'text-rose-600' : 'text-slate-800'}`}>
+                {project.consumed_tokens} <span className="text-slate-400">/</span> {project.allocated_tokens}
               </span>
             </div>
           </div>
 
           {/* Role badge */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.07] text-xs">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-xs">
             {isCreator ? (
               <>
                 <span className="w-2 h-2 rounded-full bg-ruby" />
-                <span className="text-zinc-300 font-medium">Creator</span>
+                <span className="text-slate-700 font-medium">Creator</span>
               </>
             ) : (
               <>
                 <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-                <span className="text-zinc-300 font-medium">Reviewer</span>
+                <span className="text-slate-700 font-medium">Reviewer</span>
               </>
             )}
-            <span className="text-zinc-600">•</span>
-            <span className="text-zinc-400 text-[11px] truncate max-w-[100px]">
+            <span className="text-slate-300">•</span>
+            <span className="text-slate-500 text-[11px] truncate max-w-[100px]">
               {user?.name?.split(' ')[0] || (isCreator ? 'Huy' : 'Bảo')}
             </span>
           </div>
@@ -122,7 +122,7 @@ export function RoleNavHeader() {
           <button
             onClick={resetDemoData}
             title="Khôi phục dữ liệu mẫu"
-            className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition cursor-pointer"
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>
@@ -131,7 +131,7 @@ export function RoleNavHeader() {
           <Link
             href="/"
             title="Trang chủ OTT"
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-transparent hover:border-slate-200 transition"
           >
             <Home className="w-3.5 h-3.5" />
             <span className="hidden xl:inline">Trang chủ</span>
@@ -140,7 +140,7 @@ export function RoleNavHeader() {
           {/* Logout Button */}
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-300 hover:text-rose-300 bg-white/[0.04] hover:bg-rose-500/10 border border-white/[0.07] hover:border-rose-500/20 transition cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-700 hover:text-rose-600 bg-slate-100 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 transition cursor-pointer"
             title="Đăng xuất"
           >
             <LogOut className="w-3.5 h-3.5" />

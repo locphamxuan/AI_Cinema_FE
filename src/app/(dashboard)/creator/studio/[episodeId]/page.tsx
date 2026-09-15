@@ -11,20 +11,13 @@ import {
   Play,
   Pause,
   Zap,
-  Sparkles,
-  Send,
   Plus,
   Trash2,
   CheckCircle2,
-  Clock,
   Layers,
   ArrowLeft,
   ArrowRight,
-  Settings,
   Cpu,
-  Volume2,
-  Film,
-  Eye,
   AlertCircle,
   FileCheck,
 } from 'lucide-react';
@@ -56,7 +49,6 @@ export default function CreatorStudioPage() {
   const assets = currentPackage?.assets || [];
 
   const [selectedJobId, setSelectedJobId] = useState<string>(jobs[0]?.id || '');
-  const [activeVideoPreview, setActiveVideoPreview] = useState<string>(assets[0]?.url || 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8');
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
 
@@ -65,51 +57,43 @@ export default function CreatorStudioPage() {
   const [newPromptVideo, setNewPromptVideo] = useState('');
   const [newPromptAudio, setNewPromptAudio] = useState('');
   const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].id);
-  const [tokenCost, setTokenCost] = useState(70);
+  const [tokenCost] = useState(70);
 
   const [renderingJobId, setRenderingJobId] = useState<string | null>(null);
 
   React.useEffect(() => {
     if (currentPackage) {
       setActivePackage(currentPackage.id);
-      if (jobs.length > 0 && !selectedJobId) {
-        setSelectedJobId(jobs[0].id);
-      }
     }
-  }, [currentPackage, jobs, selectedJobId, setActivePackage]);
+  }, [currentPackage?.id]);
 
   const selectedJob = jobs.find((j) => j.id === selectedJobId) || jobs[0];
-  const selectedAsset = assets.find((a) => a.job_id === selectedJob?.id);
+  const selectedAsset = assets.find((a) => a.job_id === selectedJob?.id) || assets[0];
 
-  const handleGenerate = async (jobId: string) => {
+  const handleGenerate = (jobId: string) => {
     setRenderingJobId(jobId);
-    const success = await triggerGenerationJob(currentPackage.id, jobId);
-    setRenderingJobId(null);
-    if (success) {
-      const updatedAsset = assets.find((a) => a.job_id === jobId);
-      if (updatedAsset) {
-        setActiveVideoPreview(updatedAsset.url);
-      }
-    }
+    triggerGenerationJob(currentPackage.id, jobId);
+    setTimeout(() => {
+      setRenderingJobId(null);
+    }, 4000);
   };
 
   const handleAddJob = () => {
-    if (!newSceneTitle.trim() || !newPromptVideo.trim()) {
-      alert('Vui lòng nhập tên phân cảnh và Visual Prompt!');
+    if (!newSceneTitle.trim()) {
+      alert('Vui lòng nhập tên phân cảnh mới!');
       return;
     }
-
+    const nextSceneNum = jobs.length + 1;
     addSceneJob(currentPackage.id, {
       episode_id: currentPackage.id,
-      scene_id: `sc-${Date.now()}`,
-      scene_number: jobs.length + 1,
+      scene_id: `scene-${nextSceneNum}`,
+      scene_number: nextSceneNum,
       title: newSceneTitle,
-      prompt_video: newPromptVideo,
-      prompt_audio: newPromptAudio || 'Voiceover and ambient background.',
       ai_model: selectedModel,
+      prompt_video: newPromptVideo || 'Cinematic shot, highly detailed lighting',
+      prompt_audio: newPromptAudio || 'Ambient cinematic background music',
       token_cost: tokenCost,
     });
-
     setNewSceneTitle('');
     setNewPromptVideo('');
     setNewPromptAudio('');
@@ -130,21 +114,21 @@ export default function CreatorStudioPage() {
   // Access Control: Block Reviewer from accessing Creator Studio directly
   if (isAuthenticated && user?.role === 'reviewer') {
     return (
-      <div className="min-h-screen bg-[#0B0C10] text-white flex flex-col items-center justify-center p-6">
-        <div className="max-w-md w-full bg-[#161922] border border-amber-500/30 rounded-2xl p-8 shadow-2xl text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col items-center justify-center p-6 font-sans">
+        <div className="max-w-md w-full bg-white border border-amber-200 rounded-2xl p-8 shadow-xl text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto">
             <AlertCircle className="w-8 h-8" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white mb-2">Không đúng quyền truy cập</h2>
-            <p className="text-sm text-slate-400">
-              Tài khoản hiện tại của bạn là <strong className="text-purple-400">Reviewer (Checker)</strong>. Trang này chỉ dành riêng cho vai trò <strong className="text-ruby-light">Creator (Maker)</strong>.
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Không đúng quyền truy cập</h2>
+            <p className="text-sm text-slate-600">
+              Tài khoản hiện tại của bạn là <strong className="text-purple-600">Reviewer (Checker)</strong>. Trang này chỉ dành riêng cho vai trò <strong className="text-ruby">Creator (Maker)</strong>.
             </p>
           </div>
           <div className="space-y-3">
             <button
               onClick={() => router.push('/reviewer')}
-              className="w-full py-3 px-4 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-purple-900/30"
+              className="w-full py-3 px-4 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-purple-200"
             >
               <span>Đến trang Thẩm định (Reviewer)</span>
               <ArrowRight className="w-4 h-4" />
@@ -155,7 +139,7 @@ export default function CreatorStudioPage() {
                 router.push('/');
                 openAuthModal('login');
               }}
-              className="w-full py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 font-semibold transition cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition cursor-pointer"
             >
               Đăng xuất & Đăng nhập tài khoản Creator
             </button>
@@ -166,44 +150,44 @@ export default function CreatorStudioPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0C10] text-slate-100 pb-20 font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 pb-20 font-sans">
       {/* Role Navigation Top Header */}
       <RoleNavHeader />
 
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Studio Sub-Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
             <Link
               href="/creator"
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-colors"
+              className="p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 transition-colors shadow-xs"
             >
               <ArrowLeft className="w-4 h-4" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black px-2 py-0.5 rounded bg-ruby/20 text-ruby-light border border-ruby/40">
+                <span className="text-xs font-bold px-2 py-0.5 rounded bg-ruby/10 text-ruby border border-ruby/20">
                   AI STUDIO WORKSPACE
                 </span>
-                <span className="text-xs text-slate-400 font-mono">Tập {currentPackage.episode_number}</span>
+                <span className="text-xs text-slate-500 font-mono">Tập {currentPackage.episode_number}</span>
               </div>
-              <h2 className="text-xl font-bold text-white tracking-tight mt-0.5">{currentPackage.title}</h2>
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-0.5">{currentPackage.title}</h2>
             </div>
           </div>
 
           {/* Quota tracker & Submit Action */}
           <div className="flex items-center gap-3">
-            <div className="bg-[#161922] px-3.5 py-2 rounded-xl border border-white/10 flex items-center gap-3">
+            <div className="bg-white px-3.5 py-2 rounded-xl border border-slate-200 flex items-center gap-3 shadow-xs">
               <div>
-                <span className="text-[10px] text-slate-400 block font-bold uppercase">Hạn Mức Quota</span>
-                <span className="text-xs font-mono font-bold text-amber-300">
+                <span className="text-[10px] text-slate-500 block font-bold uppercase">Hạn Mức Quota</span>
+                <span className="text-xs font-mono font-bold text-amber-600">
                   {currentPackage.actual_tokens_used} / {currentPackage.quota_allocated} Tokens
                 </span>
               </div>
-              <div className="h-6 w-px bg-white/10" />
+              <div className="h-6 w-px bg-slate-200" />
               <div>
-                <span className="text-[10px] text-slate-400 block font-bold uppercase">Còn lại</span>
-                <span className={`text-xs font-mono font-bold ${remainingQuota < 50 ? 'text-red-400' : 'text-emerald-400'}`}>
+                <span className="text-[10px] text-slate-500 block font-bold uppercase">Còn lại</span>
+                <span className={`text-xs font-mono font-bold ${remainingQuota < 50 ? 'text-rose-600' : 'text-emerald-600'}`}>
                   {remainingQuota} Tokens
                 </span>
               </div>
@@ -212,14 +196,14 @@ export default function CreatorStudioPage() {
             <button
               onClick={() => setIsSubmitModalOpen(true)}
               disabled={!allCompleted}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg cursor-pointer ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer ${
                 allCompleted
-                  ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-emerald-900/30 hover:scale-105'
-                  : 'bg-white/5 border border-white/10 text-slate-500 cursor-not-allowed'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200'
+                  : 'bg-slate-100 border border-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
-              <Send className="w-3.5 h-3.5" />
-              <span>Submit Episode to Checker</span>
+              <Zap className="w-3.5 h-3.5" />
+              <span>Nộp Bản Dựng Cho Checker</span>
             </button>
           </div>
         </div>
@@ -231,13 +215,13 @@ export default function CreatorStudioPage() {
           {/* Left Column (7 cols): Main Viewport & Timeline Assembly */}
           <div className="lg:col-span-7 space-y-6">
             {/* Video Player Previewer */}
-            <div className="bg-[#161922] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
-              <div className="p-3.5 bg-[#11141D] border-b border-white/10 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2 font-bold text-white">
+            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+              <div className="p-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2 font-bold text-slate-900">
                   <Video className="w-4 h-4 text-ruby" />
                   <span>Trình Phát Ghép Bản Dựng Phân Cảnh (Episode Assembly)</span>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-white/10 text-slate-300 font-mono text-[11px]">
+                <span className="px-2 py-0.5 rounded bg-white text-slate-600 border border-slate-200 font-mono text-[11px]">
                   4K 60fps • HEVC
                 </span>
               </div>
@@ -278,7 +262,7 @@ export default function CreatorStudioPage() {
                         <span className="font-mono text-xs">00:06 / {selectedAsset ? `00:${selectedAsset.duration_seconds}` : '00:15'}</span>
                       </div>
 
-                      <span className="text-slate-400 font-mono text-[11px]">
+                      <span className="text-slate-300 font-mono text-[11px]">
                         Model: {selectedJob?.ai_model || 'CinemaGen v3.2'}
                       </span>
                     </div>
@@ -288,38 +272,38 @@ export default function CreatorStudioPage() {
 
               {/* Clip Metadata Bar */}
               {selectedAsset && (
-                <div className="p-3.5 bg-[#0E1017] border-t border-white/10 grid grid-cols-4 gap-2 text-center text-xs">
+                <div className="p-3.5 bg-slate-50 border-t border-slate-200 grid grid-cols-4 gap-2 text-center text-xs">
                   <div>
                     <span className="text-[10px] text-slate-500 block uppercase font-bold">Độ phân giải</span>
-                    <span className="font-mono font-bold text-white">{selectedAsset.resolution}</span>
+                    <span className="font-mono font-bold text-slate-900">{selectedAsset.resolution}</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-500 block uppercase font-bold">Thời lượng</span>
-                    <span className="font-mono font-bold text-white">{selectedAsset.duration_seconds} Giây</span>
+                    <span className="font-mono font-bold text-slate-900">{selectedAsset.duration_seconds} Giây</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-500 block uppercase font-bold">Dung lượng</span>
-                    <span className="font-mono font-bold text-white">{selectedAsset.file_size_mb} MB</span>
+                    <span className="font-mono font-bold text-slate-900">{selectedAsset.file_size_mb} MB</span>
                   </div>
                   <div>
                     <span className="text-[10px] text-slate-500 block uppercase font-bold">Chi phí Token</span>
-                    <span className="font-mono font-bold text-amber-300">{selectedJob.token_cost} Tokens</span>
+                    <span className="font-mono font-bold text-amber-600">{selectedJob.token_cost} Tokens</span>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Timeline Multi-Scene Assembly (episode_package_asset) */}
-            <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-xl space-y-4">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-neon" />
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                  <Layers className="w-4 h-4 text-purple-600" />
+                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                     Timeline Phân Cảnh Ghép Tập ({jobs.length} Cảnh)
                   </h3>
                 </div>
-                <span className="text-xs text-slate-400">
-                  Hoàn thành: <b className="text-emerald-400">{jobs.filter((j) => j.status === 'completed').length}</b> / {jobs.length} Cảnh
+                <span className="text-xs text-slate-500">
+                  Hoàn thành: <b className="text-emerald-600">{jobs.filter((j) => j.status === 'completed').length}</b> / {jobs.length} Cảnh
                 </span>
               </div>
 
@@ -335,17 +319,17 @@ export default function CreatorStudioPage() {
                       onClick={() => setSelectedJobId(job.id)}
                       className={`p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                         isSelected
-                          ? 'bg-gradient-to-r from-white/10 to-white/5 border-ruby ring-1 ring-ruby/40'
-                          : 'bg-[#0E1017] border-white/10 hover:border-white/20'
+                          ? 'bg-ruby/5 border-ruby/40 ring-1 ring-ruby/30'
+                          : 'bg-slate-50 border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-ruby/20 border border-ruby/40 flex items-center justify-center text-ruby-light font-mono font-bold text-xs shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-ruby/10 border border-ruby/20 flex items-center justify-center text-ruby font-mono font-bold text-xs shrink-0">
                           #{job.scene_number}
                         </div>
                         <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-white truncate">{job.title}</h4>
-                          <p className="text-[11px] text-slate-400 truncate max-w-md font-mono mt-0.5">
+                          <h4 className="text-xs font-bold text-slate-900 truncate">{job.title}</h4>
+                          <p className="text-[11px] text-slate-500 truncate max-w-md font-mono mt-0.5">
                             {job.ai_model} • {job.token_cost} Tokens
                           </p>
                         </div>
@@ -354,15 +338,15 @@ export default function CreatorStudioPage() {
                       {/* Job Action / Status */}
                       <div className="flex items-center gap-3 shrink-0">
                         {isRendering ? (
-                          <div className="flex items-center gap-2 bg-blue-500/15 border border-blue-500/30 px-3 py-1.5 rounded-lg">
-                            <div className="w-3 h-3 rounded-full border-2 border-blue-400 border-t-transparent animate-spin" />
-                            <span className="text-xs font-bold text-blue-300 font-mono">
+                          <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 px-3 py-1.5 rounded-lg">
+                            <div className="w-3 h-3 rounded-full border-2 border-blue-600 border-t-transparent animate-spin" />
+                            <span className="text-xs font-bold text-blue-700 font-mono">
                               Rendering ({job.progress}%)
                             </span>
                           </div>
                         ) : isCompleted ? (
                           <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                               <CheckCircle2 className="w-3.5 h-3.5" />
                               <span>Hoàn Tất</span>
                             </span>
@@ -371,7 +355,7 @@ export default function CreatorStudioPage() {
                                 e.stopPropagation();
                                 handleGenerate(job.id);
                               }}
-                              className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 text-slate-300 text-xs font-semibold border border-white/10"
+                              className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-200 cursor-pointer"
                             >
                               Re-render
                             </button>
@@ -382,7 +366,7 @@ export default function CreatorStudioPage() {
                               e.stopPropagation();
                               handleGenerate(job.id);
                             }}
-                            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-ruby hover:bg-ruby-dark text-white text-xs font-bold shadow-md shadow-ruby/20 transition-all cursor-pointer"
+                            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-ruby hover:bg-ruby-dark text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
                           >
                             <Video className="w-3.5 h-3.5" />
                             <span>Sinh Clip</span>
@@ -394,7 +378,7 @@ export default function CreatorStudioPage() {
                             e.stopPropagation();
                             removeSceneJob(currentPackage.id, job.id);
                           }}
-                          className="p-1.5 text-slate-500 hover:text-red-400 rounded-lg hover:bg-white/5 transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -409,11 +393,11 @@ export default function CreatorStudioPage() {
           {/* Right Column (5 cols): AI Generator Prompt & Model Controller */}
           <div className="lg:col-span-5 space-y-6">
             {/* Generator Controller Panel */}
-            <div className="bg-[#161922] p-5 rounded-2xl border border-white/10 shadow-2xl space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
                 <div className="flex items-center gap-2">
                   <Cpu className="w-4 h-4 text-ruby" />
-                  <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">
                     Bộ Điều Khiển Sinh Tài Nguyên AI (generation_job)
                   </h3>
                 </div>
@@ -422,7 +406,7 @@ export default function CreatorStudioPage() {
               {/* Form to add or edit selected scene */}
               <div className="space-y-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     Tên Phân Cảnh (Scene Title)
                   </label>
                   <input
@@ -430,19 +414,19 @@ export default function CreatorStudioPage() {
                     value={selectedJob?.title || newSceneTitle}
                     onChange={(e) => setNewSceneTitle(e.target.value)}
                     placeholder="Ví dụ: Cảnh 4: Rượt đuổi trên xa lộ tầng không..."
-                    className="w-full bg-[#0E1017] border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:border-ruby outline-none"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:border-ruby outline-none"
                   />
                 </div>
 
                 {/* AI Model Selector */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     Mô Hình AI Tạo Sinh (ai_model)
                   </label>
                   <select
                     value={selectedJob?.ai_model || selectedModel}
                     onChange={(e) => setSelectedModel(e.target.value)}
-                    className="w-full bg-[#0E1017] border border-white/15 rounded-xl px-3 py-2 text-xs text-white focus:border-ruby outline-none cursor-pointer"
+                    className="w-full bg-white border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:border-ruby outline-none cursor-pointer"
                   >
                     {AI_MODELS.map((model) => (
                       <option key={model.id} value={model.id}>
@@ -454,7 +438,7 @@ export default function CreatorStudioPage() {
 
                 {/* Video Prompt Input */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     Visual Video Prompt (Mô tả hình ảnh & Ánh sáng)
                   </label>
                   <textarea
@@ -462,13 +446,13 @@ export default function CreatorStudioPage() {
                     onChange={(e) => setNewPromptVideo(e.target.value)}
                     rows={4}
                     placeholder="Nhập visual prompt chi tiết bằng tiếng Anh (cinematic lighting, camera angle, 8k resolution...)"
-                    className="w-full bg-[#0E1017] border border-white/15 rounded-xl p-3 text-xs text-slate-200 focus:border-ruby outline-none resize-none font-mono"
+                    className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-800 focus:border-ruby outline-none resize-none font-mono"
                   />
                 </div>
 
                 {/* Audio Prompt Input */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1">
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                     Audio & Voice Prompt (Lời thoại & SFX)
                   </label>
                   <textarea
@@ -476,14 +460,14 @@ export default function CreatorStudioPage() {
                     onChange={(e) => setNewPromptAudio(e.target.value)}
                     rows={3}
                     placeholder="Nhập lời thoại diễn viên và hiệu ứng âm thanh không gian..."
-                    className="w-full bg-[#0E1017] border border-white/15 rounded-xl p-3 text-xs text-slate-200 focus:border-neon outline-none resize-none font-mono"
+                    className="w-full bg-white border border-slate-300 rounded-xl p-3 text-xs text-slate-800 focus:border-purple-600 outline-none resize-none font-mono"
                   />
                 </div>
 
                 {/* Token Cost Estimation */}
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[#0E1017] border border-white/10 text-xs">
-                  <span className="text-slate-400 font-medium">Chi phí ước tính phân cảnh:</span>
-                  <span className="text-amber-300 font-mono font-bold text-sm">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                  <span className="text-slate-600 font-medium">Chi phí ước tính phân cảnh:</span>
+                  <span className="text-amber-600 font-mono font-bold text-sm">
                     {selectedJob?.token_cost || tokenCost} Tokens
                   </span>
                 </div>
@@ -492,7 +476,7 @@ export default function CreatorStudioPage() {
                 <div className="grid grid-cols-2 gap-3 pt-2">
                   <button
                     onClick={handleAddJob}
-                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold transition-all cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Thêm Phân Cảnh Mới</span>
@@ -501,7 +485,7 @@ export default function CreatorStudioPage() {
                   <button
                     onClick={() => selectedJob && handleGenerate(selectedJob.id)}
                     disabled={renderingJobId === selectedJob?.id}
-                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-gradient-to-r from-ruby to-ruby-dark text-white text-xs font-bold shadow-lg shadow-ruby/30 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-ruby hover:bg-ruby-dark text-white text-xs font-bold shadow-md shadow-ruby/20 transition-all cursor-pointer"
                   >
                     <Video className="w-3.5 h-3.5" />
                     <span>{renderingJobId === selectedJob?.id ? 'Đang Render...' : 'Trigger Sinh Clip'}</span>
@@ -517,61 +501,61 @@ export default function CreatorStudioPage() {
       {/* SUBMIT EPISODE MODAL (Summary of Actual Tokens)     */}
       {/* ==================================================== */}
       {isSubmitModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#161922] border border-white/20 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-scale-in text-white">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-scale-in text-slate-900">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200">
               <div className="flex items-center gap-2.5">
-                <FileCheck className="w-5 h-5 text-emerald-400" />
+                <FileCheck className="w-5 h-5 text-emerald-600" />
                 <h3 className="text-base font-bold">Nộp Bản Dựng Tập Phim Cho Reviewer</h3>
               </div>
               <button
                 onClick={() => setIsSubmitModalOpen(false)}
-                className="text-slate-400 hover:text-white text-sm"
+                className="text-slate-400 hover:text-slate-700 text-sm cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed">
               Tất cả {jobs.length} phân cảnh đã được render hoàn chỉnh. Xác nhận nộp gói tập phim (<code>episode_package</code>) sang Reviewer để thực hiện thẩm định nội dung & kiểm định pháp lý AI.
             </p>
 
             {/* Token & Specs Summary Box */}
-            <div className="bg-[#0E1017] p-4 rounded-xl border border-white/10 space-y-2.5 text-xs">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Tên tập phim:</span>
-                <span className="font-bold text-white">{currentPackage.title}</span>
+                <span className="text-slate-500">Tên tập phim:</span>
+                <span className="font-bold text-slate-900">{currentPackage.title}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Số lượng phân cảnh:</span>
-                <span className="font-mono font-bold text-white">{jobs.length} Cảnh</span>
+                <span className="text-slate-500">Số lượng phân cảnh:</span>
+                <span className="font-mono font-bold text-slate-900">{jobs.length} Cảnh</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Thời lượng ước tính:</span>
-                <span className="font-mono font-bold text-white">{currentPackage.total_duration}</span>
+                <span className="text-slate-500">Thời lượng ước tính:</span>
+                <span className="font-mono font-bold text-slate-900">{currentPackage.total_duration}</span>
               </div>
-              <div className="h-px bg-white/10 my-1" />
+              <div className="h-px bg-slate-200 my-1" />
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Token Quota được cấp:</span>
-                <span className="font-mono font-bold text-amber-300">{currentPackage.quota_allocated} Tokens</span>
+                <span className="text-slate-500">Token Quota được cấp:</span>
+                <span className="font-mono font-bold text-amber-600">{currentPackage.quota_allocated} Tokens</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Token thực tế tiêu thụ:</span>
-                <span className="font-mono font-bold text-emerald-400 text-sm">{currentPackage.actual_tokens_used} Tokens</span>
+                <span className="text-slate-500">Token thực tế tiêu thụ:</span>
+                <span className="font-mono font-bold text-emerald-600 text-sm">{currentPackage.actual_tokens_used} Tokens</span>
               </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setIsSubmitModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-bold text-slate-300 transition-colors"
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-600 transition-colors cursor-pointer"
               >
                 Hủy bỏ
               </button>
 
               <button
                 onClick={handleSubmitToChecker}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-lg shadow-emerald-900/30 transition-all cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-200 transition-all cursor-pointer"
               >
                 Xác Nhận Nộp Cho Checker
               </button>
