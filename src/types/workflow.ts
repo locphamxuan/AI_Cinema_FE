@@ -3,15 +3,79 @@
  * "AI Movie Production & Publishing" (Maker - Checker Workflow)
  */
 
+/**
+ * Episode State Model — Main Flow 1 (docs/PROJECT_OVERVIEW.md §4.1.2), 17 states in order,
+ * with 3 self-loops: PLAN_CHANGES_REQUESTED->PLANNING, CHANGES_REQUESTED->IN_PRODUCTION,
+ * COMPLIANCE_CHANGES_REQUESTED->COMPLIANCE_REVIEW.
+ */
 export type WorkflowState =
-  | 'PLAN_DRAFT'          // Maker is drafting the content brief
-  | 'PLAN_PENDING'        // Maker submitted plan, awaiting Checker review & quota
-  | 'QUOTA_ALLOCATED'     // Checker approved plan and assigned AI token quota
-  | 'IN_PRODUCTION'       // Maker is generating video/audio assets in Studio
-  | 'EPISODE_SUBMITTED'   // Maker completed assembly and submitted episode package
-  | 'CHANGES_REQUESTED'   // Checker requested plan or content revisions
-  | 'COMPLIANCE_PASSED'   // Checker validated Article 44 & Decree 142 AI compliance
-  | 'PUBLISHED';          // Published live to OTT streaming catalog
+  | 'DRAFT'                          // Episode created, not yet assigned to a Creator
+  | 'ASSIGNED'                       // Creator assigned, plan not started
+  | 'PLANNING'                       // Creator is drafting the content brief
+  | 'PLAN_REVIEW'                    // Plan submitted, awaiting Reviewer decision
+  | 'PLAN_CHANGES_REQUESTED'         // Reviewer requested plan changes (loop -> PLANNING)
+  | 'PLAN_APPROVED'                  // Reviewer approved the plan, quota not yet allocated
+  | 'READY_FOR_PRODUCTION'           // AI quota allocated, ready to generate assets
+  | 'IN_PRODUCTION'                  // Creator is generating video/audio assets in Studio
+  | 'CONTENT_REVIEW'                 // Episode submitted, awaiting Reviewer content decision
+  | 'CHANGES_REQUESTED'              // Reviewer requested content changes (loop -> IN_PRODUCTION)
+  | 'APPROVED'                       // Final content approved, compliance not yet started
+  | 'COMPLIANCE_REVIEW'              // Compliance check in progress
+  | 'COMPLIANCE_CHANGES_REQUESTED'   // Compliance failed (loop -> COMPLIANCE_REVIEW)
+  | 'COMPLIANCE_PASSED'              // Compliance check passed
+  | 'SCHEDULED'                      // Release date/time + Coin price set, not yet live
+  | 'PUBLISHED'                      // Published live to OTT streaming catalog
+  | 'ARCHIVED';                      // Retired from active catalog
+
+/**
+ * Movie Project State Model — independent from Episode state (docs/PROJECT_OVERVIEW.md §4.1.3).
+ */
+export type ProjectStatus =
+  | 'DRAFT'
+  | 'PLANNING'
+  | 'IN_PRODUCTION'
+  | 'IN_REVIEW'
+  | 'SCHEDULED'
+  | 'PUBLISHED'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
+/**
+ * Production Events — audit trail per BR-16, exact 18 names from docs/PROJECT_OVERVIEW.md §4.1.4.
+ */
+export type ProductionEventName =
+  | 'PROJECT_CREATED'
+  | 'EPISODE_CREATED'
+  | 'CREATOR_ASSIGNED'
+  | 'PRODUCTION_PLAN_SUBMITTED'
+  | 'PRODUCTION_PLAN_CHANGES_REQUESTED'
+  | 'PRODUCTION_PLAN_APPROVED'
+  | 'EPISODE_QUOTA_ALLOCATED'
+  | 'PRODUCTION_STARTED'
+  | 'GENERATION_COMPLETED'
+  | 'QUOTA_LOW'
+  | 'EPISODE_SUBMITTED'
+  | 'CONTENT_CHANGES_REQUESTED'
+  | 'EPISODE_APPROVED'
+  | 'COMPLIANCE_CHECK_STARTED'
+  | 'COMPLIANCE_CHANGES_REQUESTED'
+  | 'COMPLIANCE_PASSED'
+  | 'EPISODE_SCHEDULED'
+  | 'EPISODE_PUBLISHED';
+
+/**
+ * production_event: immutable, append-only audit log row (BR-16).
+ */
+export interface ProductionEvent {
+  id: string;
+  event_name: ProductionEventName;
+  project_id: string;
+  episode_id?: string;
+  actor_role: Role;
+  actor_name: string;
+  message?: string;
+  created_at: string;
+}
 
 export type Role = 'creator' | 'reviewer';
 
@@ -119,6 +183,7 @@ export interface EpisodePackage {
   quota_allocated: number;
   video_draft_url: string;
   thumbnail_url: string;
+  coin_price: number | null; // BR-29 — set by Reviewer when scheduling, required before publish
   brief: ContentBrief;
   jobs: GenerationJob[];
   assets: GeneratedAsset[];
@@ -195,6 +260,7 @@ export interface Publication {
 export interface ProductionProject {
   id: string;
   title: string;
+  status: ProjectStatus;
   genre: string[];
   synopsis: string;
   total_episodes: number;
