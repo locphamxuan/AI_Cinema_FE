@@ -65,8 +65,8 @@ export function RoleNavHeader() {
   const statusBadge = getStatusBadge(currentPackage?.status || 'PLAN_PENDING');
 
   return (
-    <div className="bg-[#11141D] border-b border-white/10 text-white sticky top-16 z-30 shadow-2xl backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3">
+    <div className="bg-[#11141D] border-b border-white/10 text-white sticky top-16 z-30 shadow-2xl backdrop-blur-xl w-full">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
         {/* Top bar: Project Meta & Role Switcher */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Left: Project title & Active Episode Selector */}

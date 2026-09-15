@@ -260,7 +260,15 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       </header>
 
       {/* Main Content */}
-      <main className={pathname === '/' && !isAuthenticated ? 'flex-1 w-full' : 'flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6'}>
+      <main
+        className={
+          pathname.startsWith('/creator') || pathname.startsWith('/reviewer')
+            ? 'flex-1 w-full p-0 m-0 bg-[#0B0C10]'
+            : pathname === '/' && !isAuthenticated
+            ? 'flex-1 w-full'
+            : 'flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6'
+        }
+      >
         {children}
       </main>
 
