@@ -4,24 +4,22 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
+import { useAppStore } from '@/store/useAppStore';
 import {
   Film,
   ShieldCheck,
   Zap,
-  Sparkles,
   RotateCcw,
   Layers,
-  Sliders,
-  CheckCircle2,
-  Clock,
-  AlertTriangle,
-  Send,
+  LogOut,
+  Home,
 } from 'lucide-react';
 
 export function RoleNavHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentRole, setRole, project, activePackageId, setActivePackage, resetDemoData } = useWorkflowStore();
+  const { currentRole, project, activePackageId, setActivePackage, resetDemoData } = useWorkflowStore();
+  const { user, logout } = useAppStore();
 
   const isCreator = pathname.includes('/creator') || currentRole === 'creator';
   const isReviewer = pathname.includes('/reviewer') || currentRole === 'reviewer';
@@ -29,15 +27,6 @@ export function RoleNavHeader() {
   const currentPackage = project.episodes.find((e) => e.id === activePackageId) || project.episodes[0];
   const quotaPercent = project.allocated_tokens > 0 ? (project.consumed_tokens / project.allocated_tokens) * 100 : 0;
   const isQuotaWarning = quotaPercent >= 90;
-
-  const handleRoleChange = (newRole: 'creator' | 'reviewer') => {
-    setRole(newRole);
-    if (newRole === 'creator') {
-      router.push('/creator');
-    } else {
-      router.push('/reviewer');
-    }
-  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -65,9 +54,9 @@ export function RoleNavHeader() {
   const statusBadge = getStatusBadge(currentPackage?.status || 'PLAN_PENDING');
 
   return (
-    <div className="bg-[#11141D] border-b border-white/10 text-white sticky top-16 z-30 shadow-2xl backdrop-blur-xl w-full">
+    <div className="bg-[#11141D] border-b border-white/10 text-white sticky top-0 z-30 shadow-2xl backdrop-blur-xl w-full">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-3">
-        {/* Top bar: Project Meta & Role Switcher */}
+        {/* Top bar: Project Meta & Authenticated Role Indicator */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Left: Project title & Active Episode Selector */}
           <div className="flex items-center gap-3">
@@ -88,31 +77,43 @@ export function RoleNavHeader() {
             </div>
           </div>
 
-          {/* Center: Maker - Checker Segmented Toggle */}
-          <div className="flex items-center bg-[#161922] p-1 rounded-xl border border-white/15 shadow-inner">
-            <button
-              onClick={() => handleRoleChange('creator')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                isCreator
-                  ? 'bg-gradient-to-r from-ruby to-ruby-dark text-white shadow-md shadow-ruby/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Film className="w-3.5 h-3.5" />
-              <span>Creator (Maker)</span>
-            </button>
+          {/* Center: Authenticated Role Identity (Non-clickable, cannot arbitrarily toggle) */}
+          <div className="flex items-center gap-2">
+            {isCreator ? (
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-ruby/15 border border-ruby/40 text-ruby-light text-xs font-bold shadow-sm">
+                <Film className="w-4 h-4 text-ruby" />
+                <span>Creator (Maker)</span>
+                <span className="text-slate-500">•</span>
+                <span className="text-white font-medium">{user?.name || project.creator_name}</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#8B5CF6]/15 border border-[#8B5CF6]/40 text-[#8B5CF6] text-xs font-bold shadow-sm">
+                <ShieldCheck className="w-4 h-4 text-[#8B5CF6]" />
+                <span>Reviewer (Checker)</span>
+                <span className="text-slate-500">•</span>
+                <span className="text-white font-medium">{user?.name || project.reviewer_name}</span>
+              </div>
+            )}
 
             <button
-              onClick={() => handleRoleChange('reviewer')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                isReviewer
-                  ? 'bg-gradient-to-r from-neon-dark to-neon text-white shadow-md shadow-neon/30'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
+              onClick={() => {
+                logout();
+                router.push('/login');
+              }}
+              className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-red-500/15 text-slate-400 hover:text-red-400 border border-white/10 hover:border-red-500/30 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
+              title="Đăng xuất để đổi sang tài khoản khác"
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Reviewer (Checker)</span>
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Đổi tài khoản</span>
             </button>
+
+            <Link
+              href="/"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 text-xs font-semibold transition"
+            >
+              <Home className="w-3.5 h-3.5" />
+              <span>Trang chủ OTT</span>
+            </Link>
           </div>
 
           {/* Right: Token Quota & Quick Reset */}

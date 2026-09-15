@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
+import { useAppStore } from '@/store/useAppStore';
 import RoleNavHeader from '@/components/dashboard/RoleNavHeader';
 import {
   Video,
@@ -18,6 +19,7 @@ import {
   Clock,
   Layers,
   ArrowLeft,
+  ArrowRight,
   Settings,
   Cpu,
   Volume2,
@@ -47,6 +49,7 @@ export default function CreatorStudioPage() {
     submitEpisodePackage,
     setActivePackage,
   } = useWorkflowStore();
+  const { user, isAuthenticated, logout } = useAppStore();
 
   const currentPackage = project.episodes.find((e) => e.id === episodeId) || project.episodes[0];
   const jobs = currentPackage?.jobs || [];
@@ -123,6 +126,43 @@ export default function CreatorStudioPage() {
 
   const allCompleted = jobs.length > 0 && jobs.every((j) => j.status === 'completed');
   const remainingQuota = currentPackage.quota_allocated - currentPackage.actual_tokens_used;
+
+  // Access Control: Block Reviewer from accessing Creator Studio directly
+  if (isAuthenticated && user?.role === 'reviewer') {
+    return (
+      <div className="min-h-screen bg-[#0B0C10] text-white flex flex-col items-center justify-center p-6">
+        <div className="max-w-md w-full bg-[#161922] border border-amber-500/30 rounded-2xl p-8 shadow-2xl text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+            <AlertCircle className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white mb-2">Không đúng quyền truy cập</h2>
+            <p className="text-sm text-slate-400">
+              Tài khoản hiện tại của bạn là <strong className="text-purple-400">Reviewer (Checker)</strong>. Trang này chỉ dành riêng cho vai trò <strong className="text-ruby-light">Creator (Maker)</strong>.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <button
+              onClick={() => router.push('/reviewer')}
+              className="w-full py-3 px-4 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-purple-900/30"
+            >
+              <span>Đến trang Thẩm định (Reviewer)</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => {
+                logout();
+                router.push('/login');
+              }}
+              className="w-full py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 font-semibold transition cursor-pointer"
+            >
+              Đăng xuất & Đăng nhập tài khoản Creator
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0B0C10] text-slate-100 pb-20 font-sans">
