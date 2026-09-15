@@ -26,8 +26,35 @@ export const authService = {
       { useMockFallback: true },
       () => {
         const token = 'mock_jwt_token_' + Date.now();
+        const trimmed = credentials.email.trim().toLowerCase();
+
+        let userRole: 'user' | 'vip' | 'admin' | 'creator' | 'reviewer' = 'user';
+        let redirectUrl = undefined;
+        let userName = 'Khán giả AI';
+
+        if (trimmed === 'creator@gmail.com') {
+          userRole = 'creator';
+          userName = 'Đạo diễn Trần Minh Huy (Maker)';
+          redirectUrl = '/creator';
+        } else if (trimmed === 'reviewer@gmail.com') {
+          userRole = 'reviewer';
+          userName = 'Thẩm định viên Lê Quốc Bảo (Checker)';
+          redirectUrl = '/reviewer';
+        } else if (trimmed === 'userdemo@gmail.com') {
+          userRole = 'vip';
+          userName = 'Phạm Xuân Lộc (Khán Giả VIP)';
+        }
+
+        const authenticatedUser: UserProfile = {
+          ...MOCK_USER,
+          name: userName,
+          email: credentials.email,
+          role: userRole,
+          isVIP: userRole === 'vip' || userRole === 'creator' || userRole === 'reviewer',
+        };
+
         storage.set(STORAGE_KEYS.AUTH_TOKEN, token);
-        storage.set(STORAGE_KEYS.USER_DATA, MOCK_USER);
+        storage.set(STORAGE_KEYS.USER_DATA, authenticatedUser);
 
         if (credentials.rememberMe) {
           storage.set(STORAGE_KEYS.REMEMBERED_EMAIL, credentials.email);
@@ -37,11 +64,9 @@ export const authService = {
         }
 
         return {
-          user: {
-            ...MOCK_USER,
-            email: credentials.email,
-          },
+          user: authenticatedUser,
           token,
+          redirectUrl,
         };
       }
     );
