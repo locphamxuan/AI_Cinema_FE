@@ -15,7 +15,7 @@ import ThemeToggle from '@/components/theme/ThemeToggle';
 const navLinks = [
   { href: '/', label: 'Trang chủ' },
   { href: '/watch/1', label: 'Xem phim' },
-  { href: '/reviewer/projects/create', label: '🎬 Sản xuất phim AI' },
+  { href: '/creator', label: '🎬 AI Studio' },
   { href: '/profile/subscription', label: 'Gói hội viên' },
   { href: '/profile/transactions', label: 'Lịch sử giao dịch' },
 ];
@@ -154,6 +154,26 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                         </div>
 
                         <div className="space-y-1">
+                          {user.role === 'creator' && (
+                            <Link
+                              href="/creator"
+                              onClick={() => setIsUserDropdownOpen(false)}
+                              className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold text-[#E50914] bg-[#E50914]/10 hover:bg-[#E50914]/20 transition-colors"
+                            >
+                              <span>🎬 Studio Sản xuất AI (Maker)</span>
+                              <span>›</span>
+                            </Link>
+                          )}
+                          {user.role === 'reviewer' && (
+                            <Link
+                              href="/reviewer"
+                              onClick={() => setIsUserDropdownOpen(false)}
+                              className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-bold text-[#8B5CF6] bg-[#8B5CF6]/10 hover:bg-[#8B5CF6]/20 transition-colors"
+                            >
+                              <span>🛡️ Thẩm định & Duyệt (Checker)</span>
+                              <span>›</span>
+                            </Link>
+                          )}
                           <Link
                             href="/profile/subscription"
                             onClick={() => setIsUserDropdownOpen(false)}
