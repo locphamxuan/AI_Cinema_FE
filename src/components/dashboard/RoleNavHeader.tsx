@@ -32,28 +32,46 @@ export function RoleNavHeader() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'PLAN_DRAFT':
-        return { label: 'Bản Nháp Brief', dot: 'bg-zinc-400', badge: 'bg-zinc-800/80 text-zinc-300 border-zinc-700/60' };
-      case 'PLAN_PENDING':
-        return { label: 'Chờ Duyệt Quota', dot: 'bg-amber-400', badge: 'bg-amber-500/10 text-amber-300 border-amber-500/20' };
-      case 'QUOTA_ALLOCATED':
+      case 'DRAFT':
+        return { label: 'Bản Nháp', dot: 'bg-zinc-400', badge: 'bg-zinc-800/80 text-zinc-300 border-zinc-700/60' };
+      case 'ASSIGNED':
+        return { label: 'Đã Gán Creator', dot: 'bg-zinc-400', badge: 'bg-zinc-800/80 text-zinc-300 border-zinc-700/60' };
+      case 'PLANNING':
+        return { label: 'Đang Soạn Kế Hoạch', dot: 'bg-zinc-400', badge: 'bg-zinc-800/80 text-zinc-300 border-zinc-700/60' };
+      case 'PLAN_REVIEW':
+        return { label: 'Chờ Duyệt Kế Hoạch', dot: 'bg-amber-400', badge: 'bg-amber-500/10 text-amber-300 border-amber-500/20' };
+      case 'PLAN_CHANGES_REQUESTED':
+        return { label: 'Kế Hoạch Cần Sửa', dot: 'bg-rose-400', badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' };
+      case 'PLAN_APPROVED':
+        return { label: 'Kế Hoạch Đã Duyệt', dot: 'bg-teal-400', badge: 'bg-teal-500/10 text-teal-300 border-teal-500/20' };
+      case 'READY_FOR_PRODUCTION':
         return { label: 'Đã Cấp Quota AI', dot: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
       case 'IN_PRODUCTION':
         return { label: 'Đang Sản Xuất', dot: 'bg-blue-400', badge: 'bg-blue-500/10 text-blue-300 border-blue-500/20' };
-      case 'EPISODE_SUBMITTED':
+      case 'CONTENT_REVIEW':
         return { label: 'Chờ Thẩm Định Video', dot: 'bg-purple-400', badge: 'bg-purple-500/10 text-purple-300 border-purple-500/20' };
       case 'CHANGES_REQUESTED':
-        return { label: 'Yêu Cầu Sửa Đổi', dot: 'bg-rose-400', badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' };
+        return { label: 'Nội Dung Cần Sửa', dot: 'bg-rose-400', badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' };
+      case 'APPROVED':
+        return { label: 'Nội Dung Đã Duyệt', dot: 'bg-teal-400', badge: 'bg-teal-500/10 text-teal-300 border-teal-500/20' };
+      case 'COMPLIANCE_REVIEW':
+        return { label: 'Đang Kiểm Định Pháp Lý', dot: 'bg-purple-400', badge: 'bg-purple-500/10 text-purple-300 border-purple-500/20' };
+      case 'COMPLIANCE_CHANGES_REQUESTED':
+        return { label: 'Pháp Lý Chưa Đạt', dot: 'bg-rose-400', badge: 'bg-rose-500/10 text-rose-300 border-rose-500/20' };
       case 'COMPLIANCE_PASSED':
         return { label: 'Đạt Chuẩn Pháp Lý', dot: 'bg-emerald-400', badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
+      case 'SCHEDULED':
+        return { label: 'Đã Lên Lịch', dot: 'bg-blue-400', badge: 'bg-blue-500/10 text-blue-300 border-blue-500/20' };
       case 'PUBLISHED':
         return { label: 'Đã Phát Hành', dot: 'bg-emerald-400', badge: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' };
+      case 'ARCHIVED':
+        return { label: 'Đã Lưu Trữ', dot: 'bg-zinc-500', badge: 'bg-zinc-800 text-zinc-400 border-zinc-700' };
       default:
         return { label: status, dot: 'bg-zinc-400', badge: 'bg-zinc-800 text-zinc-300 border-zinc-700' };
     }
   };
 
-  const statusBadge = getStatusBadge(currentPackage?.status || 'PLAN_PENDING');
+  const statusBadge = getStatusBadge(currentPackage?.status || 'DRAFT');
 
   return (
     <header className="bg-[#0C0E14] border-b border-white/[0.08] text-white sticky top-0 z-30 backdrop-blur-xl w-full">
