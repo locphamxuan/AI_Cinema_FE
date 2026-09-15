@@ -45,22 +45,25 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const isDashboard = pathname.startsWith('/creator') || pathname.startsWith('/reviewer');
+
   return (
     <>
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo + Clean Text Nav */}
-            <div className="flex items-center gap-8">
-              <Link href="/" className="flex items-center gap-2 group">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ruby to-ruby-dark flex items-center justify-center text-white font-black text-sm shadow-md shadow-ruby/30 group-hover:scale-105 transition-transform">
-                  AI
-                </div>
-                <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white group-hover:text-ruby transition-colors">
-                  CINEMA
-                </span>
-              </Link>
+      {/* Consumer Header (Only rendered on public/user pages, hidden on Creator & Reviewer Dashboards) */}
+      {!isDashboard && (
+        <header className="sticky top-0 z-40 border-b border-slate-200/80 dark:border-white/10 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl transition-colors">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between h-16">
+              {/* Logo + Clean Text Nav */}
+              <div className="flex items-center gap-8">
+                <Link href="/" className="flex items-center gap-2 group">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ruby to-ruby-dark flex items-center justify-center text-white font-black text-sm shadow-md shadow-ruby/30 group-hover:scale-105 transition-transform">
+                    AI
+                  </div>
+                  <span className="text-lg font-black tracking-tight text-slate-900 dark:text-white group-hover:text-ruby transition-colors">
+                    CINEMA
+                  </span>
+                </Link>
 
               {/* Navigation Tabs (Only visible when user is logged in) */}
               {isAuthenticated && user && (
@@ -257,7 +260,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         )}
-      </header>
+        </header>
+      )}
 
       {/* Main Content */}
       <main
