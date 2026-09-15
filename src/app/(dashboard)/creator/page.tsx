@@ -44,7 +44,7 @@ export default function CreatorDashboardPage() {
     reviseProductionPlan,
     reviews,
   } = useWorkflowStore();
-  const { user, isAuthenticated, logout } = useAppStore();
+  const { user, isAuthenticated, logout, openAuthModal } = useAppStore();
 
   const currentPackage = project.episodes.find((e) => e.id === activePackageId) || project.episodes[0];
   const brief = currentPackage?.brief;
@@ -182,7 +182,8 @@ export default function CreatorDashboardPage() {
             <button
               onClick={() => {
                 logout();
-                router.push('/login');
+                router.push('/');
+                openAuthModal('login');
               }}
               className="w-full py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 font-semibold transition cursor-pointer"
             >

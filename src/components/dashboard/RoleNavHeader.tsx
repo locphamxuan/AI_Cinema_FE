@@ -19,7 +19,13 @@ export function RoleNavHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { currentRole, project, activePackageId, setActivePackage, resetDemoData } = useWorkflowStore();
-  const { user, logout } = useAppStore();
+  const { user, logout, openAuthModal } = useAppStore();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+    openAuthModal('login');
+  };
 
   const isCreator = pathname.includes('/creator') || currentRole === 'creator';
   const isReviewer = pathname.includes('/reviewer') || currentRole === 'reviewer';
@@ -59,7 +65,7 @@ export function RoleNavHeader() {
         {/* Top bar: Project Meta & Authenticated Role Indicator */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           {/* Left: Project title & Active Episode Selector */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 pl-2 sm:pl-0">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ruby via-ruby-dark to-purple-900 flex items-center justify-center shadow-lg shadow-ruby/20 border border-white/10 shrink-0">
               <Film className="w-5 h-5 text-white" />
             </div>
@@ -96,15 +102,12 @@ export function RoleNavHeader() {
             )}
 
             <button
-              onClick={() => {
-                logout();
-                router.push('/login');
-              }}
+              onClick={handleLogout}
               className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-red-500/15 text-slate-400 hover:text-red-400 border border-white/10 hover:border-red-500/30 text-xs font-semibold transition cursor-pointer flex items-center gap-1.5"
-              title="Đăng xuất để đổi sang tài khoản khác"
+              title="Đăng xuất và mở hộp thoại đăng nhập"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Đổi tài khoản</span>
+              <span>Đăng xuất</span>
             </button>
 
             <Link
