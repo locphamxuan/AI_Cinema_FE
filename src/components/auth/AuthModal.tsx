@@ -1,11 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 
 const STORAGE_KEY = 'aicinema_saved_credentials';
 
 export default function AuthModal() {
+  const router = useRouter();
   const {
     isAuthModalOpen,
     authModalMode,
@@ -45,12 +47,12 @@ export default function AuthModal() {
         }
       } catch {}
 
-      // Default pre-fill if initialAuthEmail provided or default demo
+      // Default pre-fill if initialAuthEmail provided
       if (initialAuthEmail) {
         setEmail(initialAuthEmail);
       } else {
-        setEmail('userdemo@gmail.com');
-        setPassword('1');
+        setEmail('');
+        setPassword('');
         setRememberMe(true);
       }
     }
@@ -64,7 +66,7 @@ export default function AuthModal() {
     setLoading(true);
 
     // Simulate network delay
-    await new Promise((r) => setTimeout(r, 400));
+    await new Promise((r) => setTimeout(r, 350));
 
     if (mode === 'login') {
       const res = login(email, password);
@@ -80,6 +82,10 @@ export default function AuthModal() {
             localStorage.removeItem(STORAGE_KEY);
           }
         } catch {}
+
+        if (res.redirectUrl) {
+          router.push(res.redirectUrl);
+        }
       } else {
         setError(res.error || 'Đăng nhập thất bại');
       }
@@ -92,6 +98,8 @@ export default function AuthModal() {
               STORAGE_KEY,
               JSON.stringify({ email: email.trim(), password: password })
             );
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
           }
         } catch {}
       } else {
@@ -256,7 +264,7 @@ export default function AuthModal() {
             </div>
           </div>
 
-          {/* Remember Me Checkbox & Forgot Password */}
+          {/* Remember Me Checkbox */}
           <div className="flex items-center justify-between text-xs pt-1">
             <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors">
               <input
@@ -267,19 +275,6 @@ export default function AuthModal() {
               />
               <span>Ghi nhớ thông tin đăng nhập</span>
             </label>
-
-            {mode === 'login' && (
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail('userdemo@gmail.com');
-                  setPassword('1');
-                }}
-                className="text-slate-500 dark:text-muted text-[11px] hover:text-ruby hover:underline transition-colors cursor-pointer"
-              >
-                Khôi phục mặc định
-              </button>
-            )}
           </div>
 
           {mode === 'register' && (
