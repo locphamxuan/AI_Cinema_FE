@@ -146,7 +146,7 @@ export default function ReviewerAuditPage() {
     <div className="min-h-screen bg-[#0B0C10] text-gray-200">
       <RoleNavHeader />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Top Breadcrumb & Actions Bar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-[#161922] border border-white/10 rounded-2xl p-4">
           <div className="flex items-center gap-3">
