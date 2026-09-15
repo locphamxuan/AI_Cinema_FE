@@ -170,7 +170,7 @@ export default function ReviewerAuditPage() {
                       ? 'bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30'
                       : pkg.status === 'COMPLIANCE_PASSED'
                       ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : pkg.status === 'EPISODE_SUBMITTED'
+                      : pkg.status === 'CONTENT_REVIEW' || pkg.status === 'COMPLIANCE_REVIEW'
                       ? 'bg-[#8B5CF6]/20 text-[#8B5CF6] border border-[#8B5CF6]/30'
                       : 'bg-[#F59E0B]/20 text-[#F59E0B] border border-[#F59E0B]/30'
                   }`}
@@ -179,7 +179,7 @@ export default function ReviewerAuditPage() {
                     ? 'ĐÃ PHÁT HÀNH OTT'
                     : pkg.status === 'COMPLIANCE_PASSED'
                     ? 'ĐÃ DUYỆT PHÁP LÝ AI'
-                    : pkg.status === 'EPISODE_SUBMITTED'
+                    : pkg.status === 'CONTENT_REVIEW' || pkg.status === 'COMPLIANCE_REVIEW'
                     ? 'CHỜ DUYỆT KIỂM TOÁN'
                     : pkg.status}
                 </span>

@@ -38,6 +38,8 @@ export default function ReviewerDashboardPage() {
     activePackageId,
     setActivePackage,
     createProject,
+    addEpisode,
+    approveProductionPlan,
     allocateQuota,
     requestPlanChanges,
   } = useWorkflowStore();
@@ -64,7 +66,36 @@ export default function ReviewerDashboardPage() {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [quotaToAllocate, setQuotaToAllocate] = useState(brief?.estimated_tokens || 450);
   const [quotaNotes, setQuotaNotes] = useState('Kế hoạch phân cảnh đạt chuẩn. Đã cấp đủ hạn mức AI Tokens.');
+  const [quotaError, setQuotaError] = useState('');
   const [rejectFeedback, setRejectFeedback] = useState('');
+
+  // Add Episode Modal State
+  const [isAddEpisodeModalOpen, setIsAddEpisodeModalOpen] = useState(false);
+  const [newEpisodeTitle, setNewEpisodeTitle] = useState('');
+  const [newEpisodeRequirements, setNewEpisodeRequirements] = useState('');
+  const [newEpisodeDuration, setNewEpisodeDuration] = useState(25);
+  const [addEpisodeError, setAddEpisodeError] = useState('');
+
+  const remainingBudget = project.total_budget_tokens - project.allocated_tokens;
+
+  const handleAddEpisodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const res = addEpisode({
+      title: newEpisodeTitle,
+      requirements: newEpisodeRequirements,
+      target_duration_minutes: Number(newEpisodeDuration),
+    });
+    if (!res.success) {
+      setAddEpisodeError(res.error || 'Không thể tạo tập phim.');
+      return;
+    }
+    setIsAddEpisodeModalOpen(false);
+    setAddEpisodeError('');
+    setNewEpisodeTitle('');
+    setNewEpisodeRequirements('');
+    setNewEpisodeDuration(25);
+    if (res.episodeId) setActivePackage(res.episodeId);
+  };
 
   const handleCreateProjectSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,11 +115,21 @@ export default function ReviewerDashboardPage() {
     alert('Đã khởi tạo dự án sản xuất phim AI mới thành công!');
   };
 
+  const handleApprovePlan = () => {
+    if (!currentPackage) return;
+    approveProductionPlan(currentPackage.id);
+  };
+
   const handleAllocateQuotaConfirm = () => {
     if (!currentPackage) return;
-    allocateQuota(currentPackage.id, quotaToAllocate, quotaNotes);
+    const res = allocateQuota(currentPackage.id, quotaToAllocate, quotaNotes);
+    if (!res.success) {
+      setQuotaError(res.error || 'Không thể cấp quota.');
+      return;
+    }
+    setQuotaError('');
     setIsQuotaModalOpen(false);
-    alert(`Đã phê duyệt kế hoạch và cấp ${quotaToAllocate} AI Tokens cho Creator (Maker)!`);
+    alert(`Đã cấp ${quotaToAllocate} AI Tokens cho Creator (Maker)!`);
   };
 
   const handleRequestChangesConfirm = () => {
@@ -98,8 +139,10 @@ export default function ReviewerDashboardPage() {
     alert('Đã gửi yêu cầu hiệu chỉnh kế hoạch về cho Creator!');
   };
 
-  const pendingPlanEpisodes = project.episodes.filter((e) => e.status === 'PLAN_PENDING');
-  const submittedEpisodes = project.episodes.filter((e) => e.status === 'EPISODE_SUBMITTED' || e.status === 'COMPLIANCE_PASSED');
+  const pendingPlanEpisodes = project.episodes.filter((e) => e.status === 'PLAN_REVIEW');
+  const submittedEpisodes = project.episodes.filter((e) =>
+    ['CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_CHANGES_REQUESTED', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(e.status)
+  );
 
   // Access Control: Block Creator from accessing Reviewer Portal directly
   if (isAuthenticated && user?.role === 'creator') {
@@ -186,10 +229,14 @@ export default function ReviewerDashboardPage() {
                       className={`w-2 h-2 rounded-full shrink-0 ${
                         ep.status === 'PUBLISHED'
                           ? 'bg-emerald-400'
-                          : ep.status === 'EPISODE_SUBMITTED'
+                          : ep.status === 'SCHEDULED'
+                          ? 'bg-blue-400'
+                          : ['CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED'].includes(ep.status)
                           ? 'bg-purple-400 animate-pulse'
-                          : ep.status === 'PLAN_PENDING'
+                          : ep.status === 'PLAN_REVIEW'
                           ? 'bg-amber-400'
+                          : ['PLAN_CHANGES_REQUESTED', 'CHANGES_REQUESTED', 'COMPLIANCE_CHANGES_REQUESTED'].includes(ep.status)
+                          ? 'bg-rose-400 animate-pulse'
                           : 'bg-zinc-600'
                       }`}
                     />
@@ -288,7 +335,13 @@ export default function ReviewerDashboardPage() {
           </nav>
 
           {/* Bottom Sidebar Action */}
-          <div className="p-3 border-t border-white/[0.08] bg-black/30">
+          <div className="p-3 border-t border-white/[0.08] bg-black/30 space-y-2">
+            <button
+              onClick={() => setIsAddEpisodeModalOpen(true)}
+              className="w-full py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.07] text-zinc-300 hover:text-white font-medium text-xs flex items-center justify-center gap-2 transition cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5 text-emerald-400" /> Thêm Tập Phim Mới
+            </button>
             <button
               onClick={() => setIsCreateProjectModalOpen(true)}
               className="w-full py-2 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.07] text-zinc-300 hover:text-white font-medium text-xs flex items-center justify-center gap-2 transition cursor-pointer"
@@ -338,6 +391,42 @@ export default function ReviewerDashboardPage() {
           {/* TAB 1: OVERVIEW METRICS */}
           {activeTab === 'overview' && (
             <div className="space-y-6">
+              <div className="bg-[#12141C] border border-white/10 rounded-2xl p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-semibold">Main Flow 1</p>
+                    <h3 className="text-lg font-black text-white mt-1">Production Review Pipeline</h3>
+                  </div>
+                  <span className="text-xs text-white border border-purple-500/30 bg-purple-500/10 px-2.5 py-1 rounded-full">
+                    {project.status}
+                  </span>
+                </div>
+
+                <div className="mt-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-3">
+                  {[
+                    { label: 'Create project', done: true },
+                    { label: 'Review plan', done: project.episodes.some((ep) => ['PLAN_APPROVED', 'READY_FOR_PRODUCTION', 'IN_PRODUCTION', 'CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(ep.status)) },
+                    { label: 'Allocate quota', done: project.episodes.some((ep) => ['READY_FOR_PRODUCTION', 'IN_PRODUCTION', 'CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(ep.status)) },
+                    { label: 'Production', done: project.episodes.some((ep) => ['IN_PRODUCTION', 'CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(ep.status)) },
+                    { label: 'Compliance', done: project.episodes.some((ep) => ['COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(ep.status)) },
+                    { label: 'Schedule & publish', done: project.episodes.some((ep) => ['SCHEDULED', 'PUBLISHED'].includes(ep.status)) },
+                  ].map((step, index) => (
+                    <div
+                      key={step.label}
+                      className={`rounded-xl border p-3 transition ${
+                        step.done ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-white/10 bg-white/5'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Step {index + 1}</span>
+                        <span className={`w-2 h-2 rounded-full ${step.done ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                      </div>
+                      <p className="text-xs font-semibold text-white leading-relaxed">{step.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* 4 Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                 <div className="bg-[#12141C] p-4 rounded-xl border border-white/[0.08] hover:border-white/[0.14] transition-colors relative overflow-hidden">
@@ -427,16 +516,20 @@ export default function ReviewerDashboardPage() {
                         <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${
                           ep.status === 'PUBLISHED'
                             ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                            : ep.status === 'EPISODE_SUBMITTED'
+                            : ep.status === 'SCHEDULED'
+                            ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                            : ['CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED'].includes(ep.status)
                             ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
-                            : ep.status === 'PLAN_PENDING'
+                            : ep.status === 'PLAN_REVIEW'
                             ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                            : ['PLAN_CHANGES_REQUESTED', 'CHANGES_REQUESTED', 'COMPLIANCE_CHANGES_REQUESTED'].includes(ep.status)
+                            ? 'bg-rose-500/20 text-rose-400 border-rose-500/30'
                             : 'bg-slate-800 text-slate-400 border-slate-700'
                         }`}>
                           {ep.status}
                         </span>
 
-                        {ep.status === 'PLAN_PENDING' && (
+                        {ep.status === 'PLAN_REVIEW' && (
                           <button
                             onClick={() => {
                               setActivePackage(ep.id);
@@ -448,7 +541,7 @@ export default function ReviewerDashboardPage() {
                           </button>
                         )}
 
-                        {(ep.status === 'EPISODE_SUBMITTED' || ep.status === 'COMPLIANCE_PASSED') && (
+                        {['CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_CHANGES_REQUESTED', 'COMPLIANCE_PASSED', 'SCHEDULED', 'PUBLISHED'].includes(ep.status) && (
                           <Link
                             href={`/reviewer/audit/${ep.id}`}
                             className="px-3.5 py-1.5 rounded-lg bg-[#8B5CF6] hover:bg-[#7c4bf0] text-white font-bold text-xs flex items-center gap-1.5 transition"
@@ -477,18 +570,30 @@ export default function ReviewerDashboardPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setIsRejectModalOpen(true)}
-                    className="px-4 py-2 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-red-400 text-xs font-bold transition"
-                  >
-                    Yêu Cầu Chỉnh Sửa Kế Hoạch
-                  </button>
-                  <button
-                    onClick={() => setIsQuotaModalOpen(true)}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-900/30 flex items-center gap-2 transition cursor-pointer"
-                  >
-                    <CheckCircle2 className="w-4 h-4" /> Phê Duyệt & Cấp Quota AI
-                  </button>
+                  {currentPackage?.status === 'PLAN_REVIEW' && (
+                    <>
+                      <button
+                        onClick={() => setIsRejectModalOpen(true)}
+                        className="px-4 py-2 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-red-400 text-xs font-bold transition"
+                      >
+                        Yêu Cầu Chỉnh Sửa Kế Hoạch
+                      </button>
+                      <button
+                        onClick={handleApprovePlan}
+                        className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-900/30 flex items-center gap-2 transition cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-4 h-4" /> Phê Duyệt Kế Hoạch
+                      </button>
+                    </>
+                  )}
+                  {currentPackage?.status === 'PLAN_APPROVED' && (
+                    <button
+                      onClick={() => setIsQuotaModalOpen(true)}
+                      className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold shadow-lg shadow-emerald-900/30 flex items-center gap-2 transition cursor-pointer"
+                    >
+                      <Zap className="w-4 h-4" /> Cấp AI Quota
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -578,7 +683,7 @@ export default function ReviewerDashboardPage() {
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         ep.status === 'PUBLISHED'
                           ? 'bg-emerald-500/20 text-emerald-400'
-                          : ep.status === 'EPISODE_SUBMITTED'
+                          : ['CONTENT_REVIEW', 'APPROVED', 'COMPLIANCE_REVIEW', 'COMPLIANCE_PASSED', 'SCHEDULED'].includes(ep.status)
                           ? 'bg-purple-500/20 text-purple-400'
                           : 'bg-slate-800 text-slate-400'
                       }`}>
@@ -679,14 +784,22 @@ export default function ReviewerDashboardPage() {
               </div>
             </div>
 
+            <p className="text-[11px] text-slate-400">
+              Ngân sách dự án còn lại: <span className="font-mono font-bold text-amber-300">{remainingBudget} Tokens</span>
+            </p>
+
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">Số Token cấp phát:</label>
               <input
                 type="number"
                 value={quotaToAllocate}
-                onChange={(e) => setQuotaToAllocate(Number(e.target.value))}
+                onChange={(e) => {
+                  setQuotaToAllocate(Number(e.target.value));
+                  setQuotaError('');
+                }}
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-amber-300 font-mono font-bold focus:outline-none focus:border-emerald-500"
               />
+              {quotaError && <p className="text-[11px] text-red-400 mt-1.5">{quotaError}</p>}
             </div>
 
             <div>
@@ -760,6 +873,62 @@ export default function ReviewerDashboardPage() {
                 <Send className="w-3.5 h-3.5" /> Gửi Yêu Cầu Sửa
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Episode Modal */}
+      {isAddEpisodeModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-[#161922] border border-white/15 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-white">Thêm Tập Phim Mới</h3>
+            <form onSubmit={handleAddEpisodeSubmit} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">Tên Tập Phim:</label>
+                <input
+                  type="text"
+                  required
+                  value={newEpisodeTitle}
+                  onChange={(e) => setNewEpisodeTitle(e.target.value)}
+                  placeholder="Ví dụ: Tập 4: Vòng Lặp Định Mệnh..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">Yêu cầu nội dung (tùy chọn):</label>
+                <textarea
+                  rows={3}
+                  value={newEpisodeRequirements}
+                  onChange={(e) => setNewEpisodeRequirements(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">Thời lượng mục tiêu (Phút, ≤ 30 theo BR-31):</label>
+                <input
+                  type="number"
+                  value={newEpisodeDuration}
+                  onChange={(e) => setNewEpisodeDuration(Number(e.target.value))}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                />
+              </div>
+              {addEpisodeError && <p className="text-[11px] text-red-400">{addEpisodeError}</p>}
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddEpisodeModalOpen(false)}
+                  className="px-4 py-2 rounded-xl bg-white/5 text-slate-400 text-xs font-semibold"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"
+                >
+                  Tạo Tập Phim
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

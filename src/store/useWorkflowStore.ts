@@ -540,6 +540,7 @@ interface WorkflowStoreState {
   // Maker (Creator) Actions
   updateContentBrief: (packageId: string, briefData: Partial<ContentBrief>) => void;
   submitProductionPlan: (packageId: string, updatedBrief?: Partial<ContentBrief>) => ActionResult;
+  reviseProductionPlan: (packageId: string, updatedBrief?: Partial<ContentBrief>) => ActionResult;
   triggerGenerationJob: (packageId: string, jobId: string) => Promise<ActionResult>;
   addSceneJob: (packageId: string, sceneData: Omit<GenerationJob, 'id' | 'status' | 'progress' | 'created_at' | 'updated_at'>) => void;
   removeSceneJob: (packageId: string, jobId: string) => void;
@@ -555,6 +556,7 @@ interface WorkflowStoreState {
   approveContent: (packageId: string) => void;
   saveComplianceCheck: (packageId: string, data: Partial<ComplianceCheck>, labelData?: Partial<AIContentLabel>) => { success: boolean; passed: boolean };
   scheduleFilm: (packageId: string, data: { scheduled_at: string; coin_price: number; visibility: PublicationVisibility; channels: string[] }) => ActionResult;
+  scheduleAndPublish: (packageId: string, data: { scheduled_at: string; coin_price?: number; visibility?: PublicationVisibility; channels?: string[] }) => ActionResult;
   publishFilm: (packageId: string) => ActionResult;
 
   // Reset Demo State
@@ -667,6 +669,18 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
     });
 
     return { success: true };
+  },
+
+  reviseProductionPlan: (packageId, updatedBrief) => {
+    const pkg = get().getPackage(packageId);
+    if (!pkg) return { success: false, error: 'Không tìm thấy tập phim.' };
+
+    const targetDuration = updatedBrief?.target_duration_minutes ?? pkg.brief.target_duration_minutes;
+    if (targetDuration > 30) {
+      return { success: false, error: 'BR-31: Thời lượng mục tiêu không được vượt quá 30 phút.' };
+    }
+
+    return get().submitProductionPlan(packageId, updatedBrief);
   },
 
   triggerGenerationJob: async (packageId, jobId) => {
@@ -1314,6 +1328,24 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get) => ({
     });
 
     return { success: true };
+  },
+
+  scheduleAndPublish: (packageId, data) => {
+    const pkg = get().getPackage(packageId);
+    if (!pkg) return { success: false, error: 'Không tìm thấy tập phim.' };
+
+    const scheduleRes = get().scheduleFilm(packageId, {
+      scheduled_at: data.scheduled_at,
+      coin_price: data.coin_price ?? pkg.coin_price ?? 25,
+      visibility: data.visibility ?? 'public',
+      channels: data.channels ?? ['WEB_OTT', 'MOBILE_APP', 'SMART_TV'],
+    });
+
+    if (!scheduleRes.success) {
+      return scheduleRes;
+    }
+
+    return get().publishFilm(packageId);
   },
 
   publishFilm: (packageId) => {
