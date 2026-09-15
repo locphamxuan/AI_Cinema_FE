@@ -5,3 +5,4 @@ export * from './subscription';
 export * from './transaction';
 export * from './wallet';
 export * from './production';
+export * from './workflow';
