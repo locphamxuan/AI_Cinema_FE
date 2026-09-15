@@ -5,36 +5,23 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppStore } from '@/store/useAppStore';
 import {
-  Film,
-  ShieldCheck,
-  Zap,
   ArrowRight,
   Eye,
   EyeOff,
-  CheckCircle2,
   AlertCircle,
-  Sparkles,
-  Check,
   Clapperboard,
-  Tv
 } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAppStore();
 
-  const [email, setEmail] = useState('creator@gmail.com');
-  const [password, setPassword] = useState('1');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const handleSelectPreset = (presetEmail: string) => {
-    setEmail(presetEmail);
-    setPassword('1');
-    setError(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,86 +63,8 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-black text-white tracking-tight">Đăng Nhập AI Cinema</h1>
           <p className="text-xs text-gray-400 mt-1">
-            Hệ thống phân quyền tự động theo vai trò <span className="text-[#8B5CF6] font-semibold">Maker - Checker</span>
+            Nền tảng sản xuất & công chiếu phim AI OTT thế hệ mới
           </p>
-        </div>
-
-        {/* Quick Role Selection Box */}
-        <div className="mb-5 bg-black/40 border border-white/10 rounded-2xl p-3.5 space-y-2.5">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-gray-300 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-[#E50914]" /> Chọn tài khoản mẫu (MK: 1):
-            </span>
-            <span className="text-[10px] text-gray-400 font-mono">1-Click Login</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            {/* Creator Card */}
-            <button
-              type="button"
-              onClick={() => handleSelectPreset('creator@gmail.com')}
-              className={`p-2.5 rounded-xl border text-left flex flex-col gap-1 transition cursor-pointer ${
-                email.toLowerCase() === 'creator@gmail.com'
-                  ? 'bg-[#E50914]/15 border-[#E50914] text-white shadow-md shadow-[#E50914]/10'
-                  : 'bg-white/5 border-white/5 text-gray-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 font-bold text-xs text-white">
-                  <Film className="w-3.5 h-3.5 text-[#E50914]" />
-                  Creator
-                </div>
-                {email.toLowerCase() === 'creator@gmail.com' && (
-                  <Check className="w-3.5 h-3.5 text-[#E50914]" />
-                )}
-              </div>
-              <div className="text-[10px] text-gray-400 font-mono truncate">creator@gmail.com</div>
-              <span className="text-[9px] text-[#E50914] font-medium mt-0.5">➔ Vào Studio Maker</span>
-            </button>
-
-            {/* Reviewer Card */}
-            <button
-              type="button"
-              onClick={() => handleSelectPreset('reviewer@gmail.com')}
-              className={`p-2.5 rounded-xl border text-left flex flex-col gap-1 transition cursor-pointer ${
-                email.toLowerCase() === 'reviewer@gmail.com'
-                  ? 'bg-[#8B5CF6]/15 border-[#8B5CF6] text-white shadow-md shadow-[#8B5CF6]/10'
-                  : 'bg-white/5 border-white/5 text-gray-400 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 font-bold text-xs text-white">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                  Reviewer
-                </div>
-                {email.toLowerCase() === 'reviewer@gmail.com' && (
-                  <Check className="w-3.5 h-3.5 text-[#8B5CF6]" />
-                )}
-              </div>
-              <div className="text-[10px] text-gray-400 font-mono truncate">reviewer@gmail.com</div>
-              <span className="text-[9px] text-[#8B5CF6] font-medium mt-0.5">➔ Vào Thẩm định Checker</span>
-            </button>
-          </div>
-
-          {/* Regular User demo option */}
-          <button
-            type="button"
-            onClick={() => handleSelectPreset('userdemo@gmail.com')}
-            className={`w-full p-2 rounded-xl border text-left flex items-center justify-between transition cursor-pointer ${
-              email.toLowerCase() === 'userdemo@gmail.com'
-                ? 'bg-emerald-500/15 border-emerald-500 text-white'
-                : 'bg-white/5 border-white/5 text-gray-400 hover:text-white hover:bg-white/10'
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Tv className="w-3.5 h-3.5 text-emerald-400" />
-              <div>
-                <span className="text-xs font-bold text-white">Khán giả VIP (Demo)</span>
-                <span className="text-[10px] text-gray-400 ml-2 font-mono">userdemo@gmail.com</span>
-              </div>
-            </div>
-            <span className="text-[9px] text-emerald-400 font-medium">➔ Xem phim OTT</span>
-          </button>
         </div>
 
         {/* Error Alert */}
