@@ -3,16 +3,17 @@ export interface UserProfile {
   name: string;
   email: string;
   avatarUrl: string;
-  role: 'user' | 'vip' | 'admin';
+  role: 'user' | 'vip' | 'admin' | 'creator' | 'reviewer';
   isVIP: boolean;
   vipExpiresAt?: string;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface AuthResponse {
   user: UserProfile;
   token: string;
   refreshToken?: string;
+  redirectUrl?: string;
 }
 
 export interface LoginCredentials {

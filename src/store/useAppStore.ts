@@ -16,11 +16,14 @@ import {
   botResponses,
 } from '@/mocks/mockData';
 
+import { useWorkflowStore } from './useWorkflowStore';
+
 interface UserProfile {
   id: string;
   name: string;
   email: string;
   avatarUrl: string;
+  role?: 'user' | 'vip' | 'admin' | 'creator' | 'reviewer';
   isVIP: boolean;
 }
 
@@ -28,7 +31,7 @@ interface AppState {
   // Auth
   isAuthenticated: boolean;
   user: UserProfile | null;
-  login: (email: string, password: string) => { success: boolean; error?: string };
+  login: (email: string, password: string) => { success: boolean; error?: string; redirectUrl?: string };
   register: (name: string, email: string, password: string) => { success: boolean; error?: string };
   logout: () => void;
   isAuthModalOpen: boolean;
@@ -103,13 +106,64 @@ export const useAppStore = create<AppState>((set, get) => ({
   login: (email, password) => {
     const trimmedEmail = email.trim().toLowerCase();
     
-    // Kiểm tra tài khoản mock demo
+    // 1. Creator (Maker) Account: creator@gmail.com / 1
+    if (trimmedEmail === 'creator@gmail.com' && password === '1') {
+      const creatorUser: UserProfile = {
+        id: 'usr-creator-01',
+        name: 'Đạo diễn Trần Minh Huy (Maker)',
+        email: 'creator@gmail.com',
+        avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+        role: 'creator',
+        isVIP: true,
+      };
+
+      useWorkflowStore.getState().setRole('creator');
+
+      set({
+        isAuthenticated: true,
+        user: creatorUser,
+        isVIPMode: true,
+        isAuthModalOpen: false,
+        subscription: mockSubscriptionVIP,
+        wallet: { mainCoin: 1500, bonusCoin: 500 },
+      });
+
+      return { success: true, redirectUrl: '/creator' };
+    }
+
+    // 2. Reviewer (Checker) Account: reviewer@gmail.com / 1
+    if (trimmedEmail === 'reviewer@gmail.com' && password === '1') {
+      const reviewerUser: UserProfile = {
+        id: 'usr-reviewer-01',
+        name: 'Thẩm định viên Lê Quốc Bảo (Checker)',
+        email: 'reviewer@gmail.com',
+        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        role: 'reviewer',
+        isVIP: true,
+      };
+
+      useWorkflowStore.getState().setRole('reviewer');
+
+      set({
+        isAuthenticated: true,
+        user: reviewerUser,
+        isVIPMode: true,
+        isAuthModalOpen: false,
+        subscription: mockSubscriptionVIP,
+        wallet: { mainCoin: 2000, bonusCoin: 1000 },
+      });
+
+      return { success: true, redirectUrl: '/reviewer' };
+    }
+
+    // 3. Demo User: userdemo@gmail.com / 1
     if (trimmedEmail === 'userdemo@gmail.com' && password === '1') {
       const demoUser: UserProfile = {
         id: 'user-demo-001',
-        name: 'Phạm Xuân Lộc (Demo User)',
+        name: 'Phạm Xuân Lộc (Khán Giả VIP)',
         email: 'userdemo@gmail.com',
         avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=locdemo',
+        role: 'vip',
         isVIP: true,
       };
 
@@ -125,13 +179,14 @@ export const useAppStore = create<AppState>((set, get) => ({
       return { success: true };
     }
 
-    // Cho phép đăng nhập với email bất kỳ khác nếu hợp lệ
+    // 4. Cho phép đăng nhập với email bất kỳ khác nếu hợp lệ
     if (trimmedEmail && password) {
       const customUser: UserProfile = {
         id: `user-${Date.now()}`,
         name: trimmedEmail.split('@')[0] || 'Khán giả AI',
         email: trimmedEmail,
         avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${trimmedEmail}`,
+        role: 'user',
         isVIP: false,
       };
 
