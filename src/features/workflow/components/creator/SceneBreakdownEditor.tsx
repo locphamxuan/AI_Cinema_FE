@@ -57,7 +57,7 @@ export function SceneBreakdownEditor({ scenes, onAddScene, onRemoveScene, onScen
                   rows={2}
                   value={scene.visual_prompt}
                   onChange={(e) => onSceneChange(idx, 'visual_prompt', e.target.value)}
-                  className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2 font-mono text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby"
+                  className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2 font-mono text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby"
                 />
               </div>
               <div>
@@ -66,7 +66,7 @@ export function SceneBreakdownEditor({ scenes, onAddScene, onRemoveScene, onScen
                   rows={2}
                   value={scene.audio_prompt}
                   onChange={(e) => onSceneChange(idx, 'audio_prompt', e.target.value)}
-                  className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2 font-mono text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby"
+                  className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2 font-mono text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby"
                 />
               </div>
             </div>

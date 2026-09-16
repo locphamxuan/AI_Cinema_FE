@@ -159,7 +159,7 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
               type="number"
               value={targetDuration}
               onChange={(e) => setTargetDuration(Number(e.target.value))}
-              className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-ruby"
+              className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby"
             />
           </div>
           <div>
@@ -168,7 +168,7 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
               type="number"
               value={estimatedTokens}
               onChange={(e) => setEstimatedTokens(Number(e.target.value))}
-              className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400 font-mono font-bold focus:outline-none focus:border-ruby"
+              className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-3 py-1.5 text-xs text-amber-600 dark:text-amber-400 font-mono font-bold focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby"
             />
           </div>
           <div>
@@ -177,7 +177,7 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
               rows={2}
               value={storyboardSummary}
               onChange={(e) => setStoryboardSummary(e.target.value)}
-              className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2 text-[11px] text-slate-900 dark:text-white focus:outline-none focus:border-ruby"
+              className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2 text-[11px] text-slate-900 dark:text-white focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby"
             />
           </div>
         </div>

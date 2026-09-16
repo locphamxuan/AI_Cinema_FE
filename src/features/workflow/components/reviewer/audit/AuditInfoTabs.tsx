@@ -75,7 +75,14 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
               className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 text-xs"
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- external mock CDN thumbnail, not a static asset */}
-              <img src={asset.thumbnail_url} alt="Asset thumbnail" className="w-20 h-12 object-cover rounded-lg border border-slate-200 dark:border-white/10" />
+              <img
+                src={asset.thumbnail_url}
+                alt="Asset thumbnail"
+                width={80}
+                height={48}
+                loading="lazy"
+                className="w-20 h-12 object-cover rounded-lg border border-slate-200 dark:border-white/10"
+              />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <h5 className="font-semibold text-slate-900 dark:text-white">Clip Phân cảnh #{idx + 1}</h5>

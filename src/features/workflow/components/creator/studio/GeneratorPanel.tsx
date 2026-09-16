@@ -61,7 +61,7 @@ export function GeneratorPanel({
             value={selectedJob?.title || newSceneTitle}
             onChange={(e) => onSceneTitleChange(e.target.value)}
             placeholder="Ví dụ: Cảnh 4: Rượt đuổi trên xa lộ tầng không..."
-            className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-ruby outline-none"
+            className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-ruby outline-none focus:ring-1 focus:ring-ruby"
           />
         </div>
 
@@ -72,7 +72,7 @@ export function GeneratorPanel({
           <select
             value={selectedJob?.ai_model || selectedModel}
             onChange={(e) => onModelChange(e.target.value)}
-            className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-ruby outline-none cursor-pointer"
+            className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-ruby outline-none focus:ring-1 focus:ring-ruby cursor-pointer"
           >
             {AI_MODELS.map((model) => (
               <option key={model.id} value={model.id}>
@@ -91,7 +91,7 @@ export function GeneratorPanel({
             onChange={(e) => onPromptVideoChange(e.target.value)}
             rows={4}
             placeholder="Nhập visual prompt chi tiết bằng tiếng Anh (cinematic lighting, camera angle, 8k resolution...)"
-            className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:border-ruby outline-none resize-none font-mono"
+            className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:border-ruby outline-none focus:ring-1 focus:ring-ruby resize-none font-mono"
           />
         </div>
 
@@ -104,7 +104,7 @@ export function GeneratorPanel({
             onChange={(e) => onPromptAudioChange(e.target.value)}
             rows={3}
             placeholder="Nhập lời thoại diễn viên và hiệu ứng âm thanh không gian..."
-            className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:border-purple-600 outline-none resize-none font-mono"
+            className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:border-purple-600 outline-none focus:ring-1 focus:ring-purple-600 resize-none font-mono"
           />
         </div>
 

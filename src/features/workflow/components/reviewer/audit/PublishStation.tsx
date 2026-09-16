@@ -73,7 +73,7 @@ export function PublishStation({
             value={scheduledDate}
             onChange={(e) => onScheduledDateChange(e.target.value)}
             disabled={isPublished}
-            className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-600"
+            className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600"
           />
         </div>
 
@@ -105,7 +105,7 @@ export function PublishStation({
             value={visibility}
             onChange={(e) => onVisibilityChange(e.target.value as PublicationVisibility)}
             disabled={isPublished}
-            className="w-full bg-white dark:bg-[#1e222d] border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-600"
+            className="w-full bg-white dark:bg-[#1e222d] border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600"
           >
             <option value="public">Công khai toàn bộ khán giả (Public)</option>
             <option value="vip_only">Chỉ dành cho tài khoản VIP (VIP Early Access)</option>
