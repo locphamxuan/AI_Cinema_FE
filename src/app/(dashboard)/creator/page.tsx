@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { useAppStore } from '@/store/useAppStore';
 import { RoleNavHeader } from '@/components/dashboard/RoleNavHeader';
+import type { SceneBreakdownItem } from '@/types/workflow';
 import {
   Film,
   Zap,
@@ -15,22 +16,17 @@ import {
   Trash2,
   AlertCircle,
   CheckCircle2,
-  Sliders,
   FileText,
   Play,
   ArrowRight,
   Video,
-  Info,
   Layers,
   LayoutDashboard,
   Clapperboard,
-  History,
   MessageSquare,
-  Sparkles,
   ChevronRight,
   ShieldCheck,
-  Check,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 
 export default function CreatorDashboardPage() {
@@ -62,17 +58,18 @@ export default function CreatorDashboardPage() {
 
   const [isSaved, setIsSaved] = useState(false);
 
-  // Sync state when active episode changes
-  React.useEffect(() => {
-    if (brief) {
-      setSynopsis(brief.synopsis);
-      setOverviewScript(brief.overview_script);
-      setTargetDuration(brief.target_duration_minutes);
-      setEstimatedTokens(brief.estimated_tokens);
-      setStoryboardSummary(brief.storyboard_summary);
-      setScenes(brief.scene_breakdown);
+  const handleSelectEpisode = (episodeId: string) => {
+    setActivePackage(episodeId);
+    const nextBrief = project.episodes.find((e) => e.id === episodeId)?.brief;
+    if (nextBrief) {
+      setSynopsis(nextBrief.synopsis);
+      setOverviewScript(nextBrief.overview_script);
+      setTargetDuration(nextBrief.target_duration_minutes);
+      setEstimatedTokens(nextBrief.estimated_tokens);
+      setStoryboardSummary(nextBrief.storyboard_summary);
+      setScenes(nextBrief.scene_breakdown);
     }
-  }, [activePackageId, brief]);
+  };
 
   // Quota calculation
   const quotaPercent = project.allocated_tokens > 0 ? (project.consumed_tokens / project.allocated_tokens) * 100 : 0;
@@ -104,7 +101,7 @@ export default function CreatorDashboardPage() {
     setEstimatedTokens(updated.reduce((sum, s) => sum + s.estimated_tokens, 0));
   };
 
-  const handleSceneChange = (index: number, field: string, value: any) => {
+  const handleSceneChange = <K extends keyof SceneBreakdownItem>(index: number, field: K, value: SceneBreakdownItem[K]) => {
     const updated = [...scenes];
     updated[index] = { ...updated[index], [field]: value };
     setScenes(updated);
@@ -221,7 +218,7 @@ export default function CreatorDashboardPage() {
                 return (
                   <button
                     key={ep.id}
-                    onClick={() => setActivePackage(ep.id)}
+                    onClick={() => handleSelectEpisode(ep.id)}
                     className={`w-full px-3 py-2 rounded-lg text-left flex items-center justify-between transition cursor-pointer ${
                       isSelected
                         ? 'bg-white/[0.08] text-white border-l-2 border-ruby shadow-sm'
