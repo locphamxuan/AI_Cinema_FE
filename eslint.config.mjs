@@ -24,7 +24,7 @@ const eslintConfig = defineConfig([
   {
     // Seed/fixture data is not logic — line count there tracks the dataset,
     // not code complexity.
-    files: ["src/mocks/**/*.{ts,tsx}"],
+    files: ["src/mocks/**/*.{ts,tsx}", "src/**/mocks/**/*.{ts,tsx}"],
     rules: {
       "max-lines": "off",
     },
