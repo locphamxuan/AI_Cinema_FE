@@ -79,15 +79,34 @@ interface AppState {
   handleQuickAction: (actionId: string) => void;
   escalateToAgent: () => void;
 
-  // Check-in modal
+  // Modals & Floating Tools
+  isRightSidebarOpen: boolean;
+  openRightSidebar: () => void;
+  closeRightSidebar: () => void;
+  toggleRightSidebar: () => void;
+
   isCheckInModalOpen: boolean;
   setCheckInModalOpen: (open: boolean) => void;
 
-  // Unlock modal
+  isDepositModalOpen: boolean;
+  openDepositModal: () => void;
+  closeDepositModal: () => void;
+  depositCoins: (amountVND: number, mainCoin: number, bonusCoin: number, method: string) => void;
+
   isUnlockModalOpen: boolean;
   selectedEpisodeId: string | null;
   openUnlockModal: (episodeId: string) => void;
   closeUnlockModal: () => void;
+
+  // Search & Filter
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  selectedGenre: string;
+  setSelectedGenre: (genre: string) => void;
+  selectedCountry: string;
+  setSelectedCountry: (country: string) => void;
+  selectedYear: string;
+  setSelectedYear: (year: string) => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -510,12 +529,52 @@ export const useAppStore = create<AppState>((set, get) => ({
     });
   },
 
-  // ===== MODALS =====
+  // ===== MODALS & DRAWERS =====
+  isRightSidebarOpen: false,
+  openRightSidebar: () => set({ isRightSidebarOpen: true }),
+  closeRightSidebar: () => set({ isRightSidebarOpen: false }),
+  toggleRightSidebar: () => set((s) => ({ isRightSidebarOpen: !s.isRightSidebarOpen })),
+
   isCheckInModalOpen: false,
   setCheckInModalOpen: (open) => set({ isCheckInModalOpen: open }),
+
+  isDepositModalOpen: false,
+  openDepositModal: () => set({ isDepositModalOpen: true }),
+  closeDepositModal: () => set({ isDepositModalOpen: false }),
+
+  depositCoins: (amountVND, mainCoin, bonusCoin, method) => {
+    set((s) => ({
+      wallet: {
+        mainCoin: s.wallet.mainCoin + mainCoin,
+        bonusCoin: s.wallet.bonusCoin + bonusCoin,
+      },
+      isDepositModalOpen: false,
+    }));
+
+    get().addTransaction({
+      type: 'deposit',
+      typeLabel: 'Nạp Coin',
+      description: `Nạp ${mainCoin + bonusCoin} Coin qua ${method} (${amountVND.toLocaleString('vi-VN')} đ)`,
+      mainCoinDelta: mainCoin,
+      bonusCoinDelta: bonusCoin,
+      totalAmount: mainCoin + bonusCoin,
+      status: 'success',
+      statusLabel: 'Thành công',
+    });
+  },
 
   isUnlockModalOpen: false,
   selectedEpisodeId: null,
   openUnlockModal: (episodeId) => set({ isUnlockModalOpen: true, selectedEpisodeId: episodeId }),
   closeUnlockModal: () => set({ isUnlockModalOpen: false, selectedEpisodeId: null }),
+
+  // ===== SEARCH & FILTER =====
+  searchQuery: '',
+  setSearchQuery: (query) => set({ searchQuery: query }),
+  selectedGenre: 'Tất cả',
+  setSelectedGenre: (genre) => set({ selectedGenre: genre }),
+  selectedCountry: 'Tất cả',
+  setSelectedCountry: (country) => set({ selectedCountry: country }),
+  selectedYear: 'Tất cả',
+  setSelectedYear: (year) => set({ selectedYear: year }),
 }));
