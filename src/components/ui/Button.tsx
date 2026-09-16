@@ -2,7 +2,7 @@
 
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 type Size = 'sm' | 'md';
 
 const VARIANT_CLASSES: Record<Variant, string> = {
@@ -12,6 +12,7 @@ const VARIANT_CLASSES: Record<Variant, string> = {
   ghost:
     'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10',
   danger: 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm',
+  success: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm',
 };
 
 const SIZE_CLASSES: Record<Size, string> = {
