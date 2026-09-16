@@ -11,22 +11,16 @@ import {
   Plus,
   Zap,
   CheckCircle2,
-  AlertTriangle,
   FileText,
-  Calendar,
   Layers,
   ArrowRight,
   Clock,
-  Eye,
-  Sliders,
   Send,
   Film,
-  Award,
   LayoutDashboard,
   CheckSquare,
   BadgeCheck,
   Tv,
-  ExternalLink,
   ChevronRight,
   AlertCircle
 } from 'lucide-react';
@@ -950,6 +944,26 @@ export default function ReviewerDashboardPage() {
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
                 />
               </div>
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">Thể Loại:</label>
+                <input
+                  type="text"
+                  value={newGenre}
+                  onChange={(e) => setNewGenre(e.target.value)}
+                  placeholder="Ví dụ: Khoa học viễn tưởng, AI Action..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-slate-300 mb-1 font-semibold">Tóm Tắt Nội Dung:</label>
+                <textarea
+                  rows={2}
+                  value={newSynopsis}
+                  onChange={(e) => setNewSynopsis(e.target.value)}
+                  placeholder="Tóm tắt bối cảnh và cốt truyện chính của dự án..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white resize-none"
+                />
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-slate-300 mb-1 font-semibold">Số Tập:</label>
@@ -966,6 +980,26 @@ export default function ReviewerDashboardPage() {
                     type="number"
                     value={newBudgetTokens}
                     onChange={(e) => setNewBudgetTokens(Number(e.target.value))}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">Deadline Sản Xuất:</label>
+                  <input
+                    type="date"
+                    value={newDeadline}
+                    onChange={(e) => setNewDeadline(e.target.value)}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 mb-1 font-semibold">Ngày Phát Hành Dự Kiến:</label>
+                  <input
+                    type="date"
+                    value={newReleaseDate}
+                    onChange={(e) => setNewReleaseDate(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white"
                   />
                 </div>
