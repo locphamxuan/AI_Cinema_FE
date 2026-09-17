@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Video, Play } from 'lucide-react';
+import { ChevronRight, Video, Play, Milestone } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { CreatorSidebar, type CreatorTab } from './CreatorSidebar';
 import { OverviewTab } from './tabs/OverviewTab';
@@ -25,6 +25,8 @@ export function CreatorDashboardPage() {
 
   const latestFeedback = reviews.filter((r) => r.episode_package_id === currentPackage?.id && r.decision === 'changes_requested')[0];
   const episodeReviews = reviews.filter((r) => r.episode_package_id === currentPackage?.id);
+
+  const activeMilestone = project.milestones?.find((m) => m.id === project.active_milestone_id) || project.milestones?.[0];
 
   const canEnterStudio =
     currentPackage?.status === 'QUOTA_ALLOCATED' ||
@@ -82,6 +84,48 @@ export function CreatorDashboardPage() {
             )}
           </div>
         </div>
+
+        {/* Active Milestone Banner */}
+        {activeMilestone && (
+          <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 text-white rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md border border-purple-500/30">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center border border-purple-400/30 shrink-0">
+                <Milestone className="w-5 h-5 text-purple-300" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 text-[10px] uppercase font-bold tracking-wider text-purple-300">
+                  <span>📍 Cột mốc tiến độ dự án đang chọn thực hiện</span>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] bg-purple-400/20 text-purple-200 border border-purple-400/30">
+                    Thời gian: {activeMilestone.startDate ? `${activeMilestone.startDate} ➔ ${activeMilestone.deadline}` : activeMilestone.deadline}
+                  </span>
+                </div>
+                <h3 className="text-sm font-bold text-white mt-0.5">{activeMilestone.title}</h3>
+                {activeMilestone.description && (
+                  <p className="text-xs text-purple-200/80 mt-0.5 line-clamp-1">{activeMilestone.description}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-end sm:self-center shrink-0 text-xs">
+              <span className="text-[11px] text-purple-200">Trạng thái:</span>
+              <span
+                className={`px-2.5 py-1 rounded-lg font-bold text-[11px] border ${
+                  activeMilestone.status === 'completed'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : activeMilestone.status === 'in_progress'
+                    ? 'bg-purple-500/30 text-purple-200 border-purple-400/40'
+                    : 'bg-slate-700/50 text-slate-300 border-slate-600'
+                }`}
+              >
+                {activeMilestone.status === 'completed'
+                  ? 'Đã hoàn thành ✓'
+                  : activeMilestone.status === 'in_progress'
+                  ? 'Đang thực hiện'
+                  : 'Chưa thực hiện'}
+              </span>
+            </div>
+          </div>
+        )}
 
         {activeTab === 'overview' && (
           <OverviewTab

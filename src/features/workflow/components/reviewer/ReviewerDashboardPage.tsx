@@ -23,12 +23,30 @@ const TAB_TITLES: Record<ReviewerTab, string> = {
 
 const DEFAULT_FORM: CreateProjectFormState = {
   title: '',
-  genre: 'Khoa học viễn tưởng, AI Action',
+  genre: ['Khoa học viễn tưởng', 'Hành động AI'],
   synopsis: '',
   episodes: 5,
   budgetTokens: 3000,
   deadline: '2026-12-31',
   releaseDate: '2027-01-15',
+  milestones: [
+    {
+      id: 'ms-init-1',
+      title: 'Cột mốc 1: Khởi tạo kịch bản & phân cảnh',
+      startDate: '2026-09-17',
+      deadline: '2026-10-15',
+      description: 'Hoàn thành bản kịch bản chi tiết và hệ thống prompt.',
+      status: 'in_progress',
+    },
+    {
+      id: 'ms-init-2',
+      title: 'Cột mốc 2: Sản xuất AI Video & Nộp duyệt',
+      startDate: '2026-10-16',
+      deadline: '2026-11-15',
+      description: 'Render clip 4K và gửi Thẩm định viên kiểm định.',
+      status: 'pending',
+    },
+  ],
 };
 
 export function ReviewerDashboardPage() {
@@ -53,17 +71,18 @@ export function ReviewerDashboardPage() {
 
     createProject({
       title: createForm.title,
-      genre: createForm.genre.split(',').map((g) => g.trim()).filter(Boolean),
+      genre: createForm.genre.length > 0 ? createForm.genre : ['Khoa học viễn tưởng'],
       synopsis: createForm.synopsis || 'Dự án điện ảnh ứng dụng công nghệ GenAI thế hệ mới.',
       total_episodes: createForm.episodes,
       total_budget_tokens: createForm.budgetTokens,
       deadline: createForm.deadline,
       planned_release_date: createForm.releaseDate,
+      milestones: createForm.milestones,
     });
 
     setIsCreateProjectOpen(false);
     setCreateForm(DEFAULT_FORM);
-    alert('Đã khởi tạo dự án sản xuất phim AI mới thành công!');
+    alert('Đã khởi tạo dự án sản xuất phim AI mới cùng các cột mốc tiến độ thành công!');
   };
 
   const handleAllocateQuotaConfirm = () => {

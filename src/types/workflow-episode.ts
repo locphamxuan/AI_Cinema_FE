@@ -55,6 +55,18 @@ export interface EpisodePackage {
 }
 
 /**
+ * Cột mốc tiến độ dự án do Content Reviewer quy định
+ */
+export interface ProjectMilestone {
+  id: string;
+  title: string;
+  startDate?: string;
+  deadline: string;
+  description?: string;
+  status: 'pending' | 'in_progress' | 'completed';
+}
+
+/**
  * Production Project: Dự án tổng thể chứa nhiều tập phim
  */
 export interface ProductionProject {
@@ -70,7 +82,10 @@ export interface ProductionProject {
   planned_release_date: string;
   creator_name: string;
   reviewer_name: string;
+  milestones?: ProjectMilestone[];
+  active_milestone_id?: string;
   episodes: EpisodePackage[];
   created_at: string;
   updated_at: string;
 }
+
