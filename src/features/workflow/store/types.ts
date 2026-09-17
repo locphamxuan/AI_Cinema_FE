@@ -1,6 +1,7 @@
 import {
   Role,
   ProductionProject,
+  ProjectMilestone,
   EpisodePackage,
   ContentBrief,
   GenerationJob,
@@ -32,7 +33,18 @@ export interface EpisodeSlice {
   addSceneJob: (packageId: string, sceneData: Omit<GenerationJob, 'id' | 'status' | 'progress' | 'created_at' | 'updated_at'>) => void;
   removeSceneJob: (packageId: string, jobId: string) => void;
   submitEpisodePackage: (packageId: string) => boolean;
-  createProject: (data: { title: string; genre: string[]; synopsis: string; total_episodes: number; total_budget_tokens: number; deadline: string; planned_release_date: string }) => void;
+  createProject: (data: {
+    title: string;
+    genre: string[];
+    synopsis: string;
+    total_episodes: number;
+    total_budget_tokens: number;
+    deadline: string;
+    planned_release_date: string;
+    milestones?: ProjectMilestone[];
+  }) => void;
+  setActiveMilestone: (milestoneId: string) => void;
+  updateMilestoneStatus: (milestoneId: string, status: 'pending' | 'in_progress' | 'completed') => void;
 }
 
 export interface ProductionSlice {

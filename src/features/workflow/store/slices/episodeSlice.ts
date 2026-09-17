@@ -155,6 +155,16 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
   },
 
   createProject: (data) => {
+    const milestones = data.milestones && data.milestones.length > 0 ? data.milestones : [
+      {
+        id: `ms-1-${Date.now()}`,
+        title: 'Khởi tạo kịch bản & phân cảnh',
+        deadline: data.deadline,
+        description: 'Tạo bản thảo kịch bản chi tiết và danh sách cảnh phim.',
+        status: 'in_progress' as const,
+      }
+    ];
+
     const newProject: ProductionProject = {
       id: `proj-${Date.now()}`,
       title: data.title,
@@ -168,11 +178,35 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       planned_release_date: data.planned_release_date,
       creator_name: 'Đạo diễn Trần Minh Huy (Maker)',
       reviewer_name: 'Thẩm định viên Lê Quốc Bảo (Checker)',
+      milestones,
+      active_milestone_id: milestones[0]?.id,
       episodes: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
 
     set({ project: newProject, activeProjectId: newProject.id });
+  },
+
+  setActiveMilestone: (milestoneId) => {
+    set((state) => ({
+      project: {
+        ...state.project,
+        active_milestone_id: milestoneId,
+        updated_at: new Date().toISOString(),
+      },
+    }));
+  },
+
+  updateMilestoneStatus: (milestoneId, status) => {
+    set((state) => ({
+      project: {
+        ...state.project,
+        milestones: state.project.milestones?.map((m) =>
+          m.id === milestoneId ? { ...m, status } : m
+        ),
+        updated_at: new Date().toISOString(),
+      },
+    }));
   },
 });
