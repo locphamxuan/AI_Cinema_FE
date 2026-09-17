@@ -129,7 +129,7 @@ export default function DemoControlPanel() {
                   <span className="truncate">Xem phim 4K</span>
                 </Link>
                 <Link
-                  href="/reviewer/projects/create"
+                  href="/reviewer"
                   onClick={() => setIsOpen(false)}
                   className="p-2.5 rounded-xl bg-ruby/10 hover:bg-ruby/20 border border-ruby/30 text-ruby font-bold transition-all flex items-center gap-2"
                 >
@@ -137,7 +137,7 @@ export default function DemoControlPanel() {
                   <span className="truncate">Reviewer Hub</span>
                 </Link>
                 <Link
-                  href="/creator/episodes/ep-prod-03/studio"
+                  href="/creator"
                   onClick={() => setIsOpen(false)}
                   className="p-2.5 rounded-xl bg-neon/10 hover:bg-neon/20 border border-neon/30 text-neon font-bold transition-all flex items-center gap-2"
                 >
