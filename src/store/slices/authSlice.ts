@@ -1,7 +1,7 @@
 import type { StateCreator } from 'zustand';
 import { mockSubscriptionVIP, mockWallet } from '@/mocks/mockData';
 import { useWorkflowStore } from '../useWorkflowStore';
-import type { AppState, AuthSlice, UserProfile } from './types';
+import { emptySubscription, type AppState, type AuthSlice, type UserProfile } from './types';
 
 export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, get) => ({
   isAuthenticated: false, // Bắt đầu ở trạng thái chưa đăng nhập để thấy landing page Netflix style
@@ -68,20 +68,43 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
       return { success: true, redirectUrl: '/reviewer' };
     }
 
-    // 3. Demo User: userdemo@gmail.com / 1
+    // 3. Demo Normal User: userdemo@gmail.com / 1
     if (trimmedEmail === 'userdemo@gmail.com' && password === '1') {
       const demoUser: UserProfile = {
         id: 'user-demo-001',
-        name: 'Phạm Xuân Lộc (Khán Giả VIP)',
+        name: 'Phạm Xuân Lộc (Khán Giả)',
         email: 'userdemo@gmail.com',
         avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=locdemo',
+        role: 'user',
+        isVIP: false,
+      };
+
+      set({
+        isAuthenticated: true,
+        user: demoUser,
+        isVIPMode: false,
+        isAuthModalOpen: false,
+        subscription: emptySubscription,
+        wallet: { mainCoin: 60, bonusCoin: 20 },
+      });
+
+      return { success: true };
+    }
+
+    // 4. Demo VIP User: vipdemo@gmail.com / 1
+    if (trimmedEmail === 'vipdemo@gmail.com' && password === '1') {
+      const vipUser: UserProfile = {
+        id: 'user-vip-001',
+        name: 'Phạm Xuân Lộc (Khán Giả VIP)',
+        email: 'vipdemo@gmail.com',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=locvip',
         role: 'vip',
         isVIP: true,
       };
 
       set({
         isAuthenticated: true,
-        user: demoUser,
+        user: vipUser,
         isVIPMode: true,
         isAuthModalOpen: false,
         subscription: mockSubscriptionVIP,
@@ -91,7 +114,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
       return { success: true };
     }
 
-    // 4. Cho phép đăng nhập với email bất kỳ khác nếu hợp lệ
+    // 5. Cho phép đăng nhập với email bất kỳ khác nếu hợp lệ
     if (trimmedEmail && password) {
       const customUser: UserProfile = {
         id: `user-${Date.now()}`,
@@ -107,6 +130,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
         user: customUser,
         isVIPMode: false,
         isAuthModalOpen: false,
+        subscription: emptySubscription,
         wallet: { mainCoin: 50, bonusCoin: 20 },
       });
 
@@ -138,6 +162,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
       user: newUser,
       isVIPMode: false,
       isAuthModalOpen: false,
+      subscription: emptySubscription,
       wallet: {
         mainCoin: 0,
         bonusCoin: 50, // Quà tặng đăng ký mới
@@ -164,6 +189,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
       isAuthenticated: false,
       user: null,
       isVIPMode: false,
+      subscription: emptySubscription,
     });
   },
 });

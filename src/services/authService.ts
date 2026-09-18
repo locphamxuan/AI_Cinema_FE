@@ -40,9 +40,12 @@ export const authService = {
           userRole = 'reviewer';
           userName = 'Thẩm định viên Lê Quốc Bảo (Checker)';
           redirectUrl = '/reviewer';
-        } else if (trimmed === 'userdemo@gmail.com') {
+        } else if (trimmed === 'vipdemo@gmail.com') {
           userRole = 'vip';
           userName = 'Phạm Xuân Lộc (Khán Giả VIP)';
+        } else if (trimmed === 'userdemo@gmail.com') {
+          userRole = 'user';
+          userName = 'Phạm Xuân Lộc (Khán Giả)';
         }
 
         const authenticatedUser: UserProfile = {

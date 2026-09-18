@@ -4,6 +4,15 @@ import { UserSubscription } from '@/types/subscription';
 import { Transaction } from '@/types/transaction';
 import { ChatMessage, ChatPhase, SupportTicket } from '@/types/chat';
 
+export const emptySubscription: UserSubscription = {
+  plan: null,
+  status: 'none',
+  startDate: null,
+  endDate: null,
+  autoRenew: false,
+  paymentMethod: '',
+};
+
 export interface UserProfile {
   id: string;
   name: string;

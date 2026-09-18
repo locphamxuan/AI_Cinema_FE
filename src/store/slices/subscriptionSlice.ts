@@ -1,9 +1,8 @@
 import type { StateCreator } from 'zustand';
-import { mockSubscriptionVIP } from '@/mocks/mockData';
-import type { AppState, SubscriptionSlice } from './types';
+import { emptySubscription, type AppState, type SubscriptionSlice } from './types';
 
 export const createSubscriptionSlice: StateCreator<AppState, [], [], SubscriptionSlice> = (set) => ({
-  subscription: mockSubscriptionVIP,
+  subscription: emptySubscription,
 
   toggleAutoRenew: () =>
     set((s) => ({
