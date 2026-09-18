@@ -1193,41 +1193,49 @@ export default function ReviewerProjectCreatePage() {
 
       {/* Add Milestone Modal */}
       {isAddMilestoneOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg glass-card p-6 border border-slate-200 dark:border-white/10 shadow-2xl bg-white dark:bg-slate-900 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🚩</span>
-                <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                  Thêm Cột Mốc Tiến Độ Mới
-                </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="relative w-full max-w-lg rounded-3xl border border-slate-200/80 dark:border-white/15 shadow-2xl bg-white dark:bg-[#13161F] p-6 space-y-4 overflow-hidden">
+            {/* Top Gradient Shimmer Bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ruby via-neon to-coin" />
+
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200/80 dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-ruby/10 text-ruby flex items-center justify-center font-bold text-sm">
+                  🚩
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Thêm Cột Mốc Tiến Độ Mới
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-zinc-400">Thiết lập thời hạn và sản phẩm nghiệm thu</p>
+                </div>
               </div>
               <button
                 onClick={() => setIsAddMilestoneOpen(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSaveMilestone} className="space-y-4">
+            <form onSubmit={handleSaveMilestone} className="space-y-4 text-xs">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
                   Tên Cột Mốc <span className="text-ruby">*</span>
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ví dụ: Cột mốc 3: Hoàn thiện kỹ xảo AI & Âm thanh"
+                  placeholder="Ví dụ: Cột mốc 3: Hoàn thiện kỹ xảo AI & Âm thanh..."
                   value={newMilestoneTitle}
                   onChange={(e) => setNewMilestoneTitle(e.target.value)}
-                  className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none focus:ring-2 focus:ring-ruby/30 focus:border-ruby transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
                     Hạn Chót (Due Date) <span className="text-ruby">*</span>
                   </label>
                   <input
@@ -1235,37 +1243,38 @@ export default function ReviewerProjectCreatePage() {
                     required
                     value={newMilestoneDueDate}
                     onChange={(e) => setNewMilestoneDueDate(e.target.value)}
-                    className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-ruby/30 focus:border-ruby transition-all dark:[color-scheme:dark]"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
                     Người Chịu Trách Nhiệm
                   </label>
                   <input
                     type="text"
                     value={newMilestoneAssignee}
                     onChange={(e) => setNewMilestoneAssignee(e.target.value)}
-                    className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                    placeholder="VD: Creator Team..."
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-ruby/30 focus:border-ruby transition-all"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
                   Sản Phẩm Đầu Ra / Nghiệm Thu (Deliverable)
                 </label>
                 <input
                   type="text"
-                  placeholder="Ví dụ: 5 cảnh video 4K, bản âm thanh Dolby 5.1"
+                  placeholder="Ví dụ: 5 cảnh video 4K, bản âm thanh Dolby 5.1..."
                   value={newMilestoneDeliverable}
                   onChange={(e) => setNewMilestoneDeliverable(e.target.value)}
-                  className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-ruby/30 focus:border-ruby transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1.5">
                   Mô Tả & Yêu Cầu Cần Đạt
                 </label>
                 <textarea
@@ -1273,21 +1282,21 @@ export default function ReviewerProjectCreatePage() {
                   placeholder="Chi tiết công việc và tiêu chí thẩm định chất lượng theo mốc..."
                   value={newMilestoneDesc}
                   onChange={(e) => setNewMilestoneDesc(e.target.value)}
-                  className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                  className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-2 focus:ring-ruby/30 focus:border-ruby transition-all resize-none"
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-2 border-t border-slate-200 dark:border-white/10">
+              <div className="flex justify-end gap-3 pt-3 border-t border-slate-200/80 dark:border-white/10">
                 <button
                   type="button"
                   onClick={() => setIsAddMilestoneOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/10"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-ruby hover:bg-ruby-dark shadow-md shadow-ruby/30 transition-all cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-ruby to-ruby-dark hover:shadow-lg hover:shadow-ruby/30 transition-all cursor-pointer"
                 >
                   Lưu Cột Mốc
                 </button>
