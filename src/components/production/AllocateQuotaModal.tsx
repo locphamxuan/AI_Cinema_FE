@@ -113,9 +113,9 @@ export default function AllocateQuotaModal({
                 required
                 value={quotaAmount}
                 onChange={(e) => setQuotaAmount(Number(e.target.value))}
-                className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-4 py-2.5 text-base font-mono font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-4 py-2.5 text-base font-mono font-bold text-slate-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
-              <span className="absolute right-4 top-2.5 text-xs font-bold text-slate-400 dark:text-zinc-500">
+              <span className="absolute right-4 top-2.5 text-xs font-bold text-slate-400 dark:text-zinc-500 pointer-events-none">
                 AI Tokens
               </span>
             </div>

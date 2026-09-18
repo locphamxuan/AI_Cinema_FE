@@ -17,7 +17,8 @@ export function FormField({ label, children, className = '' }: FormFieldProps) {
 }
 
 const FIELD_BASE =
-  'w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-ruby/40 focus:border-ruby transition';
+  'w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-ruby/30 focus:border-ruby transition-all dark:[color-scheme:dark] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
 
 export const fieldInputClass = FIELD_BASE;
 export const fieldTextareaClass = `${FIELD_BASE} resize-none`;
+
