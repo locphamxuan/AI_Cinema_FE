@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useAppStore } from '@/store/useAppStore';
 import { genreCategories } from '@/mocks/mockData';
 
 interface CategoryPillsProps {
@@ -76,17 +77,17 @@ function CategoryIcon({ category, className = 'w-3.5 h-3.5' }: { category: strin
 }
 
 export default function CategoryPills({ onSelectCategory }: CategoryPillsProps) {
-  const [activeCategory, setActiveCategory] = useState('Tất cả');
+  const { selectedGenre, setSelectedGenre } = useAppStore();
 
   const handleSelect = (cat: string) => {
-    setActiveCategory(cat);
+    setSelectedGenre(cat);
     onSelectCategory?.(cat);
   };
 
   return (
     <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2 px-1">
       {genreCategories.map((cat) => {
-        const isActive = activeCategory === cat;
+        const isActive = selectedGenre === cat || (selectedGenre === 'Tất cả' && cat === 'Tất cả');
 
         return (
           <button

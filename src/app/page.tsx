@@ -16,11 +16,14 @@ export default function HomePage() {
     return <LandingHero />;
   }
 
+  // Top 5 hot movies for Full-Width Hero Carousel
+  const hotMovies = allMockMovies.slice(0, 5);
+
   // If logged in -> Show Full Premium OTT Streaming Dashboard
   return (
     <div className="space-y-10 animate-fade-in pb-12">
-      {/* 1. Cinematic Hero Banner with Ambient Glow */}
-      <HeroBanner movie={currentMovie} isVIPMode={isVIPMode} />
+      {/* 1. Cinematic Full-Width Hero Carousel (5 Hot Movies) */}
+      <HeroBanner movies={hotMovies} isVIPMode={isVIPMode} />
 
       {/* 2. Category Filter Pills */}
       <CategoryPills />

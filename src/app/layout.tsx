@@ -15,7 +15,11 @@ export const metadata: Metadata = {
   keywords: ["AI Cinema", "streaming", "phim AI", "OTT", "Việt Nam"],
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="vi" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
