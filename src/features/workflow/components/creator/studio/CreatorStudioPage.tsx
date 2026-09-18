@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Zap } from 'lucide-react';
+import { ArrowLeft, Zap, Plus } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { StudioPlayer } from './StudioPlayer';
 import { StudioTimeline } from './StudioTimeline';
@@ -50,19 +50,16 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   };
 
   const handleAddJob = () => {
-    if (!newSceneTitle.trim()) {
-      alert('Vui lòng nhập tên phân cảnh mới!');
-      return;
-    }
     const nextSceneNum = jobs.length + 1;
+    const titleToUse = newSceneTitle.trim() || `Cảnh ${nextSceneNum}: Phân Cảnh Mới #${nextSceneNum}`;
     addSceneJob(currentPackage.id, {
       episode_id: currentPackage.id,
-      scene_id: `scene-${nextSceneNum}`,
+      scene_id: `scene-${nextSceneNum}-${Date.now()}`,
       scene_number: nextSceneNum,
-      title: newSceneTitle,
+      title: titleToUse,
       ai_model: selectedModel,
-      prompt_video: newPromptVideo || 'Cinematic shot, highly detailed lighting',
-      prompt_audio: newPromptAudio || 'Ambient cinematic background music',
+      prompt_video: newPromptVideo.trim() || 'Cinematic wide angle, highly detailed lighting, 8k render',
+      prompt_audio: newPromptAudio.trim() || 'Ambient cinematic background music and sound effects',
       token_cost: tokenCost,
     });
     setNewSceneTitle('');
@@ -117,6 +114,15 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
                 {remainingQuota} Tokens
               </span>
             </div>
+            <button
+              onClick={() => {
+                alert('Đã gửi thông báo xin cấp thêm Token Quota tới Thẩm định viên (Reviewer)!');
+              }}
+              title="Xin cấp thêm Token Quota"
+              className="p-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 text-amber-600 dark:text-amber-400 border border-amber-500/30 transition cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           <button
