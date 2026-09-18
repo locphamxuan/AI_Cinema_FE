@@ -50,25 +50,15 @@ export function SceneBreakdownEditor({ scenes, onAddScene, onRemoveScene, onScen
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-              <div>
-                <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">Visual Prompt AI:</label>
-                <textarea
-                  rows={2}
-                  value={scene.visual_prompt}
-                  onChange={(e) => onSceneChange(idx, 'visual_prompt', e.target.value)}
-                  className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2 font-mono text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">Audio / Voice Prompt:</label>
-                <textarea
-                  rows={2}
-                  value={scene.audio_prompt}
-                  onChange={(e) => onSceneChange(idx, 'audio_prompt', e.target.value)}
-                  className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2 font-mono text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby"
-                />
-              </div>
+            <div className="text-xs">
+              <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1 font-semibold">Visual Prompt AI:</label>
+              <textarea
+                rows={2}
+                value={scene.visual_prompt}
+                onChange={(e) => onSceneChange(idx, 'visual_prompt', e.target.value)}
+                placeholder="Mô tả chi tiết góc quay, bối cảnh, nhân vật, chuyển động và hiệu ứng ánh sáng AI..."
+                className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2.5 font-mono text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition"
+              />
             </div>
           </div>
         ))}
