@@ -6,7 +6,19 @@ import ProductionHeader from '@/components/production/ProductionHeader';
 import AllocateQuotaModal from '@/components/production/AllocateQuotaModal';
 import RequestChangesModal from '@/components/production/RequestChangesModal';
 import { useProductionStore } from '@/store/useProductionStore';
-import { ProductionEpisode } from '@/types/production';
+import { ProductionEpisode, AIPolicy, ProjectMilestone } from '@/types/production';
+import { mockAIPolicies } from '@/mocks/productionMock';
+
+const PRESET_GENRE_TAGS = [
+  'Khoa học viễn tưởng',
+  'Hành động AI',
+  'Cyberpunk',
+  'Kinh dị Tâm lý',
+  'Giả tưởng Không gian',
+  'Hoạt hình 3D AI',
+  'Trinh thám Siêu thực',
+  'Xã hội Tương lai',
+];
 
 export default function ReviewerProjectCreatePage() {
   const {
@@ -16,6 +28,10 @@ export default function ReviewerProjectCreatePage() {
     createProject,
     approveAndAllocateQuota,
     requestPlanChanges,
+    addMilestone,
+    removeMilestone,
+    setProjectPolicy,
+    respondToTokenExtension,
   } = useProductionStore();
 
   const currentProject = getProject();
@@ -23,17 +39,48 @@ export default function ReviewerProjectCreatePage() {
   // Create Project Form state
   const [isCreatingProject, setIsCreatingProject] = useState(false);
   const [title, setTitle] = useState('');
-  const [genre, setGenre] = useState('Khoa học viễn tưởng, AI Thriller');
+  const [selectedTags, setSelectedTags] = useState<string[]>([
+    'Khoa học viễn tưởng',
+    'Cyberpunk',
+    'AI Thriller',
+  ]);
+  const [customTagInput, setCustomTagInput] = useState('');
   const [synopsis, setSynopsis] = useState('');
   const [totalEpisodes, setTotalEpisodes] = useState(5);
   const [deadline, setDeadline] = useState('2026-12-31');
   const [plannedReleaseDate, setPlannedReleaseDate] = useState('2027-01-15');
   const [totalBudgetTokens, setTotalBudgetTokens] = useState(3000);
+  const [selectedPolicy, setSelectedPolicy] = useState<AIPolicy>(mockAIPolicies[0]);
+
+  // Milestone Modal State
+  const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
+  const [newMilestoneTitle, setNewMilestoneTitle] = useState('');
+  const [newMilestoneDueDate, setNewMilestoneDueDate] = useState('2026-10-15');
+  const [newMilestoneAssignee, setNewMilestoneAssignee] = useState('Creator Team');
+  const [newMilestoneDeliverable, setNewMilestoneDeliverable] = useState('');
+  const [newMilestoneDesc, setNewMilestoneDesc] = useState('');
 
   // Modal states
   const [selectedEpForQuota, setSelectedEpForQuota] = useState<ProductionEpisode | null>(null);
   const [selectedEpForChanges, setSelectedEpForChanges] = useState<ProductionEpisode | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+
+  // Tag helper
+  const handleToggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter((t) => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const handleAddCustomTag = () => {
+    const trimmed = customTagInput.trim();
+    if (trimmed && !selectedTags.includes(trimmed)) {
+      setSelectedTags([...selectedTags, trimmed]);
+      setCustomTagInput('');
+    }
+  };
 
   const handleCreateProject = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +88,7 @@ export default function ReviewerProjectCreatePage() {
 
     createProject({
       title: title.trim(),
-      genre: genre.split(',').map((g) => g.trim()),
+      genre: selectedTags,
       synopsis: synopsis.trim(),
       totalEpisodes,
       deadline,
@@ -49,6 +96,18 @@ export default function ReviewerProjectCreatePage() {
       totalBudgetTokens,
       creatorName: 'Đạo diễn AI (Creator Team)',
       reviewerName: 'Thẩm định viên Lê Quốc Bảo (Reviewer)',
+      appliedPolicy: selectedPolicy,
+      milestones: [
+        {
+          id: `ms-${Date.now()}-1`,
+          title: 'Cột mốc 1: Kịch bản & Phân cảnh mẫu',
+          description: 'Hoàn thiện kịch bản và phân cảnh cho 5 tập.',
+          dueDate: deadline,
+          status: 'in_progress',
+          assignedTo: 'Đạo diễn AI & Creator Team',
+          deliverable: 'Kịch bản tổng quan & Prompt mẫu',
+        },
+      ],
       episodes: [
         {
           id: `ep-${Date.now()}-1`,
@@ -61,7 +120,9 @@ export default function ReviewerProjectCreatePage() {
           videoDraftUrl: '',
           quota: null,
           compliance: null,
-          scheduledReleaseDate: null,
+          scheduledReleaseDate: plannedReleaseDate,
+          draftsCount: 1,
+          assigneeName: 'Trần Minh Huy (Creator)',
           scenes: [],
           plan: {
             id: `plan-${Date.now()}-1`,
@@ -95,6 +156,39 @@ export default function ReviewerProjectCreatePage() {
     if (!selectedEpForChanges || !currentProject) return;
     requestPlanChanges(currentProject.id, selectedEpForChanges.id, feedback);
     setSuccessToast(`Đã gửi yêu cầu chỉnh sửa kế hoạch cho ${selectedEpForChanges.title}!`);
+    setTimeout(() => setSuccessToast(null), 3000);
+  };
+
+  const handleSaveMilestone = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMilestoneTitle.trim() || !currentProject) return;
+
+    addMilestone(currentProject.id, {
+      title: newMilestoneTitle.trim(),
+      dueDate: newMilestoneDueDate,
+      assignedTo: newMilestoneAssignee.trim(),
+      deliverable: newMilestoneDeliverable.trim() || 'Sản phẩm hoàn thiện theo mốc',
+      description: newMilestoneDesc.trim() || 'Thực hiện đúng tiến độ quy định',
+      status: 'pending',
+    });
+
+    setIsAddMilestoneOpen(false);
+    setNewMilestoneTitle('');
+    setNewMilestoneDeliverable('');
+    setNewMilestoneDesc('');
+    setSuccessToast('Đã thêm cột mốc mới thành công!');
+    setTimeout(() => setSuccessToast(null), 3000);
+  };
+
+  const handleTokenResponse = (requestId: string, approve: boolean) => {
+    if (!currentProject) return;
+    respondToTokenExtension(
+      currentProject.id,
+      requestId,
+      approve,
+      approve ? 'Reviewer đã chấp thuận bổ sung Token Quota.' : 'Không đồng ý cấp thêm Quota do vượt ngân sách.'
+    );
+    setSuccessToast(approve ? 'Đã duyệt cấp thêm Token cho Creator!' : 'Đã từ chối đề xuất mở rộng Token.');
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
@@ -208,15 +302,113 @@ export default function ReviewerProjectCreatePage() {
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
-                    Thể Loại (Phân tách bằng dấu phẩy)
+                    Thể Loại Phim (Dạng Tag)
                   </label>
-                  <input
-                    type="text"
-                    value={genre}
-                    onChange={(e) => setGenre(e.target.value)}
-                    placeholder="Khoa học viễn tưởng, Hành động..."
-                    className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white outline-none focus:border-ruby transition-all"
-                  />
+                  {/* Selected Tags Display */}
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {selectedTags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-ruby/15 text-ruby border border-ruby/30"
+                      >
+                        <span>{tag}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleTag(tag)}
+                          className="hover:text-white hover:bg-ruby rounded-full w-3.5 h-3.5 flex items-center justify-center text-[10px]"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Preset Tags Suggestions */}
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {PRESET_GENRE_TAGS.map((preset) => {
+                      const isSelected = selectedTags.includes(preset);
+                      return (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => handleToggleTag(preset)}
+                          className={`px-2 py-0.5 rounded text-[11px] font-medium transition-all ${
+                            isSelected
+                              ? 'bg-ruby text-white font-bold'
+                              : 'bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-zinc-300 hover:bg-slate-300 dark:hover:bg-white/15'
+                          }`}
+                        >
+                          {isSelected ? '✓ ' : '+ '}
+                          {preset}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Custom Tag Input */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={customTagInput}
+                      onChange={(e) => setCustomTagInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleAddCustomTag();
+                        }
+                      }}
+                      placeholder="Nhập tag tùy chỉnh..."
+                      className="flex-1 bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddCustomTag}
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/15 text-slate-800 dark:text-white"
+                    >
+                      Thêm Tag
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Policy Selection */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  Quy Định AI Áp Dụng (AI Policy)
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {mockAIPolicies.map((pol) => {
+                    const isSelected = selectedPolicy.id === pol.id;
+                    return (
+                      <div
+                        key={pol.id}
+                        onClick={() => setSelectedPolicy(pol)}
+                        className={`p-3 rounded-xl border cursor-pointer transition-all ${
+                          isSelected
+                            ? 'border-ruby bg-ruby/5 dark:bg-ruby/10 shadow-sm'
+                            : 'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-mono text-[10px] font-bold text-ruby">
+                            {pol.code}
+                          </span>
+                          {isSelected && <span className="text-xs text-ruby font-bold">✓ Áp dụng</span>}
+                        </div>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white mb-1">
+                          {pol.name}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-zinc-400 line-clamp-2">
+                          {pol.description}
+                        </p>
+                        <div className="mt-2 text-[10px] text-slate-400 dark:text-zinc-500 flex items-center gap-2">
+                          <span>Điểm tối thiểu: {pol.minModerationScore}%</span>
+                          <span>•</span>
+                          <span>Watermark: {pol.watermarkRequired ? 'Bắt buộc' : 'Không'}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -305,6 +497,271 @@ export default function ReviewerProjectCreatePage() {
             </form>
           </div>
         )}
+
+        {/* Token Extension Requests Banner (When Creator requests more tokens) */}
+        {currentProject?.tokenExtensionRequests && currentProject.tokenExtensionRequests.some((r) => r.status === 'pending') && (
+          <div className="glass-card p-5 border-2 border-amber-500/50 bg-amber-500/10 glow-coin animate-pulse space-y-3">
+            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold text-sm">
+              <span className="text-xl">⚠️</span>
+              <span>Có Yêu Cầu Đề Xuất Mở Rộng Token Quota Từ Creator</span>
+            </div>
+            {currentProject.tokenExtensionRequests.filter((r) => r.status === 'pending').map((req) => (
+              <div
+                key={req.id}
+                className="p-4 rounded-xl bg-white/70 dark:bg-slate-900/80 border border-amber-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white">
+                      Xin +{req.requestedTokens} Tokens
+                    </span>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                      {req.episodeTitle}
+                    </h4>
+                    <span className="text-xs text-slate-400">
+                      bởi {req.requestedBy} • {new Date(req.requestedAt).toLocaleDateString('vi-VN')}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-600 dark:text-zinc-300 italic">
+                    &quot;{req.reason}&quot;
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleTokenResponse(req.id, false)}
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-danger bg-danger/10 hover:bg-danger/20 border border-danger/30 transition-all cursor-pointer"
+                  >
+                    ✕ Từ chối
+                  </button>
+                  <button
+                    onClick={() => handleTokenResponse(req.id, true)}
+                    className="px-4 py-1.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:shadow-lg hover:shadow-emerald-500/30 transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <span>✓</span>
+                    <span>Phê Duyệt (+{req.requestedTokens} Tokens)</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Section: Cột Mốc Dự Án (Project Milestones Tracker) */}
+        <div className="glass-card p-6 border border-slate-200 dark:border-white/10 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-white/10">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🚩</span>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                  Cột Mốc & Tiến Độ Dự Án (Project Milestones)
+                </h3>
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-zinc-300">
+                  {currentProject?.milestones?.length || 0} cột mốc
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                Các mốc thời gian kiểm soát tiến độ sản xuất phim AI, người chịu trách nhiệm và sản phẩm nghiệm thu
+              </p>
+            </div>
+
+            <button
+              onClick={() => setIsAddMilestoneOpen(true)}
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-ruby hover:bg-ruby-dark shadow-md shadow-ruby/30 transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+            >
+              <span>+</span>
+              <span>Thêm Cột Mốc</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            {currentProject?.milestones?.map((ms, idx) => {
+              const isDone = ms.status === 'completed';
+              const isInProgress = ms.status === 'in_progress';
+              return (
+                <div
+                  key={ms.id}
+                  className={`p-4 rounded-xl border flex flex-col justify-between gap-3 transition-all ${
+                    isDone
+                      ? 'bg-emerald-500/5 border-emerald-500/30'
+                      : isInProgress
+                      ? 'bg-amber-500/5 border-amber-500/40 shadow-sm'
+                      : 'bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/10'
+                  }`}
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono font-bold text-slate-400">
+                        Mốc #{idx + 1}
+                      </span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
+                          isDone
+                            ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                            : isInProgress
+                            ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                            : 'bg-slate-200 dark:bg-white/10 text-slate-500'
+                        }`}
+                      >
+                        {isDone ? '✓ Hoàn thành' : isInProgress ? '⏳ Đang làm' : 'Chờ thực hiện'}
+                      </span>
+                    </div>
+
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white line-clamp-2">
+                      {ms.title}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 dark:text-zinc-400 line-clamp-2">
+                      {ms.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-200 dark:border-white/10 space-y-1 text-[11px]">
+                    <div className="flex items-center justify-between text-slate-600 dark:text-zinc-300">
+                      <span>Phụ trách:</span>
+                      <strong className="truncate max-w-[120px]">{ms.assignedTo}</strong>
+                    </div>
+                    <div className="flex items-center justify-between text-slate-600 dark:text-zinc-300">
+                      <span>Hạn chót:</span>
+                      <strong className="font-mono text-ruby">{ms.dueDate}</strong>
+                    </div>
+                    <div className="text-[10px] text-slate-400 dark:text-zinc-500 truncate">
+                      📦 {ms.deliverable}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Section: Bảng Chính Mô Tả Kế Hoạch Dự Án (Master Project Plan Table) */}
+        <div className="glass-card p-6 border border-slate-200 dark:border-white/10 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-white/10">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">📑</span>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                  Bảng Kế Hoạch Dự Án Phim Tổng Thể (Master Project Plan)
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                Khống chế số bản draft, token hạn mức, người phụ trách, độ dài tối đa và cột mốc cho từng tập phim
+              </p>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-white/10 text-slate-500 dark:text-zinc-400 uppercase text-[10px]">
+                  <th className="py-3 px-3">Tập</th>
+                  <th className="py-3 px-3">Tiêu Đề Tập Phim</th>
+                  <th className="py-3 px-3">Người Phụ Trách</th>
+                  <th className="py-3 px-3 text-center">Bản Draft</th>
+                  <th className="py-3 px-3">Khống Chế Token Quota</th>
+                  <th className="py-3 px-3">Độ Dài Tối Đa</th>
+                  <th className="py-3 px-3">Trạng Thái Kế Hoạch</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-200 dark:divide-white/5">
+                {currentProject?.episodes.map((ep) => {
+                  const quotaVal = ep.quota?.allocatedTokens || ep.plan?.estimatedTokens || 450;
+                  const isQuotaExceeded = ep.actualTokensUsed > quotaVal;
+                  return (
+                    <tr key={ep.id} className="hover:bg-slate-100/50 dark:hover:bg-white/[0.02] transition-colors">
+                      <td className="py-3 px-3 font-bold font-mono text-slate-900 dark:text-white">
+                        Tập {ep.episodeNumber}
+                      </td>
+                      <td className="py-3 px-3 font-bold text-slate-900 dark:text-white">
+                        {ep.title}
+                      </td>
+                      <td className="py-3 px-3 text-slate-600 dark:text-zinc-300">
+                        {ep.assigneeName || 'Đạo diễn AI Trần Minh Huy'}
+                      </td>
+                      <td className="py-3 px-3 text-center font-mono">
+                        <span className="px-2 py-0.5 rounded bg-slate-200 dark:bg-white/10 font-bold">
+                          v1.{(ep.submissions?.length || 0) + 1}.0 ({ep.draftsCount || 1} bản)
+                        </span>
+                      </td>
+                      <td className="py-3 px-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`font-mono font-bold ${isQuotaExceeded ? 'text-danger' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                            {ep.actualTokensUsed} / {quotaVal} Tokens
+                          </span>
+                          {isQuotaExceeded && (
+                            <span className="text-[10px] text-danger font-bold">Vượt trần</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-3 px-3 text-slate-600 dark:text-zinc-300">
+                        {ep.plan?.targetDuration || ep.totalDuration || '45 phút'}
+                      </td>
+                      <td className="py-3 px-3">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-zinc-300">
+                          {ep.status}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Section: Kế Hoạch Phát Hành Công Khai (Public Release Schedule) */}
+        <div className="glass-card p-6 border border-slate-200 dark:border-white/10 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200 dark:border-white/10">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🗓️</span>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 dark:text-white">
+                  Kế Hoạch Phát Sóng Công Khai (Public Premiere Schedule)
+                </h3>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
+                Quản lý lịch phát sóng định kỳ, đặc quyền xem sớm 24h cho hội viên VIP
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+            {currentProject?.episodes.map((ep, idx) => {
+              const releaseDate = ep.scheduledReleaseDate || `2027-01-${15 + idx * 7}`;
+              const isLive = ep.status === 'PUBLISHED';
+              return (
+                <div
+                  key={ep.id}
+                  className={`p-4 rounded-xl border flex flex-col justify-between gap-2 ${
+                    isLive
+                      ? 'bg-emerald-500/10 border-emerald-500/40'
+                      : 'bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/10'
+                  }`}
+                >
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400">TẬP {ep.episodeNumber}</span>
+                    <h5 className="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">
+                      {ep.title}
+                    </h5>
+                  </div>
+                  <div className="space-y-1 text-[11px]">
+                    <p className="text-slate-500 dark:text-zinc-400">Lịch chiếu:</p>
+                    <p className="font-mono font-bold text-ruby">{releaseDate}</p>
+                    <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                      VIP xem sớm 24h
+                    </span>
+                  </div>
+                  <div className="pt-2 border-t border-slate-200 dark:border-white/10 text-[10px] font-bold">
+                    {isLive ? (
+                      <span className="text-emerald-500">🟢 Đang công chiếu</span>
+                    ) : (
+                      <span className="text-slate-400">⏳ Đã lên lịch</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* Section 2: Review Production Plans List (Maker-Checker Hub) */}
         <div className="space-y-4">
@@ -484,6 +941,112 @@ export default function ReviewerProjectCreatePage() {
           targetTitle={selectedEpForChanges.title}
           onConfirm={handleConfirmPlanChanges}
         />
+      )}
+
+      {/* Add Milestone Modal */}
+      {isAddMilestoneOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-lg glass-card p-6 border border-slate-200 dark:border-white/10 shadow-2xl bg-white dark:bg-slate-900 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🚩</span>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Thêm Cột Mốc Tiến Độ Mới
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsAddMilestoneOpen(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveMilestone} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  Tên Cột Mốc <span className="text-ruby">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: Cột mốc 3: Hoàn thiện kỹ xảo AI & Âm thanh"
+                  value={newMilestoneTitle}
+                  onChange={(e) => setNewMilestoneTitle(e.target.value)}
+                  className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                    Hạn Chót (Due Date) <span className="text-ruby">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    required
+                    value={newMilestoneDueDate}
+                    onChange={(e) => setNewMilestoneDueDate(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                    Người Chịu Trách Nhiệm
+                  </label>
+                  <input
+                    type="text"
+                    value={newMilestoneAssignee}
+                    onChange={(e) => setNewMilestoneAssignee(e.target.value)}
+                    className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  Sản Phẩm Đầu Ra / Nghiệm Thu (Deliverable)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: 5 cảnh video 4K, bản âm thanh Dolby 5.1"
+                  value={newMilestoneDeliverable}
+                  onChange={(e) => setNewMilestoneDeliverable(e.target.value)}
+                  className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-zinc-300 mb-1">
+                  Mô Tả & Yêu Cầu Cần Đạt
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Chi tiết công việc và tiêu chí thẩm định chất lượng theo mốc..."
+                  value={newMilestoneDesc}
+                  onChange={(e) => setNewMilestoneDesc(e.target.value)}
+                  className="w-full bg-slate-100 dark:bg-white/10 border border-slate-300 dark:border-white/15 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white outline-none"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2 border-t border-slate-200 dark:border-white/10">
+                <button
+                  type="button"
+                  onClick={() => setIsAddMilestoneOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/10"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-ruby hover:bg-ruby-dark shadow-md shadow-ruby/30 transition-all cursor-pointer"
+                >
+                  Lưu Cột Mốc
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useProductionStore } from '@/store/useProductionStore';
-import { mockProjectCyber } from '@/mocks/productionMock';
+import { mockProjectCyber, mockUserDevices } from '@/mocks/productionMock';
 
 describe('Zustand Production Store (src/store/useProductionStore.ts)', () => {
   beforeEach(() => {
@@ -8,6 +8,7 @@ describe('Zustand Production Store (src/store/useProductionStore.ts)', () => {
       projects: [JSON.parse(JSON.stringify(mockProjectCyber))],
       activeProjectId: 'proj-cyber-01',
       activeRole: 'reviewer',
+      devices: JSON.parse(JSON.stringify(mockUserDevices)),
     });
   });
 
@@ -155,4 +156,111 @@ describe('Zustand Production Store (src/store/useProductionStore.ts)', () => {
       expect(useProductionStore.getState().activeRole).toBe('reviewer');
     });
   });
+
+  describe('MainFlow4 Features (Milestones, Policies, Devices, Reviews, Tokens, Submissions)', () => {
+    it('manages user devices (revoke one, revoke all other devices)', () => {
+      const store = useProductionStore.getState();
+      expect(store.devices.length).toBeGreaterThanOrEqual(2);
+
+      const targetId = store.devices.find((d) => !d.isCurrentDevice)?.id;
+      if (targetId) {
+        store.revokeDevice(targetId);
+        expect(useProductionStore.getState().devices.find((d) => d.id === targetId)).toBeUndefined();
+      }
+
+      store.revokeAllOtherDevices();
+      const remaining = useProductionStore.getState().devices;
+      expect(remaining.length).toBe(1);
+      expect(remaining[0].isCurrentDevice).toBe(true);
+    });
+
+    it('adds, updates, and removes project milestones', () => {
+      const store = useProductionStore.getState();
+      const projId = 'proj-cyber-01';
+
+      store.addMilestone(projId, {
+        title: 'Cột mốc thử nghiệm',
+        dueDate: '2026-11-01',
+        assignedTo: 'Tester',
+        deliverable: 'Bản render demo',
+        description: 'Mô tả mốc',
+        status: 'pending',
+      });
+
+      const updatedProj = useProductionStore.getState().getProject(projId)!;
+      const added = updatedProj.milestones?.find((m) => m.title === 'Cột mốc thử nghiệm');
+      expect(added).toBeDefined();
+
+      if (added) {
+        store.updateMilestone(projId, added.id, { status: 'completed' });
+        const checkDone = useProductionStore.getState().getProject(projId)?.milestones?.find((m) => m.id === added.id);
+        expect(checkDone?.status).toBe('completed');
+
+        store.removeMilestone(projId, added.id);
+        const checkRemoved = useProductionStore.getState().getProject(projId)?.milestones?.find((m) => m.id === added.id);
+        expect(checkRemoved).toBeUndefined();
+      }
+    });
+
+    it('reorders scenes and updates scene review status individually', () => {
+      const store = useProductionStore.getState();
+      const projId = 'proj-cyber-01';
+      const epId = 'ep-prod-02';
+
+      // Review scene
+      store.reviewScene(projId, epId, 'sc-203', 'approved');
+      const ep = useProductionStore.getState().getEpisode(epId, projId)!;
+      const sc3 = ep.scenes.find((s) => s.id === 'sc-203');
+      expect(sc3?.reviewStatus).toBe('approved');
+
+      // Reorder scenes
+      const initialFirstSceneId = ep.scenes[0].id;
+      const initialSecondSceneId = ep.scenes[1].id;
+      store.reorderScenes(projId, epId, 0, 1);
+      const reorderedEp = useProductionStore.getState().getEpisode(epId, projId)!;
+      expect(reorderedEp.scenes[0].id).toBe(initialSecondSceneId);
+      expect(reorderedEp.scenes[1].id).toBe(initialFirstSceneId);
+      expect(reorderedEp.scenes[0].sceneNumber).toBe(1);
+    });
+
+    it('handles token extension requests and approves them, automatically crediting quota', () => {
+      const store = useProductionStore.getState();
+      const projId = 'proj-cyber-01';
+      const epId = 'ep-prod-03';
+
+      const initialQuota = store.getEpisode(epId, projId)?.quota?.allocatedTokens || 0;
+      store.requestTokenExtension(projId, epId, 150, 'Cần thêm tokens cho VFX phức tạp');
+
+      const projWithReq = useProductionStore.getState().getProject(projId)!;
+      const pendingReq = projWithReq.tokenExtensionRequests?.find((r) => r.status === 'pending');
+      expect(pendingReq).toBeDefined();
+      expect(pendingReq?.requestedTokens).toBe(150);
+
+      if (pendingReq) {
+        store.respondToTokenExtension(projId, pendingReq.id, true, 'Đã đồng ý cấp thêm 150 tokens');
+        const afterProj = useProductionStore.getState().getProject(projId)!;
+        const approvedReq = afterProj.tokenExtensionRequests?.find((r) => r.id === pendingReq.id);
+        expect(approvedReq?.status).toBe('approved');
+
+        const afterEp = useProductionStore.getState().getEpisode(epId, projId)!;
+        expect(afterEp.quota?.allocatedTokens).toBe(initialQuota + 150);
+      }
+    });
+
+    it('submits episode draft and creates official EpisodeSubmission entity', () => {
+      const store = useProductionStore.getState();
+      const projId = 'proj-cyber-01';
+      const epId = 'ep-prod-02';
+
+      const result = store.submitEpisodeDraft(projId, epId, 'Bản nộp Master 4K hoàn chỉnh');
+      expect(result.success).toBe(true);
+      expect(result.submission).toBeDefined();
+      expect(result.submission?.versionNumber).toBe('v1.1.0');
+
+      const updatedEp = useProductionStore.getState().getEpisode(epId, projId)!;
+      expect(updatedEp.status).toBe('CONTENT_SUBMITTED');
+      expect(updatedEp.submissions?.length).toBe(1);
+    });
+  });
 });
+

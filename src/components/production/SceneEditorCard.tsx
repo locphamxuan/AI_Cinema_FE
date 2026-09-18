@@ -9,6 +9,10 @@ interface SceneEditorCardProps {
   onUpdate: (sceneId: string, updates: Partial<Scene>) => void;
   onGenerate: (sceneId: string) => Promise<{ success: boolean; error?: string }>;
   onDelete?: (sceneId: string) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
 }
 
 const VOICE_MODELS = [
@@ -30,6 +34,10 @@ export default function SceneEditorCard({
   onUpdate,
   onGenerate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = false,
+  canMoveDown = false,
 }: SceneEditorCardProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [genError, setGenError] = useState<string | null>(null);
@@ -64,7 +72,29 @@ export default function SceneEditorCard({
     >
       {/* Scene Top Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-200 dark:border-white/10">
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
+          {/* Reorder Buttons ▲ ▼ */}
+          <div className="flex flex-col gap-0.5 shrink-0">
+            <button
+              type="button"
+              disabled={!canMoveUp}
+              onClick={onMoveUp}
+              title="Di chuyển cảnh lên trên"
+              className="w-5 h-4 rounded text-[10px] flex items-center justify-center bg-slate-200 dark:bg-white/10 hover:bg-neon hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all cursor-pointer"
+            >
+              ▲
+            </button>
+            <button
+              type="button"
+              disabled={!canMoveDown}
+              onClick={onMoveDown}
+              title="Di chuyển cảnh xuống dưới"
+              className="w-5 h-4 rounded text-[10px] flex items-center justify-center bg-slate-200 dark:bg-white/10 hover:bg-neon hover:text-white disabled:opacity-20 disabled:cursor-not-allowed transition-all cursor-pointer"
+            >
+              ▼
+            </button>
+          </div>
+
           <span className="w-7 h-7 rounded-lg bg-slate-200 dark:bg-white/10 text-slate-800 dark:text-white font-black text-xs flex items-center justify-center shrink-0">
             #{scene.sceneNumber}
           </span>
@@ -77,7 +107,26 @@ export default function SceneEditorCard({
           />
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-3 text-xs">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs">
+          {/* Review Status Badge */}
+          {scene.reviewStatus === 'approved' && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+              <span>✓</span>
+              <span>Reviewer Đã Duyệt Cảnh</span>
+            </span>
+          )}
+          {scene.reviewStatus === 'changes_requested' && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-danger/15 text-danger border border-danger/30 flex items-center gap-1">
+              <span>⚠️</span>
+              <span>Cần Chỉnh Sửa Theo Y/C</span>
+            </span>
+          )}
+          {(!scene.reviewStatus || scene.reviewStatus === 'pending') && (
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-zinc-400">
+              Chờ Thẩm Định
+            </span>
+          )}
+
           <span className="font-mono text-slate-500 dark:text-zinc-400">
             {scene.durationSec}s • <strong className="text-amber-600 dark:text-amber-400 font-mono">{scene.tokenCost} Tokens</strong>
           </span>
@@ -105,6 +154,17 @@ export default function SceneEditorCard({
           )}
         </div>
       </div>
+
+      {/* Reviewer Feedback Callout if Changes Requested */}
+      {scene.reviewStatus === 'changes_requested' && scene.reviewFeedback && (
+        <div className="mb-3 p-3 rounded-xl bg-danger/10 border border-danger/30 text-xs flex items-start gap-2.5 text-danger">
+          <span className="text-base shrink-0">💬</span>
+          <div>
+            <strong className="block font-bold">Góp ý từ Reviewer kiểm định:</strong>
+            <p className="mt-0.5 text-slate-700 dark:text-zinc-200">{scene.reviewFeedback}</p>
+          </div>
+        </div>
+      )}
 
       {/* Inputs Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
