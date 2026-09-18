@@ -49,6 +49,15 @@ export function GeneratorPanel({
             Bộ Điều Khiển Sinh Tài Nguyên AI (generation_job)
           </h3>
         </div>
+
+        <button
+          onClick={onAddJob}
+          title="Thêm phân cảnh mới"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-ruby/10 hover:bg-ruby/20 active:scale-95 text-ruby text-xs font-bold border border-ruby/30 transition cursor-pointer shadow-xs"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Thêm Cảnh</span>
+        </button>
       </div>
 
       <div className="space-y-3.5">
