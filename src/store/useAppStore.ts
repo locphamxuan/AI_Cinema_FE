@@ -18,6 +18,15 @@ import {
 
 import { useWorkflowStore } from './useWorkflowStore';
 
+export const emptySubscription: UserSubscription = {
+  plan: null,
+  status: 'none',
+  startDate: null,
+  endDate: null,
+  autoRenew: false,
+  paymentMethod: '',
+};
+
 interface UserProfile {
   id: string;
   name: string;
@@ -156,20 +165,43 @@ export const useAppStore = create<AppState>((set, get) => ({
       return { success: true, redirectUrl: '/reviewer' };
     }
 
-    // 3. Demo User: userdemo@gmail.com / 1
+    // 3. Demo User Normal: userdemo@gmail.com / 1
     if (trimmedEmail === 'userdemo@gmail.com' && password === '1') {
       const demoUser: UserProfile = {
         id: 'user-demo-001',
-        name: 'Phạm Xuân Lộc (Khán Giả VIP)',
+        name: 'Phạm Xuân Lộc (Khán Giả)',
         email: 'userdemo@gmail.com',
         avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=locdemo',
+        role: 'user',
+        isVIP: false,
+      };
+
+      set({
+        isAuthenticated: true,
+        user: demoUser,
+        isVIPMode: false,
+        isAuthModalOpen: false,
+        subscription: emptySubscription,
+        wallet: { mainCoin: 60, bonusCoin: 20 },
+      });
+
+      return { success: true };
+    }
+
+    // 4. Demo User VIP: vipdemo@gmail.com / 1
+    if (trimmedEmail === 'vipdemo@gmail.com' && password === '1') {
+      const vipUser: UserProfile = {
+        id: 'user-vip-001',
+        name: 'Phạm Xuân Lộc (Khán Giả VIP)',
+        email: 'vipdemo@gmail.com',
+        avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=locvip',
         role: 'vip',
         isVIP: true,
       };
 
       set({
         isAuthenticated: true,
-        user: demoUser,
+        user: vipUser,
         isVIPMode: true,
         isAuthModalOpen: false,
         subscription: mockSubscriptionVIP,
@@ -179,7 +211,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       return { success: true };
     }
 
-    // 4. Cho phép đăng nhập với email bất kỳ khác nếu hợp lệ
+    // 5. Cho phép đăng nhập với email bất kỳ khác nếu hợp lệ
     if (trimmedEmail && password) {
       const customUser: UserProfile = {
         id: `user-${Date.now()}`,
@@ -195,6 +227,7 @@ export const useAppStore = create<AppState>((set, get) => ({
         user: customUser,
         isVIPMode: false,
         isAuthModalOpen: false,
+        subscription: emptySubscription,
         wallet: { mainCoin: 50, bonusCoin: 20 },
       });
 
@@ -226,6 +259,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       user: newUser,
       isVIPMode: false,
       isAuthModalOpen: false,
+      subscription: emptySubscription,
       wallet: {
         mainCoin: 0,
         bonusCoin: 50, // Quà tặng đăng ký mới
@@ -252,6 +286,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       isAuthenticated: false,
       user: null,
       isVIPMode: false,
+      subscription: emptySubscription,
     });
   },
 
@@ -276,21 +311,14 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // ===== VIP MODE =====
-  isVIPMode: true,
+  isVIPMode: false,
   toggleVIPMode: () =>
     set((state) => {
       const newIsVIP = !state.isVIPMode;
       return {
         isVIPMode: newIsVIP,
         user: state.user ? { ...state.user, isVIP: newIsVIP } : null,
-        subscription: newIsVIP ? mockSubscriptionVIP : {
-          plan: null,
-          status: 'none' as const,
-          startDate: null,
-          endDate: null,
-          autoRenew: false,
-          paymentMethod: '',
-        },
+        subscription: newIsVIP ? mockSubscriptionVIP : emptySubscription,
       };
     }),
 
@@ -391,7 +419,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   // ===== SUBSCRIPTION =====
-  subscription: mockSubscriptionVIP,
+  subscription: emptySubscription,
 
   toggleAutoRenew: () =>
     set((s) => ({
