@@ -6,7 +6,6 @@ import Image from 'next/image';
 import {
   Clapperboard,
   Clock,
-  Sparkles,
   FileText,
   Video,
   MessageSquare,
@@ -173,7 +172,6 @@ export function CreatorProjectHubPage() {
             onClick={() => handleOpenProject(proj.id, 'overview')}
             className={`${sizeClass} rounded-xl font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white flex items-center justify-center gap-2 transition-all duration-200 shadow-md shadow-purple-500/30 cursor-pointer group/btn whitespace-nowrap`}
           >
-            <Sparkles className="w-4 h-4 text-purple-200 animate-pulse shrink-0" />
             <span>Tiếp Tục Sản Xuất Trong Studio</span>
             <ArrowRight className="w-4 h-4 ml-auto transition-transform group-hover/btn:translate-x-1 shrink-0" />
           </button>
@@ -236,7 +234,7 @@ export function CreatorProjectHubPage() {
             {/* Metric 2: In Progress */}
             <div className="px-4 py-2 text-center min-w-[95px]">
               <div className="flex items-center justify-center gap-1.5 text-purple-300 text-xs font-semibold mb-0.5">
-                <Sparkles className="w-3.5 h-3.5 animate-pulse" />
+                <Video className="w-3.5 h-3.5" />
                 <span>Đang quay</span>
               </div>
               <span className="block text-2xl font-black text-purple-300">{stats.inProgress}</span>
@@ -293,7 +291,7 @@ export function CreatorProjectHubPage() {
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Zap className="w-3.5 h-3.5" />
             <span>Đang thực hiện</span>
             <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${filter === 'IN_PROGRESS' ? 'bg-white/20 text-white' : 'bg-purple-100 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300'}`}>
               {stats.inProgress}
@@ -511,7 +509,7 @@ export function CreatorProjectHubPage() {
                         </>
                       ) : proj.overall_status === 'IN_PROGRESS' ? (
                         <>
-                          <Sparkles className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                          <Zap className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                           <span>Đang render clip 4K và phối hợp thẩm định cùng Reviewer</span>
                         </>
                       ) : proj.overall_status === 'COMPLETED' ? (
