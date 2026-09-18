@@ -284,30 +284,17 @@ export default function CreatorPlanEditPage({ params }: { params: Promise<{ id: 
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 dark:text-zinc-400 mb-1">
-                        Visual Prompt Dự Kiến
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={scene.visualPrompt}
-                        onChange={(e) => handleSceneChange(idx, 'visualPrompt', e.target.value)}
-                        className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-2 text-xs text-slate-900 dark:text-white outline-none resize-none"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[10px] font-bold text-slate-600 dark:text-zinc-400 mb-1">
-                        Audio / Voice Prompt & Dialogue
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={scene.audioPrompt}
-                        onChange={(e) => handleSceneChange(idx, 'audioPrompt', e.target.value)}
-                        className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-2 text-xs text-slate-900 dark:text-white outline-none resize-none"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-zinc-400 mb-1">
+                      Visual Prompt Dự Kiến
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={scene.visualPrompt}
+                      onChange={(e) => handleSceneChange(idx, 'visualPrompt', e.target.value)}
+                      placeholder="Mô tả bối cảnh, góc máy và hiệu ứng AI..."
+                      className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 text-xs text-slate-900 dark:text-white outline-none resize-none"
+                    />
                   </div>
                 </div>
               ))}
