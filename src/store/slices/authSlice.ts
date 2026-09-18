@@ -40,7 +40,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
         wallet: { mainCoin: 1500, bonusCoin: 500 },
       });
 
-      return { success: true, redirectUrl: '/creator' };
+      return { success: true, redirectUrl: '/creator/projects' };
     }
 
     // 2. Reviewer (Checker) Account: reviewer@gmail.com / 1
