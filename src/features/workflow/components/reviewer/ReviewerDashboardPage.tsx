@@ -21,6 +21,14 @@ const TAB_TITLES: Record<ReviewerTab, string> = {
   tokens: 'Kiểm Soát Ngân Sách AI Tokens',
 };
 
+const TAB_BREADCRUMBS: Record<ReviewerTab, string> = {
+  overview: 'Tổng Quan',
+  plans: 'Duyệt Kế Hoạch',
+  audits: 'Kiểm Định Video',
+  projects: 'Quản Lý Dự Án',
+  tokens: 'Ngân Sách Tokens',
+};
+
 const DEFAULT_FORM: CreateProjectFormState = {
   title: '',
   genre: ['Khoa học viễn tưởng', 'Hành động AI'],
@@ -124,17 +132,19 @@ export function ReviewerDashboardPage() {
               <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
               <span className="text-purple-600 dark:text-purple-400 font-semibold">{project.title}</span>
               <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
-              <span className="text-slate-700 dark:text-slate-300 font-medium capitalize">{activeTab}</span>
+              <span className="text-slate-700 dark:text-slate-300 font-medium">{TAB_BREADCRUMBS[activeTab]}</span>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight">{TAB_TITLES[activeTab]}</h1>
           </div>
 
-          <button
-            onClick={() => setIsCreateProjectOpen(true)}
-            className="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold text-xs flex items-center gap-2 transition shadow-md shadow-purple-200 dark:shadow-none cursor-pointer"
-          >
-            <Plus className="w-4 h-4" /> Tạo Dự Án Mới
-          </button>
+          {(activeTab === 'projects' || activeTab === 'overview') && (
+            <button
+              onClick={() => setIsCreateProjectOpen(true)}
+              className="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold text-xs flex items-center gap-2 transition shadow-md shadow-purple-200 dark:shadow-none cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Tạo Dự Án Mới
+            </button>
+          )}
         </div>
 
         {activeTab === 'overview' && (

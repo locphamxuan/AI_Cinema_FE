@@ -45,7 +45,9 @@ export function RoleNavHeader() {
         {currentPackage && (
           <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs">
             <span className="text-slate-500 dark:text-slate-400 font-medium">Tập {currentPackage.episode_number}:</span>
-            <span className="text-slate-900 dark:text-slate-200 font-semibold truncate max-w-[140px]">{currentPackage.title}</span>
+            <span className="text-slate-900 dark:text-slate-200 font-semibold truncate max-w-[160px]">
+              {currentPackage.title.replace(/^Tập\s*\d+\s*[:\-]\s*/i, '')}
+            </span>
             <span className="text-slate-300 dark:text-slate-600">•</span>
             <StatusBadge status={currentPackage.status} />
           </div>
