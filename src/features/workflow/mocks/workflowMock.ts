@@ -337,10 +337,15 @@ export const initialProject: ProductionProject = {
   total_budget_tokens: 3000,
   allocated_tokens: 900,
   consumed_tokens: 815,
-  deadline: '2026-11-30',
+  deadline: '2026-09-30',
   planned_release_date: '2026-12-15',
   creator_name: 'Đạo diễn Trần Minh Huy (Maker)',
   reviewer_name: 'Thẩm định viên Lê Quốc Bảo (Checker)',
+  creator_role: 'Đạo diễn / Maker - Lead Director',
+  thumbnail_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+  overall_status: 'IN_PROGRESS',
+  active_episode_title: 'Tập 3: Mạng Lưới Bóng Tối (Dark Mesh)',
+  progress_percent: 60,
   active_milestone_id: 'ms-2',
   milestones: [
     {
@@ -380,6 +385,70 @@ export const initialProject: ProductionProject = {
   created_at: '2026-08-01T08:00:00Z',
   updated_at: '2026-09-08T14:30:00Z',
 };
+
+export const mockProjectAncient: ProductionProject = {
+  ...initialProject,
+  id: 'proj-ancient-02',
+  title: 'Huyền Thoại Sơn Tinh Thủy Tinh 2088',
+  genre: ['Thần thoại AI', 'Kỹ xảo Visual', 'Hoạt hình 3D'],
+  synopsis: 'Tái hiện trận chiến giữa Sơn Tinh và Thủy Tinh trong bối cảnh công nghệ sinh học và kiểm soát thời tiết lượng tử năm 2088.',
+  total_episodes: 6,
+  total_budget_tokens: 4500,
+  allocated_tokens: 1200,
+  consumed_tokens: 650,
+  deadline: '2026-10-15',
+  planned_release_date: '2027-01-10',
+  creator_role: 'Đạo diễn Kỹ xảo AI',
+  thumbnail_url: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80',
+  overall_status: 'CHANGES_REQUESTED',
+  active_episode_title: 'Tập 1: Thần Khí Lượng Tử & Lệnh Gọi Sơn Lâm',
+  progress_percent: 25,
+};
+
+export const mockProjectSpace: ProductionProject = {
+  ...initialProject,
+  id: 'proj-space-03',
+  title: 'Hành Trình Sao Vàng: Thiên Hà Mới',
+  genre: ['Space Opera', 'Khám phá vũ trụ', 'AI Sci-Fi'],
+  synopsis: 'Tàu thám hiểm Việt Nam Star-01 du hành qua lỗ sâu tới hệ hành tinh mới, phát hiện tàn tích của một nền văn minh cổ đại.',
+  total_episodes: 4,
+  total_budget_tokens: 2800,
+  allocated_tokens: 0,
+  consumed_tokens: 0,
+  deadline: '2026-11-01',
+  planned_release_date: '2027-02-20',
+  creator_role: 'Trưởng nhóm Kịch bản & Visual Prompt',
+  thumbnail_url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80',
+  overall_status: 'NOT_STARTED',
+  active_episode_title: 'Tập 1: Tín Hiệu Từ Vũ Trụ',
+  progress_percent: 0,
+};
+
+export const mockProjectAgent: ProductionProject = {
+  ...initialProject,
+  id: 'proj-agent-04',
+  title: 'Bóng Đêm Thầm Lặng: AI Agent',
+  genre: ['Tình báo', 'Hành động', 'Điệp viên'],
+  synopsis: 'Cuộc chiến thầm lặng giữa các điệp viên mạng và tổ chức tội phạm trí tuệ nhân tạo xuyên quốc gia.',
+  total_episodes: 3,
+  total_budget_tokens: 2000,
+  allocated_tokens: 2000,
+  consumed_tokens: 1980,
+  deadline: '2026-08-15',
+  planned_release_date: '2026-09-01',
+  creator_role: 'Đạo diễn Sản xuất',
+  thumbnail_url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&auto=format&fit=crop&q=80',
+  overall_status: 'COMPLETED',
+  active_episode_title: 'Tập 3: Trật Tự Mới (Phim đã phát sóng)',
+  progress_percent: 100,
+};
+
+export const mockAssignedProjects: ProductionProject[] = [
+  initialProject,
+  mockProjectAncient,
+  mockProjectSpace,
+  mockProjectAgent,
+];
 
 export const initialReviews: ReviewLog[] = [
   {

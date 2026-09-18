@@ -82,6 +82,11 @@ export interface ProductionProject {
   planned_release_date: string;
   creator_name: string;
   reviewer_name: string;
+  creator_role?: string;
+  thumbnail_url?: string;
+  overall_status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'PENDING_REVIEW' | 'CHANGES_REQUESTED' | 'COMPLETED';
+  active_episode_title?: string;
+  progress_percent?: number;
   milestones?: ProjectMilestone[];
   active_milestone_id?: string;
   episodes: EpisodePackage[];

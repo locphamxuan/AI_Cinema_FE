@@ -53,16 +53,27 @@ export function CreatorDashboardPage() {
       />
 
       <main className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-6 transition-colors">
+        {/* Top Header & Breadcrumbs */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
           <div>
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span>{project.title}</span>
+            {/* Top Bar Breadcrumb: Tất cả project / Cyber Saigon 2077 / Tập 3 */}
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1 flex-wrap">
+              <Link
+                href="/creator/projects"
+                className="text-purple-600 dark:text-purple-400 font-bold hover:underline transition flex items-center gap-1"
+              >
+                Tất cả project
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
-              <span className="text-ruby font-semibold">Tập {currentPackage.episode_number}</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-200">{project.title}</span>
               <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
-              <span className="text-slate-700 dark:text-slate-300 font-medium capitalize">{activeTab}</span>
+              <span className="text-purple-600 dark:text-purple-400 font-bold">Tập {currentPackage.episode_number}</span>
+              <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
+              <span className="text-slate-600 dark:text-slate-300 capitalize font-medium">{activeTab}</span>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight">{currentPackage.title}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+              {currentPackage.title}
+            </h1>
           </div>
 
           <div className="flex items-center gap-3">
@@ -82,6 +93,46 @@ export function CreatorDashboardPage() {
                 <Play className="w-4 h-4" /> Xem Trên OTT
               </Link>
             )}
+          </div>
+        </div>
+
+        {/* Dedicated Episode Selector Bar (Horizontal Selector) */}
+        <div className="bg-white dark:bg-[#161922] p-3 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xs space-y-2">
+          <div className="flex items-center justify-between text-xs px-1">
+            <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 uppercase text-[11px] tracking-wider">
+              <span className="w-2 h-2 rounded-full bg-purple-500" /> Chọn tập phim thực hiện:
+            </span>
+            <span className="text-[11px] text-slate-400 font-mono">
+              Tổng số: {project.episodes.length} Tập
+            </span>
+          </div>
+
+          {/* Episode Horizontal Pills */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {project.episodes.map((ep) => {
+              const isSelected = ep.id === currentPackage.id;
+              return (
+                <button
+                  key={ep.id}
+                  onClick={() => setActivePackage(ep.id)}
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 cursor-pointer border ${
+                    isSelected
+                      ? 'bg-purple-600 text-white border-purple-500 shadow-md shadow-purple-500/25'
+                      : 'bg-slate-50 dark:bg-white/5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10'
+                  }`}
+                >
+                  <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400'}`}>
+                    Tập {ep.episode_number}
+                  </span>
+                  <span className="truncate max-w-[160px]">{ep.title.replace(/^Tập \d+:\s*/, '')}</span>
+                  {ep.actual_tokens_used > 0 && (
+                    <span className={`text-[10px] font-mono ${isSelected ? 'text-purple-200' : 'text-amber-600 dark:text-amber-400'}`}>
+                      {ep.actual_tokens_used}T
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
