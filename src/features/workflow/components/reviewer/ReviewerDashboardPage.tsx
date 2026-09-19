@@ -128,15 +128,15 @@ export function ReviewerDashboardPage() {
         onCreateProject={() => setIsCreateProjectOpen(true)}
       />
 
-      <main className="flex-1 bg-[#F8FAFC] dark:bg-[#111319] p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-6 transition-colors">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
+      <main className="flex-1 bg-[#F9FAFB] dark:bg-[#0D0E12] p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-6 transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200/80 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <Link href="/reviewer/projects" className="hover:text-purple-600 dark:hover:text-purple-400 font-semibold flex items-center gap-1 transition">
+              <Link href="/reviewer/projects" className="hover:text-indigo-600 dark:hover:text-indigo-400 font-medium flex items-center gap-1 transition">
                 <ArrowLeft className="w-3.5 h-3.5" /> Tất Cả Dự Án
               </Link>
               <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
-              <span className="text-purple-600 dark:text-purple-400 font-semibold">{project.title}</span>
+              <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{project.title}</span>
               <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
               <span className="text-slate-700 dark:text-slate-300 font-medium">{TAB_BREADCRUMBS[activeTab]}</span>
             </div>
@@ -146,7 +146,7 @@ export function ReviewerDashboardPage() {
           {(activeTab === 'projects' || activeTab === 'overview' || activeTab === 'publication') && (
             <button
               onClick={() => setIsCreateProjectOpen(true)}
-              className="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold text-xs flex items-center gap-2 transition shadow-md shadow-purple-200 dark:shadow-none cursor-pointer"
+              className="px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer"
             >
               <Plus className="w-4 h-4" /> Tạo Dự Án Mới
             </button>

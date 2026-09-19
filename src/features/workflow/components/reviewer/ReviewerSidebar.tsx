@@ -14,8 +14,8 @@ export interface ReviewerSidebarProps {
   onCreateProject: () => void;
 }
 
-const NAV_ITEM_BASE = 'w-full px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center transition-all cursor-pointer';
-const NAV_ITEM_ACTIVE = 'bg-purple-50 dark:bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-500/30 font-bold shadow-xs';
+const NAV_ITEM_BASE = 'w-full px-3 py-2.5 rounded-lg text-xs font-medium flex items-center transition-all cursor-pointer';
+const NAV_ITEM_ACTIVE = 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-500/20 font-semibold shadow-2xs';
 const NAV_ITEM_INACTIVE = 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 border border-transparent';
 
 export function ReviewerSidebar({
@@ -29,18 +29,18 @@ export function ReviewerSidebar({
   const publishedCount = project.episodes.filter((e) => e.status === 'PUBLISHED').length;
 
   return (
-    <aside className="w-full md:w-64 lg:w-72 bg-white dark:bg-[#12141A] border-r border-slate-200 dark:border-white/10 flex flex-col shrink-0 transition-colors">
+    <aside className="w-full md:w-60 lg:w-64 bg-white dark:bg-[#12141A] border-r border-slate-200/80 dark:border-white/10 flex flex-col shrink-0 transition-colors">
       {/* Project Brand & Reviewer Identity Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-white/10 space-y-2">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-purple-600/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 font-bold text-sm shrink-0">
+      <div className="p-4 border-b border-slate-200/80 dark:border-white/10 space-y-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200/60 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm shrink-0">
             <UserCheck className="w-4 h-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-purple-600 dark:text-purple-400 block truncate">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-600 dark:text-indigo-400 block truncate">
               Content Reviewer Hub
             </span>
-            <h2 className="text-xs font-bold text-slate-900 dark:text-white truncate">
+            <h2 className="text-xs font-semibold text-slate-900 dark:text-white truncate">
               {project.title}
             </h2>
           </div>
@@ -48,15 +48,15 @@ export function ReviewerSidebar({
 
         <div className="flex items-center justify-between text-[11px] pt-1 text-slate-500 dark:text-slate-400">
           <span>Quy mô dự án:</span>
-          <span className="font-bold text-slate-800 dark:text-slate-200 font-mono">
+          <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
             {project.episodes.length} Tập Phim
           </span>
         </div>
       </div>
 
       {/* 4 Navigation Menu Items */}
-      <nav className="p-3 space-y-1.5 flex-1">
-        <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-3 pt-1">
+      <nav className="p-3 space-y-1 flex-1">
+        <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2 px-2.5 pt-1">
           Menu Điều Hướng Thẩm Định
         </div>
 
@@ -64,9 +64,9 @@ export function ReviewerSidebar({
         <button
           type="button"
           onClick={() => onTabChange('overview')}
-          className={`${NAV_ITEM_BASE} gap-3 ${activeTab === 'overview' ? NAV_ITEM_ACTIVE : NAV_ITEM_INACTIVE}`}
+          className={`${NAV_ITEM_BASE} gap-2.5 ${activeTab === 'overview' ? NAV_ITEM_ACTIVE : NAV_ITEM_INACTIVE}`}
         >
-          <LayoutDashboard className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
+          <LayoutDashboard className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
           <span className="truncate">📊 Tổng Quan Thẩm Định</span>
         </button>
 
@@ -76,13 +76,13 @@ export function ReviewerSidebar({
           onClick={() => onTabChange('plans')}
           className={`${NAV_ITEM_BASE} justify-between ${activeTab === 'plans' ? NAV_ITEM_ACTIVE : NAV_ITEM_INACTIVE}`}
         >
-          <div className="flex items-center gap-3 truncate">
-            <CheckSquare className="w-4 h-4 text-amber-500 shrink-0" />
+          <div className="flex items-center gap-2.5 truncate">
+            <CheckSquare className="w-4 h-4 text-slate-500 shrink-0" />
             <span className="truncate">📝 Duyệt Kế Hoạch & Quota</span>
           </div>
           {pendingPlanCount > 0 ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold border border-amber-500/30 shrink-0">
-              {pendingPlanCount} chờ
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 font-semibold border border-amber-500/20 shrink-0">
+              {pendingPlanCount}
             </span>
           ) : (
             <span className="text-[10px] text-slate-400 shrink-0">0</span>
@@ -95,13 +95,13 @@ export function ReviewerSidebar({
           onClick={() => onTabChange('audits')}
           className={`${NAV_ITEM_BASE} justify-between ${activeTab === 'audits' ? NAV_ITEM_ACTIVE : NAV_ITEM_INACTIVE}`}
         >
-          <div className="flex items-center gap-3 truncate">
-            <ShieldCheck className="w-4 h-4 text-blue-500 shrink-0" />
+          <div className="flex items-center gap-2.5 truncate">
+            <ShieldCheck className="w-4 h-4 text-slate-500 shrink-0" />
             <span className="truncate">⚖️ Kiểm Định & Tuân Thủ AI</span>
           </div>
           {submittedCount > 0 ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-400 font-extrabold border border-purple-500/30 shrink-0">
-              {submittedCount} video
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-semibold border border-indigo-500/20 shrink-0">
+              {submittedCount}
             </span>
           ) : (
             <span className="text-[10px] text-slate-400 shrink-0">0</span>
@@ -114,24 +114,24 @@ export function ReviewerSidebar({
           onClick={() => onTabChange('publication')}
           className={`${NAV_ITEM_BASE} justify-between ${activeTab === 'publication' ? NAV_ITEM_ACTIVE : NAV_ITEM_INACTIVE}`}
         >
-          <div className="flex items-center gap-3 truncate">
-            <Calendar className="w-4 h-4 text-emerald-500 shrink-0" />
+          <div className="flex items-center gap-2.5 truncate">
+            <Calendar className="w-4 h-4 text-slate-500 shrink-0" />
             <span className="truncate">📅 Lịch Chiếu & Xuất Bản</span>
           </div>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-extrabold border border-emerald-500/30 shrink-0">
-            {publishedCount} OTT
+          <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 font-mono shrink-0">
+            {publishedCount}
           </span>
         </button>
       </nav>
 
       {/* Footer Quick Action */}
-      <div className="p-3 border-t border-slate-200 dark:border-white/10 bg-slate-50/70 dark:bg-white/[0.02]">
+      <div className="p-3 border-t border-slate-200/80 dark:border-white/10 bg-slate-50/50 dark:bg-white/[0.01]">
         <button
           type="button"
           onClick={onCreateProject}
-          className="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer"
+          className="w-full py-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-200 font-medium text-xs flex items-center justify-center gap-1.5 transition cursor-pointer"
         >
-          <Plus className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Khởi Tạo Dự Án Mới
+          <Plus className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> Khởi Tạo Dự Án Mới
         </button>
       </div>
     </aside>
