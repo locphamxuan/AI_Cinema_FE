@@ -5,7 +5,9 @@ import {
   EpisodePackage,
   ContentBrief,
   GenerationJob,
+  GenerationStep,
   ReviewLog,
+  SceneReviewStatus,
   ComplianceCheck,
   AIContentLabel,
   Publication,
@@ -22,6 +24,8 @@ export interface ViewSlice {
 
 export interface EpisodeSlice {
   project: ProductionProject;
+  /** Roster of every project assigned to the current user (both roles read this for the sidebar's assigned/completed lists). */
+  projects: ProductionProject[];
 
   getPackage: (packageId?: string) => EpisodePackage | undefined;
   getBrief: (packageId?: string) => ContentBrief | undefined;
@@ -30,14 +34,20 @@ export interface EpisodeSlice {
   updateContentBrief: (packageId: string, briefData: Partial<ContentBrief>) => void;
   submitProductionPlan: (packageId: string) => void;
   reviseProductionPlan: (packageId: string, updatedBrief: Partial<ContentBrief>) => void;
+  reviewScene: (packageId: string, sceneNumber: number, status: SceneReviewStatus, comment?: string) => void;
   addSceneJob: (packageId: string, sceneData: Omit<GenerationJob, 'id' | 'status' | 'progress' | 'created_at' | 'updated_at'>) => void;
   removeSceneJob: (packageId: string, jobId: string) => void;
+  addGenerationStep: (packageId: string, jobId: string, step: Omit<GenerationStep, 'id'>) => void;
+  updateGenerationStep: (packageId: string, jobId: string, stepId: string, data: Partial<GenerationStep>) => void;
+  removeGenerationStep: (packageId: string, jobId: string, stepId: string) => void;
   submitEpisodePackage: (packageId: string) => boolean;
   createProject: (data: {
     title: string;
     genre: string[];
     synopsis: string;
-    total_episodes: number;
+    season_count: number;
+    episodes_per_season: number;
+    target_duration_per_episode_minutes: number;
     total_budget_tokens: number;
     deadline: string;
     planned_release_date: string;

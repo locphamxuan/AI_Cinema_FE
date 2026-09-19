@@ -6,6 +6,7 @@ import {
   initialPublications,
 } from '@/features/workflow/mocks/workflowMock';
 import type { ComplianceSlice, WorkflowStoreState } from '../types';
+import { withProjectUpdate } from './projectRoster';
 
 export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], ComplianceSlice> = (set, get) => ({
   complianceChecks: initialComplianceChecks,
@@ -48,10 +49,10 @@ export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], Com
         ...state.labels,
         [packageId]: label,
       },
-      project: {
-        ...state.project,
+      ...withProjectUpdate(state, (project) => ({
+        ...project,
         updated_at: new Date().toISOString(),
-        episodes: state.project.episodes.map((ep) => {
+        episodes: project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
           return {
             ...ep,
@@ -59,7 +60,7 @@ export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], Com
             updated_at: new Date().toISOString(),
           };
         }),
-      },
+      })),
     }));
   },
 
@@ -85,18 +86,20 @@ export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], Com
         ...state.publications,
         [packageId]: publication,
       },
-      project: {
-        ...state.project,
-        updated_at: new Date().toISOString(),
-        episodes: state.project.episodes.map((ep) => {
+      ...withProjectUpdate(state, (project) => {
+        const episodes = project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'PUBLISHED',
-            updated_at: new Date().toISOString(),
-          };
-        }),
-      },
+          return { ...ep, status: 'PUBLISHED' as const, updated_at: new Date().toISOString() };
+        });
+        const allPublished = episodes.every((ep) => ep.status === 'PUBLISHED');
+        return {
+          ...project,
+          episodes,
+          overall_status: allPublished ? 'COMPLETED' : project.overall_status,
+          progress_percent: allPublished ? 100 : project.progress_percent,
+          updated_at: new Date().toISOString(),
+        };
+      }),
     }));
   },
 });

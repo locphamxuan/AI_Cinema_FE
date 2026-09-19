@@ -2,6 +2,7 @@ import type { StateCreator } from 'zustand';
 import { ReviewLog } from '@/types/workflow';
 import { initialReviews } from '@/features/workflow/mocks/workflowMock';
 import type { ReviewSlice, WorkflowStoreState } from '../types';
+import { withProjectUpdate } from './projectRoster';
 
 export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewSlice> = (set) => ({
   reviews: initialReviews,
@@ -20,10 +21,11 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
 
     set((state) => ({
       reviews: [newReview, ...state.reviews],
-      project: {
-        ...state.project,
+      ...withProjectUpdate(state, (project) => ({
+        ...project,
+        overall_status: 'CHANGES_REQUESTED',
         updated_at: new Date().toISOString(),
-        episodes: state.project.episodes.map((ep) => {
+        episodes: project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
           return {
             ...ep,
@@ -35,7 +37,7 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
             },
           };
         }),
-      },
+      })),
     }));
   },
 
@@ -54,11 +56,12 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
 
     set((state) => ({
       reviews: [newReview, ...state.reviews],
-      project: {
-        ...state.project,
-        allocated_tokens: state.project.allocated_tokens + tokenQuota,
+      ...withProjectUpdate(state, (project) => ({
+        ...project,
+        allocated_tokens: project.allocated_tokens + tokenQuota,
+        overall_status: 'IN_PROGRESS',
         updated_at: new Date().toISOString(),
-        episodes: state.project.episodes.map((ep) => {
+        episodes: project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
           return {
             ...ep,
@@ -71,7 +74,7 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
             },
           };
         }),
-      },
+      })),
     }));
   },
 
@@ -89,10 +92,11 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
 
     set((state) => ({
       reviews: [newReview, ...state.reviews],
-      project: {
-        ...state.project,
+      ...withProjectUpdate(state, (project) => ({
+        ...project,
+        overall_status: 'CHANGES_REQUESTED',
         updated_at: new Date().toISOString(),
-        episodes: state.project.episodes.map((ep) => {
+        episodes: project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
           return {
             ...ep,
@@ -100,16 +104,16 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
             updated_at: new Date().toISOString(),
           };
         }),
-      },
+      })),
     }));
   },
 
   approveContent: (packageId) => {
-    set((state) => ({
-      project: {
-        ...state.project,
+    set((state) =>
+      withProjectUpdate(state, (project) => ({
+        ...project,
         updated_at: new Date().toISOString(),
-        episodes: state.project.episodes.map((ep) => {
+        episodes: project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
           return {
             ...ep,
@@ -117,7 +121,7 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
             updated_at: new Date().toISOString(),
           };
         }),
-      },
-    }));
+      }))
+    );
   },
 });

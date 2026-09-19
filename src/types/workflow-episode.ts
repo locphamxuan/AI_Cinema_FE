@@ -1,8 +1,11 @@
 import type { WorkflowState } from './workflow-role';
 import type { GenerationJob, GeneratedAsset } from './workflow-job';
+import type { SceneReview } from './workflow-review';
 
 /**
- * 1. content_brief: Kịch bản và kế hoạch sản xuất ban đầu
+ * 1. content_brief: Kịch bản và kế hoạch sản xuất ban đầu. Chỉ giữ mô tả
+ * phân cảnh ở bước lập kế hoạch — prompt AI thuộc bước sản xuất (Studio),
+ * xem GenerationStep trong workflow-job.ts.
  */
 export interface SceneBreakdownItem {
   scene_number: number;
@@ -10,10 +13,6 @@ export interface SceneBreakdownItem {
   description: string;
   target_duration_sec: number;
   estimated_tokens: number;
-  visual_prompt: string;
-  audio_prompt: string;
-  voice_model?: string;
-  video_model?: string;
 }
 
 export interface ContentBrief {
@@ -21,13 +20,14 @@ export interface ContentBrief {
   project_id: string;
   episode_id: string;
   title: string;
-  synopsis: string;
   overview_script: string;
   scene_count: number;
   target_duration_minutes: number;
   estimated_tokens: number;
   storyboard_summary: string;
   scene_breakdown: SceneBreakdownItem[];
+  /** Per-scene reviewer verdict — reset to 'pending' on every (re)submit. */
+  scene_reviews: SceneReview[];
   status: WorkflowState;
   created_at: string;
   updated_at: string;
@@ -40,6 +40,7 @@ export interface EpisodePackage {
   id: string;
   project_id: string;
   episode_number: number;
+  season_number: number;
   title: string;
   status: WorkflowState;
   total_duration: string;
@@ -74,7 +75,11 @@ export interface ProductionProject {
   title: string;
   genre: string[];
   synopsis: string;
+  season_count: number;
+  episodes_per_season: number;
   total_episodes: number;
+  /** Baseline Reviewer sets at project creation — Creator's proposed duration per episode is checked against this during plan review. */
+  target_duration_per_episode_minutes: number;
   total_budget_tokens: number;
   allocated_tokens: number;
   consumed_tokens: number;
