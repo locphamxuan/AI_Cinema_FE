@@ -38,13 +38,13 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
       {tab === 'brief' && (
         <div className="space-y-3 text-xs">
           <div>
-            <h4 className="text-slate-500 dark:text-slate-400 font-medium mb-1">Tóm tắt kịch bản:</h4>
+            <h4 className="text-slate-500 dark:text-slate-400 font-medium mb-1">Kịch bản tổng thể:</h4>
             <p className="text-slate-800 dark:text-white bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200 dark:border-white/5 leading-relaxed">
-              {pkg.brief.synopsis}
+              {pkg.brief.overview_script}
             </p>
           </div>
           <div>
-            <h4 className="text-slate-500 dark:text-slate-400 font-medium mb-1">Kịch bản chi tiết theo phân đoạn:</h4>
+            <h4 className="text-slate-500 dark:text-slate-400 font-medium mb-1">Danh sách phân cảnh:</h4>
             <div className="space-y-2">
               {pkg.brief.scene_breakdown.map((sc) => (
                 <div key={sc.scene_number} className="bg-slate-50 dark:bg-white/5 p-3 rounded-xl border border-slate-200 dark:border-white/5">
@@ -56,10 +56,7 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
                       {sc.target_duration_sec}s · {sc.estimated_tokens} Tokens
                     </span>
                   </div>
-                  <p className="text-slate-700 dark:text-slate-300 mb-1.5">{sc.description}</p>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400 bg-white dark:bg-black/30 p-2 rounded border border-slate-200 dark:border-white/5 font-mono">
-                    Prompt: {sc.visual_prompt}
-                  </div>
+                  <p className="text-slate-700 dark:text-slate-300">{sc.description}</p>
                 </div>
               ))}
             </div>
@@ -138,7 +135,7 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
               <div key={job.id} className="flex justify-between items-center bg-slate-50 dark:bg-black/20 p-2.5 rounded-lg border border-slate-200 dark:border-white/5">
                 <div>
                   <div className="font-medium text-slate-900 dark:text-white">{job.title}</div>
-                  <div className="text-[11px] text-slate-500 dark:text-slate-400">{job.ai_model}</div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400">{job.generation_steps.length} prompt</div>
                 </div>
                 <div className="text-right">
                   <span className="font-mono font-bold text-purple-600 dark:text-purple-400">{job.token_cost} Tokens</span>

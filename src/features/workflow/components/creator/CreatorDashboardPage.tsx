@@ -185,7 +185,6 @@ export function CreatorDashboardPage() {
             isQuotaWarning={isQuotaWarning}
             scenesCount={currentPackage.brief.scene_breakdown.length}
             estimatedTokens={currentPackage.brief.estimated_tokens}
-            synopsis={currentPackage.brief.synopsis}
             latestFeedback={latestFeedback}
             canEnterStudio={canEnterStudio}
             onGotoBrief={() => setActiveTab('brief')}

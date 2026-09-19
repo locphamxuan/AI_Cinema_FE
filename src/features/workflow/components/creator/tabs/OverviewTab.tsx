@@ -26,7 +26,6 @@ export interface OverviewTabProps {
   isQuotaWarning: boolean;
   scenesCount: number;
   estimatedTokens: number;
-  synopsis: string;
   latestFeedback?: ReviewLog;
   canEnterStudio: boolean;
   onGotoBrief: () => void;
@@ -38,7 +37,6 @@ export function OverviewTab({
   isQuotaWarning,
   scenesCount,
   estimatedTokens,
-  synopsis,
   latestFeedback,
   canEnterStudio,
   onGotoBrief,
@@ -265,11 +263,11 @@ export function OverviewTab({
           </div>
         </div>
 
-        {/* Tóm tắt kịch bản */}
+        {/* Tóm tắt phim (do Reviewer nhập khi tạo dự án) */}
         <div className="space-y-1">
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Tóm Tắt Kịch Bản & Bối Cảnh Phim:</span>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Tóm Tắt Nội Dung Phim:</span>
           <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-white/5 p-3.5 rounded-xl border border-slate-200 dark:border-white/10 leading-relaxed">
-            {synopsis || 'Chưa có tóm tắt kịch bản.'}
+            {project.synopsis || 'Chưa có tóm tắt.'}
           </p>
         </div>
 
