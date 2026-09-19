@@ -49,7 +49,7 @@ export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJo
                 <div className="min-w-0">
                   <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate">{job.title}</h4>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-md font-mono mt-0.5">
-                    {job.ai_model} • {job.token_cost} Tokens
+                    {job.generation_steps.length} prompt • {job.token_cost} Tokens
                   </p>
                 </div>
               </div>

@@ -7,16 +7,39 @@ import { ArrowLeft, Zap, Plus } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { StudioPlayer } from './StudioPlayer';
 import { StudioTimeline } from './StudioTimeline';
-import { GeneratorPanel, AI_MODELS } from './GeneratorPanel';
+import { GeneratorPanel, FUNCTION_TYPE_META } from './GeneratorPanel';
 import { SubmitEpisodeModal } from './SubmitEpisodeModal';
+import type { GenerationStep } from '@/types/workflow';
 
 export interface CreatorStudioPageProps {
   episodeId: string;
 }
 
+function makeDraftStep(): GenerationStep {
+  const meta = FUNCTION_TYPE_META.VIDEO;
+  return {
+    id: `draft-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    function_type: 'VIDEO',
+    prompt: '',
+    selected_model: meta.model,
+    status: 'pending',
+    token_cost: meta.defaultTokens,
+  };
+}
+
 export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   const router = useRouter();
-  const { project, triggerGenerationJob, addSceneJob, removeSceneJob, submitEpisodePackage, setActivePackage } = useWorkflowStore();
+  const {
+    project,
+    triggerGenerationJob,
+    addSceneJob,
+    removeSceneJob,
+    addGenerationStep,
+    updateGenerationStep,
+    removeGenerationStep,
+    submitEpisodePackage,
+    setActivePackage,
+  } = useWorkflowStore();
 
   const currentPackage = project.episodes.find((e) => e.id === episodeId) || project.episodes[0];
   const jobs = currentPackage?.jobs || [];
@@ -27,10 +50,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
 
   const [newSceneTitle, setNewSceneTitle] = useState('');
-  const [newPromptVideo, setNewPromptVideo] = useState('');
-  const [newPromptAudio, setNewPromptAudio] = useState('');
-  const [selectedModel, setSelectedModel] = useState(AI_MODELS[0].id);
-  const [tokenCost] = useState(70);
+  const [draftSteps, setDraftSteps] = useState<GenerationStep[]>([makeDraftStep()]);
   const [renderingJobId, setRenderingJobId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,19 +72,50 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   const handleAddJob = () => {
     const nextSceneNum = jobs.length + 1;
     const titleToUse = newSceneTitle.trim() || `Cảnh ${nextSceneNum}: Phân Cảnh Mới #${nextSceneNum}`;
+    const stepsToUse = draftSteps.filter((s) => s.prompt.trim().length > 0);
     addSceneJob(currentPackage.id, {
       episode_id: currentPackage.id,
       scene_id: `scene-${nextSceneNum}-${Date.now()}`,
       scene_number: nextSceneNum,
       title: titleToUse,
-      ai_model: selectedModel,
-      prompt_video: newPromptVideo.trim() || 'Cinematic wide angle, highly detailed lighting, 8k render',
-      prompt_audio: newPromptAudio.trim() || 'Ambient cinematic background music and sound effects',
-      token_cost: tokenCost,
+      generation_steps: stepsToUse,
+      token_cost: stepsToUse.reduce((sum, s) => sum + s.token_cost, 0),
     });
     setNewSceneTitle('');
-    setNewPromptVideo('');
-    setNewPromptAudio('');
+    setDraftSteps([makeDraftStep()]);
+  };
+
+  // Editing steps operates on whichever scene is selected in the timeline;
+  // falls back to the new-scene draft when nothing is selected yet.
+  const handleAddStep = () => {
+    if (selectedJob) {
+      const meta = FUNCTION_TYPE_META.VIDEO;
+      addGenerationStep(currentPackage.id, selectedJob.id, {
+        function_type: 'VIDEO',
+        prompt: '',
+        selected_model: meta.model,
+        status: 'pending',
+        token_cost: meta.defaultTokens,
+      });
+    } else {
+      setDraftSteps((prev) => [...prev, makeDraftStep()]);
+    }
+  };
+
+  const handleUpdateStep = (stepId: string, data: Partial<GenerationStep>) => {
+    if (selectedJob) {
+      updateGenerationStep(currentPackage.id, selectedJob.id, stepId, data);
+    } else {
+      setDraftSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, ...data } : s)));
+    }
+  };
+
+  const handleRemoveStep = (stepId: string) => {
+    if (selectedJob) {
+      removeGenerationStep(currentPackage.id, selectedJob.id, stepId);
+    } else {
+      setDraftSteps((prev) => prev.filter((s) => s.id !== stepId));
+    }
   };
 
   const handleSubmitToChecker = () => {
@@ -163,13 +214,10 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
             selectedJob={selectedJob}
             newSceneTitle={newSceneTitle}
             onSceneTitleChange={setNewSceneTitle}
-            selectedModel={selectedModel}
-            onModelChange={setSelectedModel}
-            newPromptVideo={newPromptVideo}
-            onPromptVideoChange={setNewPromptVideo}
-            newPromptAudio={newPromptAudio}
-            onPromptAudioChange={setNewPromptAudio}
-            tokenCost={tokenCost}
+            steps={selectedJob ? selectedJob.generation_steps : draftSteps}
+            onAddStep={handleAddStep}
+            onUpdateStep={handleUpdateStep}
+            onRemoveStep={handleRemoveStep}
             isGenerating={renderingJobId === selectedJob?.id}
             onAddJob={handleAddJob}
             onGenerateSelected={() => selectedJob && handleGenerate(selectedJob.id)}

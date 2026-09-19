@@ -48,7 +48,7 @@ export function TokensTab({ currentPackage, quotaPercent, isQuotaWarning }: Toke
             <div key={job.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs">
               <div>
                 <p className="font-bold text-slate-900 dark:text-white">{job.title}</p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{job.ai_model}</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{job.generation_steps.length} prompt</p>
               </div>
               <div className="text-right">
                 <span className="font-mono font-bold text-purple-600 dark:text-purple-400">{job.token_cost} Tokens</span>

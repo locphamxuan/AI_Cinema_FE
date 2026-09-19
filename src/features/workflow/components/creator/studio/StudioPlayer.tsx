@@ -57,7 +57,11 @@ export function StudioPlayer({ selectedJob, selectedAsset, isPlaying, onTogglePl
                 <span className="font-mono text-xs">00:06 / {selectedAsset ? `00:${selectedAsset.duration_seconds}` : '00:15'}</span>
               </div>
 
-              <span className="text-slate-300 font-mono text-[11px]">Model: {selectedJob?.ai_model || 'CinemaGen v3.2'}</span>
+              <span className="text-slate-300 font-mono text-[11px]">
+                {selectedJob && selectedJob.generation_steps.length > 0
+                  ? `${selectedJob.generation_steps.length} model tự chọn`
+                  : 'CinemaGen v3.2'}
+              </span>
             </div>
           </div>
         </div>
