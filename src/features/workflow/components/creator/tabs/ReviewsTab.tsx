@@ -41,7 +41,7 @@ export function ReviewsTab({ episodeReviews }: ReviewsTabProps) {
                 {rev.feedback_notes}
               </p>
               {rev.quota_granted && (
-                <p className="text-[11px] text-amber-700 dark:text-amber-400 font-mono font-medium">⚡ Quota cấp: +{rev.quota_granted} Tokens</p>
+                <p className="text-[11px] text-amber-700 dark:text-amber-400 font-mono font-medium">Quota cấp: +{rev.quota_granted} Tokens</p>
               )}
             </div>
           ))}

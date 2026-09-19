@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Video, Play, LayoutDashboard, FileText, MessageSquare, Zap, Film } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
-import { WorkspaceSidebar } from '../shared/WorkspaceSidebar';
+import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
 import { OverviewTab } from './tabs/OverviewTab';
 import { BriefTab } from './tabs/BriefTab';
 import { StudioLinkTab } from './tabs/StudioLinkTab';
@@ -12,14 +12,6 @@ import { TokensTab } from './tabs/TokensTab';
 import { ReviewsTab } from './tabs/ReviewsTab';
 
 type CreatorTab = 'overview' | 'brief' | 'studio' | 'tokens' | 'reviews';
-
-const TABS: { key: CreatorTab; label: string; icon: typeof LayoutDashboard }[] = [
-  { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
-  { key: 'brief', label: 'Kịch bản & phân cảnh', icon: FileText },
-  { key: 'studio', label: 'Sản xuất video', icon: Video },
-  { key: 'reviews', label: 'Feedback & duyệt', icon: MessageSquare },
-  { key: 'tokens', label: 'Token', icon: Zap },
-];
 
 /**
  * Creator's entry point after login: a left sidebar listing every assigned
@@ -52,6 +44,14 @@ export function CreatorWorkspacePage() {
     currentPackage?.status === 'COMPLIANCE_PASSED' ||
     currentPackage?.status === 'PUBLISHED';
 
+  const navItems: SidebarNavItem[] = [
+    { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
+    { key: 'brief', label: 'Kịch bản & phân cảnh', icon: FileText },
+    { key: 'studio', label: 'Sản xuất video', icon: Video },
+    { key: 'reviews', label: 'Feedback & duyệt', icon: MessageSquare, badge: latestFeedback ? 1 : undefined },
+    { key: 'tokens', label: 'Token', icon: Zap },
+  ];
+
   const handleSelectProject = (projectId: string) => {
     setActiveProject(projectId);
     setActiveTab('overview');
@@ -59,7 +59,15 @@ export function CreatorWorkspacePage() {
 
   return (
     <div className="flex-1 flex flex-col md:flex-row w-full overflow-hidden">
-      <WorkspaceSidebar title="Không gian làm việc" projects={projects} selectedProjectId={hasSelection ? activeProjectId : undefined} onSelectProject={handleSelectProject} />
+      <WorkspaceSidebar
+        title="Không gian làm việc"
+        projects={projects}
+        selectedProjectId={hasSelection ? activeProjectId : undefined}
+        onSelectProject={handleSelectProject}
+        navItems={navItems}
+        activeNavKey={activeTab}
+        onNavSelect={(key) => setActiveTab(key as CreatorTab)}
+      />
 
       <main className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto transition-colors">
         {!hasSelection || !currentPackage ? (
@@ -121,25 +129,6 @@ export function CreatorWorkspacePage() {
                   </button>
                 );
               })}
-            </div>
-
-            {/* Tab strip */}
-            <div className="flex items-center gap-1 border-b border-slate-200 dark:border-white/10 overflow-x-auto scrollbar-none">
-              {TABS.map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveTab(key)}
-                  className={`px-3.5 py-2.5 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition cursor-pointer shrink-0 ${
-                    activeTab === key
-                      ? 'border-ruby text-ruby'
-                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {label}
-                  {key === 'reviews' && latestFeedback && <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />}
-                </button>
-              ))}
             </div>
 
             {activeTab === 'overview' && (

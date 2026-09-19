@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Plus, X, Trash2, Tag, Calendar, Milestone as MilestoneIcon, Film, Coins, Minus } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
-import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import type { ProjectMilestone } from '@/types/workflow';
 
 export interface CreateProjectFormState {
@@ -11,7 +11,8 @@ export interface CreateProjectFormState {
   synopsis: string;
   seasonCount: number;
   episodesPerSeason: number;
-  targetDurationMinutes: number;
+  /** One target duration (minutes) per episode, in creation order. */
+  episodeDurations: number[];
   budgetTokens: number;
   deadline: string;
   releaseDate: string;
@@ -41,7 +42,6 @@ const PRESET_GENRES = [
 
 const QUICK_SEASON_OPTIONS = [1, 2, 3];
 const QUICK_EPISODES_PER_SEASON_OPTIONS = [3, 4, 5, 8];
-const QUICK_DURATION_OPTIONS = [15, 20, 30, 45];
 const QUICK_TOKEN_OPTIONS = [1500, 3000, 5000, 8000];
 
 export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: CreateProjectModalProps) {
@@ -90,6 +90,43 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
   const handleRemoveMilestone = (index: number) => {
     onChange('milestones', form.milestones.filter((_, i) => i !== index));
   };
+
+  const [bulkDuration, setBulkDuration] = useState(30);
+
+  const resizeDurations = (seasonCount: number, episodesPerSeason: number, current: number[]) => {
+    const total = seasonCount * episodesPerSeason;
+    const fallback = current[0] ?? 30;
+    return Array.from({ length: total }, (_, i) => current[i] ?? fallback);
+  };
+
+  const handleSeasonCountChange = (value: number) => {
+    const seasonCount = Math.max(1, value);
+    onChange('seasonCount', seasonCount);
+    onChange('episodeDurations', resizeDurations(seasonCount, form.episodesPerSeason, form.episodeDurations));
+  };
+
+  const handleEpisodesPerSeasonChange = (value: number) => {
+    const episodesPerSeason = Math.max(1, value);
+    onChange('episodesPerSeason', episodesPerSeason);
+    onChange('episodeDurations', resizeDurations(form.seasonCount, episodesPerSeason, form.episodeDurations));
+  };
+
+  const handleDurationChange = (index: number, minutes: number) => {
+    const updated = [...form.episodeDurations];
+    updated[index] = Math.max(1, minutes);
+    onChange('episodeDurations', updated);
+  };
+
+  const handleApplyBulkDuration = () => {
+    onChange('episodeDurations', form.episodeDurations.map(() => bulkDuration));
+  };
+
+  const totalEpisodes = form.seasonCount * form.episodesPerSeason;
+  const episodeRows = Array.from({ length: totalEpisodes }, (_, i) => ({
+    index: i,
+    season: Math.floor(i / form.episodesPerSeason) + 1,
+    episodeInSeason: (i % form.episodesPerSeason) + 1,
+  }));
 
   return (
     <Modal
@@ -229,7 +266,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => onChange('seasonCount', Math.max(1, form.seasonCount - 1))}
+                  onClick={() => handleSeasonCountChange(form.seasonCount - 1)}
                   className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
                 >
                   <Minus className="w-3 h-3" />
@@ -239,12 +276,12 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                   min={1}
                   max={10}
                   value={form.seasonCount}
-                  onChange={(e) => onChange('seasonCount', Math.max(1, Number(e.target.value)))}
+                  onChange={(e) => handleSeasonCountChange(Number(e.target.value))}
                   className={`${fieldInputClass} text-center font-bold text-sm py-1.5`}
                 />
                 <button
                   type="button"
-                  onClick={() => onChange('seasonCount', form.seasonCount + 1)}
+                  onClick={() => handleSeasonCountChange(form.seasonCount + 1)}
                   className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
                 >
                   <Plus className="w-3 h-3" />
@@ -255,7 +292,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                   <button
                     key={s}
                     type="button"
-                    onClick={() => onChange('seasonCount', s)}
+                    onClick={() => handleSeasonCountChange(s)}
                     className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
                       form.seasonCount === s
                         ? 'bg-ruby text-white font-bold'
@@ -273,7 +310,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
-                  onClick={() => onChange('episodesPerSeason', Math.max(1, form.episodesPerSeason - 1))}
+                  onClick={() => handleEpisodesPerSeasonChange(form.episodesPerSeason - 1)}
                   className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
                 >
                   <Minus className="w-3 h-3" />
@@ -283,12 +320,12 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                   min={1}
                   max={20}
                   value={form.episodesPerSeason}
-                  onChange={(e) => onChange('episodesPerSeason', Math.max(1, Number(e.target.value)))}
+                  onChange={(e) => handleEpisodesPerSeasonChange(Number(e.target.value))}
                   className={`${fieldInputClass} text-center font-bold text-sm py-1.5`}
                 />
                 <button
                   type="button"
-                  onClick={() => onChange('episodesPerSeason', form.episodesPerSeason + 1)}
+                  onClick={() => handleEpisodesPerSeasonChange(form.episodesPerSeason + 1)}
                   className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
                 >
                   <Plus className="w-3 h-3" />
@@ -299,7 +336,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                   <button
                     key={ep}
                     type="button"
-                    onClick={() => onChange('episodesPerSeason', ep)}
+                    onClick={() => handleEpisodesPerSeasonChange(ep)}
                     className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
                       form.episodesPerSeason === ep
                         ? 'bg-ruby text-white font-bold'
@@ -314,41 +351,58 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           </div>
         </div>
 
-        {/* Thời Lượng Mục Tiêu Mỗi Tập & Ngân Sách AI Tokens */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-ruby" /> Thời Lượng Mục Tiêu / Tập:
-              </label>
-              <span className="text-[11px] font-mono text-ruby font-bold">{form.targetDurationMinutes} phút</span>
-            </div>
+        {/* Thời lượng mục tiêu từng tập — mỗi tập chỉnh riêng, không gộp chung */}
+        <div className="space-y-2 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-ruby" /> Thời Lượng Mục Tiêu Từng Tập:
+            </label>
+            <span className="text-[10px] text-slate-500 dark:text-zinc-400">Mốc so sánh khi duyệt kế hoạch</span>
+          </div>
+
+          <div className="flex items-center gap-1.5">
             <input
               type="number"
               min={1}
-              value={form.targetDurationMinutes}
-              onChange={(e) => onChange('targetDurationMinutes', Math.max(1, Number(e.target.value)))}
-              className={`${fieldInputClass} font-mono font-bold py-1.5`}
+              value={bulkDuration}
+              onChange={(e) => setBulkDuration(Math.max(1, Number(e.target.value)))}
+              className={`${fieldInputClass} w-20 text-center py-1`}
             />
-            <p className="text-[10px] text-slate-500 dark:text-zinc-400">Dùng làm mốc so sánh khi duyệt kế hoạch sản xuất của Creator.</p>
-            <div className="flex items-center gap-1.5 pt-0.5">
-              {QUICK_DURATION_OPTIONS.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => onChange('targetDurationMinutes', d)}
-                  className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
-                    form.targetDurationMinutes === d
-                      ? 'bg-ruby text-white font-bold'
-                      : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
-                  }`}
-                >
-                  {d} phút
-                </button>
-              ))}
-            </div>
+            <span className="text-[11px] text-slate-500 dark:text-zinc-400">phút</span>
+            <button
+              type="button"
+              onClick={handleApplyBulkDuration}
+              className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-[11px] font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
+            >
+              Áp dụng cho tất cả
+            </button>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto pr-1">
+            {episodeRows.map((row) => (
+              <div
+                key={row.index}
+                className="flex items-center justify-between gap-2 bg-white dark:bg-[#0E1118] px-2.5 py-1.5 rounded-lg border border-slate-200/80 dark:border-white/10"
+              >
+                <span className="text-[11px] text-slate-600 dark:text-zinc-400 font-medium">
+                  Mùa {row.season} · Tập {row.episodeInSeason}
+                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  <input
+                    type="number"
+                    min={1}
+                    value={form.episodeDurations[row.index] ?? 30}
+                    onChange={(e) => handleDurationChange(row.index, Number(e.target.value))}
+                    className="w-14 text-center py-0.5 rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs font-mono font-semibold text-slate-800 dark:text-white focus:outline-none focus:border-ruby"
+                  />
+                  <span className="text-[10px] text-slate-400">phút</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
           {/* Ngân Sách AI Tokens */}
           <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
             <div className="flex items-center justify-between">
@@ -428,13 +482,13 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                 <MilestoneIcon className="w-3.5 h-3.5 text-ruby" /> Lộ Trình Cột Mốc Tiến Độ:
               </label>
               <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">
-                Thiết lập các mốc bàn giao kịch bản, video draft và nghiệm thu cho Creator
+                Mốc bàn giao kịch bản, video draft và nghiệm thu cho Creator
               </p>
             </div>
             <button
               type="button"
               onClick={handleAddMilestone}
-              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-ruby to-ruby-dark text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm hover:shadow-ruby/20 cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-ruby text-white font-bold text-xs flex items-center gap-1.5 transition hover:bg-ruby-dark cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Thêm Mốc</span>
@@ -523,13 +577,9 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           <Button type="button" variant="secondary" onClick={onClose} className="px-5 py-2 rounded-xl text-xs font-bold">
             Hủy
           </Button>
-          <button
-            type="submit"
-            className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-ruby to-ruby-dark hover:shadow-lg hover:shadow-ruby/30 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
-          >
-            <Film className="w-3.5 h-3.5" />
-            <span>Khởi Tạo Dự Án Phim</span>
-          </button>
+          <Button type="submit" className="px-5 py-2.5 rounded-xl text-xs">
+            Tạo Dự Án
+          </Button>
         </div>
       </form>
     </Modal>

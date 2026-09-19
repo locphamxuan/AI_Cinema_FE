@@ -38,7 +38,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
               href={`/reviewer/audit/${ep.id}`}
               className="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-xs"
             >
-              <BadgeCheck className="w-3.5 h-3.5" /> Mở Trạm Kiểm Định Chi Tiết ➔
+              <BadgeCheck className="w-3.5 h-3.5" /> Mở trạm kiểm định
             </Link>
           </div>
         ))}

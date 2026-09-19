@@ -11,10 +11,10 @@ export interface PlanReviewTabProps {
 
 export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuota }: PlanReviewTabProps) {
   const reviewScene = useWorkflowStore((s) => s.reviewScene);
-  const targetDurationPerEpisode = useWorkflowStore((s) => s.project.target_duration_per_episode_minutes);
+  const targetDuration = currentPackage?.target_duration_minutes || 0;
   const brief = currentPackage?.brief;
   const durationMismatch = Boolean(
-    brief && targetDurationPerEpisode > 0 && Math.abs(brief.target_duration_minutes - targetDurationPerEpisode) / targetDurationPerEpisode > 0.15
+    brief && targetDuration > 0 && Math.abs(brief.target_duration_minutes - targetDuration) / targetDuration > 0.15
   );
   const cleanTitle = currentPackage?.title?.replace(/^Tập\s*\d+\s*[:\-]\s*/i, '') || currentPackage?.title || 'Chưa đặt tên';
 
@@ -100,7 +100,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
               <div className="min-w-0">
                 <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Thời lượng đề xuất</div>
                 <div className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                  {brief.target_duration_minutes} / {targetDurationPerEpisode} Phút
+                  {brief.target_duration_minutes} / {targetDuration} Phút
                 </div>
                 {durationMismatch && <div className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Lệch mốc dự án</div>}
               </div>

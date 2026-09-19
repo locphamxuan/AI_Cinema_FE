@@ -13,6 +13,7 @@ function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumbe
     episode_number: episodeNumber,
     season_number: seasonNumber,
     title: `Tập ${episodeNumber}: Chưa đặt tên`,
+    target_duration_minutes: targetDurationMinutes,
     status: 'PLAN_DRAFT',
     total_duration: '',
     actual_tokens_used: 0,
@@ -294,7 +295,8 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     let episodeNumber = 1;
     for (let season = 1; season <= data.season_count; season += 1) {
       for (let i = 0; i < data.episodes_per_season; i += 1) {
-        episodes.push(buildBlankEpisode(projectId, episodeNumber, season, data.target_duration_per_episode_minutes));
+        const duration = data.episode_target_durations[episodeNumber - 1] ?? data.episode_target_durations[0] ?? 30;
+        episodes.push(buildBlankEpisode(projectId, episodeNumber, season, duration));
         episodeNumber += 1;
       }
     }
@@ -307,7 +309,6 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       season_count: data.season_count,
       episodes_per_season: data.episodes_per_season,
       total_episodes: totalEpisodes,
-      target_duration_per_episode_minutes: data.target_duration_per_episode_minutes,
       total_budget_tokens: data.total_budget_tokens,
       allocated_tokens: 0,
       consumed_tokens: 0,

@@ -113,13 +113,13 @@ export function GeneratorPanel({
         setStreamTokens(currentTokens);
 
         if (elapsedMs < 900) {
-          setStreamLog('🔍 [AI Router] Phân tích prompt & nạp ngữ cảnh điện ảnh...');
+          setStreamLog('[AI Router] Phân tích prompt & nạp ngữ cảnh điện ảnh...');
         } else if (elapsedMs < 2100) {
-          setStreamLog('🤖 [Model Engine] Kết nối các model đã tự động chọn cho từng prompt...');
+          setStreamLog('[Model Engine] Kết nối các model đã tự động chọn cho từng prompt...');
         } else if (elapsedMs < 3400) {
-          setStreamLog('⚡ [Tensors Stream] Đang render khung hình & tổng hợp dữ liệu...');
+          setStreamLog('[Tensors Stream] Đang render khung hình & tổng hợp dữ liệu...');
         } else {
-          setStreamLog('✨ [Finalize] Khử nhiễu, mã hóa chuẩn 4K & xuất asset hoàn chỉnh!');
+          setStreamLog('[Finalize] Khử nhiễu, mã hóa chuẩn 4K & xuất asset hoàn chỉnh!');
         }
       }, 50);
     } else if (streamProgress > 0) {

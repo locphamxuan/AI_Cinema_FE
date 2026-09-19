@@ -318,7 +318,7 @@ export function OverviewTab({ project, pendingPlanCount, submittedCount, onRevie
                           onClick={() => onReviewPlan(ep.id)}
                           className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-xs transition shadow-sm shadow-amber-500/20 active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
                         >
-                          <span>Duyệt Kế Hoạch & Cấp Quota ➔</span>
+                          <span>Duyệt kế hoạch & cấp quota</span>
                         </button>
                       ) : isSubmitted || isCompliancePassed ? (
                         <Link
@@ -326,7 +326,7 @@ export function OverviewTab({ project, pendingPlanCount, submittedCount, onRevie
                           className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-ruby via-rose-600 to-purple-600 hover:from-ruby-dark hover:to-purple-700 text-white font-bold text-xs transition shadow-sm shadow-ruby/25 active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
                         >
                           <ShieldCheck className="w-3.5 h-3.5" />
-                          <span>Thẩm Định & Gắn Nhãn AI ➔</span>
+                          <span>Thẩm định & gắn nhãn AI</span>
                         </Link>
                       ) : isPublished ? (
                         <Link

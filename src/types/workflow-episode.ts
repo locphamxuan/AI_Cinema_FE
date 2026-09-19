@@ -42,6 +42,8 @@ export interface EpisodePackage {
   episode_number: number;
   season_number: number;
   title: string;
+  /** Reviewer's target duration for this specific episode, set at project creation. */
+  target_duration_minutes: number;
   status: WorkflowState;
   total_duration: string;
   actual_tokens_used: number;
@@ -78,8 +80,6 @@ export interface ProductionProject {
   season_count: number;
   episodes_per_season: number;
   total_episodes: number;
-  /** Baseline Reviewer sets at project creation — Creator's proposed duration per episode is checked against this during plan review. */
-  target_duration_per_episode_minutes: number;
   total_budget_tokens: number;
   allocated_tokens: number;
   consumed_tokens: number;

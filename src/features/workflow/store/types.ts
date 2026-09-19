@@ -47,7 +47,8 @@ export interface EpisodeSlice {
     synopsis: string;
     season_count: number;
     episodes_per_season: number;
-    target_duration_per_episode_minutes: number;
+    /** One target duration (minutes) per episode, in creation order. */
+    episode_target_durations: number[];
     total_budget_tokens: number;
     deadline: string;
     planned_release_date: string;

@@ -355,6 +355,7 @@ const initialEpisodes: EpisodePackage[] = [
     episode_number: 1,
     season_number: 1,
     title: 'Tập 1: Điểm Khởi Đầu (Genesis)',
+    target_duration_minutes: 45,
     status: 'PUBLISHED',
     total_duration: '45:30',
     actual_tokens_used: 420,
@@ -379,6 +380,7 @@ const initialEpisodes: EpisodePackage[] = [
     episode_number: 2,
     season_number: 1,
     title: 'Tập 2: Cơn Bão Nơ-ron (Neural Surge)',
+    target_duration_minutes: 42,
     status: 'EPISODE_SUBMITTED', // Scenario 2: Video submitted, waiting for compliance & publishing
     total_duration: '42:15',
     actual_tokens_used: 395,
@@ -397,6 +399,7 @@ const initialEpisodes: EpisodePackage[] = [
     episode_number: 3,
     season_number: 1,
     title: 'Tập 3: Mạng Lưới Bóng Tối (Dark Mesh)',
+    target_duration_minutes: 40,
     status: 'PLAN_PENDING', // Scenario 1: Brief submitted, waiting for Reviewer Quota Allocation
     total_duration: '40:00 (Dự kiến)',
     actual_tokens_used: 0,
@@ -419,7 +422,6 @@ export const initialProject: ProductionProject = {
   season_count: 1,
   episodes_per_season: 5,
   total_episodes: 5,
-  target_duration_per_episode_minutes: 40,
   total_budget_tokens: 3000,
   allocated_tokens: 900,
   consumed_tokens: 815,

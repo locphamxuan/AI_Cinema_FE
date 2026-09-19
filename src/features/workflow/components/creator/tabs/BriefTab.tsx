@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { FileText, Send } from 'lucide-react';
 import type { EpisodePackage, SceneBreakdownItem } from '@/types/workflow';
 import { SceneBreakdownEditor } from '../SceneBreakdownEditor';
-import { useWorkflowStore } from '@/store/useWorkflowStore';
 
 export interface BriefTabProps {
   currentPackage: EpisodePackage;
@@ -18,10 +17,10 @@ export interface BriefTabProps {
  */
 export function BriefTab({ currentPackage, updateContentBrief, submitProductionPlan, reviseProductionPlan }: BriefTabProps) {
   const brief = currentPackage.brief;
-  const targetDurationPerEpisode = useWorkflowStore((s) => s.project.target_duration_per_episode_minutes);
+  const reviewerTargetDuration = currentPackage.target_duration_minutes;
 
   const [overviewScript, setOverviewScript] = useState(brief.overview_script);
-  const [targetDuration, setTargetDuration] = useState(brief.target_duration_minutes);
+  const [draftTargetDuration, setDraftTargetDuration] = useState(brief.target_duration_minutes);
   const [estimatedTokens, setEstimatedTokens] = useState(brief.estimated_tokens);
   const [storyboardSummary, setStoryboardSummary] = useState(brief.storyboard_summary);
   const [scenes, setScenes] = useState<SceneBreakdownItem[]>(brief.scene_breakdown);
@@ -61,7 +60,7 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
   const handleSaveDraft = () => {
     updateContentBrief(currentPackage.id, {
       overview_script: overviewScript,
-      target_duration_minutes: targetDuration,
+      target_duration_minutes: draftTargetDuration,
       estimated_tokens: estimatedTokens,
       storyboard_summary: storyboardSummary,
       scene_breakdown: scenes,
@@ -76,7 +75,7 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
     if (currentPackage.status === 'CHANGES_REQUESTED') {
       reviseProductionPlan(currentPackage.id, {
         overview_script: overviewScript,
-        target_duration_minutes: targetDuration,
+        target_duration_minutes: draftTargetDuration,
         estimated_tokens: estimatedTokens,
         storyboard_summary: storyboardSummary,
         scene_breakdown: scenes,
@@ -147,12 +146,12 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
           </h4>
           <div>
             <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
-              Thời lượng mục tiêu (Phút) <span className="text-slate-400">— dự án đề ra {targetDurationPerEpisode} phút</span>:
+              Thời lượng mục tiêu (Phút) <span className="text-slate-400">— Reviewer đề ra {reviewerTargetDuration} phút cho tập này</span>:
             </label>
             <input
               type="number"
-              value={targetDuration}
-              onChange={(e) => setTargetDuration(Number(e.target.value))}
+              value={draftTargetDuration}
+              onChange={(e) => setDraftTargetDuration(Number(e.target.value))}
               className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby"
             />
           </div>

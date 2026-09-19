@@ -68,7 +68,7 @@ export function OverviewTab({
       title: 'Kịch Bản & Phân Cảnh',
       shortTitle: '1. Kịch bản',
       description: 'Hoàn thiện kịch bản chi tiết, dàn ý phân cảnh và visual prompt AI cho tập phim.',
-      actionLabel: '✍️ Soạn Thảo Kịch Bản & Phân Cảnh',
+      actionLabel: 'Soạn thảo kịch bản',
       onAction: onGotoBrief,
       icon: FileText,
       defaultStatus: 'completed' as const,
@@ -80,7 +80,7 @@ export function OverviewTab({
       title: 'Sản Xuất Video AI',
       shortTitle: '2. Sản xuất Video AI',
       description: 'Tạo clip 4K, lời thoại nhân vật và hiệu ứng âm thanh trong AI Studio.',
-      actionLabel: '🎬 Vào AI Studio Sinh Clip',
+      actionLabel: 'Vào AI Studio',
       onAction: () => (onGotoStudio ? onGotoStudio() : onGotoBrief()),
       icon: Video,
       defaultStatus: 'in_progress' as const,
@@ -92,7 +92,7 @@ export function OverviewTab({
       title: 'Phê Duyệt Quota',
       shortTitle: '3. Phê duyệt Quota',
       description: 'Thẩm định viên (Reviewer) xem xét kịch bản và cấp hạn ngạch AI Token sản xuất.',
-      actionLabel: '🪙 Quản Lý Hạn Ngạch Tokens',
+      actionLabel: 'Quản lý token',
       onAction: () => (onGotoTokens ? onGotoTokens() : onGotoBrief()),
       icon: Coins,
       defaultStatus: 'pending' as const,
@@ -104,7 +104,7 @@ export function OverviewTab({
       title: 'Kiểm Định & Đánh Giá',
       shortTitle: '4. Kiểm định',
       description: 'Thẩm định chất lượng bản dựng, kiểm định pháp lý AI theo NĐ 142 và công chiếu OTT.',
-      actionLabel: '📋 Xem Báo Cáo & Phản Hồi Kiểm Định',
+      actionLabel: 'Xem phản hồi kiểm định',
       onAction: () => (onGotoReviews ? onGotoReviews() : onGotoBrief()),
       icon: ShieldCheck,
       defaultStatus: 'pending' as const,
@@ -116,7 +116,7 @@ export function OverviewTab({
     const matchedMilestone = milestones[i] || milestones.find((m) => m.id === st.id);
     const status = matchedMilestone?.status || st.defaultStatus;
     const deadline = matchedMilestone?.startDate
-      ? `${matchedMilestone.startDate} ➔ ${matchedMilestone.deadline}`
+      ? `${matchedMilestone.startDate} - ${matchedMilestone.deadline}`
       : matchedMilestone?.deadline;
     const milestoneId = matchedMilestone?.id || st.id;
     return {
@@ -210,7 +210,7 @@ export function OverviewTab({
                       </span>
                     ) : isCompleted ? (
                       <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
-                        Xong ✓
+                        Xong
                       </span>
                     ) : (
                       <span className="text-[10px] text-slate-400">
@@ -227,7 +227,7 @@ export function OverviewTab({
                   {/* Step Footer with Deadline & Status Select */}
                   <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-200/60 dark:border-white/10 text-[10px]">
                     <span className="text-slate-500 dark:text-slate-400 truncate max-w-[130px]">
-                      {st.deadline ? `📅 ${st.deadline}` : 'Tiến độ kế hoạch'}
+                      {st.deadline || 'Tiến độ kế hoạch'}
                     </span>
 
                     <select
@@ -241,7 +241,7 @@ export function OverviewTab({
                     >
                       <option value="pending">Chưa làm</option>
                       <option value="in_progress">Đang làm</option>
-                      <option value="completed">Đã xong ✓</option>
+                      <option value="completed">Đã xong</option>
                     </select>
                   </div>
                 </div>
@@ -357,7 +357,7 @@ export function OverviewTab({
               onClick={onGotoBrief}
               className="mt-2.5 px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] flex items-center gap-1.5 transition cursor-pointer"
             >
-              Mở Form Kịch Bản Để Hiệu Chỉnh ➔
+              Mở form kịch bản
             </button>
           </div>
         </div>
@@ -389,7 +389,7 @@ export function OverviewTab({
             href={`/creator/studio/${currentPackage.id}`}
             className="inline-flex text-xs text-purple-600 dark:text-purple-400 hover:underline font-semibold items-center gap-1 mt-2"
           >
-            Chuyển vào AI Studio Workspace ➔
+            Chuyển vào AI Studio
           </Link>
         )}
       </Card>

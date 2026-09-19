@@ -1,25 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { LayoutDashboard, ClipboardCheck, ShieldCheck, Zap, Film } from 'lucide-react';
+import { LayoutDashboard, ClipboardCheck, ShieldCheck, Zap, Film, Tv } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
-import { WorkspaceSidebar } from '../shared/WorkspaceSidebar';
+import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
 import { OverviewTab } from './tabs/OverviewTab';
 import { PlanReviewTab } from './tabs/PlanReviewTab';
 import { AuditsTab } from './tabs/AuditsTab';
 import { TokensTab } from './tabs/TokensTab';
+import { PublicationTab } from './tabs/PublicationTab';
 import { AllocateQuotaModal } from './modals/AllocateQuotaModal';
 import { RejectPlanModal } from './modals/RejectPlanModal';
 import { CreateProjectModal, type CreateProjectFormState } from './modals/CreateProjectModal';
 
-type ReviewerTab = 'overview' | 'plans' | 'audits' | 'tokens';
-
-const TABS: { key: ReviewerTab; label: string; icon: typeof LayoutDashboard }[] = [
-  { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
-  { key: 'plans', label: 'Duyệt kế hoạch', icon: ClipboardCheck },
-  { key: 'audits', label: 'Kiểm định & pháp lý', icon: ShieldCheck },
-  { key: 'tokens', label: 'Ngân sách token', icon: Zap },
-];
+type ReviewerTab = 'overview' | 'plans' | 'audits' | 'publication' | 'tokens';
 
 const DEFAULT_FORM: CreateProjectFormState = {
   title: '',
@@ -27,7 +21,7 @@ const DEFAULT_FORM: CreateProjectFormState = {
   synopsis: '',
   seasonCount: 1,
   episodesPerSeason: 5,
-  targetDurationMinutes: 30,
+  episodeDurations: [30, 30, 30, 30, 30],
   budgetTokens: 3000,
   deadline: '2026-12-31',
   releaseDate: '2027-01-15',
@@ -52,9 +46,9 @@ const DEFAULT_FORM: CreateProjectFormState = {
 };
 
 /**
- * Reviewer's entry point after login: same left-sidebar shell as Creator's
- * workspace (assigned / completed film lists), with a review-focused tab
- * strip on the right once a film is selected.
+ * Reviewer's entry point after login: left sidebar holds the film lists
+ * plus a contextual nav (Duyệt phim / Kiểm định pháp lý / Ngân sách token)
+ * for whichever film is selected.
  */
 export function ReviewerWorkspacePage() {
   const { projects, activeProjectId, setActiveProject, project, activePackageId, setActivePackage, createProject, allocateQuota, requestPlanChanges } = useWorkflowStore();
@@ -74,6 +68,20 @@ export function ReviewerWorkspacePage() {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectFeedback, setRejectFeedback] = useState('');
 
+  const pendingPlanEpisodes = hasSelection ? project.episodes.filter((e) => e.status === 'PLAN_PENDING') : [];
+  const submittedEpisodes = hasSelection
+    ? project.episodes.filter((e) => e.status === 'EPISODE_SUBMITTED' || e.status === 'COMPLIANCE_PASSED')
+    : [];
+  const publishReadyEpisodes = hasSelection ? project.episodes.filter((e) => e.status === 'COMPLIANCE_PASSED') : [];
+
+  const navItems: SidebarNavItem[] = [
+    { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
+    { key: 'plans', label: 'Duyệt phim', icon: ClipboardCheck, badge: pendingPlanEpisodes.length || undefined },
+    { key: 'audits', label: 'Kiểm định pháp lý', icon: ShieldCheck },
+    { key: 'publication', label: 'Xuất bản OTT', icon: Tv, badge: publishReadyEpisodes.length || undefined },
+    { key: 'tokens', label: 'Ngân sách token', icon: Zap },
+  ];
+
   const handleSelectProject = (projectId: string) => {
     setActiveProject(projectId);
     setActiveTab('overview');
@@ -89,7 +97,7 @@ export function ReviewerWorkspacePage() {
       synopsis: createForm.synopsis || 'Dự án điện ảnh ứng dụng công nghệ GenAI thế hệ mới.',
       season_count: createForm.seasonCount,
       episodes_per_season: createForm.episodesPerSeason,
-      target_duration_per_episode_minutes: createForm.targetDurationMinutes,
+      episode_target_durations: createForm.episodeDurations,
       total_budget_tokens: createForm.budgetTokens,
       deadline: createForm.deadline,
       planned_release_date: createForm.releaseDate,
@@ -114,11 +122,6 @@ export function ReviewerWorkspacePage() {
     setRejectFeedback('');
   };
 
-  const pendingPlanEpisodes = hasSelection ? project.episodes.filter((e) => e.status === 'PLAN_PENDING') : [];
-  const submittedEpisodes = hasSelection
-    ? project.episodes.filter((e) => e.status === 'EPISODE_SUBMITTED' || e.status === 'COMPLIANCE_PASSED')
-    : [];
-
   return (
     <div className="flex-1 flex flex-col md:flex-row w-full overflow-hidden">
       <WorkspaceSidebar
@@ -127,6 +130,9 @@ export function ReviewerWorkspacePage() {
         selectedProjectId={hasSelection ? activeProjectId : undefined}
         onSelectProject={handleSelectProject}
         onCreateProject={() => setIsCreateProjectOpen(true)}
+        navItems={navItems}
+        activeNavKey={activeTab}
+        onNavSelect={(key) => setActiveTab(key as ReviewerTab)}
       />
 
       <main className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto transition-colors">
@@ -142,32 +148,29 @@ export function ReviewerWorkspacePage() {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
-              <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Trung tâm thẩm định</p>
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{project.title}</h1>
+            {(activeTab === 'plans' || activeTab === 'audits') && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+                {project.episodes.map((ep) => {
+                  const isSelected = ep.id === currentPackage.id;
+                  return (
+                    <button
+                      key={ep.id}
+                      onClick={() => setActivePackage(ep.id)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-2 shrink-0 cursor-pointer border ${
+                        isSelected
+                          ? 'bg-ruby text-white border-ruby'
+                          : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
+                      }`}
+                    >
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${isSelected ? 'bg-white/20' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400'}`}>
+                        M{ep.season_number} · T{ep.episode_number}
+                      </span>
+                      <span className="truncate max-w-[160px]">{ep.title.replace(/^Tập \d+:\s*/, '')}</span>
+                    </button>
+                  );
+                })}
               </div>
-            </div>
-
-            <div className="flex items-center gap-1 border-b border-slate-200 dark:border-white/10 overflow-x-auto scrollbar-none">
-              {TABS.map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveTab(key)}
-                  className={`px-3.5 py-2.5 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition cursor-pointer shrink-0 ${
-                    activeTab === key
-                      ? 'border-ruby text-ruby'
-                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {label}
-                  {key === 'plans' && pendingPlanEpisodes.length > 0 && (
-                    <span className="px-1.5 py-0 rounded-full bg-amber-500 text-white text-[10px] font-bold">{pendingPlanEpisodes.length}</span>
-                  )}
-                </button>
-              ))}
-            </div>
+            )}
 
             {activeTab === 'overview' && (
               <OverviewTab
@@ -186,6 +189,8 @@ export function ReviewerWorkspacePage() {
             )}
 
             {activeTab === 'audits' && <AuditsTab project={project} />}
+
+            {activeTab === 'publication' && <PublicationTab project={project} />}
 
             {activeTab === 'tokens' && <TokensTab project={project} />}
           </div>

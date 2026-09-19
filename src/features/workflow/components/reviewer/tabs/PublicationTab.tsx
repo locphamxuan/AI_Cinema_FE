@@ -25,7 +25,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
                   OTT Broadcasting & Publication Pipeline
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  ⚖️ Nghị định 142 & Điều 44
+                  NĐ 142 & Điều 44
                 </span>
               </div>
               <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white mt-0.5">
@@ -94,7 +94,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
                         </span>
                       ) : isCompliancePassed ? (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30">
-                          ✓ Đã Duyệt Pháp Lý - Sẵn Sàng Chiếu
+                          Đã duyệt pháp lý
                         </span>
                       ) : (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400">
@@ -121,7 +121,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
                       href={`/watch/${ep.id}`}
                       className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer"
                     >
-                      <Play className="w-3.5 h-3.5" /> Xem Trên OTT ➔
+                      <Play className="w-3.5 h-3.5" /> Xem trên OTT
                     </Link>
                   ) : (
                     <Link

@@ -51,7 +51,7 @@ export function StudioLinkTab({ currentPackage, canEnterStudio, onGotoBrief }: S
             onClick={onGotoBrief}
             className="px-4 py-2 rounded-xl bg-white dark:bg-[#12141A] hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-white/10 transition cursor-pointer"
           >
-            Kiểm Tra Lại Bản Kế Hoạch ➔
+            Kiểm tra lại bản kế hoạch
           </button>
         </div>
       )}
