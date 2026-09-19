@@ -1,4 +1,4 @@
-import { ShieldCheck, CheckCircle2, Check, BadgeCheck } from 'lucide-react';
+import { Check } from 'lucide-react';
 import type { DisplayLocation } from '@/types/workflow';
 
 export interface ComplianceStationProps {
@@ -15,6 +15,35 @@ export interface ComplianceStationProps {
   onConfirm: () => void;
 }
 
+interface CheckRowProps {
+  title: string;
+  description: string;
+  checked: boolean;
+  disabled: boolean;
+  onChange: (value: boolean) => void;
+}
+
+function CheckRow({ title, description, checked, disabled, onChange }: CheckRowProps) {
+  return (
+    <li>
+      <label className="flex items-start gap-3 py-3 cursor-pointer has-[:disabled]:cursor-default">
+        <input
+          type="checkbox"
+          checked={checked}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.checked)}
+          className="mt-0.5 w-4 h-4 accent-purple-600 shrink-0"
+        />
+        <span className="min-w-0">
+          <span className="block text-sm font-medium text-slate-900 dark:text-white">{title}</span>
+          <span className="block text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</span>
+        </span>
+      </label>
+    </li>
+  );
+}
+
+/** Step 1 of the video audit: the legal checklist the Reviewer signs off before publishing. */
 export function ComplianceStation({
   isCompliancePassed,
   isPassingCompliance,
@@ -28,98 +57,65 @@ export function ComplianceStation({
   displayLocation,
   onConfirm,
 }: ComplianceStationProps) {
+  const allChecked = article44Passed && decree142Passed && watermarkVerified;
+  const labelPlacement = displayLocation === 'INTRO_OUTRO' ? 'ở đầu và cuối phim (5 giây)' : 'trong suốt thời lượng phim';
+
   return (
-    <div className="bg-white dark:bg-[#161922] border border-slate-200 dark:border-white/10 rounded-2xl p-5 space-y-4 shadow-xs">
-      <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/20 border border-purple-200 dark:border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
-            <ShieldCheck className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Kiểm định Pháp lý AI</h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">Điều 44 Luật AI & Nghị định 142/2024</p>
-          </div>
-        </div>
-        {isCompliancePassed ? (
-          <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 text-[11px] font-bold flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" /> ĐẠT CHUẨN
-          </span>
-        ) : (
-          <span className="px-2.5 py-1 rounded-full bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 text-[11px] font-bold">
-            CHỜ DUYỆT
-          </span>
-        )}
+    <section aria-labelledby="compliance-title" className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#151822] p-5">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="compliance-title" className="text-sm font-semibold text-slate-900 dark:text-white">
+          <span className="text-slate-400 font-normal mr-1.5">1.</span>Kiểm định pháp lý
+        </h2>
+        <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <span className={`w-1.5 h-1.5 rounded-full ${isCompliancePassed ? 'bg-emerald-500' : 'bg-amber-500'}`} aria-hidden="true" />
+          {isCompliancePassed ? 'Đã đạt' : 'Chưa xác nhận'}
+        </span>
       </div>
 
-      <div className="space-y-2.5 text-xs">
-        <label className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition">
-          <div className="space-y-0.5">
-            <span className="font-semibold text-slate-900 dark:text-white">Điều 44: Nhãn dán định danh AI</span>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">Hiển thị thông báo nội dung do AI tạo ở 5s đầu</p>
-          </div>
-          <input type="checkbox" checked={article44Passed} onChange={(e) => onArticle44Change(e.target.checked)} className="w-4 h-4 accent-emerald-600 rounded" />
-        </label>
+      <ul className="mt-2 divide-y divide-slate-100 dark:divide-white/5">
+        <CheckRow
+          title="Nhãn nội dung AI (Điều 44)"
+          description="Có thông báo nội dung do AI tạo ở 5 giây đầu."
+          checked={article44Passed}
+          disabled={isCompliancePassed}
+          onChange={onArticle44Change}
+        />
+        <CheckRow
+          title="Dấu mờ bản quyền (Nghị định 142)"
+          description="Đã nhúng mã xác thực trong luồng video."
+          checked={decree142Passed}
+          disabled={isCompliancePassed}
+          onChange={onDecree142Change}
+        />
+        <CheckRow
+          title="An toàn nội dung"
+          description="Kiểm duyệt tự động đạt 99,4%, không phát hiện vi phạm bản quyền hay nội dung nhạy cảm."
+          checked={watermarkVerified}
+          disabled={isCompliancePassed}
+          onChange={onWatermarkChange}
+        />
+      </ul>
 
-        <label className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition">
-          <div className="space-y-0.5">
-            <span className="font-semibold text-slate-900 dark:text-white">Nghị định 142: Dấu mờ bản quyền AI</span>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">Đã nhúng mã xác thực watermark ẩn trong luồng video</p>
-          </div>
-          <input type="checkbox" checked={decree142Passed} onChange={(e) => onDecree142Change(e.target.checked)} className="w-4 h-4 accent-emerald-600 rounded" />
-        </label>
+      <p className="text-xs text-slate-500 dark:text-slate-400 py-3 border-t border-slate-100 dark:border-white/5">
+        Nhãn AI sẽ hiển thị {labelPlacement}.
+        {certificationId && <span className="block mt-0.5 font-mono">Mã chứng nhận {certificationId}</span>}
+      </p>
 
-        <label className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition">
-          <div className="space-y-0.5">
-            <span className="font-semibold text-slate-900 dark:text-white">An toàn nội dung (Content Moderation)</span>
-            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">Điểm an toàn: 99.4% (Không vi phạm bản quyền/NSFW)</p>
-          </div>
-          <input type="checkbox" checked={watermarkVerified} onChange={(e) => onWatermarkChange(e.target.checked)} className="w-4 h-4 accent-emerald-600 rounded" />
-        </label>
-      </div>
-
-      <div className="bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl p-3 space-y-2">
-        <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
-          <span>Mô phỏng nhãn định danh phát hành:</span>
-          <span className="text-purple-600 dark:text-purple-400 font-mono text-[10px]">DECREE_142_2024_V1</span>
-        </div>
-        <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-500/30 p-2.5 rounded-lg text-xs space-y-1">
-          <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-            <BadgeCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            AI CONTENT CERTIFIED
-          </div>
-          <p className="text-[11px] text-slate-600 dark:text-slate-300">
-            Mã chứng chỉ: <span className="font-mono text-purple-600 dark:text-purple-400">{certificationId || 'AI-VN-2026-CINEMA-1042-EP2'}</span>
-          </p>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400">
-            Vị trí hiển thị: {displayLocation === 'INTRO_OUTRO' ? 'Đầu & Cuối phim (5s)' : 'Watermark toàn thời lượng'}
-          </p>
-        </div>
-      </div>
+      {!allChecked && !isCompliancePassed && (
+        <p role="status" className="mb-3 text-xs text-amber-700 dark:text-amber-400">
+          Cần đạt cả ba mục mới xác nhận được. Nếu có mục chưa đạt, dùng &quot;Yêu cầu sửa&quot; để trả về cho người sản xuất.
+        </p>
+      )}
 
       <button
+        type="button"
         onClick={onConfirm}
-        disabled={isPassingCompliance || isCompliancePassed}
-        className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition ${
-          isCompliancePassed
-            ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 cursor-default'
-            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 dark:shadow-none'
-        }`}
+        disabled={isPassingCompliance || isCompliancePassed || !allChecked}
+        className="w-full py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition bg-purple-600 hover:bg-purple-700 text-white disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
       >
-        {isPassingCompliance ? (
-          <>
-            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            Đang lưu chứng nhận...
-          </>
-        ) : isCompliancePassed ? (
-          <>
-            <CheckCircle2 className="w-4 h-4" /> Đã xác nhận Đạt chuẩn Pháp lý AI
-          </>
-        ) : (
-          <>
-            <Check className="w-4 h-4" /> Xác nhận Đạt chuẩn Pháp lý AI (Pass Compliance)
-          </>
-        )}
+        {isCompliancePassed && <Check className="w-4 h-4" aria-hidden="true" />}
+        {isPassingCompliance ? 'Đang lưu…' : isCompliancePassed ? 'Đã xác nhận đạt chuẩn' : 'Xác nhận đạt chuẩn'}
       </button>
-    </div>
+    </section>
   );
 }

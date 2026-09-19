@@ -29,8 +29,8 @@ export function AuditsTab({ project }: AuditsTabProps) {
         );
       case 'EPISODE_SUBMITTED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0 animate-pulse" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0 animate-pulse" />
             Chờ Thẩm Định Video
           </span>
         );
@@ -63,7 +63,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
       {/* Sleek Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-white/5">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
             <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
@@ -94,7 +94,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
           return (
             <div
               key={ep.id}
-              className="bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/5 rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-4 hover:border-slate-300 dark:hover:border-white/15 transition-all"
+              className="bg-slate-50/50 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/5 rounded-xl p-4 sm:p-5 flex flex-col justify-between gap-4 hover:border-slate-300 dark:hover:border-white/15 transition"
             >
               {/* Card Header */}
               <div className="space-y-2">
@@ -118,7 +118,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
                   </span>
                   <span className="text-slate-300 dark:text-slate-700">•</span>
                   <span className="flex items-center gap-1 font-mono">
-                    <Zap className="w-3.5 h-3.5 text-indigo-500" />
+                    <Zap className="w-3.5 h-3.5 text-purple-500" />
                     {ep.actual_tokens_used.toLocaleString()} Tokens
                   </span>
                 </div>
@@ -134,9 +134,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
                   href={`/reviewer/audit/${ep.id}`}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition cursor-pointer ${
                     isPendingAudit
-                      ? 'bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white shadow-xs font-semibold'
-                      : isPassed
-                      ? 'bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10'
+                      ? 'bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white shadow-xs font-semibold'
                       : 'bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10'
                   }`}
                 >

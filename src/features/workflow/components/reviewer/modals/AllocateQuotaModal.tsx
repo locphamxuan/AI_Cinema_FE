@@ -1,8 +1,9 @@
-import { Zap, CheckCircle2, Coins, Minus, Plus } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 import type { EpisodePackage } from '@/types/workflow';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { clamp } from '@/features/workflow/lib/limits';
 
 export interface AllocateQuotaModalProps {
   open: boolean;
@@ -11,121 +12,92 @@ export interface AllocateQuotaModalProps {
   currentPackage?: EpisodePackage;
   quota: number;
   onQuotaChange: (value: number) => void;
+  /** Project budget not yet granted to any episode — the hard ceiling for this grant. */
+  availableBudget: number;
   notes: string;
   onNotesChange: (value: string) => void;
 }
 
-const QUICK_QUOTA_PRESETS = [300, 450, 600, 1000];
+const MIN_QUOTA = 50;
+const STEP = 50;
+const STEPPER_CLASS =
+  'w-9 h-9 rounded-lg border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 disabled:opacity-40 disabled:cursor-not-allowed';
 
-export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, quota, onQuotaChange, notes, onNotesChange }: AllocateQuotaModalProps) {
+export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, quota, onQuotaChange, availableBudget, notes, onNotesChange }: AllocateQuotaModalProps) {
+  const ceiling = Math.max(MIN_QUOTA, availableBudget);
+  const estimate = currentPackage?.brief.estimated_tokens ?? 0;
+  const isOverBudget = availableBudget < MIN_QUOTA;
+  const setQuota = (value: number) => onQuotaChange(clamp(value, MIN_QUOTA, ceiling));
+
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="Cấp Phép Token Quota"
-      subtitle="Phân bổ hạn ngạch ngân sách sinh video AI cho tập phim"
-      icon={<Zap className="w-4 h-4 text-emerald-500" />}
-      maxWidth="max-w-md"
-    >
-      <div className="space-y-4 text-xs">
-        {/* Package banner */}
-        <div className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0 shadow-xs">
-            <Zap className="w-5 h-5" />
-          </div>
-          <div>
-            <span className="text-[10px] font-mono font-bold uppercase text-slate-400 dark:text-zinc-500">Tập phim mục tiêu</span>
-            <p className="text-sm font-bold text-slate-900 dark:text-white">{currentPackage?.title || 'Tập phim'}</p>
-          </div>
-        </div>
-
-        {/* Quota Input with Stepper */}
-        <div className="space-y-2 bg-slate-50 dark:bg-white/[0.03] p-4 rounded-2xl border border-slate-200/80 dark:border-white/10">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1.5">
-              <Coins className="w-3.5 h-3.5 text-amber-500" /> Số Token Cấp Phát:
-            </label>
-            <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
-              {quota.toLocaleString()} Tokens
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => onQuotaChange(Math.max(50, quota - 50))}
-              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer shrink-0"
-            >
-              <Minus className="w-4 h-4" />
-            </button>
-            <div className="relative flex-1">
-              <input
-                type="number"
-                min={50}
-                step={50}
-                value={quota}
-                onChange={(e) => onQuotaChange(Math.max(50, Number(e.target.value)))}
-                className={`${fieldInputClass} text-center text-amber-600 dark:text-amber-400 font-mono font-black text-base py-1.5`}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => onQuotaChange(quota + 50)}
-              className="w-9 h-9 rounded-xl bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer shrink-0"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Presets */}
-          <div className="flex items-center gap-1.5 pt-1">
-            <span className="text-[10px] text-slate-400 dark:text-zinc-500">Mẫu:</span>
-            {QUICK_QUOTA_PRESETS.map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => onQuotaChange(p)}
-                className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold transition cursor-pointer ${
-                  quota === p
-                    ? 'bg-amber-500 text-white font-bold shadow-xs'
-                    : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
-                }`}
-              >
-                {p}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Notes */}
+    <Modal open={open} onClose={onClose} title="Cấp token cho tập" subtitle={currentPackage?.title} maxWidth="max-w-md">
+      <dl className="grid grid-cols-2 gap-3 text-sm">
         <div>
-          <label className="block text-slate-700 dark:text-zinc-300 mb-1.5 text-xs font-bold">
-            Ghi Chú Thẩm Định & Hướng Dẫn:
-          </label>
-          <textarea
-            rows={3}
-            value={notes}
-            onChange={(e) => onNotesChange(e.target.value)}
-            placeholder="Nhập ghi chú hoặc yêu cầu kỹ thuật cho Creator..."
-            className={fieldTextareaClass}
-          />
+          <dt className="text-xs text-slate-500 dark:text-slate-400">Creator dự toán</dt>
+          <dd className="font-medium text-slate-900 dark:text-white tabular-nums">{estimate} token</dd>
         </div>
+        <div>
+          <dt className="text-xs text-slate-500 dark:text-slate-400">Ngân sách còn lại của dự án</dt>
+          <dd className="font-medium text-slate-900 dark:text-white tabular-nums">{availableBudget.toLocaleString()} token</dd>
+        </div>
+      </dl>
 
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-200/80 dark:border-white/10">
-          <Button variant="secondary" onClick={onClose} className="px-4 py-2 rounded-xl text-xs font-bold">
-            Hủy Bỏ
-          </Button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:shadow-lg hover:shadow-emerald-500/30 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
-          >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Xác Nhận Cấp Quota</span>
+      <div className="space-y-2">
+        <label htmlFor="quota-input" className="block text-xs font-medium text-slate-600 dark:text-slate-300">
+          Số token cấp
+        </label>
+        <div className="flex items-center gap-2">
+          <button type="button" aria-label={`Giảm ${STEP} token`} onClick={() => setQuota(quota - STEP)} disabled={quota <= MIN_QUOTA} className={STEPPER_CLASS}>
+            <Minus className="w-4 h-4" aria-hidden="true" />
+          </button>
+          <input
+            id="quota-input"
+            type="number"
+            min={MIN_QUOTA}
+            max={ceiling}
+            step={STEP}
+            value={quota}
+            onChange={(e) => setQuota(Number(e.target.value))}
+            className={`${fieldInputClass} text-center font-mono tabular-nums`}
+          />
+          <button type="button" aria-label={`Tăng ${STEP} token`} onClick={() => setQuota(quota + STEP)} disabled={quota >= ceiling} className={STEPPER_CLASS}>
+            <Plus className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
+        {estimate > 0 && (
+          <button
+            type="button"
+            onClick={() => setQuota(estimate)}
+            className="text-xs text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+          >
+            Dùng đúng mức dự toán ({estimate} token)
+          </button>
+        )}
+        {isOverBudget && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400">Ngân sách dự án không còn đủ để cấp thêm token.</p>}
+      </div>
+
+      <div className="space-y-1.5">
+        <label htmlFor="quota-notes" className="block text-xs font-medium text-slate-600 dark:text-slate-300">
+          Ghi chú cho người sản xuất
+        </label>
+        <textarea
+          id="quota-notes"
+          rows={3}
+          value={notes}
+          onChange={(e) => onNotesChange(e.target.value)}
+          placeholder="Không bắt buộc…"
+          className={fieldTextareaClass}
+        />
+      </div>
+
+      <div className="flex items-center justify-end gap-3 pt-2">
+        <Button variant="secondary" onClick={onClose}>
+          Hủy
+        </Button>
+        <Button variant="success" onClick={onConfirm} disabled={isOverBudget}>
+          Cấp token
+        </Button>
       </div>
     </Modal>
   );
 }
-

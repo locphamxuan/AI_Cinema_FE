@@ -1,7 +1,32 @@
 export type JobStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
 /**
- * 2. generation_job: Tác vụ sinh tài nguyên AI (Video, Voice, SFX)
+ * Function a single AI generation step performs. The system auto-selects
+ * the model for each type — Creator only supplies scene_name + prompt (BR-40).
+ * 'CUSTOM' lets the Creator describe a function the catalog does not list;
+ * the system then finds a suitable model itself (see lib/modelRegistry).
+ */
+export type GenerationFunctionType = 'SCRIPT_VOICE' | 'IMAGE' | 'VIDEO' | 'AUDIO_MUSIC' | 'CUSTOM';
+
+/**
+ * One AI generation call within a scene (e.g. the video shot, a voice line,
+ * an SFX cue). A scene can hold any number of these — see GenerationJob.
+ */
+export interface GenerationStep {
+  id: string;
+  function_type: GenerationFunctionType;
+  /** Creator's own description of the function when function_type is 'CUSTOM'. */
+  custom_function?: string;
+  prompt: string;
+  selected_model: string;
+  status: JobStatus;
+  token_cost: number;
+  output_duration?: number;
+}
+
+/**
+ * 2. generation_job: Một phân cảnh (scene) trong Studio, gồm nhiều
+ * generation_steps (script/voice, image, video, audio/music, ...).
  */
 export interface GenerationJob {
   id: string;
@@ -9,12 +34,10 @@ export interface GenerationJob {
   scene_id: string;
   scene_number: number;
   title: string;
-  prompt_video: string;
-  prompt_audio: string;
-  ai_model: string;
+  generation_steps: GenerationStep[];
   status: JobStatus;
   progress: number; // 0 - 100
-  token_cost: number;
+  token_cost: number; // aggregate, summed from generation_steps
   output_asset_id?: string;
   error_message?: string;
   created_at: string;

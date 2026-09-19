@@ -5,7 +5,10 @@ import {
   EpisodePackage,
   ContentBrief,
   GenerationJob,
+  GenerationStep,
   ReviewLog,
+  SceneReviewStatus,
+  PlanFieldKey,
   ComplianceCheck,
   AIContentLabel,
   Publication,
@@ -22,6 +25,8 @@ export interface ViewSlice {
 
 export interface EpisodeSlice {
   project: ProductionProject;
+  /** Roster of every project assigned to the current user (both roles read this for the sidebar's assigned/completed lists). */
+  projects: ProductionProject[];
 
   getPackage: (packageId?: string) => EpisodePackage | undefined;
   getBrief: (packageId?: string) => ContentBrief | undefined;
@@ -30,15 +35,24 @@ export interface EpisodeSlice {
   updateContentBrief: (packageId: string, briefData: Partial<ContentBrief>) => void;
   submitProductionPlan: (packageId: string) => void;
   reviseProductionPlan: (packageId: string, updatedBrief: Partial<ContentBrief>) => void;
+  /** Rewrites the project-level overall script; bumps script_version and resets its review when the text changed. */
+  updateOverallScript: (script: string) => void;
   addSceneJob: (packageId: string, sceneData: Omit<GenerationJob, 'id' | 'status' | 'progress' | 'created_at' | 'updated_at'>) => void;
   removeSceneJob: (packageId: string, jobId: string) => void;
+  addGenerationStep: (packageId: string, jobId: string, step: Omit<GenerationStep, 'id'>) => void;
+  updateGenerationStep: (packageId: string, jobId: string, stepId: string, data: Partial<GenerationStep>) => void;
+  removeGenerationStep: (packageId: string, jobId: string, stepId: string) => void;
   submitEpisodePackage: (packageId: string) => boolean;
   createProject: (data: {
     title: string;
     genre: string[];
     synopsis: string;
-    total_episodes: number;
+    season_count: number;
+    episodes_per_season: number;
+    /** One target duration (minutes) per episode, in creation order. */
+    episode_target_durations: number[];
     total_budget_tokens: number;
+    production_start_date: string;
     deadline: string;
     planned_release_date: string;
     milestones?: ProjectMilestone[];
@@ -53,6 +67,9 @@ export interface ProductionSlice {
 
 export interface ReviewSlice {
   reviews: ReviewLog[];
+  reviewScene: (packageId: string, sceneNumber: number, status: SceneReviewStatus, comment?: string) => void;
+  /** Field-level review of the overall script, or an episode's duration/token estimate (BR-39). */
+  reviewPlanField: (packageId: string, field: PlanFieldKey, status: SceneReviewStatus, comment?: string) => void;
   requestPlanChanges: (packageId: string, feedbackNotes: string) => void;
   allocateQuota: (packageId: string, tokenQuota: number, notes?: string) => void;
   requestContentChanges: (packageId: string, feedbackNotes: string) => void;

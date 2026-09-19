@@ -49,7 +49,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-3">
           <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
             <Calendar className="w-4 h-4 text-emerald-500" />
-            <span>Danh Sách Lịch Phát Sóng Các Tập</span>
+            <span>Lịch phát hành các tập</span>
           </h3>
           <span className="text-[11px] text-slate-400 dark:text-slate-500">
             Hạn chót toàn dự án:{' '}
@@ -68,7 +68,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
             return (
               <div
                 key={ep.id}
-                className="bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-50 dark:hover:bg-white/[0.04] border border-slate-200/70 dark:border-white/5 rounded-xl p-4 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
+                className="bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-50 dark:hover:bg-white/[0.04] border border-slate-200/70 dark:border-white/5 rounded-xl p-4 transition flex flex-col md:flex-row md:items-center justify-between gap-4"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-lg bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-slate-200 font-mono font-bold text-xs flex items-center justify-center shrink-0">
@@ -86,8 +86,8 @@ export function PublicationTab({ project }: PublicationTabProps) {
                           Đang Công Chiếu
                         </span>
                       ) : isCompliancePassed ? (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20">
+                          <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0" />
                           Sẵn Sàng Chiếu
                         </span>
                       ) : (
@@ -118,7 +118,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
                       className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-medium text-xs flex items-center gap-1.5 transition shadow-xs cursor-pointer"
                     >
                       <Play className="w-3.5 h-3.5 fill-current" />
-                      <span>Xem Trên OTT</span>
+                      <span>Xem trên OTT</span>
                     </Link>
                   ) : (
                     <Link

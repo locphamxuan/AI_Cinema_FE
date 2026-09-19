@@ -1,4 +1,3 @@
-import { Send } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
@@ -13,25 +12,23 @@ export interface RequestChangesModalProps {
 
 export function RequestChangesModal({ open, onClose, onConfirm, feedback, onFeedbackChange }: RequestChangesModalProps) {
   return (
-    <Modal open={open} onClose={onClose} title="Yêu cầu Chỉnh sửa Nội dung" maxWidth="max-w-md">
-      <p className="text-xs text-slate-500 dark:text-slate-400 -mt-1">Gửi phản hồi trả về cho Maker (Creator)</p>
-
-      <FormField label="Lý do & hướng dẫn chỉnh sửa:">
+    <Modal open={open} onClose={onClose} title="Yêu cầu chỉnh sửa" subtitle="Phản hồi sẽ được gửi cho người sản xuất nội dung." maxWidth="max-w-md">
+      <FormField label="Cần sửa gì?">
         <textarea
           rows={4}
           value={feedback}
           onChange={(e) => onFeedbackChange(e.target.value)}
-          placeholder="Ví dụ: Phân cảnh 2 ánh sáng hơi chói và thoại AI Aura bị trễ nhịp so với khẩu hình. Vui lòng re-render lại cảnh 2..."
+          placeholder="Ví dụ: cảnh 2 ánh sáng hơi chói, thoại lệch nhịp so với khẩu hình…"
           className={fieldTextareaClass}
         />
       </FormField>
 
       <div className="flex items-center justify-end gap-3 pt-2">
         <Button variant="secondary" onClick={onClose}>
-          Hủy bỏ
+          Hủy
         </Button>
-        <Button variant="danger" onClick={onConfirm}>
-          <Send className="w-3.5 h-3.5" /> Gửi phản hồi
+        <Button variant="danger" onClick={onConfirm} disabled={!feedback.trim()}>
+          Gửi phản hồi
         </Button>
       </div>
     </Modal>
