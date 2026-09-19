@@ -11,13 +11,13 @@ export interface StudioPlayerProps {
 /** Video viewport previewer for the currently-selected scene, plus its clip metadata bar. */
 export function StudioPlayer({ selectedJob, selectedAsset, isPlaying, onTogglePlay }: StudioPlayerProps) {
   return (
-    <div className="bg-white dark:bg-[#161922] rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden shadow-xs">
-      <div className="p-3.5 bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/10 flex items-center justify-between text-xs">
+    <div className="bg-white dark:bg-[#151822] rounded-xl border border-slate-200/80 dark:border-white/10 overflow-hidden shadow-xs transition-colors">
+      <div className="p-3.5 bg-slate-50/70 dark:bg-white/[0.02] border-b border-slate-200/80 dark:border-white/10 flex items-center justify-between text-xs">
         <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
-          <Video className="w-4 h-4 text-ruby" />
+          <Video className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           <span>Trình Phát Ghép Bản Dựng Phân Cảnh (Episode Assembly)</span>
         </div>
-        <span className="px-2 py-0.5 rounded bg-white dark:bg-[#12141A] text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 font-mono text-[11px]">
+        <span className="px-2 py-0.5 rounded-md bg-white dark:bg-[#12141A] text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 font-mono text-[11px]">
           4K 60fps • HEVC
         </span>
       </div>
@@ -42,7 +42,7 @@ export function StudioPlayer({ selectedJob, selectedAsset, isPlaying, onTogglePl
 
           <div className="space-y-2">
             <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden cursor-pointer">
-              <div className="h-full bg-ruby rounded-full w-2/5" />
+              <div className="h-full bg-indigo-500 rounded-full w-2/5" />
             </div>
 
             <div className="flex items-center justify-between text-xs text-white">
@@ -50,7 +50,7 @@ export function StudioPlayer({ selectedJob, selectedAsset, isPlaying, onTogglePl
                 <button
                   onClick={onTogglePlay}
                   aria-label={isPlaying ? 'Tạm dừng' : 'Phát'}
-                  className="w-8 h-8 rounded-full bg-ruby flex items-center justify-center hover:scale-110 transition-transform cursor-pointer shadow-lg shadow-ruby/30"
+                  className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center hover:scale-110 transition-transform cursor-pointer shadow-md shadow-indigo-600/30"
                 >
                   {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                 </button>
@@ -64,7 +64,7 @@ export function StudioPlayer({ selectedJob, selectedAsset, isPlaying, onTogglePl
       </div>
 
       {selectedAsset && selectedJob && (
-        <div className="p-3.5 bg-slate-50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10 grid grid-cols-4 gap-2 text-center text-xs">
+        <div className="p-3.5 bg-slate-50/70 dark:bg-white/[0.02] border-t border-slate-200/80 dark:border-white/10 grid grid-cols-4 gap-2 text-center text-xs">
           <div>
             <span className="text-[10px] text-slate-500 dark:text-slate-400 block uppercase font-bold">Độ phân giải</span>
             <span className="font-mono font-bold text-slate-900 dark:text-white">{selectedAsset.resolution}</span>
@@ -79,7 +79,7 @@ export function StudioPlayer({ selectedJob, selectedAsset, isPlaying, onTogglePl
           </div>
           <div>
             <span className="text-[10px] text-slate-500 dark:text-slate-400 block uppercase font-bold">Chi phí Token</span>
-            <span className="font-mono font-bold text-amber-600 dark:text-amber-400">{selectedJob.token_cost} Tokens</span>
+            <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400">{selectedJob.token_cost} Tokens</span>
           </div>
         </div>
       )}

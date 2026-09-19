@@ -10,6 +10,7 @@ import {
   Clock,
   Zap,
   Activity,
+  Sparkles,
 } from 'lucide-react';
 import type { GenerationJob } from '@/types/workflow';
 
@@ -90,32 +91,32 @@ const CATEGORY_THEMES: Record<
   }
 > = {
   video: {
-    activeBorder: 'border-ruby/60 ring-1 ring-ruby/30',
-    activeBg: 'bg-gradient-to-br from-ruby/15 via-rose-500/10 to-transparent',
-    iconActive: 'bg-ruby text-white shadow-sm shadow-ruby/40',
-    textActive: 'text-ruby dark:text-rose-400',
-    dot: 'bg-ruby',
+    activeBorder: 'border-indigo-500/70 dark:border-indigo-500/60 ring-1 ring-indigo-500/20',
+    activeBg: 'bg-indigo-50/60 dark:bg-indigo-500/10',
+    iconActive: 'bg-indigo-600 text-white shadow-xs',
+    textActive: 'text-indigo-950 dark:text-white',
+    dot: 'bg-indigo-500',
   },
   audio: {
-    activeBorder: 'border-purple-500/60 ring-1 ring-purple-500/30',
-    activeBg: 'bg-gradient-to-br from-purple-500/15 via-indigo-500/10 to-transparent',
-    iconActive: 'bg-purple-600 text-white shadow-sm shadow-purple-600/40',
-    textActive: 'text-purple-600 dark:text-purple-400',
-    dot: 'bg-purple-500',
+    activeBorder: 'border-violet-500/70 dark:border-violet-500/60 ring-1 ring-violet-500/20',
+    activeBg: 'bg-violet-50/60 dark:bg-violet-500/10',
+    iconActive: 'bg-violet-600 text-white shadow-xs',
+    textActive: 'text-violet-950 dark:text-white',
+    dot: 'bg-violet-500',
   },
   sfx: {
-    activeBorder: 'border-cyan-500/60 ring-1 ring-cyan-500/30',
-    activeBg: 'bg-gradient-to-br from-cyan-500/15 via-teal-500/10 to-transparent',
-    iconActive: 'bg-cyan-600 text-white shadow-sm shadow-cyan-600/40',
-    textActive: 'text-cyan-600 dark:text-cyan-400',
-    dot: 'bg-cyan-500',
+    activeBorder: 'border-sky-500/70 dark:border-sky-500/60 ring-1 ring-sky-500/20',
+    activeBg: 'bg-sky-50/60 dark:bg-sky-500/10',
+    iconActive: 'bg-sky-600 text-white shadow-xs',
+    textActive: 'text-sky-950 dark:text-white',
+    dot: 'bg-sky-500',
   },
   full: {
-    activeBorder: 'border-amber-500/60 ring-1 ring-amber-500/30',
-    activeBg: 'bg-gradient-to-br from-amber-500/15 via-orange-500/10 to-transparent',
-    iconActive: 'bg-amber-600 text-white shadow-sm shadow-amber-600/40',
-    textActive: 'text-amber-600 dark:text-amber-400',
-    dot: 'bg-amber-500',
+    activeBorder: 'border-indigo-500/70 dark:border-indigo-500/60 ring-1 ring-indigo-500/20',
+    activeBg: 'bg-indigo-50/60 dark:bg-indigo-500/10',
+    iconActive: 'bg-indigo-600 text-white shadow-xs',
+    textActive: 'text-indigo-950 dark:text-white',
+    dot: 'bg-indigo-500',
   },
 };
 
@@ -211,7 +212,7 @@ export function GeneratorPanel({
     handlePromptChange(`${current}${separator}${preset}`);
   };
 
-  // Real-time token consumption meter & execution timer (Claude Code / Gemini style)
+  // Real-time token consumption meter & execution timer
   const [streamProgress, setStreamProgress] = useState(0);
   const [streamTokens, setStreamTokens] = useState(0);
   const [streamTime, setStreamTime] = useState('0.0s');
@@ -266,11 +267,11 @@ export function GeneratorPanel({
   }, [isGenerating, targetCost, currentOption.modelLabel]);
 
   return (
-    <div className="bg-white dark:bg-[#161922] p-5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xs space-y-4 transition-colors">
+    <div className="bg-white dark:bg-[#151822] p-5 sm:p-6 rounded-xl border border-slate-200/80 dark:border-white/10 shadow-xs space-y-5 transition-colors">
       {/* Header with Quick Add Scene Button */}
       <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 dark:border-white/5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-ruby/10 border border-ruby/20 flex items-center justify-center text-ruby">
+          <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
             <Cpu className="w-4 h-4" />
           </div>
           <div>
@@ -278,7 +279,7 @@ export function GeneratorPanel({
               Bộ Điều Khiển Sinh Tài Nguyên AI
             </h3>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Định tuyến Model tự động theo danh mục
+              Định tuyến Model tự động theo danh mục tài nguyên
             </p>
           </div>
         </div>
@@ -286,7 +287,7 @@ export function GeneratorPanel({
         <button
           onClick={onAddJob}
           title="Thêm phân cảnh mới"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-ruby/10 hover:text-ruby dark:hover:bg-ruby/20 dark:hover:text-ruby-light border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-medium transition cursor-pointer"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Thêm Cảnh</span>
@@ -305,12 +306,12 @@ export function GeneratorPanel({
               value={selectedJob?.title || newSceneTitle}
               onChange={(e) => onSceneTitleChange(e.target.value)}
               placeholder="Ví dụ: Cảnh 1: Phòng Thí Nghiệm Neon CyberLab..."
-              className="w-full bg-slate-50/70 dark:bg-[#101218] border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-ruby outline-none focus:ring-2 focus:ring-ruby/20 transition placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium"
+              className="w-full bg-slate-50/70 dark:bg-[#101218] border border-slate-200/80 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-indigo-500 outline-none focus:ring-1 focus:ring-indigo-500/20 transition placeholder:text-slate-400 dark:placeholder:text-slate-600 font-medium"
             />
           </div>
         </div>
 
-        {/* Field 2: Resource Type Category Picker (Themed Cards) */}
+        {/* Field 2: Resource Type Category Picker (Modern SaaS Cards) */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
@@ -334,14 +335,16 @@ export function GeneratorPanel({
                   onClick={() => handleCategorySelect(type.id)}
                   className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden group ${
                     isSelected
-                      ? `${theme.activeBorder} ${theme.activeBg} shadow-sm`
-                      : 'bg-slate-50/70 dark:bg-white/[0.03] border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'
+                      ? `${theme.activeBorder} ${theme.activeBg} shadow-xs`
+                      : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-200/80 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/20'
                   }`}
                 >
                   <div className="flex items-start gap-2.5">
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-105 ${
-                        isSelected ? theme.iconActive : 'bg-slate-200/70 dark:bg-white/10 text-slate-600 dark:text-slate-300'
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all ${
+                        isSelected
+                          ? theme.iconActive
+                          : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-white/10'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -352,7 +355,7 @@ export function GeneratorPanel({
                           {type.label}
                         </span>
                         {isSelected && (
-                          <span className={`w-1.5 h-1.5 rounded-full ${theme.dot} shrink-0 animate-ping`} />
+                          <span className={`w-1.5 h-1.5 rounded-full ${theme.dot} shrink-0`} />
                         )}
                       </div>
                       <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
@@ -372,7 +375,7 @@ export function GeneratorPanel({
             <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
               Nội Dung Prompt ({currentOption.label})
             </label>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-purple-600 dark:text-purple-400 font-semibold border border-slate-200 dark:border-white/10">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 font-medium border border-slate-200/80 dark:border-white/10">
               {singlePromptValue.length} ký tự
             </span>
           </div>
@@ -383,7 +386,7 @@ export function GeneratorPanel({
               onChange={(e) => handlePromptChange(e.target.value)}
               rows={4}
               placeholder={currentOption.placeholder}
-              className="w-full bg-slate-50/80 dark:bg-[#101218] border border-slate-200 dark:border-white/10 rounded-xl p-3.5 text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-ruby outline-none focus:ring-2 focus:ring-ruby/20 resize-none font-sans leading-relaxed transition"
+              className="w-full bg-slate-50/70 dark:bg-[#101218] border border-slate-200/80 dark:border-white/10 rounded-xl p-3.5 text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-indigo-500 outline-none focus:ring-1 focus:ring-indigo-500/20 resize-none font-sans leading-relaxed transition"
             />
           </div>
 
@@ -397,7 +400,7 @@ export function GeneratorPanel({
                 key={preset}
                 type="button"
                 onClick={() => handleAddPreset(preset)}
-                className="text-[10px] font-medium px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-ruby/10 hover:text-ruby dark:hover:bg-ruby/20 dark:hover:text-ruby-light border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 transition-colors cursor-pointer"
+                className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-400 border border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-400 transition-colors cursor-pointer"
               >
                 + {preset}
               </button>
@@ -405,11 +408,11 @@ export function GeneratorPanel({
           </div>
         </div>
 
-        {/* Field 4: Unified Auto-Routed AI Engine Card (No duplicate boxes!) */}
-        <div className="p-3.5 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100/80 dark:from-white/[0.04] dark:to-white/[0.01] border border-slate-200 dark:border-white/10 space-y-2.5 shadow-xs">
+        {/* Field 4: Unified Auto-Routed AI Engine Card */}
+        <div className="p-3.5 rounded-xl bg-slate-50/60 dark:bg-white/[0.02] border border-slate-200/80 dark:border-white/5 space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-ruby/10 text-ruby flex items-center justify-center">
+              <div className="w-6 h-6 rounded-md bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-100 dark:border-indigo-500/20">
                 <Cpu className="w-3.5 h-3.5" />
               </div>
               <div>
@@ -421,7 +424,7 @@ export function GeneratorPanel({
                 </span>
               </div>
             </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1">
+            <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 text-[10px] font-semibold flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" /> Auto-Routed
             </span>
           </div>
@@ -429,7 +432,7 @@ export function GeneratorPanel({
           <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-white/5">
             <div className="min-w-0">
               <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5 truncate">
-                <span className="w-2 h-2 rounded-full bg-ruby animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
                 <span>{currentOption.modelLabel}</span>
               </div>
               <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
@@ -437,11 +440,11 @@ export function GeneratorPanel({
               </div>
             </div>
 
-            <div className="text-right shrink-0 pl-4 border-l border-slate-200 dark:border-white/10">
+            <div className="text-right shrink-0 pl-4 border-l border-slate-200/80 dark:border-white/10">
               <span className="text-[10px] uppercase tracking-wider text-slate-400 dark:text-slate-500 block font-semibold">
                 Định mức chi phí
               </span>
-              <span className="text-sm font-mono font-bold text-amber-600 dark:text-amber-400 flex items-center justify-end gap-1">
+              <span className="text-sm font-mono font-bold text-indigo-600 dark:text-indigo-400 flex items-center justify-end gap-1">
                 <Zap className="w-3.5 h-3.5 text-amber-500" />
                 {targetCost} Tokens
               </span>
@@ -449,42 +452,37 @@ export function GeneratorPanel({
           </div>
         </div>
 
-        {/* Field 5: Live Streaming Token & Time Meter (Claude Code / Gemini style) */}
+        {/* Field 5: Live Streaming Token & Time Meter */}
         {isGenerating ? (
-          <div className="p-4 rounded-xl bg-gradient-to-br from-slate-900 via-[#13151D] to-black border border-purple-500/40 shadow-lg text-white space-y-3 relative overflow-hidden">
-            {/* Ambient background glow */}
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-ruby/20 rounded-full blur-2xl pointer-events-none" />
-
+          <div className="p-4 rounded-xl bg-[#0e1017] border border-indigo-500/30 shadow-md text-white space-y-3 relative overflow-hidden">
             <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-2">
-                <span className="relative flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" />
                 </span>
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5 font-mono">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5 font-mono">
                   <Activity className="w-3.5 h-3.5" /> AI Live Execution Stream
                 </span>
               </div>
 
               <div className="flex items-center gap-3 text-xs font-mono">
                 <span className="flex items-center gap-1 text-slate-300">
-                  <Clock className="w-3 h-3 text-blue-400" /> {streamTime}
+                  <Clock className="w-3 h-3 text-indigo-400" /> {streamTime}
                 </span>
-                <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30 flex items-center gap-1">
-                  <Zap className="w-3 h-3" /> {streamTokens} / {targetCost} Tokens
+                <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-amber-400" /> {streamTokens} / {targetCost} Tokens
                 </span>
               </div>
             </div>
 
-            {/* Glowing animated progress bar */}
+            {/* Progress bar */}
             <div className="space-y-1 relative z-10">
-              <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden p-0.5">
+              <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-ruby via-purple-500 to-amber-400 transition-all duration-100 ease-out relative"
+                  className="h-full rounded-full bg-indigo-500 transition-all duration-100 ease-out"
                   style={{ width: `${streamProgress}%` }}
-                >
-                  <div className="absolute inset-0 bg-white/30 animate-pulse" />
-                </div>
+                />
               </div>
               <div className="flex justify-between text-[10px] text-slate-400 font-mono">
                 <span>Tiến trình kết xuất ({streamProgress}%)</span>
@@ -492,14 +490,14 @@ export function GeneratorPanel({
               </div>
             </div>
 
-            {/* Terminal Log Line like Claude Code / Gemini */}
-            <div className="bg-black/60 rounded-lg p-2.5 border border-white/10 font-mono text-[11px] text-slate-300 flex items-center gap-2 relative z-10">
-              <div className="w-2 h-2 rounded-full bg-purple-400 animate-ping shrink-0" />
+            {/* Terminal Log Line */}
+            <div className="bg-black/50 rounded-lg p-2.5 border border-white/10 font-mono text-[11px] text-slate-300 flex items-center gap-2 relative z-10">
+              <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse shrink-0" />
               <span className="truncate">{streamLog}</span>
             </div>
           </div>
         ) : isCompletedRecently ? (
-          <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400 animate-in fade-in duration-300">
+          <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400 animate-in fade-in duration-300">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
               <span>
@@ -516,7 +514,7 @@ export function GeneratorPanel({
         <div className="grid grid-cols-2 gap-3 pt-1">
           <button
             onClick={onAddJob}
-            className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 active:scale-98 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all cursor-pointer shadow-xs"
+            className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 active:scale-[0.99] border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-200 text-xs font-medium transition cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Thêm Phân Cảnh</span>
@@ -525,7 +523,7 @@ export function GeneratorPanel({
           <button
             onClick={onGenerateSelected}
             disabled={isGenerating}
-            className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-ruby via-rose-600 to-ruby-dark hover:from-ruby-dark hover:to-rose-700 active:scale-98 text-white text-xs font-bold shadow-md shadow-ruby/25 hover:shadow-ruby/40 transition-all cursor-pointer disabled:opacity-60"
+            className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-semibold shadow-sm shadow-indigo-600/20 transition cursor-pointer disabled:opacity-60"
           >
             {isGenerating ? (
               <>
@@ -534,8 +532,8 @@ export function GeneratorPanel({
               </>
             ) : (
               <>
-                <Video className="w-3.5 h-3.5" />
-                <span>Trigger Sinh Clip</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Tạo Sinh Clip AI</span>
               </>
             )}
           </button>
