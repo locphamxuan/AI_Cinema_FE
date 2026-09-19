@@ -146,7 +146,7 @@ export function OverviewTab({
       {/* 1. Horizontal Stepper: Thanh Tiến Trình 4 Giai Đoạn Nối Nhau */}
       <Card className="p-5 space-y-4 shadow-xs border-purple-200/80 dark:border-purple-900/40 relative overflow-hidden">
         {/* Top subtle accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-purple-600 to-slate-300 dark:to-white/10" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-purple-400" />
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-3">
           <div>
@@ -273,7 +273,7 @@ export function OverviewTab({
             <button
               type="button"
               onClick={currentStage.onAction}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-ruby to-rose-600 hover:from-ruby-dark hover:to-rose-700 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-ruby/30 active:scale-95 cursor-pointer shrink-0"
+              className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md shadow-purple-600/30 active:scale-95 cursor-pointer shrink-0"
             >
               <span>{currentStage.actionLabel}</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -285,7 +285,7 @@ export function OverviewTab({
       {/* 2. Hàng Ngang 4 Ô Thông Số Đồng Đều (Token Quota, Tiến Độ, Kịch Bản, Dự Án) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <StatBox
-          icon={<Film className="w-3.5 h-3.5 text-ruby" />}
+          icon={<Film className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />}
           label="Dự Án Tổng Thể"
           value={<span className="text-base truncate block">{project.title}</span>}
           hint={
@@ -299,7 +299,7 @@ export function OverviewTab({
         <Card className={`p-4 ${isQuotaWarning ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30' : ''}`}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide">AI Token Quota</span>
-            <Zap className={`w-3.5 h-3.5 ${isQuotaWarning ? 'text-rose-500' : 'text-amber-500'}`} />
+            <Zap className={`w-3.5 h-3.5 ${isQuotaWarning ? 'text-rose-500' : 'text-purple-500'}`} />
           </div>
           <div className="flex items-baseline gap-1.5">
             <span className="text-xl font-bold font-mono text-slate-900 dark:text-white">{quotaUsed}</span>
@@ -307,7 +307,7 @@ export function OverviewTab({
           </div>
           <div className="w-full bg-slate-100 dark:bg-white/10 h-1.5 rounded-full overflow-hidden mt-2">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${isQuotaWarning ? 'bg-rose-500' : 'bg-amber-400'}`}
+              className={`h-full rounded-full transition-all duration-500 ${isQuotaWarning ? 'bg-rose-500' : 'bg-purple-500'}`}
               style={{ width: `${quotaFillPercent}%` }}
             />
           </div>
@@ -329,7 +329,7 @@ export function OverviewTab({
         />
 
         <StatBox
-          icon={<Video className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />}
+          icon={<Video className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />}
           label="Tiến Độ Studio"
           value={
             <>
@@ -398,7 +398,7 @@ export function OverviewTab({
       <Card className="p-5 space-y-4 shadow-xs">
         <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
           <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <FileText className="w-4 h-4 text-ruby" /> Khung Đọc Kịch Bản & Thông Tin Tham Khảo
+            <FileText className="w-4 h-4 text-purple-600 dark:text-purple-400" /> Khung Đọc Kịch Bản & Thông Tin Tham Khảo
           </h3>
           <span className="text-[11px] text-slate-500">
             Người thực hiện: <strong className="text-slate-800 dark:text-slate-200">{project.creator_name}</strong>
@@ -408,14 +408,14 @@ export function OverviewTab({
         {/* Thể loại phim */}
         <div className="space-y-1.5">
           <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-            <Tag className="w-3.5 h-3.5 text-ruby" /> Thể Loại Phim:
+            <Tag className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Thể Loại Phim:
           </span>
           <div className="flex flex-wrap gap-1.5">
             {project.genre && project.genre.length > 0 ? (
               project.genre.map((g) => (
                 <span
                   key={g}
-                  className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-ruby/10 text-ruby border border-ruby/20 shadow-xs"
+                  className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20 shadow-xs"
                 >
                   #{g}
                 </span>

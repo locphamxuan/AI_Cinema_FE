@@ -107,7 +107,7 @@ export function CreatorDashboardPage() {
         {/* 1. Action Bar Ở Đầu Trang */}
         <div className="bg-white dark:bg-[#12141A] rounded-2xl p-5 border border-slate-200 dark:border-white/10 shadow-sm relative overflow-hidden">
           {/* Top subtle accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ruby via-purple-600 to-amber-500" />
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 to-purple-400" />
 
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
             {/* Left: Episode Title & Specs */}
@@ -139,7 +139,7 @@ export function CreatorDashboardPage() {
               <button
                 type="button"
                 onClick={() => (canEnterStudio ? router.push(`/creator/studio/${currentPackage.id}`) : setActiveTab('brief'))}
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-ruby via-rose-600 to-purple-600 hover:from-ruby-dark hover:to-purple-700 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-lg shadow-ruby/25 hover:shadow-ruby/40 active:scale-95 cursor-pointer"
+                className="px-5 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 transition-all shadow-lg shadow-purple-600/25 hover:shadow-purple-600/40 active:scale-95 cursor-pointer"
               >
                 <Video className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
                 <span>🎬 Mở AI Production Studio</span>
@@ -202,7 +202,7 @@ export function CreatorDashboardPage() {
                   </span>
                   <span className="truncate max-w-[160px]">{ep.title.replace(/^Tập \d+:\s*/, '')}</span>
                   {ep.actual_tokens_used > 0 && (
-                    <span className={`text-[10px] font-mono ${isSelected ? 'text-purple-200' : 'text-amber-600 dark:text-amber-400'}`}>
+                    <span className={`text-[10px] font-mono ${isSelected ? 'text-purple-200' : 'text-slate-500 dark:text-slate-400'}`}>
                       {ep.actual_tokens_used}T
                     </span>
                   )}
