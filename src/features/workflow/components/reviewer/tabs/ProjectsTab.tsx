@@ -1,4 +1,4 @@
-import { Plus, Tag, Milestone as MilestoneIcon, Calendar, CheckCircle2, Circle, Sparkles } from 'lucide-react';
+import { Plus, Tag, Milestone as MilestoneIcon, Calendar, CheckCircle2, Circle, Clock } from 'lucide-react';
 import type { ProductionProject } from '@/types/workflow';
 
 export interface ProjectsTabProps {
@@ -91,7 +91,7 @@ export function ProjectsTab({ project, onCreateProject }: ProjectsTabProps) {
                     {ms.status === 'completed' ? (
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                     ) : ms.status === 'in_progress' ? (
-                      <Sparkles className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                      <Clock className="w-3.5 h-3.5 text-purple-500 shrink-0" />
                     ) : (
                       <Circle className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     )}
