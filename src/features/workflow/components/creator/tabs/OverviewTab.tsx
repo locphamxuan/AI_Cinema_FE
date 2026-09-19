@@ -13,7 +13,6 @@ import {
   Circle,
   User,
   ShieldCheck,
-  Sparkles,
 } from 'lucide-react';
 import type { EpisodePackage, ProductionProject, ReviewLog } from '@/types/workflow';
 import { Card } from '@/components/ui/Card';
@@ -177,7 +176,7 @@ export function OverviewTab({
                       {isCompleted ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       ) : isInProgress ? (
-                        <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0 animate-pulse" />
+                        <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
                       ) : (
                         <Circle className="w-4 h-4 text-slate-400 shrink-0" />
                       )}

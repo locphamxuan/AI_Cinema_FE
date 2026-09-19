@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X, Trash2, Tag, Calendar, Milestone as MilestoneIcon, Film, Sparkles, Coins, Minus } from 'lucide-react';
+import { Plus, X, Trash2, Tag, Calendar, Milestone as MilestoneIcon, Film, Coins, Minus } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
@@ -443,7 +443,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
             type="submit"
             className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-gradient-to-r from-ruby to-ruby-dark hover:shadow-lg hover:shadow-ruby/30 transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Film className="w-3.5 h-3.5" />
             <span>Khởi Tạo Dự Án Phim</span>
           </button>
         </div>

@@ -6,7 +6,6 @@ import {
   Mic,
   Volume2,
   Film,
-  Sparkles,
   CheckCircle2,
   Clock,
   Zap,
@@ -410,8 +409,8 @@ export function GeneratorPanel({
         <div className="p-3.5 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100/80 dark:from-white/[0.04] dark:to-white/[0.01] border border-slate-200 dark:border-white/10 space-y-2.5 shadow-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5" />
+              <div className="w-6 h-6 rounded-lg bg-ruby/10 text-ruby flex items-center justify-center">
+                <Cpu className="w-3.5 h-3.5" />
               </div>
               <div>
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200 block">
