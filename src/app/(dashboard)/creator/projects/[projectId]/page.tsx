@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
-import { CreatorDashboardPage } from '@/features/workflow/components/creator/CreatorDashboardPage';
+import { CreatorWorkspacePage } from '@/features/workflow/components/creator/CreatorWorkspacePage';
 
 export default function ProjectWorkspacePage() {
   const params = useParams();
@@ -14,7 +14,8 @@ export default function ProjectWorkspacePage() {
     if (projectId) {
       setActiveProject(projectId);
     }
-  }, [projectId, setActiveProject]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-sync when the URL param itself changes
+  }, [projectId]);
 
-  return <CreatorDashboardPage />;
+  return <CreatorWorkspacePage />;
 }

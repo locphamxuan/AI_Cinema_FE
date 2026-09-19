@@ -1,5 +1,5 @@
-import { ReviewerDashboardPage } from '@/features/workflow/components/reviewer/ReviewerDashboardPage';
+import { ReviewerWorkspacePage } from '@/features/workflow/components/reviewer/ReviewerWorkspacePage';
 
 export default function Page() {
-  return <ReviewerDashboardPage />;
+  return <ReviewerWorkspacePage />;
 }
