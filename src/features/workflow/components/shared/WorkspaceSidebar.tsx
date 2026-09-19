@@ -1,25 +1,19 @@
 'use client';
 
-import { useMemo, useState, type ComponentType } from 'react';
+import { useState, type ComponentType } from 'react';
 import Image from 'next/image';
-import { Search, Clapperboard, Plus } from 'lucide-react';
+import { Clapperboard, Plus, ChevronDown } from 'lucide-react';
 import type { ProductionProject } from '@/types/workflow';
-import { Badge } from '@/components/ui/Badge';
+import type { ProjectGroup } from '@/features/workflow/lib/projectGroups';
 
-const STATUS_LABEL: Record<NonNullable<ProductionProject['overall_status']>, string> = {
-  NOT_STARTED: 'Cần bắt đầu',
-  IN_PROGRESS: 'Đang thực hiện',
-  PENDING_REVIEW: 'Chờ duyệt',
-  CHANGES_REQUESTED: 'Cần chỉnh sửa',
-  COMPLETED: 'Đã hoàn thành',
-};
+type ProjectStatus = NonNullable<ProductionProject['overall_status']>;
 
-const STATUS_TONE: Record<NonNullable<ProductionProject['overall_status']>, 'neutral' | 'amber' | 'emerald' | 'blue' | 'purple' | 'rose'> = {
-  NOT_STARTED: 'blue',
-  IN_PROGRESS: 'purple',
-  PENDING_REVIEW: 'amber',
-  CHANGES_REQUESTED: 'rose',
-  COMPLETED: 'emerald',
+const STATUS_META: Record<ProjectStatus, { label: string; dot: string }> = {
+  NOT_STARTED: { label: 'Chưa bắt đầu', dot: 'bg-slate-400' },
+  IN_PROGRESS: { label: 'Đang thực hiện', dot: 'bg-purple-500' },
+  PENDING_REVIEW: { label: 'Chờ duyệt', dot: 'bg-amber-500' },
+  CHANGES_REQUESTED: { label: 'Cần chỉnh sửa', dot: 'bg-rose-500' },
+  COMPLETED: { label: 'Hoàn thành', dot: 'bg-emerald-500' },
 };
 
 export interface SidebarNavItem {
@@ -30,176 +24,144 @@ export interface SidebarNavItem {
 }
 
 export interface WorkspaceSidebarProps {
-  title: string;
-  projects: ProductionProject[];
+  groups: ProjectGroup[];
   selectedProjectId?: string;
   onSelectProject: (projectId: string) => void;
   onCreateProject?: () => void;
-  /** Contextual nav for whichever project is selected (e.g. Overview / Plan review / Tokens). */
+  /** Nav for whichever project is selected, shown nested under that project (e.g. Overview / Plan review). */
   navItems?: SidebarNavItem[];
   activeNavKey?: string;
   onNavSelect?: (key: string) => void;
 }
 
-function TokenBar({ used, allocated }: { used: number; allocated: number }) {
-  if (allocated <= 0) return null;
-  const pct = Math.min(100, Math.round((used / allocated) * 100));
-  return (
-    <div className="w-full h-1 rounded-full bg-slate-200 dark:bg-white/10 overflow-hidden mt-1.5">
-      <div className={`h-full rounded-full ${pct >= 90 ? 'bg-rose-500' : 'bg-amber-400'}`} style={{ width: `${pct}%` }} />
-    </div>
-  );
-}
-
 function ProjectRow({ project, isSelected, onSelect }: { project: ProductionProject; isSelected: boolean; onSelect: () => void }) {
-  const status = project.overall_status || 'NOT_STARTED';
+  const status = STATUS_META[project.overall_status || 'NOT_STARTED'];
 
   return (
     <button
       type="button"
       onClick={onSelect}
-      className={`w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition cursor-pointer border ${
-        isSelected ? 'bg-ruby/10 dark:bg-ruby/15 border-ruby/40' : 'bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-white/5'
+      aria-current={isSelected ? 'true' : undefined}
+      className={`w-full flex items-center gap-2.5 p-2 rounded-lg text-left transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${
+        isSelected ? 'bg-purple-50 dark:bg-purple-500/10' : 'hover:bg-slate-100 dark:hover:bg-white/5'
       }`}
     >
-      <div className="relative w-11 h-11 rounded-lg overflow-hidden bg-slate-200 dark:bg-white/10 shrink-0">
+      <div className="relative w-9 h-9 rounded-md overflow-hidden bg-slate-200 dark:bg-white/10 shrink-0">
         {project.thumbnail_url ? (
-          <Image src={project.thumbnail_url} alt={project.title} fill sizes="44px" className="object-cover" />
+          <Image src={project.thumbnail_url} alt="" fill sizes="36px" className="object-cover" />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-slate-400">
-            <Clapperboard className="w-4 h-4" />
+            <Clapperboard className="w-4 h-4" aria-hidden="true" />
           </div>
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className={`text-xs font-semibold truncate ${isSelected ? 'text-ruby' : 'text-slate-800 dark:text-slate-200'}`}>{project.title}</p>
-        <div className="flex items-center gap-1.5 mt-1">
-          <span className="text-[11px] text-slate-500 dark:text-slate-400">{project.total_episodes} tập</span>
-          <span className="text-slate-300 dark:text-white/20">·</span>
-          <Badge tone={STATUS_TONE[status]} dot className="px-1.5 py-0 text-[10px]">
-            {STATUS_LABEL[status]}
-          </Badge>
-        </div>
-        <TokenBar used={project.consumed_tokens} allocated={project.allocated_tokens} />
+        <p className={`text-[13px] font-semibold truncate ${isSelected ? 'text-purple-700 dark:text-purple-300' : 'text-slate-800 dark:text-slate-200'}`}>
+          {project.title}
+        </p>
+        <p className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${status.dot}`} aria-hidden="true" />
+          <span className="truncate">{status.label}</span>
+        </p>
       </div>
     </button>
   );
 }
 
+function NavList({ items, activeKey, onSelect }: { items: SidebarNavItem[]; activeKey?: string; onSelect?: (key: string) => void }) {
+  return (
+    <nav aria-label="Các mục của phim đang chọn" className="ml-4 pl-3 my-1 border-l border-slate-200 dark:border-white/10 space-y-0.5">
+      {items.map(({ key, label, icon: Icon, badge }) => {
+        const isActive = activeKey === key;
+        return (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onSelect?.(key)}
+            aria-current={isActive ? 'page' : undefined}
+            className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md text-xs font-medium transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${
+              isActive ? 'bg-purple-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+            <span className="flex-1 text-left truncate">{label}</span>
+            {Boolean(badge) && (
+              <span className={`min-w-4 px-1 rounded-full text-[10px] font-bold text-center ${isActive ? 'bg-white/25 text-white' : 'bg-amber-500 text-white'}`}>
+                {badge}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
 /**
- * Left-hand navigation for both role workspaces: search + film lists
- * (assigned / completed), plus a contextual nav section for whichever
- * project is currently selected (Overview, plan review, tokens, ...).
+ * Left-hand navigation for both role workspaces. Projects are split into
+ * collapsible groups (which groups depends on the role); opening a group lists
+ * its films, and the selected film expands into its own sections.
  */
-export function WorkspaceSidebar({
-  title,
-  projects,
-  selectedProjectId,
-  onSelectProject,
-  onCreateProject,
-  navItems,
-  activeNavKey,
-  onNavSelect,
-}: WorkspaceSidebarProps) {
-  const [query, setQuery] = useState('');
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return projects;
-    return projects.filter((p) => p.title.toLowerCase().includes(q) || p.genre.some((g) => g.toLowerCase().includes(q)));
-  }, [projects, query]);
-
-  const assigned = filtered.filter((p) => p.overall_status !== 'COMPLETED');
-  const completed = filtered.filter((p) => p.overall_status === 'COMPLETED');
-  const selectedProject = projects.find((p) => p.id === selectedProjectId);
-
-  const totalAllocated = projects.reduce((sum, p) => sum + p.allocated_tokens, 0);
-  const totalConsumed = projects.reduce((sum, p) => sum + p.consumed_tokens, 0);
+export function WorkspaceSidebar({ groups, selectedProjectId, onSelectProject, onCreateProject, navItems, activeNavKey, onNavSelect }: WorkspaceSidebarProps) {
+  // A group the user has not touched stays open only while it holds the selected film.
+  const [openByKey, setOpenByKey] = useState<Record<string, boolean>>({});
 
   return (
-    <aside className="w-full md:w-72 shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/10 bg-white dark:bg-[#0E0F14] flex flex-col md:h-[calc(100vh-56px)] md:sticky md:top-14">
-      <div className="p-4 space-y-3 border-b border-slate-100 dark:border-white/5">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wide">{title}</h2>
-        </div>
-        {onCreateProject && (
+    <aside className="w-full md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/10 bg-white dark:bg-[#0E0F14] flex flex-col md:h-[calc(100vh-56px)] md:sticky md:top-14">
+      {onCreateProject && (
+        <div className="p-3 border-b border-slate-100 dark:border-white/5">
           <button
             type="button"
             onClick={onCreateProject}
-            className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-ruby/10 hover:bg-ruby/20 text-ruby text-xs font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ruby/50"
+            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-xs font-medium transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0E0F14]"
           >
-            <Plus className="w-3.5 h-3.5" /> Thêm dự án phim mới
+            <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Tạo dự án phim
           </button>
-        )}
-        <div className="relative">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm phim…"
-            aria-label="Tìm phim"
-            autoComplete="off"
-            className="w-full pl-8 pr-2.5 py-1.5 bg-slate-100 dark:bg-white/5 border border-transparent rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-ruby/40 transition"
-          />
-        </div>
-        {navItems && (projects.length > 0) && (
-          <div className="flex items-center justify-between text-[10.5px] text-slate-500 dark:text-slate-400 px-0.5">
-            <span>Ngân sách token tổng</span>
-            <span className="font-mono font-semibold text-amber-600 dark:text-amber-400">
-              {totalConsumed}/{totalAllocated}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {navItems && navItems.length > 0 && (
-        <div className="p-3 border-b border-slate-100 dark:border-white/5 space-y-1">
-          {selectedProject && <p className="px-1.5 text-[10px] text-slate-400 dark:text-slate-500 truncate mb-1">{selectedProject.title}</p>}
-          {navItems.map(({ key, label, icon: Icon, badge }) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onNavSelect?.(key)}
-              disabled={!selectedProjectId}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-semibold transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-                activeNavKey === key
-                  ? 'bg-ruby/10 dark:bg-ruby/15 text-ruby'
-                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5 shrink-0" />
-              <span className="flex-1 text-left truncate">{label}</span>
-              {Boolean(badge) && <span className="px-1.5 py-0 rounded-full bg-amber-500 text-white text-[10px] font-bold">{badge}</span>}
-            </button>
-          ))}
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-3 space-y-4">
-        <div className="space-y-1">
-          <div className="px-1.5 py-1 text-[10.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center justify-between">
-            <span>Phim được giao</span>
-            <span>{assigned.length}</span>
-          </div>
-          {assigned.length === 0 ? (
-            <p className="px-1.5 py-2 text-[11px] text-slate-400 dark:text-slate-500">Không có phim nào.</p>
-          ) : (
-            assigned.map((p) => <ProjectRow key={p.id} project={p} isSelected={p.id === selectedProjectId} onSelect={() => onSelectProject(p.id)} />)
-          )}
-        </div>
+      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+        {groups.map((group) => {
+          const hasSelected = group.projects.some((p) => p.id === selectedProjectId);
+          const isOpen = openByKey[group.key] ?? hasSelected;
+          const panelId = `sidebar-group-${group.key}`;
 
-        <div className="space-y-1">
-          <div className="px-1.5 py-1 text-[10.5px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center justify-between">
-            <span>Phim đã hoàn thành</span>
-            <span>{completed.length}</span>
-          </div>
-          {completed.length === 0 ? (
-            <p className="px-1.5 py-2 text-[11px] text-slate-400 dark:text-slate-500">Chưa có phim nào hoàn thành.</p>
-          ) : (
-            completed.map((p) => <ProjectRow key={p.id} project={p} isSelected={p.id === selectedProjectId} onSelect={() => onSelectProject(p.id)} />)
-          )}
-        </div>
+          return (
+            <section key={group.key}>
+              <button
+                type="button"
+                onClick={() => setOpenByKey((prev) => ({ ...prev, [group.key]: !isOpen }))}
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left text-[13px] font-semibold text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-white/5 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+              >
+                <span className="flex-1 truncate">{group.label}</span>
+                <span className="text-xs font-normal text-slate-400 tabular-nums">{group.projects.length}</span>
+                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? '' : '-rotate-90'}`} aria-hidden="true" />
+              </button>
+
+              {isOpen && (
+                <div id={panelId} className="mt-0.5 mb-2 pl-1">
+                  {group.projects.length === 0 ? (
+                    <p className="px-2.5 py-2 text-xs text-slate-400 dark:text-slate-500">{group.emptyText}</p>
+                  ) : (
+                    <ul className="space-y-0.5">
+                      {group.projects.map((p) => {
+                        const isSelected = p.id === selectedProjectId;
+                        return (
+                          <li key={p.id}>
+                            <ProjectRow project={p} isSelected={isSelected} onSelect={() => onSelectProject(p.id)} />
+                            {isSelected && navItems && navItems.length > 0 && <NavList items={navItems} activeKey={activeNavKey} onSelect={onNavSelect} />}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </section>
+          );
+        })}
       </div>
     </aside>
   );

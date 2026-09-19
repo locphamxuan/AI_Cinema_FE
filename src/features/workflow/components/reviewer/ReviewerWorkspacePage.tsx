@@ -4,6 +4,9 @@ import { useState } from 'react';
 import { LayoutDashboard, ClipboardCheck, ShieldCheck, Zap, Film, Tv } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
+import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
+import { reviewerGroups } from '@/features/workflow/lib/projectGroups';
+import { availableBudget, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
 import { OverviewTab } from './tabs/OverviewTab';
 import { PlanReviewTab } from './tabs/PlanReviewTab';
 import { AuditsTab } from './tabs/AuditsTab';
@@ -23,6 +26,7 @@ const DEFAULT_FORM: CreateProjectFormState = {
   episodesPerSeason: 5,
   episodeDurations: [30, 30, 30, 30, 30],
   budgetTokens: 3000,
+  productionStartDate: '2026-09-17',
   deadline: '2026-12-31',
   releaseDate: '2027-01-15',
   milestones: [
@@ -76,10 +80,10 @@ export function ReviewerWorkspacePage() {
 
   const navItems: SidebarNavItem[] = [
     { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
-    { key: 'plans', label: 'Duyệt phim', icon: ClipboardCheck, badge: pendingPlanEpisodes.length || undefined },
-    { key: 'audits', label: 'Kiểm định pháp lý', icon: ShieldCheck },
-    { key: 'publication', label: 'Xuất bản OTT', icon: Tv, badge: publishReadyEpisodes.length || undefined },
-    { key: 'tokens', label: 'Ngân sách token', icon: Zap },
+    { key: 'plans', label: 'Duyệt kế hoạch', icon: ClipboardCheck, badge: pendingPlanEpisodes.length || undefined },
+    { key: 'audits', label: 'Kiểm định', icon: ShieldCheck },
+    { key: 'publication', label: 'Xuất bản', icon: Tv, badge: publishReadyEpisodes.length || undefined },
+    { key: 'tokens', label: 'Token', icon: Zap },
   ];
 
   const handleSelectProject = (projectId: string) => {
@@ -99,6 +103,7 @@ export function ReviewerWorkspacePage() {
       episodes_per_season: createForm.episodesPerSeason,
       episode_target_durations: createForm.episodeDurations,
       total_budget_tokens: createForm.budgetTokens,
+      production_start_date: createForm.productionStartDate,
       deadline: createForm.deadline,
       planned_release_date: createForm.releaseDate,
       milestones: createForm.milestones,
@@ -107,6 +112,11 @@ export function ReviewerWorkspacePage() {
     setIsCreateProjectOpen(false);
     setCreateForm(DEFAULT_FORM);
     setActiveTab('overview');
+  };
+
+  const openRejectModal = () => {
+    if (currentPackage) setRejectFeedback(summarizeFlaggedFields(project, currentPackage.brief));
+    setIsRejectModalOpen(true);
   };
 
   const handleAllocateQuotaConfirm = () => {
@@ -125,8 +135,7 @@ export function ReviewerWorkspacePage() {
   return (
     <div className="flex-1 flex flex-col md:flex-row w-full overflow-hidden">
       <WorkspaceSidebar
-        title="Không gian thẩm định"
-        projects={projects}
+        groups={reviewerGroups(projects)}
         selectedProjectId={hasSelection ? activeProjectId : undefined}
         onSelectProject={handleSelectProject}
         onCreateProject={() => setIsCreateProjectOpen(true)}
@@ -142,34 +151,14 @@ export function ReviewerWorkspacePage() {
               <Film className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Chọn một phim để thẩm định</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Danh sách phim được giao nằm ở thanh bên trái.</p>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Chọn một phim để xem</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Danh sách phim nằm ở thanh bên trái.</p>
             </div>
           </div>
         ) : (
           <div className="space-y-6">
             {(activeTab === 'plans' || activeTab === 'audits') && (
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                {project.episodes.map((ep) => {
-                  const isSelected = ep.id === currentPackage.id;
-                  return (
-                    <button
-                      key={ep.id}
-                      onClick={() => setActivePackage(ep.id)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-2 shrink-0 cursor-pointer border ${
-                        isSelected
-                          ? 'bg-ruby text-white border-ruby'
-                          : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
-                      }`}
-                    >
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${isSelected ? 'bg-white/20' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400'}`}>
-                        M{ep.season_number} · T{ep.episode_number}
-                      </span>
-                      <span className="truncate max-w-[160px]">{ep.title.replace(/^Tập \d+:\s*/, '')}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <EpisodeSwitcher episodes={project.episodes} selectedId={currentPackage.id} onSelect={setActivePackage} />
             )}
 
             {activeTab === 'overview' && (
@@ -185,7 +174,7 @@ export function ReviewerWorkspacePage() {
             )}
 
             {activeTab === 'plans' && (
-              <PlanReviewTab currentPackage={currentPackage} onRequestChanges={() => setIsRejectModalOpen(true)} onAllocateQuota={() => setIsQuotaModalOpen(true)} />
+              <PlanReviewTab currentPackage={currentPackage} onRequestChanges={openRejectModal} onAllocateQuota={() => setIsQuotaModalOpen(true)} />
             )}
 
             {activeTab === 'audits' && <AuditsTab project={project} />}
@@ -203,6 +192,7 @@ export function ReviewerWorkspacePage() {
         onConfirm={handleAllocateQuotaConfirm}
         currentPackage={currentPackage}
         quota={quotaToAllocate}
+        availableBudget={availableBudget(project)}
         onQuotaChange={setQuotaToAllocate}
         notes={quotaNotes}
         onNotesChange={setQuotaNotes}

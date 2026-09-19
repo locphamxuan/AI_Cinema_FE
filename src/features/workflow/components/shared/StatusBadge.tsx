@@ -2,14 +2,14 @@ import { Badge } from '@/components/ui/Badge';
 import type { WorkflowState } from '@/types/workflow';
 
 const STATUS_CONFIG: Record<WorkflowState, { label: string; tone: 'neutral' | 'amber' | 'emerald' | 'blue' | 'purple' | 'rose' }> = {
-  PLAN_DRAFT: { label: 'Bản Nháp Brief', tone: 'neutral' },
-  PLAN_PENDING: { label: 'Chờ Duyệt Quota', tone: 'amber' },
-  QUOTA_ALLOCATED: { label: 'Đã Cấp Quota AI', tone: 'emerald' },
-  IN_PRODUCTION: { label: 'Đang Sản Xuất', tone: 'blue' },
-  EPISODE_SUBMITTED: { label: 'Chờ Thẩm Định Video', tone: 'purple' },
-  CHANGES_REQUESTED: { label: 'Yêu Cầu Sửa Đổi', tone: 'rose' },
-  COMPLIANCE_PASSED: { label: 'Đạt Chuẩn Pháp Lý', tone: 'emerald' },
-  PUBLISHED: { label: 'Đã Phát Hành', tone: 'emerald' },
+  PLAN_DRAFT: { label: 'Đang soạn kế hoạch', tone: 'neutral' },
+  PLAN_PENDING: { label: 'Chờ duyệt kế hoạch', tone: 'amber' },
+  QUOTA_ALLOCATED: { label: 'Đã cấp token', tone: 'emerald' },
+  IN_PRODUCTION: { label: 'Đang sản xuất', tone: 'blue' },
+  EPISODE_SUBMITTED: { label: 'Chờ kiểm định', tone: 'purple' },
+  CHANGES_REQUESTED: { label: 'Cần chỉnh sửa', tone: 'rose' },
+  COMPLIANCE_PASSED: { label: 'Đã kiểm định', tone: 'emerald' },
+  PUBLISHED: { label: 'Đã phát hành', tone: 'emerald' },
 };
 
 export interface StatusBadgeProps {

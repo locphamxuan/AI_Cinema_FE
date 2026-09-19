@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { Video, Play, LayoutDashboard, FileText, MessageSquare, Zap, Film } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
+import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
+import { creatorGroups } from '@/features/workflow/lib/projectGroups';
 import { OverviewTab } from './tabs/OverviewTab';
 import { BriefTab } from './tabs/BriefTab';
 import { StudioLinkTab } from './tabs/StudioLinkTab';
@@ -21,7 +23,7 @@ type CreatorTab = 'overview' | 'brief' | 'studio' | 'tokens' | 'reviews';
  */
 export function CreatorWorkspacePage() {
   const router = useRouter();
-  const { projects, activeProjectId, setActiveProject, project, activePackageId, setActivePackage, updateContentBrief, submitProductionPlan, reviseProductionPlan, reviews } =
+  const { projects, activeProjectId, setActiveProject, project, activePackageId, setActivePackage, updateContentBrief, updateOverallScript, submitProductionPlan, reviseProductionPlan, reviews } =
     useWorkflowStore();
 
   const [activeTab, setActiveTab] = useState<CreatorTab>('overview');
@@ -46,9 +48,9 @@ export function CreatorWorkspacePage() {
 
   const navItems: SidebarNavItem[] = [
     { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
-    { key: 'brief', label: 'Kịch bản & phân cảnh', icon: FileText },
-    { key: 'studio', label: 'Sản xuất video', icon: Video },
-    { key: 'reviews', label: 'Feedback & duyệt', icon: MessageSquare, badge: latestFeedback ? 1 : undefined },
+    { key: 'brief', label: 'Kịch bản', icon: FileText },
+    { key: 'studio', label: 'Sản xuất', icon: Video },
+    { key: 'reviews', label: 'Phản hồi', icon: MessageSquare, badge: latestFeedback ? 1 : undefined },
     { key: 'tokens', label: 'Token', icon: Zap },
   ];
 
@@ -60,8 +62,7 @@ export function CreatorWorkspacePage() {
   return (
     <div className="flex-1 flex flex-col md:flex-row w-full overflow-hidden">
       <WorkspaceSidebar
-        title="Không gian làm việc"
-        projects={projects}
+        groups={creatorGroups(projects)}
         selectedProjectId={hasSelection ? activeProjectId : undefined}
         onSelectProject={handleSelectProject}
         navItems={navItems}
@@ -77,7 +78,7 @@ export function CreatorWorkspacePage() {
             </div>
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">Chọn một phim để bắt đầu</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Danh sách phim được giao nằm ở thanh bên trái.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Danh sách phim nằm ở thanh bên trái.</p>
             </div>
           </div>
         ) : (
@@ -92,7 +93,7 @@ export function CreatorWorkspacePage() {
                 {canEnterStudio && (
                   <button
                     onClick={() => router.push(`/creator/studio/${currentPackage.id}`)}
-                    className="px-4 py-2 rounded-xl bg-ruby hover:bg-ruby-dark text-white font-bold text-xs flex items-center gap-2 transition cursor-pointer shadow-sm"
+                    className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-2 transition cursor-pointer shadow-sm"
                   >
                     <Video className="w-4 h-4" /> Mở AI Studio
                   </button>
@@ -108,28 +109,7 @@ export function CreatorWorkspacePage() {
               </div>
             </div>
 
-            {/* Episode selector */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-              {project.episodes.map((ep) => {
-                const isSelected = ep.id === currentPackage.id;
-                return (
-                  <button
-                    key={ep.id}
-                    onClick={() => setActivePackage(ep.id)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-2 shrink-0 cursor-pointer border ${
-                      isSelected
-                        ? 'bg-ruby text-white border-ruby'
-                        : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10'
-                    }`}
-                  >
-                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${isSelected ? 'bg-white/20' : 'bg-slate-100 dark:bg-white/10 text-slate-500 dark:text-slate-400'}`}>
-                      M{ep.season_number} · T{ep.episode_number}
-                    </span>
-                    <span className="truncate max-w-[160px]">{ep.title.replace(/^Tập \d+:\s*/, '')}</span>
-                  </button>
-                );
-              })}
-            </div>
+            <EpisodeSwitcher episodes={project.episodes} selectedId={currentPackage.id} onSelect={setActivePackage} />
 
             {activeTab === 'overview' && (
               <OverviewTab
@@ -152,6 +132,10 @@ export function CreatorWorkspacePage() {
               <BriefTab
                 key={currentPackage.id}
                 currentPackage={currentPackage}
+                overallScript={project.overall_script}
+                scriptVersion={project.script_version}
+                scriptReview={project.script_review}
+                updateOverallScript={updateOverallScript}
                 updateContentBrief={updateContentBrief}
                 submitProductionPlan={submitProductionPlan}
                 reviseProductionPlan={reviseProductionPlan}
