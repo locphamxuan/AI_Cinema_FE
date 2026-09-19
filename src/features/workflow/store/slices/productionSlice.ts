@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand';
 import { GeneratedAsset } from '@/types/workflow';
 import type { ProductionSlice, WorkflowStoreState } from '../types';
+import { settleGenerationStep } from '@/features/workflow/lib/tokenCost';
 import { withProjectUpdate } from './projectRoster';
 
 export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], ProductionSlice> = (set, get) => ({
@@ -11,13 +12,13 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
     const job = pkg.jobs.find((j) => j.id === jobId);
     if (!job || job.generation_steps.length === 0) return false;
 
-    // Check token quota
+    // Check token quota against the estimated cost; actual cost is settled from output length below
     const currentTokens = pkg.actual_tokens_used;
     const quota = pkg.quota_allocated;
-    const cost = job.generation_steps.reduce((sum, s) => sum + s.token_cost, 0);
+    const estimatedCost = job.generation_steps.reduce((sum, s) => sum + s.token_cost, 0);
 
-    if (quota > 0 && currentTokens + cost > quota) {
-      alert(`Vượt quá hạn mức Token Quota đã cấp (${currentTokens}/${quota} Tokens, Cần: ${cost})!`);
+    if (quota > 0 && currentTokens + estimatedCost > quota) {
+      alert(`Vượt quá hạn mức Token Quota đã cấp (${currentTokens}/${quota} Tokens, Cần: ${estimatedCost})!`);
       return false;
     }
 
@@ -64,7 +65,9 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
 
     await new Promise((resolve) => setTimeout(resolve, 600));
 
-    // Step 3: Complete job + every step, create one output asset for the scene
+    // Step 3: Complete job + every step with output-based token cost, create one output asset for the scene
+    const settledSteps = job.generation_steps.map((s) => ({ ...s, status: 'completed' as const, ...settleGenerationStep(s) }));
+    const cost = settledSteps.reduce((sum, s) => sum + s.token_cost, 0);
     const newAssetId = `asset-${Date.now()}`;
     const newAsset: GeneratedAsset = {
       id: newAssetId,
@@ -103,7 +106,7 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
                     status: 'completed',
                     progress: 100,
                     token_cost: cost,
-                    generation_steps: j.generation_steps.map((s) => ({ ...s, status: 'completed' })),
+                    generation_steps: settledSteps,
                     output_asset_id: newAssetId,
                     updated_at: new Date().toISOString(),
                   }

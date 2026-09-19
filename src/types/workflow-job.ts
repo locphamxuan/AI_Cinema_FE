@@ -3,8 +3,10 @@ export type JobStatus = 'pending' | 'processing' | 'completed' | 'failed';
 /**
  * Function a single AI generation step performs. The system auto-selects
  * the model for each type — Creator only supplies scene_name + prompt (BR-40).
+ * 'CUSTOM' lets the Creator describe a function the catalog does not list;
+ * the system then finds a suitable model itself (see lib/modelRegistry).
  */
-export type GenerationFunctionType = 'SCRIPT_VOICE' | 'IMAGE' | 'VIDEO' | 'AUDIO_MUSIC';
+export type GenerationFunctionType = 'SCRIPT_VOICE' | 'IMAGE' | 'VIDEO' | 'AUDIO_MUSIC' | 'CUSTOM';
 
 /**
  * One AI generation call within a scene (e.g. the video shot, a voice line,
@@ -13,6 +15,8 @@ export type GenerationFunctionType = 'SCRIPT_VOICE' | 'IMAGE' | 'VIDEO' | 'AUDIO
 export interface GenerationStep {
   id: string;
   function_type: GenerationFunctionType;
+  /** Creator's own description of the function when function_type is 'CUSTOM'. */
+  custom_function?: string;
   prompt: string;
   selected_model: string;
   status: JobStatus;
