@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronRight, Plus } from 'lucide-react';
+import Link from 'next/link';
+import { ChevronRight, Plus, ArrowLeft } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { ReviewerSidebar, type ReviewerTab } from './ReviewerSidebar';
 import { OverviewTab } from './tabs/OverviewTab';
@@ -128,7 +129,9 @@ export function ReviewerDashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span>Trung Tâm Thẩm Định</span>
+              <Link href="/reviewer/projects" className="hover:text-purple-600 dark:hover:text-purple-400 font-semibold flex items-center gap-1 transition">
+                <ArrowLeft className="w-3.5 h-3.5" /> Tất Cả Dự Án
+              </Link>
               <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
               <span className="text-purple-600 dark:text-purple-400 font-semibold">{project.title}</span>
               <ChevronRight className="w-3 h-3 text-slate-400 dark:text-slate-600" />
