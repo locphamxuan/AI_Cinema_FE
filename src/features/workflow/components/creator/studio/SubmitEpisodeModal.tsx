@@ -11,43 +11,35 @@ export interface SubmitEpisodeModalProps {
 }
 
 export function SubmitEpisodeModal({ open, onClose, onConfirm, currentPackage, jobsCount }: SubmitEpisodeModalProps) {
+  const rows: Array<[string, string]> = [
+    ['Tập phim', currentPackage.title],
+    ['Số phân cảnh', `${jobsCount}`],
+    ['Thời lượng', currentPackage.total_duration || 'Chưa có'],
+    ['Token được cấp', `${currentPackage.quota_allocated}`],
+    ['Token đã dùng', `${currentPackage.actual_tokens_used}`],
+  ];
+
   return (
-    <Modal open={open} onClose={onClose} title="Nộp Bản Dựng Tập Phim Cho Reviewer">
-      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-        Tất cả {jobsCount} phân cảnh đã được render hoàn chỉnh. Xác nhận nộp gói tập phim (<code>episode_package</code>) sang Reviewer để
-        thực hiện thẩm định nội dung & kiểm định pháp lý AI.
+    <Modal open={open} onClose={onClose} title="Nộp bản dựng">
+      <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+        Cả {jobsCount} phân cảnh đã tạo xong. Sau khi nộp, người kiểm duyệt sẽ xem nội dung và kiểm định pháp lý cho tập này.
       </p>
 
-      <div className="bg-slate-50 dark:bg-white/5 p-4 rounded-xl border border-slate-200 dark:border-white/10 space-y-2.5 text-xs">
-        <div className="flex items-center justify-between">
-          <span className="text-slate-500 dark:text-slate-400">Tên tập phim:</span>
-          <span className="font-bold text-slate-900 dark:text-white">{currentPackage.title}</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-500 dark:text-slate-400">Số lượng phân cảnh:</span>
-          <span className="font-mono font-bold text-slate-900 dark:text-white">{jobsCount} Cảnh</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-500 dark:text-slate-400">Thời lượng ước tính:</span>
-          <span className="font-mono font-bold text-slate-900 dark:text-white">{currentPackage.total_duration}</span>
-        </div>
-        <div className="h-px bg-slate-200 dark:bg-white/10 my-1" />
-        <div className="flex items-center justify-between">
-          <span className="text-slate-500 dark:text-slate-400">Token Quota được cấp:</span>
-          <span className="font-mono font-bold text-amber-600 dark:text-amber-400">{currentPackage.quota_allocated} Tokens</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-slate-500 dark:text-slate-400">Token thực tế tiêu thụ:</span>
-          <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400 text-sm">{currentPackage.actual_tokens_used} Tokens</span>
-        </div>
-      </div>
+      <dl className="divide-y divide-slate-100 dark:divide-white/5 text-sm">
+        {rows.map(([term, detail]) => (
+          <div key={term} className="flex items-center justify-between gap-4 py-2">
+            <dt className="text-slate-500 dark:text-slate-400">{term}</dt>
+            <dd className="font-medium text-slate-900 dark:text-white text-right tabular-nums">{detail}</dd>
+          </div>
+        ))}
+      </dl>
 
       <div className="flex items-center justify-end gap-3 pt-2">
         <Button variant="secondary" onClick={onClose}>
-          Hủy bỏ
+          Hủy
         </Button>
         <Button variant="success" onClick={onConfirm}>
-          Xác Nhận Nộp Cho Checker
+          Nộp bản dựng
         </Button>
       </div>
     </Modal>

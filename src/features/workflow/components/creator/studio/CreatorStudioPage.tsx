@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Zap, Plus } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { StudioPlayer } from './StudioPlayer';
 import { StudioTimeline } from './StudioTimeline';
-import { GeneratorPanel, FUNCTION_TYPE_META } from './GeneratorPanel';
+import { GeneratorPanel } from './GeneratorPanel';
+import { resolveModel, stepDefaults } from '@/features/workflow/lib/modelRegistry';
 import { SubmitEpisodeModal } from './SubmitEpisodeModal';
 import type { GenerationStep } from '@/types/workflow';
 
@@ -16,14 +17,12 @@ export interface CreatorStudioPageProps {
 }
 
 function makeDraftStep(): GenerationStep {
-  const meta = FUNCTION_TYPE_META.VIDEO;
   return {
     id: `draft-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     function_type: 'VIDEO',
     prompt: '',
-    selected_model: meta.model,
     status: 'pending',
-    token_cost: meta.defaultTokens,
+    ...stepDefaults({ function_type: 'VIDEO' }),
   };
 }
 
@@ -46,7 +45,6 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   const assets = currentPackage?.assets || [];
 
   const [selectedJobId, setSelectedJobId] = useState<string>(jobs[0]?.id || '');
-  const [isPlaying, setIsPlaying] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
 
   const [newSceneTitle, setNewSceneTitle] = useState('');
@@ -72,7 +70,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   const handleAddJob = () => {
     const nextSceneNum = jobs.length + 1;
     const titleToUse = newSceneTitle.trim() || `Cảnh ${nextSceneNum}: Phân Cảnh Mới #${nextSceneNum}`;
-    const stepsToUse = draftSteps.filter((s) => s.prompt.trim().length > 0);
+    const stepsToUse = draftSteps.filter((s) => s.prompt.trim().length > 0 && resolveModel(s).match !== 'pending');
     addSceneJob(currentPackage.id, {
       episode_id: currentPackage.id,
       scene_id: `scene-${nextSceneNum}-${Date.now()}`,
@@ -89,13 +87,11 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   // falls back to the new-scene draft when nothing is selected yet.
   const handleAddStep = () => {
     if (selectedJob) {
-      const meta = FUNCTION_TYPE_META.VIDEO;
       addGenerationStep(currentPackage.id, selectedJob.id, {
         function_type: 'VIDEO',
         prompt: '',
-        selected_model: meta.model,
         status: 'pending',
-        token_cost: meta.defaultTokens,
+        ...stepDefaults({ function_type: 'VIDEO' }),
       });
     } else {
       setDraftSteps((prev) => [...prev, makeDraftStep()]);
@@ -122,7 +118,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
     const success = submitEpisodePackage(currentPackage.id);
     if (success) {
       setIsSubmitModalOpen(false);
-      alert('Tập phim đã được nộp thành công sang Thẩm định viên (Reviewer / Checker) để kiểm định nội dung & pháp lý!');
+      alert('Đã nộp bản dựng cho người kiểm duyệt.');
       router.push('/creator');
     }
   };
@@ -133,72 +129,33 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-20">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/creator"
-            aria-label="Quay lại Dashboard Creator"
-            className="p-2 rounded-xl bg-white dark:bg-[#161922] hover:bg-slate-50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 transition-colors shadow-xs"
-          >
-            <ArrowLeft className="w-4 h-4" />
+        <div className="min-w-0">
+          <Link href="/creator" className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+            <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Quay lại phim
           </Link>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-ruby/10 text-ruby border border-ruby/20">AI STUDIO WORKSPACE</span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">Tập {currentPackage.episode_number}</span>
-            </div>
-            <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight mt-0.5">{currentPackage.title}</h2>
-          </div>
+          <h1 className="text-xl font-semibold text-slate-900 dark:text-white mt-1.5 truncate">{currentPackage.title}</h1>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="bg-white dark:bg-[#161922] px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 flex items-center gap-3 shadow-xs">
-            <div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-bold uppercase">Hạn Mức Quota</span>
-              <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">
-                {currentPackage.actual_tokens_used} / {currentPackage.quota_allocated} Tokens
-              </span>
-            </div>
-            <div className="h-6 w-px bg-slate-200 dark:bg-white/10" />
-            <div>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-bold uppercase">Còn lại</span>
-              <span className={`text-xs font-mono font-bold ${remainingQuota < 50 ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
-                {remainingQuota} Tokens
-              </span>
-            </div>
-            <button
-              onClick={() => {
-                alert('Đã gửi thông báo xin cấp thêm Token Quota tới Thẩm định viên (Reviewer)!');
-              }}
-              title="Xin cấp thêm Token Quota"
-              className="p-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 active:scale-95 text-amber-600 dark:text-amber-400 border border-amber-500/30 transition cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
+        <div className="flex items-center gap-4 shrink-0">
+          <p className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
+            Token: {currentPackage.actual_tokens_used.toLocaleString()} / {currentPackage.quota_allocated.toLocaleString()}
+            <span className={`ml-1.5 ${remainingQuota < 50 ? 'text-rose-600 dark:text-rose-400 font-medium' : ''}`}>(còn {remainingQuota.toLocaleString()})</span>
+          </p>
           <button
+            type="button"
             onClick={() => setIsSubmitModalOpen(true)}
             disabled={!allCompleted}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer ${
-              allCompleted
-                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 dark:shadow-none'
-                : 'bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-400 dark:text-slate-600 cursor-not-allowed'
-            }`}
+            title={allCompleted ? undefined : 'Cần tạo xong tất cả phân cảnh trước khi nộp'}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white transition cursor-pointer disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0B0C10]"
           >
-            <Zap className="w-3.5 h-3.5" />
-            <span>Nộp Bản Dựng Cho Checker</span>
+            Nộp bản dựng
           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-6">
-          <StudioPlayer
-            selectedJob={selectedJob}
-            selectedAsset={selectedAsset}
-            isPlaying={isPlaying}
-            onTogglePlay={() => setIsPlaying(!isPlaying)}
-          />
+          <StudioPlayer selectedJob={selectedJob} selectedAsset={selectedAsset} />
           <StudioTimeline
             jobs={jobs}
             selectedJobId={selectedJobId}
