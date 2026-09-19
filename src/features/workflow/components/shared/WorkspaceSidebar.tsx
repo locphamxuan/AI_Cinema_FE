@@ -100,8 +100,9 @@ export function WorkspaceSidebar({ title, projects, selectedProjectId, onSelectP
             <button
               type="button"
               onClick={onCreateProject}
+              aria-label="Tạo dự án mới"
               title="Tạo dự án mới"
-              className="w-7 h-7 rounded-lg bg-ruby/10 hover:bg-ruby/20 text-ruby flex items-center justify-center transition cursor-pointer shrink-0"
+              className="w-7 h-7 rounded-lg bg-ruby/10 hover:bg-ruby/20 text-ruby flex items-center justify-center transition cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ruby/50"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -113,8 +114,10 @@ export function WorkspaceSidebar({ title, projects, selectedProjectId, onSelectP
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm phim..."
-            className="w-full pl-8 pr-2.5 py-1.5 bg-slate-100 dark:bg-white/5 border border-transparent rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-ruby/40 transition"
+            placeholder="Tìm phim…"
+            aria-label="Tìm phim"
+            autoComplete="off"
+            className="w-full pl-8 pr-2.5 py-1.5 bg-slate-100 dark:bg-white/5 border border-transparent rounded-lg text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-ruby/40 transition"
           />
         </div>
       </div>
