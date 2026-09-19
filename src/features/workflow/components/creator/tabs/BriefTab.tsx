@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FileText, Send } from 'lucide-react';
 import type { EpisodePackage, SceneBreakdownItem } from '@/types/workflow';
 import { SceneBreakdownEditor } from '../SceneBreakdownEditor';
+import { useWorkflowStore } from '@/store/useWorkflowStore';
 
 export interface BriefTabProps {
   currentPackage: EpisodePackage;
@@ -17,14 +18,16 @@ export interface BriefTabProps {
  */
 export function BriefTab({ currentPackage, updateContentBrief, submitProductionPlan, reviseProductionPlan }: BriefTabProps) {
   const brief = currentPackage.brief;
+  const targetDurationPerEpisode = useWorkflowStore((s) => s.project.target_duration_per_episode_minutes);
 
-  const [synopsis, setSynopsis] = useState(brief.synopsis);
   const [overviewScript, setOverviewScript] = useState(brief.overview_script);
   const [targetDuration, setTargetDuration] = useState(brief.target_duration_minutes);
   const [estimatedTokens, setEstimatedTokens] = useState(brief.estimated_tokens);
   const [storyboardSummary, setStoryboardSummary] = useState(brief.storyboard_summary);
   const [scenes, setScenes] = useState<SceneBreakdownItem[]>(brief.scene_breakdown);
   const [isSaved, setIsSaved] = useState(false);
+
+  const scenesNeedingRework = brief.scene_reviews.filter((sr) => sr.status === 'changes_requested');
 
   const handleAddScene = () => {
     const nextNum = scenes.length + 1;
@@ -34,8 +37,6 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
       description: 'Mô tả bối cảnh và diễn biến phân cảnh...',
       target_duration_sec: 15,
       estimated_tokens: 60,
-      visual_prompt: 'Cinematic lighting, high detailed scene.',
-      audio_prompt: 'Voiceover and ambient SFX sound.',
     };
     const updated = [...scenes, newScene];
     setScenes(updated);
@@ -59,7 +60,6 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
 
   const handleSaveDraft = () => {
     updateContentBrief(currentPackage.id, {
-      synopsis,
       overview_script: overviewScript,
       target_duration_minutes: targetDuration,
       estimated_tokens: estimatedTokens,
@@ -75,7 +75,6 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
     handleSaveDraft();
     if (currentPackage.status === 'CHANGES_REQUESTED') {
       reviseProductionPlan(currentPackage.id, {
-        synopsis,
         overview_script: overviewScript,
         target_duration_minutes: targetDuration,
         estimated_tokens: estimatedTokens,
@@ -95,9 +94,9 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <FileText className="w-5 h-5 text-ruby" />
-            Soạn Thảo Kế Hoạch & Kịch Bản (Content Brief)
+            Kế Hoạch Sản Xuất
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">PostgreSQL Schema: `content_brief`</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Kịch bản tổng thể và danh sách phân cảnh của tập phim</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -120,30 +119,23 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
         </div>
       </div>
 
+      {scenesNeedingRework.length > 0 && (
+        <div className="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/30 rounded-xl p-4 text-xs text-rose-700 dark:text-rose-300">
+          <strong>Reviewer yêu cầu làm lại {scenesNeedingRework.length} phân cảnh</strong> — xem ghi chú ngay tại từng phân cảnh bên dưới, chỉnh sửa rồi nộp lại.
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Tóm Tắt Cốt Truyện (Synopsis)
+              Kịch Bản Tổng Thể
             </label>
             <textarea
-              rows={3}
-              value={synopsis}
-              onChange={(e) => setSynopsis(e.target.value)}
-              placeholder="Nhập bối cảnh và tóm tắt diễn biến chính của tập phim..."
-              className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl p-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby leading-relaxed font-sans"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
-              Kịch Bản Tổng Thể (Overview Script)
-            </label>
-            <textarea
-              rows={4}
+              rows={6}
               value={overviewScript}
               onChange={(e) => setOverviewScript(e.target.value)}
-              placeholder="Diễn giải kịch bản mở đầu, cao trào và kết thúc..."
+              placeholder="Nhập kịch bản tổng thể của tập phim: bối cảnh, mở đầu, cao trào và kết thúc..."
               className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-xl p-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby leading-relaxed font-sans"
             />
           </div>
@@ -154,7 +146,9 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
             Thông Số Kỹ Thuật Dự Kiến
           </h4>
           <div>
-            <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">Thời lượng mục tiêu (Phút):</label>
+            <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1">
+              Thời lượng mục tiêu (Phút) <span className="text-slate-400">— dự án đề ra {targetDurationPerEpisode} phút</span>:
+            </label>
             <input
               type="number"
               value={targetDuration}
@@ -185,6 +179,7 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
 
       <SceneBreakdownEditor
         scenes={scenes}
+        sceneReviews={brief.scene_reviews}
         onAddScene={handleAddScene}
         onRemoveScene={handleRemoveScene}
         onSceneChange={handleSceneChange}

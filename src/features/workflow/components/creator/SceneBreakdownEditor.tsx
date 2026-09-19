@@ -1,15 +1,16 @@
-import { Plus, Trash2, Layers } from 'lucide-react';
-import type { SceneBreakdownItem } from '@/types/workflow';
+import { Plus, Trash2, Layers, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import type { SceneBreakdownItem, SceneReview } from '@/types/workflow';
 
 export interface SceneBreakdownEditorProps {
   scenes: SceneBreakdownItem[];
+  sceneReviews?: SceneReview[];
   onAddScene: () => void;
   onRemoveScene: (index: number) => void;
   onSceneChange: <K extends keyof SceneBreakdownItem>(index: number, field: K, value: SceneBreakdownItem[K]) => void;
 }
 
-/** Editable list of scenes inside a content brief — add/remove/edit title & AI prompts per scene. */
-export function SceneBreakdownEditor({ scenes, onAddScene, onRemoveScene, onSceneChange }: SceneBreakdownEditorProps) {
+/** Editable list of scenes inside a content brief — add/remove/edit title & description per scene. */
+export function SceneBreakdownEditor({ scenes, sceneReviews, onAddScene, onRemoveScene, onSceneChange }: SceneBreakdownEditorProps) {
   return (
     <div className="pt-4 border-t border-slate-200 dark:border-white/10 space-y-4">
       <div className="flex items-center justify-between">
@@ -27,41 +28,72 @@ export function SceneBreakdownEditor({ scenes, onAddScene, onRemoveScene, onScen
       </div>
 
       <div className="space-y-3">
-        {scenes.map((scene, idx) => (
-          <div key={idx} className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-2">
-              <span className="font-bold text-xs text-ruby flex items-center gap-1.5">Phân Cảnh #{scene.scene_number}</span>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={scene.title}
-                  onChange={(e) => onSceneChange(idx, 'title', e.target.value)}
-                  placeholder="Tiêu đề phân cảnh..."
-                  className="bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-2.5 py-1 text-xs text-slate-900 dark:text-white font-bold"
+        {scenes.map((scene, idx) => {
+          const review = sceneReviews?.find((sr) => sr.scene_number === scene.scene_number);
+          const needsRework = review?.status === 'changes_requested';
+          const isApproved = review?.status === 'approved';
+
+          return (
+            <div
+              key={idx}
+              className={`border rounded-xl p-4 space-y-3 ${
+                needsRework
+                  ? 'bg-rose-50/60 dark:bg-rose-500/[0.06] border-rose-300 dark:border-rose-500/40'
+                  : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10'
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-white/10 pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-xs text-ruby">Phân Cảnh #{scene.scene_number}</span>
+                  {needsRework && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300">
+                      <AlertTriangle className="w-3 h-3" /> Cần làm lại
+                    </span>
+                  )}
+                  {isApproved && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">
+                      <CheckCircle2 className="w-3 h-3" /> Đã duyệt
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={scene.title}
+                    onChange={(e) => onSceneChange(idx, 'title', e.target.value)}
+                    placeholder="Tiêu đề phân cảnh..."
+                    className="bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-2.5 py-1 text-xs text-slate-900 dark:text-white font-bold"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onRemoveScene(idx)}
+                    aria-label={`Xoá phân cảnh ${scene.scene_number}`}
+                    className="p-1 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {needsRework && review?.comment && (
+                <div className="text-[11px] text-rose-700 dark:text-rose-300 bg-white dark:bg-[#161922] border border-rose-200 dark:border-rose-500/30 rounded-lg p-2.5">
+                  <strong>Ghi chú của Reviewer:</strong> {review.comment}
+                </div>
+              )}
+
+              <div className="text-xs">
+                <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1 font-semibold">Mô Tả Phân Cảnh:</label>
+                <textarea
+                  rows={2}
+                  value={scene.description}
+                  onChange={(e) => onSceneChange(idx, 'description', e.target.value)}
+                  placeholder="Mô tả bối cảnh, nhân vật và diễn biến chính của phân cảnh này..."
+                  className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2.5 text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition leading-relaxed"
                 />
-                <button
-                  type="button"
-                  onClick={() => onRemoveScene(idx)}
-                  aria-label={`Xoá phân cảnh ${scene.scene_number}`}
-                  className="p-1 rounded-lg text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition cursor-pointer"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
               </div>
             </div>
-
-            <div className="text-xs">
-              <label className="block text-[11px] text-slate-600 dark:text-slate-400 mb-1 font-semibold">Visual Prompt AI:</label>
-              <textarea
-                rows={2}
-                value={scene.visual_prompt}
-                onChange={(e) => onSceneChange(idx, 'visual_prompt', e.target.value)}
-                placeholder="Mô tả chi tiết góc quay, bối cảnh, nhân vật, chuyển động và hiệu ứng ánh sáng AI..."
-                className="w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg p-2.5 font-mono text-[11px] text-slate-800 dark:text-slate-200 focus:outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition"
-              />
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
