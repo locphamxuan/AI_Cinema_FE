@@ -9,7 +9,9 @@ export interface CreateProjectFormState {
   title: string;
   genre: string[];
   synopsis: string;
-  episodes: number;
+  seasonCount: number;
+  episodesPerSeason: number;
+  targetDurationMinutes: number;
   budgetTokens: number;
   deadline: string;
   releaseDate: string;
@@ -37,7 +39,9 @@ const PRESET_GENRES = [
   'Hài hước',
 ];
 
-const QUICK_EPISODE_OPTIONS = [3, 5, 8, 12];
+const QUICK_SEASON_OPTIONS = [1, 2, 3];
+const QUICK_EPISODES_PER_SEASON_OPTIONS = [3, 4, 5, 8];
+const QUICK_DURATION_OPTIONS = [15, 20, 30, 45];
 const QUICK_TOKEN_OPTIONS = [1500, 3000, 5000, 8000];
 
 export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: CreateProjectModalProps) {
@@ -210,56 +214,136 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           />
         </div>
 
-        {/* Số Tập & Ngân Sách AI Tokens */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          {/* Số Tập */}
-          <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">
-                Số Tập Dự Kiến:
-              </label>
-              <span className="text-[11px] font-mono text-slate-400">1 - 50 tập</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => onChange('episodes', Math.max(1, form.episodes - 1))}
-                className="w-8 h-8 rounded-xl bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
-              >
-                <Minus className="w-3.5 h-3.5" />
-              </button>
-              <input
-                type="number"
-                min={1}
-                max={50}
-                value={form.episodes}
-                onChange={(e) => onChange('episodes', Math.max(1, Number(e.target.value)))}
-                className={`${fieldInputClass} text-center font-bold text-sm py-1.5`}
-              />
-              <button
-                type="button"
-                onClick={() => onChange('episodes', form.episodes + 1)}
-                className="w-8 h-8 rounded-xl bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-              </button>
+        {/* Cấu Trúc Season & Ngân Sách AI Tokens */}
+        <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">Cấu Trúc Season:</label>
+            <span className="text-[11px] font-mono text-ruby font-bold">
+              Tổng {form.seasonCount * form.episodesPerSeason} tập
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-semibold block">Số Season:</span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => onChange('seasonCount', Math.max(1, form.seasonCount - 1))}
+                  className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
+                >
+                  <Minus className="w-3 h-3" />
+                </button>
+                <input
+                  type="number"
+                  min={1}
+                  max={10}
+                  value={form.seasonCount}
+                  onChange={(e) => onChange('seasonCount', Math.max(1, Number(e.target.value)))}
+                  className={`${fieldInputClass} text-center font-bold text-sm py-1.5`}
+                />
+                <button
+                  type="button"
+                  onClick={() => onChange('seasonCount', form.seasonCount + 1)}
+                  className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
+              <div className="flex items-center gap-1 pt-0.5">
+                {QUICK_SEASON_OPTIONS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => onChange('seasonCount', s)}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
+                      form.seasonCount === s
+                        ? 'bg-ruby text-white font-bold'
+                        : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
+                    }`}
+                  >
+                    {s} mùa
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Quick episode pills */}
-            <div className="flex items-center gap-1.5 pt-0.5">
-              {QUICK_EPISODE_OPTIONS.map((ep) => (
+            <div className="space-y-1">
+              <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-semibold block">Số Tập / Season:</span>
+              <div className="flex items-center gap-1.5">
                 <button
-                  key={ep}
                   type="button"
-                  onClick={() => onChange('episodes', ep)}
+                  onClick={() => onChange('episodesPerSeason', Math.max(1, form.episodesPerSeason - 1))}
+                  className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
+                >
+                  <Minus className="w-3 h-3" />
+                </button>
+                <input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={form.episodesPerSeason}
+                  onChange={(e) => onChange('episodesPerSeason', Math.max(1, Number(e.target.value)))}
+                  className={`${fieldInputClass} text-center font-bold text-sm py-1.5`}
+                />
+                <button
+                  type="button"
+                  onClick={() => onChange('episodesPerSeason', form.episodesPerSeason + 1)}
+                  className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
+                >
+                  <Plus className="w-3 h-3" />
+                </button>
+              </div>
+              <div className="flex items-center gap-1 pt-0.5">
+                {QUICK_EPISODES_PER_SEASON_OPTIONS.map((ep) => (
+                  <button
+                    key={ep}
+                    type="button"
+                    onClick={() => onChange('episodesPerSeason', ep)}
+                    className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
+                      form.episodesPerSeason === ep
+                        ? 'bg-ruby text-white font-bold'
+                        : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
+                    }`}
+                  >
+                    {ep} tập
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Thời Lượng Mục Tiêu Mỗi Tập & Ngân Sách AI Tokens */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1">
+                <Calendar className="w-3.5 h-3.5 text-ruby" /> Thời Lượng Mục Tiêu / Tập:
+              </label>
+              <span className="text-[11px] font-mono text-ruby font-bold">{form.targetDurationMinutes} phút</span>
+            </div>
+            <input
+              type="number"
+              min={1}
+              value={form.targetDurationMinutes}
+              onChange={(e) => onChange('targetDurationMinutes', Math.max(1, Number(e.target.value)))}
+              className={`${fieldInputClass} font-mono font-bold py-1.5`}
+            />
+            <p className="text-[10px] text-slate-500 dark:text-zinc-400">Dùng làm mốc so sánh khi duyệt kế hoạch sản xuất của Creator.</p>
+            <div className="flex items-center gap-1.5 pt-0.5">
+              {QUICK_DURATION_OPTIONS.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => onChange('targetDurationMinutes', d)}
                   className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
-                    form.episodes === ep
+                    form.targetDurationMinutes === d
                       ? 'bg-ruby text-white font-bold'
                       : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
                   }`}
                 >
-                  {ep} tập
+                  {d} phút
                 </button>
               ))}
             </div>
