@@ -149,9 +149,13 @@ export function CreatorWorkspacePage() {
                 isQuotaWarning={isQuotaWarning}
                 scenesCount={currentPackage.brief.scene_breakdown.length}
                 estimatedTokens={currentPackage.brief.estimated_tokens}
+                synopsis={project.synopsis}
                 latestFeedback={latestFeedback}
                 canEnterStudio={canEnterStudio}
                 onGotoBrief={() => setActiveTab('brief')}
+                onGotoStudio={() => router.push(`/creator/studio/${currentPackage.id}`)}
+                onGotoTokens={() => setActiveTab('tokens')}
+                onGotoReviews={() => setActiveTab('reviews')}
               />
             )}
 
