@@ -3,8 +3,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export default function DemoControlPanel() {
+  const pathname = usePathname();
+  const isDashboard = pathname.startsWith('/creator') || pathname.startsWith('/reviewer');
   const { user, isVIPMode, wallet, toggleVIPMode, setWalletBalance, isAuthenticated } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -23,10 +26,19 @@ export default function DemoControlPanel() {
   if (!isAuthenticated) return null;
 
   return (
-    <div ref={panelRef} className="fixed bottom-6 left-4 sm:left-6 z-40">
+    <div
+      ref={panelRef}
+      className={`fixed bottom-6 z-40 transition-all duration-300 ${
+        isDashboard ? 'right-20 sm:right-24' : 'left-4 sm:left-6'
+      }`}
+    >
       {/* Popover Control Center (Apple / Glassmorphism Style) */}
       {isOpen && (
-        <div className="absolute bottom-16 left-0 w-[340px] sm:w-[380px] max-w-[calc(100vw-2rem)] bg-white dark:bg-[#161922] p-5 border border-slate-200 dark:border-white/20 shadow-2xl rounded-2xl animate-scale-in z-50">
+        <div
+          className={`absolute bottom-16 ${
+            isDashboard ? 'right-0' : 'left-0'
+          } w-[340px] sm:w-[380px] max-w-[calc(100vw-2rem)] bg-white dark:bg-[#161922] p-5 border border-slate-200 dark:border-white/20 shadow-2xl rounded-2xl animate-scale-in z-50`}
+        >
           {/* Header */}
           <div className="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-100 dark:border-white/10">
             <div className="flex items-center gap-2.5">
