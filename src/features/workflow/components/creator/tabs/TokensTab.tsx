@@ -19,8 +19,8 @@ export function TokensTab({ currentPackage, quotaPercent, isQuotaWarning }: Toke
             <Zap className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">Chi Tiết Tiêu Hao Token AI</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Hạn mức được cấp phát bởi Reviewer (Checker)</p>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">Token đã dùng</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Hạn mức do người kiểm duyệt cấp</p>
           </div>
         </div>
         <span className="text-sm font-mono font-bold text-amber-600 dark:text-amber-400">
@@ -42,7 +42,7 @@ export function TokensTab({ currentPackage, quotaPercent, isQuotaWarning }: Toke
           </div>
         </div>
 
-        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Danh Sách Tác Vụ Sinh Clip:</h4>
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Các phân cảnh đã tạo</h4>
         <div className="space-y-2">
           {currentPackage.jobs.map((job) => (
             <div key={job.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs">

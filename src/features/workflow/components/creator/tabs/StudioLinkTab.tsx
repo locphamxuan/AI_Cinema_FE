@@ -27,31 +27,30 @@ export function StudioLinkTab({ currentPackage, canEnterStudio, onGotoBrief }: S
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Studio Đã Sẵn Sàng Hoạt Động</h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-              Hạn mức Token Quota: <span className="font-bold text-amber-600 dark:text-amber-400 font-mono">{currentPackage.quota_allocated} Tokens</span>
+              Hạn mức token: <span className="font-bold text-amber-600 dark:text-amber-400 font-mono">{currentPackage.quota_allocated} Tokens</span>
             </p>
           </div>
           <Link
             href={`/creator/studio/${currentPackage.id}`}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-ruby hover:bg-ruby-dark text-white font-bold text-xs shadow-md shadow-ruby/20 transition"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-md shadow-purple-600/20 transition"
           >
-            <Play className="w-4 h-4" /> Truy Cập AI Studio Ngay
+            <Play className="w-4 h-4" /> Mở studio
           </Link>
         </div>
       ) : (
         <div className="p-6 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-2xl text-center space-y-3">
           <Clock className="w-10 h-10 text-amber-600 dark:text-amber-400 mx-auto" />
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Studio Đang Khóa (Chờ Duyệt Quota)</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Studio chưa mở</h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-              Kịch bản của bạn đang ở trạng thái <span className="font-bold text-amber-600 dark:text-amber-400">{currentPackage.status}</span>.
-              Reviewer (Checker) cần phê duyệt và cấp Token Quota trước khi bắt đầu sinh clip.
+              Kế hoạch của tập này cần được người kiểm duyệt duyệt và cấp token trước khi bạn bắt đầu tạo clip.
             </p>
           </div>
           <button
             onClick={onGotoBrief}
             className="px-4 py-2 rounded-xl bg-white dark:bg-[#12141A] hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-white/10 transition cursor-pointer"
           >
-            Kiểm tra lại bản kế hoạch
+            Xem lại kế hoạch
           </button>
         </div>
       )}
