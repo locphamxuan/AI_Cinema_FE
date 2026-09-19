@@ -10,6 +10,7 @@ import { PlanReviewTab } from './tabs/PlanReviewTab';
 import { AuditsTab } from './tabs/AuditsTab';
 import { ProjectsTab } from './tabs/ProjectsTab';
 import { TokensTab } from './tabs/TokensTab';
+import { PublicationTab } from './tabs/PublicationTab';
 import { AllocateQuotaModal } from './modals/AllocateQuotaModal';
 import { RejectPlanModal } from './modals/RejectPlanModal';
 import { CreateProjectModal, type CreateProjectFormState } from './modals/CreateProjectModal';
@@ -18,6 +19,7 @@ const TAB_TITLES: Record<ReviewerTab, string> = {
   overview: 'Bảng Điều Khiển Thẩm Định Tổng Thể',
   plans: 'Thẩm Định Kịch Bản & Cấp AI Token Quota',
   audits: 'Kiểm Định Tuân Thủ & Pháp Lý Video',
+  publication: 'Lịch Chiếu & Kế Hoạch Xuất Bản OTT',
   projects: 'Cấu Hình & Quản Lý Dự Án',
   tokens: 'Kiểm Soát Ngân Sách AI Tokens',
 };
@@ -26,6 +28,7 @@ const TAB_BREADCRUMBS: Record<ReviewerTab, string> = {
   overview: 'Tổng Quan',
   plans: 'Duyệt Kế Hoạch',
   audits: 'Kiểm Định Video',
+  publication: 'Lịch Chiếu & Xuất Bản',
   projects: 'Quản Lý Dự Án',
   tokens: 'Ngân Sách Tokens',
 };
@@ -125,7 +128,7 @@ export function ReviewerDashboardPage() {
         onCreateProject={() => setIsCreateProjectOpen(true)}
       />
 
-      <main className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-6 transition-colors">
+      <main className="flex-1 bg-[#F8FAFC] dark:bg-[#111319] p-4 sm:p-6 lg:p-8 overflow-y-auto space-y-6 transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
@@ -140,7 +143,7 @@ export function ReviewerDashboardPage() {
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1 tracking-tight">{TAB_TITLES[activeTab]}</h1>
           </div>
 
-          {(activeTab === 'projects' || activeTab === 'overview') && (
+          {(activeTab === 'projects' || activeTab === 'overview' || activeTab === 'publication') && (
             <button
               onClick={() => setIsCreateProjectOpen(true)}
               className="px-4 py-2 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold text-xs flex items-center gap-2 transition shadow-md shadow-purple-200 dark:shadow-none cursor-pointer"
@@ -171,6 +174,8 @@ export function ReviewerDashboardPage() {
         )}
 
         {activeTab === 'audits' && <AuditsTab project={project} />}
+
+        {activeTab === 'publication' && <PublicationTab project={project} />}
 
         {activeTab === 'projects' && <ProjectsTab project={project} onCreateProject={() => setIsCreateProjectOpen(true)} />}
 
