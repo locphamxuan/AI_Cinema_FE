@@ -1,7 +1,8 @@
 import type { StateCreator } from 'zustand';
-import { EpisodePackage, ProductionProject } from '@/types/workflow';
+import { EpisodePackage, ProductionProject, PENDING_FIELD_REVIEW } from '@/types/workflow';
 import { initialProject, mockAssignedProjects } from '@/features/workflow/mocks/workflowMock';
 import type { EpisodeSlice, WorkflowStoreState } from '../types';
+import { pendingPlanReviews } from '@/features/workflow/lib/planVerdict';
 import { withProjectUpdate } from './projectRoster';
 
 function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumber: number, targetDurationMinutes: number): EpisodePackage {
@@ -25,13 +26,13 @@ function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumbe
       project_id: projectId,
       episode_id: episodeId,
       title: `Tập ${episodeNumber}: Chưa đặt tên`,
-      overview_script: '',
       scene_count: 0,
       target_duration_minutes: targetDurationMinutes,
       estimated_tokens: 0,
+      production_approach: '',
       storyboard_summary: '',
       scene_breakdown: [],
-      scene_reviews: [],
+      ...pendingPlanReviews([]),
       status: 'PLAN_DRAFT',
       created_at: now,
       updated_at: now,
@@ -86,17 +87,17 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     set((state) =>
       withProjectUpdate(state, (project) => ({
         ...project,
+        overall_status: 'PENDING_REVIEW',
         updated_at: new Date().toISOString(),
         episodes: project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
-          const scene_reviews = ep.brief.scene_breakdown.map((sc) => ({ scene_number: sc.scene_number, status: 'pending' as const }));
           return {
             ...ep,
             status: 'PLAN_PENDING',
             brief: {
               ...ep.brief,
               status: 'PLAN_PENDING',
-              scene_reviews,
+              ...pendingPlanReviews(ep.brief.scene_breakdown),
               updated_at: new Date().toISOString(),
             },
           };
@@ -109,11 +110,11 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     set((state) =>
       withProjectUpdate(state, (project) => ({
         ...project,
+        overall_status: 'PENDING_REVIEW',
         updated_at: new Date().toISOString(),
         episodes: project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
           const scenes = updatedBrief.scene_breakdown || ep.brief.scene_breakdown;
-          const scene_reviews = scenes.map((sc) => ({ scene_number: sc.scene_number, status: 'pending' as const }));
           return {
             ...ep,
             status: 'PLAN_PENDING',
@@ -121,7 +122,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
               ...ep.brief,
               ...updatedBrief,
               status: 'PLAN_PENDING',
-              scene_reviews,
+              ...pendingPlanReviews(scenes),
               updated_at: new Date().toISOString(),
             },
           };
@@ -130,18 +131,18 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     );
   },
 
-  reviewScene: (packageId, sceneNumber, status, comment) => {
+  updateOverallScript: (script) => {
     set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          const scene_reviews = ep.brief.scene_reviews.map((sr) =>
-            sr.scene_number === sceneNumber ? { ...sr, status, comment } : sr
-          );
-          return { ...ep, brief: { ...ep.brief, scene_reviews, updated_at: new Date().toISOString() } };
-        }),
-      }))
+      withProjectUpdate(state, (project) => {
+        if (script === project.overall_script) return project;
+        return {
+          ...project,
+          overall_script: script,
+          script_version: project.script_version + 1,
+          script_review: PENDING_FIELD_REVIEW,
+          updated_at: new Date().toISOString(),
+        };
+      })
     );
   },
 
@@ -306,16 +307,20 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       title: data.title,
       genre: data.genre,
       synopsis: data.synopsis,
+      overall_script: '',
+      script_version: 1,
+      script_review: PENDING_FIELD_REVIEW,
       season_count: data.season_count,
       episodes_per_season: data.episodes_per_season,
       total_episodes: totalEpisodes,
       total_budget_tokens: data.total_budget_tokens,
       allocated_tokens: 0,
       consumed_tokens: 0,
+      production_start_date: data.production_start_date,
       deadline: data.deadline,
       planned_release_date: data.planned_release_date,
-      creator_name: 'Đạo diễn Trần Minh Huy (Maker)',
-      reviewer_name: 'Thẩm định viên Lê Quốc Bảo (Checker)',
+      creator_name: 'Trần Minh Huy',
+      reviewer_name: 'Lê Quốc Bảo',
       overall_status: 'NOT_STARTED',
       milestones,
       active_milestone_id: milestones[0]?.id,

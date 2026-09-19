@@ -1,11 +1,12 @@
 import type { WorkflowState } from './workflow-role';
 import type { GenerationJob, GeneratedAsset } from './workflow-job';
-import type { SceneReview } from './workflow-review';
+import type { FieldReview, SceneReview } from './workflow-review';
 
 /**
- * 1. content_brief: Kịch bản và kế hoạch sản xuất ban đầu. Chỉ giữ mô tả
+ * 1. content_brief: Episode Plan — kế hoạch sản xuất của một tập. Chỉ giữ mô tả
  * phân cảnh ở bước lập kế hoạch — prompt AI thuộc bước sản xuất (Studio),
- * xem GenerationStep trong workflow-job.ts.
+ * xem GenerationStep trong workflow-job.ts. Kịch bản tổng thể nằm ở cấp
+ * ProductionProject (overall_script), không lặp lại theo từng tập.
  */
 export interface SceneBreakdownItem {
   scene_number: number;
@@ -20,14 +21,19 @@ export interface ContentBrief {
   project_id: string;
   episode_id: string;
   title: string;
-  overview_script: string;
   scene_count: number;
+  /** Creator's proposed duration (proposed_duration), checked against EpisodePackage.target_duration_minutes. */
   target_duration_minutes: number;
+  /** Planning estimate summed from scene_breakdown — not a hard quota (BR-38). */
   estimated_tokens: number;
+  /** How the Creator plans to produce/assemble assets (model/prompt strategy). */
+  production_approach: string;
   storyboard_summary: string;
   scene_breakdown: SceneBreakdownItem[];
-  /** Per-scene reviewer verdict — reset to 'pending' on every (re)submit. */
+  /** Field-level reviewer verdicts (BR-39) — all reset to 'pending' on every (re)submit. */
   scene_reviews: SceneReview[];
+  duration_review: FieldReview;
+  token_review: FieldReview;
   status: WorkflowState;
   created_at: string;
   updated_at: string;
@@ -77,12 +83,18 @@ export interface ProductionProject {
   title: string;
   genre: string[];
   synopsis: string;
+  /** Overall script of the whole movie/series, shared by every episode plan. */
+  overall_script: string;
+  script_version: number;
+  script_review: FieldReview;
   season_count: number;
   episodes_per_season: number;
   total_episodes: number;
   total_budget_tokens: number;
   allocated_tokens: number;
   consumed_tokens: number;
+  production_start_date: string;
+  /** Production end date (production_end_date). */
   deadline: string;
   planned_release_date: string;
   creator_name: string;

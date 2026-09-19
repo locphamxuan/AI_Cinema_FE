@@ -4,6 +4,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import type { ProjectMilestone } from '@/types/workflow';
+import { clamp, MAX_EPISODE_MINUTES, MAX_EPISODES_PER_SEASON, MIN_EPISODES_PER_SEASON } from '@/features/workflow/lib/limits';
 
 export interface CreateProjectFormState {
   title: string;
@@ -14,6 +15,7 @@ export interface CreateProjectFormState {
   /** One target duration (minutes) per episode, in creation order. */
   episodeDurations: number[];
   budgetTokens: number;
+  productionStartDate: string;
   deadline: string;
   releaseDate: string;
   milestones: ProjectMilestone[];
@@ -100,20 +102,20 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
   };
 
   const handleSeasonCountChange = (value: number) => {
-    const seasonCount = Math.max(1, value);
+    const seasonCount = clamp(value, 1, 10);
     onChange('seasonCount', seasonCount);
     onChange('episodeDurations', resizeDurations(seasonCount, form.episodesPerSeason, form.episodeDurations));
   };
 
   const handleEpisodesPerSeasonChange = (value: number) => {
-    const episodesPerSeason = Math.max(1, value);
+    const episodesPerSeason = clamp(value, MIN_EPISODES_PER_SEASON, MAX_EPISODES_PER_SEASON);
     onChange('episodesPerSeason', episodesPerSeason);
     onChange('episodeDurations', resizeDurations(form.seasonCount, episodesPerSeason, form.episodeDurations));
   };
 
   const handleDurationChange = (index: number, minutes: number) => {
     const updated = [...form.episodeDurations];
-    updated[index] = Math.max(1, minutes);
+    updated[index] = clamp(minutes, 1, MAX_EPISODE_MINUTES);
     onChange('episodeDurations', updated);
   };
 
@@ -132,23 +134,23 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
     <Modal
       open={open}
       onClose={onClose}
-      title="Khởi Tạo Dự Án Phim AI Mới"
-      subtitle="Thiết lập hạn mức Token, lịch trình cột mốc và thể loại phim"
-      icon={<Film className="w-4 h-4 text-ruby" />}
+      title="Tạo dự án phim"
+      subtitle="Thiết lập số mùa, số tập, ngân sách token và lịch sản xuất"
+      icon={<Film className="w-4 h-4 text-purple-600 dark:text-purple-400" />}
       maxWidth="max-w-2xl"
     >
       <form onSubmit={onSubmit} className="space-y-4 text-xs">
         {/* Tên Dự Án */}
         <div>
           <label className="block text-slate-700 dark:text-zinc-300 mb-1.5 text-xs font-bold flex items-center gap-1.5">
-            <Film className="w-3.5 h-3.5 text-ruby" /> Tên Dự Án Phim: <span className="text-ruby">*</span>
+            <Film className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Tên dự án phim <span className="text-purple-600 dark:text-purple-400">*</span>
           </label>
           <input
             type="text"
             required
             value={form.title}
             onChange={(e) => onChange('title', e.target.value)}
-            placeholder="Ví dụ: Kỷ Nguyên Siêu Trí Tuệ 2088..."
+            placeholder="Ví dụ: Kỷ Nguyên Siêu Trí Tuệ 2088…"
             className={fieldInputClass}
           />
         </div>
@@ -157,7 +159,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
         <div className="space-y-2.5 bg-slate-50 dark:bg-white/[0.03] p-4 rounded-2xl border border-slate-200/80 dark:border-white/10">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-ruby" /> Thể Loại Phim (Tags):
+              <Tag className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Thể Loại Phim (Tags):
             </label>
             <span className="text-[11px] font-medium text-slate-500 dark:text-zinc-400 bg-slate-200/60 dark:bg-white/10 px-2 py-0.5 rounded-full">
               Đã chọn {form.genre.length} thể loại
@@ -170,13 +172,13 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
               {form.genre.map((g) => (
                 <span
                   key={g}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-ruby/10 dark:bg-ruby/20 text-ruby border border-ruby/30 shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-600/10 dark:bg-purple-600/20 text-purple-600 dark:text-purple-400 border border-purple-600/30 shadow-xs"
                 >
                   <span>{g}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveTag(g)}
-                    className="w-3.5 h-3.5 rounded-full hover:bg-ruby hover:text-white flex items-center justify-center transition cursor-pointer"
+                    className="w-3.5 h-3.5 rounded-full hover:bg-purple-600 hover:text-white flex items-center justify-center transition cursor-pointer"
                     title="Xóa tag này"
                   >
                     <X className="w-2.5 h-2.5" />
@@ -201,8 +203,8 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                     onClick={() => togglePresetGenre(preset)}
                     className={`px-2.5 py-1 rounded-lg text-[11px] transition cursor-pointer font-semibold border ${
                       isSelected
-                        ? 'bg-ruby text-white border-ruby shadow-xs'
-                        : 'bg-white dark:bg-white/5 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-white/10 hover:border-ruby/40 hover:bg-slate-100 dark:hover:bg-white/10'
+                        ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
+                        : 'bg-white dark:bg-white/5 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-white/10 hover:border-purple-600/40 hover:bg-slate-100 dark:hover:bg-white/10'
                     }`}
                   >
                     {isSelected ? `✓ ${preset}` : `+ ${preset}`}
@@ -224,7 +226,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                   handleAddCustomTag();
                 }
               }}
-              placeholder="Nhập tag tự định nghĩa (Enter để thêm)..."
+              placeholder="Nhập tag tự định nghĩa (Enter để thêm)…"
               className={`${fieldInputClass} py-1.5 text-xs`}
             />
             <button
@@ -246,7 +248,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
             rows={2}
             value={form.synopsis}
             onChange={(e) => onChange('synopsis', e.target.value)}
-            placeholder="Dự án điện ảnh ứng dụng công nghệ GenAI thế hệ mới, mâu thuẫn trung tâm và phong cách hình ảnh..."
+            placeholder="Dự án điện ảnh ứng dụng công nghệ GenAI thế hệ mới, mâu thuẫn trung tâm và phong cách hình ảnh…"
             className={fieldTextareaClass}
           />
         </div>
@@ -254,8 +256,8 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
         {/* Cấu Trúc Season & Ngân Sách AI Tokens */}
         <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
           <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">Cấu Trúc Season:</label>
-            <span className="text-[11px] font-mono text-ruby font-bold">
+            <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">Số mùa và số tập</label>
+            <span className="text-[11px] font-mono text-purple-600 dark:text-purple-400 font-bold">
               Tổng {form.seasonCount * form.episodesPerSeason} tập
             </span>
           </div>
@@ -295,7 +297,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                     onClick={() => handleSeasonCountChange(s)}
                     className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
                       form.seasonCount === s
-                        ? 'bg-ruby text-white font-bold'
+                        ? 'bg-purple-600 text-white font-bold'
                         : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
                     }`}
                   >
@@ -317,8 +319,8 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                 </button>
                 <input
                   type="number"
-                  min={1}
-                  max={20}
+                  min={MIN_EPISODES_PER_SEASON}
+                  max={MAX_EPISODES_PER_SEASON}
                   value={form.episodesPerSeason}
                   onChange={(e) => handleEpisodesPerSeasonChange(Number(e.target.value))}
                   className={`${fieldInputClass} text-center font-bold text-sm py-1.5`}
@@ -339,7 +341,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                     onClick={() => handleEpisodesPerSeasonChange(ep)}
                     className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
                       form.episodesPerSeason === ep
-                        ? 'bg-ruby text-white font-bold'
+                        ? 'bg-purple-600 text-white font-bold'
                         : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
                     }`}
                   >
@@ -355,7 +357,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
         <div className="space-y-2 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
           <div className="flex items-center justify-between">
             <label className="text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-ruby" /> Thời Lượng Mục Tiêu Từng Tập:
+              <Calendar className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Thời Lượng Mục Tiêu Từng Tập:
             </label>
             <span className="text-[10px] text-slate-500 dark:text-zinc-400">Mốc so sánh khi duyệt kế hoạch</span>
           </div>
@@ -364,8 +366,9 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
             <input
               type="number"
               min={1}
+              max={MAX_EPISODE_MINUTES}
               value={bulkDuration}
-              onChange={(e) => setBulkDuration(Math.max(1, Number(e.target.value)))}
+              onChange={(e) => setBulkDuration(clamp(Number(e.target.value), 1, MAX_EPISODE_MINUTES))}
               className={`${fieldInputClass} w-20 text-center py-1`}
             />
             <span className="text-[11px] text-slate-500 dark:text-zinc-400">phút</span>
@@ -391,9 +394,10 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                   <input
                     type="number"
                     min={1}
-                    value={form.episodeDurations[row.index] ?? 30}
+                    max={MAX_EPISODE_MINUTES}
+                    value={form.episodeDurations[row.index] ?? MAX_EPISODE_MINUTES}
                     onChange={(e) => handleDurationChange(row.index, Number(e.target.value))}
-                    className="w-14 text-center py-0.5 rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs font-mono font-semibold text-slate-800 dark:text-white focus:outline-none focus:border-ruby"
+                    className="w-14 text-center py-0.5 rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs font-mono font-semibold text-slate-800 dark:text-white focus:outline-none focus:border-purple-600"
                   />
                   <span className="text-[10px] text-slate-400">phút</span>
                 </div>
@@ -407,7 +411,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1">
-                <Coins className="w-3.5 h-3.5 text-amber-500" /> Ngân Sách AI Tokens:
+                <Coins className="w-3.5 h-3.5 text-amber-500" /> Ngân sách token
               </label>
               <span className="text-[11px] font-mono text-amber-600 dark:text-amber-400 font-bold">
                 {form.budgetTokens.toLocaleString()} Tokens
@@ -449,10 +453,21 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
         </div>
 
         {/* Hạn Chót Sản Xuất & Ngày Công Chiếu */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
           <div>
             <label className="block text-slate-700 dark:text-zinc-300 mb-1.5 text-xs font-bold flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-ruby" /> Hạn Chót Sản Xuất (Deadline):
+              <Calendar className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Bắt Đầu Sản Xuất:
+            </label>
+            <input
+              type="date"
+              value={form.productionStartDate}
+              onChange={(e) => onChange('productionStartDate', e.target.value)}
+              className={fieldInputClass}
+            />
+          </div>
+          <div>
+            <label className="block text-slate-700 dark:text-zinc-300 mb-1.5 text-xs font-bold flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Kết thúc sản xuất
             </label>
             <input
               type="date"
@@ -463,7 +478,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           </div>
           <div>
             <label className="block text-slate-700 dark:text-zinc-300 mb-1.5 text-xs font-bold flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-emerald-500" /> Ngày Công Chiếu Dự Kiến:
+              <Calendar className="w-3.5 h-3.5 text-emerald-500" /> Ngày công chiếu dự kiến
             </label>
             <input
               type="date"
@@ -479,7 +494,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           <div className="flex items-center justify-between">
             <div>
               <label className="text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
-                <MilestoneIcon className="w-3.5 h-3.5 text-ruby" /> Lộ Trình Cột Mốc Tiến Độ:
+                <MilestoneIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Lộ Trình Cột Mốc Tiến Độ:
               </label>
               <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">
                 Mốc bàn giao kịch bản, video draft và nghiệm thu cho Creator
@@ -488,16 +503,16 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
             <button
               type="button"
               onClick={handleAddMilestone}
-              className="px-3 py-1.5 rounded-xl bg-ruby text-white font-bold text-xs flex items-center gap-1.5 transition hover:bg-ruby-dark cursor-pointer"
+              className="px-3 py-1.5 rounded-xl bg-purple-600 text-white font-bold text-xs flex items-center gap-1.5 transition hover:bg-purple-700 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Thêm Mốc</span>
+              <span>Thêm mốc</span>
             </button>
           </div>
 
           {form.milestones.length === 0 ? (
             <div className="text-center py-6 text-slate-400 dark:text-zinc-500 bg-white dark:bg-[#0E1118] rounded-xl border border-dashed border-slate-200 dark:border-white/10 text-xs">
-              Chưa có cột mốc nào. Bấm nút &quot;Thêm Mốc&quot; ở trên để thiết lập tiến độ dự án.
+              Chưa có cột mốc nào. Bấm nút &quot;Thêm mốc&quot; ở trên để thiết lập tiến độ dự án.
             </div>
           ) : (
             <div className="space-y-2.5 max-h-52 overflow-y-auto pr-1">
@@ -508,7 +523,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-lg bg-ruby/10 text-ruby flex items-center justify-center text-[10px]">
+                      <span className="w-5 h-5 rounded-lg bg-purple-600/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-[10px]">
                         {index + 1}
                       </span>
                       <span>Giai đoạn {index + 1}</span>
@@ -528,7 +543,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                     required
                     value={ms.title}
                     onChange={(e) => handleUpdateMilestone(index, 'title', e.target.value)}
-                    placeholder="Tên cột mốc (vd: Hoàn thành kịch bản phân cảnh 5 tập)..."
+                    placeholder="Tên cột mốc (vd: Hoàn thành kịch bản phân cảnh 5 tập)…"
                     className={`${fieldInputClass} text-xs py-1.5`}
                   />
 
@@ -563,7 +578,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                     type="text"
                     value={ms.description || ''}
                     onChange={(e) => handleUpdateMilestone(index, 'description', e.target.value)}
-                    placeholder="Sản phẩm nghiệm thu (vd: Kịch bản phân cảnh, prompt mẫu, clip 4K)..."
+                    placeholder="Sản phẩm nghiệm thu (vd: Kịch bản phân cảnh, prompt mẫu, clip 4K)…"
                     className={`${fieldInputClass} text-[11px] py-1 text-slate-600 dark:text-zinc-400`}
                   />
                 </div>

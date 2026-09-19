@@ -14,11 +14,14 @@ export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], Com
   publications: initialPublications,
 
   saveComplianceCheck: (packageId, data, labelData) => {
+    // A failed check must go back to the Creator (request changes), never be recorded as passed.
+    if (data.article_44_passed === false || data.decree142_passed === false || data.watermark_verified === false) return;
+
     const compliance: ComplianceCheck = {
       id: `comp-${Date.now()}`,
       episode_package_id: packageId,
       checker_id: 'rev-user-01',
-      checker_name: 'Lê Quốc Bảo (Checker)',
+      checker_name: 'Lê Quốc Bảo',
       article_44_passed: data.article_44_passed ?? true,
       decree142_passed: data.decree142_passed ?? true,
       watermark_verified: data.watermark_verified ?? true,

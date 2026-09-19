@@ -8,6 +8,7 @@ import {
   GenerationStep,
   ReviewLog,
   SceneReviewStatus,
+  PlanFieldKey,
   ComplianceCheck,
   AIContentLabel,
   Publication,
@@ -34,7 +35,8 @@ export interface EpisodeSlice {
   updateContentBrief: (packageId: string, briefData: Partial<ContentBrief>) => void;
   submitProductionPlan: (packageId: string) => void;
   reviseProductionPlan: (packageId: string, updatedBrief: Partial<ContentBrief>) => void;
-  reviewScene: (packageId: string, sceneNumber: number, status: SceneReviewStatus, comment?: string) => void;
+  /** Rewrites the project-level overall script; bumps script_version and resets its review when the text changed. */
+  updateOverallScript: (script: string) => void;
   addSceneJob: (packageId: string, sceneData: Omit<GenerationJob, 'id' | 'status' | 'progress' | 'created_at' | 'updated_at'>) => void;
   removeSceneJob: (packageId: string, jobId: string) => void;
   addGenerationStep: (packageId: string, jobId: string, step: Omit<GenerationStep, 'id'>) => void;
@@ -50,6 +52,7 @@ export interface EpisodeSlice {
     /** One target duration (minutes) per episode, in creation order. */
     episode_target_durations: number[];
     total_budget_tokens: number;
+    production_start_date: string;
     deadline: string;
     planned_release_date: string;
     milestones?: ProjectMilestone[];
@@ -64,6 +67,9 @@ export interface ProductionSlice {
 
 export interface ReviewSlice {
   reviews: ReviewLog[];
+  reviewScene: (packageId: string, sceneNumber: number, status: SceneReviewStatus, comment?: string) => void;
+  /** Field-level review of the overall script, or an episode's duration/token estimate (BR-39). */
+  reviewPlanField: (packageId: string, field: PlanFieldKey, status: SceneReviewStatus, comment?: string) => void;
   requestPlanChanges: (packageId: string, feedbackNotes: string) => void;
   allocateQuota: (packageId: string, tokenQuota: number, notes?: string) => void;
   requestContentChanges: (packageId: string, feedbackNotes: string) => void;
