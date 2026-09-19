@@ -1,12 +1,14 @@
 import Link from 'next/link';
-import { Tv, Info, Globe, Smartphone, CheckCircle2, Send, Eye } from 'lucide-react';
 import type { PublicationVisibility } from '@/types/workflow';
 
 const CHANNELS = [
-  { id: 'WEB_OTT', label: 'Web OTT', icon: Globe },
-  { id: 'MOBILE_APP', label: 'Mobile App', icon: Smartphone },
-  { id: 'SMART_TV', label: 'Smart TV', icon: Tv },
+  { id: 'WEB_OTT', label: 'Web' },
+  { id: 'MOBILE_APP', label: 'Ứng dụng di động' },
+  { id: 'SMART_TV', label: 'Smart TV' },
 ] as const;
+
+const FIELD_CLASS =
+  'w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 disabled:opacity-60';
 
 export interface PublishStationProps {
   packageId: string;
@@ -22,6 +24,7 @@ export interface PublishStationProps {
   onPublish: () => void;
 }
 
+/** Step 2 of the video audit: schedule and release the episode. Locked until step 1 is signed off. */
 export function PublishStation({
   packageId,
   isCompliancePassed,
@@ -35,115 +38,85 @@ export function PublishStation({
   onToggleChannel,
   onPublish,
 }: PublishStationProps) {
+  const isLocked = !isCompliancePassed || isPublished;
+
   return (
-    <div
-      className={`bg-white dark:bg-[#161922] border rounded-2xl p-5 space-y-4 transition ${
-        isCompliancePassed ? 'border-slate-200 dark:border-white/10 opacity-100' : 'border-slate-100 dark:border-white/5 opacity-50 pointer-events-none'
-      }`}
-    >
-      <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-ruby/10 border border-ruby/30 flex items-center justify-center text-ruby">
-            <Tv className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">Lên lịch & Phát hành</h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">Phân phối tới OTT Cinema Catalog</p>
-          </div>
-        </div>
+    <section aria-labelledby="publish-title" className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#151822] p-5">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 id="publish-title" className="text-sm font-semibold text-slate-900 dark:text-white">
+          <span className="text-slate-400 font-normal mr-1.5">2.</span>Phát hành
+        </h2>
         {isPublished && (
-          <span className="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/30 text-[11px] font-bold">
-            LIVE TRÊN OTT
+          <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+            Đã phát hành
           </span>
         )}
       </div>
 
-      {!isCompliancePassed && (
-        <div className="p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl text-xs text-amber-700 dark:text-amber-400 flex items-center gap-2">
-          <Info className="w-4 h-4 shrink-0" />
-          <span>Cần hoàn tất xác nhận Pháp lý AI phía trên trước khi phát hành.</span>
-        </div>
-      )}
+      {!isCompliancePassed && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Xác nhận kiểm định pháp lý ở bước 1 để mở bước này.</p>}
 
-      <div className="space-y-3 text-xs">
+      <fieldset disabled={isLocked} className="mt-4 space-y-4 disabled:opacity-60 min-w-0">
         <div>
-          <label className="block text-slate-500 dark:text-slate-400 mb-1">Thời gian công chiếu:</label>
-          <input
-            type="datetime-local"
-            value={scheduledDate}
-            onChange={(e) => onScheduledDateChange(e.target.value)}
-            disabled={isPublished}
-            className="w-full bg-white dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600"
-          />
+          <label htmlFor="publish-time" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">
+            Thời gian công chiếu
+          </label>
+          <input id="publish-time" type="datetime-local" value={scheduledDate} onChange={(e) => onScheduledDateChange(e.target.value)} className={FIELD_CLASS} />
         </div>
 
         <div>
-          <label className="block text-slate-500 dark:text-slate-400 mb-1.5">Kênh phân phối áp dụng:</label>
-          <div className="grid grid-cols-3 gap-2">
-            {CHANNELS.map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                type="button"
-                disabled={isPublished}
-                onClick={() => onToggleChannel(id)}
-                className={`p-2 rounded-xl border text-center flex flex-col items-center gap-1 transition ${
-                  selectedChannels.includes(id)
-                    ? 'bg-purple-50 dark:bg-purple-500/20 border-purple-400 dark:border-purple-500 text-slate-900 dark:text-white'
-                    : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/5 text-slate-500 dark:text-slate-400'
-                }`}
-              >
-                <Icon className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                <span className="text-[11px] font-semibold">{label}</span>
-              </button>
-            ))}
+          <span className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">Phát trên</span>
+          <div className="flex flex-wrap gap-2">
+            {CHANNELS.map(({ id, label }) => {
+              const isOn = selectedChannels.includes(id);
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={isOn}
+                  onClick={() => onToggleChannel(id)}
+                  className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${
+                    isOn
+                      ? 'border-purple-500 bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300'
+                      : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         <div>
-          <label className="block text-slate-500 dark:text-slate-400 mb-1">Chế độ hiển thị:</label>
-          <select
-            value={visibility}
-            onChange={(e) => onVisibilityChange(e.target.value as PublicationVisibility)}
-            disabled={isPublished}
-            className="w-full bg-white dark:bg-[#1e222d] border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-600 focus:ring-1 focus:ring-purple-600"
-          >
-            <option value="public">Công khai toàn bộ khán giả (Public)</option>
-            <option value="vip_only">Chỉ dành cho tài khoản VIP (VIP Early Access)</option>
-            <option value="unlisted">Không công khai (Chỉ xem qua liên kết)</option>
+          <label htmlFor="publish-visibility" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1.5">
+            Ai được xem
+          </label>
+          <select id="publish-visibility" value={visibility} onChange={(e) => onVisibilityChange(e.target.value as PublicationVisibility)} className={FIELD_CLASS}>
+            <option value="public">Tất cả khán giả</option>
+            <option value="vip_only">Thành viên VIP xem sớm</option>
+            <option value="unlisted">Chỉ người có liên kết</option>
           </select>
         </div>
-      </div>
+      </fieldset>
 
       {isPublished ? (
-        <div className="space-y-2">
-          <div className="p-3 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl text-center text-xs text-emerald-700 dark:text-emerald-400 font-semibold flex items-center justify-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> Tập phim đã phát hành công khai trên nền tảng OTT!
-          </div>
-          <Link
-            href={`/watch/${packageId}`}
-            className="w-full py-2.5 rounded-xl bg-ruby hover:bg-ruby-dark text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-ruby/20"
-          >
-            <Eye className="w-4 h-4" /> Mở trang xem phim (Watch OTT)
-          </Link>
-        </div>
+        <Link
+          href={`/watch/${packageId}`}
+          className="mt-5 w-full py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 flex items-center justify-center transition"
+        >
+          Xem trên OTT
+        </Link>
       ) : (
         <button
+          type="button"
           onClick={onPublish}
           disabled={!isCompliancePassed || isPublishing}
-          className="w-full py-3 rounded-xl bg-ruby hover:bg-ruby-dark disabled:opacity-50 text-white font-bold text-xs flex items-center justify-center gap-2 transition shadow-lg shadow-ruby/25"
+          className="mt-5 w-full py-2.5 rounded-lg text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
         >
-          {isPublishing ? (
-            <>
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Đang đồng bộ và phát hành OTT...
-            </>
-          ) : (
-            <>
-              <Send className="w-4 h-4" /> Phát hành lên nền tảng OTT (Publish Content to Platform)
-            </>
-          )}
+          {isPublishing ? 'Đang phát hành…' : 'Phát hành'}
         </button>
       )}
-    </div>
+    </section>
   );
 }
