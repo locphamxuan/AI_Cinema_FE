@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X, Trash2, Tag, Calendar, Milestone as MilestoneIcon, Film, Coins, Minus } from 'lucide-react';
+import { Plus, X, Trash2, Tag, Calendar, Milestone as MilestoneIcon, Film, Coins, Minus, UserCheck } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
@@ -8,6 +8,7 @@ import { clamp, MAX_EPISODE_MINUTES, MAX_EPISODES_PER_SEASON, MIN_EPISODES_PER_S
 
 export interface CreateProjectFormState {
   title: string;
+  assignedCreator: string;
   genre: string[];
   synopsis: string;
   seasonCount: number;
@@ -28,6 +29,14 @@ export interface CreateProjectModalProps {
   form: CreateProjectFormState;
   onChange: <K extends keyof CreateProjectFormState>(field: K, value: CreateProjectFormState[K]) => void;
 }
+
+const PRESET_CREATORS = [
+  'Trần Minh Huy',
+  'Nguyễn Văn An',
+  'Phạm Thùy Linh',
+  'Lê Hoàng Nam',
+  'Đặng Thu Hà',
+];
 
 const PRESET_GENRES = [
   'Khoa học viễn tưởng',
@@ -487,6 +496,24 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
               className={fieldInputClass}
             />
           </div>
+        </div>
+
+        {/* Creator Phụ Trách (Dropdown) */}
+        <div>
+          <label className="block text-slate-700 dark:text-zinc-300 mb-1.5 text-xs font-bold flex items-center gap-1.5">
+            <UserCheck className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Creator Phụ Trách <span className="text-purple-600 dark:text-purple-400">*</span>
+          </label>
+          <select
+            value={form.assignedCreator}
+            onChange={(e) => onChange('assignedCreator', e.target.value)}
+            className={`${fieldInputClass} cursor-pointer font-medium text-slate-800 dark:text-zinc-200 bg-white dark:bg-[#0E1118]`}
+          >
+            {PRESET_CREATORS.map((creator) => (
+              <option key={creator} value={creator} className="bg-white dark:bg-[#0E1118] text-slate-900 dark:text-white">
+                {creator}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Section 2: Cột mốc (Thời gian tiến độ dự án) */}

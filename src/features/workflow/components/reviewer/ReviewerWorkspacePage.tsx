@@ -20,6 +20,7 @@ type ReviewerTab = 'overview' | 'plans' | 'audits' | 'publication' | 'tokens';
 
 const DEFAULT_FORM: CreateProjectFormState = {
   title: '',
+  assignedCreator: 'Trần Minh Huy',
   genre: ['Khoa học viễn tưởng', 'Hành động AI'],
   synopsis: '',
   seasonCount: 1,
@@ -97,6 +98,7 @@ export function ReviewerWorkspacePage() {
 
     createProject({
       title: createForm.title,
+      creator_name: createForm.assignedCreator,
       genre: createForm.genre.length > 0 ? createForm.genre : ['Khoa học viễn tưởng'],
       synopsis: createForm.synopsis || 'Dự án điện ảnh ứng dụng công nghệ GenAI thế hệ mới.',
       season_count: createForm.seasonCount,
