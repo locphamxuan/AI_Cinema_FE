@@ -23,6 +23,7 @@ import {
   Plus,
   User,
 } from 'lucide-react';
+import { toast } from '@/components/ui/Toast';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { mockAssignedProjects } from '@/features/workflow/mocks/workflowMock';
 import type { ProductionProject } from '@/types/workflow';
@@ -128,7 +129,7 @@ export function ReviewerProjectHubPage() {
 
     setIsCreateProjectOpen(false);
     setCreateForm(DEFAULT_FORM);
-    alert('Đã khởi tạo dự án sản xuất phim AI mới thành công!');
+    toast.success('Khởi tạo dự án thành công!', 'Dự án sản xuất phim AI mới đã được tạo và kích hoạt.');
   };
 
   const renderStatusBadge = (status?: string) => {

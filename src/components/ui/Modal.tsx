@@ -29,14 +29,14 @@ export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth
         className={`relative bg-white dark:bg-[#13161F] border border-slate-200/80 dark:border-white/15 rounded-3xl w-full ${maxWidth} shadow-2xl shadow-black/50 overflow-hidden my-auto animate-scale-in flex flex-col max-h-[92vh]`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Gradient Shimmer Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ruby via-neon to-coin z-10" />
+        {/* Top Accent Bar */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-indigo-600 z-10" />
 
         {/* Modal Header (Sticky) */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-[#13161F]/95 backdrop-blur-md shrink-0">
           <div className="flex items-center gap-3">
             {icon && (
-              <div className="w-8 h-8 rounded-xl bg-ruby/10 text-ruby flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center shrink-0">
                 {icon}
               </div>
             )}

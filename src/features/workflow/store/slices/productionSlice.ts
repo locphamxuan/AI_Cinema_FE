@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand';
 import { GeneratedAsset } from '@/types/workflow';
 import type { ProductionSlice, WorkflowStoreState } from '../types';
+import { toast } from '@/components/ui/Toast';
 
 export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], ProductionSlice> = (set, get) => ({
   triggerGenerationJob: async (packageId, jobId) => {
@@ -16,7 +17,10 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
     const cost = job.token_cost;
 
     if (quota > 0 && currentTokens + cost > quota) {
-      alert(`Vượt quá hạn mức Token Quota đã cấp (${currentTokens}/${quota} Tokens, Cần: ${cost})!`);
+      toast.error(
+        'Vượt quá hạn mức Token Quota!',
+        `Đã dùng ${currentTokens}/${quota} Tokens, cần thêm ${cost} Tokens. Vui lòng xin cấp thêm Quota.`
+      );
       return false;
     }
 

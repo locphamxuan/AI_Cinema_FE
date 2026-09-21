@@ -13,6 +13,7 @@ import AuthModal from '@/components/auth/AuthModal';
 import DemoControlPanel from '@/components/home/DemoControlPanel';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import RightSidebar from '@/components/layout/RightSidebar';
+import { ToastContainer } from '@/components/ui/Toast';
 import { allMockMovies } from '@/mocks/mockData';
 
 const genreOptions = [
@@ -476,6 +477,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       {/* Global Floating Controls */}
       <DemoControlPanel />
       <SupportChatWidget />
+      <ToastContainer />
     </>
   );
 }

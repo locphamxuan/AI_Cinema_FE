@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { FileText, Send } from 'lucide-react';
 import type { EpisodePackage, SceneBreakdownItem } from '@/types/workflow';
 import { SceneBreakdownEditor } from '../SceneBreakdownEditor';
+import { toast } from '@/components/ui/Toast';
 
 export interface BriefTabProps {
   currentPackage: EpisodePackage;
@@ -68,6 +69,7 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
       scene_count: scenes.length,
     });
     setIsSaved(true);
+    toast.info('Đã lưu bản nháp', 'Nội dung kịch bản và phân cảnh đã được cập nhật thành công.');
     setTimeout(() => setIsSaved(false), 2000);
   };
 
@@ -82,29 +84,35 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
         storyboard_summary: storyboardSummary,
         scene_breakdown: scenes,
       });
-      alert('Đã nộp bản kế hoạch hiệu chỉnh lên Reviewer (Checker) để duyệt và cấp lại Quota!');
+      toast.success(
+        'Đã nộp bản kế hoạch hiệu chỉnh!',
+        'Kịch bản chỉnh sửa đã được chuyển lên Reviewer (Checker) để duyệt và cấp lại Quota.'
+      );
     } else {
       submitProductionPlan(currentPackage.id);
-      alert('Đã nộp Kế hoạch Sản xuất lên Thẩm định viên (Reviewer) để phê duyệt và cấp Token Quota!');
+      toast.success(
+        'Đã nộp Kế hoạch Sản xuất!',
+        'Bản thảo kịch bản đã được gửi lên Thẩm định viên (Reviewer) để phê duyệt và cấp Token Quota.'
+      );
     }
   };
 
   return (
-    <div className="bg-white dark:bg-[#161922] rounded-xl border border-slate-200 dark:border-white/10 p-6 space-y-6 shadow-xs">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
+    <div className="bg-white dark:bg-[#151822] rounded-xl border border-slate-200/80 dark:border-white/10 p-5 sm:p-6 space-y-6 shadow-xs transition-colors">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <FileText className="w-5 h-5 text-ruby" />
+            <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Soạn Thảo Kế Hoạch & Kịch Bản (Content Brief)
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">PostgreSQL Schema: `content_brief`</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">PostgreSQL Schema: `content_brief`</p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 self-end sm:self-auto">
           <button
             type="button"
             onClick={handleSaveDraft}
-            className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-700 dark:text-slate-200 text-xs font-bold border border-slate-200 dark:border-white/10 transition cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200/80 dark:border-white/10 transition cursor-pointer"
           >
             {isSaved ? '✓ Đã Lưu' : 'Lưu Bản Nháp'}
           </button>
@@ -112,7 +120,7 @@ export function BriefTab({ currentPackage, updateContentBrief, submitProductionP
           <button
             type="button"
             onClick={handleSubmitPlan}
-            className="px-5 py-2 rounded-xl bg-ruby hover:bg-ruby-dark text-white text-xs font-bold shadow-md shadow-ruby/20 flex items-center gap-2 transition cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 active:scale-[0.99] text-white text-xs font-semibold shadow-xs flex items-center gap-2 transition cursor-pointer"
           >
             <Send className="w-3.5 h-3.5" />
             {currentPackage.status === 'CHANGES_REQUESTED' ? 'Nộp Lại Bản Hiệu Chỉnh' : 'Nộp Kế Hoạch & Xin Quota'}

@@ -2,6 +2,7 @@ import type { StateCreator } from 'zustand';
 import { ProductionProject } from '@/types/workflow';
 import { initialProject } from '@/features/workflow/mocks/workflowMock';
 import type { EpisodeSlice, WorkflowStoreState } from '../types';
+import { toast } from '@/components/ui/Toast';
 
 export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], EpisodeSlice> = (set, get) => ({
   project: initialProject,
@@ -131,7 +132,10 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
 
     const uncompleted = pkg.jobs.filter((j) => j.status !== 'completed');
     if (uncompleted.length > 0) {
-      alert(`Còn ${uncompleted.length} phân cảnh chưa render hoàn tất. Vui lòng sinh xong clip trước khi submit!`);
+      toast.warning(
+        'Chưa hoàn tất render!',
+        `Còn ${uncompleted.length} phân cảnh chưa render hoàn tất. Vui lòng sinh xong toàn bộ clip trước khi nộp bản dựng.`
+      );
       return false;
     }
 

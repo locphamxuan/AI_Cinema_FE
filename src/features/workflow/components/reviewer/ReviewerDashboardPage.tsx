@@ -14,6 +14,7 @@ import { PublicationTab } from './tabs/PublicationTab';
 import { AllocateQuotaModal } from './modals/AllocateQuotaModal';
 import { RejectPlanModal } from './modals/RejectPlanModal';
 import { CreateProjectModal, type CreateProjectFormState } from './modals/CreateProjectModal';
+import { toast } from '@/components/ui/Toast';
 
 const TAB_TITLES: Record<ReviewerTab, string> = {
   overview: 'Bảng Điều Khiển Thẩm Định Tổng Thể',
@@ -94,14 +95,17 @@ export function ReviewerDashboardPage() {
 
     setIsCreateProjectOpen(false);
     setCreateForm(DEFAULT_FORM);
-    alert('Đã khởi tạo dự án sản xuất phim AI mới cùng các cột mốc tiến độ thành công!');
+    toast.success('Khởi tạo dự án thành công!', 'Dự án sản xuất phim AI mới và các cột mốc tiến độ đã được tạo.');
   };
 
   const handleAllocateQuotaConfirm = () => {
     if (!currentPackage) return;
     allocateQuota(currentPackage.id, quotaToAllocate, quotaNotes);
     setIsQuotaModalOpen(false);
-    alert(`Đã phê duyệt kế hoạch và cấp ${quotaToAllocate} AI Tokens cho Creator (Maker)!`);
+    toast.success(
+      'Đã duyệt & cấp Quota thành công!',
+      `Đã phân bổ ${quotaToAllocate} AI Tokens cho Creator (Maker) bắt đầu sản xuất.`
+    );
   };
 
   const handleRequestChangesConfirm = () => {
@@ -109,7 +113,10 @@ export function ReviewerDashboardPage() {
     requestPlanChanges(currentPackage.id, rejectFeedback);
     setIsRejectModalOpen(false);
     setRejectFeedback('');
-    alert('Đã gửi yêu cầu hiệu chỉnh kế hoạch về cho Creator!');
+    toast.info(
+      'Đã gửi yêu cầu hiệu chỉnh',
+      'Phản hồi chỉnh sửa kịch bản đã được gửi về cho Creator.'
+    );
   };
 
   const pendingPlanEpisodes = project.episodes.filter((e) => e.status === 'PLAN_PENDING');

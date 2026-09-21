@@ -9,6 +9,7 @@ import { StudioPlayer } from './StudioPlayer';
 import { StudioTimeline } from './StudioTimeline';
 import { GeneratorPanel, AI_MODELS } from './GeneratorPanel';
 import { SubmitEpisodeModal } from './SubmitEpisodeModal';
+import { toast } from '@/components/ui/Toast';
 
 export interface CreatorStudioPageProps {
   episodeId: string;
@@ -71,7 +72,10 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
     const success = submitEpisodePackage(currentPackage.id);
     if (success) {
       setIsSubmitModalOpen(false);
-      alert('Tập phim đã được nộp thành công sang Thẩm định viên (Reviewer / Checker) để kiểm định nội dung & pháp lý!');
+      toast.success(
+        'Đã nộp bản dựng thành công!',
+        'Gói tập phim đã được chuyển sang Thẩm định viên (Reviewer / Checker) để kiểm định nội dung & pháp lý.'
+      );
       router.push('/creator');
     }
   };
@@ -134,7 +138,10 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
             </div>
             <button
               onClick={() => {
-                alert('Đã gửi thông báo xin cấp thêm Token Quota tới Thẩm định viên (Reviewer)!');
+                toast.info(
+                  'Đã gửi yêu cầu cấp thêm Quota',
+                  'Thông báo xin cấp thêm Token Quota đã được chuyển tới Thẩm định viên (Reviewer).'
+                );
               }}
               title="Xin cấp thêm Token Quota"
               className="p-1.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 transition cursor-pointer"

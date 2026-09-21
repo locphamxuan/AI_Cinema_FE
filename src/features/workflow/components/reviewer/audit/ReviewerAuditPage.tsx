@@ -11,6 +11,7 @@ import { AuditInfoTabs } from './AuditInfoTabs';
 import { ComplianceStation } from './ComplianceStation';
 import { PublishStation } from './PublishStation';
 import { RequestChangesModal } from './RequestChangesModal';
+import { toast } from '@/components/ui/Toast';
 
 export interface ReviewerAuditPageProps {
   packageId: string;
@@ -94,18 +95,25 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
     setTimeout(() => {
       scheduleAndPublish(pkg.id, { scheduled_at: scheduledDate, visibility, channels: selectedChannels });
       setIsPublishing(false);
+      toast.success(
+        'Đã phát hành tập phim!',
+        `Tập ${pkg.episode_number} đã được phát sóng công khai lên nền tảng OTT với đầy đủ nhãn tuân thủ AI.`
+      );
     }, 700);
   };
 
   const handleRequestChanges = () => {
     if (!rejectFeedback.trim()) {
-      alert('Vui lòng nhập lý do yêu cầu chỉnh sửa!');
+      toast.warning('Thiếu thông tin', 'Vui lòng nhập lý do yêu cầu chỉnh sửa!');
       return;
     }
     requestContentChanges(pkg.id, rejectFeedback.trim());
     setShowRejectModal(false);
     setRejectFeedback('');
-    alert('Đã gửi phản hồi yêu cầu chỉnh sửa nội dung về cho Creator!');
+    toast.info(
+      'Đã gửi yêu cầu chỉnh sửa',
+      'Phản hồi yêu cầu chỉnh sửa nội dung đã được chuyển về cho Creator.'
+    );
   };
 
   return (
