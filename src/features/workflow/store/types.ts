@@ -45,6 +45,7 @@ export interface EpisodeSlice {
   submitEpisodePackage: (packageId: string) => boolean;
   createProject: (data: {
     title: string;
+    creator_name?: string;
     genre: string[];
     synopsis: string;
     season_count: number;

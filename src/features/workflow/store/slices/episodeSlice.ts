@@ -319,7 +319,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       production_start_date: data.production_start_date,
       deadline: data.deadline,
       planned_release_date: data.planned_release_date,
-      creator_name: 'Trần Minh Huy',
+      creator_name: data.creator_name?.trim() || 'Trần Minh Huy',
       reviewer_name: 'Lê Quốc Bảo',
       overall_status: 'NOT_STARTED',
       milestones,
