@@ -107,7 +107,7 @@ export function WorkspaceSidebar({ groups, selectedProjectId, onSelectProject, o
   const [openByKey, setOpenByKey] = useState<Record<string, boolean>>({});
 
   return (
-    <aside className="w-full md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/10 bg-white dark:bg-[#0E0F14] flex flex-col md:h-[calc(100vh-56px)] md:sticky md:top-14">
+    <aside className="w-full md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/10 bg-white dark:bg-[#0E0F14] flex flex-col h-full overflow-hidden">
       {onCreateProject && (
         <div className="p-3 border-b border-slate-100 dark:border-white/5">
           <button
