@@ -116,6 +116,18 @@ class ApiClient {
     );
   }
 
+  patch<T>(endpoint: string, body?: unknown, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
+    return this.request<T>(
+      endpoint,
+      {
+        ...options,
+        method: 'PATCH',
+        body: body ? JSON.stringify(body) : undefined,
+      },
+      mockFallbackFn
+    );
+  }
+
   delete<T>(endpoint: string, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' }, mockFallbackFn);
   }

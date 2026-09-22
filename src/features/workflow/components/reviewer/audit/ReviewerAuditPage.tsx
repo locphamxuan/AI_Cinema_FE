@@ -12,6 +12,7 @@ import { ComplianceStation } from './ComplianceStation';
 import { PublishStation } from './PublishStation';
 import { RequestChangesModal } from './RequestChangesModal';
 import { toast } from '@/components/ui/Toast';
+import { workflowService } from '@/services/workflowService';
 
 export interface ReviewerAuditPageProps {
   packageId: string;
@@ -67,6 +68,22 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
 
   const handleConfirmCompliance = () => {
     setIsPassingCompliance(true);
+    // Call backend API in background to save compliance check and AI label
+    workflowService.createAiContentLabel(pkg.id, {
+      labelType: 'AI_GENERATED',
+      labelText: 'Nội dung được tạo hoàn toàn bằng trí tuệ nhân tạo theo Điều 44 Luật AI và Nghị định 142/2024/NĐ-CP.',
+      displayLocation,
+      appliedById: '1deebe95-e8ca-49aa-bd4d-c44489f9964f',
+      policyId: 'pol-d44-2025',
+    }).then(() => {
+      workflowService.createComplianceCheck(pkg.id, {
+        checkType: 'AI_LABEL_PRESENCE',
+        policyId: 'pol-d44-2025',
+        result: 'PASS',
+        checkedBySystem: 'FE-Reviewer-Audit',
+      }).catch((e) => console.warn('Compliance check API call:', e));
+    }).catch((e) => console.warn('AI label API call:', e));
+
     setTimeout(() => {
       saveComplianceCheck(
         pkg.id,

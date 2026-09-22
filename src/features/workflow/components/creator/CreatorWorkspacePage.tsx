@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Video, Play, LayoutDashboard, FileText, MessageSquare, Zap, Film } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
@@ -23,10 +23,26 @@ type CreatorTab = 'overview' | 'brief' | 'studio' | 'tokens' | 'reviews';
  */
 export function CreatorWorkspacePage() {
   const router = useRouter();
-  const { projects, activeProjectId, setActiveProject, project, activePackageId, setActivePackage, updateContentBrief, updateOverallScript, submitProductionPlan, reviseProductionPlan, reviews } =
-    useWorkflowStore();
+  const {
+    projects,
+    activeProjectId,
+    setActiveProject,
+    project,
+    activePackageId,
+    setActivePackage,
+    updateContentBrief,
+    updateOverallScript,
+    submitProductionPlan,
+    reviseProductionPlan,
+    reviews,
+    loadProjects,
+  } = useWorkflowStore();
 
   const [activeTab, setActiveTab] = useState<CreatorTab>('overview');
+
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
 
   const hasSelection = projects.some((p) => p.id === activeProjectId);
   const currentPackage = hasSelection ? project.episodes.find((e) => e.id === activePackageId) || project.episodes[0] : undefined;

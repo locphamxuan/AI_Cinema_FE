@@ -7,6 +7,7 @@ import {
 } from '@/features/workflow/mocks/workflowMock';
 import type { ComplianceSlice, WorkflowStoreState } from '../types';
 import { withProjectUpdate } from './projectRoster';
+import { workflowService } from '@/services/workflowService';
 
 export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], ComplianceSlice> = (set, get) => ({
   complianceChecks: initialComplianceChecks,
@@ -83,6 +84,17 @@ export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], Com
       streaming_url: pkg.video_draft_url || 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
       quality: '4K Ultra HD',
     };
+
+    // Trigger backend publication flow
+    workflowService.createPublication(packageId, {
+      packageId,
+      publishedById: '1deebe95-e8ca-49aa-bd4d-c44489f9964f',
+      scheduledAt: data.scheduled_at,
+    }).then((res) => {
+      if (res.success && res.data?.id) {
+        workflowService.publishEpisode(res.data.id).catch((e) => console.warn('Publish episode API call:', e));
+      }
+    }).catch((e) => console.warn('Create publication API call:', e));
 
     set((state) => ({
       publications: {

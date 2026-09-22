@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LayoutDashboard, ClipboardCheck, ShieldCheck, Zap, Film, Tv } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
@@ -56,7 +56,22 @@ const DEFAULT_FORM: CreateProjectFormState = {
  * for whichever film is selected.
  */
 export function ReviewerWorkspacePage() {
-  const { projects, activeProjectId, setActiveProject, project, activePackageId, setActivePackage, createProject, allocateQuota, requestPlanChanges } = useWorkflowStore();
+  const {
+    projects,
+    activeProjectId,
+    setActiveProject,
+    project,
+    activePackageId,
+    setActivePackage,
+    createProject,
+    allocateQuota,
+    requestPlanChanges,
+    loadProjects,
+  } = useWorkflowStore();
+
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
 
   const [activeTab, setActiveTab] = useState<ReviewerTab>('overview');
 

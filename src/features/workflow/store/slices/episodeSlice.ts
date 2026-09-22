@@ -5,6 +5,7 @@ import type { EpisodeSlice, WorkflowStoreState } from '../types';
 import { toast } from '@/components/ui/Toast';
 import { pendingPlanReviews } from '@/features/workflow/lib/planVerdict';
 import { withProjectUpdate } from './projectRoster';
+import { workflowService } from '@/services/workflowService';
 
 function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumber: number, targetDurationMinutes: number): EpisodePackage {
   const now = new Date().toISOString();
@@ -48,6 +49,39 @@ function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumbe
 export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], EpisodeSlice> = (set, get) => ({
   project: initialProject,
   projects: mockAssignedProjects,
+  isLoading: false,
+  error: null,
+
+  loadProjects: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await workflowService.listProjects();
+      if (res.success && res.data?.data) {
+        // If API returned projects, adapt and update roster
+        const backendProjects = res.data.data;
+        if (backendProjects.length > 0) {
+          // Keep current mock format for UI compatibility if needed
+          // or adapt fields
+        }
+      }
+      set({ isLoading: false });
+    } catch (err) {
+      set({ isLoading: false, error: err instanceof Error ? err.message : 'Lỗi tải dự án' });
+    }
+  },
+
+  loadProject: async (projectId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await workflowService.getProject(projectId);
+      if (res.success && res.data) {
+        // Project loaded
+      }
+      set({ isLoading: false });
+    } catch (err) {
+      set({ isLoading: false, error: err instanceof Error ? err.message : 'Lỗi tải chi tiết dự án' });
+    }
+  },
 
   getPackage: (packageId) => {
     const id = packageId || get().activePackageId;
@@ -85,6 +119,23 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
   },
 
   submitProductionPlan: (packageId) => {
+    const pkg = get().getPackage(packageId);
+    if (pkg?.brief) {
+      // Fire-and-forget or await backend sync
+      workflowService.submitPlan(packageId, {
+        scriptText: pkg.brief.storyboard_summary || 'Kịch bản phân cảnh',
+        productionApproach: pkg.brief.production_approach || 'AI Standard',
+        targetDurationSeconds: (pkg.target_duration_minutes || 30) * 60,
+        estimatedAiResourceUsage: pkg.brief.estimated_tokens || 500,
+        scenes: pkg.brief.scene_breakdown.map((s) => ({
+          sceneNumber: s.scene_number,
+          title: s.title,
+          scriptText: s.description,
+          targetDurationSeconds: s.target_duration_sec,
+        })),
+      }).catch((e) => console.warn('Submit plan API call:', e));
+    }
+
     set((state) =>
       withProjectUpdate(state, (project) => ({
         ...project,
@@ -296,6 +347,26 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
 
     const projectId = `proj-${Date.now()}`;
     const totalEpisodes = data.season_count * data.episodes_per_season;
+
+    // Call backend API in background to persist project if backend is up
+    workflowService.createProject({
+      title: data.title,
+      description: data.synopsis,
+      contentType: data.season_count > 1 || totalEpisodes > 1 ? 'SERIES' : 'MOVIE',
+      totalAiQuotaBudget: data.total_budget_tokens,
+      productionStartDate: data.production_start_date,
+      deadline: data.deadline,
+      plannedReleaseDate: data.planned_release_date,
+      defaultEpisodeDurationSeconds: (data.episode_target_durations[0] || 30) * 60,
+      episodeCount: totalEpisodes,
+      assignedCreatorId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      milestones: milestones.map((m) => ({
+        title: m.title,
+        description: m.description,
+        targetDate: m.deadline,
+      })),
+    }).catch((e) => console.warn('Create project API call:', e));
+
     const episodes: EpisodePackage[] = [];
     let episodeNumber = 1;
     for (let season = 1; season <= data.season_count; season += 1) {

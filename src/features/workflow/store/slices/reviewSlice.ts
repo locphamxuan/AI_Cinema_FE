@@ -4,6 +4,7 @@ import { initialReviews } from '@/features/workflow/mocks/workflowMock';
 import type { ReviewSlice, WorkflowStoreState } from '../types';
 import { availableBudget } from '@/features/workflow/lib/planVerdict';
 import { withProjectUpdate } from './projectRoster';
+import { workflowService } from '@/services/workflowService';
 
 export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewSlice> = (set, get) => ({
   reviews: initialReviews,
@@ -77,6 +78,13 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
     // SUM(episode quotas) must stay within the project's available budget, so a grant is capped to what is left.
     const tokenQuota = Math.min(requestedQuota, availableBudget(get().project));
     if (tokenQuota <= 0) return;
+
+    // Call backend API in background
+    workflowService.createQuotaAllocation(packageId, {
+      allocationType: 'INITIAL',
+      allocatedAmount: tokenQuota,
+      allocatedById: '1deebe95-e8ca-49aa-bd4d-c44489f9964f',
+    }).catch((e) => console.warn('Allocate quota API call:', e));
 
     const newReview: ReviewLog = {
       id: `rev-${Date.now()}`,

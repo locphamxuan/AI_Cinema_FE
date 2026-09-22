@@ -58,9 +58,14 @@ export interface EpisodeSlice {
     planned_release_date: string;
     milestones?: ProjectMilestone[];
   }) => void;
+  loadProjects: () => Promise<void>;
+  loadProject: (projectId: string) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
   setActiveMilestone: (milestoneId: string) => void;
   updateMilestoneStatus: (milestoneId: string, status: 'pending' | 'in_progress' | 'completed') => void;
 }
+
 
 export interface ProductionSlice {
   triggerGenerationJob: (packageId: string, jobId: string) => Promise<boolean>;

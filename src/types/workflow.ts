@@ -9,3 +9,4 @@ export * from './workflow-episode';
 export * from './workflow-review';
 export * from './workflow-compliance';
 export * from './workflow-publication';
+export * from './workflow-api';
