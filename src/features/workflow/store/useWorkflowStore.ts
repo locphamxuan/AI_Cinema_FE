@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import {
   initialProject,
+  mockAssignedProjects,
   initialReviews,
   initialComplianceChecks,
   initialLabels,
@@ -26,6 +27,7 @@ export const useWorkflowStore = create<WorkflowStoreState>((set, get, api) => ({
       activeProjectId: 'proj-cyber-01',
       activePackageId: 'pkg-ep-03',
       project: initialProject,
+      projects: mockAssignedProjects,
       reviews: initialReviews,
       complianceChecks: initialComplianceChecks,
       labels: initialLabels,

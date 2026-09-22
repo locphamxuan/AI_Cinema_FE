@@ -7,8 +7,8 @@ import { useAppStore } from '@/store/useAppStore';
 import type { Role } from '@/types/workflow';
 
 const ROLE_COPY: Record<Role, { label: string; path: string; accent: string }> = {
-  creator: { label: 'Creator (Maker)', path: '/creator', accent: 'text-ruby' },
-  reviewer: { label: 'Reviewer (Checker)', path: '/reviewer', accent: 'text-purple-600 dark:text-purple-400' },
+  creator: { label: 'Người sản xuất nội dung', path: '/creator', accent: 'text-purple-600 dark:text-purple-400' },
+  reviewer: { label: 'Người kiểm duyệt nội dung', path: '/reviewer', accent: 'text-purple-600 dark:text-purple-400' },
 };
 
 export interface RoleGuardProps {

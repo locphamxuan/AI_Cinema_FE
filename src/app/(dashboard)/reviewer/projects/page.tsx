@@ -1,5 +1,5 @@
-import { ReviewerProjectHubPage } from '@/features/workflow/components/reviewer/ReviewerProjectHubPage';
+import { ReviewerWorkspacePage } from '@/features/workflow/components/reviewer/ReviewerWorkspacePage';
 
 export default function Page() {
-  return <ReviewerProjectHubPage />;
+  return <ReviewerWorkspacePage />;
 }

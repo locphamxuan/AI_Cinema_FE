@@ -19,15 +19,19 @@ export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-3 sm:p-6 animate-fade-in overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-3 sm:p-6 animate-fade-in overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
-      onClick={onClose}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === 'Escape') onClose();
+      }}
     >
       <div
-        className={`relative bg-white dark:bg-[#13161F] border border-slate-200/80 dark:border-white/15 rounded-3xl w-full ${maxWidth} shadow-2xl shadow-black/50 overflow-hidden my-auto animate-scale-in flex flex-col max-h-[92vh]`}
-        onClick={(e) => e.stopPropagation()}
+        className={`relative bg-white dark:bg-[#13161F] border border-slate-200/80 dark:border-white/15 rounded-2xl w-full ${maxWidth} shadow-2xl shadow-black/50 overflow-hidden my-auto animate-scale-in flex flex-col max-h-[92vh]`}
       >
         {/* Top Accent Bar */}
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-indigo-600 z-10" />

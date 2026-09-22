@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ChevronRight, AlertCircle, AlertTriangle, Eye } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import type { DisplayLocation, LabelType, PublicationVisibility } from '@/types/workflow';
 import { StatusBadge } from '../../shared/StatusBadge';
@@ -34,7 +34,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
   const [labelType] = useState<LabelType>(label?.label_type || 'AI_GENERATED_FULL');
   const [displayLocation] = useState<DisplayLocation>(label?.display_location || 'INTRO_OUTRO');
   const [complianceNotes] = useState(
-    compliance?.notes || 'Tất cả các cảnh 3D/VFX và nhân vật ảo đã được kiểm duyệt, nhãn dán xuất hiện 5 giây đầu & cuối video.'
+    compliance?.notes || 'Các cảnh 3D/VFX và nhân vật ảo đã được kiểm duyệt; nhãn AI hiển thị 5 giây đầu và cuối video.'
   );
   const [isPassingCompliance, setIsPassingCompliance] = useState(false);
 
@@ -45,11 +45,10 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
 
   if (!pkg) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0C10] text-slate-900 dark:text-white p-8 flex flex-col items-center justify-center">
-        <AlertTriangle className="w-12 h-12 text-amber-500 mb-4" />
-        <h2 className="text-xl font-bold mb-2">Không tìm thấy gói tập phim</h2>
-        <Link href="/reviewer" className="text-xs text-ruby hover:underline flex items-center gap-1">
-          <ArrowLeft className="w-4 h-4" /> Quay về Dashboard Thẩm định
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2 text-center px-4">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-white">Không tìm thấy tập phim</h2>
+        <Link href="/reviewer" className="text-sm text-purple-600 dark:text-purple-400 hover:underline">
+          Quay lại danh sách
         </Link>
       </div>
     );
@@ -81,7 +80,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
         },
         {
           label_type: labelType,
-          label_text: 'Nội dung tạo 100% bằng Trí tuệ Nhân tạo theo Điều 44 Luật AI và Nghị định 142/2024/NĐ-CP.',
+          label_text: 'Nội dung được tạo hoàn toàn bằng trí tuệ nhân tạo theo Điều 44 Luật AI và Nghị định 142/2024/NĐ-CP.',
           display_location: displayLocation,
           ruleset_version: 'DECREE_142_2024_V1',
         }
@@ -117,46 +116,32 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
   };
 
   return (
-    <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-[#161922] border border-slate-200 dark:border-white/10 rounded-2xl p-4">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/reviewer"
-            aria-label="Quay lại Dashboard Reviewer"
-            className="p-2 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-white/5 transition"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <div>
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <span>Dự án: {project.title}</span>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-purple-600 dark:text-purple-400 font-medium">Tập {pkg.episode_number}</span>
-            </div>
-            <h1 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              {pkg.title}
-              <StatusBadge status={pkg.status} />
-            </h1>
-          </div>
-        </div>
+    <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <div className="space-y-3">
+        <Link href="/reviewer" className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">
+          <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Quay lại danh sách tập
+        </Link>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowRejectModal(true)}
-            className="px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-rose-50 dark:hover:bg-rose-500/10 text-slate-600 dark:text-slate-300 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200 dark:border-white/10 hover:border-rose-200 dark:hover:border-rose-500/30 text-xs font-semibold flex items-center gap-2 transition"
-          >
-            <AlertCircle className="w-4 h-4 text-rose-500 dark:text-rose-400" />
-            Yêu cầu sửa nội dung (Request Changes)
-          </button>
-          {isPublished && (
-            <Link
-              href={`/watch/${pkg.id}`}
-              className="px-4 py-2 rounded-xl bg-ruby hover:bg-ruby-dark text-white text-xs font-semibold flex items-center gap-2 transition shadow-lg shadow-ruby/20"
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {project.title} · Tập {pkg.episode_number}
+            </p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
+              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">{pkg.title.replace(/^Tập\s*\d+\s*[:\-]\s*/i, '')}</h1>
+              <StatusBadge status={pkg.status} />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowRejectModal(true)}
+              className="px-3.5 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-500/30 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
             >
-              <Eye className="w-4 h-4" />
-              Xem trên OTT
-            </Link>
-          )}
+              Yêu cầu sửa
+            </button>
+          </div>
         </div>
       </div>
 
