@@ -61,7 +61,30 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       if (res.success && res.data) {
         const rawList = Array.isArray(res.data) ? res.data : (res.data as { data?: any[] })?.data || [];
         if (rawList.length > 0) {
-          const adaptedProjects = rawList.map((p) => adaptApiProjectToUiProject(p));
+          const currentProjects = get().projects;
+          const adaptedProjects = rawList.map((p) => {
+            const adapted = adaptApiProjectToUiProject(p);
+            const existing = currentProjects.find((cp) => cp.id === adapted.id);
+            if (!existing) return adapted;
+            return {
+              ...adapted,
+              episodes: adapted.episodes.map((ep) => {
+                const existingEp = existing.episodes.find((e) => e.id === ep.id);
+                if (!existingEp) return ep;
+                return {
+                  ...ep,
+                  status: existingEp.status !== 'PLAN_DRAFT' ? existingEp.status : ep.status,
+                  quota_allocated: existingEp.quota_allocated || ep.quota_allocated,
+                  brief: {
+                    ...ep.brief,
+                    scene_reviews: existingEp.brief?.scene_reviews?.length ? existingEp.brief.scene_reviews : ep.brief?.scene_reviews,
+                    duration_review: existingEp.brief?.duration_review || ep.brief?.duration_review,
+                    token_review: existingEp.brief?.token_review || ep.brief?.token_review,
+                  },
+                };
+              }),
+            };
+          });
           const currentActive = get().activeProjectId;
           const foundActive = adaptedProjects.find((p) => p.id === currentActive) || adaptedProjects[0];
           set({
