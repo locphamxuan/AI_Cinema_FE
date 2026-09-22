@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { LayoutDashboard, ClipboardCheck, ShieldCheck, Zap, Film, Tv } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
@@ -74,7 +74,15 @@ export function ReviewerWorkspacePage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const mainRef = useRef<HTMLElement>(null);
   const [activeTab, setActiveTab] = useState<ReviewerTab>('overview');
+
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeTab, activePackageId]);
 
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
   const [createForm, setCreateForm] = useState<CreateProjectFormState>(DEFAULT_FORM);
@@ -151,7 +159,7 @@ export function ReviewerWorkspacePage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row w-full overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row w-full overflow-hidden md:h-[calc(100vh-56px)]">
       <WorkspaceSidebar
         groups={reviewerGroups(projects)}
         selectedProjectId={hasSelection ? activeProjectId : undefined}
@@ -162,7 +170,7 @@ export function ReviewerWorkspacePage() {
         onNavSelect={(key) => setActiveTab(key as ReviewerTab)}
       />
 
-      <main className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto transition-colors">
+      <main ref={mainRef} className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto transition-colors">
         {!hasSelection || !currentPackage ? (
           <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
             <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">

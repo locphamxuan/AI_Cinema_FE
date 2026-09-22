@@ -9,14 +9,14 @@ export interface SceneBreakdownEditorProps {
   onSceneChange: <K extends keyof SceneBreakdownItem>(index: number, field: K, value: SceneBreakdownItem[K]) => void;
 }
 
-/** Editable list of scenes inside a content brief — add/remove/edit title & description per scene. */
-export function SceneBreakdownEditor({ scenes, sceneReviews, onAddScene, onRemoveScene, onSceneChange }: SceneBreakdownEditorProps) {
+export function SceneBreakdownEditor({ scenes = [], sceneReviews = [], onAddScene, onRemoveScene, onSceneChange }: SceneBreakdownEditorProps) {
+  const safeScenes = scenes || [];
   return (
     <div className="pt-4 border-t border-slate-200 dark:border-white/10 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <Layers className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-          Phân Tích Chi Tiết Từng Phân Cảnh ({scenes.length} Cảnh)
+          Phân Tích Chi Tiết Từng Phân Cảnh ({safeScenes.length} Cảnh)
         </h3>
         <button
           type="button"
@@ -28,7 +28,7 @@ export function SceneBreakdownEditor({ scenes, sceneReviews, onAddScene, onRemov
       </div>
 
       <div className="space-y-3">
-        {scenes.map((scene, idx) => {
+        {safeScenes.map((scene, idx) => {
           const review = sceneReviews?.find((sr) => sr.scene_number === scene.scene_number);
           const needsRework = review?.status === 'changes_requested';
           const isApproved = review?.status === 'approved';
@@ -56,13 +56,13 @@ export function SceneBreakdownEditor({ scenes, sceneReviews, onAddScene, onRemov
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <input
                     type="text"
                     value={scene.title}
                     onChange={(e) => onSceneChange(idx, 'title', e.target.value)}
                     placeholder="Tiêu đề phân cảnh…"
-                    className="bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-2.5 py-1 text-xs text-slate-900 dark:text-white font-bold"
+                    className="bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-2.5 py-1 text-xs text-slate-900 dark:text-white font-bold min-w-0 w-full sm:w-64 focus:outline-none focus-visible:ring-1 focus-visible:ring-purple-500"
                   />
                   <button
                     type="button"

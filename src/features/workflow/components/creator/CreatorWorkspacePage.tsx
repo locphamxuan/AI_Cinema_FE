@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Video, Play, LayoutDashboard, FileText, MessageSquare, Zap, Film } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
@@ -23,6 +23,7 @@ type CreatorTab = 'overview' | 'brief' | 'studio' | 'tokens' | 'reviews';
  */
 export function CreatorWorkspacePage() {
   const router = useRouter();
+  const mainRef = useRef<HTMLElement>(null);
   const {
     projects,
     activeProjectId,
@@ -44,6 +45,14 @@ export function CreatorWorkspacePage() {
     loadProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Smoothly reset scroll position to top whenever active tab or active package changes
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeTab, activePackageId]);
 
   const hasSelection = projects.some((p) => p.id === activeProjectId);
   const currentPackage = hasSelection ? project.episodes.find((e) => e.id === activePackageId) || project.episodes[0] : undefined;
@@ -77,7 +86,7 @@ export function CreatorWorkspacePage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col md:flex-row w-full overflow-hidden">
+    <div className="flex-1 flex flex-col md:flex-row w-full overflow-hidden md:h-[calc(100vh-56px)]">
       <WorkspaceSidebar
         groups={creatorGroups(projects)}
         selectedProjectId={hasSelection ? activeProjectId : undefined}
@@ -87,7 +96,7 @@ export function CreatorWorkspacePage() {
         onNavSelect={(key) => setActiveTab(key as CreatorTab)}
       />
 
-      <main className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto transition-colors">
+      <main ref={mainRef} className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto transition-colors">
         {!hasSelection || !currentPackage ? (
           <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
             <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
@@ -133,8 +142,8 @@ export function CreatorWorkspacePage() {
                 project={project}
                 currentPackage={currentPackage}
                 isQuotaWarning={isQuotaWarning}
-                scenesCount={currentPackage.brief.scene_breakdown.length}
-                estimatedTokens={currentPackage.brief.estimated_tokens}
+                scenesCount={currentPackage.brief?.scene_breakdown?.length ?? 0}
+                estimatedTokens={currentPackage.brief?.estimated_tokens ?? 0}
                 synopsis={project.synopsis}
                 latestFeedback={latestFeedback}
                 canEnterStudio={canEnterStudio}
