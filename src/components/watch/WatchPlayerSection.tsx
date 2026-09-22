@@ -179,10 +179,10 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
               </div>
             )}
 
-            {/* Compliance Badge Button (Bottom left) */}
+            {/* Compliance Badge Button (Top left to not obstruct video seek bar / controls) */}
             <button
               onClick={() => setShowComplianceDrawer(true)}
-              className="absolute bottom-3 left-3 right-3 sm:left-3 sm:right-auto flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/80 backdrop-blur-md text-[10px] sm:text-xs text-muted-light hover:text-white hover:bg-black/95 transition-all cursor-pointer border border-white/15 shadow-xl z-20"
+              className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/75 backdrop-blur-md text-[10px] sm:text-xs text-muted-light hover:text-white hover:bg-black/90 transition-all cursor-pointer border border-white/15 shadow-xl z-20"
             >
               <span className="text-sm">🏷️</span>
               <span className="line-clamp-1">

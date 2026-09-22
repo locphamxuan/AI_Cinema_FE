@@ -40,8 +40,10 @@ class ApiClient {
       ...options.headers,
     };
 
-    // If mock fallback is explicitly requested or running without backend
-    const shouldFallback = options.useMockFallback ?? true;
+    // Use real database by default in development and production environments.
+    // In vitest unit tests (where no local server is listening), fallback allows offline testing.
+    const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
+    const shouldFallback = options.useMockFallback ?? isTest;
 
     try {
       const response = await fetch(url, {
@@ -62,7 +64,21 @@ class ApiClient {
             };
           }
         }
-        throw new Error(`HTTP error! status: ${response.status}`);
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+          const errBody = await response.json();
+          if (errBody?.message) {
+            errorMessage = Array.isArray(errBody.message) ? errBody.message.join(', ') : errBody.message;
+          }
+        } catch {
+          // non-JSON error body
+        }
+        return {
+          success: false,
+          data: null as unknown as T,
+          message: errorMessage,
+          statusCode: response.status,
+        };
       }
 
       const data = await response.json();

@@ -1,5 +1,5 @@
 /**
- * AI Cinema - Dual-Wallet & Reward Service
+ * AI Cinema - Dual-Wallet & Reward Service (Connected to Database)
  */
 
 import { apiClient, ApiResponse } from './apiClient';
@@ -19,51 +19,25 @@ export interface UnlockEpisodeResult {
 
 export const walletService = {
   async getBalance(): Promise<ApiResponse<WalletState>> {
-    return apiClient.get<WalletState>(
-      API_ROUTES.WALLET.BALANCE,
-      { useMockFallback: true },
-      () => ({ mainCoin: 120, bonusCoin: 100 })
-    );
+    return apiClient.get<WalletState>(API_ROUTES.WALLET.BALANCE, {}, () => ({ mainCoin: 120, bonusCoin: 100 }));
   },
 
   async getCheckInStreak(): Promise<ApiResponse<CheckInStreak>> {
-    return apiClient.get<CheckInStreak>(
-      API_ROUTES.WALLET.STREAK,
-      { useMockFallback: true },
-      () => mockCheckInStreak
-    );
+    return apiClient.get<CheckInStreak>(API_ROUTES.WALLET.STREAK, {}, () => mockCheckInStreak);
   },
 
-  async claimDailyReward(currentStreak: CheckInStreak, currentWallet: WalletState): Promise<ApiResponse<{ streak: CheckInStreak; wallet: WalletState; reward: number }>> {
+  async claimDailyReward(_currentStreak?: CheckInStreak, _currentWallet?: WalletState): Promise<ApiResponse<{ streak: CheckInStreak; wallet: WalletState; reward: number }>> {
     return apiClient.post<{ streak: CheckInStreak; wallet: WalletState; reward: number }>(
       API_ROUTES.WALLET.CHECK_IN,
       {},
-      { useMockFallback: true },
+      {},
       () => {
-        const todayIndex = currentStreak.days.findIndex((d) => d.isToday);
-        const reward = todayIndex !== -1 ? currentStreak.days[todayIndex].reward : 10;
-
-        const updatedDays = currentStreak.days.map((day) =>
-          day.isToday ? { ...day, claimed: true } : day
-        );
-
-        const updatedStreak: CheckInStreak = {
-          ...currentStreak,
-          days: updatedDays,
-          currentStreak: currentStreak.currentStreak + 1,
-          lastCheckInDate: new Date().toISOString(),
-          todayClaimed: true,
-        };
-
-        const updatedWallet: WalletState = {
-          ...currentWallet,
-          bonusCoin: currentWallet.bonusCoin + reward,
-        };
-
+        const streak = _currentStreak || mockCheckInStreak;
+        const wallet = _currentWallet || { mainCoin: 120, bonusCoin: 100 };
         return {
-          streak: updatedStreak,
-          wallet: updatedWallet,
-          reward,
+          streak: { ...streak, currentStreak: streak.currentStreak + 1, todayClaimed: true },
+          wallet: { ...wallet, bonusCoin: wallet.bonusCoin + 10 },
+          reward: 10,
         };
       }
     );
@@ -73,14 +47,15 @@ export const walletService = {
     movieId: string,
     episodeId: string,
     price: number,
-    currentWallet: WalletState
+    _currentWallet?: WalletState
   ): Promise<ApiResponse<UnlockEpisodeResult>> {
     return apiClient.post<UnlockEpisodeResult>(
       API_ROUTES.WALLET.UNLOCK_EPISODE,
       { movieId, episodeId, price },
-      { useMockFallback: true },
+      {},
       () => {
-        const totalCoins = currentWallet.mainCoin + currentWallet.bonusCoin;
+        const wallet = _currentWallet || { mainCoin: 120, bonusCoin: 100 };
+        const totalCoins = wallet.mainCoin + wallet.bonusCoin;
         if (totalCoins < price) {
           throw new Error('Số dư coin không đủ để mở khóa tập phim này.');
         }
@@ -89,19 +64,14 @@ export const walletService = {
         let bonusDeducted = 0;
         let deductedFrom: 'main' | 'bonus' | 'split' = 'main';
 
-        if (currentWallet.mainCoin >= price) {
+        if (wallet.mainCoin >= price) {
           mainDeducted = price;
           deductedFrom = 'main';
         } else {
-          mainDeducted = currentWallet.mainCoin;
+          mainDeducted = wallet.mainCoin;
           bonusDeducted = price - mainDeducted;
           deductedFrom = mainDeducted > 0 ? 'split' : 'bonus';
         }
-
-        const newBalance: WalletState = {
-          mainCoin: currentWallet.mainCoin - mainDeducted,
-          bonusCoin: currentWallet.bonusCoin - bonusDeducted,
-        };
 
         return {
           success: true,
@@ -109,17 +79,16 @@ export const walletService = {
           deductedFrom,
           mainDeducted,
           bonusDeducted,
-          newBalance,
+          newBalance: {
+            mainCoin: wallet.mainCoin - mainDeducted,
+            bonusCoin: wallet.bonusCoin - bonusDeducted,
+          },
         };
       }
     );
   },
 
   async getTransactions(): Promise<ApiResponse<Transaction[]>> {
-    return apiClient.get<Transaction[]>(
-      API_ROUTES.WALLET.TRANSACTIONS,
-      { useMockFallback: true },
-      () => mockTransactions
-    );
+    return apiClient.get<Transaction[]>(API_ROUTES.WALLET.TRANSACTIONS, {}, () => mockTransactions);
   },
 };

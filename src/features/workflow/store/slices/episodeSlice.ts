@@ -46,6 +46,8 @@ function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumbe
   };
 }
 
+import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
+
 export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], EpisodeSlice> = (set, get) => ({
   project: initialProject,
   projects: mockAssignedProjects,
@@ -56,17 +58,23 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     set({ isLoading: true, error: null });
     try {
       const res = await workflowService.listProjects();
-      if (res.success && res.data?.data) {
-        // If API returned projects, adapt and update roster
-        const backendProjects = res.data.data;
-        if (backendProjects.length > 0) {
-          // Keep current mock format for UI compatibility if needed
-          // or adapt fields
+      if (res.success && res.data) {
+        const rawList = Array.isArray(res.data) ? res.data : (res.data as { data?: any[] })?.data || [];
+        if (rawList.length > 0) {
+          const adaptedProjects = rawList.map((p) => adaptApiProjectToUiProject(p));
+          const currentActive = get().activeProjectId;
+          const foundActive = adaptedProjects.find((p) => p.id === currentActive) || adaptedProjects[0];
+          set({
+            projects: adaptedProjects,
+            project: foundActive,
+            activeProjectId: foundActive.id,
+            activePackageId: foundActive.episodes?.[0]?.id || '',
+          });
         }
       }
       set({ isLoading: false });
     } catch (err) {
-      set({ isLoading: false, error: err instanceof Error ? err.message : 'Lỗi tải dự án' });
+      set({ isLoading: false, error: err instanceof Error ? err.message : 'Lỗi tải dự án từ cơ sở dữ liệu' });
     }
   },
 
@@ -75,7 +83,13 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     try {
       const res = await workflowService.getProject(projectId);
       if (res.success && res.data) {
-        // Project loaded
+        const adapted = adaptApiProjectToUiProject(res.data);
+        set((state) => ({
+          project: adapted,
+          activeProjectId: adapted.id,
+          activePackageId: adapted.episodes?.[0]?.id || '',
+          projects: state.projects.map((p) => (p.id === adapted.id ? adapted : p)),
+        }));
       }
       set({ isLoading: false });
     } catch (err) {
