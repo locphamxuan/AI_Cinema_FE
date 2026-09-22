@@ -28,42 +28,64 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
   const fieldReviews = brief ? planFieldReviews(project, brief) : [];
   const approvedCount = fieldReviews.filter((r) => r.status === 'approved').length;
 
+  const isAlreadyApproved =
+    currentPackage?.status === 'QUOTA_ALLOCATED' ||
+    currentPackage?.status === 'IN_PRODUCTION' ||
+    currentPackage?.status === 'EPISODE_SUBMITTED' ||
+    currentPackage?.status === 'COMPLIANCE_PASSED' ||
+    currentPackage?.status === 'PUBLISHED';
+
   return (
     <div className="bg-white dark:bg-[#161922] rounded-xl border border-slate-200 dark:border-white/10 p-5 sm:p-6 space-y-5 shadow-xs transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-white/5">
         <div className="min-w-0">
           <h2 className="text-base font-bold text-slate-900 dark:text-white truncate">{cleanTitle}</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {approvedCount}/{fieldReviews.length} mục đã duyệt
-            {verdict === 'CHANGES_REQUESTED' && <span className="text-rose-600 dark:text-rose-400"> · Có mục cần sửa</span>}
+            {isAlreadyApproved ? (
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">✓ Kế hoạch đã duyệt & đã cấp {currentPackage?.quota_allocated ?? 0} token</span>
+            ) : (
+              <>
+                {approvedCount}/{fieldReviews.length} mục đã duyệt
+                {verdict === 'CHANGES_REQUESTED' && <span className="text-rose-600 dark:text-rose-400"> · Có mục cần sửa</span>}
+              </>
+            )}
           </p>
         </div>
 
         <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
-          <button
-            type="button"
-            onClick={onRequestChanges}
-            disabled={verdict !== 'CHANGES_REQUESTED'}
-            title={verdict === 'CHANGES_REQUESTED' ? undefined : 'Đánh dấu ít nhất một mục cần sửa trước'}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/5 enabled:hover:bg-rose-50 dark:enabled:hover:bg-rose-500/10 text-slate-700 dark:text-slate-300 enabled:hover:text-rose-600 dark:enabled:hover:text-rose-400 border border-slate-200 dark:border-white/10 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Edit3 className="w-3.5 h-3.5 text-rose-500" aria-hidden="true" />
-            Trả về để sửa
-          </button>
-          <button
-            type="button"
-            onClick={onAllocateQuota}
-            disabled={!canApprove}
-            title={canApprove ? undefined : 'Cần duyệt kịch bản, thời lượng, token và tất cả phân cảnh trước khi cấp token'}
-            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${
-              canApprove
-                ? 'bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white cursor-pointer'
-                : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-600 cursor-not-allowed'
-            }`}
-          >
-            <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
-            Duyệt và cấp token
-          </button>
+          {isAlreadyApproved ? (
+            <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-500/20">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>Đã cấp {currentPackage?.quota_allocated ?? 0} token</span>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={onRequestChanges}
+                disabled={verdict !== 'CHANGES_REQUESTED'}
+                title={verdict === 'CHANGES_REQUESTED' ? undefined : 'Đánh dấu ít nhất một mục cần sửa trước'}
+                className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-white/5 enabled:hover:bg-rose-50 dark:enabled:hover:bg-rose-500/10 text-slate-700 dark:text-slate-300 enabled:hover:text-rose-600 dark:enabled:hover:text-rose-400 border border-slate-200 dark:border-white/10 text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-rose-500" aria-hidden="true" />
+                Trả về để sửa
+              </button>
+              <button
+                type="button"
+                onClick={onAllocateQuota}
+                disabled={!canApprove}
+                title={canApprove ? undefined : 'Cần duyệt kịch bản, thời lượng, token và tất cả phân cảnh trước khi cấp token'}
+                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${
+                  canApprove
+                    ? 'bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white cursor-pointer'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-600 cursor-not-allowed'
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
+                Duyệt và cấp token
+              </button>
+            </>
+          )}
         </div>
       </div>
 

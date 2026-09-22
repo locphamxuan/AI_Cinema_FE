@@ -75,8 +75,11 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
   },
 
   allocateQuota: (packageId, requestedQuota, notes) => {
-    // SUM(episode quotas) must stay within the project's available budget, so a grant is capped to what is left.
-    const tokenQuota = Math.min(requestedQuota, availableBudget(get().project));
+    const currentPkg = get().project.episodes.find((e) => e.id === packageId);
+    const existingQuota = currentPkg?.quota_allocated || 0;
+    const avail = availableBudget(get().project);
+    const maxAllowed = avail + existingQuota;
+    const tokenQuota = Math.min(requestedQuota, maxAllowed);
     if (tokenQuota <= 0) return;
 
     // Call backend API in background
@@ -100,25 +103,30 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
 
     set((state) => ({
       reviews: [newReview, ...state.reviews],
-      ...withProjectUpdate(state, (project) => ({
-        ...project,
-        allocated_tokens: project.allocated_tokens + tokenQuota,
-        overall_status: 'IN_PROGRESS',
-        updated_at: new Date().toISOString(),
-        episodes: project.episodes.map((ep) => {
+      ...withProjectUpdate(state, (project) => {
+        const nextEpisodes = project.episodes.map((ep) => {
           if (ep.id !== packageId) return ep;
           return {
             ...ep,
-            status: 'QUOTA_ALLOCATED',
+            status: 'QUOTA_ALLOCATED' as const,
             quota_allocated: tokenQuota,
             brief: {
               ...ep.brief,
-              status: 'QUOTA_ALLOCATED',
+              status: 'QUOTA_ALLOCATED' as const,
               updated_at: new Date().toISOString(),
             },
           };
-        }),
-      })),
+        });
+        const totalAllocated = nextEpisodes.reduce((sum, ep) => sum + (ep.quota_allocated || 0), 0);
+
+        return {
+          ...project,
+          allocated_tokens: totalAllocated,
+          overall_status: 'IN_PROGRESS',
+          updated_at: new Date().toISOString(),
+          episodes: nextEpisodes,
+        };
+      }),
     }));
   },
 

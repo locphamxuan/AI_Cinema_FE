@@ -15,6 +15,7 @@ import { PublicationTab } from './tabs/PublicationTab';
 import { AllocateQuotaModal } from './modals/AllocateQuotaModal';
 import { RejectPlanModal } from './modals/RejectPlanModal';
 import { CreateProjectModal, type CreateProjectFormState } from './modals/CreateProjectModal';
+import { toast } from '@/components/ui/Toast';
 
 type ReviewerTab = 'overview' | 'plans' | 'audits' | 'publication' | 'tokens';
 
@@ -145,10 +146,26 @@ export function ReviewerWorkspacePage() {
     setIsRejectModalOpen(true);
   };
 
+  const openQuotaModal = () => {
+    if (!currentPackage) return;
+    const estimate = currentPackage.brief?.estimated_tokens || 400;
+    const avail = availableBudget(project);
+    const maxAvail = avail + (currentPackage.quota_allocated || 0);
+    const initialQuota = currentPackage.quota_allocated > 0
+      ? currentPackage.quota_allocated
+      : Math.min(estimate, Math.max(50, maxAvail));
+    setQuotaToAllocate(initialQuota);
+    setIsQuotaModalOpen(true);
+  };
+
   const handleAllocateQuotaConfirm = () => {
     if (!currentPackage) return;
     allocateQuota(currentPackage.id, quotaToAllocate, quotaNotes);
     setIsQuotaModalOpen(false);
+    toast.success(
+      'Duyệt kế hoạch thành công!',
+      `Đã duyệt và cấp ${quotaToAllocate.toLocaleString()} token cho ${currentPackage.title}.`
+    );
   };
 
   const handleRequestChangesConfirm = () => {
@@ -156,6 +173,7 @@ export function ReviewerWorkspacePage() {
     requestPlanChanges(currentPackage.id, rejectFeedback);
     setIsRejectModalOpen(false);
     setRejectFeedback('');
+    toast.info('Đã trả về bản kế hoạch', 'Yêu cầu chỉnh sửa đã được gửi đến Creator.');
   };
 
   return (
@@ -167,7 +185,16 @@ export function ReviewerWorkspacePage() {
         onCreateProject={() => setIsCreateProjectOpen(true)}
         navItems={navItems}
         activeNavKey={activeTab}
-        onNavSelect={(key) => setActiveTab(key as ReviewerTab)}
+        onNavSelect={(key) => {
+          const newTab = key as ReviewerTab;
+          setActiveTab(newTab);
+          if (newTab === 'plans') {
+            const pending = project.episodes.filter((e) => e.status === 'PLAN_PENDING');
+            if (pending.length > 0 && (!currentPackage || currentPackage.status !== 'PLAN_PENDING')) {
+              setActivePackage(pending[0].id);
+            }
+          }
+        }}
       />
 
       <main ref={mainRef} className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto transition-colors">
@@ -200,7 +227,7 @@ export function ReviewerWorkspacePage() {
             )}
 
             {activeTab === 'plans' && (
-              <PlanReviewTab currentPackage={currentPackage} onRequestChanges={openRejectModal} onAllocateQuota={() => setIsQuotaModalOpen(true)} />
+              <PlanReviewTab currentPackage={currentPackage} onRequestChanges={openRejectModal} onAllocateQuota={openQuotaModal} />
             )}
 
             {activeTab === 'audits' && <AuditsTab project={project} />}

@@ -1,5 +1,5 @@
 import { PENDING_FIELD_REVIEW } from '@/types/workflow';
-import type { ContentBrief, FieldReview, ProductionProject, SceneBreakdownItem } from '@/types/workflow';
+import type { ContentBrief, EpisodePackage, FieldReview, ProductionProject, SceneBreakdownItem } from '@/types/workflow';
 
 export type PlanVerdict = 'PENDING' | 'APPROVED' | 'CHANGES_REQUESTED';
 
@@ -46,6 +46,10 @@ export function summarizeFlaggedFields(project: Pick<ProductionProject, 'script_
 }
 
 /** Project AI budget not yet granted to an episode quota — what the token review compares against. */
-export function availableBudget(project: Pick<ProductionProject, 'total_budget_tokens' | 'allocated_tokens'>): number {
+export function availableBudget(project: Pick<ProductionProject, 'total_budget_tokens' | 'allocated_tokens'> & { episodes?: EpisodePackage[] }): number {
+  if (project?.episodes && project.episodes.length > 0) {
+    const sumAllocated = project.episodes.reduce((sum, ep) => sum + (ep.quota_allocated || 0), 0);
+    return Math.max(0, (project.total_budget_tokens || 0) - sumAllocated);
+  }
   return Math.max(0, (project?.total_budget_tokens || 0) - (project?.allocated_tokens || 0));
 }

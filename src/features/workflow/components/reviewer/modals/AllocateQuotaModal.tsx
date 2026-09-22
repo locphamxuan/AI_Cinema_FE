@@ -24,9 +24,9 @@ const STEPPER_CLASS =
   'w-9 h-9 rounded-lg border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 disabled:opacity-40 disabled:cursor-not-allowed';
 
 export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, quota, onQuotaChange, availableBudget, notes, onNotesChange }: AllocateQuotaModalProps) {
-  const ceiling = Math.max(MIN_QUOTA, availableBudget);
+  const ceiling = Math.max(MIN_QUOTA, availableBudget + (currentPackage?.quota_allocated || 0));
   const estimate = currentPackage?.brief.estimated_tokens ?? 0;
-  const isOverBudget = availableBudget < MIN_QUOTA;
+  const isOverBudget = ceiling < MIN_QUOTA;
   const setQuota = (value: number) => onQuotaChange(clamp(value, MIN_QUOTA, ceiling));
 
   return (
