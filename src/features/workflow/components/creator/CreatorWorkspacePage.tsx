@@ -42,7 +42,8 @@ export function CreatorWorkspacePage() {
 
   useEffect(() => {
     loadProjects();
-  }, [loadProjects]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const hasSelection = projects.some((p) => p.id === activeProjectId);
   const currentPackage = hasSelection ? project.episodes.find((e) => e.id === activePackageId) || project.episodes[0] : undefined;

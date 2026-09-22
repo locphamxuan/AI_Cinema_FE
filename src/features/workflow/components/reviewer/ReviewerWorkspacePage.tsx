@@ -71,7 +71,8 @@ export function ReviewerWorkspacePage() {
 
   useEffect(() => {
     loadProjects();
-  }, [loadProjects]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [activeTab, setActiveTab] = useState<ReviewerTab>('overview');
 
