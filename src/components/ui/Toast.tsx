@@ -1,7 +1,7 @@
 'use client';
 
 import { create } from 'zustand';
-import { CheckCircle2, AlertCircle, AlertTriangle, Info, X, Sparkles } from 'lucide-react';
+import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -72,9 +72,9 @@ const TOAST_STYLES: Record<
     borderAccent: 'border-l-4 border-l-emerald-500',
   },
   info: {
-    icon: Sparkles,
-    iconBoxClass: 'bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 text-indigo-600 dark:text-indigo-400',
-    borderAccent: 'border-l-4 border-l-indigo-500',
+    icon: Info,
+    iconBoxClass: 'bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 text-purple-600 dark:text-purple-400',
+    borderAccent: 'border-l-4 border-l-purple-500',
   },
   warning: {
     icon: AlertTriangle,
