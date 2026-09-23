@@ -50,6 +50,7 @@ export interface WalletSlice {
   wallet: WalletState;
   checkInStreak: CheckInStreak;
   claimDailyCheckIn: () => boolean;
+  syncCheckInStreak: () => void;
   setWalletBalance: (main: number, bonus: number) => void;
   isDepositModalOpen: boolean;
   openDepositModal: () => void;

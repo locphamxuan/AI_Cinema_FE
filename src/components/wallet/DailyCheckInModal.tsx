@@ -42,11 +42,18 @@ export default function DailyCheckInModal() {
     setCheckInModalOpen,
     checkInStreak,
     claimDailyCheckIn,
+    syncCheckInStreak,
   } = useAppStore();
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [claimSuccess, setClaimSuccess] = useState(false);
   const [rewardAmount, setRewardAmount] = useState(0);
+
+  useEffect(() => {
+    if (isCheckInModalOpen) {
+      syncCheckInStreak();
+    }
+  }, [isCheckInModalOpen, syncCheckInStreak]);
 
   const handleClaim = useCallback(() => {
     const todayDay = checkInStreak.days.find((d) => d.isToday);
@@ -137,7 +144,7 @@ export default function DailyCheckInModal() {
                           : 'bg-white/5 border border-white/10'
                   }`}
                 >
-                  <span className="text-[10px] font-medium text-muted-light mb-1">{day.dayLabel}</span>
+                  <span className={`text-[10px] font-bold mb-1 ${isToday ? 'text-neon' : 'text-muted-light'}`}>{day.dayLabel}</span>
                   <span className="text-lg mb-1">
                     {isClaimed ? '✅' : isToday ? '🎁' : isMissed ? '❌' : '🔒'}
                   </span>
@@ -147,7 +154,9 @@ export default function DailyCheckInModal() {
                     +{day.reward}
                   </span>
                   {isToday && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-neon rounded-full animate-pulse" />
+                    <span className="mt-1 px-1.5 py-0.5 rounded-full text-[8px] font-extrabold bg-neon text-black leading-none shadow-xs">
+                      Hôm nay
+                    </span>
                   )}
                 </div>
               );

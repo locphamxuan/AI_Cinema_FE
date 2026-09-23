@@ -1,16 +1,46 @@
 import type { StateCreator } from 'zustand';
 import { mockWallet, mockCheckInStreak } from '@/mocks/mockData';
+import { getTodayDayIndex, getTodayDateString } from '@/lib/dateUtils';
 import type { AppState, WalletSlice } from './types';
 
 export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (set, get) => ({
   wallet: mockWallet,
   checkInStreak: mockCheckInStreak,
 
+  syncCheckInStreak: () => {
+    const todayIdx = getTodayDayIndex();
+    const todayStr = getTodayDateString();
+    set((s) => {
+      const current = s.checkInStreak || mockCheckInStreak;
+      const isTodayClaimed = current.lastCheckInDate === todayStr && current.todayClaimed;
+      const updatedDays = current.days.map((d, idx) => ({
+        ...d,
+        isToday: idx === todayIdx,
+        claimed: idx < todayIdx ? true : idx === todayIdx ? isTodayClaimed : false,
+      }));
+      return {
+        checkInStreak: {
+          ...current,
+          todayClaimed: isTodayClaimed,
+          currentStreak: isTodayClaimed ? Math.max(current.currentStreak, todayIdx + 1) : Math.max(current.currentStreak, todayIdx),
+          days: updatedDays,
+        },
+      };
+    });
+  },
+
   claimDailyCheckIn: () => {
     const state = get();
-    if (state.checkInStreak.todayClaimed) return false;
+    const todayIdx = getTodayDayIndex();
+    const todayStr = getTodayDateString();
 
-    const todayDay = state.checkInStreak.days.find((d) => d.isToday);
+    if (state.checkInStreak.todayClaimed && state.checkInStreak.lastCheckInDate === todayStr) {
+      return false;
+    }
+
+    const todayDay =
+      state.checkInStreak.days[todayIdx] ||
+      state.checkInStreak.days.find((d) => d.isToday);
     if (!todayDay) return false;
 
     const reward = todayDay.reward;
@@ -23,9 +53,11 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
       checkInStreak: {
         ...s.checkInStreak,
         todayClaimed: true,
-        currentStreak: s.checkInStreak.currentStreak + 1,
-        lastCheckInDate: new Date().toISOString().split('T')[0],
-        days: s.checkInStreak.days.map((d) => (d.isToday ? { ...d, claimed: true } : d)),
+        currentStreak: Math.max(s.checkInStreak.currentStreak, todayIdx + 1),
+        lastCheckInDate: todayStr,
+        days: s.checkInStreak.days.map((d, idx) =>
+          idx === todayIdx || d.isToday ? { ...d, claimed: true, isToday: true } : d
+        ),
       },
     }));
 
