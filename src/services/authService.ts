@@ -1,119 +1,122 @@
 /**
- * AI Cinema - Authentication Service
+ * AI Cinema - Authentication Service (NestJS backend)
  */
 
 import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
-import { UserProfile, LoginCredentials, RegisterCredentials, AuthResponse } from '@/types/auth';
+import { UserProfile, LoginCredentials, RegisterCredentials } from '@/types/auth';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 
-const MOCK_USER: UserProfile = {
-  id: 'usr_premium_01',
-  name: 'Trần Minh Huy',
-  email: 'huy.cinema.vip@gmail.com',
-  avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-  role: 'vip',
-  isVIP: true,
-  vipExpiresAt: new Date(Date.now() + 20 * 60 * 60 * 1000).toISOString(),
-  createdAt: '2026-01-15T08:00:00Z',
+/** Roles as the backend's UserRole enum spells them. */
+export type BackendRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
+
+interface BackendUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: BackendRole;
+  isActive: boolean;
+}
+
+interface AuthSession {
+  accessToken: string;
+  refreshToken: string;
+  user: BackendUser;
+}
+
+const ROLE_MAP: Record<BackendRole, UserProfile['role']> = {
+  MEMBER: 'user',
+  CONTENT_CREATOR: 'creator',
+  CONTENT_REVIEWER: 'reviewer',
+  STAFF: 'admin',
+  ADMIN: 'admin',
 };
 
+const REDIRECT_BY_ROLE: Partial<Record<UserProfile['role'], string>> = {
+  creator: '/creator/projects',
+  reviewer: '/reviewer',
+};
+
+export function toUserProfile(user: BackendUser): UserProfile {
+  const role = ROLE_MAP[user.role] ?? 'user';
+  return {
+    id: user.id,
+    name: user.fullName,
+    email: user.email,
+    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email)}`,
+    role,
+    isVIP: role === 'creator' || role === 'reviewer' || role === 'admin',
+  };
+}
+
+export function redirectUrlFor(role: UserProfile['role']): string | undefined {
+  return REDIRECT_BY_ROLE[role];
+}
+
+function persistSession(session: AuthSession): UserProfile {
+  const profile = toUserProfile(session.user);
+  storage.set(STORAGE_KEYS.AUTH_TOKEN, session.accessToken);
+  storage.set(STORAGE_KEYS.REFRESH_TOKEN, session.refreshToken);
+  storage.set(STORAGE_KEYS.USER_DATA, profile);
+  return profile;
+}
+
 export const authService = {
-  async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
-    return apiClient.post<AuthResponse>(
-      API_ROUTES.AUTH.LOGIN,
-      credentials,
-      { useMockFallback: true },
-      () => {
-        const token = 'mock_jwt_token_' + Date.now();
-        const trimmed = credentials.email.trim().toLowerCase();
+  async login(credentials: LoginCredentials): Promise<ApiResponse<UserProfile>> {
+    const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.LOGIN, {
+      email: credentials.email.trim().toLowerCase(),
+      password: credentials.password,
+    });
 
-        let userRole: 'user' | 'vip' | 'admin' | 'creator' | 'reviewer' = 'user';
-        let redirectUrl = undefined;
-        let userName = 'Khán giả AI';
+    if (!res.success) {
+      return { ...res, data: null as unknown as UserProfile };
+    }
 
-        if (trimmed === 'creator@gmail.com') {
-          userRole = 'creator';
-          userName = 'Đạo diễn Trần Minh Huy (Maker)';
-          redirectUrl = '/creator';
-        } else if (trimmed === 'reviewer@gmail.com') {
-          userRole = 'reviewer';
-          userName = 'Thẩm định viên Lê Quốc Bảo (Checker)';
-          redirectUrl = '/reviewer';
-        } else if (trimmed === 'vipdemo@gmail.com') {
-          userRole = 'vip';
-          userName = 'Phạm Xuân Lộc (Khán Giả VIP)';
-        } else if (trimmed === 'userdemo@gmail.com') {
-          userRole = 'user';
-          userName = 'Phạm Xuân Lộc (Khán Giả)';
-        }
+    const profile = persistSession(res.data);
+    if (credentials.rememberMe) {
+      storage.set(STORAGE_KEYS.REMEMBERED_EMAIL, credentials.email);
+    } else {
+      storage.remove(STORAGE_KEYS.REMEMBERED_EMAIL);
+    }
 
-        const authenticatedUser: UserProfile = {
-          ...MOCK_USER,
-          name: userName,
-          email: credentials.email,
-          role: userRole,
-          isVIP: userRole === 'vip' || userRole === 'creator' || userRole === 'reviewer',
-        };
-
-        storage.set(STORAGE_KEYS.AUTH_TOKEN, token);
-        storage.set(STORAGE_KEYS.USER_DATA, authenticatedUser);
-
-        if (credentials.rememberMe) {
-          storage.set(STORAGE_KEYS.REMEMBERED_EMAIL, credentials.email);
-          storage.set(STORAGE_KEYS.REMEMBERED_PASSWORD, credentials.password);
-        } else {
-          storage.remove(STORAGE_KEYS.REMEMBERED_PASSWORD);
-        }
-
-        return {
-          user: authenticatedUser,
-          token,
-          redirectUrl,
-        };
-      }
-    );
+    return { ...res, data: profile };
   },
 
-  async register(credentials: RegisterCredentials): Promise<ApiResponse<AuthResponse>> {
-    return apiClient.post<AuthResponse>(
-      API_ROUTES.AUTH.REGISTER,
-      credentials,
-      { useMockFallback: true },
-      () => {
-        const token = 'mock_jwt_token_' + Date.now();
-        const newUser: UserProfile = {
-          ...MOCK_USER,
-          id: 'usr_' + Date.now(),
-          name: credentials.name,
-          email: credentials.email,
-          isVIP: false,
-          role: 'user',
-        };
-        storage.set(STORAGE_KEYS.AUTH_TOKEN, token);
-        storage.set(STORAGE_KEYS.USER_DATA, newUser);
-        return { user: newUser, token };
-      }
-    );
+  /** Members sign up for themselves; creator/reviewer accounts are provisioned by an admin. */
+  async register(credentials: RegisterCredentials): Promise<ApiResponse<UserProfile>> {
+    const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.REGISTER, {
+      email: credentials.email.trim().toLowerCase(),
+      password: credentials.password,
+      fullName: credentials.name.trim(),
+      role: 'MEMBER',
+    });
+
+    if (!res.success) {
+      return { ...res, data: null as unknown as UserProfile };
+    }
+
+    return { ...res, data: persistSession(res.data) };
   },
 
-  async logout(): Promise<ApiResponse<{ success: boolean }>> {
+  async me(): Promise<ApiResponse<UserProfile>> {
+    const res = await apiClient.get<BackendUser>(API_ROUTES.AUTH.PROFILE);
+    if (!res.success) {
+      return { ...res, data: null as unknown as UserProfile };
+    }
+    return { ...res, data: toUserProfile(res.data) };
+  },
+
+  logout(): void {
     storage.remove(STORAGE_KEYS.AUTH_TOKEN);
+    storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
     storage.remove(STORAGE_KEYS.USER_DATA);
-    return apiClient.post<{ success: boolean }>(
-      API_ROUTES.AUTH.LOGOUT,
-      {},
-      { useMockFallback: true },
-      () => ({ success: true })
-    );
   },
 
-  async getCurrentUser(): Promise<ApiResponse<UserProfile>> {
-    const savedUser = storage.get<UserProfile | null>(STORAGE_KEYS.USER_DATA, null);
-    return apiClient.get<UserProfile>(
-      API_ROUTES.AUTH.PROFILE,
-      { useMockFallback: true },
-      () => savedUser || MOCK_USER
-    );
+  getStoredUser(): UserProfile | null {
+    return storage.get<UserProfile | null>(STORAGE_KEYS.USER_DATA, null);
+  },
+
+  hasSession(): boolean {
+    return Boolean(storage.getString(STORAGE_KEYS.AUTH_TOKEN));
   },
 };

@@ -63,6 +63,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     setSelectedCountry,
     selectedYear,
     setSelectedYear,
+    restoreSession,
   } = useAppStore();
 
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
@@ -80,6 +81,11 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
           m.genre.some((g) => g.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : [];
+
+  // Bring back the session saved by a previous login so a page reload stays authenticated.
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
 
   // Close dropdowns on click outside
   useEffect(() => {
