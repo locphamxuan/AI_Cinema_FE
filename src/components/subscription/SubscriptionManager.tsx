@@ -1,13 +1,13 @@
 'use client';
 
 import { useAppStore } from '@/store/useAppStore';
-import { useProductionStore } from '@/store/useProductionStore';
+import { useDeviceStore } from '@/store/useDeviceStore';
 import { subscriptionPlans } from '@/mocks/mockData';
 import { useState, useEffect, useMemo } from 'react';
 
 export default function SubscriptionManager() {
   const { subscription, toggleAutoRenew, isVIPMode } = useAppStore();
-  const { devices, revokeDevice, revokeAllOtherDevices } = useProductionStore();
+  const { devices, revokeDevice, revokeAllOtherDevices } = useDeviceStore();
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   // Calculate hours until renewal
