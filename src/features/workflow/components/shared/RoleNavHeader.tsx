@@ -11,7 +11,7 @@ import { AccountMenu } from './AccountMenu';
 export function RoleNavHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentRole, resetDemoData } = useWorkflowStore();
+  const { currentRole } = useWorkflowStore();
   const { user, logout, openAuthModal } = useAppStore();
 
   const isCreator = pathname.includes('/creator') || (!pathname.includes('/reviewer') && currentRole === 'creator');
@@ -38,7 +38,7 @@ export function RoleNavHeader() {
 
         <div className="flex items-center gap-2 shrink-0">
           <ThemeToggle />
-          <AccountMenu name={displayName} roleLabel={roleLabel} onResetDemo={resetDemoData} onLogout={handleLogout} />
+          <AccountMenu name={displayName} roleLabel={roleLabel} onLogout={handleLogout} />
         </div>
       </div>
     </header>
