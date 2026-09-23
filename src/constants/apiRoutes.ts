@@ -2,16 +2,17 @@
  * AI Cinema - API Endpoints Registry
  */
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+// Same-origin by default so the Next.js rewrite in next.config.ts proxies to the backend
+// and the browser never makes a cross-origin call.
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export const API_ROUTES = {
   // Auth
   AUTH: {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
-    LOGOUT: '/auth/logout',
-    REFRESH_TOKEN: '/auth/refresh-token',
-    PROFILE: '/auth/profile',
+    REFRESH_TOKEN: '/auth/refresh',
+    PROFILE: '/auth/me',
   },
   // Movies & Video
   MOVIES: {
