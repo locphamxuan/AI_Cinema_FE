@@ -72,6 +72,19 @@ describe('Zustand App Store (src/store/useAppStore.ts)', () => {
       const success = store.claimDailyCheckIn();
       expect(success).toBe(false);
     });
+
+    it('maintains todayClaimed after store sync / page reload simulation', () => {
+      const store = useAppStore.getState();
+      expect(store.checkInStreak.todayClaimed).toBe(true);
+
+      // Simulate F5 page refresh sync
+      store.syncCheckInStreak();
+      expect(useAppStore.getState().checkInStreak.todayClaimed).toBe(true);
+
+      // Cannot claim again
+      const success = useAppStore.getState().claimDailyCheckIn();
+      expect(success).toBe(false);
+    });
   });
 
   describe('VIP Mode Toggle', () => {

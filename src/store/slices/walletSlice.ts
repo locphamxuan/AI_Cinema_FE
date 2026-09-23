@@ -12,7 +12,7 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
     const todayStr = getTodayDateString();
     set((s) => {
       const current = s.checkInStreak || mockCheckInStreak;
-      const isTodayClaimed = current.lastCheckInDate === todayStr && current.todayClaimed;
+      const isTodayClaimed = current.lastCheckInDate === todayStr;
       const updatedDays = current.days.map((d, idx) => ({
         ...d,
         isToday: idx === todayIdx,
@@ -34,7 +34,7 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
     const todayIdx = getTodayDayIndex();
     const todayStr = getTodayDateString();
 
-    if (state.checkInStreak.todayClaimed && state.checkInStreak.lastCheckInDate === todayStr) {
+    if (state.checkInStreak.lastCheckInDate === todayStr || state.checkInStreak.todayClaimed) {
       return false;
     }
 
