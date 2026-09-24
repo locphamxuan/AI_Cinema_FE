@@ -98,6 +98,7 @@ export const API_ROUTES = {
 
     // AI model routing (BR-40)
     AI_MODEL_ROUTING: '/ai-models/routing',
+    AI_MODEL_ROUTE: '/ai-models/route',
 
     // Review & Compliance Decisions
     REVIEW_DETAIL: (reviewId: string) => `/reviews/${reviewId}`,

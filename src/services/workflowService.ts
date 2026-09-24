@@ -20,6 +20,7 @@ import type {
   ApiPublication,
   ApiQuotaAllocation,
   ApiReview,
+  ApiRoute,
   ApiRoutingRow,
   ApiScene,
   ApiUser,
@@ -33,6 +34,7 @@ import type {
   CreateQuotaAllocationDto,
   CreateReviewDto,
   CreateSceneDto,
+  GenerationJobType,
   DecideReviewDto,
   Paginated,
   RecordComplianceReviewDto,
@@ -62,6 +64,12 @@ class WorkflowService {
 
   getRouting(): Promise<ApiResponse<ApiRoutingRow[]>> {
     return apiClient.get<ApiRoutingRow[]>(ROUTES.AI_MODEL_ROUTING);
+  }
+
+  /** Model one job would be routed to — resolves a described CUSTOM function (BR-40). */
+  resolveRoute(jobType: GenerationJobType, customFunction?: string): Promise<ApiResponse<ApiRoute>> {
+    const query = new URLSearchParams({ jobType, ...(customFunction ? { customFunction } : {}) });
+    return apiClient.get<ApiRoute>(`${ROUTES.AI_MODEL_ROUTE}?${query}`);
   }
 
   // Projects & milestones (Reviewer)

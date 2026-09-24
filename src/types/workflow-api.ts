@@ -405,9 +405,16 @@ export interface ApiGenerationJob {
   generatedAssets: ApiGeneratedAsset[];
 }
 
+/** Model a job type is routed to, with its planning estimate (BR-40, BR-41). */
 export interface ApiRoutingRow {
   jobType: GenerationJobType;
   provider: string;
   model: string;
+  modality: string;
   estimatedTokenCost: number;
+}
+
+/** Route of one job, including a described CUSTOM function. */
+export interface ApiRoute extends ApiRoutingRow {
+  match: 'catalog' | 'specialist' | 'general';
 }
