@@ -4,7 +4,7 @@ import { workflowService } from '@/services/workflowService';
 import { availableBudget, derivePlanVerdict, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
 import { creatorGroups, reviewerGroups } from '@/features/workflow/lib/projectGroups';
 import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
-import { initialProject, mockAssignedProjects, initialReviews } from '@/tests/fixtures/workflowFixtures';
+import { initialProject, mockAssignedProjects } from '@/tests/fixtures/workflowFixtures';
 import { apiJob, apiPackage, apiPlan, apiPlanReview, apiProject, apiScene } from '@/tests/fixtures/workflowApiFixtures';
 import type { ApiProductionProject } from '@/types/workflow-api';
 
@@ -63,7 +63,6 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
       activePackageId: 'pkg-ep-03',
       project: initialProject,
       projects: mockAssignedProjects,
-      reviews: initialReviews,
     });
   });
 
@@ -176,7 +175,6 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
       expect(await useWorkflowStore.getState().requestPlanChanges('plan-1', 'Sửa token')).toBe(true);
       expect(api.decidePlanReview).toHaveBeenCalledTimes(1);
       expect(api.decidePlanReview).toHaveBeenCalledWith('row-d', { decision: 'CHANGES_REQUESTED', rejectionReason: 'Sửa token' });
-      expect(useWorkflowStore.getState().reviews[0].decision).toBe('changes_requested');
     });
   });
 

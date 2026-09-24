@@ -4,7 +4,6 @@ import {
   GeneratedAsset,
   EpisodePackage,
   ProductionProject,
-  ReviewLog,
 } from '@/types/workflow';
 
 // Seed data for useWorkflowStore's initial state (demo project "Cyber Saigon
@@ -345,6 +344,7 @@ const initialEpisodes: EpisodePackage[] = [
     },
     jobs: mockJobsEp2,
     assets: mockAssetsEp2,
+    review_log: [],
     created_at: '2026-08-01T08:00:00Z',
     updated_at: '2026-08-28T16:00:00Z',
   },
@@ -364,6 +364,7 @@ const initialEpisodes: EpisodePackage[] = [
     brief: mockBriefEp2,
     jobs: mockJobsEp2,
     assets: mockAssetsEp2,
+    review_log: [],
     created_at: '2026-08-15T08:00:00Z',
     updated_at: '2026-08-25T14:30:00Z',
   },
@@ -383,6 +384,7 @@ const initialEpisodes: EpisodePackage[] = [
     brief: mockBriefEp3,
     jobs: mockJobsEp3,
     assets: [],
+    review_log: [],
     created_at: '2026-09-02T10:00:00Z',
     updated_at: '2026-09-02T10:00:00Z',
   },
@@ -523,29 +525,4 @@ export const mockAssignedProjects: ProductionProject[] = [
   mockProjectAncient,
   mockProjectSpace,
   mockProjectAgent,
-];
-
-export const initialReviews: ReviewLog[] = [
-  {
-    id: 'rev-001',
-    episode_package_id: 'pkg-ep-01',
-    reviewer_id: 'rev-user-01',
-    reviewer_name: 'Lê Quốc Bảo',
-    review_type: 'plan',
-    decision: 'approved',
-    feedback_notes: 'Kịch bản mở đầu lôi cuốn, dự toán token phù hợp. Cấp quota 450 Tokens.',
-    quota_granted: 450,
-    created_at: '2026-08-05T09:00:00Z',
-  },
-  {
-    id: 'rev-002',
-    episode_package_id: 'pkg-ep-02',
-    reviewer_id: 'rev-user-01',
-    reviewer_name: 'Lê Quốc Bảo',
-    review_type: 'plan',
-    decision: 'approved',
-    feedback_notes: 'Cốt truyện cao trào bùng nổ. Đã cấp 450 Tokens để tiến hành sản xuất clip trong AI Studio.',
-    quota_granted: 450,
-    created_at: '2026-08-18T10:00:00Z',
-  },
 ];
