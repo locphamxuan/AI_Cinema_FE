@@ -1,18 +1,55 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
+import { workflowService } from '@/services/workflowService';
 import { availableBudget, derivePlanVerdict, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
 import { creatorGroups, reviewerGroups } from '@/features/workflow/lib/projectGroups';
-import {
-  initialProject,
-  mockAssignedProjects,
-  initialReviews,
-  initialComplianceChecks,
-  initialLabels,
-  initialPublications,
-} from '@/tests/fixtures/workflowFixtures';
+import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
+import { initialProject, mockAssignedProjects, initialReviews } from '@/tests/fixtures/workflowFixtures';
+import { apiPackage, apiPlan, apiPlanReview, apiProject, apiScene } from '@/tests/fixtures/workflowApiFixtures';
+import type { ApiProductionProject } from '@/types/workflow-api';
+
+vi.mock('@/services/workflowService', () => ({
+  workflowService: {
+    listProjects: vi.fn(),
+    getProject: vi.fn(),
+    createProject: vi.fn(),
+    updateMilestone: vi.fn(),
+    createScene: vi.fn(),
+    updateScene: vi.fn(),
+    deleteScene: vi.fn(),
+    submitPlan: vi.fn(),
+    createPlanReview: vi.fn(),
+    decidePlanReview: vi.fn(),
+    allocateQuota: vi.fn(),
+    createReview: vi.fn(),
+    decideReview: vi.fn(),
+    listPolicies: vi.fn(),
+    createAiContentLabel: vi.fn(),
+    recordComplianceReview: vi.fn(),
+    createCatalog: vi.fn(),
+    createPublication: vi.fn(),
+    publish: vi.fn(),
+  },
+}));
+
+const api = vi.mocked(workflowService);
+const ok = <T,>(data: T) => Promise.resolve({ success: true, data });
+const fail = (message: string) => Promise.resolve({ success: false, data: null as never, message });
+
+/** Loads `project` into the store and makes every reload return it. */
+function useBackendProject(project: ApiProductionProject) {
+  api.getProject.mockImplementation(() => ok(project));
+  useWorkflowStore.setState({
+    project: adaptApiProjectToUiProject(project),
+    projects: [adaptApiProjectToUiProject(project)],
+    activeProjectId: project.id,
+    activePackageId: project.productionPlans?.[0]?.id ?? '',
+  });
+}
 
 describe('Zustand Workflow Store (src/features/workflow/store)', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     useWorkflowStore.setState({
       currentRole: 'creator',
       activeProjectId: 'proj-cyber-01',
@@ -20,91 +57,219 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
       project: initialProject,
       projects: mockAssignedProjects,
       reviews: initialReviews,
-      complianceChecks: initialComplianceChecks,
-      labels: initialLabels,
-      publications: initialPublications,
     });
   });
 
-  describe('Maker (Creator) plan actions', () => {
-    it('submits a production plan and moves it to PLAN_PENDING', () => {
-      const store = useWorkflowStore.getState();
-      store.submitProductionPlan('pkg-ep-03');
+  describe('Loading projects', () => {
+    it('lists projects, then loads the detail of the active one', async () => {
+      const detail = apiProject([apiPlan()]);
+      api.listProjects.mockReturnValue(ok({ data: [apiProject([], { productionPlans: undefined })] }));
+      api.getProject.mockReturnValue(ok(detail));
+      useWorkflowStore.setState({ activeProjectId: 'project-1', projects: [] });
 
-      const pkg = useWorkflowStore.getState().getPackage('pkg-ep-03');
-      expect(pkg?.status).toBe('PLAN_PENDING');
-      expect(pkg?.brief.status).toBe('PLAN_PENDING');
-    });
-  });
-
-  describe('Checker (Reviewer) plan review actions', () => {
-    it('allocates quota and moves the package to QUOTA_ALLOCATED', () => {
-      const store = useWorkflowStore.getState();
-      store.allocateQuota('pkg-ep-03', 500, 'Đạt chuẩn');
+      await useWorkflowStore.getState().loadProjects();
 
       const state = useWorkflowStore.getState();
-      const pkg = state.getPackage('pkg-ep-03');
-      expect(pkg?.status).toBe('QUOTA_ALLOCATED');
-      expect(pkg?.quota_allocated).toBe(500);
-      expect(state.project.allocated_tokens).toBe(900 + 500);
-      expect(state.reviews[0].decision).toBe('approved');
+      expect(api.getProject).toHaveBeenCalledWith('project-1');
+      expect(state.project.episodes.map((e) => e.id)).toEqual(['plan-1']);
+      expect(state.activePackageId).toBe('plan-1');
     });
 
-    it('requests plan changes and moves the package to CHANGES_REQUESTED', () => {
-      const store = useWorkflowStore.getState();
-      store.requestPlanChanges('pkg-ep-02', 'Cần bổ sung phân cảnh mở đầu');
+    it('keeps the selected episode across reloads', async () => {
+      useBackendProject(apiProject([apiPlan(), apiPlan({ id: 'plan-2', episodeNumber: 2 })]));
+      useWorkflowStore.setState({ activePackageId: 'plan-2' });
 
-      const state = useWorkflowStore.getState();
-      const pkg = state.getPackage('pkg-ep-02');
-      expect(pkg?.status).toBe('CHANGES_REQUESTED');
-      expect(state.reviews[0].decision).toBe('changes_requested');
-      expect(state.reviews[0].feedback_notes).toBe('Cần bổ sung phân cảnh mở đầu');
+      await useWorkflowStore.getState().loadProject('project-1');
+      expect(useWorkflowStore.getState().activePackageId).toBe('plan-2');
     });
   });
 
-  describe('Field-level plan review (BR-39)', () => {
-    const approveEverything = (packageId: string) => {
-      const s = useWorkflowStore.getState();
-      s.reviewPlanField(packageId, 'script', 'approved');
-      s.reviewPlanField(packageId, 'duration', 'approved');
-      s.reviewPlanField(packageId, 'token', 'approved');
-      s.getBrief(packageId)?.scene_breakdown.forEach((sc) => s.reviewScene(packageId, sc.scene_number, 'approved'));
-    };
-    const verdictOf = (packageId: string) => {
-      const { project, getBrief } = useWorkflowStore.getState();
-      return derivePlanVerdict(project, getBrief(packageId)!);
-    };
-
-    it('stays PENDING until every field is approved, then becomes APPROVED', () => {
-      useWorkflowStore.getState().submitProductionPlan('pkg-ep-03');
-      useWorkflowStore.getState().reviewPlanField('pkg-ep-03', 'script', 'approved');
-      expect(verdictOf('pkg-ep-03')).toBe('PENDING');
-
-      approveEverything('pkg-ep-03');
-      expect(verdictOf('pkg-ep-03')).toBe('APPROVED');
-    });
-
-    it('turns CHANGES_REQUESTED when a single field is flagged, keeping its comment', () => {
-      approveEverything('pkg-ep-03');
-      useWorkflowStore.getState().reviewPlanField('pkg-ep-03', 'token', 'changes_requested', 'Vượt ngân sách còn lại');
-
-      expect(verdictOf('pkg-ep-03')).toBe('CHANGES_REQUESTED');
-      expect(useWorkflowStore.getState().getBrief('pkg-ep-03')?.token_review).toEqual({
-        status: 'changes_requested',
-        comment: 'Vượt ngân sách còn lại',
+  describe('Maker (Creator) plan submission', () => {
+    it('deletes removed scenes, saves the rest and submits the plan with their ids', async () => {
+      useBackendProject(apiProject([apiPlan()]));
+      const brief = useWorkflowStore.getState().getBrief('plan-1')!;
+      useWorkflowStore.getState().updateContentBrief('plan-1', {
+        scene_breakdown: [brief.scene_breakdown[0], { scene_number: 2, title: 'Cảnh mới', description: 'Mới', target_duration_sec: 30, estimated_tokens: 50 }],
       });
+      api.deleteScene.mockReturnValue(ok({}));
+      api.updateScene.mockReturnValue(ok(apiScene(1)));
+      api.createScene.mockReturnValue(ok(apiScene(3, { id: 'scene-new' })));
+      api.submitPlan.mockReturnValue(ok(apiPlan({ status: 'SUBMITTED' })));
+
+      expect(await useWorkflowStore.getState().submitProductionPlan('plan-1')).toBe(true);
+
+      expect(api.deleteScene).toHaveBeenCalledWith('scene-2');
+      expect(api.updateScene).toHaveBeenCalledWith('scene-1', expect.objectContaining({ sceneNumber: 1 }));
+      expect(api.createScene).toHaveBeenCalledWith('plan-1', expect.objectContaining({ title: 'Cảnh mới' }));
+      expect(api.submitPlan).toHaveBeenCalledWith(
+        'plan-1',
+        expect.objectContaining({
+          scriptText: 'Kịch bản tổng thể',
+          scenes: [
+            { sceneId: 'scene-1', scriptText: 'Mô tả cảnh 1' },
+            { sceneId: 'scene-new', scriptText: 'Mới' },
+          ],
+        })
+      );
     });
 
-    it('resets episode field reviews on resubmit', () => {
-      approveEverything('pkg-ep-03');
-      useWorkflowStore.getState().submitProductionPlan('pkg-ep-03');
+    it('stops and reports failure when a scene cannot be saved', async () => {
+      useBackendProject(apiProject([apiPlan()]));
+      api.updateScene.mockReturnValue(fail('Total scene duration exceeds the plan target duration'));
 
-      const brief = useWorkflowStore.getState().getBrief('pkg-ep-03');
-      expect(brief?.duration_review.status).toBe('pending');
-      expect(brief?.token_review.status).toBe('pending');
-      expect(brief?.scene_reviews.every((r) => r.status === 'pending')).toBe(true);
+      expect(await useWorkflowStore.getState().submitProductionPlan('plan-1')).toBe(false);
+      expect(api.submitPlan).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Checker (Reviewer) field-level plan review (BR-39)', () => {
+    it('opens the review round on the first verdict, then decides that row', async () => {
+      useBackendProject(apiProject([apiPlan({ status: 'SUBMITTED' })]));
+      api.createPlanReview.mockReturnValue(
+        ok([apiPlanReview('SCENE', { id: 'row-s1', sceneId: 'scene-1' }), apiPlanReview('DURATION', { id: 'row-d' })])
+      );
+      api.decidePlanReview.mockReturnValue(ok(apiPlanReview('DURATION')));
+
+      expect(await useWorkflowStore.getState().reviewPlanField('plan-1', 'duration', 'approved')).toBe(true);
+      expect(api.createPlanReview).toHaveBeenCalledWith('plan-1');
+      expect(api.decidePlanReview).toHaveBeenCalledWith('row-d', { decision: 'APPROVED', comments: undefined });
     });
 
+    it('decides the open row of a scene directly, sending the comment as the reason', async () => {
+      useBackendProject(apiProject([apiPlan({ status: 'UNDER_REVIEW', planReviews: [apiPlanReview('SCENE', { id: 'row-s2', sceneId: 'scene-2' })] })]));
+      api.decidePlanReview.mockReturnValue(ok(apiPlanReview('SCENE')));
+
+      await useWorkflowStore.getState().reviewScene('plan-1', 2, 'changes_requested', 'Thiếu mô tả');
+      expect(api.createPlanReview).not.toHaveBeenCalled();
+      expect(api.decidePlanReview).toHaveBeenCalledWith('row-s2', { decision: 'CHANGES_REQUESTED', rejectionReason: 'Thiếu mô tả' });
+    });
+
+    it('does not re-decide a field already decided in this round', async () => {
+      useBackendProject(
+        apiProject([apiPlan({ status: 'UNDER_REVIEW', planReviews: [apiPlanReview('TOKEN_ESTIMATE', { status: 'APPROVED', decidedAt: 'x' })] })])
+      );
+      expect(await useWorkflowStore.getState().reviewPlanField('plan-1', 'token', 'changes_requested', 'x')).toBe(false);
+      expect(api.decidePlanReview).not.toHaveBeenCalled();
+    });
+
+    it('sends every undecided field back when requesting changes', async () => {
+      useBackendProject(
+        apiProject([
+          apiPlan({
+            status: 'UNDER_REVIEW',
+            planReviews: [
+              apiPlanReview('TOKEN_ESTIMATE', { status: 'CHANGES_REQUESTED', decidedAt: 'x' }),
+              apiPlanReview('DURATION', { id: 'row-d' }),
+            ],
+          }),
+        ])
+      );
+      api.decidePlanReview.mockReturnValue(ok(apiPlanReview('DURATION')));
+
+      expect(await useWorkflowStore.getState().requestPlanChanges('plan-1', 'Sửa token')).toBe(true);
+      expect(api.decidePlanReview).toHaveBeenCalledTimes(1);
+      expect(api.decidePlanReview).toHaveBeenCalledWith('row-d', { decision: 'CHANGES_REQUESTED', rejectionReason: 'Sửa token' });
+      expect(useWorkflowStore.getState().reviews[0].decision).toBe('changes_requested');
+    });
+  });
+
+  describe('Quota allocation', () => {
+    it('grants an INITIAL quota, then only the difference as TOP_UP', async () => {
+      useBackendProject(apiProject([apiPlan({ status: 'APPROVED' })]));
+      api.allocateQuota.mockReturnValue(ok({}) as never);
+      await useWorkflowStore.getState().allocateQuota('plan-1', 400);
+      expect(api.allocateQuota).toHaveBeenCalledWith('plan-1', { allocationType: 'INITIAL', allocatedAmount: 400 });
+
+      const quota = [{ id: 'q1', allocationType: 'INITIAL' as const, allocatedAmount: '400', remainingAmount: '400', status: 'ACTIVE' as const, createdAt: '' }];
+      useBackendProject(apiProject([apiPlan({ status: 'APPROVED', quotaAllocations: quota })]));
+      await useWorkflowStore.getState().allocateQuota('plan-1', 600);
+      expect(api.allocateQuota).toHaveBeenLastCalledWith('plan-1', { allocationType: 'TOP_UP', allocatedAmount: 200 });
+    });
+
+    it('does nothing when the requested quota is not above the current one', async () => {
+      const quota = [{ id: 'q1', allocationType: 'INITIAL' as const, allocatedAmount: '400', remainingAmount: '400', status: 'ACTIVE' as const, createdAt: '' }];
+      useBackendProject(apiProject([apiPlan({ status: 'APPROVED', quotaAllocations: quota })]));
+      expect(await useWorkflowStore.getState().allocateQuota('plan-1', 400)).toBe(false);
+      expect(api.allocateQuota).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Compliance & publishing (BR-42)', () => {
+    const allPassed = { CONTENT_POLICY: true, LEGAL: true, COPYRIGHT: true, WATERMARK: true, REAL_PERSON_LIKENESS: true };
+    const submitted = () => apiProject([apiPlan({ status: 'APPROVED', episodePackages: [apiPackage()] })]);
+
+    it('approves the cut, labels it and records every manual check as passed', async () => {
+      useBackendProject(submitted());
+      api.listPolicies.mockReturnValue(ok({ data: [{ id: 'policy-1', name: 'AI', type: 'AI_LABELING', version: '1', isActive: true }] }));
+      api.createReview.mockReturnValue(ok({ id: 'review-1' }) as never);
+      api.decideReview.mockReturnValue(ok({}) as never);
+      api.createAiContentLabel.mockReturnValue(ok({}) as never);
+      api.recordComplianceReview.mockReturnValue(ok({ verdict: 'PASS', checks: [] }) as never);
+
+      expect(await useWorkflowStore.getState().passCompliance('plan-1', allPassed, 'INTRO_OUTRO')).toBe(true);
+      expect(api.decideReview).toHaveBeenCalledWith('review-1', { decision: 'APPROVED' });
+      expect(api.createAiContentLabel).toHaveBeenCalledWith('package-1', expect.objectContaining({ policyId: 'policy-1', displayLocation: 'INTRO_OUTRO' }));
+      const { checks } = api.recordComplianceReview.mock.calls[0][1];
+      expect(checks.map((c) => c.checkType).sort()).toEqual(['CONTENT_POLICY', 'COPYRIGHT', 'LEGAL', 'REAL_PERSON_LIKENESS', 'WATERMARK']);
+      expect(checks.every((c) => c.result === 'PASS')).toBe(true);
+    });
+
+    it('records nothing when any check failed — the cut goes back through "request changes"', async () => {
+      useBackendProject(submitted());
+      expect(await useWorkflowStore.getState().passCompliance('plan-1', { ...allPassed, COPYRIGHT: false }, 'INTRO_OUTRO')).toBe(false);
+      expect(api.createReview).not.toHaveBeenCalled();
+      expect(api.recordComplianceReview).not.toHaveBeenCalled();
+    });
+
+    it('creates the catalog episode on first publish, then publishes the package', async () => {
+      useBackendProject(submitted());
+      api.createCatalog.mockReturnValue(ok({ id: 'movie-1', episodes: [{ id: 'episode-1', currentPackageId: 'package-1' }] }));
+      api.createPublication.mockReturnValue(ok({ id: 'pub-1' }) as never);
+      api.publish.mockReturnValue(ok({}) as never);
+
+      expect(await useWorkflowStore.getState().publishEpisode('plan-1', '2026-10-01T13:00:00.000Z')).toBe(true);
+      expect(api.createPublication).toHaveBeenCalledWith('episode-1', { packageId: 'package-1', scheduledAt: '2026-10-01T13:00:00.000Z' });
+      expect(api.publish).toHaveBeenCalledWith('pub-1');
+    });
+
+    it('requests content changes through a new review of the package', async () => {
+      useBackendProject(submitted());
+      api.createReview.mockReturnValue(ok({ id: 'review-2' }) as never);
+      api.decideReview.mockReturnValue(ok({}) as never);
+
+      expect(await useWorkflowStore.getState().requestContentChanges('plan-1', 'Âm thanh lệch')).toBe(true);
+      expect(api.decideReview).toHaveBeenCalledWith('review-2', { decision: 'CHANGES_REQUESTED', rejectionReason: 'Âm thanh lệch' });
+    });
+  });
+
+  describe('Project creation', () => {
+    it('sends ids for the creator and genres and selects the new project', async () => {
+      api.createProject.mockReturnValue(ok(apiProject([], { id: 'project-new' })));
+      api.listProjects.mockReturnValue(ok({ data: [apiProject([], { id: 'project-new', productionPlans: undefined })] }));
+      api.getProject.mockReturnValue(ok(apiProject([apiPlan()], { id: 'project-new' })));
+
+      const created = await useWorkflowStore.getState().createProject({
+        title: 'Phim thử',
+        creator_id: 'creator-1',
+        genre_ids: ['genre-1'],
+        synopsis: '',
+        total_episodes: 2,
+        episode_duration_minutes: 20,
+        total_budget_tokens: 1000,
+        production_start_date: '2026-10-01',
+        deadline: '2026-12-01',
+        planned_release_date: '2027-01-01',
+      });
+
+      expect(created).toBe(true);
+      expect(api.createProject).toHaveBeenCalledWith(
+        expect.objectContaining({ assignedCreatorId: 'creator-1', genreIds: ['genre-1'], contentType: 'SERIES', episodeCount: 2, defaultEpisodeDurationSeconds: 1200 })
+      );
+      expect(useWorkflowStore.getState().activeProjectId).toBe('project-new');
+    });
+  });
+
+  describe('Local plan helpers', () => {
     it('bumps script_version and resets its review only when the overall script changes', () => {
       const before = useWorkflowStore.getState().project;
       useWorkflowStore.getState().updateOverallScript(before.overall_script);
@@ -120,6 +285,20 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     it('computes the available project budget from allocated tokens', () => {
       expect(availableBudget(useWorkflowStore.getState().project)).toBe(3000 - 900);
     });
+
+    it('derives the plan verdict and summarises only the flagged fields', () => {
+      const { project, getBrief } = useWorkflowStore.getState();
+      const brief = {
+        ...getBrief('pkg-ep-03')!,
+        token_review: { status: 'changes_requested' as const, comment: 'Vượt ngân sách' },
+        scene_reviews: [
+          { scene_number: 1, status: 'approved' as const },
+          { scene_number: 2, status: 'changes_requested' as const, comment: 'Thiếu mô tả' },
+        ],
+      };
+      expect(derivePlanVerdict(project, brief)).toBe('CHANGES_REQUESTED');
+      expect(summarizeFlaggedFields(project, brief)).toBe('• Token dự toán: Vượt ngân sách\n• Phân cảnh 2: Thiếu mô tả');
+    });
   });
 
   describe('Scene production token cost (BR-41)', () => {
@@ -131,39 +310,6 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
       expect(long.output_duration).toBeGreaterThan(short.output_duration);
       expect(long.token_cost).toBeGreaterThan(short.token_cost);
       expect(short.token_cost).toBe(Math.round(short.output_duration * 3));
-    });
-  });
-
-  describe('Flow guards from the product spec', () => {
-    it('never grants more than the project budget still available (SUM of quotas <= budget)', () => {
-      const store = useWorkflowStore.getState();
-      const left = availableBudget(store.project);
-      store.allocateQuota('pkg-ep-03', left + 5000, 'vượt ngân sách');
-
-      const state = useWorkflowStore.getState();
-      expect(state.getPackage('pkg-ep-03')?.quota_allocated).toBe(left);
-      expect(availableBudget(state.project)).toBe(0);
-    });
-
-    it('does not record a compliance check as passed when any item failed', () => {
-      useWorkflowStore.getState().saveComplianceCheck('pkg-ep-02', { article_44_passed: false });
-      expect(useWorkflowStore.getState().complianceChecks['pkg-ep-02']?.status).not.toBe('passed');
-      expect(useWorkflowStore.getState().getPackage('pkg-ep-02')?.status).not.toBe('COMPLIANCE_PASSED');
-    });
-
-    it('summarises only the flagged plan fields, with their comments', () => {
-      const store = useWorkflowStore.getState();
-      store.reviewPlanField('pkg-ep-03', 'token', 'changes_requested', 'Vượt ngân sách');
-      store.reviewScene('pkg-ep-03', 2, 'changes_requested', 'Thiếu mô tả');
-      store.reviewScene('pkg-ep-03', 1, 'approved');
-
-      const { project, getBrief } = useWorkflowStore.getState();
-      expect(summarizeFlaggedFields(project, getBrief('pkg-ep-03')!)).toBe('• Token dự toán: Vượt ngân sách\n• Phân cảnh 2: Thiếu mô tả');
-    });
-
-    it('keeps every seeded episode inside the 30 minute MVP cap', () => {
-      const { project } = useWorkflowStore.getState();
-      expect(project.episodes.every((ep) => ep.target_duration_minutes <= 30 && ep.brief.target_duration_minutes <= 30)).toBe(true);
     });
   });
 
@@ -181,28 +327,6 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
       expect(groups.reduce((sum, g) => sum + g.projects.length, 0)).toBe(projects.length);
       expect(groups.find((g) => g.key === 'planReview')?.projects.map((p) => p.id)).toContain('proj-cyber-01');
       expect(groups.find((g) => g.key === 'production')?.projects.length).toBeGreaterThan(0);
-    });
-
-    it('moves a brand new project to the plan-review stage once its plan is submitted', () => {
-      const store = useWorkflowStore.getState();
-      store.createProject({
-        title: 'Phim thử',
-        genre: ['Hành động'],
-        synopsis: '',
-        season_count: 1,
-        episodes_per_season: 1,
-        episode_target_durations: [30],
-        total_budget_tokens: 1000,
-        production_start_date: '2026-10-01',
-        deadline: '2026-12-01',
-        planned_release_date: '2027-01-01',
-      });
-      const created = useWorkflowStore.getState().project;
-      const stageOf = (id: string) => reviewerGroups(useWorkflowStore.getState().projects).find((g) => g.projects.some((p) => p.id === id))?.key;
-      expect(stageOf(created.id)).toBe('new');
-
-      useWorkflowStore.getState().submitProductionPlan(created.episodes[0].id);
-      expect(stageOf(created.id)).toBe('planReview');
     });
   });
 
@@ -224,31 +348,6 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
       expect(resolveModel({ function_type: 'CUSTOM', custom_function: 'làm gì đó rất lạ' }).match).toBe('general');
       expect(resolveModel({ function_type: 'CUSTOM', custom_function: '  ' }).match).toBe('pending');
       expect(stepDefaults({ function_type: 'CUSTOM', custom_function: '' })).toEqual({ selected_model: '', token_cost: 0 });
-    });
-  });
-
-  describe('Checker (Reviewer) compliance & publishing actions', () => {
-    it('saves a compliance check and moves the package to COMPLIANCE_PASSED', () => {
-      const store = useWorkflowStore.getState();
-      store.saveComplianceCheck('pkg-ep-02', { article_44_passed: true, decree142_passed: true });
-
-      const state = useWorkflowStore.getState();
-      expect(state.getPackage('pkg-ep-02')?.status).toBe('COMPLIANCE_PASSED');
-      expect(state.complianceChecks['pkg-ep-02'].status).toBe('passed');
-      expect(state.labels['pkg-ep-02'].label_type).toBe('AI_GENERATED_FULL');
-    });
-
-    it('schedules and publishes a package, moving it to PUBLISHED', () => {
-      const store = useWorkflowStore.getState();
-      store.scheduleAndPublish('pkg-ep-02', {
-        scheduled_at: '2026-10-01T20:00:00Z',
-        visibility: 'public',
-        channels: ['WEB_OTT'],
-      });
-
-      const state = useWorkflowStore.getState();
-      expect(state.getPackage('pkg-ep-02')?.status).toBe('PUBLISHED');
-      expect(state.publications['pkg-ep-02'].visibility).toBe('public');
     });
   });
 });

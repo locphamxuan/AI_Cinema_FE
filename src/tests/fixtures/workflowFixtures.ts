@@ -5,9 +5,6 @@ import {
   EpisodePackage,
   ProductionProject,
   ReviewLog,
-  ComplianceCheck,
-  AIContentLabel,
-  Publication,
 } from '@/types/workflow';
 
 // Seed data for useWorkflowStore's initial state (demo project "Cyber Saigon
@@ -579,58 +576,3 @@ export const initialReviews: ReviewLog[] = [
     created_at: '2026-08-18T10:00:00Z',
   },
 ];
-
-export const initialComplianceChecks: Record<string, ComplianceCheck> = {
-  'pkg-ep-01': {
-    id: 'comp-001',
-    episode_package_id: 'pkg-ep-01',
-    checker_id: 'rev-user-01',
-    checker_name: 'Lê Quốc Bảo',
-    article_44_passed: true,
-    decree142_passed: true,
-    watermark_verified: true,
-    moderation_score: 99.2,
-    ai_content_percentage: 100,
-    status: 'passed',
-    notes: 'Đã gắn nhãn định danh AI mở đầu và kết thúc phim theo chuẩn Nghị định 142.',
-    checked_at: '2026-08-28T16:00:00Z',
-  },
-};
-
-export const initialLabels: Record<string, AIContentLabel> = {
-  'pkg-ep-01': {
-    id: 'lbl-001',
-    episode_package_id: 'pkg-ep-01',
-    label_type: 'AI_GENERATED_FULL',
-    label_text: 'Nội dung được tạo sinh 100% bằng Trí tuệ Nhân tạo theo Điều 44 Luật AI và Nghị định 142/2024/NĐ-CP.',
-    display_location: 'INTRO_OUTRO',
-    ruleset_version: 'DECREE_142_2024_V1',
-    certification_id: 'AI-VN-2026-CINEMA-0984-EP1',
-    is_active: true,
-  },
-  'pkg-ep-02': {
-    id: 'lbl-002',
-    episode_package_id: 'pkg-ep-02',
-    label_type: 'AI_GENERATED_FULL',
-    label_text: 'Nội dung tạo 100% bằng Trí tuệ Nhân tạo - Không sử dụng hình ảnh diễn viên thật.',
-    display_location: 'INTRO_OUTRO',
-    ruleset_version: 'DECREE_142_2024_V1',
-    certification_id: 'AI-VN-2026-CINEMA-1042-EP2',
-    is_active: true,
-  },
-};
-
-export const initialPublications: Record<string, Publication> = {
-  'pkg-ep-01': {
-    id: 'pub-001',
-    episode_package_id: 'pkg-ep-01',
-    movie_catalog_id: 'movie-001',
-    title: 'Tập 1: Điểm Khởi Đầu',
-    scheduled_at: '2026-09-01T20:00:00Z',
-    published_at: '2026-09-01T20:00:00Z',
-    visibility: 'public',
-    platform_channels: ['WEB_OTT', 'MOBILE_APP', 'SMART_TV'],
-    streaming_url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-    quality: '4K Ultra HD',
-  },
-};
