@@ -387,6 +387,19 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
   });
 
+  describe('Milestones', () => {
+    it('sends the backend status of a milestone and reloads, reporting a failure', async () => {
+      serveBackendProject(apiProject([apiPlan()]));
+      api.updateMilestone.mockReturnValue(ok({}) as never);
+      expect(await useWorkflowStore.getState().updateMilestoneStatus('m1', 'in_progress')).toBe(true);
+      expect(api.updateMilestone).toHaveBeenCalledWith('m1', { status: 'IN_PROGRESS' });
+      expect(api.getProject).toHaveBeenCalled();
+
+      api.updateMilestone.mockReturnValue(fail('not found'));
+      expect(await useWorkflowStore.getState().updateMilestoneStatus('m1', 'completed')).toBe(false);
+    });
+  });
+
   describe('Local plan helpers', () => {
     it('bumps script_version and resets its review only when the overall script changes', () => {
       const before = useWorkflowStore.getState().project;
