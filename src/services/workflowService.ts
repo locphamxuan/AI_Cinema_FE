@@ -54,6 +54,11 @@ class WorkflowService {
     return apiClient.get<Paginated<ApiUser>>(`${ROUTES.USERS}${query}`);
   }
 
+  /** Adds a genre; a name that exists (ignoring case) returns that genre instead. */
+  createGenre(name: string): Promise<ApiResponse<ApiGenre>> {
+    return apiClient.post<ApiGenre>(ROUTES.GENRES, { name });
+  }
+
   listGenres(): Promise<ApiResponse<Paginated<ApiGenre>>> {
     return apiClient.get<Paginated<ApiGenre>>(`${ROUTES.GENRES}?limit=100`);
   }

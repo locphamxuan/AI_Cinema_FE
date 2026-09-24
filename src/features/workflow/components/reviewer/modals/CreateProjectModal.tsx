@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Plus, X, Trash2, Tag, Calendar, Milestone as MilestoneIcon, Film, Coins, Minus, UserCheck } from 'lucide-react';
+import { Plus, Trash2, Calendar, Milestone as MilestoneIcon, Film, Coins, UserCheck } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import type { ProjectMilestone } from '@/types/workflow';
 import type { ApiGenre, ApiUser } from '@/types/workflow-api';
 import { workflowService } from '@/services/workflowService';
-import { clamp, MAX_EPISODE_MINUTES, MAX_EPISODES_PER_SEASON, MIN_EPISODES_PER_SEASON } from '@/features/workflow/lib/limits';
+import { toast } from '@/components/ui/Toast';
+import { GenrePicker } from './GenrePicker';
+import { SeasonEpisodesEditor } from './SeasonEpisodesEditor';
 
 export interface CreateProjectFormState {
   title: string;
@@ -15,10 +17,8 @@ export interface CreateProjectFormState {
   /** Genre ids. */
   genre: string[];
   synopsis: string;
-  seasonCount: number;
-  episodesPerSeason: number;
-  /** One target duration (minutes) per episode, in creation order. */
-  episodeDurations: number[];
+  /** One list per season, holding each episode's target duration in minutes; seasons may differ in size. */
+  seasons: number[][];
   budgetTokens: number;
   productionStartDate: string;
   deadline: string;
@@ -34,8 +34,6 @@ export interface CreateProjectModalProps {
   onChange: <K extends keyof CreateProjectFormState>(field: K, value: CreateProjectFormState[K]) => void;
 }
 
-const QUICK_SEASON_OPTIONS = [1, 2, 3];
-const QUICK_EPISODES_PER_SEASON_OPTIONS = [3, 4, 5, 8];
 const QUICK_TOKEN_OPTIONS = [1500, 3000, 5000, 8000];
 
 export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: CreateProjectModalProps) {
@@ -57,14 +55,14 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
     if (!form.assignedCreator && creators.length > 0) onChange('assignedCreator', creators[0].id);
   }, [creators, form.assignedCreator, onChange]);
 
-  const genreName = (id: string) => genres.find((g) => g.id === id)?.name ?? id;
-
-  const toggleGenre = (genreId: string) => {
-    if (form.genre.includes(genreId)) {
-      onChange('genre', form.genre.filter((g) => g !== genreId));
-    } else {
-      onChange('genre', [...form.genre, genreId]);
+  const handleCreateGenre = async (name: string) => {
+    const res = await workflowService.createGenre(name);
+    if (!res.success) {
+      toast.error('Không thêm được thể loại', res.message ?? 'Không kết nối được máy chủ.');
+      return null;
     }
+    setGenres((prev) => (prev.some((g) => g.id === res.data.id) ? prev : [...prev, res.data].sort((a, b) => a.name.localeCompare(b.name, 'vi'))));
+    return res.data;
   };
 
   const handleAddMilestone = () => {
@@ -89,43 +87,6 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
   const handleRemoveMilestone = (index: number) => {
     onChange('milestones', form.milestones.filter((_, i) => i !== index));
   };
-
-  const [bulkDuration, setBulkDuration] = useState(30);
-
-  const resizeDurations = (seasonCount: number, episodesPerSeason: number, current: number[]) => {
-    const total = seasonCount * episodesPerSeason;
-    const fallback = current[0] ?? 30;
-    return Array.from({ length: total }, (_, i) => current[i] ?? fallback);
-  };
-
-  const handleSeasonCountChange = (value: number) => {
-    const seasonCount = clamp(value, 1, 10);
-    onChange('seasonCount', seasonCount);
-    onChange('episodeDurations', resizeDurations(seasonCount, form.episodesPerSeason, form.episodeDurations));
-  };
-
-  const handleEpisodesPerSeasonChange = (value: number) => {
-    const episodesPerSeason = clamp(value, MIN_EPISODES_PER_SEASON, MAX_EPISODES_PER_SEASON);
-    onChange('episodesPerSeason', episodesPerSeason);
-    onChange('episodeDurations', resizeDurations(form.seasonCount, episodesPerSeason, form.episodeDurations));
-  };
-
-  const handleDurationChange = (index: number, minutes: number) => {
-    const updated = [...form.episodeDurations];
-    updated[index] = clamp(minutes, 1, MAX_EPISODE_MINUTES);
-    onChange('episodeDurations', updated);
-  };
-
-  const handleApplyBulkDuration = () => {
-    onChange('episodeDurations', form.episodeDurations.map(() => bulkDuration));
-  };
-
-  const totalEpisodes = form.seasonCount * form.episodesPerSeason;
-  const episodeRows = Array.from({ length: totalEpisodes }, (_, i) => ({
-    index: i,
-    season: Math.floor(i / form.episodesPerSeason) + 1,
-    episodeInSeason: (i % form.episodesPerSeason) + 1,
-  }));
 
   return (
     <Modal
@@ -152,66 +113,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           />
         </div>
 
-        {/* Section 1: Thể loại dưới dạng Tags */}
-        <div className="space-y-2.5 bg-slate-50 dark:bg-white/[0.03] p-4 rounded-2xl border border-slate-200/80 dark:border-white/10">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Thể Loại Phim (Tags):
-            </label>
-            <span className="text-[11px] font-medium text-slate-500 dark:text-zinc-400 bg-slate-200/60 dark:bg-white/10 px-2 py-0.5 rounded-full">
-              Đã chọn {form.genre.length} thể loại
-            </span>
-          </div>
-
-          {/* Active Selected Tags */}
-          {form.genre.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 p-2.5 bg-white dark:bg-[#0E1118] rounded-xl border border-slate-200/80 dark:border-white/10 shadow-inner">
-              {form.genre.map((g) => (
-                <span
-                  key={g}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-600/10 dark:bg-purple-600/20 text-purple-600 dark:text-purple-400 border border-purple-600/30 shadow-xs"
-                >
-                  <span>{genreName(g)}</span>
-                  <button
-                    type="button"
-                    onClick={() => toggleGenre(g)}
-                    className="w-3.5 h-3.5 rounded-full hover:bg-purple-600 hover:text-white flex items-center justify-center transition cursor-pointer"
-                    title="Xóa tag này"
-                  >
-                    <X className="w-2.5 h-2.5" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Preset Tag selector */}
-          <div className="space-y-1.5">
-            <span className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium block">
-              Thể loại trong hệ thống (bấm để thêm / gỡ):
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {genres.map((genre) => {
-                const isSelected = form.genre.includes(genre.id);
-                return (
-                  <button
-                    key={genre.id}
-                    type="button"
-                    onClick={() => toggleGenre(genre.id)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] transition cursor-pointer font-semibold border ${
-                      isSelected
-                        ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
-                        : 'bg-white dark:bg-white/5 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-white/10 hover:border-purple-600/40 hover:bg-slate-100 dark:hover:bg-white/10'
-                    }`}
-                  >
-                    {isSelected ? `✓ ${genre.name}` : `+ ${genre.name}`}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-        </div>
+        <GenrePicker genres={genres} selected={form.genre} onChange={(ids) => onChange('genre', ids)} onCreate={handleCreateGenre} />
 
         {/* Tóm tắt cốt truyện */}
         <div>
@@ -227,158 +129,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           />
         </div>
 
-        {/* Cấu Trúc Season & Ngân Sách AI Tokens */}
-        <div className="space-y-1.5 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-700 dark:text-zinc-300">Số mùa và số tập</label>
-            <span className="text-[11px] font-mono text-purple-600 dark:text-purple-400 font-bold">
-              Tổng {form.seasonCount * form.episodesPerSeason} tập
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1">
-              <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-semibold block">Số Season:</span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleSeasonCountChange(form.seasonCount - 1)}
-                  className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
-                >
-                  <Minus className="w-3 h-3" />
-                </button>
-                <input
-                  type="number"
-                  min={1}
-                  max={10}
-                  value={form.seasonCount}
-                  onChange={(e) => handleSeasonCountChange(Number(e.target.value))}
-                  className={`${fieldInputClass} text-center font-bold text-sm py-1.5`}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleSeasonCountChange(form.seasonCount + 1)}
-                  className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
-                >
-                  <Plus className="w-3 h-3" />
-                </button>
-              </div>
-              <div className="flex items-center gap-1 pt-0.5">
-                {QUICK_SEASON_OPTIONS.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onClick={() => handleSeasonCountChange(s)}
-                    className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
-                      form.seasonCount === s
-                        ? 'bg-purple-600 text-white font-bold'
-                        : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
-                    }`}
-                  >
-                    {s} mùa
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <span className="text-[10px] text-slate-500 dark:text-zinc-400 font-semibold block">Số Tập / Season:</span>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => handleEpisodesPerSeasonChange(form.episodesPerSeason - 1)}
-                  className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
-                >
-                  <Minus className="w-3 h-3" />
-                </button>
-                <input
-                  type="number"
-                  min={MIN_EPISODES_PER_SEASON}
-                  max={MAX_EPISODES_PER_SEASON}
-                  value={form.episodesPerSeason}
-                  onChange={(e) => handleEpisodesPerSeasonChange(Number(e.target.value))}
-                  className={`${fieldInputClass} text-center font-bold text-sm py-1.5`}
-                />
-                <button
-                  type="button"
-                  onClick={() => handleEpisodesPerSeasonChange(form.episodesPerSeason + 1)}
-                  className="w-7 h-7 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
-                >
-                  <Plus className="w-3 h-3" />
-                </button>
-              </div>
-              <div className="flex items-center gap-1 pt-0.5">
-                {QUICK_EPISODES_PER_SEASON_OPTIONS.map((ep) => (
-                  <button
-                    key={ep}
-                    type="button"
-                    onClick={() => handleEpisodesPerSeasonChange(ep)}
-                    className={`px-2 py-0.5 rounded-md text-[10px] font-semibold transition cursor-pointer ${
-                      form.episodesPerSeason === ep
-                        ? 'bg-purple-600 text-white font-bold'
-                        : 'bg-white dark:bg-white/10 text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/15'
-                    }`}
-                  >
-                    {ep} tập
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Thời lượng mục tiêu từng tập — mỗi tập chỉnh riêng, không gộp chung */}
-        <div className="space-y-2 bg-slate-50 dark:bg-white/[0.03] p-3 rounded-2xl border border-slate-200/80 dark:border-white/10">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-700 dark:text-zinc-300 flex items-center gap-1">
-              <Calendar className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Thời Lượng Mục Tiêu Từng Tập:
-            </label>
-            <span className="text-[10px] text-slate-500 dark:text-zinc-400">Mốc so sánh khi duyệt kế hoạch</span>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <input
-              type="number"
-              min={1}
-              max={MAX_EPISODE_MINUTES}
-              value={bulkDuration}
-              onChange={(e) => setBulkDuration(clamp(Number(e.target.value), 1, MAX_EPISODE_MINUTES))}
-              className={`${fieldInputClass} w-20 text-center py-1`}
-            />
-            <span className="text-[11px] text-slate-500 dark:text-zinc-400">phút</span>
-            <button
-              type="button"
-              onClick={handleApplyBulkDuration}
-              className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 text-[11px] font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-white/15 transition cursor-pointer"
-            >
-              Áp dụng cho tất cả
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 max-h-40 overflow-y-auto pr-1">
-            {episodeRows.map((row) => (
-              <div
-                key={row.index}
-                className="flex items-center justify-between gap-2 bg-white dark:bg-[#0E1118] px-2.5 py-1.5 rounded-lg border border-slate-200/80 dark:border-white/10"
-              >
-                <span className="text-[11px] text-slate-600 dark:text-zinc-400 font-medium">
-                  Mùa {row.season} · Tập {row.episodeInSeason}
-                </span>
-                <div className="flex items-center gap-1 shrink-0">
-                  <input
-                    type="number"
-                    min={1}
-                    max={MAX_EPISODE_MINUTES}
-                    value={form.episodeDurations[row.index] ?? MAX_EPISODE_MINUTES}
-                    onChange={(e) => handleDurationChange(row.index, Number(e.target.value))}
-                    className="w-14 text-center py-0.5 rounded-md border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs font-mono font-semibold text-slate-800 dark:text-white focus:outline-none focus:border-purple-600"
-                  />
-                  <span className="text-[10px] text-slate-400">phút</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <SeasonEpisodesEditor seasons={form.seasons} onChange={(seasons) => onChange('seasons', seasons)} />
 
         <div>
           {/* Ngân Sách AI Tokens */}

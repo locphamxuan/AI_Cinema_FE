@@ -46,9 +46,8 @@ export interface EpisodeSlice {
     creator_id: string;
     genre_ids: string[];
     synopsis: string;
-    total_episodes: number;
-    /** Default duration (minutes) of every episode. */
-    episode_duration_minutes: number;
+    /** Every episode in order with its season and the duration (minutes) the Reviewer allots it. */
+    episodes: { season_number: number; duration_minutes: number }[];
     total_budget_tokens: number;
     production_start_date: string;
     deadline: string;

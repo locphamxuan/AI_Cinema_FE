@@ -254,13 +254,12 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       workflowService.createProject({
         title: data.title,
         description: data.synopsis,
-        contentType: data.total_episodes > 1 ? 'SERIES' : 'MOVIE',
+        contentType: data.episodes.length > 1 ? 'SERIES' : 'MOVIE',
         totalAiQuotaBudget: data.total_budget_tokens,
         productionStartDate: data.production_start_date,
         deadline: data.deadline,
         plannedReleaseDate: data.planned_release_date,
-        defaultEpisodeDurationSeconds: data.episode_duration_minutes * 60,
-        episodeCount: data.total_episodes,
+        episodes: data.episodes.map((e) => ({ seasonNumber: e.season_number, targetDurationSeconds: e.duration_minutes * 60 })),
         assignedCreatorId: data.creator_id,
         genreIds: data.genre_ids,
         milestones: (data.milestones ?? []).map((m) => ({
