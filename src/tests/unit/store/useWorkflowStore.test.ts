@@ -4,6 +4,7 @@ import { workflowService } from '@/services/workflowService';
 import { availableBudget, derivePlanVerdict, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
 import { creatorGroups, reviewerGroups } from '@/features/workflow/lib/projectGroups';
 import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
+import { routeDefaults } from '@/features/workflow/lib/modelRouting';
 import { initialProject, mockAssignedProjects } from '@/tests/fixtures/workflowFixtures';
 import { apiJob, apiPackage, apiPlan, apiPlanReview, apiProject, apiScene } from '@/tests/fixtures/workflowApiFixtures';
 import type { ApiProductionProject } from '@/types/workflow-api';
@@ -36,6 +37,8 @@ vi.mock('@/services/workflowService', () => ({
     submitScene: vi.fn(),
     createEpisodePackage: vi.fn(),
     submitEpisodePackage: vi.fn(),
+    getRouting: vi.fn(),
+    resolveRoute: vi.fn(),
   },
 }));
 
@@ -392,24 +395,45 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
   });
 
-  describe('Custom generation functions (BR-40)', () => {
-    it('maps built-in functions straight to their catalog model', async () => {
-      const { resolveModel } = await import('@/features/workflow/lib/modelRegistry');
-      expect(resolveModel({ function_type: 'VIDEO' }).match).toBe('catalog');
+  describe('Model routing from the backend (BR-40)', () => {
+    const routing = [
+      { jobType: 'SCENE_VIDEO' as const, provider: 'Google', model: 'veo-3', modality: 'VIDEO', estimatedTokenCost: 60 },
+      { jobType: 'CUSTOM' as const, provider: 'OpenAI', model: 'gpt', modality: 'TEXT', estimatedTokenCost: 8 },
+    ];
+    const draftStep = () => useWorkflowStore.getState().getJobs('plan-1').find((j) => j.id === 'scene-1')!.generation_steps[0];
+
+    beforeEach(() => {
+      serveBackendProject(apiProject([apiPlan({ status: 'APPROVED' })]));
+      useWorkflowStore.setState({ routing });
+      useWorkflowStore.getState().addGenerationStep('plan-1', 'scene-1', { function_type: 'VIDEO', prompt: 'x', status: 'pending', selected_model: '', token_cost: 0 });
     });
 
-    it('finds a specialist model for a custom function, ignoring Vietnamese diacritics', async () => {
-      const { resolveModel } = await import('@/features/workflow/lib/modelRegistry');
-      const lipsync = resolveModel({ function_type: 'CUSTOM', custom_function: 'Đồng bộ khẩu hình cho nhân vật' });
-      expect(lipsync.match).toBe('specialist');
-      expect(lipsync.model?.name).toBe('LipSync Studio');
+    it('takes a built-in function’s model and estimate from the routing table', async () => {
+      expect(routeDefaults(routing, { function_type: 'VIDEO' })).toEqual({ selected_model: 'veo-3', token_cost: 60, model_match: 'catalog' });
+      await useWorkflowStore.getState().routeStep('plan-1', 'scene-1', draftStep().id, { function_type: 'VIDEO' });
+      expect(api.resolveRoute).not.toHaveBeenCalled();
     });
 
-    it('falls back to the general model for unknown functions and waits while the label is empty', async () => {
-      const { resolveModel, stepDefaults } = await import('@/features/workflow/lib/modelRegistry');
-      expect(resolveModel({ function_type: 'CUSTOM', custom_function: 'làm gì đó rất lạ' }).match).toBe('general');
-      expect(resolveModel({ function_type: 'CUSTOM', custom_function: '  ' }).match).toBe('pending');
-      expect(stepDefaults({ function_type: 'CUSTOM', custom_function: '' })).toEqual({ selected_model: '', token_cost: 0 });
+    it('waits on an undescribed custom function, then asks the backend for its specialist', async () => {
+      const id = draftStep().id;
+      await useWorkflowStore.getState().routeStep('plan-1', 'scene-1', id, { function_type: 'CUSTOM', custom_function: '  ' });
+      expect(draftStep()).toMatchObject({ model_match: 'pending', token_cost: 0 });
+      expect(api.resolveRoute).not.toHaveBeenCalled();
+
+      api.resolveRoute.mockReturnValue(ok({ ...routing[0], jobType: 'CUSTOM', match: 'specialist' }));
+      await useWorkflowStore.getState().routeStep('plan-1', 'scene-1', id, { function_type: 'CUSTOM', custom_function: 'Đồng bộ khẩu hình' });
+      expect(api.resolveRoute).toHaveBeenCalledWith('CUSTOM', 'Đồng bộ khẩu hình');
+      expect(draftStep()).toMatchObject({ selected_model: 'veo-3', token_cost: 60, model_match: 'specialist' });
+    });
+
+    it('ignores a route that arrives after the description changed', async () => {
+      const id = draftStep().id;
+      api.resolveRoute.mockImplementation(() => {
+        useWorkflowStore.getState().updateGenerationStep('plan-1', 'scene-1', id, { custom_function: 'mô tả mới' });
+        return ok({ ...routing[0], jobType: 'CUSTOM', match: 'specialist' });
+      });
+      await useWorkflowStore.getState().routeStep('plan-1', 'scene-1', id, { function_type: 'CUSTOM', custom_function: 'cũ' });
+      expect(draftStep()).toMatchObject({ model_match: 'pending', selected_model: '' });
     });
   });
 });
