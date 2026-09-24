@@ -24,18 +24,15 @@ export const useWorkflowStore = create<WorkflowStoreState>()(
           project: EMPTY_PROJECT,
           projects: [],
           reviews: [],
-          complianceChecks: {},
-          labels: {},
-          publications: {},
         });
         await get().loadProjects();
       },
     }),
     {
       name: 'ai_cinema_workflow_store',
-      // v1 dropped the bundled demo projects — discard state persisted by v0
-      // so browsers stop showing them.
-      version: 1,
+      // Project data now always comes from the backend; v2 discards the
+      // project snapshots persisted by earlier versions.
+      version: 2,
       migrate: () => ({}),
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : {
         getItem: () => null,
@@ -46,12 +43,6 @@ export const useWorkflowStore = create<WorkflowStoreState>()(
         currentRole: state.currentRole,
         activeProjectId: state.activeProjectId,
         activePackageId: state.activePackageId,
-        project: state.project,
-        projects: state.projects,
-        reviews: state.reviews,
-        complianceChecks: state.complianceChecks,
-        labels: state.labels,
-        publications: state.publications,
       }),
     }
   )

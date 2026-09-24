@@ -1,178 +1,141 @@
 import type { StateCreator } from 'zustand';
-import { ReviewLog } from '@/types/workflow';
+import type { FieldReview, PlanFieldKey, ReviewLog, SceneReviewStatus } from '@/types/workflow';
+import type { DecideReviewDto, PlanReviewField } from '@/types/workflow-api';
 import type { ReviewSlice, WorkflowStoreState } from '../types';
-import { availableBudget } from '@/features/workflow/lib/planVerdict';
-import { withProjectUpdate } from './projectRoster';
+import { toast } from '@/components/ui/Toast';
+import { authService } from '@/services/authService';
 import { workflowService } from '@/services/workflowService';
+import { planFieldReviews, scriptReview } from '@/features/workflow/lib/planVerdict';
+import { apiResult } from './apiResult';
 
-export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewSlice> = (set, get) => ({
-  reviews: [],
+const FIELD_OF: Record<PlanFieldKey, PlanReviewField> = {
+  script: 'OVERALL_SCRIPT',
+  duration: 'DURATION',
+  token: 'TOKEN_ESTIMATE',
+};
 
-  reviewScene: (packageId, sceneNumber, status, comment) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          const scene_reviews = ep.brief.scene_reviews.map((sr) =>
-            sr.scene_number === sceneNumber ? { ...sr, status, comment } : sr
-          );
-          return { ...ep, brief: { ...ep.brief, scene_reviews, updated_at: new Date().toISOString() } };
-        }),
-      }))
-    );
-  },
+interface ReviewTarget {
+  field: PlanReviewField;
+  sceneId?: string;
+}
 
-  reviewPlanField: (packageId, field, status, comment) => {
-    const verdict = { status, comment };
-    set((state) =>
-      withProjectUpdate(state, (project) => {
-        if (field === 'script') return { ...project, script_review: verdict };
-        const key = field === 'duration' ? 'duration_review' : 'token_review';
-        return {
-          ...project,
-          episodes: project.episodes.map((ep) =>
-            ep.id === packageId ? { ...ep, brief: { ...ep.brief, [key]: verdict, updated_at: new Date().toISOString() } } : ep
-          ),
-        };
-      })
-    );
-  },
+function decision(status: SceneReviewStatus, comment?: string): DecideReviewDto {
+  if (status === 'approved') return { decision: 'APPROVED', comments: comment };
+  return { decision: 'CHANGES_REQUESTED', rejectionReason: comment || 'Cần chỉnh sửa' };
+}
 
-  requestPlanChanges: (packageId, feedbackNotes) => {
-    const newReview: ReviewLog = {
-      id: `rev-${Date.now()}`,
-      episode_package_id: packageId,
-      reviewer_id: 'rev-user-01',
-      reviewer_name: 'Lê Quốc Bảo',
-      review_type: 'plan',
-      decision: 'changes_requested',
-      feedback_notes: feedbackNotes,
-      created_at: new Date().toISOString(),
-    };
+function reviewLog(packageId: string, type: ReviewLog['review_type'], decisionValue: ReviewLog['decision'], notes: string, quota?: number): ReviewLog {
+  const reviewer = authService.getStoredUser();
+  return {
+    id: `rev-${Date.now()}`,
+    episode_package_id: packageId,
+    reviewer_id: reviewer?.id ?? '',
+    reviewer_name: reviewer?.name ?? '',
+    review_type: type,
+    decision: decisionValue,
+    feedback_notes: notes,
+    quota_granted: quota,
+    created_at: new Date().toISOString(),
+  };
+}
 
-    set((state) => ({
-      reviews: [newReview, ...state.reviews],
-      ...withProjectUpdate(state, (project) => ({
-        ...project,
-        overall_status: 'CHANGES_REQUESTED',
-        updated_at: new Date().toISOString(),
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'CHANGES_REQUESTED',
-            brief: {
-              ...ep.brief,
-              status: 'CHANGES_REQUESTED',
-              updated_at: new Date().toISOString(),
-            },
-          };
-        }),
-      })),
-    }));
-  },
+export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewSlice> = (set, get) => {
+  const reload = () => get().loadProject(get().activeProjectId);
 
-  allocateQuota: (packageId, requestedQuota, notes) => {
-    const currentPkg = get().project.episodes.find((e) => e.id === packageId);
-    const existingQuota = currentPkg?.quota_allocated || 0;
-    const avail = availableBudget(get().project);
-    const maxAllowed = avail + existingQuota;
-    const tokenQuota = Math.min(requestedQuota, maxAllowed);
-    if (tokenQuota <= 0) return;
+  /** The verdict currently shown for a plan target. */
+  const currentVerdict = (packageId: string, target: ReviewTarget): FieldReview | undefined => {
+    const brief = get().getBrief(packageId);
+    if (!brief) return undefined;
+    if (target.field === 'SCENE') {
+      const scene = brief.scene_breakdown.find((s) => s.id === target.sceneId);
+      return brief.scene_reviews.find((r) => r.scene_number === scene?.scene_number);
+    }
+    if (target.field === 'OVERALL_SCRIPT') return scriptReview(get().project, brief);
+    return target.field === 'DURATION' ? brief.duration_review : brief.token_review;
+  };
 
-    // Call backend API in background
-    workflowService.createQuotaAllocation(packageId, {
-      allocationType: 'INITIAL',
-      allocatedAmount: tokenQuota,
-      allocatedById: '1deebe95-e8ca-49aa-bd4d-c44489f9964f',
-    }).catch((e) => console.warn('Allocate quota API call:', e));
+  /** Id of the undecided review row of a target, opening the plan's review round when none is open yet. */
+  const openReviewId = async (packageId: string, target: ReviewTarget): Promise<string | null> => {
+    const current = currentVerdict(packageId, target);
+    if (current?.review_id) {
+      if (current.status === 'pending') return current.review_id;
+      toast.info('Mục này đã được chốt', 'Không thể đổi quyết định trong vòng duyệt hiện tại.');
+      return null;
+    }
+    const rows = await apiResult(workflowService.createPlanReview(packageId), 'Không mở được vòng duyệt');
+    const row = rows?.find((r) => r.field === target.field && (target.field !== 'SCENE' || r.sceneId === target.sceneId));
+    return row?.id ?? null;
+  };
 
-    const newReview: ReviewLog = {
-      id: `rev-${Date.now()}`,
-      episode_package_id: packageId,
-      reviewer_id: 'rev-user-01',
-      reviewer_name: 'Lê Quốc Bảo',
-      review_type: 'plan',
-      decision: 'approved',
-      feedback_notes: `Kế hoạch được duyệt. Đã cấp ${tokenQuota} token. ${notes || ''}`.trim(),
-      quota_granted: tokenQuota,
-      created_at: new Date().toISOString(),
-    };
+  const decideTarget = async (packageId: string, target: ReviewTarget, status: SceneReviewStatus, comment?: string) => {
+    if (status === 'pending') return false;
+    const reviewId = await openReviewId(packageId, target);
+    if (!reviewId) {
+      await reload();
+      return false;
+    }
+    const decided = await apiResult(workflowService.decidePlanReview(reviewId, decision(status, comment)), 'Không lưu được đánh giá');
+    await reload();
+    return decided !== null;
+  };
 
-    set((state) => ({
-      reviews: [newReview, ...state.reviews],
-      ...withProjectUpdate(state, (project) => {
-        const nextEpisodes = project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'QUOTA_ALLOCATED' as const,
-            quota_allocated: tokenQuota,
-            brief: {
-              ...ep.brief,
-              status: 'QUOTA_ALLOCATED' as const,
-              updated_at: new Date().toISOString(),
-            },
-          };
-        });
-        const totalAllocated = nextEpisodes.reduce((sum, ep) => sum + (ep.quota_allocated || 0), 0);
+  return {
+    reviews: [],
 
-        return {
-          ...project,
-          allocated_tokens: totalAllocated,
-          overall_status: 'IN_PROGRESS',
-          updated_at: new Date().toISOString(),
-          episodes: nextEpisodes,
-        };
-      }),
-    }));
-  },
+    reviewScene: async (packageId, sceneNumber, status, comment) => {
+      const scene = get().getBrief(packageId)?.scene_breakdown.find((s) => s.scene_number === sceneNumber);
+      if (!scene?.id) return false;
+      return decideTarget(packageId, { field: 'SCENE', sceneId: scene.id }, status, comment);
+    },
 
-  requestContentChanges: (packageId, feedbackNotes) => {
-    const newReview: ReviewLog = {
-      id: `rev-${Date.now()}`,
-      episode_package_id: packageId,
-      reviewer_id: 'rev-user-01',
-      reviewer_name: 'Lê Quốc Bảo',
-      review_type: 'content',
-      decision: 'changes_requested',
-      feedback_notes: feedbackNotes,
-      created_at: new Date().toISOString(),
-    };
+    reviewPlanField: (packageId, field, status, comment) => decideTarget(packageId, { field: FIELD_OF[field] }, status, comment),
 
-    set((state) => ({
-      reviews: [newReview, ...state.reviews],
-      ...withProjectUpdate(state, (project) => ({
-        ...project,
-        overall_status: 'CHANGES_REQUESTED',
-        updated_at: new Date().toISOString(),
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'CHANGES_REQUESTED',
-            updated_at: new Date().toISOString(),
-          };
-        }),
-      })),
-    }));
-  },
+    requestPlanChanges: async (packageId, feedbackNotes) => {
+      const brief = get().getBrief(packageId);
+      if (!brief) return false;
+      const undecided = planFieldReviews(get().project, brief).filter((r) => r.status === 'pending' && r.review_id);
+      for (const review of undecided) {
+        const decided = await apiResult(
+          workflowService.decidePlanReview(review.review_id!, { decision: 'CHANGES_REQUESTED', rejectionReason: feedbackNotes }),
+          'Không trả được kế hoạch về'
+        );
+        if (!decided) {
+          await reload();
+          return false;
+        }
+      }
+      set((state) => ({ reviews: [reviewLog(packageId, 'plan', 'changes_requested', feedbackNotes), ...state.reviews] }));
+      await reload();
+      return true;
+    },
 
-  approveContent: (packageId) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        updated_at: new Date().toISOString(),
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'COMPLIANCE_PASSED',
-            updated_at: new Date().toISOString(),
-          };
-        }),
-      }))
-    );
-  },
-});
+    allocateQuota: async (packageId, requestedQuota, notes) => {
+      const existing = get().getPackage(packageId)?.quota_allocated ?? 0;
+      const amount = requestedQuota - existing;
+      if (amount <= 0) return false;
+      const allocation = await apiResult(
+        workflowService.allocateQuota(packageId, { allocationType: existing > 0 ? 'TOP_UP' : 'INITIAL', allocatedAmount: amount }),
+        'Không cấp được token'
+      );
+      if (!allocation) return false;
+      const note = `Kế hoạch được duyệt. Đã cấp ${requestedQuota} token. ${notes ?? ''}`.trim();
+      set((state) => ({ reviews: [reviewLog(packageId, 'plan', 'approved', note, requestedQuota), ...state.reviews] }));
+      await reload();
+      return true;
+    },
+
+    requestContentChanges: async (packageId, feedbackNotes) => {
+      const pkgId = get().getPackage(packageId)?.package_id;
+      if (!pkgId) return false;
+      const review = await apiResult(workflowService.createReview(pkgId, { comments: feedbackNotes }), 'Không tạo được phiên duyệt');
+      if (!review) return false;
+      const decided = await apiResult(
+        workflowService.decideReview(review.id, { decision: 'CHANGES_REQUESTED', rejectionReason: feedbackNotes }),
+        'Không gửi được yêu cầu chỉnh sửa'
+      );
+      if (decided) set((state) => ({ reviews: [reviewLog(packageId, 'content', 'changes_requested', feedbackNotes), ...state.reviews] }));
+      await reload();
+      return decided !== null;
+    },
+  };
+};

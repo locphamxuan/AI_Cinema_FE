@@ -9,10 +9,8 @@ import {
   ReviewLog,
   SceneReviewStatus,
   PlanFieldKey,
-  ComplianceCheck,
-  AIContentLabel,
-  Publication,
 } from '@/types/workflow';
+import type { ManualComplianceCheck } from '@/features/workflow/components/reviewer/audit/ComplianceStation';
 
 export interface ViewSlice {
   currentRole: Role;
@@ -32,9 +30,11 @@ export interface EpisodeSlice {
   getBrief: (packageId?: string) => ContentBrief | undefined;
   getJobs: (packageId?: string) => GenerationJob[];
 
+  /** Edits the local plan draft; nothing reaches the backend until the plan is submitted. */
   updateContentBrief: (packageId: string, briefData: Partial<ContentBrief>) => void;
-  submitProductionPlan: (packageId: string) => void;
-  reviseProductionPlan: (packageId: string, updatedBrief: Partial<ContentBrief>) => void;
+  /** Saves the draft's scenes, then submits the plan for review. */
+  submitProductionPlan: (packageId: string) => Promise<boolean>;
+  reviseProductionPlan: (packageId: string, updatedBrief: Partial<ContentBrief>) => Promise<boolean>;
   /** Rewrites the project-level overall script; bumps script_version and resets its review when the text changed. */
   updateOverallScript: (script: string) => void;
   addSceneJob: (packageId: string, sceneData: Omit<GenerationJob, 'id' | 'status' | 'progress' | 'created_at' | 'updated_at'>) => void;
@@ -45,25 +45,24 @@ export interface EpisodeSlice {
   submitEpisodePackage: (packageId: string) => boolean;
   createProject: (data: {
     title: string;
-    creator_name?: string;
-    genre: string[];
+    creator_id: string;
+    genre_ids: string[];
     synopsis: string;
-    season_count: number;
-    episodes_per_season: number;
-    /** One target duration (minutes) per episode, in creation order. */
-    episode_target_durations: number[];
+    total_episodes: number;
+    /** Default duration (minutes) of every episode. */
+    episode_duration_minutes: number;
     total_budget_tokens: number;
     production_start_date: string;
     deadline: string;
     planned_release_date: string;
     milestones?: ProjectMilestone[];
-  }) => void;
+  }) => Promise<boolean>;
   loadProjects: () => Promise<void>;
   loadProject: (projectId: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
   setActiveMilestone: (milestoneId: string) => void;
-  updateMilestoneStatus: (milestoneId: string, status: 'pending' | 'in_progress' | 'completed') => void;
+  updateMilestoneStatus: (milestoneId: string, status: 'pending' | 'in_progress' | 'completed') => Promise<boolean>;
 }
 
 
@@ -73,21 +72,20 @@ export interface ProductionSlice {
 
 export interface ReviewSlice {
   reviews: ReviewLog[];
-  reviewScene: (packageId: string, sceneNumber: number, status: SceneReviewStatus, comment?: string) => void;
+  reviewScene: (packageId: string, sceneNumber: number, status: SceneReviewStatus, comment?: string) => Promise<boolean>;
   /** Field-level review of the overall script, or an episode's duration/token estimate (BR-39). */
-  reviewPlanField: (packageId: string, field: PlanFieldKey, status: SceneReviewStatus, comment?: string) => void;
-  requestPlanChanges: (packageId: string, feedbackNotes: string) => void;
-  allocateQuota: (packageId: string, tokenQuota: number, notes?: string) => void;
-  requestContentChanges: (packageId: string, feedbackNotes: string) => void;
-  approveContent: (packageId: string) => void;
+  reviewPlanField: (packageId: string, field: PlanFieldKey, status: SceneReviewStatus, comment?: string) => Promise<boolean>;
+  /** Sends every still-undecided field back with the flagged ones, which closes the round as CHANGES_REQUESTED. */
+  requestPlanChanges: (packageId: string, feedbackNotes: string) => Promise<boolean>;
+  allocateQuota: (packageId: string, tokenQuota: number, notes?: string) => Promise<boolean>;
+  requestContentChanges: (packageId: string, feedbackNotes: string) => Promise<boolean>;
 }
 
 export interface ComplianceSlice {
-  complianceChecks: Record<string, ComplianceCheck>;
-  labels: Record<string, AIContentLabel>;
-  publications: Record<string, Publication>;
-  saveComplianceCheck: (packageId: string, data: Partial<ComplianceCheck>, labelData?: Partial<AIContentLabel>) => void;
-  scheduleAndPublish: (packageId: string, data: { scheduled_at: string; visibility: 'public' | 'vip_only' | 'unlisted'; channels: string[] }) => void;
+  /** Approves the submitted cut, attaches the AI label and records every compliance check (BR-42). */
+  passCompliance: (packageId: string, checks: Record<ManualComplianceCheck, boolean>, labelDisplayLocation: string) => Promise<boolean>;
+  /** Puts the package in the catalog and publishes it; `scheduledAt` is recorded on the publication. */
+  publishEpisode: (packageId: string, scheduledAt?: string) => Promise<boolean>;
 }
 
 export type WorkflowStoreState = ViewSlice &
