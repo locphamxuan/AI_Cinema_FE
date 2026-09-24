@@ -123,12 +123,11 @@ export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBan
           <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md">
             {currentMovie.ageRating || 'T16'}
           </span>
-          <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md hidden sm:inline-block">
-            {currentMovie.quality || '4K Ultra HD'}
-          </span>
-          <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md hidden sm:inline-block">
-            {currentMovie.audioQuality || 'Dolby Atmos'}
-          </span>
+          {currentMovie.quality && (
+            <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md hidden sm:inline-block">
+              {currentMovie.quality}
+            </span>
+          )}
 
           {isVIPMode && (
             <span className="px-2 py-0.5 rounded bg-amber-400/25 border border-amber-400/40 text-amber-300 text-xs font-bold">

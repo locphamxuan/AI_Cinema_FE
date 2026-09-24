@@ -8,6 +8,8 @@ const paidEpisode = (n: number): Episode => ({
   title: `Tập ${n}`,
   duration: '25:00',
   hlsUrl: '',
+  qualities: [],
+  subtitles: [],
   thumbnailUrl: '',
   price: 50,
   isFree: false,

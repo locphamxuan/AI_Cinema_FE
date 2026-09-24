@@ -1,4 +1,6 @@
 import type { AIComplianceInfo, Episode, Movie } from '@/types/movie';
+import { API_BASE_URL, API_ROUTES } from '@/constants/apiRoutes';
+import { languageLabel } from '@/constants/languages';
 
 /** Shapes returned by the public catalog endpoints (GET /movies, GET /movies/:id). */
 export interface ApiCatalogEpisode {
@@ -10,6 +12,8 @@ export interface ApiCatalogEpisode {
   durationSeconds: number | null;
   coinPrice: number;
   streamUrl: string | null;
+  qualities: string[];
+  currentPackage: { subtitles: { language: string }[] } | null;
 }
 
 export interface ApiCatalogMovie {
@@ -52,6 +56,11 @@ export function formatDuration(seconds: number | null): string {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
+/** Highest rendition any episode offers, e.g. '1080p'; undefined when nothing is transcoded. */
+function bestQuality(qualities: string[]): string | undefined {
+  return [...qualities].sort((a, b) => parseInt(b, 10) - parseInt(a, 10))[0];
+}
+
 function adaptEpisode(ep: ApiCatalogEpisode, fallbackImage: string): Episode {
   const isFree = ep.coinPrice === 0;
   return {
@@ -60,6 +69,12 @@ function adaptEpisode(ep: ApiCatalogEpisode, fallbackImage: string): Episode {
     title: ep.title,
     duration: formatDuration(ep.durationSeconds),
     hlsUrl: ep.streamUrl ?? '',
+    qualities: ep.qualities,
+    subtitles: (ep.currentPackage?.subtitles ?? []).map(({ language }) => ({
+      language,
+      label: languageLabel(language),
+      src: `${API_BASE_URL}${API_ROUTES.MOVIES.EPISODE_SUBTITLE(ep.id, language)}`,
+    })),
     thumbnailUrl: ep.thumbnailUrl ?? fallbackImage,
     price: ep.coinPrice,
     isFree,
@@ -91,6 +106,7 @@ export function adaptApiMovie(api: ApiCatalogMovie): Movie {
     totalEpisodes: api.episodes.length,
     ageRating,
     episodes: api.episodes.map((ep) => adaptEpisode(ep, posterUrl)),
+    quality: bestQuality(api.episodes.flatMap((ep) => ep.qualities)),
     aiCompliance,
   };
 }

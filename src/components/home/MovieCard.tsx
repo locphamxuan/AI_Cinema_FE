@@ -54,9 +54,11 @@ export default function MovieCard({ movie }: MovieCardProps) {
               <span className="px-1.5 py-0.5 rounded bg-white/20 border border-white/25 text-white/90 text-[10px] font-semibold">
                 {movie.ageRating || 'T16'}
               </span>
-              <span className="px-1.5 py-0.5 rounded bg-white/20 border border-white/25 text-white/90 text-[10px] font-semibold">
-                {movie.quality || '4K'}
-              </span>
+              {movie.quality && (
+                <span className="px-1.5 py-0.5 rounded bg-white/20 border border-white/25 text-white/90 text-[10px] font-semibold">
+                  {movie.quality}
+                </span>
+              )}
             </div>
 
             {/* Title */}

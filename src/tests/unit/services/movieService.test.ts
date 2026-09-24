@@ -23,6 +23,8 @@ const apiMovie: ApiCatalogMovie = {
       durationSeconds: 1530,
       coinPrice: 0,
       streamUrl: 'https://example.com/ep1.m3u8',
+      qualities: ['360p', '720p', '1080p'],
+      currentPackage: { subtitles: [{ language: 'vi' }, { language: 'en' }] },
     },
     {
       id: 'ep-2',
@@ -33,6 +35,8 @@ const apiMovie: ApiCatalogMovie = {
       durationSeconds: 1335,
       coinPrice: 50,
       streamUrl: null,
+      qualities: [],
+      currentPackage: null,
     },
   ],
 };
@@ -68,6 +72,7 @@ describe('Movie Service (src/services/movieService.ts)', () => {
       year: 2026,
       totalEpisodes: 2,
       ageRating: 'P',
+      quality: '1080p',
     });
     expect(movie.aiCompliance.contentRating).toContain('mọi lứa tuổi');
     expect(movie.aiCompliance.moderationScore).toBeUndefined();
@@ -82,6 +87,20 @@ describe('Movie Service (src/services/movieService.ts)', () => {
     expect(free).toMatchObject({ duration: '25:30', price: 0, isFree: true, isUnlocked: true, isPreview: true });
     expect(free.thumbnailUrl).toBe(apiMovie.posterUrl);
     expect(paid).toMatchObject({ duration: '22:15', price: 50, isFree: false, isUnlocked: false, hlsUrl: '' });
+  });
+
+  it('exposes the renditions and a subtitle track per language of each episode', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(apiMovie));
+
+    const res = await movieService.getMovieById(apiMovie.id);
+
+    const [first, second] = res.data.episodes;
+    expect(first.qualities).toEqual(['360p', '720p', '1080p']);
+    expect(first.subtitles).toEqual([
+      { language: 'vi', label: 'Tiếng Việt', src: '/api/catalog/episodes/ep-1/subtitles/vi' },
+      { language: 'en', label: 'English', src: '/api/catalog/episodes/ep-1/subtitles/en' },
+    ]);
+    expect(second.subtitles).toEqual([]);
   });
 
   it('returns genres from the paginated genre endpoint', async () => {

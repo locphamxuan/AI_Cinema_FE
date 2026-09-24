@@ -5,6 +5,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { Episode, EpisodeVersion } from '@/types/movie';
 import ComplianceDrawer from './ComplianceDrawer';
 import EpisodeVersionDrawer from './EpisodeVersionDrawer';
+import { QualitySelect, type QualityLevel } from './QualitySelect';
 import Hls from 'hls.js';
 
 interface WatchPlayerSectionProps {
@@ -21,6 +22,9 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   const [showVersionDrawer, setShowVersionDrawer] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [versionToast, setVersionToast] = useState<string | null>(null);
+  // Renditions hls.js found in the master playlist; -1 lets it pick by bandwidth.
+  const [levels, setLevels] = useState<QualityLevel[]>([]);
+  const [level, setLevel] = useState(-1);
 
   useEffect(() => {
     if (episodeId) selectEpisode(episodeId);
@@ -57,6 +61,8 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
       hlsRef.current.destroy();
       hlsRef.current = null;
     }
+    setLevels([]);
+    setLevel(-1);
 
     if (canPlay) {
       if (Hls.isSupported()) {
@@ -64,6 +70,12 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
         hls.loadSource(streamUrl);
         hls.attachMedia(video);
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          setLevels(
+            hls.levels
+              .map((l, index) => ({ index, height: l.height }))
+              .filter((l) => l.height > 0)
+              .sort((a, b) => b.height - a.height),
+          );
           video.play().catch(() => {});
         });
         hlsRef.current = hls;
@@ -108,6 +120,11 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
     video.addEventListener('timeupdate', handleTimeUpdate);
     return () => video.removeEventListener('timeupdate', handleTimeUpdate);
   }, [canPlay, currentEpisode, openUnlockModal]);
+
+  const handleSelectLevel = (index: number) => {
+    setLevel(index);
+    if (hlsRef.current) hlsRef.current.currentLevel = index;
+  };
 
   const handleEpisodeClick = (ep: Episode) => {
     const canPlayEp = isVIPMode || ep.isFree || ep.isUnlocked;
@@ -156,7 +173,18 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
               playsInline
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
-            />
+            >
+              {currentEpisode.subtitles.map((track, index) => (
+                <track
+                  key={`${currentEpisode.id}-${track.language}`}
+                  kind="subtitles"
+                  src={track.src}
+                  srcLang={track.language}
+                  label={track.label}
+                  default={index === 0}
+                />
+              ))}
+            </video>
 
             {/* Locked Overlay */}
             {!canPlay && (
@@ -215,9 +243,15 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                   👑 VIP Member
                 </span>
               )}
-              <span className="quality-badge">4K UHD</span>
-              <span className="quality-badge">HDR10+</span>
-              <span className="quality-badge">Dolby Atmos</span>
+              {currentEpisode.qualities.length > 0 && (
+                <span className="quality-badge">{currentEpisode.qualities.at(-1)}</span>
+              )}
+              {currentEpisode.subtitles.length > 0 && (
+                <span className="quality-badge" title="Phụ đề có sẵn">
+                  CC · {currentEpisode.subtitles.map((track) => track.label).join(', ')}
+                </span>
+              )}
+              {levels.length > 1 && <QualitySelect levels={levels} value={level} onChange={handleSelectLevel} />}
               <span className="text-muted-light text-xs font-mono">{currentEpisode.duration}</span>
             </div>
 

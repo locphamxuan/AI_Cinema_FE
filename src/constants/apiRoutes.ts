@@ -18,6 +18,7 @@ export const API_ROUTES = {
   MOVIES: {
     LIST: '/movies',
     DETAIL: (id: string) => `/movies/${id}`,
+    EPISODE_SUBTITLE: (episodeId: string, language: string) => `/catalog/episodes/${episodeId}/subtitles/${language}`,
   },
   GENRES: {
     LIST: '/genres',
@@ -90,6 +91,7 @@ export const API_ROUTES = {
     // Episode Packages & Assembly
     PACKAGES: (planId: string) => `/production-plans/${planId}/episode-packages`,
     PACKAGE_DETAIL: (packageId: string) => `/episode-packages/${packageId}`,
+    PACKAGE_SUBTITLE: (packageId: string, language: string) => `/episode-packages/${packageId}/subtitles/${language}`,
     PACKAGE_SUBMISSIONS: (packageId: string) => `/episode-packages/${packageId}/submissions`,
     PACKAGE_REVIEWS: (packageId: string) => `/episode-packages/${packageId}/reviews`,
     PACKAGE_AI_LABELS: (packageId: string) => `/episode-packages/${packageId}/ai-content-labels`,
