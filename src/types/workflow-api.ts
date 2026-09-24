@@ -29,6 +29,8 @@ export type QuotaAllocationType = 'INITIAL' | 'TOP_UP';
 
 export type QuotaAllocationStatus = 'ACTIVE' | 'CONSUMED' | 'RETURNED' | 'SUPERSEDED';
 
+export type QuotaRequestStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+
 export type GenerationJobType =
   | 'SCRIPT'
   | 'VOICE'
@@ -136,6 +138,21 @@ export interface DecideReviewDto {
 export interface CreateQuotaAllocationDto {
   allocationType: QuotaAllocationType;
   allocatedAmount: number;
+}
+
+export interface CreateQuotaRequestDto {
+  requestedAmount: number;
+  reason: string;
+}
+
+export interface ApproveQuotaRequestDto {
+  /** Defaults to the amount the Creator asked for. */
+  approvedAmount?: number;
+  note?: string;
+}
+
+export interface RejectQuotaRequestDto {
+  note: string;
 }
 
 export interface CreateGenerationJobDto {
@@ -256,6 +273,20 @@ export interface ApiQuotaAllocation {
   createdAt: string;
 }
 
+/** A Creator's request for more tokens on a plan; approving it grants a TOP_UP allocation. */
+export interface ApiQuotaRequest {
+  id: string;
+  requestedAmount: number;
+  reason: string;
+  status: QuotaRequestStatus;
+  decisionNote: string | null;
+  quotaAllocationId: string | null;
+  requestedBy?: ApiActor | null;
+  decidedBy?: ApiActor | null;
+  createdAt: string;
+  decidedAt: string | null;
+}
+
 export interface ApiComplianceCheck {
   id: string;
   checkType: ComplianceCheckType;
@@ -340,6 +371,8 @@ export interface ApiProductionPlan {
   scenes: ApiScene[];
   planReviews: ApiPlanReview[];
   quotaAllocations: ApiQuotaAllocation[];
+  /** Top-up requests, newest first. */
+  quotaRequests: ApiQuotaRequest[];
   _count: { generationJobs: number };
   episodePackages: ApiEpisodePackage[];
 }

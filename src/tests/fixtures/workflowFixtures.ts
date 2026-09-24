@@ -333,6 +333,7 @@ const initialEpisodes: EpisodePackage[] = [
     total_duration: '29:45',
     actual_tokens_used: 420,
     quota_allocated: 450,
+    quota_requests: [],
     brief: {
       ...mockBriefEp2,
       id: 'brief-ep-01',
@@ -357,6 +358,7 @@ const initialEpisodes: EpisodePackage[] = [
     total_duration: '29:40',
     actual_tokens_used: 395,
     quota_allocated: 450,
+    quota_requests: [],
     brief: mockBriefEp2,
     jobs: mockJobsEp2,
     assets: mockAssetsEp2,
@@ -375,6 +377,7 @@ const initialEpisodes: EpisodePackage[] = [
     total_duration: '28:00 (Dự kiến)',
     actual_tokens_used: 0,
     quota_allocated: 0,
+    quota_requests: [],
     brief: mockBriefEp3,
     jobs: mockJobsEp3,
     assets: [],

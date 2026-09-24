@@ -1,6 +1,6 @@
 import type { WorkflowState } from './workflow-role';
 import type { GenerationJob, GeneratedAsset } from './workflow-job';
-import type { FieldReview, ReviewLog, SceneReview } from './workflow-review';
+import type { FieldReview, QuotaRequest, ReviewLog, SceneReview } from './workflow-review';
 
 /**
  * 1. content_brief: Episode Plan — kế hoạch sản xuất của một tập. Chỉ giữ mô tả
@@ -77,6 +77,8 @@ export interface EpisodePackage {
   total_duration: string;
   actual_tokens_used: number;
   quota_allocated: number;
+  /** Top-up requests for this episode, newest first; at most one is pending. */
+  quota_requests: QuotaRequest[];
   /** The assembled cut the Reviewer audits; absent until the Creator submits one. */
   final_cut?: FinalCut;
   brief: ContentBrief;

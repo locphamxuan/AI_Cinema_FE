@@ -19,6 +19,8 @@ import type {
   ApiProductionProject,
   ApiPublication,
   ApiQuotaAllocation,
+  ApiQuotaRequest,
+  ApproveQuotaRequestDto,
   ApiReview,
   ApiRoute,
   ApiRoutingRow,
@@ -32,6 +34,8 @@ import type {
   CreateProductionProjectDto,
   CreatePublicationDto,
   CreateQuotaAllocationDto,
+  CreateQuotaRequestDto,
+  RejectQuotaRequestDto,
   CreateReviewDto,
   CreateSceneDto,
   GenerationJobType,
@@ -123,6 +127,19 @@ class WorkflowService {
 
   allocateQuota(planId: string, dto: CreateQuotaAllocationDto): Promise<ApiResponse<ApiQuotaAllocation>> {
     return apiClient.post<ApiQuotaAllocation>(ROUTES.QUOTA_ALLOCATIONS(planId), dto);
+  }
+
+  /** Creator asks for more tokens once the plan's quota runs low. */
+  requestQuota(planId: string, dto: CreateQuotaRequestDto): Promise<ApiResponse<ApiQuotaRequest>> {
+    return apiClient.post<ApiQuotaRequest>(ROUTES.QUOTA_REQUESTS(planId), dto);
+  }
+
+  approveQuotaRequest(requestId: string, dto: ApproveQuotaRequestDto): Promise<ApiResponse<ApiQuotaRequest>> {
+    return apiClient.post<ApiQuotaRequest>(ROUTES.QUOTA_REQUEST_APPROVE(requestId), dto);
+  }
+
+  rejectQuotaRequest(requestId: string, dto: RejectQuotaRequestDto): Promise<ApiResponse<ApiQuotaRequest>> {
+    return apiClient.post<ApiQuotaRequest>(ROUTES.QUOTA_REQUEST_REJECT(requestId), dto);
   }
 
   // Generation jobs (Studio)

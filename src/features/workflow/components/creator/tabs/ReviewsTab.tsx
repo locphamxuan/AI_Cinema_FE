@@ -34,13 +34,13 @@ export function ReviewsTab({ episodeReviews }: ReviewsTabProps) {
                       : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-500/20'
                   }`}
                 >
-                  {rev.decision === 'approved' ? 'ĐÃ PHÊ DUYỆT' : 'YÊU CẦU CHỈNH SỬA'}
+                  {rev.decision === 'approved' ? 'ĐÃ PHÊ DUYỆT' : rev.decision === 'rejected' ? 'TỪ CHỐI' : 'YÊU CẦU CHỈNH SỬA'}
                 </span>
               </div>
               <p className="text-slate-700 dark:text-slate-300 bg-white dark:bg-[#12141A] p-2.5 rounded-lg border border-slate-200 dark:border-white/10 leading-relaxed">
                 {rev.feedback_notes}
               </p>
-              {rev.quota_granted && (
+              {rev.quota_granted !== undefined && rev.quota_granted > 0 && (
                 <p className="text-[11px] text-amber-700 dark:text-amber-400 font-mono font-medium">Được cấp thêm {rev.quota_granted} token</p>
               )}
             </div>

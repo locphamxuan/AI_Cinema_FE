@@ -4,6 +4,7 @@ import type {
   ApiPlanReview,
   ApiProductionPlan,
   ApiProductionProject,
+  ApiQuotaRequest,
   ApiScene,
 } from '@/types/workflow-api';
 
@@ -75,8 +76,25 @@ export function apiPlan(overrides: Partial<ApiProductionPlan> = {}): ApiProducti
     scenes: [apiScene(1), apiScene(2)],
     planReviews: [],
     quotaAllocations: [],
+    quotaRequests: [],
     _count: { generationJobs: 0 },
     episodePackages: [],
+    ...overrides,
+  };
+}
+
+export function apiQuotaRequest(overrides: Partial<ApiQuotaRequest> = {}): ApiQuotaRequest {
+  return {
+    id: 'request-1',
+    requestedAmount: 500,
+    reason: 'Sinh lại cảnh 3',
+    status: 'PENDING',
+    decisionNote: null,
+    quotaAllocationId: null,
+    requestedBy: { id: 'creator-1', fullName: 'Creator Một' },
+    decidedBy: null,
+    createdAt: at,
+    decidedAt: null,
     ...overrides,
   };
 }

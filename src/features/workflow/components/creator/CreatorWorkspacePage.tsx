@@ -56,9 +56,6 @@ export function CreatorWorkspacePage() {
   const hasSelection = projects.some((p) => p.id === activeProjectId);
   const currentPackage = hasSelection ? project.episodes.find((e) => e.id === activePackageId) || project.episodes[0] : undefined;
 
-  const quotaPercent = project.allocated_tokens > 0 ? (project.consumed_tokens / project.allocated_tokens) * 100 : 0;
-  const isQuotaWarning = quotaPercent >= 90;
-
   // Only the newest decision is still open for the Creator; older change requests were already answered.
   const newestReview = currentPackage?.review_log[0];
   const latestFeedback = newestReview?.decision === 'changes_requested' ? newestReview : undefined;
@@ -140,7 +137,6 @@ export function CreatorWorkspacePage() {
               <OverviewTab
                 project={project}
                 currentPackage={currentPackage}
-                isQuotaWarning={isQuotaWarning}
                 scenesCount={currentPackage.brief?.scene_breakdown?.length ?? 0}
                 estimatedTokens={currentPackage.brief?.estimated_tokens ?? 0}
                 synopsis={project.synopsis}
@@ -170,7 +166,7 @@ export function CreatorWorkspacePage() {
               <StudioLinkTab currentPackage={currentPackage} canEnterStudio={canEnterStudio} onGotoBrief={() => setActiveTab('brief')} />
             )}
 
-            {activeTab === 'tokens' && <TokensTab currentPackage={currentPackage} quotaPercent={quotaPercent} isQuotaWarning={isQuotaWarning} />}
+            {activeTab === 'tokens' && <TokensTab currentPackage={currentPackage} />}
 
             {activeTab === 'reviews' && <ReviewsTab episodeReviews={episodeReviews} />}
           </div>

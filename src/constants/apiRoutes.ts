@@ -78,6 +78,9 @@ export const API_ROUTES = {
 
     // Quota Allocations
     QUOTA_ALLOCATIONS: (planId: string) => `/production-plans/${planId}/quota-allocations`,
+    QUOTA_REQUESTS: (planId: string) => `/production-plans/${planId}/quota-requests`,
+    QUOTA_REQUEST_APPROVE: (requestId: string) => `/quota-requests/${requestId}/approve`,
+    QUOTA_REQUEST_REJECT: (requestId: string) => `/quota-requests/${requestId}/reject`,
 
     // Generation Jobs & Assets
     GENERATION_JOBS: (planId: string) => `/production-plans/${planId}/generation-jobs`,

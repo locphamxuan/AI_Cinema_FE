@@ -14,6 +14,7 @@ import type {
   FieldReview,
   ProductionProject,
   ProjectMilestone,
+  QuotaRequest,
   SceneBreakdownItem,
   SceneReviewStatus,
   WorkflowState,
@@ -28,6 +29,7 @@ import type {
   ApiPlanReview,
   ApiProductionPlan,
   ApiProductionProject,
+  ApiQuotaRequest,
   ReviewStatus,
 } from '@/types/workflow-api';
 
@@ -116,6 +118,22 @@ function finalCutOf(pkg: ApiEpisodePackage, streamUrl: string): FinalCut {
   };
 }
 
+function adaptQuotaRequest(request: ApiQuotaRequest, plan: ApiProductionPlan): QuotaRequest {
+  const grant = plan.quotaAllocations.find((q) => q.id === request.quotaAllocationId);
+  return {
+    id: request.id,
+    requested_amount: request.requestedAmount,
+    granted_amount: grant ? toNumber(grant.allocatedAmount) : undefined,
+    reason: request.reason,
+    status: request.status === 'APPROVED' ? 'approved' : request.status === 'REJECTED' ? 'rejected' : 'pending',
+    requested_by_name: request.requestedBy?.fullName ?? '',
+    decided_by_name: request.decidedBy?.fullName ?? undefined,
+    decision_note: request.decisionNote ?? undefined,
+    created_at: request.createdAt,
+    decided_at: request.decidedAt ?? undefined,
+  };
+}
+
 function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multiSeason: boolean): EpisodePackage {
   const reviews = latestReviews(plan);
   const pkg = plan.episodePackages[0];
@@ -152,6 +170,7 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multi
     total_duration: pkg?.durationSeconds ? formatDuration(pkg.durationSeconds) : `${proposedMinutes}:00`,
     actual_tokens_used: allocated - remaining,
     quota_allocated: allocated,
+    quota_requests: plan.quotaRequests.map((r) => adaptQuotaRequest(r, plan)),
     final_cut: pkg?.streamUrl ? finalCutOf(pkg, pkg.streamUrl) : undefined,
     brief: {
       id: plan.id,

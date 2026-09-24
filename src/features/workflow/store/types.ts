@@ -90,6 +90,11 @@ export interface ReviewSlice {
   /** Sends every still-undecided field back with the flagged ones, which closes the round as CHANGES_REQUESTED. */
   requestPlanChanges: (packageId: string, feedbackNotes: string) => Promise<boolean>;
   allocateQuota: (packageId: string, tokenQuota: number) => Promise<boolean>;
+  /** Creator asks for more tokens on an episode already in production. */
+  requestQuota: (packageId: string, amount: number, reason: string) => Promise<boolean>;
+  /** Grants a pending request as a top-up; `amount` defaults to what the Creator asked for. */
+  approveQuotaRequest: (requestId: string, amount?: number, note?: string) => Promise<boolean>;
+  rejectQuotaRequest: (requestId: string, note: string) => Promise<boolean>;
   requestContentChanges: (packageId: string, feedbackNotes: string) => Promise<boolean>;
 }
 

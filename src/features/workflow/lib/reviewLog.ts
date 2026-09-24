@@ -1,6 +1,7 @@
 /**
  * Builds an episode's feedback history from the backend: one entry per closed
- * plan review round, one per quota grant and one per decided content review.
+ * plan review round, one per quota grant, one per turned-down top-up request
+ * and one per decided content review.
  */
 
 import type { ReviewLog } from '@/types/workflow';
@@ -75,20 +76,37 @@ function contentEntry(planId: string, review: ApiReview): ReviewLog | null {
 
 export function buildReviewLog(plan: ApiProductionPlan): ReviewLog[] {
   const rounds = planReviewRounds(plan.planReviews).map((round) => roundEntry(plan, round));
-  const grants: ReviewLog[] = plan.quotaAllocations.map((q) => ({
-    id: q.id,
-    episode_package_id: plan.id,
-    reviewer_id: q.allocatedBy?.id ?? '',
-    reviewer_name: q.allocatedBy?.fullName ?? '',
-    review_type: 'plan',
-    decision: 'approved',
-    feedback_notes: `Đã cấp ${Number(q.allocatedAmount)} token ${q.allocationType === 'INITIAL' ? 'để bắt đầu sản xuất' : 'bổ sung'}.`,
-    quota_granted: Number(q.allocatedAmount),
-    created_at: q.createdAt,
-  }));
+  const grants: ReviewLog[] = plan.quotaAllocations.map((q) => {
+    const note = plan.quotaRequests.find((r) => r.quotaAllocationId === q.id)?.decisionNote;
+    const granted = `Đã cấp ${Number(q.allocatedAmount)} token ${q.allocationType === 'INITIAL' ? 'để bắt đầu sản xuất' : 'bổ sung'}.`;
+    return {
+      id: q.id,
+      episode_package_id: plan.id,
+      reviewer_id: q.allocatedBy?.id ?? '',
+      reviewer_name: q.allocatedBy?.fullName ?? '',
+      review_type: 'plan',
+      decision: 'approved',
+      feedback_notes: note ? `${granted}
+${note}` : granted,
+      quota_granted: Number(q.allocatedAmount),
+      created_at: q.createdAt,
+    };
+  });
+  const refusals: ReviewLog[] = plan.quotaRequests
+    .filter((r) => r.status === 'REJECTED' && r.decidedAt)
+    .map((r) => ({
+      id: r.id,
+      episode_package_id: plan.id,
+      reviewer_id: r.decidedBy?.id ?? '',
+      reviewer_name: r.decidedBy?.fullName ?? '',
+      review_type: 'plan',
+      decision: 'rejected',
+      feedback_notes: `Không cấp thêm ${r.requestedAmount} token: ${r.decisionNote ?? ''}`.trim(),
+      created_at: r.decidedAt!,
+    }));
   const content = plan.episodePackages.flatMap((pkg) => pkg.reviews.map((r) => contentEntry(plan.id, r)));
 
-  return [...rounds, ...grants, ...content]
+  return [...rounds, ...grants, ...refusals, ...content]
     .filter((entry): entry is ReviewLog => entry !== null)
     .sort((a, b) => b.created_at.localeCompare(a.created_at));
 }

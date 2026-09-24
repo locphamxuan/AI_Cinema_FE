@@ -22,6 +22,9 @@ vi.mock('@/services/workflowService', () => ({
     createPlanReview: vi.fn(),
     decidePlanReview: vi.fn(),
     allocateQuota: vi.fn(),
+    requestQuota: vi.fn(),
+    approveQuotaRequest: vi.fn(),
+    rejectQuotaRequest: vi.fn(),
     createReview: vi.fn(),
     decideReview: vi.fn(),
     listPolicies: vi.fn(),
@@ -357,6 +360,30 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
         })
       );
       expect(useWorkflowStore.getState().activeProjectId).toBe('project-new');
+    });
+  });
+
+  describe('Quota top-up requests', () => {
+    beforeEach(() => serveBackendProject(apiProject([apiPlan({ status: 'APPROVED' })])));
+
+    it('sends the Creator request and reloads the project', async () => {
+      api.requestQuota.mockReturnValue(ok({}) as never);
+      expect(await useWorkflowStore.getState().requestQuota('plan-1', 500, 'Sinh lại cảnh 3')).toBe(true);
+      expect(api.requestQuota).toHaveBeenCalledWith('plan-1', { requestedAmount: 500, reason: 'Sinh lại cảnh 3' });
+      expect(api.getProject).toHaveBeenCalled();
+    });
+
+    it('grants the amount the Reviewer chose, without an empty note', async () => {
+      api.approveQuotaRequest.mockReturnValue(ok({}) as never);
+      expect(await useWorkflowStore.getState().approveQuotaRequest('request-1', 300, '')).toBe(true);
+      expect(api.approveQuotaRequest).toHaveBeenCalledWith('request-1', { approvedAmount: 300, note: undefined });
+    });
+
+    it('reloads even when the request was already decided elsewhere', async () => {
+      api.rejectQuotaRequest.mockReturnValue(fail('already decided'));
+      expect(await useWorkflowStore.getState().rejectQuotaRequest('request-1', 'Hết ngân sách')).toBe(false);
+      expect(api.rejectQuotaRequest).toHaveBeenCalledWith('request-1', { note: 'Hết ngân sách' });
+      expect(api.getProject).toHaveBeenCalled();
     });
   });
 

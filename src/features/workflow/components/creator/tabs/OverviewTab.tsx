@@ -1,12 +1,12 @@
 import { ArrowRight, AlertCircle, Check } from 'lucide-react';
 import type { EpisodePackage, ProductionProject, ReviewLog, WorkflowState } from '@/types/workflow';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
+import { quotaUsage } from '@/features/workflow/lib/quota';
 import { MilestoneStatusDropdown } from './MilestoneStatusDropdown';
 
 export interface OverviewTabProps {
   project: ProductionProject;
   currentPackage?: EpisodePackage;
-  isQuotaWarning: boolean;
   scenesCount: number;
   estimatedTokens: number;
   synopsis: string;
@@ -46,7 +46,6 @@ function Stat({ label, value, hint, children }: { label: string; value: React.Re
 export function OverviewTab({
   project,
   currentPackage,
-  isQuotaWarning,
   scenesCount,
   estimatedTokens,
   synopsis,
@@ -59,9 +58,7 @@ export function OverviewTab({
 }: OverviewTabProps) {
   const { updateMilestoneStatus } = useWorkflowStore();
 
-  const quotaAllocated = currentPackage?.quota_allocated ?? 0;
-  const quotaUsed = currentPackage?.actual_tokens_used ?? 0;
-  const quotaFillPercent = quotaAllocated > 0 ? Math.min(100, (quotaUsed / quotaAllocated) * 100) : 0;
+  const quota = quotaUsage(currentPackage);
   const jobs = currentPackage?.jobs ?? [];
   const completedJobsCount = jobs.filter((j) => j.status === 'completed').length;
   const milestones = project.milestones ?? [];
@@ -174,9 +171,9 @@ export function OverviewTab({
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <Stat label="Token đã dùng" value={`${quotaUsed} / ${quotaAllocated}`}>
+        <Stat label="Token đã dùng" value={`${quota.used} / ${quota.allocated}`}>
           <div className="w-full bg-slate-100 dark:bg-white/10 h-1.5 rounded-full overflow-hidden mt-2">
-            <div className={`h-full rounded-full ${isQuotaWarning ? 'bg-rose-500' : 'bg-purple-500'}`} style={{ width: `${quotaFillPercent}%` }} />
+            <div className={`h-full rounded-full ${quota.isWarning ? 'bg-rose-500' : 'bg-purple-500'}`} style={{ width: `${quota.percent}%` }} />
           </div>
         </Stat>
         <Stat label="Phân cảnh" value={scenesCount} hint={`Dự toán ${estimatedTokens} token`} />

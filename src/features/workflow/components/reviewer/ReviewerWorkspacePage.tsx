@@ -7,6 +7,7 @@ import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSideba
 import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
 import { reviewerGroups } from '@/features/workflow/lib/projectGroups';
 import { availableBudget, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
+import { pendingQuotaRequest } from '@/features/workflow/lib/quota';
 import { OverviewTab } from './tabs/OverviewTab';
 import { PlanReviewTab } from './tabs/PlanReviewTab';
 import { AuditsTab } from './tabs/AuditsTab';
@@ -110,13 +111,14 @@ export function ReviewerWorkspacePage() {
     ? project.episodes.filter((e) => e.status === 'EPISODE_SUBMITTED' || e.status === 'COMPLIANCE_PASSED')
     : [];
   const publishReadyEpisodes = hasSelection ? project.episodes.filter((e) => e.status === 'COMPLIANCE_PASSED') : [];
+  const quotaRequestCount = hasSelection ? project.episodes.filter((e) => pendingQuotaRequest(e)).length : 0;
 
   const navItems: SidebarNavItem[] = [
     { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
     { key: 'plans', label: 'Duyệt kế hoạch', icon: ClipboardCheck, badge: pendingPlanEpisodes.length || undefined },
     { key: 'audits', label: 'Kiểm định', icon: ShieldCheck },
     { key: 'publication', label: 'Xuất bản', icon: Tv, badge: publishReadyEpisodes.length || undefined },
-    { key: 'tokens', label: 'Token', icon: Zap },
+    { key: 'tokens', label: 'Token', icon: Zap, badge: quotaRequestCount || undefined },
   ];
 
   const handleSelectProject = (projectId: string) => {

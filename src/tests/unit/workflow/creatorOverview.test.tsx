@@ -9,7 +9,6 @@ const renderOverview = (status: WorkflowState, milestones = initialProject.miles
     <OverviewTab
       project={{ ...initialProject, milestones }}
       currentPackage={{ ...initialProject.episodes[0], status }}
-      isQuotaWarning={false}
       scenesCount={3}
       estimatedTokens={300}
       synopsis=""

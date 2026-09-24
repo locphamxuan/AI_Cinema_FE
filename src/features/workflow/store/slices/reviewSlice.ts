@@ -103,6 +103,28 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
       return true;
     },
 
+    requestQuota: async (packageId, amount, reason) => {
+      const request = await apiResult(workflowService.requestQuota(packageId, { requestedAmount: amount, reason }), 'Không gửi được yêu cầu');
+      if (!request) return false;
+      await reload();
+      return true;
+    },
+
+    approveQuotaRequest: async (requestId, amount, note) => {
+      const decided = await apiResult(
+        workflowService.approveQuotaRequest(requestId, { approvedAmount: amount, note: note || undefined }),
+        'Không cấp được token'
+      );
+      await reload();
+      return decided !== null;
+    },
+
+    rejectQuotaRequest: async (requestId, note) => {
+      const decided = await apiResult(workflowService.rejectQuotaRequest(requestId, { note }), 'Không từ chối được yêu cầu');
+      await reload();
+      return decided !== null;
+    },
+
     requestContentChanges: async (packageId, feedbackNotes) => {
       const pkgId = get().getPackage(packageId)?.package_id;
       if (!pkgId) return false;

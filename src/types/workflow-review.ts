@@ -41,3 +41,21 @@ export interface ReviewLog {
   quota_granted?: number;
   created_at: string;
 }
+
+/**
+ * Creator's request for more tokens on an episode whose quota runs low; the
+ * Reviewer grants all or part of it as a top-up, or turns it down.
+ */
+export interface QuotaRequest {
+  id: string;
+  requested_amount: number;
+  /** Tokens actually granted; set once approved. */
+  granted_amount?: number;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected';
+  requested_by_name: string;
+  decided_by_name?: string;
+  decision_note?: string;
+  created_at: string;
+  decided_at?: string;
+}
