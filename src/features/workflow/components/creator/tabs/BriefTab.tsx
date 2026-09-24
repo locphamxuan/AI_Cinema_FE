@@ -13,8 +13,7 @@ export interface BriefTabProps {
   scriptReview: FieldReview;
   updateOverallScript: (script: string) => void;
   updateContentBrief: (packageId: string, data: Partial<EpisodePackage['brief']>) => void;
-  submitProductionPlan: (packageId: string) => void;
-  reviseProductionPlan: (packageId: string, data: Partial<EpisodePackage['brief']>) => void;
+  reviseProductionPlan: (packageId: string, data: Partial<EpisodePackage['brief']>) => Promise<boolean>;
 }
 
 /**
@@ -29,7 +28,6 @@ export function BriefTab({
   scriptReview,
   updateOverallScript,
   updateContentBrief,
-  submitProductionPlan,
   reviseProductionPlan,
 }: BriefTabProps) {
   const brief = currentPackage?.brief;
@@ -79,37 +77,34 @@ export function BriefTab({
     }
   };
 
+  const draftBrief = () => ({
+    production_approach: productionApproach,
+    target_duration_minutes: draftTargetDuration,
+    estimated_tokens: estimatedTokens,
+    storyboard_summary: storyboardSummary,
+    scene_breakdown: scenes,
+    scene_count: scenes.length,
+  });
+
   const handleSaveDraft = () => {
     updateOverallScript(draftScript);
-    updateContentBrief(currentPackage.id, {
-      production_approach: productionApproach,
-      target_duration_minutes: draftTargetDuration,
-      estimated_tokens: estimatedTokens,
-      storyboard_summary: storyboardSummary,
-      scene_breakdown: scenes,
-      scene_count: scenes.length,
-    });
+    updateContentBrief(currentPackage.id, draftBrief());
     setIsSaved(true);
-    toast.info('Đã lưu bản nháp', 'Nội dung kịch bản và phân cảnh đã được cập nhật thành công.');
+    toast.info('Đã lưu bản nháp', 'Bản nháp được giữ trong phiên làm việc này; nộp kế hoạch để lưu lên hệ thống.');
     setTimeout(() => setIsSaved(false), 2000);
   };
 
-  const handleSubmitPlan = () => {
-    handleSaveDraft();
-    if (currentPackage.status === 'CHANGES_REQUESTED') {
-      reviseProductionPlan(currentPackage.id, {
-        production_approach: productionApproach,
-        target_duration_minutes: draftTargetDuration,
-        estimated_tokens: estimatedTokens,
-        storyboard_summary: storyboardSummary,
-        scene_breakdown: scenes,
-      });
+  const handleSubmitPlan = async () => {
+    updateOverallScript(draftScript);
+    const isRevision = currentPackage.status === 'CHANGES_REQUESTED';
+    const ok = await reviseProductionPlan(currentPackage.id, draftBrief());
+    if (!ok) return;
+    if (isRevision) {
       toast.success(
         'Đã nộp bản kế hoạch hiệu chỉnh!',
         'Kịch bản chỉnh sửa đã được chuyển lên Reviewer (Checker) để duyệt và cấp lại Quota.'
       );
     } else {
-      submitProductionPlan(currentPackage.id);
       toast.success(
         'Đã nộp Kế hoạch Sản xuất!',
         'Bản thảo kịch bản đã được gửi lên Thẩm định viên (Reviewer) để phê duyệt và cấp Token Quota.'

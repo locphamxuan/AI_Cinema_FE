@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, X, Trash2, Tag, Calendar, Milestone as MilestoneIcon, Film, Coins, Minus, UserCheck } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import type { ProjectMilestone } from '@/types/workflow';
+import type { ApiGenre, ApiUser } from '@/types/workflow-api';
+import { workflowService } from '@/services/workflowService';
 import { clamp, MAX_EPISODE_MINUTES, MAX_EPISODES_PER_SEASON, MIN_EPISODES_PER_SEASON } from '@/features/workflow/lib/limits';
 
 export interface CreateProjectFormState {
   title: string;
+  /** User id of the assigned Content Creator. */
   assignedCreator: string;
+  /** Genre ids. */
   genre: string[];
   synopsis: string;
   seasonCount: number;
@@ -30,53 +34,37 @@ export interface CreateProjectModalProps {
   onChange: <K extends keyof CreateProjectFormState>(field: K, value: CreateProjectFormState[K]) => void;
 }
 
-const PRESET_CREATORS = [
-  'Trần Minh Huy',
-  'Nguyễn Văn An',
-  'Phạm Thùy Linh',
-  'Lê Hoàng Nam',
-  'Đặng Thu Hà',
-];
-
-const PRESET_GENRES = [
-  'Khoa học viễn tưởng',
-  'Cyberpunk',
-  'Hành động AI',
-  'Kinh dị',
-  'Tình cảm',
-  'Phiêu lưu',
-  'Hoạt hình AI',
-  'Kỳ ảo / Fantasy',
-  'Trinh thám',
-  'Hài hước',
-];
-
 const QUICK_SEASON_OPTIONS = [1, 2, 3];
 const QUICK_EPISODES_PER_SEASON_OPTIONS = [3, 4, 5, 8];
 const QUICK_TOKEN_OPTIONS = [1500, 3000, 5000, 8000];
 
 export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: CreateProjectModalProps) {
-  const [customTagInput, setCustomTagInput] = useState('');
+  const [creators, setCreators] = useState<ApiUser[]>([]);
+  const [genres, setGenres] = useState<ApiGenre[]>([]);
 
-  const togglePresetGenre = (genre: string) => {
-    if (form.genre.includes(genre)) {
-      onChange('genre', form.genre.filter((g) => g !== genre));
+  useEffect(() => {
+    if (!open) return;
+    workflowService.listUsers('CONTENT_CREATOR').then((res) => {
+      if (res.success) setCreators(res.data.data);
+    });
+    workflowService.listGenres().then((res) => {
+      if (res.success) setGenres(res.data.data);
+    });
+  }, [open]);
+
+  // Default to the first creator once the roster arrives.
+  useEffect(() => {
+    if (!form.assignedCreator && creators.length > 0) onChange('assignedCreator', creators[0].id);
+  }, [creators, form.assignedCreator, onChange]);
+
+  const genreName = (id: string) => genres.find((g) => g.id === id)?.name ?? id;
+
+  const toggleGenre = (genreId: string) => {
+    if (form.genre.includes(genreId)) {
+      onChange('genre', form.genre.filter((g) => g !== genreId));
     } else {
-      onChange('genre', [...form.genre, genre]);
+      onChange('genre', [...form.genre, genreId]);
     }
-  };
-
-  const handleAddCustomTag = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    const tag = customTagInput.trim();
-    if (tag && !form.genre.includes(tag)) {
-      onChange('genre', [...form.genre, tag]);
-      setCustomTagInput('');
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    onChange('genre', form.genre.filter((g) => g !== tagToRemove));
   };
 
   const handleAddMilestone = () => {
@@ -183,10 +171,10 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
                   key={g}
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-600/10 dark:bg-purple-600/20 text-purple-600 dark:text-purple-400 border border-purple-600/30 shadow-xs"
                 >
-                  <span>{g}</span>
+                  <span>{genreName(g)}</span>
                   <button
                     type="button"
-                    onClick={() => handleRemoveTag(g)}
+                    onClick={() => toggleGenre(g)}
                     className="w-3.5 h-3.5 rounded-full hover:bg-purple-600 hover:text-white flex items-center justify-center transition cursor-pointer"
                     title="Xóa tag này"
                   >
@@ -200,52 +188,29 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
           {/* Preset Tag selector */}
           <div className="space-y-1.5">
             <span className="text-[11px] text-slate-500 dark:text-zinc-400 font-medium block">
-              Gợi ý tag phổ biến (bấm để thêm / gỡ):
+              Thể loại trong hệ thống (bấm để thêm / gỡ):
             </span>
             <div className="flex flex-wrap gap-1.5">
-              {PRESET_GENRES.map((preset) => {
-                const isSelected = form.genre.includes(preset);
+              {genres.map((genre) => {
+                const isSelected = form.genre.includes(genre.id);
                 return (
                   <button
-                    key={preset}
+                    key={genre.id}
                     type="button"
-                    onClick={() => togglePresetGenre(preset)}
+                    onClick={() => toggleGenre(genre.id)}
                     className={`px-2.5 py-1 rounded-lg text-[11px] transition cursor-pointer font-semibold border ${
                       isSelected
                         ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
                         : 'bg-white dark:bg-white/5 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-white/10 hover:border-purple-600/40 hover:bg-slate-100 dark:hover:bg-white/10'
                     }`}
                   >
-                    {isSelected ? `✓ ${preset}` : `+ ${preset}`}
+                    {isSelected ? `✓ ${genre.name}` : `+ ${genre.name}`}
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Custom tag input */}
-          <div className="flex items-center gap-2 pt-1">
-            <input
-              type="text"
-              value={customTagInput}
-              onChange={(e) => setCustomTagInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddCustomTag();
-                }
-              }}
-              placeholder="Nhập tag tự định nghĩa (Enter để thêm)…"
-              className={`${fieldInputClass} py-1.5 text-xs`}
-            />
-            <button
-              type="button"
-              onClick={handleAddCustomTag}
-              className="px-3.5 py-2 rounded-xl bg-slate-800 dark:bg-white/15 hover:bg-slate-900 dark:hover:bg-white/20 text-white font-bold text-xs shrink-0 transition cursor-pointer"
-            >
-              + Thêm Tag
-            </button>
-          </div>
         </div>
 
         {/* Tóm tắt cốt truyện */}
@@ -508,9 +473,9 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
             onChange={(e) => onChange('assignedCreator', e.target.value)}
             className={`${fieldInputClass} cursor-pointer font-medium text-slate-800 dark:text-zinc-200 bg-white dark:bg-[#0E1118]`}
           >
-            {PRESET_CREATORS.map((creator) => (
-              <option key={creator} value={creator} className="bg-white dark:bg-[#0E1118] text-slate-900 dark:text-white">
-                {creator}
+            {creators.map((creator) => (
+              <option key={creator.id} value={creator.id} className="bg-white dark:bg-[#0E1118] text-slate-900 dark:text-white">
+                {creator.fullName}
               </option>
             ))}
           </select>

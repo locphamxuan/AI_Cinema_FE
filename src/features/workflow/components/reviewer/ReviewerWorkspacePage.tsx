@@ -21,8 +21,8 @@ type ReviewerTab = 'overview' | 'plans' | 'audits' | 'publication' | 'tokens';
 
 const DEFAULT_FORM: CreateProjectFormState = {
   title: '',
-  assignedCreator: 'Trần Minh Huy',
-  genre: ['Khoa học viễn tưởng', 'Hành động AI'],
+  assignedCreator: '',
+  genre: [],
   synopsis: '',
   seasonCount: 1,
   episodesPerSeason: 5,
@@ -117,24 +117,25 @@ export function ReviewerWorkspacePage() {
     setActiveTab('overview');
   };
 
-  const handleCreateProjectSubmit = (e: React.FormEvent) => {
+  const handleCreateProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!createForm.title.trim()) return;
+    if (!createForm.title.trim() || !createForm.assignedCreator) return;
 
-    createProject({
+    const created = await createProject({
       title: createForm.title,
-      creator_name: createForm.assignedCreator,
-      genre: createForm.genre.length > 0 ? createForm.genre : ['Khoa học viễn tưởng'],
-      synopsis: createForm.synopsis || 'Dự án điện ảnh ứng dụng công nghệ GenAI thế hệ mới.',
-      season_count: createForm.seasonCount,
-      episodes_per_season: createForm.episodesPerSeason,
-      episode_target_durations: createForm.episodeDurations,
+      creator_id: createForm.assignedCreator,
+      genre_ids: createForm.genre,
+      synopsis: createForm.synopsis,
+      total_episodes: createForm.seasonCount * createForm.episodesPerSeason,
+      // The backend keeps one duration cap per project, so the longest episode sets it.
+      episode_duration_minutes: Math.max(...createForm.episodeDurations),
       total_budget_tokens: createForm.budgetTokens,
       production_start_date: createForm.productionStartDate,
       deadline: createForm.deadline,
       planned_release_date: createForm.releaseDate,
       milestones: createForm.milestones,
     });
+    if (!created) return;
 
     setIsCreateProjectOpen(false);
     setCreateForm(DEFAULT_FORM);
@@ -158,9 +159,9 @@ export function ReviewerWorkspacePage() {
     setIsQuotaModalOpen(true);
   };
 
-  const handleAllocateQuotaConfirm = () => {
+  const handleAllocateQuotaConfirm = async () => {
     if (!currentPackage) return;
-    allocateQuota(currentPackage.id, quotaToAllocate, quotaNotes);
+    if (!(await allocateQuota(currentPackage.id, quotaToAllocate, quotaNotes))) return;
     setIsQuotaModalOpen(false);
     toast.success(
       'Duyệt kế hoạch thành công!',
@@ -168,9 +169,9 @@ export function ReviewerWorkspacePage() {
     );
   };
 
-  const handleRequestChangesConfirm = () => {
+  const handleRequestChangesConfirm = async () => {
     if (!currentPackage || !rejectFeedback.trim()) return;
-    requestPlanChanges(currentPackage.id, rejectFeedback);
+    if (!(await requestPlanChanges(currentPackage.id, rejectFeedback))) return;
     setIsRejectModalOpen(false);
     setRejectFeedback('');
     toast.info('Đã trả về bản kế hoạch', 'Yêu cầu chỉnh sửa đã được gửi đến Creator.');

@@ -2,7 +2,7 @@ import { CheckCircle2, Edit3, Film } from 'lucide-react';
 import { PENDING_FIELD_REVIEW } from '@/types/workflow';
 import type { EpisodePackage } from '@/types/workflow';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
-import { availableBudget, derivePlanVerdict, planFieldReviews } from '@/features/workflow/lib/planVerdict';
+import { availableBudget, derivePlanVerdict, planFieldReviews, scriptReview } from '@/features/workflow/lib/planVerdict';
 import { FieldReviewCard } from '../../shared/FieldReviewCard';
 
 export interface PlanReviewTabProps {
@@ -93,7 +93,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
         <div className="space-y-5">
           {/* Overall script — reviewed once per project (BR-39) */}
           <FieldReviewCard
-            review={project.script_review}
+            review={scriptReview(project, brief)}
             onReview={(status, comment) => reviewPlanField(packageId, 'script', status, comment)}
             approveLabel="Duyệt kịch bản"
             header={

@@ -4,44 +4,36 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
-import type { DisplayLocation, LabelType, PublicationVisibility } from '@/types/workflow';
+import type { DisplayLocation, PublicationVisibility } from '@/types/workflow';
 import { StatusBadge } from '../../shared/StatusBadge';
 import { AuditPlayer } from './AuditPlayer';
 import { AuditInfoTabs } from './AuditInfoTabs';
-import { ComplianceStation } from './ComplianceStation';
+import { ComplianceStation, MANUAL_COMPLIANCE_CHECKS, type ManualComplianceCheck } from './ComplianceStation';
 import { PublishStation } from './PublishStation';
 import { RequestChangesModal } from './RequestChangesModal';
 import { toast } from '@/components/ui/Toast';
-import { workflowService } from '@/services/workflowService';
 
 export interface ReviewerAuditPageProps {
   packageId: string;
 }
 
 export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
-  const { project, complianceChecks, labels, publications, requestContentChanges, saveComplianceCheck, scheduleAndPublish } = useWorkflowStore();
+  const { project, requestContentChanges, passCompliance, publishEpisode } = useWorkflowStore();
 
-  const pkg = project.episodes.find((ep) => ep.id === packageId) || project.episodes[1] || project.episodes[0];
-  const compliance = complianceChecks[pkg?.id || ''];
-  const label = labels[pkg?.id || ''];
-  const publication = publications[pkg?.id || ''];
+  const pkg = project.episodes.find((ep) => ep.id === packageId);
 
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectFeedback, setRejectFeedback] = useState('');
 
-  const [article44Passed, setArticle44Passed] = useState(compliance?.article_44_passed ?? true);
-  const [decree142Passed, setDecree142Passed] = useState(compliance?.decree142_passed ?? true);
-  const [watermarkVerified, setWatermarkVerified] = useState(compliance?.watermark_verified ?? true);
-  const [labelType] = useState<LabelType>(label?.label_type || 'AI_GENERATED_FULL');
-  const [displayLocation] = useState<DisplayLocation>(label?.display_location || 'INTRO_OUTRO');
-  const [complianceNotes] = useState(
-    compliance?.notes || 'Các cảnh 3D/VFX và nhân vật ảo đã được kiểm duyệt; nhãn AI hiển thị 5 giây đầu và cuối video.'
+  const [checks, setChecks] = useState<Record<ManualComplianceCheck, boolean>>(
+    () => Object.fromEntries(MANUAL_COMPLIANCE_CHECKS.map((c) => [c.type, true])) as Record<ManualComplianceCheck, boolean>
   );
+  const [displayLocation] = useState<DisplayLocation>('INTRO_OUTRO');
   const [isPassingCompliance, setIsPassingCompliance] = useState(false);
 
-  const [scheduledDate, setScheduledDate] = useState('2026-09-20T20:00');
-  const [visibility, setVisibility] = useState<PublicationVisibility>(publication?.visibility || 'public');
-  const [selectedChannels, setSelectedChannels] = useState<string[]>(publication?.platform_channels || ['WEB_OTT', 'MOBILE_APP', 'SMART_TV']);
+  const [scheduledDate, setScheduledDate] = useState(() => new Date().toISOString().slice(0, 16));
+  const [visibility, setVisibility] = useState<PublicationVisibility>('public');
+  const [selectedChannels, setSelectedChannels] = useState<string[]>(['WEB_OTT', 'MOBILE_APP', 'SMART_TV']);
   const [isPublishing, setIsPublishing] = useState(false);
 
   if (!pkg) {
@@ -66,64 +58,32 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
     }
   };
 
-  const handleConfirmCompliance = () => {
+  const handleConfirmCompliance = async () => {
     setIsPassingCompliance(true);
-    // Call backend API in background to save compliance check and AI label
-    workflowService.createAiContentLabel(pkg.id, {
-      labelType: 'AI_GENERATED',
-      labelText: 'Nội dung được tạo hoàn toàn bằng trí tuệ nhân tạo theo Điều 44 Luật AI và Nghị định 142/2024/NĐ-CP.',
-      displayLocation,
-      appliedById: '1deebe95-e8ca-49aa-bd4d-c44489f9964f',
-      policyId: 'pol-d44-2025',
-    }).then(() => {
-      workflowService.createComplianceCheck(pkg.id, {
-        checkType: 'AI_LABEL_PRESENCE',
-        policyId: 'pol-d44-2025',
-        result: 'PASS',
-        checkedBySystem: 'FE-Reviewer-Audit',
-      }).catch((e) => console.warn('Compliance check API call:', e));
-    }).catch((e) => console.warn('AI label API call:', e));
-
-    setTimeout(() => {
-      saveComplianceCheck(
-        pkg.id,
-        {
-          article_44_passed: article44Passed,
-          decree142_passed: decree142Passed,
-          watermark_verified: watermarkVerified,
-          moderation_score: 99.4,
-          ai_content_percentage: 100,
-          notes: complianceNotes,
-        },
-        {
-          label_type: labelType,
-          label_text: 'Nội dung được tạo hoàn toàn bằng trí tuệ nhân tạo theo Điều 44 Luật AI và Nghị định 142/2024/NĐ-CP.',
-          display_location: displayLocation,
-          ruleset_version: 'DECREE_142_2024_V1',
-        }
-      );
-      setIsPassingCompliance(false);
-    }, 600);
+    const ok = await passCompliance(pkg.id, checks, displayLocation);
+    setIsPassingCompliance(false);
+    if (ok) toast.success('Đã xác nhận đạt chuẩn', `Tập ${pkg.episode_number} đã qua kiểm định pháp lý và được gắn nhãn AI.`);
   };
 
-  const handlePublishNow = () => {
+  const handlePublishNow = async () => {
     setIsPublishing(true);
-    setTimeout(() => {
-      scheduleAndPublish(pkg.id, { scheduled_at: scheduledDate, visibility, channels: selectedChannels });
-      setIsPublishing(false);
+    const ok = await publishEpisode(pkg.id, new Date(scheduledDate).toISOString());
+    setIsPublishing(false);
+    if (ok) {
       toast.success(
         'Đã phát hành tập phim!',
         `Tập ${pkg.episode_number} đã được phát sóng công khai lên nền tảng OTT với đầy đủ nhãn tuân thủ AI.`
       );
-    }, 700);
+    }
   };
 
-  const handleRequestChanges = () => {
+  const handleRequestChanges = async () => {
     if (!rejectFeedback.trim()) {
       toast.warning('Thiếu thông tin', 'Vui lòng nhập lý do yêu cầu chỉnh sửa!');
       return;
     }
-    requestContentChanges(pkg.id, rejectFeedback.trim());
+    const ok = await requestContentChanges(pkg.id, rejectFeedback.trim());
+    if (!ok) return;
     setShowRejectModal(false);
     setRejectFeedback('');
     toast.info(
@@ -164,7 +124,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-6">
-          <AuditPlayer pkg={pkg} certificationId={label?.certification_id} />
+          <AuditPlayer pkg={pkg} />
           <AuditInfoTabs pkg={pkg} />
         </div>
 
@@ -172,13 +132,8 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
           <ComplianceStation
             isCompliancePassed={isCompliancePassed}
             isPassingCompliance={isPassingCompliance}
-            article44Passed={article44Passed}
-            onArticle44Change={setArticle44Passed}
-            decree142Passed={decree142Passed}
-            onDecree142Change={setDecree142Passed}
-            watermarkVerified={watermarkVerified}
-            onWatermarkChange={setWatermarkVerified}
-            certificationId={label?.certification_id}
+            checks={checks}
+            onCheckChange={(type, value) => setChecks((prev) => ({ ...prev, [type]: value }))}
             displayLocation={displayLocation}
             onConfirm={handleConfirmCompliance}
           />

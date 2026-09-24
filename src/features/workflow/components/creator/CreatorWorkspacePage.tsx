@@ -7,6 +7,7 @@ import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
 import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
 import { creatorGroups } from '@/features/workflow/lib/projectGroups';
+import { scriptReview } from '@/features/workflow/lib/planVerdict';
 import { OverviewTab } from './tabs/OverviewTab';
 import { BriefTab } from './tabs/BriefTab';
 import { StudioLinkTab } from './tabs/StudioLinkTab';
@@ -33,7 +34,6 @@ export function CreatorWorkspacePage() {
     setActivePackage,
     updateContentBrief,
     updateOverallScript,
-    submitProductionPlan,
     reviseProductionPlan,
     reviews,
     loadProjects,
@@ -160,10 +160,9 @@ export function CreatorWorkspacePage() {
                 currentPackage={currentPackage}
                 overallScript={project.overall_script}
                 scriptVersion={project.script_version}
-                scriptReview={project.script_review}
+                scriptReview={scriptReview(project, currentPackage.brief)}
                 updateOverallScript={updateOverallScript}
                 updateContentBrief={updateContentBrief}
-                submitProductionPlan={submitProductionPlan}
                 reviseProductionPlan={reviseProductionPlan}
               />
             )}

@@ -3,11 +3,10 @@ import type { EpisodePackage } from '@/types/workflow';
 
 export interface AuditPlayerProps {
   pkg: EpisodePackage;
-  certificationId?: string;
 }
 
 /** Preview frame of the rendered episode with its basic technical facts underneath. */
-export function AuditPlayer({ pkg, certificationId }: AuditPlayerProps) {
+export function AuditPlayer({ pkg }: AuditPlayerProps) {
   const facts = [`${pkg.assets.length} phân cảnh`, pkg.total_duration, '4K · 60 fps'].filter(Boolean);
 
   return (
@@ -23,7 +22,6 @@ export function AuditPlayer({ pkg, certificationId }: AuditPlayerProps) {
       </div>
       <figcaption className="px-4 py-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
         <span>{facts.join(' · ')}</span>
-        {certificationId && <span className="font-mono">Mã chứng nhận {certificationId}</span>}
       </figcaption>
     </figure>
   );
