@@ -1,6 +1,7 @@
 import { Video, Mic, Volume2, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 import type { GenerationJob, GenerationStep, GenerationFunctionType } from '@/types/workflow';
-import { resolveModel, stepDefaults, type ModelMatch } from '@/features/workflow/lib/modelRegistry';
+import { useEffect, useRef } from 'react';
+import type { ModelMatch } from '@/types/workflow';
 import { isDraftStep } from '@/features/workflow/lib/jobAdapter';
 import { useGenerationMeter } from './useGenerationMeter';
 import { GenerationMeter } from './GenerationMeter';
@@ -57,6 +58,8 @@ export interface GeneratorPanelProps {
   steps: GenerationStep[];
   onAddStep: () => void;
   onUpdateStep: (stepId: string, data: Partial<GenerationStep>) => void;
+  /** Changes a step's function; the backend picks its model (BR-40). */
+  onRouteStep: (stepId: string, change: Pick<GenerationStep, 'function_type' | 'custom_function'>) => void;
   onRemoveStep: (stepId: string) => void;
   isGenerating: boolean;
   onGenerateSelected: () => void;
@@ -67,10 +70,23 @@ export function GeneratorPanel({
   steps,
   onAddStep,
   onUpdateStep,
+  onRouteStep,
   onRemoveStep,
   isGenerating,
   onGenerateSelected,
 }: GeneratorPanelProps) {
+  // Route a custom function once the Creator pauses typing, not on every key.
+  const routeTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  useEffect(() => {
+    const timers = routeTimers.current;
+    return () => Object.values(timers).forEach(clearTimeout);
+  }, []);
+  const describeCustomFunction = (stepId: string, customFunction: string) => {
+    onUpdateStep(stepId, { custom_function: customFunction, selected_model: '', token_cost: 0, model_match: 'pending' });
+    clearTimeout(routeTimers.current[stepId]);
+    routeTimers.current[stepId] = setTimeout(() => onRouteStep(stepId, { function_type: 'CUSTOM', custom_function: customFunction }), 400);
+  };
+
   const drafts = steps.filter((s) => isDraftStep(s));
   // Generating runs the drafts; without drafts it regenerates every saved step.
   const toRun = drafts.length > 0 ? drafts : steps;
@@ -98,7 +114,7 @@ export function GeneratorPanel({
 
         {steps.map((step) => {
           const meta = FUNCTION_TYPE_META[step.function_type];
-          const { match } = resolveModel(step);
+          const match = step.model_match ?? 'pending';
           if (!isDraftStep(step)) {
             const { icon: TypeIcon, label } = meta;
             return (
@@ -129,7 +145,7 @@ export function GeneratorPanel({
                         key={type}
                         type="button"
                         aria-pressed={isSelected}
-                        onClick={() => onUpdateStep(step.id, { function_type: type, ...stepDefaults({ function_type: type, custom_function: step.custom_function }) })}
+                        onClick={() => onRouteStep(step.id, { function_type: type, custom_function: step.custom_function })}
                         className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${
                           isSelected
                             ? 'bg-purple-600 text-white border-purple-600'
@@ -157,12 +173,7 @@ export function GeneratorPanel({
                   <input
                     type="text"
                     value={step.custom_function ?? ''}
-                    onChange={(e) =>
-                      onUpdateStep(step.id, {
-                        custom_function: e.target.value,
-                        ...stepDefaults({ function_type: 'CUSTOM', custom_function: e.target.value }),
-                      })
-                    }
+                    onChange={(e) => describeCustomFunction(step.id, e.target.value)}
                     aria-label="Chức năng bạn muốn làm"
                     placeholder="Bạn muốn làm gì? Ví dụ: đồng bộ khẩu hình, dịch phụ đề, chỉnh màu…"
                     autoComplete="off"

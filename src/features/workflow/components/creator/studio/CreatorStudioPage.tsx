@@ -8,7 +8,7 @@ import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { StudioPlayer } from './StudioPlayer';
 import { StudioTimeline } from './StudioTimeline';
 import { GeneratorPanel } from './GeneratorPanel';
-import { stepDefaults } from '@/features/workflow/lib/modelRegistry';
+import { routeDefaults } from '@/features/workflow/lib/modelRouting';
 import { SubmitEpisodeModal } from './SubmitEpisodeModal';
 import { toast } from '@/components/ui/Toast';
 import type { GenerationStep } from '@/types/workflow';
@@ -21,6 +21,9 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   const router = useRouter();
   const {
     project,
+    routing,
+    loadRouting,
+    routeStep,
     loadProjects,
     loadJobs,
     triggerGenerationJob,
@@ -42,6 +45,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
 
   // Opened by URL (e.g. after a refresh): the project is not in memory yet.
   useEffect(() => {
+    loadRouting();
     if (!currentPackage) loadProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- once per opened episode
   }, [episodeId]);
@@ -81,7 +85,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
       function_type: 'VIDEO',
       prompt: '',
       status: 'pending',
-      ...stepDefaults({ function_type: 'VIDEO' }),
+      ...routeDefaults(routing, { function_type: 'VIDEO' }),
     });
   };
 
@@ -178,6 +182,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
             steps={selectedJob?.generation_steps ?? []}
             onAddStep={handleAddStep}
             onUpdateStep={handleUpdateStep}
+            onRouteStep={(stepId, change) => selectedJob && routeStep(currentPackage.id, selectedJob.id, stepId, change)}
             onRemoveStep={handleRemoveStep}
             isGenerating={renderingJobId === selectedJob?.id}
             onGenerateSelected={() => selectedJob && handleGenerate(selectedJob.id)}

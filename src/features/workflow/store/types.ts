@@ -9,6 +9,7 @@ import {
   SceneReviewStatus,
   PlanFieldKey,
 } from '@/types/workflow';
+import type { ApiRoutingRow } from '@/types/workflow-api';
 import type { ManualComplianceCheck } from '@/features/workflow/components/reviewer/audit/ComplianceStation';
 
 export interface ViewSlice {
@@ -64,6 +65,16 @@ export interface EpisodeSlice {
 
 
 export interface ProductionSlice {
+  /** Model and estimate per job type, from the backend (BR-40). */
+  routing: ApiRoutingRow[];
+  loadRouting: () => Promise<void>;
+  /** Sets a draft step's function and routes it to its model; a custom function is resolved by the backend. */
+  routeStep: (
+    packageId: string,
+    sceneJobId: string,
+    stepId: string,
+    change: Pick<GenerationStep, 'function_type' | 'custom_function'>
+  ) => Promise<void>;
   /** Loads the plan's generation jobs into the episode's scene rows, keeping draft steps. */
   loadJobs: (packageId: string) => Promise<void>;
   /** Generates the scene's draft steps, or regenerates its saved ones when it has no drafts (BR-41). */

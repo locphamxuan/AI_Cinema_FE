@@ -3,6 +3,7 @@ import type { ProductionSlice, WorkflowStoreState } from '../types';
 import { toast } from '@/components/ui/Toast';
 import { workflowService } from '@/services/workflowService';
 import { buildSceneJobs, isDraftStep, JOB_TYPE_OF } from '@/features/workflow/lib/jobAdapter';
+import { routeDefaults } from '@/features/workflow/lib/modelRouting';
 import { withProjectUpdate } from './projectRoster';
 import { apiResult } from './apiResult';
 
@@ -21,6 +22,31 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
     );
 
   return {
+    routing: [],
+
+    loadRouting: async () => {
+      if (get().routing.length > 0) return;
+      const res = await workflowService.getRouting();
+      if (res.success) set({ routing: res.data });
+    },
+
+    routeStep: async (packageId, sceneJobId, stepId, change) => {
+      get().updateGenerationStep(packageId, sceneJobId, stepId, { ...change, ...routeDefaults(get().routing, change) });
+      const described = change.function_type === 'CUSTOM' ? change.custom_function?.trim() : '';
+      if (!described) return;
+
+      const res = await workflowService.resolveRoute('CUSTOM', described);
+      if (!res.success) return;
+      const step = get().getJobs(packageId).find((j) => j.id === sceneJobId)?.generation_steps.find((s) => s.id === stepId);
+      // A newer description replaced this one while the request was in flight.
+      if (step?.function_type !== 'CUSTOM' || step.custom_function?.trim() !== described) return;
+      get().updateGenerationStep(packageId, sceneJobId, stepId, {
+        selected_model: res.data.model,
+        token_cost: res.data.estimatedTokenCost,
+        model_match: res.data.match,
+      });
+    },
+
     loadJobs: async (packageId) => {
       const res = await workflowService.listJobs(packageId);
       if (!res.success) return;
@@ -36,7 +62,10 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
       const row = get().getJobs(packageId).find((j) => j.id === sceneJobId);
       if (!row) return false;
 
-      const drafts = row.generation_steps.filter((s) => isDraftStep(s) && s.prompt.trim());
+      // A custom step needs its function described before the backend can route it.
+      const drafts = row.generation_steps.filter(
+        (s) => isDraftStep(s) && s.prompt.trim() && (s.function_type !== 'CUSTOM' || s.custom_function?.trim())
+      );
       const saved = row.generation_steps.filter((s) => !isDraftStep(s));
       if (drafts.length === 0 && saved.length === 0) {
         toast.warning('Chưa có nội dung', 'Thêm ít nhất một mục có mô tả trước khi tạo clip.');
