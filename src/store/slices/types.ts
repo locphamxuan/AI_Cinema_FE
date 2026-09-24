@@ -58,8 +58,21 @@ export interface WalletSlice {
   depositCoins: (amountVND: number, mainCoin: number, bonusCoin: number, method: string) => void;
 }
 
+export interface CatalogGenre {
+  id: string;
+  name: string;
+}
+
 export interface MovieSlice {
-  currentMovie: Movie;
+  movies: Movie[];
+  genres: CatalogGenre[];
+  isCatalogLoading: boolean;
+  catalogError: string | null;
+  /** Fetches published movies and genres once; later calls are no-ops unless `force`. */
+  loadCatalog: (force?: boolean) => Promise<void>;
+  /** Movie that contains the episode being watched, or null until the catalog has it. */
+  currentMovie: Movie | null;
+  selectEpisode: (episodeId: string) => Promise<void>;
   unlockEpisode: (episodeId: string) => { success: boolean; error?: string };
   isUnlockModalOpen: boolean;
   selectedEpisodeId: string | null;

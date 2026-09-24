@@ -1,9 +1,9 @@
 export interface AIComplianceInfo {
-  aiModel: string;
-  generatedDate: string;
+  aiModel?: string;
+  generatedDate?: string;
   complianceArticle: string;
   reviewStatus: 'approved' | 'pending' | 'flagged';
-  moderationScore: number;
+  moderationScore?: number;
   contentRating: string;
   disclaimer: string;
 }

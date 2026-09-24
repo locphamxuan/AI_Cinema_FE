@@ -18,10 +18,9 @@ export const API_ROUTES = {
   MOVIES: {
     LIST: '/movies',
     DETAIL: (id: string) => `/movies/${id}`,
-    FEATURED: '/movies/featured',
-    CATEGORIES: '/movies/categories',
-    VERSIONS: (movieId: string, episodeId: string) => `/movies/${movieId}/episodes/${episodeId}/versions`,
-    COMPLIANCE: (movieId: string) => `/movies/${movieId}/compliance`,
+  },
+  GENRES: {
+    LIST: '/genres',
   },
   // Wallet & Coin
   WALLET: {

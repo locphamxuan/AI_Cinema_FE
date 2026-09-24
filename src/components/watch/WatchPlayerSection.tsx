@@ -12,7 +12,7 @@ interface WatchPlayerSectionProps {
 }
 
 export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProps) {
-  const { currentMovie, isVIPMode, openUnlockModal } = useAppStore();
+  const { currentMovie, isVIPMode, openUnlockModal, selectEpisode, isCatalogLoading } = useAppStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
@@ -22,9 +22,13 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   const [isPlaying, setIsPlaying] = useState(false);
   const [versionToast, setVersionToast] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (episodeId) selectEpisode(episodeId);
+  }, [episodeId, selectEpisode]);
+
   // Determine current episode and its default version
   useEffect(() => {
-    const ep = currentMovie.episodes.find((e) => e.id === episodeId) || currentMovie.episodes[0];
+    const ep = currentMovie?.episodes.find((e) => e.id === episodeId) || currentMovie?.episodes[0] || null;
     setCurrentEpisode(ep);
 
     if (ep?.versions && ep.versions.length > 0) {
@@ -33,7 +37,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
     } else {
       setActiveVersion(null);
     }
-  }, [episodeId, currentMovie.episodes]);
+  }, [episodeId, currentMovie?.episodes]);
 
   // Can the user play this episode?
   const canPlay = currentEpisode
@@ -125,7 +129,13 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
     setTimeout(() => setVersionToast(null), 3500);
   };
 
-  if (!currentEpisode) return null;
+  if (!currentMovie || !currentEpisode) {
+    return (
+      <div className="py-24 text-center text-sm text-muted-light">
+        {isCatalogLoading ? 'Đang tải phim...' : 'Không tìm thấy tập phim này hoặc tập chưa được phát hành.'}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">

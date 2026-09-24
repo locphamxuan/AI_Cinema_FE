@@ -1,5 +1,33 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useAppStore } from '@/store/useAppStore';
+import type { Episode, Movie } from '@/types/movie';
+
+const paidEpisode = (n: number): Episode => ({
+  id: `ep-00${n}`,
+  episodeNumber: n,
+  title: `Tập ${n}`,
+  duration: '25:00',
+  hlsUrl: '',
+  thumbnailUrl: '',
+  price: 50,
+  isFree: false,
+  isPreview: false,
+  isUnlocked: false,
+  synopsis: '',
+});
+
+const fixtureMovie: Movie = {
+  id: 'movie-fixture',
+  title: 'Phim thử nghiệm',
+  genre: [],
+  posterUrl: '',
+  bannerUrl: '',
+  description: '',
+  year: 2026,
+  totalEpisodes: 3,
+  episodes: [3, 4, 5].map(paidEpisode),
+  aiCompliance: { complianceArticle: '', reviewStatus: 'approved', contentRating: '', disclaimer: '' },
+};
 
 describe('Zustand App Store (src/store/useAppStore.ts)', () => {
   beforeEach(() => {
@@ -7,6 +35,7 @@ describe('Zustand App Store (src/store/useAppStore.ts)', () => {
     const store = useAppStore.getState();
     store.logout();
     store.setWalletBalance(120, 80);
+    useAppStore.setState({ currentMovie: fixtureMovie, movies: [fixtureMovie] });
   });
 
   describe('Dual Wallet & Coin Deduction', () => {

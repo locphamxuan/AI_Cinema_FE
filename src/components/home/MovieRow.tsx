@@ -18,7 +18,7 @@ export default function MovieRow({
   subtitle,
   icon,
   movies,
-  exploreHref = '/watch/ep-001',
+  exploreHref,
 }: MovieRowProps) {
   const rowRef = useRef<HTMLDivElement>(null);
 
@@ -45,13 +45,15 @@ export default function MovieRow({
           {subtitle && <p className="text-xs text-muted-light mt-0.5">{subtitle}</p>}
         </div>
 
-        <Link
-          href={exploreHref}
-          className="text-xs font-semibold text-neon hover:text-neon-dark dark:hover:text-white transition-colors flex items-center gap-1 group/link"
-        >
-          <span>Xem tất cả</span>
-          <span className="transition-transform group-hover/link:translate-x-1">›</span>
-        </Link>
+        {exploreHref && (
+          <Link
+            href={exploreHref}
+            className="text-xs font-semibold text-neon hover:text-neon-dark dark:hover:text-white transition-colors flex items-center gap-1 group/link"
+          >
+            <span>Xem tất cả</span>
+            <span className="transition-transform group-hover/link:translate-x-1">›</span>
+          </Link>
+        )}
       </div>
 
       {/* Row Container with Scroll Buttons */}

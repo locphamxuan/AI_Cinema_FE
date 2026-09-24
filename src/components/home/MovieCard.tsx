@@ -19,7 +19,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/watch/${movie.episodes[0]?.id || 'ep-001'}`} className="block">
+      <Link href={`/watch/${movie.episodes[0]?.id}`} className="block">
         {/* Main Card Container */}
         <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-slate-100 dark:bg-[#161922] border border-slate-200 dark:border-white/10 transition-all duration-300 group-hover:scale-105 group-hover:border-ruby/50 group-hover:shadow-2xl group-hover:shadow-ruby/20 group-hover:z-30 shadow-sm">
           {/* Poster Image */}

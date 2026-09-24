@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Movie } from '@/types/movie';
-import { allMockMovies } from '@/mocks/mockData';
 
 interface HeroBannerProps {
   movies?: Movie[];
@@ -13,11 +12,7 @@ interface HeroBannerProps {
 
 export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBannerProps) {
   // Determine movies list (up to 5 hot movies)
-  const movieList = movies && movies.length > 0 
-    ? movies.slice(0, 5) 
-    : movie 
-    ? [movie] 
-    : allMockMovies.slice(0, 5);
+  const movieList = movies && movies.length > 0 ? movies.slice(0, 5) : movie ? [movie] : [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
@@ -44,6 +39,7 @@ export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBan
   };
 
   const currentMovie = movieList[currentIndex] || movieList[0];
+  if (!currentMovie) return null;
   const isAdded = !!myListMap[currentMovie.id];
 
   const toggleMyList = (id: string) => {
@@ -167,7 +163,7 @@ export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBan
         <div className="flex flex-wrap items-center gap-3">
           {/* Primary Xem Ngay Button (Emerald Green like in ONFLIX reference image, retaining option for ruby theme) */}
           <Link
-            href={`/watch/${currentMovie.episodes[0]?.id || 'ep-001'}`}
+            href={`/watch/${currentMovie.episodes[0]?.id}`}
             className="px-7 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-full text-sm sm:text-base flex items-center gap-2.5 shadow-xl shadow-emerald-500/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <span className="text-lg">▶</span>

@@ -23,7 +23,7 @@ export default function TopTenRow({ movies }: TopTenRowProps) {
           return (
             <Link
               key={movie.id}
-              href={`/watch/${movie.episodes[0]?.id || 'ep-001'}`}
+              href={`/watch/${movie.episodes[0]?.id}`}
               className="group relative flex items-center flex-shrink-0 transition-transform duration-300 hover:scale-105"
             >
               {/* Giant Rank Number */}

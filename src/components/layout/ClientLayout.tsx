@@ -14,18 +14,6 @@ import DemoControlPanel from '@/components/home/DemoControlPanel';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import RightSidebar from '@/components/layout/RightSidebar';
 import { ToastContainer } from '@/components/ui/Toast';
-import { allMockMovies } from '@/mocks/mockData';
-
-const genreOptions = [
-  'Tất cả thể loại',
-  'Khoa học viễn tưởng',
-  'Cyberpunk 2049',
-  'Hành động Kịch tính',
-  'Trí tuệ Nhân tạo',
-  'Tâm lý & Bí ẩn',
-  'Hoạt hình',
-  'Giả tưởng',
-];
 
 const countryOptions = [
   'Tất cả quốc gia',
@@ -64,7 +52,11 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     selectedYear,
     setSelectedYear,
     restoreSession,
+    movies,
+    genres,
+    loadCatalog,
   } = useAppStore();
+  const genreOptions = ['Tất cả thể loại', ...genres.map((g) => g.name)];
 
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -75,7 +67,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
 
   // Filter movies based on search query
   const searchResults = searchQuery.trim()
-    ? allMockMovies.filter(
+    ? movies.filter(
         (m) =>
           m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           m.genre.some((g) => g.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -86,6 +78,11 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
+
+  // The published catalog is public, so it loads regardless of login state.
+  useEffect(() => {
+    loadCatalog();
+  }, [loadCatalog]);
 
   // Close dropdowns on click outside
   useEffect(() => {
@@ -184,25 +181,6 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                       </div>
                     </div>
 
-                    {/* Quick Filter Links */}
-                    <button
-                      onClick={() => setSelectedGenre('Cyberpunk 2049')}
-                      className="py-1.5 px-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
-                    >
-                      Phim Bộ
-                    </button>
-                    <button
-                      onClick={() => setSelectedGenre('Hành động Kịch tính')}
-                      className="py-1.5 px-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
-                    >
-                      Phim Lẻ
-                    </button>
-                    <Link
-                      href="/watch/ep-001"
-                      className="py-1.5 px-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-                    >
-                      Lịch chiếu
-                    </Link>
                   </nav>
                 )}
               </div>
@@ -242,7 +220,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
                         {searchResults.map((m) => (
                           <Link
                             key={m.id}
-                            href={`/watch/${m.episodes[0]?.id || 'ep-001'}`}
+                            href={`/watch/${m.episodes[0]?.id}`}
                             className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 transition-colors group"
                           >
                             <img

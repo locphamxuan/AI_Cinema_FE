@@ -17,8 +17,8 @@ export default function UnlockEpisodeModal() {
   const [result, setResult] = useState<{ success: boolean; error?: string } | null>(null);
 
   const episode = useMemo(
-    () => currentMovie.episodes.find((ep) => ep.id === selectedEpisodeId),
-    [currentMovie.episodes, selectedEpisodeId]
+    () => currentMovie?.episodes.find((ep) => ep.id === selectedEpisodeId),
+    [currentMovie?.episodes, selectedEpisodeId]
   );
 
   const deduction = useMemo(() => {

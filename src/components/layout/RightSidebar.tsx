@@ -242,35 +242,37 @@ export default function RightSidebar() {
           </div>
 
           {/* Continue Watching Widget */}
-          <div className="p-3 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10">
-            <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-muted-light mb-2">
-              Đang Xem Dở
-            </p>
+          {currentMovie && currentMovie.episodes.length > 0 && (
+            <div className="p-3 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10">
+              <p className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-muted-light mb-2">
+                Đang Xem Dở
+              </p>
 
-            <Link
-              href={`/watch/${currentMovie.episodes[0]?.id || 'ep-001'}`}
-              onClick={closeRightSidebar}
-              className="flex items-center gap-3 group"
-            >
-              <div className="relative w-16 h-10 rounded-lg overflow-hidden shrink-0 border border-slate-300 dark:border-white/20">
-                <img
-                  src={currentMovie.bannerUrl}
-                  alt={currentMovie.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <span className="text-white text-xs">▶</span>
+              <Link
+                href={`/watch/${currentMovie.episodes[0]?.id}`}
+                onClick={closeRightSidebar}
+                className="flex items-center gap-3 group"
+              >
+                <div className="relative w-16 h-10 rounded-lg overflow-hidden shrink-0 border border-slate-300 dark:border-white/20">
+                  <img
+                    src={currentMovie.bannerUrl}
+                    alt={currentMovie.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <span className="text-white text-xs">▶</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="overflow-hidden">
-                <p className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-ruby transition-colors">
-                  {currentMovie.title}
-                </p>
-                <p className="text-[10px] text-slate-500 dark:text-muted-light">Tập 1 • 45 phút</p>
-              </div>
-            </Link>
-          </div>
+                <div className="overflow-hidden">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-ruby transition-colors">
+                    {currentMovie.title}
+                  </p>
+                  <p className="text-[10px] text-slate-500 dark:text-muted-light">Tập 1{currentMovie.episodes[0]?.duration && ` • ${currentMovie.episodes[0].duration}`}</p>
+                </div>
+              </Link>
+            </div>
+          )}
         </div>
       </aside>
     </>
