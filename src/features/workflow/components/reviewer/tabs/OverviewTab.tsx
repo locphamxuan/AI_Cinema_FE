@@ -90,7 +90,7 @@ export function OverviewTab({ project, pendingPlanCount, submittedCount, onRevie
                   <tr key={ep.id} className="hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
                     <td className="py-3 px-5">
                       <p className="font-semibold text-slate-900 dark:text-white truncate max-w-[240px]">
-                        Tập {ep.episode_number}: {ep.title.replace(/^Tập \d+:\s*/, '')}
+                        {ep.title}
                       </p>
                       <p className="text-[11px] text-slate-400 mt-0.5">{ep.brief.scene_breakdown.length} phân cảnh</p>
                     </td>

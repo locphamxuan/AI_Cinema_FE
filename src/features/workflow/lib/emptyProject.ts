@@ -13,7 +13,6 @@ export const EMPTY_PROJECT: ProductionProject = {
   script_version: 1,
   script_review: PENDING_FIELD_REVIEW,
   season_count: 0,
-  episodes_per_season: 0,
   total_episodes: 0,
   total_budget_tokens: 0,
   allocated_tokens: 0,

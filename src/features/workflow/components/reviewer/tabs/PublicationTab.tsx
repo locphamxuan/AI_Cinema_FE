@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { Calendar, Tv, Play, Eye } from 'lucide-react';
 import type { ProductionProject } from '@/types/workflow';
+import { episodeName, spansSeasons } from '@/features/workflow/lib/episodeLabel';
 
 export interface PublicationTabProps {
   project: ProductionProject;
 }
 
 export function PublicationTab({ project }: PublicationTabProps) {
+  const multiSeason = spansSeasons(project.episodes);
   const publishedEpisodes = project.episodes.filter((e) => e.status === 'PUBLISHED');
 
   return (
@@ -63,7 +65,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
           {project.episodes.map((ep) => {
             const isPublished = ep.status === 'PUBLISHED';
             const isCompliancePassed = ep.status === 'COMPLIANCE_PASSED';
-            const cleanTitle = ep.title?.replace(/^Tập\s*\d+\s*[:\-]\s*/i, '') || ep.title;
+            const cleanTitle = episodeName(ep.title);
 
             return (
               <div
@@ -72,7 +74,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-9 h-9 rounded-lg bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-slate-200 font-mono font-bold text-xs flex items-center justify-center shrink-0">
-                    #{ep.episode_number}
+                    {multiSeason ? `${ep.season_number}.${ep.episode_number}` : `#${ep.episode_number}`}
                   </div>
 
                   <div className="space-y-1 min-w-0">

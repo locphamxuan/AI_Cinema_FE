@@ -85,22 +85,9 @@ export interface CreateProductionProjectDto {
   genreIds?: string[];
   policyIds?: string[];
   assignedCreatorId: string;
+  /** Every episode in order with its season and allotted duration; seasons may differ in size. */
+  episodes?: { seasonNumber: number; targetDurationSeconds: number }[];
   milestones?: CreateMilestoneDto[];
-}
-
-export interface UpdateProductionProjectDto {
-  title?: string;
-  description?: string;
-  defaultEpisodeDurationSeconds?: number;
-  deadline?: string;
-  plannedReleaseDate?: string;
-  totalAiQuotaBudget?: number;
-  genreIds?: string[];
-  policyIds?: string[];
-}
-
-export interface CancelProductionProjectDto {
-  cancelledReason?: string;
 }
 
 export interface UpdateMilestoneDto {
@@ -120,16 +107,6 @@ export interface SubmitProductionPlanDto {
   /** Final script of every existing scene of the plan. */
   scenes: { sceneId: string; scriptText: string }[];
 }
-
-export interface UpdateProductionPlanDto {
-  scriptText?: string;
-  productionApproach?: string;
-  targetDurationSeconds?: number;
-  targetLanguages?: string[];
-  estimatedAiResourceUsage?: number;
-}
-
-export type CreateProductionPlanRevisionDto = UpdateProductionPlanDto;
 
 export interface CreateSceneDto {
   sceneNumber: number;
@@ -218,7 +195,7 @@ export interface ApiUser {
 export interface ApiGenre {
   id: string;
   name: string;
-  slug: string;
+  description?: string | null;
 }
 
 export interface ApiPolicy {
@@ -339,7 +316,12 @@ export interface ApiEpisodePackage {
 
 export interface ApiProductionPlan {
   id: string;
+  /** Running number across the project; seasonEpisodeNumber is the number viewers see. */
   episodeNumber: number;
+  seasonNumber: number;
+  seasonEpisodeNumber: number;
+  /** Duration the Reviewer allotted this episode at project creation. */
+  allottedDurationSeconds?: number | null;
   planVersion: number;
   status: ProductionPlanStatus;
   scriptText?: string | null;

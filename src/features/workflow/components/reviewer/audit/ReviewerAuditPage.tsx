@@ -12,6 +12,7 @@ import { ComplianceStation, MANUAL_COMPLIANCE_CHECKS, type ManualComplianceCheck
 import { PublishStation } from './PublishStation';
 import { RequestChangesModal } from './RequestChangesModal';
 import { toast } from '@/components/ui/Toast';
+import { episodeLabel, episodeName, spansSeasons } from '@/features/workflow/lib/episodeLabel';
 
 export interface ReviewerAuditPageProps {
   packageId: string;
@@ -53,6 +54,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
     );
   }
 
+  const label = episodeLabel(pkg, spansSeasons(project.episodes));
   const isCompliancePassed = pkg.status === 'COMPLIANCE_PASSED' || pkg.status === 'PUBLISHED';
   const isPublished = pkg.status === 'PUBLISHED';
 
@@ -68,7 +70,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
     setIsPassingCompliance(true);
     const ok = await passCompliance(pkg.id, checks, displayLocation);
     setIsPassingCompliance(false);
-    if (ok) toast.success('Đã xác nhận đạt chuẩn', `Tập ${pkg.episode_number} đã qua kiểm định pháp lý và được gắn nhãn AI.`);
+    if (ok) toast.success('Đã xác nhận đạt chuẩn', `${label} đã qua kiểm định pháp lý và được gắn nhãn AI.`);
   };
 
   const handlePublishNow = async () => {
@@ -78,7 +80,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
     if (ok) {
       toast.success(
         'Đã phát hành tập phim!',
-        `Tập ${pkg.episode_number} đã được phát sóng công khai lên nền tảng OTT với đầy đủ nhãn tuân thủ AI.`
+        `${label} đã được phát sóng công khai lên nền tảng OTT với đầy đủ nhãn tuân thủ AI.`
       );
     }
   };
@@ -108,10 +110,10 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {project.title} · Tập {pkg.episode_number}
+              {project.title} · {label}
             </p>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-0.5">
-              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">{pkg.title.replace(/^Tập\s*\d+\s*[:\-]\s*/i, '')}</h1>
+              <h1 className="text-xl font-semibold text-slate-900 dark:text-white">{episodeName(pkg.title)}</h1>
               <StatusBadge status={pkg.status} />
             </div>
           </div>

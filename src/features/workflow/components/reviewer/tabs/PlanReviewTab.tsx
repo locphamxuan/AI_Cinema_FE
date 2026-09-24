@@ -4,6 +4,7 @@ import type { EpisodePackage } from '@/types/workflow';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { availableBudget, derivePlanVerdict, planFieldReviews, scriptReview } from '@/features/workflow/lib/planVerdict';
 import { FieldReviewCard } from '../../shared/FieldReviewCard';
+import { episodeName } from '@/features/workflow/lib/episodeLabel';
 
 export interface PlanReviewTabProps {
   currentPackage?: EpisodePackage;
@@ -21,7 +22,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
   const durationMismatch = Boolean(
     brief && targetDuration > 0 && Math.abs(brief.target_duration_minutes - targetDuration) / targetDuration > 0.15
   );
-  const cleanTitle = currentPackage?.title?.replace(/^Tập\s*\d+\s*[:\-]\s*/i, '') || currentPackage?.title || 'Chưa đặt tên';
+  const cleanTitle = episodeName(currentPackage?.title) || 'Chưa đặt tên';
   const budgetLeft = availableBudget(project);
   const verdict = brief ? derivePlanVerdict(project, brief) : 'PENDING';
   const canApprove = verdict === 'APPROVED';

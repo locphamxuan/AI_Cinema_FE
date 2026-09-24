@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { ShieldCheck, Clock, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
 import type { ProductionProject, WorkflowState } from '@/types/workflow';
+import { episodeName, spansSeasons } from '@/features/workflow/lib/episodeLabel';
 
 export interface AuditsTabProps {
   project: ProductionProject;
 }
 
 export function AuditsTab({ project }: AuditsTabProps) {
+  const multiSeason = spansSeasons(project.episodes);
   const passedCount = project.episodes.filter(
     (e) => e.status === 'COMPLIANCE_PASSED' || e.status === 'PUBLISHED'
   ).length;
@@ -89,7 +91,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
         {project.episodes.map((ep) => {
           const isPassed = ep.status === 'COMPLIANCE_PASSED' || ep.status === 'PUBLISHED';
           const isPendingAudit = ep.status === 'EPISODE_SUBMITTED';
-          const cleanTitle = ep.title?.replace(/^Tập\s*\d+\s*[:\-]\s*/i, '') || ep.title;
+          const cleanTitle = episodeName(ep.title);
 
           return (
             <div
@@ -100,8 +102,8 @@ export function AuditsTab({ project }: AuditsTabProps) {
               <div className="space-y-2">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="w-6 h-6 rounded-md bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-slate-200 font-mono font-bold text-xs flex items-center justify-center shrink-0">
-                      #{ep.episode_number}
+                    <span className="min-w-6 h-6 px-1 rounded-md bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-800 dark:text-slate-200 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                      {multiSeason ? `${ep.season_number}.${ep.episode_number}` : `#${ep.episode_number}`}
                     </span>
                     <h3 className="text-xs font-bold text-slate-900 dark:text-white truncate">
                       {cleanTitle}

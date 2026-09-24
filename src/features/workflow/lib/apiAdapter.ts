@@ -16,6 +16,7 @@ import type {
 } from '@/types/workflow';
 import { buildSceneJobs } from './jobAdapter';
 import { buildReviewLog } from './reviewLog';
+import { episodeLabel } from './episodeLabel';
 import type {
   ApiEpisodePackage,
   ApiMilestone,
@@ -98,12 +99,16 @@ function deriveEpisodeState(plan: ApiProductionPlan, pkg: ApiEpisodePackage | un
   }
 }
 
-function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject): EpisodePackage {
+function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multiSeason: boolean): EpisodePackage {
   const reviews = latestReviews(plan);
   const pkg = plan.episodePackages[0];
   const status = deriveEpisodeState(plan, pkg);
-  const targetMinutes = Math.round((plan.targetDurationSeconds ?? project.defaultEpisodeDurationSeconds ?? DEFAULT_EPISODE_SECONDS) / 60);
-  const title = `Tập ${plan.episodeNumber}: ${project.title}`;
+  // The Reviewer's allotted duration is the baseline; the Creator proposes the plan's own duration.
+  const allottedSeconds = plan.allottedDurationSeconds ?? project.defaultEpisodeDurationSeconds ?? DEFAULT_EPISODE_SECONDS;
+  const allottedMinutes = Math.round(allottedSeconds / 60);
+  const proposedMinutes = Math.round((plan.targetDurationSeconds ?? allottedSeconds) / 60);
+  const numbered = { season_number: plan.seasonNumber, episode_number: plan.seasonEpisodeNumber };
+  const title = `${episodeLabel(numbered, multiSeason)}: ${project.title}`;
 
   const scenes: SceneBreakdownItem[] = plan.scenes.map((s) => ({
     id: s.id,
@@ -123,12 +128,11 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject): Epis
     package_id: pkg?.id,
     catalog_episode_id: pkg?.currentForEpisode?.id,
     project_id: project.id,
-    episode_number: plan.episodeNumber,
-    season_number: 1,
+    ...numbered,
     title,
-    target_duration_minutes: targetMinutes,
+    target_duration_minutes: allottedMinutes,
     status,
-    total_duration: `${targetMinutes}:00`,
+    total_duration: `${proposedMinutes}:00`,
     actual_tokens_used: allocated - remaining,
     quota_allocated: allocated,
     video_draft_url: '',
@@ -139,7 +143,7 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject): Epis
       episode_id: plan.id,
       title,
       scene_count: scenes.length,
-      target_duration_minutes: targetMinutes,
+      target_duration_minutes: proposedMinutes,
       estimated_tokens: toNumber(plan.estimatedAiResourceUsage),
       production_approach: plan.productionApproach ?? '',
       storyboard_summary: plan.scriptText ?? '',
@@ -162,13 +166,13 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject): Epis
   return { ...episode, ...buildSceneJobs(episode, []) };
 }
 
-/** The detail endpoint returns every plan version, newest first per episode — keep the newest. */
+/** The detail endpoint returns every plan version, newest first per episode — keep the newest, in season order. */
 function latestPlans(plans: ApiProductionPlan[]): ApiProductionPlan[] {
   const byEpisode = new Map<number, ApiProductionPlan>();
   for (const plan of plans) {
     if (!byEpisode.has(plan.episodeNumber)) byEpisode.set(plan.episodeNumber, plan);
   }
-  return [...byEpisode.values()].sort((a, b) => a.episodeNumber - b.episodeNumber);
+  return [...byEpisode.values()].sort((a, b) => a.seasonNumber - b.seasonNumber || a.seasonEpisodeNumber - b.seasonEpisodeNumber);
 }
 
 function overallStatus(api: ApiProductionProject, episodes: EpisodePackage[]): ProductionProject['overall_status'] {
@@ -185,7 +189,8 @@ function overallStatus(api: ApiProductionProject, episodes: EpisodePackage[]): P
  */
 export function adaptApiProjectToUiProject(api: ApiProductionProject): ProductionProject {
   const plans = latestPlans(api.productionPlans ?? []);
-  const episodes = plans.map((plan) => adaptPlan(plan, api));
+  const seasonCount = Math.max(1, ...plans.map((p) => p.seasonNumber));
+  const episodes = plans.map((plan) => adaptPlan(plan, api, seasonCount > 1));
   const milestones = (api.milestones ?? []).map(adaptMilestone);
   const total = toNumber(api.totalAiQuotaBudget);
   const allocated = total - toNumber(api.remainingAiQuotaBudget);
@@ -200,8 +205,7 @@ export function adaptApiProjectToUiProject(api: ApiProductionProject): Productio
     overall_script: scriptPlan?.scriptText ?? '',
     script_version: scriptPlan?.planVersion ?? 1,
     script_review: scriptPlan ? toFieldReview(latestReviews(scriptPlan).get('OVERALL_SCRIPT')) : PENDING_FIELD_REVIEW,
-    season_count: 1,
-    episodes_per_season: api.episodeCount,
+    season_count: seasonCount,
     total_episodes: api.episodeCount,
     total_budget_tokens: total,
     allocated_tokens: allocated,

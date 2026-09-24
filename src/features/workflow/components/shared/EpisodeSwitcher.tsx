@@ -1,5 +1,6 @@
 import type { EpisodePackage } from '@/types/workflow';
 import { statusDotClass } from './StatusBadge';
+import { episodeLabel, spansSeasons } from '@/features/workflow/lib/episodeLabel';
 
 export interface EpisodeSwitcherProps {
   episodes: EpisodePackage[];
@@ -7,9 +8,9 @@ export interface EpisodeSwitcherProps {
   onSelect: (episodeId: string) => void;
 }
 
-/** Row of compact episode chips ("Tập 1", or "M2 · Tập 1" when the project has several seasons) with a status dot each. */
+/** Row of compact episode chips ("Tập 1", or "Mùa 2 · Tập 1" when the project has several seasons) with a status dot each. */
 export function EpisodeSwitcher({ episodes, selectedId, onSelect }: EpisodeSwitcherProps) {
-  const hasMultipleSeasons = new Set(episodes.map((e) => e.season_number)).size > 1;
+  const multiSeason = spansSeasons(episodes);
 
   return (
     <div role="group" aria-label="Chọn tập phim" className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
@@ -29,7 +30,7 @@ export function EpisodeSwitcher({ episodes, selectedId, onSelect }: EpisodeSwitc
             }`}
           >
             <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : statusDotClass(ep.status)}`} aria-hidden="true" />
-            {hasMultipleSeasons ? `M${ep.season_number} · Tập ${ep.episode_number}` : `Tập ${ep.episode_number}`}
+            {episodeLabel(ep, multiSeason)}
           </button>
         );
       })}

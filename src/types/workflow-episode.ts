@@ -99,7 +99,6 @@ export interface ProductionProject {
   script_version: number;
   script_review: FieldReview;
   season_count: number;
-  episodes_per_season: number;
   total_episodes: number;
   total_budget_tokens: number;
   allocated_tokens: number;
