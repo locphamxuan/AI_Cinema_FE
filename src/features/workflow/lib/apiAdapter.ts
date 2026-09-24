@@ -21,6 +21,7 @@ import type {
 import { buildSceneJobs } from './jobAdapter';
 import { buildReviewLog } from './reviewLog';
 import { episodeLabel } from './episodeLabel';
+import { MAX_EPISODE_MINUTES } from './limits';
 import type {
   ApiEpisodePackage,
   ApiMilestone,
@@ -30,7 +31,7 @@ import type {
   ReviewStatus,
 } from '@/types/workflow-api';
 
-const DEFAULT_EPISODE_SECONDS = 1800;
+const DEFAULT_EPISODE_SECONDS = MAX_EPISODE_MINUTES * 60;
 
 const toNumber = (value: number | string | null | undefined): number => Number(value ?? 0) || 0;
 
@@ -234,7 +235,6 @@ export function adaptApiProjectToUiProject(api: ApiProductionProject): Productio
     active_episode_title: episodes[0]?.title ?? '',
     progress_percent: api.episodeCount > 0 ? Math.round((published / api.episodeCount) * 100) : 0,
     milestones,
-    active_milestone_id: milestones.find((m) => m.status === 'in_progress')?.id ?? milestones[0]?.id,
     episodes,
     created_at: api.createdAt,
     updated_at: api.updatedAt,

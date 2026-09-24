@@ -278,16 +278,6 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     return true;
   },
 
-  setActiveMilestone: (milestoneId) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        active_milestone_id: milestoneId,
-        updated_at: new Date().toISOString(),
-      }))
-    );
-  },
-
   updateMilestoneStatus: async (milestoneId, status) => {
     const updated = await apiResult(
       workflowService.updateMilestone(milestoneId, { status: MILESTONE_STATUS[status] }),

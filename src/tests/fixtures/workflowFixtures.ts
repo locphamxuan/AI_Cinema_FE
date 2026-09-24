@@ -407,7 +407,6 @@ export const initialProject: ProductionProject = {
   overall_status: 'IN_PROGRESS',
   active_episode_title: 'Tập 3: Mạng Lưới Bóng Tối (Dark Mesh)',
   progress_percent: 60,
-  active_milestone_id: 'ms-2',
   milestones: [
     {
       id: 'ms-1',

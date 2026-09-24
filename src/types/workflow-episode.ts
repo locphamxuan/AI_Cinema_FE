@@ -129,7 +129,6 @@ export interface ProductionProject {
   active_episode_title?: string;
   progress_percent?: number;
   milestones?: ProjectMilestone[];
-  active_milestone_id?: string;
   episodes: EpisodePackage[];
   created_at: string;
   updated_at: string;
