@@ -1,144 +1,218 @@
 /**
- * Adapter converting Backend Prisma API objects into Frontend Workflow Store shapes
+ * Maps the NestJS MF-1 responses onto the workspace store shapes.
+ * An episode's `id` is its latest production plan id, so every store action
+ * can call the plan-scoped endpoints directly.
  */
 
-import type { ProductionProject, EpisodePackage, ProjectMilestone, SceneBreakdownItem } from '@/types/workflow';
-import type { ApiProductionProject, ApiProductionPlan, ApiMilestone } from '@/types/workflow-api';
-import { pendingPlanReviews } from './planVerdict';
+import { PENDING_FIELD_REVIEW } from '@/types/workflow';
+import type {
+  EpisodePackage,
+  FieldReview,
+  ProductionProject,
+  ProjectMilestone,
+  SceneBreakdownItem,
+  SceneReviewStatus,
+  WorkflowState,
+} from '@/types/workflow';
+import type {
+  ApiEpisodePackage,
+  ApiMilestone,
+  ApiPlanReview,
+  ApiProductionPlan,
+  ApiProductionProject,
+  ReviewStatus,
+} from '@/types/workflow-api';
 
-export function adaptApiMilestoneToUi(m: ApiMilestone): ProjectMilestone {
+const DEFAULT_EPISODE_SECONDS = 1800;
+
+const toNumber = (value: number | string | null | undefined): number => Number(value ?? 0) || 0;
+
+const toDate = (iso: string | null | undefined): string => (iso ? iso.split('T')[0] : '');
+
+function adaptMilestone(m: ApiMilestone): ProjectMilestone {
   return {
     id: m.id,
     title: m.title,
-    description: m.description || '',
-    startDate: m.startDate,
-    deadline: m.targetDate || '',
-    status: (m.status?.toLowerCase() as any) || 'pending',
+    description: m.description ?? '',
+    startDate: m.startDate ?? undefined,
+    deadline: toDate(m.targetDate),
+    status: m.status === 'IN_PROGRESS' ? 'in_progress' : m.status === 'COMPLETED' ? 'completed' : 'pending',
   };
 }
 
-export function adaptApiPlanToEpisodePackage(plan: ApiProductionPlan, project: ApiProductionProject): EpisodePackage {
-  const scenes: SceneBreakdownItem[] = (plan.scenes || []).map((s) => ({
+function toFieldStatus(status: ReviewStatus): SceneReviewStatus {
+  if (status === 'APPROVED') return 'approved';
+  if (status === 'CHANGES_REQUESTED' || status === 'REJECTED') return 'changes_requested';
+  return 'pending';
+}
+
+function toFieldReview(review: ApiPlanReview | undefined): FieldReview {
+  if (!review) return PENDING_FIELD_REVIEW;
+  return {
+    status: toFieldStatus(review.status),
+    comment: review.rejectionReason ?? review.comments ?? undefined,
+    review_id: review.id,
+  };
+}
+
+/**
+ * Latest review of every target — each scene, each plan-level field (BR-39).
+ * Reviews arrive oldest first. A freshly (re)submitted plan has no open round
+ * yet, so its previous verdicts no longer apply.
+ */
+function latestReviews(plan: ApiProductionPlan): Map<string, ApiPlanReview> {
+  const latest = new Map<string, ApiPlanReview>();
+  if (plan.status === 'SUBMITTED') return latest;
+  for (const review of plan.planReviews ?? []) {
+    latest.set(review.field === 'SCENE' ? `scene:${review.sceneId}` : review.field, review);
+  }
+  return latest;
+}
+
+/** Where the episode is in MF-1, derived from the plan and its latest package. */
+function deriveEpisodeState(plan: ApiProductionPlan, pkg: ApiEpisodePackage | undefined): WorkflowState {
+  const episode = pkg?.currentForEpisode;
+  if (episode?.productionStatus === 'PUBLISHED') return 'PUBLISHED';
+
+  if (pkg) {
+    const review = pkg.reviews[0];
+    if (review?.status === 'CHANGES_REQUESTED' || review?.status === 'REJECTED') return 'CHANGES_REQUESTED';
+    const checks = pkg.complianceChecks;
+    if (checks.length > 0 && checks.every((c) => c.result === 'PASS')) return 'COMPLIANCE_PASSED';
+    if (pkg.submissions.length > 0) return 'EPISODE_SUBMITTED';
+  }
+
+  switch (plan.status) {
+    case 'DRAFT':
+      return 'PLAN_DRAFT';
+    case 'CHANGES_REQUESTED':
+      return 'CHANGES_REQUESTED';
+    case 'SUBMITTED':
+    case 'UNDER_REVIEW':
+      return 'PLAN_PENDING';
+    case 'APPROVED':
+      if (plan._count.generationJobs > 0) return 'IN_PRODUCTION';
+      return plan.quotaAllocations.some((q) => q.status === 'ACTIVE') ? 'QUOTA_ALLOCATED' : 'PLAN_PENDING';
+  }
+}
+
+function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject): EpisodePackage {
+  const reviews = latestReviews(plan);
+  const pkg = plan.episodePackages[0];
+  const status = deriveEpisodeState(plan, pkg);
+  const targetMinutes = Math.round((plan.targetDurationSeconds ?? project.defaultEpisodeDurationSeconds ?? DEFAULT_EPISODE_SECONDS) / 60);
+  const title = `Tập ${plan.episodeNumber}: ${project.title}`;
+
+  const scenes: SceneBreakdownItem[] = plan.scenes.map((s) => ({
+    id: s.id,
     scene_number: s.sceneNumber,
     title: s.title,
-    description: s.description || s.scriptText || '',
-    target_duration_sec: s.targetDurationSeconds || 15,
-    estimated_tokens: 60,
+    description: s.description ?? s.scriptText ?? '',
+    target_duration_sec: s.targetDurationSeconds,
+    estimated_tokens: s.estimatedTokens,
   }));
 
-  const pkg = plan.episodePackages?.[0];
-  const now = new Date().toISOString();
+  const activeQuota = plan.quotaAllocations.filter((q) => q.status === 'ACTIVE');
+  const allocated = activeQuota.reduce((sum, q) => sum + toNumber(q.allocatedAmount), 0);
+  const remaining = activeQuota.reduce((sum, q) => sum + toNumber(q.remainingAmount), 0);
 
   return {
-    id: pkg?.id || `pkg-${plan.id}`,
+    id: plan.id,
+    package_id: pkg?.id,
+    catalog_episode_id: pkg?.currentForEpisode?.id,
     project_id: project.id,
     episode_number: plan.episodeNumber,
     season_number: 1,
-    title: `Tập ${plan.episodeNumber}: ${project.title}`,
-    target_duration_minutes: Math.round((plan.targetDurationSeconds || 1800) / 60),
-    status: (pkg?.status as any) || (plan.status as any) || 'PLAN_DRAFT',
-    total_duration: `${Math.round((plan.targetDurationSeconds || 1800) / 60)}:00`,
-    actual_tokens_used: plan.estimatedAiResourceUsage || 0,
-    quota_allocated: plan.estimatedAiResourceUsage || 0,
+    title,
+    target_duration_minutes: targetMinutes,
+    status,
+    total_duration: `${targetMinutes}:00`,
+    actual_tokens_used: allocated - remaining,
+    quota_allocated: allocated,
     video_draft_url: '',
     thumbnail_url: '',
     brief: {
-      id: `brief-${plan.id}`,
+      id: plan.id,
       project_id: project.id,
-      episode_id: pkg?.id || `pkg-${plan.id}`,
-      title: `Tập ${plan.episodeNumber}: ${project.title}`,
+      episode_id: plan.id,
+      title,
       scene_count: scenes.length,
-      target_duration_minutes: Math.round((plan.targetDurationSeconds || 1800) / 60),
-      estimated_tokens: plan.estimatedAiResourceUsage || 0,
-      production_approach: plan.productionApproach || '',
-      storyboard_summary: '',
+      target_duration_minutes: targetMinutes,
+      estimated_tokens: toNumber(plan.estimatedAiResourceUsage),
+      production_approach: plan.productionApproach ?? '',
+      storyboard_summary: plan.scriptText ?? '',
       scene_breakdown: scenes,
-      ...pendingPlanReviews(scenes),
-      status: (plan.status as any) || 'PLAN_DRAFT',
-      created_at: plan.createdAt || now,
-      updated_at: plan.updatedAt || now,
+      scene_reviews: scenes.map((s) => ({ scene_number: s.scene_number, ...toFieldReview(reviews.get(`scene:${s.id}`)) })),
+      script_review: toFieldReview(reviews.get('OVERALL_SCRIPT')),
+      duration_review: toFieldReview(reviews.get('DURATION')),
+      token_review: toFieldReview(reviews.get('TOKEN_ESTIMATE')),
+      status,
+      created_at: plan.createdAt,
+      updated_at: plan.updatedAt,
     },
     jobs: [],
     assets: [],
-    created_at: plan.createdAt || now,
-    updated_at: plan.updatedAt || now,
+    created_at: plan.createdAt,
+    updated_at: plan.updatedAt,
   };
 }
 
+/** The detail endpoint returns every plan version, newest first per episode — keep the newest. */
+function latestPlans(plans: ApiProductionPlan[]): ApiProductionPlan[] {
+  const byEpisode = new Map<number, ApiProductionPlan>();
+  for (const plan of plans) {
+    if (!byEpisode.has(plan.episodeNumber)) byEpisode.set(plan.episodeNumber, plan);
+  }
+  return [...byEpisode.values()].sort((a, b) => a.episodeNumber - b.episodeNumber);
+}
+
+function overallStatus(api: ApiProductionProject, episodes: EpisodePackage[]): ProductionProject['overall_status'] {
+  if (api.status === 'COMPLETED' || (episodes.length > 0 && episodes.every((e) => e.status === 'PUBLISHED'))) return 'COMPLETED';
+  if (episodes.some((e) => e.status === 'CHANGES_REQUESTED')) return 'CHANGES_REQUESTED';
+  if (episodes.some((e) => e.status === 'PLAN_PENDING' || e.status === 'EPISODE_SUBMITTED')) return 'PENDING_REVIEW';
+  if (episodes.some((e) => e.status !== 'PLAN_DRAFT')) return 'IN_PROGRESS';
+  return 'NOT_STARTED';
+}
+
+/**
+ * The list endpoint carries no plans, so its projects get no episodes until
+ * the detail endpoint is loaded for them.
+ */
 export function adaptApiProjectToUiProject(api: ApiProductionProject): ProductionProject {
-  const genres = api.genres?.map((g) => g.genre?.name).filter(Boolean) as string[] || [];
-  const milestones = (api.milestones || []).map(adaptApiMilestoneToUi);
-
-  const episodes: EpisodePackage[] = (api.plans && api.plans.length > 0)
-    ? api.plans.map((plan) => adaptApiPlanToEpisodePackage(plan, api))
-    : Array.from({ length: Math.max(1, api.episodeCount || 1) }, (_, i) => {
-        const epNum = i + 1;
-        const now = new Date().toISOString();
-        return {
-          id: `pkg-${api.id}-${epNum}`,
-          project_id: api.id,
-          episode_number: epNum,
-          season_number: 1,
-          title: `Tập ${epNum}: ${api.title}`,
-          target_duration_minutes: Math.round((api.defaultEpisodeDurationSeconds || 1800) / 60),
-          status: 'PLAN_DRAFT',
-          total_duration: '',
-          actual_tokens_used: 0,
-          quota_allocated: 0,
-          video_draft_url: '',
-          thumbnail_url: '',
-          brief: {
-            id: `brief-${api.id}-${epNum}`,
-            project_id: api.id,
-            episode_id: `pkg-${api.id}-${epNum}`,
-            title: `Tập ${epNum}: ${api.title}`,
-            scene_count: 0,
-            target_duration_minutes: Math.round((api.defaultEpisodeDurationSeconds || 1800) / 60),
-            estimated_tokens: 0,
-            production_approach: '',
-            storyboard_summary: '',
-            scene_breakdown: [],
-            ...pendingPlanReviews([]),
-            status: 'PLAN_DRAFT',
-            created_at: now,
-            updated_at: now,
-          },
-          jobs: [],
-          assets: [],
-          created_at: now,
-          updated_at: now,
-        };
-      });
-
-  const allocated = Math.max(0, (api.totalAiQuotaBudget || 0) - (api.remainingAiQuotaBudget || 0));
+  const plans = latestPlans(api.productionPlans ?? []);
+  const episodes = plans.map((plan) => adaptPlan(plan, api));
+  const milestones = (api.milestones ?? []).map(adaptMilestone);
+  const total = toNumber(api.totalAiQuotaBudget);
+  const allocated = total - toNumber(api.remainingAiQuotaBudget);
+  const scriptPlan = plans.find((p) => p.planReviews.some((r) => r.field === 'OVERALL_SCRIPT')) ?? plans[0];
+  const published = episodes.filter((e) => e.status === 'PUBLISHED').length;
 
   return {
     id: api.id,
     title: api.title,
-    genre: genres.length > 0 ? genres : ['Khoa học viễn tưởng'],
-    synopsis: api.description || 'Dự án phim sản xuất bằng AI.',
-    overall_script: api.plans?.[0]?.scriptText || '',
-    script_version: api.plans?.[0]?.planVersion || 1,
-    script_review: { status: 'approved' },
+    genre: (api.productionProjectGenres ?? []).map((g) => g.genre.name),
+    synopsis: api.description ?? '',
+    overall_script: scriptPlan?.scriptText ?? '',
+    script_version: scriptPlan?.planVersion ?? 1,
+    script_review: scriptPlan ? toFieldReview(latestReviews(scriptPlan).get('OVERALL_SCRIPT')) : PENDING_FIELD_REVIEW,
     season_count: 1,
-    episodes_per_season: api.episodeCount || 1,
-    total_episodes: api.episodeCount || 1,
-    total_budget_tokens: api.totalAiQuotaBudget || 0,
+    episodes_per_season: api.episodeCount,
+    total_episodes: api.episodeCount,
+    total_budget_tokens: total,
     allocated_tokens: allocated,
-    consumed_tokens: allocated,
-    production_start_date: api.productionStartDate || new Date().toISOString().split('T')[0],
-    deadline: api.deadline || new Date().toISOString().split('T')[0],
-    planned_release_date: api.plannedReleaseDate || new Date().toISOString().split('T')[0],
-    creator_name: api.assignedCreator?.fullName || 'Trần Minh Huy',
-    reviewer_name: api.createdBy?.fullName || 'Lê Quốc Bảo',
-    creator_role: 'Đạo diễn / Maker',
-    overall_status: (api.status as any) || 'IN_PROGRESS',
-    active_episode_title: episodes[0]?.title || '',
-    progress_percent: 0,
+    consumed_tokens: episodes.reduce((sum, e) => sum + e.actual_tokens_used, 0),
+    production_start_date: toDate(api.productionStartDate),
+    deadline: toDate(api.deadline),
+    planned_release_date: toDate(api.plannedReleaseDate),
+    creator_name: api.assignedCreator?.fullName ?? '',
+    reviewer_name: api.createdBy?.fullName ?? '',
+    overall_status: overallStatus(api, episodes),
+    active_episode_title: episodes[0]?.title ?? '',
+    progress_percent: api.episodeCount > 0 ? Math.round((published / api.episodeCount) * 100) : 0,
     milestones,
-    active_milestone_id: milestones[0]?.id || 'ms-1',
+    active_milestone_id: milestones.find((m) => m.status === 'in_progress')?.id ?? milestones[0]?.id,
     episodes,
-    created_at: api.createdAt || new Date().toISOString(),
-    updated_at: api.updatedAt || new Date().toISOString(),
+    created_at: api.createdAt,
+    updated_at: api.updatedAt,
   };
 }
