@@ -5,6 +5,6 @@ import { ReviewerAuditPage } from '@/features/workflow/components/reviewer/audit
 
 export default function Page() {
   const params = useParams();
-  const packageId = (params?.packageId as string) || 'pkg-ep-02';
+  const packageId = params?.packageId as string;
   return <ReviewerAuditPage packageId={packageId} />;
 }

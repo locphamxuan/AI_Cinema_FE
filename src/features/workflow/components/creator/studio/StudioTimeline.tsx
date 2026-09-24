@@ -1,4 +1,4 @@
-import { Check, Trash2 } from 'lucide-react';
+import { Check } from 'lucide-react';
 import type { GenerationJob } from '@/types/workflow';
 
 export interface StudioTimelineProps {
@@ -7,14 +7,13 @@ export interface StudioTimelineProps {
   renderingJobId: string | null;
   onSelectJob: (id: string) => void;
   onGenerate: (id: string) => void;
-  onRemove: (id: string) => void;
 }
 
 const ACTION_CLASS =
   'px-3 py-1.5 rounded-md text-xs font-medium transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50';
 
-/** The episode's scenes in order: pick one to edit, create or redo its clip, or delete it. */
-export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJob, onGenerate, onRemove }: StudioTimelineProps) {
+/** The plan's scenes in order: pick one to edit, then create or redo its clip. */
+export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJob, onGenerate }: StudioTimelineProps) {
   const doneCount = jobs.filter((j) => j.status === 'completed').length;
 
   return (
@@ -28,7 +27,7 @@ export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJo
         </span>
       </div>
 
-      {jobs.length === 0 && <p className="py-4 text-xs text-slate-400 dark:text-slate-500">Chưa có phân cảnh nào. Thêm phân cảnh ở khung bên cạnh.</p>}
+      {jobs.length === 0 && <p className="py-4 text-xs text-slate-400 dark:text-slate-500">Kế hoạch được duyệt chưa có phân cảnh nào.</p>}
 
       <ul className="space-y-2">
         {jobs.map((job) => {
@@ -63,7 +62,7 @@ export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJo
               <div className="flex items-center gap-1.5 pr-2 shrink-0">
                 {isRendering ? (
                   <span role="status" className="text-xs text-purple-700 dark:text-purple-300 tabular-nums px-2">
-                    Đang tạo {job.progress}%
+                    Đang tạo…
                   </span>
                 ) : isCompleted ? (
                   <>
@@ -75,19 +74,13 @@ export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJo
                     </button>
                   </>
                 ) : (
-                  <button type="button" onClick={() => onGenerate(job.id)} className={`${ACTION_CLASS} bg-purple-600 hover:bg-purple-700 text-white`}>
-                    Tạo clip
-                  </button>
+                  <>
+                    {job.status === 'failed' && <span className="text-xs text-rose-600 dark:text-rose-400">Lỗi</span>}
+                    <button type="button" onClick={() => onGenerate(job.id)} className={`${ACTION_CLASS} bg-purple-600 hover:bg-purple-700 text-white`}>
+                      Tạo clip
+                    </button>
+                  </>
                 )}
-
-                <button
-                  type="button"
-                  onClick={() => onRemove(job.id)}
-                  aria-label={`Xóa phân cảnh ${job.scene_number}`}
-                  className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded-md hover:bg-rose-50 dark:hover:bg-rose-500/10 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/40"
-                >
-                  <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
-                </button>
               </div>
             </li>
           );

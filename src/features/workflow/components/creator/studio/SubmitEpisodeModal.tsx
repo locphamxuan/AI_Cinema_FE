@@ -6,11 +6,12 @@ export interface SubmitEpisodeModalProps {
   open: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  isSubmitting: boolean;
   currentPackage: EpisodePackage;
   jobsCount: number;
 }
 
-export function SubmitEpisodeModal({ open, onClose, onConfirm, currentPackage, jobsCount }: SubmitEpisodeModalProps) {
+export function SubmitEpisodeModal({ open, onClose, onConfirm, isSubmitting, currentPackage, jobsCount }: SubmitEpisodeModalProps) {
   const rows: Array<[string, string]> = [
     ['Tập phim', currentPackage.title],
     ['Số phân cảnh', `${jobsCount}`],
@@ -38,8 +39,8 @@ export function SubmitEpisodeModal({ open, onClose, onConfirm, currentPackage, j
         <Button variant="secondary" onClick={onClose}>
           Hủy
         </Button>
-        <Button variant="success" onClick={onConfirm}>
-          Nộp bản dựng
+        <Button variant="success" onClick={onConfirm} disabled={isSubmitting}>
+          {isSubmitting ? 'Đang nộp…' : 'Nộp bản dựng'}
         </Button>
       </div>
     </Modal>

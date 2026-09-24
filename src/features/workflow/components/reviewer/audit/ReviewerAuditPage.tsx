@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
@@ -18,9 +18,15 @@ export interface ReviewerAuditPageProps {
 }
 
 export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
-  const { project, requestContentChanges, passCompliance, publishEpisode } = useWorkflowStore();
+  const { project, loadProjects, requestContentChanges, passCompliance, publishEpisode } = useWorkflowStore();
 
   const pkg = project.episodes.find((ep) => ep.id === packageId);
+
+  // Opened by URL (e.g. after a refresh): the project is not in memory yet.
+  useEffect(() => {
+    if (!pkg) loadProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per opened episode
+  }, [packageId]);
 
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectFeedback, setRejectFeedback] = useState('');

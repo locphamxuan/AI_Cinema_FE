@@ -8,6 +8,13 @@ export interface AuditInfoTabsProps {
 
 type Tab = 'script' | 'clips' | 'tokens';
 
+const ASSET_LABEL: Record<EpisodePackage['assets'][number]['asset_type'], string> = {
+  video: 'Video',
+  image: 'Hình ảnh',
+  audio: 'Âm thanh',
+  text: 'Văn bản',
+};
+
 const CARD = 'rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#151822]';
 
 /** Reference material for the audit: what was planned, what was rendered, what it cost. */
@@ -73,17 +80,17 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
 
         {tab === 'clips' && (
           <ul className="divide-y divide-slate-100 dark:divide-white/5">
-            {pkg.assets.map((asset, idx) => (
+            {pkg.assets.map((asset) => (
               <li key={asset.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                {/* eslint-disable-next-line @next/next/no-img-element -- external mock CDN thumbnail, not a static asset */}
-                <img src={asset.thumbnail_url} alt="" width={80} height={48} loading="lazy" className="w-20 h-12 object-cover rounded-md shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-slate-900 dark:text-white">Phân cảnh {idx + 1}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{asset.metadata.prompt}</p>
+                  <p className="font-medium text-slate-900 dark:text-white">
+                    Phân cảnh {pkg.jobs.find((j) => j.id === asset.job_id)?.scene_number ?? '?'} · {ASSET_LABEL[asset.asset_type]}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{asset.prompt}</p>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 text-right shrink-0 tabular-nums">
-                  {asset.duration_seconds} giây
-                  <span className="block">{asset.resolution}</span>
+                  {asset.duration_seconds !== null && `${asset.duration_seconds} giây`}
+                  <span className="block">{asset.model}</span>
                 </p>
               </li>
             ))}

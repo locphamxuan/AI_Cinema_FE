@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { StudioPlayer } from './StudioPlayer';
 import { StudioTimeline } from './StudioTimeline';
 import { GeneratorPanel } from './GeneratorPanel';
-import { resolveModel, stepDefaults } from '@/features/workflow/lib/modelRegistry';
+import { stepDefaults } from '@/features/workflow/lib/modelRegistry';
 import { SubmitEpisodeModal } from './SubmitEpisodeModal';
 import { toast } from '@/components/ui/Toast';
 import type { GenerationStep } from '@/types/workflow';
@@ -17,23 +17,13 @@ export interface CreatorStudioPageProps {
   episodeId: string;
 }
 
-function makeDraftStep(): GenerationStep {
-  return {
-    id: `draft-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    function_type: 'VIDEO',
-    prompt: '',
-    status: 'pending',
-    ...stepDefaults({ function_type: 'VIDEO' }),
-  };
-}
-
 export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   const router = useRouter();
   const {
     project,
+    loadProjects,
+    loadJobs,
     triggerGenerationJob,
-    addSceneJob,
-    removeSceneJob,
     addGenerationStep,
     updateGenerationStep,
     removeGenerationStep,
@@ -41,82 +31,72 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
     setActivePackage,
   } = useWorkflowStore();
 
-  const currentPackage = project.episodes.find((e) => e.id === episodeId) || project.episodes[0];
+  const currentPackage = project.episodes.find((e) => e.id === episodeId);
   const jobs = currentPackage?.jobs || [];
   const assets = currentPackage?.assets || [];
 
   const [selectedJobId, setSelectedJobId] = useState<string>(jobs[0]?.id || '');
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
-
-  const [newSceneTitle, setNewSceneTitle] = useState('');
-  const [draftSteps, setDraftSteps] = useState<GenerationStep[]>([makeDraftStep()]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [renderingJobId, setRenderingJobId] = useState<string | null>(null);
+
+  // Opened by URL (e.g. after a refresh): the project is not in memory yet.
+  useEffect(() => {
+    if (!currentPackage) loadProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per opened episode
+  }, [episodeId]);
 
   useEffect(() => {
     if (currentPackage) {
       setActivePackage(currentPackage.id);
+      loadJobs(currentPackage.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-sync when the episode itself changes
   }, [currentPackage?.id]);
 
+  if (!currentPackage) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-2 text-center px-4">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-white">Không tìm thấy tập phim</h2>
+        <Link href="/creator" className="text-sm text-purple-600 dark:text-purple-400 hover:underline">
+          Quay lại danh sách
+        </Link>
+      </div>
+    );
+  }
+
   const selectedJob = jobs.find((j) => j.id === selectedJobId) || jobs[0];
-  const selectedAsset = assets.find((a) => a.job_id === selectedJob?.id) || assets[0];
+  const selectedAsset = assets.find((a) => a.job_id === selectedJob?.id);
 
-  const handleGenerate = (jobId: string) => {
+  const handleGenerate = async (jobId: string) => {
     setRenderingJobId(jobId);
-    triggerGenerationJob(currentPackage.id, jobId);
-    setTimeout(() => setRenderingJobId(null), 4000);
+    const ok = await triggerGenerationJob(currentPackage.id, jobId);
+    setRenderingJobId(null);
+    if (ok) toast.success('Đã tạo xong', 'Kết quả sinh đã được lưu cho phân cảnh này.');
   };
 
-  const handleAddJob = () => {
-    const nextSceneNum = jobs.length + 1;
-    const titleToUse = newSceneTitle.trim() || `Cảnh ${nextSceneNum}: Phân Cảnh Mới #${nextSceneNum}`;
-    const stepsToUse = draftSteps.filter((s) => s.prompt.trim().length > 0 && resolveModel(s).match !== 'pending');
-    addSceneJob(currentPackage.id, {
-      episode_id: currentPackage.id,
-      scene_id: `scene-${nextSceneNum}-${Date.now()}`,
-      scene_number: nextSceneNum,
-      title: titleToUse,
-      generation_steps: stepsToUse,
-      token_cost: stepsToUse.reduce((sum, s) => sum + s.token_cost, 0),
-    });
-    setNewSceneTitle('');
-    setDraftSteps([makeDraftStep()]);
-  };
-
-  // Editing steps operates on whichever scene is selected in the timeline;
-  // falls back to the new-scene draft when nothing is selected yet.
   const handleAddStep = () => {
-    if (selectedJob) {
-      addGenerationStep(currentPackage.id, selectedJob.id, {
-        function_type: 'VIDEO',
-        prompt: '',
-        status: 'pending',
-        ...stepDefaults({ function_type: 'VIDEO' }),
-      });
-    } else {
-      setDraftSteps((prev) => [...prev, makeDraftStep()]);
-    }
+    if (!selectedJob) return;
+    addGenerationStep(currentPackage.id, selectedJob.id, {
+      function_type: 'VIDEO',
+      prompt: '',
+      status: 'pending',
+      ...stepDefaults({ function_type: 'VIDEO' }),
+    });
   };
 
   const handleUpdateStep = (stepId: string, data: Partial<GenerationStep>) => {
-    if (selectedJob) {
-      updateGenerationStep(currentPackage.id, selectedJob.id, stepId, data);
-    } else {
-      setDraftSteps((prev) => prev.map((s) => (s.id === stepId ? { ...s, ...data } : s)));
-    }
+    if (selectedJob) updateGenerationStep(currentPackage.id, selectedJob.id, stepId, data);
   };
 
   const handleRemoveStep = (stepId: string) => {
-    if (selectedJob) {
-      removeGenerationStep(currentPackage.id, selectedJob.id, stepId);
-    } else {
-      setDraftSteps((prev) => prev.filter((s) => s.id !== stepId));
-    }
+    if (selectedJob) removeGenerationStep(currentPackage.id, selectedJob.id, stepId);
   };
 
-  const handleSubmitToChecker = () => {
-    const success = submitEpisodePackage(currentPackage.id);
+  const handleSubmitToChecker = async () => {
+    setIsSubmitting(true);
+    const success = await submitEpisodePackage(currentPackage.id);
+    setIsSubmitting(false);
     if (success) {
       setIsSubmitModalOpen(false);
       toast.success(
@@ -166,19 +146,6 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
                 {remainingQuota.toLocaleString()} Tokens
               </span>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                toast.info(
-                  'Đã gửi yêu cầu cấp thêm Quota',
-                  'Thông báo xin cấp thêm Token Quota đã được chuyển tới Thẩm định viên (Reviewer).'
-                );
-              }}
-              title="Xin cấp thêm Token Quota"
-              className="p-1.5 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 transition cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5" />
-            </button>
           </div>
 
           <button
@@ -202,21 +169,17 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
             renderingJobId={renderingJobId}
             onSelectJob={setSelectedJobId}
             onGenerate={handleGenerate}
-            onRemove={(jobId) => removeSceneJob(currentPackage.id, jobId)}
           />
         </div>
 
         <div className="lg:col-span-5 space-y-6">
           <GeneratorPanel
             selectedJob={selectedJob}
-            newSceneTitle={newSceneTitle}
-            onSceneTitleChange={setNewSceneTitle}
-            steps={selectedJob ? selectedJob.generation_steps : draftSteps}
+            steps={selectedJob?.generation_steps ?? []}
             onAddStep={handleAddStep}
             onUpdateStep={handleUpdateStep}
             onRemoveStep={handleRemoveStep}
             isGenerating={renderingJobId === selectedJob?.id}
-            onAddJob={handleAddJob}
             onGenerateSelected={() => selectedJob && handleGenerate(selectedJob.id)}
           />
         </div>
@@ -226,6 +189,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
         open={isSubmitModalOpen}
         onClose={() => setIsSubmitModalOpen(false)}
         onConfirm={handleSubmitToChecker}
+        isSubmitting={isSubmitting}
         currentPackage={currentPackage}
         jobsCount={jobs.length}
       />

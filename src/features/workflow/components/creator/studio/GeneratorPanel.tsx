@@ -1,6 +1,7 @@
 import { Video, Mic, Volume2, Image as ImageIcon, Plus, Trash2 } from 'lucide-react';
 import type { GenerationJob, GenerationStep, GenerationFunctionType } from '@/types/workflow';
 import { resolveModel, stepDefaults, type ModelMatch } from '@/features/workflow/lib/modelRegistry';
+import { isDraftStep } from '@/features/workflow/lib/jobAdapter';
 import { useGenerationMeter } from './useGenerationMeter';
 import { GenerationMeter } from './GenerationMeter';
 
@@ -41,36 +42,39 @@ const MATCH_HINT: Record<ModelMatch, string> = {
   general: 'Chưa có model chuyên biệt, hệ thống dùng model đa năng để thực hiện.',
 };
 
+const STEP_STATUS_LABEL: Record<GenerationStep['status'], string> = {
+  pending: 'Đang chờ',
+  processing: 'Đang tạo',
+  completed: 'Đã tạo',
+  failed: 'Lỗi',
+};
+
 const INPUT_CLASS =
   'w-full bg-white dark:bg-[#101218] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 transition';
 
 export interface GeneratorPanelProps {
   selectedJob?: GenerationJob;
-  newSceneTitle: string;
-  onSceneTitleChange: (value: string) => void;
   steps: GenerationStep[];
   onAddStep: () => void;
   onUpdateStep: (stepId: string, data: Partial<GenerationStep>) => void;
   onRemoveStep: (stepId: string) => void;
   isGenerating: boolean;
-  onAddJob: () => void;
   onGenerateSelected: () => void;
 }
 
 export function GeneratorPanel({
   selectedJob,
-  newSceneTitle,
-  onSceneTitleChange,
   steps,
   onAddStep,
   onUpdateStep,
   onRemoveStep,
   isGenerating,
-  onAddJob,
   onGenerateSelected,
 }: GeneratorPanelProps) {
-  const totalTokens = steps.reduce((sum, s) => sum + (s.token_cost || 0), 0);
-  const targetCost = selectedJob ? selectedJob.token_cost : totalTokens;
+  const drafts = steps.filter((s) => isDraftStep(s));
+  // Generating runs the drafts; without drafts it regenerates every saved step.
+  const toRun = drafts.length > 0 ? drafts : steps;
+  const targetCost = toRun.reduce((sum, s) => sum + (s.token_cost || 0), 0);
   const meter = useGenerationMeter(isGenerating, targetCost);
 
   return (
@@ -79,20 +83,9 @@ export function GeneratorPanel({
         Nội dung phân cảnh
       </h2>
 
-      <div className="space-y-1.5">
-        <label htmlFor="scene-title" className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-          Tên phân cảnh
-        </label>
-        <input
-          id="scene-title"
-          type="text"
-          value={selectedJob?.title || newSceneTitle}
-          onChange={(e) => onSceneTitleChange(e.target.value)}
-          placeholder="Ví dụ: Cảnh 1 – Phòng thí nghiệm…"
-          autoComplete="off"
-          className={INPUT_CLASS}
-        />
-      </div>
+      <p className="text-sm text-slate-700 dark:text-slate-200">
+        {selectedJob ? `Cảnh ${selectedJob.scene_number}: ${selectedJob.title}` : 'Kế hoạch chưa có phân cảnh nào.'}
+      </p>
 
       <div className="space-y-3">
         <p className="text-xs font-medium text-slate-600 dark:text-slate-300">Cần tạo gì cho cảnh này?</p>
@@ -106,6 +99,24 @@ export function GeneratorPanel({
         {steps.map((step) => {
           const meta = FUNCTION_TYPE_META[step.function_type];
           const { match } = resolveModel(step);
+          if (!isDraftStep(step)) {
+            const { icon: TypeIcon, label } = meta;
+            return (
+              <div key={step.id} className="p-3 rounded-lg border border-slate-200 dark:border-white/10 space-y-1.5">
+                <div className="flex items-center justify-between gap-2 text-xs">
+                  <span className="inline-flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-200">
+                    <TypeIcon className="w-3 h-3" aria-hidden="true" />
+                    {step.function_type === 'CUSTOM' ? step.custom_function : label} · {step.selected_model}
+                  </span>
+                  <span className={step.status === 'failed' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-400'}>
+                    {STEP_STATUS_LABEL[step.status]}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{step.prompt}</p>
+                <p className="text-right text-xs text-slate-400 dark:text-slate-500 tabular-nums">{step.token_cost} token</p>
+              </div>
+            );
+          }
           return (
             <div key={step.id} className="p-3 rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-white/[0.02] space-y-2.5">
               <div className="flex items-start justify-between gap-2">
@@ -180,7 +191,8 @@ export function GeneratorPanel({
         <button
           type="button"
           onClick={onAddStep}
-          className="w-full py-2 rounded-lg border border-dashed border-slate-300 dark:border-white/15 text-slate-600 dark:text-slate-300 hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-300 text-xs font-medium flex items-center justify-center gap-1.5 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+          disabled={!selectedJob}
+          className="w-full py-2 rounded-lg border border-dashed border-slate-300 dark:border-white/15 text-slate-600 dark:text-slate-300 hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-300 text-xs font-medium flex items-center justify-center gap-1.5 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
         >
           <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm mục
         </button>
@@ -190,23 +202,16 @@ export function GeneratorPanel({
 
       <div className="pt-4 border-t border-slate-100 dark:border-white/5 space-y-3">
         <p className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
-          {steps.length} mục · dự kiến {targetCost} token
+          {toRun.length} mục sẽ tạo · dự kiến {targetCost} token
         </p>
-        <div className="grid grid-cols-2 gap-2.5">
-          <button
-            type="button"
-            onClick={onAddJob}
-            className="py-2 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
-          >
-            Thêm phân cảnh
-          </button>
+        <div>
           <button
             type="button"
             onClick={onGenerateSelected}
-            disabled={isGenerating || steps.length === 0}
-            className="py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
+            disabled={isGenerating || toRun.length === 0}
+            className="w-full py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
           >
-            {isGenerating ? 'Đang tạo…' : 'Tạo clip'}
+            {isGenerating ? 'Đang tạo…' : drafts.length > 0 || steps.length === 0 ? 'Tạo clip' : 'Tạo lại'}
           </button>
         </div>
       </div>
