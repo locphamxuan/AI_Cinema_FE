@@ -40,7 +40,6 @@ import type {
   RecordComplianceReviewDto,
   SubmitProductionPlanDto,
   UpdateMilestoneDto,
-  UpdateProductionPlanDto,
   UpdateSceneDto,
   ApiMilestone,
 } from '@/types/workflow-api';
@@ -95,17 +94,11 @@ class WorkflowService {
   }
 
   // Plans & scenes (Creator)
-  updatePlan(planId: string, dto: UpdateProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
-    return apiClient.patch<ApiProductionPlan>(ROUTES.PLAN_DETAIL(planId), dto);
-  }
 
   submitPlan(planId: string, dto: SubmitProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
     return apiClient.post<ApiProductionPlan>(ROUTES.PLAN_SUBMIT(planId), dto);
   }
 
-  createPlanRevision(projectId: string, planId: string, dto: UpdateProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
-    return apiClient.post<ApiProductionPlan>(ROUTES.PLAN_REVISIONS(projectId, planId), dto);
-  }
 
   createScene(planId: string, dto: CreateSceneDto): Promise<ApiResponse<ApiScene>> {
     return apiClient.post<ApiScene>(ROUTES.PLAN_SCENES(planId), dto);
