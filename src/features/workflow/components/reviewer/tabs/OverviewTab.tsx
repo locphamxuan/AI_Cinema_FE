@@ -61,7 +61,7 @@ export function OverviewTab({ project, pendingPlanCount, submittedCount, onRevie
         <Stat label="Chờ duyệt kế hoạch" value={pendingPlanCount} highlight={pendingPlanCount > 0} />
         <Stat label="Chờ thẩm định video" value={submittedCount} highlight={submittedCount > 0} />
         <Stat label="Đã xuất bản" value={`${publishedCount} / ${project.total_episodes}`} />
-        <Stat label="Token đã cấp" value={`${project.consumed_tokens} / ${project.allocated_tokens}`} />
+        <Stat label="Token đã dùng / đã cấp" value={`${project.consumed_tokens} / ${project.allocated_tokens}`} />
       </div>
 
       <section className={`${CARD} overflow-hidden`} aria-label="Danh sách tập phim">
