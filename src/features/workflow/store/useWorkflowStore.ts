@@ -23,7 +23,6 @@ export const useWorkflowStore = create<WorkflowStoreState>()(
           activePackageId: '',
           project: EMPTY_PROJECT,
           projects: [],
-          reviews: [],
         });
         await get().loadProjects();
       },

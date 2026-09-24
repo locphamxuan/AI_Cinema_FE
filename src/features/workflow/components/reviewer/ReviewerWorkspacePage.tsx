@@ -93,7 +93,6 @@ export function ReviewerWorkspacePage() {
 
   const [isQuotaModalOpen, setIsQuotaModalOpen] = useState(false);
   const [quotaToAllocate, setQuotaToAllocate] = useState(currentPackage?.quota_allocated || 500);
-  const [quotaNotes, setQuotaNotes] = useState('Đạt tiêu chuẩn nội dung. Cấp phép hạn mức Token sản xuất.');
 
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectFeedback, setRejectFeedback] = useState('');
@@ -161,7 +160,7 @@ export function ReviewerWorkspacePage() {
 
   const handleAllocateQuotaConfirm = async () => {
     if (!currentPackage) return;
-    if (!(await allocateQuota(currentPackage.id, quotaToAllocate, quotaNotes))) return;
+    if (!(await allocateQuota(currentPackage.id, quotaToAllocate))) return;
     setIsQuotaModalOpen(false);
     toast.success(
       'Duyệt kế hoạch thành công!',
@@ -248,8 +247,6 @@ export function ReviewerWorkspacePage() {
         quota={quotaToAllocate}
         availableBudget={availableBudget(project)}
         onQuotaChange={setQuotaToAllocate}
-        notes={quotaNotes}
-        onNotesChange={setQuotaNotes}
       />
 
       <RejectPlanModal

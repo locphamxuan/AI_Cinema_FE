@@ -35,7 +35,6 @@ export function CreatorWorkspacePage() {
     updateContentBrief,
     updateOverallScript,
     reviseProductionPlan,
-    reviews,
     loadProjects,
   } = useWorkflowStore();
 
@@ -60,10 +59,10 @@ export function CreatorWorkspacePage() {
   const quotaPercent = project.allocated_tokens > 0 ? (project.consumed_tokens / project.allocated_tokens) * 100 : 0;
   const isQuotaWarning = quotaPercent >= 90;
 
-  const latestFeedback = currentPackage
-    ? reviews.filter((r) => r.episode_package_id === currentPackage.id && r.decision === 'changes_requested')[0]
-    : undefined;
-  const episodeReviews = currentPackage ? reviews.filter((r) => r.episode_package_id === currentPackage.id) : [];
+  // Only the newest decision is still open for the Creator; older change requests were already answered.
+  const newestReview = currentPackage?.review_log[0];
+  const latestFeedback = newestReview?.decision === 'changes_requested' ? newestReview : undefined;
+  const episodeReviews = currentPackage?.review_log ?? [];
 
   const canEnterStudio =
     currentPackage?.status === 'QUOTA_ALLOCATED' ||

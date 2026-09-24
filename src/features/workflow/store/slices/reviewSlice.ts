@@ -1,9 +1,8 @@
 import type { StateCreator } from 'zustand';
-import type { FieldReview, PlanFieldKey, ReviewLog, SceneReviewStatus } from '@/types/workflow';
+import type { FieldReview, PlanFieldKey, SceneReviewStatus } from '@/types/workflow';
 import type { DecideReviewDto, PlanReviewField } from '@/types/workflow-api';
 import type { ReviewSlice, WorkflowStoreState } from '../types';
 import { toast } from '@/components/ui/Toast';
-import { authService } from '@/services/authService';
 import { workflowService } from '@/services/workflowService';
 import { planFieldReviews, scriptReview } from '@/features/workflow/lib/planVerdict';
 import { apiResult } from './apiResult';
@@ -24,22 +23,7 @@ function decision(status: SceneReviewStatus, comment?: string): DecideReviewDto 
   return { decision: 'CHANGES_REQUESTED', rejectionReason: comment || 'Cần chỉnh sửa' };
 }
 
-function reviewLog(packageId: string, type: ReviewLog['review_type'], decisionValue: ReviewLog['decision'], notes: string, quota?: number): ReviewLog {
-  const reviewer = authService.getStoredUser();
-  return {
-    id: `rev-${Date.now()}`,
-    episode_package_id: packageId,
-    reviewer_id: reviewer?.id ?? '',
-    reviewer_name: reviewer?.name ?? '',
-    review_type: type,
-    decision: decisionValue,
-    feedback_notes: notes,
-    quota_granted: quota,
-    created_at: new Date().toISOString(),
-  };
-}
-
-export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewSlice> = (set, get) => {
+export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewSlice> = (_set, get) => {
   const reload = () => get().loadProject(get().activeProjectId);
 
   /** The verdict currently shown for a plan target. */
@@ -80,8 +64,6 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
   };
 
   return {
-    reviews: [],
-
     reviewScene: async (packageId, sceneNumber, status, comment) => {
       const scene = get().getBrief(packageId)?.scene_breakdown.find((s) => s.scene_number === sceneNumber);
       if (!scene?.id) return false;
@@ -104,12 +86,11 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
           return false;
         }
       }
-      set((state) => ({ reviews: [reviewLog(packageId, 'plan', 'changes_requested', feedbackNotes), ...state.reviews] }));
       await reload();
       return true;
     },
 
-    allocateQuota: async (packageId, requestedQuota, notes) => {
+    allocateQuota: async (packageId, requestedQuota) => {
       const existing = get().getPackage(packageId)?.quota_allocated ?? 0;
       const amount = requestedQuota - existing;
       if (amount <= 0) return false;
@@ -118,8 +99,6 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
         'Không cấp được token'
       );
       if (!allocation) return false;
-      const note = `Kế hoạch được duyệt. Đã cấp ${requestedQuota} token. ${notes ?? ''}`.trim();
-      set((state) => ({ reviews: [reviewLog(packageId, 'plan', 'approved', note, requestedQuota), ...state.reviews] }));
       await reload();
       return true;
     },
@@ -133,7 +112,6 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
         workflowService.decideReview(review.id, { decision: 'CHANGES_REQUESTED', rejectionReason: feedbackNotes }),
         'Không gửi được yêu cầu chỉnh sửa'
       );
-      if (decided) set((state) => ({ reviews: [reviewLog(packageId, 'content', 'changes_requested', feedbackNotes), ...state.reviews] }));
       await reload();
       return decided !== null;
     },

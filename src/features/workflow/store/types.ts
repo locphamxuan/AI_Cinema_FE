@@ -6,7 +6,6 @@ import {
   ContentBrief,
   GenerationJob,
   GenerationStep,
-  ReviewLog,
   SceneReviewStatus,
   PlanFieldKey,
 } from '@/types/workflow';
@@ -74,13 +73,12 @@ export interface ProductionSlice {
 }
 
 export interface ReviewSlice {
-  reviews: ReviewLog[];
   reviewScene: (packageId: string, sceneNumber: number, status: SceneReviewStatus, comment?: string) => Promise<boolean>;
   /** Field-level review of the overall script, or an episode's duration/token estimate (BR-39). */
   reviewPlanField: (packageId: string, field: PlanFieldKey, status: SceneReviewStatus, comment?: string) => Promise<boolean>;
   /** Sends every still-undecided field back with the flagged ones, which closes the round as CHANGES_REQUESTED. */
   requestPlanChanges: (packageId: string, feedbackNotes: string) => Promise<boolean>;
-  allocateQuota: (packageId: string, tokenQuota: number, notes?: string) => Promise<boolean>;
+  allocateQuota: (packageId: string, tokenQuota: number) => Promise<boolean>;
   requestContentChanges: (packageId: string, feedbackNotes: string) => Promise<boolean>;
 }
 
