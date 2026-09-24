@@ -69,9 +69,8 @@ export default function AuthModal() {
     await new Promise((r) => setTimeout(r, 350));
 
     if (mode === 'login') {
-      const res = login(email, password);
+      const res = await login(email, password);
       if (res.success) {
-        // Save or clear credentials in localStorage
         try {
           if (rememberMe) {
             localStorage.setItem(
@@ -90,7 +89,7 @@ export default function AuthModal() {
         setError(res.error || 'Đăng nhập thất bại');
       }
     } else {
-      const res = register(name, email, password);
+      const res = await register(name, email, password);
       if (res.success) {
         try {
           if (rememberMe) {

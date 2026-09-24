@@ -13,7 +13,7 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const res = storeLogin(credentials.email, credentials.password);
+      const res = await storeLogin(credentials.email, credentials.password);
       if (res.success) {
         return true;
       } else {
@@ -32,7 +32,7 @@ export function useAuth() {
     setLoading(true);
     setError(null);
     try {
-      const res = storeRegister(credentials.name, credentials.email, credentials.password);
+      const res = await storeRegister(credentials.name, credentials.email, credentials.password);
       if (res.success) {
         return true;
       } else {

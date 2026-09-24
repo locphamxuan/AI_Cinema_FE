@@ -30,7 +30,7 @@ export default function LoginPage() {
 
     await new Promise((resolve) => setTimeout(resolve, 400));
 
-    const res = login(email, password);
+    const res = await login(email, password);
     if (res.success) {
       if (res.redirectUrl) {
         router.push(res.redirectUrl);

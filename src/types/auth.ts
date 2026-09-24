@@ -22,8 +22,11 @@ export interface LoginCredentials {
   rememberMe?: boolean;
 }
 
+export type AuthRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
+
 export interface RegisterCredentials {
   name: string;
   email: string;
   password: string;
+  role?: AuthRole;
 }
