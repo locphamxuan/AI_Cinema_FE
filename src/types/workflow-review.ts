@@ -10,6 +10,8 @@ export type SceneReviewStatus = 'pending' | 'approved' | 'changes_requested';
 export interface FieldReview {
   status: SceneReviewStatus;
   comment?: string;
+  /** Backend PlanReview row this verdict is recorded on, once a review round exists. */
+  review_id?: string;
 }
 
 /** Plan fields the Reviewer signs off besides the individual scenes. */

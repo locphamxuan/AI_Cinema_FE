@@ -81,6 +81,7 @@ export const API_ROUTES = {
     // Generation Jobs & Assets
     GENERATION_JOBS: (planId: string) => `/production-plans/${planId}/generation-jobs`,
     JOB_DETAIL: (jobId: string) => `/generation-jobs/${jobId}`,
+    JOB_RUN: (jobId: string) => `/generation-jobs/${jobId}/run`,
     JOB_RETRY: (jobId: string) => `/generation-jobs/${jobId}/retry`,
     JOB_CANCEL: (jobId: string) => `/generation-jobs/${jobId}/cancel`,
     JOB_ASSETS: (jobId: string) => `/generation-jobs/${jobId}/generated-assets`,
@@ -93,6 +94,10 @@ export const API_ROUTES = {
     PACKAGE_REVIEWS: (packageId: string) => `/episode-packages/${packageId}/reviews`,
     PACKAGE_AI_LABELS: (packageId: string) => `/episode-packages/${packageId}/ai-content-labels`,
     PACKAGE_COMPLIANCE_CHECKS: (packageId: string) => `/episode-packages/${packageId}/compliance-checks`,
+    PACKAGE_COMPLIANCE_REVIEWS: (packageId: string) => `/episode-packages/${packageId}/compliance-reviews`,
+
+    // AI model routing (BR-40)
+    AI_MODEL_ROUTING: '/ai-models/routing',
 
     // Review & Compliance Decisions
     REVIEW_DETAIL: (reviewId: string) => `/reviews/${reviewId}`,

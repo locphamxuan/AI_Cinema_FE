@@ -1,281 +1,174 @@
 /**
- * AI Cinema - Production Workflow API Service
- * Encapsulates all 42 endpoints connecting directly to Backend Database API
+ * AI Cinema - MF-1 Production Workflow API Service
+ * One method per backend endpoint the workspace uses. The acting user is
+ * always taken from the JWT by the backend, never sent in the body.
  */
 
 import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
-import {
-  // Lookups
-  ApiUser,
+import type {
+  ApiAiContentLabel,
+  ApiCatalogEntry,
+  ApiComplianceVerdict,
+  ApiEpisodePackage,
   ApiGenre,
-  ApiPolicy,
-  // Projects & Milestones
-  CreateProductionProjectDto,
-  UpdateProductionProjectDto,
-  CancelProductionProjectDto,
-  CreateMilestoneDto,
-  UpdateMilestoneDto,
-  ApiProductionProject,
-  ApiMilestone,
-  // Plans & Scenes
-  SubmitProductionPlanDto,
-  UpdateProductionPlanDto,
-  CreateProductionPlanRevisionDto,
-  CreateSceneDto,
-  UpdateSceneDto,
-  SubmitSceneDto,
-  ApiProductionPlan,
-  ApiScene,
-  // Plan Reviews
-  CreatePlanReviewDto,
-  DecidePlanReviewDto,
-  ApiPlanReview,
-  // Quota
-  CreateQuotaAllocationDto,
-  ApiQuotaAllocation,
-  // Jobs & Assets
-  CreateGenerationJobDto,
-  CreateGeneratedAssetDto,
-  CompleteGenerationJobDto,
   ApiGenerationJob,
-  ApiGeneratedAsset,
-  // Packages & Final Reviews
+  ApiPlanReview,
+  ApiPolicy,
+  ApiProductionPlan,
+  ApiProductionProject,
+  ApiPublication,
+  ApiQuotaAllocation,
+  ApiReview,
+  ApiRoutingRow,
+  ApiScene,
+  ApiUser,
+  CreateAiContentLabelDto,
   CreateEpisodePackageDto,
   CreateEpisodeSubmissionDto,
-  CreateReviewDto,
-  DecideReviewDto,
-  ApiEpisodePackage,
-  ApiReview,
-  // Compliance & AI Labels
-  CreateAiContentLabelDto,
-  CreateComplianceCheckDto,
-  DecideComplianceCheckDto,
-  ApiAiContentLabel,
-  ApiComplianceCheck,
-  // Catalog & Publications
-  CreateCatalogDto,
+  CreateGenerationJobDto,
+  CreatePlanReviewDto,
+  CreateProductionProjectDto,
   CreatePublicationDto,
-  ApiPublication,
+  CreateQuotaAllocationDto,
+  CreateReviewDto,
+  CreateSceneDto,
+  DecideReviewDto,
+  Paginated,
+  RecordComplianceReviewDto,
+  SubmitProductionPlanDto,
+  UpdateMilestoneDto,
+  UpdateProductionPlanDto,
+  UpdateSceneDto,
+  ApiMilestone,
 } from '@/types/workflow-api';
 
 const ROUTES = API_ROUTES.WORKFLOW;
 
 class WorkflowService {
-  // ==========================================
-  // BƯỚC 0: LOOKUPS (Users, Genres, Policies)
-  // ==========================================
-
-  async listUsers(role?: string): Promise<ApiResponse<{ data: ApiUser[] }>> {
-    const endpoint = role ? `${ROUTES.USERS}?filter[role]=${role}` : ROUTES.USERS;
-    return apiClient.get<{ data: ApiUser[] }>(endpoint);
+  // Lookups
+  listUsers(role?: string): Promise<ApiResponse<Paginated<ApiUser>>> {
+    const query = role ? `?filter.role=$eq:${role}` : '';
+    return apiClient.get<Paginated<ApiUser>>(`${ROUTES.USERS}${query}`);
   }
 
-  async listGenres(): Promise<ApiResponse<{ data: ApiGenre[] }>> {
-    return apiClient.get<{ data: ApiGenre[] }>(ROUTES.GENRES);
+  listGenres(): Promise<ApiResponse<Paginated<ApiGenre>>> {
+    return apiClient.get<Paginated<ApiGenre>>(ROUTES.GENRES);
   }
 
-  async listPolicies(): Promise<ApiResponse<{ data: ApiPolicy[] }>> {
-    return apiClient.get<{ data: ApiPolicy[] }>(ROUTES.POLICIES);
+  listPolicies(): Promise<ApiResponse<Paginated<ApiPolicy>>> {
+    return apiClient.get<Paginated<ApiPolicy>>(ROUTES.POLICIES);
   }
 
-  // ==========================================
-  // BƯỚC 1: KHỞI TẠO DỰ ÁN & MILESTONES (Reviewer)
-  // ==========================================
-
-  async listProjects(params?: { status?: string; contentType?: string }): Promise<ApiResponse<{ data: ApiProductionProject[] }>> {
-    let query = '';
-    if (params) {
-      const q = new URLSearchParams();
-      if (params.status) q.append('filter[status]', params.status);
-      if (params.contentType) q.append('filter[contentType]', params.contentType);
-      query = `?${q.toString()}`;
-    }
-    return apiClient.get<{ data: ApiProductionProject[] }>(`${ROUTES.PROJECTS}${query}`);
+  getRouting(): Promise<ApiResponse<ApiRoutingRow[]>> {
+    return apiClient.get<ApiRoutingRow[]>(ROUTES.AI_MODEL_ROUTING);
   }
 
-  async getProject(projectId: string): Promise<ApiResponse<ApiProductionProject>> {
+  // Projects & milestones (Reviewer)
+  listProjects(): Promise<ApiResponse<Paginated<ApiProductionProject>>> {
+    return apiClient.get<Paginated<ApiProductionProject>>(ROUTES.PROJECTS);
+  }
+
+  getProject(projectId: string): Promise<ApiResponse<ApiProductionProject>> {
     return apiClient.get<ApiProductionProject>(ROUTES.PROJECT_DETAIL(projectId));
   }
 
-  async createProject(dto: CreateProductionProjectDto): Promise<ApiResponse<ApiProductionProject>> {
+  createProject(dto: CreateProductionProjectDto): Promise<ApiResponse<ApiProductionProject>> {
     return apiClient.post<ApiProductionProject>(ROUTES.PROJECTS, dto);
   }
 
-  async updateProject(projectId: string, dto: UpdateProductionProjectDto): Promise<ApiResponse<ApiProductionProject>> {
-    return apiClient.patch<ApiProductionProject>(ROUTES.PROJECT_DETAIL(projectId), dto);
-  }
-
-  async cancelProject(projectId: string, dto?: CancelProductionProjectDto): Promise<ApiResponse<ApiProductionProject>> {
-    return apiClient.post<ApiProductionProject>(ROUTES.PROJECT_CANCEL(projectId), dto);
-  }
-
-  async listMilestones(projectId: string): Promise<ApiResponse<ApiMilestone[]>> {
-    return apiClient.get<ApiMilestone[]>(ROUTES.PROJECT_MILESTONES(projectId));
-  }
-
-  async createMilestone(projectId: string, dto: CreateMilestoneDto): Promise<ApiResponse<ApiMilestone>> {
-    return apiClient.post<ApiMilestone>(ROUTES.PROJECT_MILESTONES(projectId), dto);
-  }
-
-  async updateMilestone(milestoneId: string, dto: UpdateMilestoneDto): Promise<ApiResponse<ApiMilestone>> {
+  updateMilestone(milestoneId: string, dto: UpdateMilestoneDto): Promise<ApiResponse<ApiMilestone>> {
     return apiClient.patch<ApiMilestone>(ROUTES.MILESTONE_DETAIL(milestoneId), dto);
   }
 
-  // ==========================================
-  // BƯỚC 2: PRODUCTION PLANS & SCENES (Creator)
-  // ==========================================
-
-  async listPlans(projectId: string): Promise<ApiResponse<{ data: ApiProductionPlan[] }>> {
-    return apiClient.get<{ data: ApiProductionPlan[] }>(ROUTES.PROJECT_PLANS(projectId));
-  }
-
-  async getPlan(planId: string): Promise<ApiResponse<ApiProductionPlan>> {
-    return apiClient.get<ApiProductionPlan>(ROUTES.PLAN_DETAIL(planId));
-  }
-
-  async submitPlan(projectId: string, dto: SubmitProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
-    return apiClient.post<ApiProductionPlan>(ROUTES.PROJECT_PLANS(projectId), dto);
-  }
-
-  async updatePlan(planId: string, dto: UpdateProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
+  // Plans & scenes (Creator)
+  updatePlan(planId: string, dto: UpdateProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
     return apiClient.patch<ApiProductionPlan>(ROUTES.PLAN_DETAIL(planId), dto);
   }
 
-  async createPlanRevision(projectId: string, planId: string, dto: CreateProductionPlanRevisionDto): Promise<ApiResponse<ApiProductionPlan>> {
+  submitPlan(planId: string, dto: SubmitProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
+    return apiClient.post<ApiProductionPlan>(ROUTES.PLAN_SUBMIT(planId), dto);
+  }
+
+  createPlanRevision(projectId: string, planId: string, dto: UpdateProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
     return apiClient.post<ApiProductionPlan>(ROUTES.PLAN_REVISIONS(projectId, planId), dto);
   }
 
-  async listScenes(planId: string): Promise<ApiResponse<ApiScene[]>> {
-    return apiClient.get<ApiScene[]>(ROUTES.PLAN_SCENES(planId));
-  }
-
-  async createScene(planId: string, dto: CreateSceneDto): Promise<ApiResponse<ApiScene>> {
+  createScene(planId: string, dto: CreateSceneDto): Promise<ApiResponse<ApiScene>> {
     return apiClient.post<ApiScene>(ROUTES.PLAN_SCENES(planId), dto);
   }
 
-  async updateScene(sceneId: string, dto: UpdateSceneDto): Promise<ApiResponse<ApiScene>> {
+  updateScene(sceneId: string, dto: UpdateSceneDto): Promise<ApiResponse<ApiScene>> {
     return apiClient.patch<ApiScene>(ROUTES.SCENE_DETAIL(sceneId), dto);
   }
 
-  async submitScene(sceneId: string, dto?: SubmitSceneDto): Promise<ApiResponse<ApiScene>> {
-    return apiClient.post<ApiScene>(ROUTES.SCENE_SUBMIT(sceneId), dto);
+  deleteScene(sceneId: string): Promise<ApiResponse<unknown>> {
+    return apiClient.delete<unknown>(ROUTES.SCENE_DETAIL(sceneId));
   }
 
-  // ==========================================
-  // BƯỚC 3: PLAN REVIEWS (Reviewer)
-  // ==========================================
-
-  async createPlanReview(planId: string, dto: CreatePlanReviewDto): Promise<ApiResponse<ApiPlanReview>> {
-    return apiClient.post<ApiPlanReview>(ROUTES.PLAN_REVIEWS(planId), dto);
+  // Plan reviews & quota (Reviewer)
+  createPlanReview(planId: string, dto: CreatePlanReviewDto = {}): Promise<ApiResponse<ApiPlanReview[]>> {
+    return apiClient.post<ApiPlanReview[]>(ROUTES.PLAN_REVIEWS(planId), dto);
   }
 
-  async decidePlanReview(planReviewId: string, dto: DecidePlanReviewDto): Promise<ApiResponse<ApiPlanReview>> {
+  decidePlanReview(planReviewId: string, dto: DecideReviewDto): Promise<ApiResponse<ApiPlanReview>> {
     return apiClient.patch<ApiPlanReview>(ROUTES.PLAN_REVIEW_DETAIL(planReviewId), dto);
   }
 
-  async listPlanReviews(planId: string): Promise<ApiResponse<ApiPlanReview[]>> {
-    return apiClient.get<ApiPlanReview[]>(ROUTES.PLAN_REVIEWS(planId));
-  }
-
-  // ==========================================
-  // BƯỚC 4: QUOTA ALLOCATION (Reviewer)
-  // ==========================================
-
-  async allocateQuota(planId: string, dto: CreateQuotaAllocationDto): Promise<ApiResponse<ApiQuotaAllocation>> {
+  allocateQuota(planId: string, dto: CreateQuotaAllocationDto): Promise<ApiResponse<ApiQuotaAllocation>> {
     return apiClient.post<ApiQuotaAllocation>(ROUTES.QUOTA_ALLOCATIONS(planId), dto);
   }
 
-  async createQuotaAllocation(planId: string, dto: CreateQuotaAllocationDto): Promise<ApiResponse<ApiQuotaAllocation>> {
-    return this.allocateQuota(planId, dto);
+  // Generation jobs (Studio)
+  listJobs(planId: string): Promise<ApiResponse<Paginated<ApiGenerationJob>>> {
+    return apiClient.get<Paginated<ApiGenerationJob>>(ROUTES.GENERATION_JOBS(planId));
   }
 
-  async getQuotaByPlan(planId: string): Promise<ApiResponse<ApiQuotaAllocation[]>> {
-    return apiClient.get<ApiQuotaAllocation[]>(ROUTES.QUOTA_ALLOCATIONS(planId));
-  }
-
-  // ==========================================
-  // BƯỚC 5: GENERATION JOBS & ASSETS (Studio)
-  // ==========================================
-
-  async listJobs(planId: string): Promise<ApiResponse<{ data: ApiGenerationJob[] }>> {
-    return apiClient.get<{ data: ApiGenerationJob[] }>(ROUTES.GENERATION_JOBS(planId));
-  }
-
-  async createJob(planId: string, dto: CreateGenerationJobDto): Promise<ApiResponse<ApiGenerationJob>> {
+  createJob(planId: string, dto: CreateGenerationJobDto): Promise<ApiResponse<ApiGenerationJob>> {
     return apiClient.post<ApiGenerationJob>(ROUTES.GENERATION_JOBS(planId), dto);
   }
 
-  async completeJob(jobId: string, dto?: CompleteGenerationJobDto): Promise<ApiResponse<ApiGenerationJob>> {
-    return apiClient.post<ApiGenerationJob>(ROUTES.JOB_COMPLETE(jobId), dto);
+  runJob(jobId: string): Promise<ApiResponse<ApiGenerationJob>> {
+    return apiClient.post<ApiGenerationJob>(ROUTES.JOB_RUN(jobId));
   }
 
-  async createAsset(jobId: string, dto: CreateGeneratedAssetDto): Promise<ApiResponse<ApiGeneratedAsset>> {
-    return apiClient.post<ApiGeneratedAsset>(ROUTES.JOB_ASSETS(jobId), dto);
-  }
-
-  // ==========================================
-  // BƯỚC 6: EPISODE PACKAGES & SUBMISSION
-  // ==========================================
-
-  async createEpisodePackage(planId: string, dto?: CreateEpisodePackageDto): Promise<ApiResponse<ApiEpisodePackage>> {
+  // Episode packages, submission & content review
+  createEpisodePackage(planId: string, dto: CreateEpisodePackageDto = {}): Promise<ApiResponse<ApiEpisodePackage>> {
     return apiClient.post<ApiEpisodePackage>(ROUTES.PACKAGES(planId), dto);
   }
 
-  async submitEpisodePackage(packageId: string, dto: CreateEpisodeSubmissionDto): Promise<ApiResponse<unknown>> {
+  submitEpisodePackage(packageId: string, dto: CreateEpisodeSubmissionDto = {}): Promise<ApiResponse<unknown>> {
     return apiClient.post<unknown>(ROUTES.PACKAGE_SUBMISSIONS(packageId), dto);
   }
 
-  // ==========================================
-  // BƯỚC 7: REVIEWS / AUDIT (Reviewer)
-  // ==========================================
-
-  async createReview(packageId: string, dto: CreateReviewDto): Promise<ApiResponse<ApiReview>> {
+  createReview(packageId: string, dto: CreateReviewDto = {}): Promise<ApiResponse<ApiReview>> {
     return apiClient.post<ApiReview>(ROUTES.PACKAGE_REVIEWS(packageId), dto);
   }
 
-  async decideReview(reviewId: string, dto: DecideReviewDto): Promise<ApiResponse<ApiReview>> {
+  decideReview(reviewId: string, dto: DecideReviewDto): Promise<ApiResponse<ApiReview>> {
     return apiClient.patch<ApiReview>(ROUTES.REVIEW_DETAIL(reviewId), dto);
   }
 
-  // ==========================================
-  // BƯỚC 8: AI CONTENT LABEL (ĐIỀU 44 & NĐ 142)
-  // ==========================================
-
-  async createAiContentLabel(packageId: string, dto: CreateAiContentLabelDto): Promise<ApiResponse<ApiAiContentLabel>> {
+  // Compliance (Điều 44 Luật AI & NĐ 142)
+  createAiContentLabel(packageId: string, dto: CreateAiContentLabelDto): Promise<ApiResponse<ApiAiContentLabel>> {
     return apiClient.post<ApiAiContentLabel>(ROUTES.PACKAGE_AI_LABELS(packageId), dto);
   }
 
-  // ==========================================
-  // BƯỚC 9: COMPLIANCE CHECK
-  // ==========================================
-
-  async createComplianceCheck(packageId: string, dto: CreateComplianceCheckDto): Promise<ApiResponse<ApiComplianceCheck>> {
-    return apiClient.post<ApiComplianceCheck>(ROUTES.PACKAGE_COMPLIANCE_CHECKS(packageId), dto);
+  recordComplianceReview(packageId: string, dto: RecordComplianceReviewDto): Promise<ApiResponse<ApiComplianceVerdict>> {
+    return apiClient.post<ApiComplianceVerdict>(ROUTES.PACKAGE_COMPLIANCE_REVIEWS(packageId), dto);
   }
 
-  async decideComplianceCheck(checkId: string, dto: DecideComplianceCheckDto): Promise<ApiResponse<ApiComplianceCheck>> {
-    return apiClient.patch<ApiComplianceCheck>(ROUTES.COMPLIANCE_CHECK_DETAIL(checkId), dto);
+  // Catalog & publication
+  createCatalog(packageId: string): Promise<ApiResponse<ApiCatalogEntry>> {
+    return apiClient.post<ApiCatalogEntry>(ROUTES.CATALOG_FROM_PACKAGE(packageId));
   }
 
-  // ==========================================
-  // BƯỚC 10: CATALOG & PUBLICATIONS
-  // ==========================================
-
-  async createCatalog(packageId: string, _dto?: CreateCatalogDto): Promise<ApiResponse<unknown>> {
-    return apiClient.post<unknown>(ROUTES.CATALOG_FROM_PACKAGE(packageId));
-  }
-
-  async createPublication(episodeId: string, dto: CreatePublicationDto): Promise<ApiResponse<ApiPublication>> {
+  createPublication(episodeId: string, dto: CreatePublicationDto): Promise<ApiResponse<ApiPublication>> {
     return apiClient.post<ApiPublication>(ROUTES.EPISODE_PUBLICATIONS(episodeId), dto);
   }
 
-  async publishEpisode(publicationId: string): Promise<ApiResponse<ApiPublication>> {
+  publish(publicationId: string): Promise<ApiResponse<ApiPublication>> {
     return apiClient.post<ApiPublication>(ROUTES.PUBLICATION_PUBLISH(publicationId));
-  }
-
-  async publishNow(publicationId: string): Promise<ApiResponse<ApiPublication>> {
-    return this.publishEpisode(publicationId);
   }
 }
 

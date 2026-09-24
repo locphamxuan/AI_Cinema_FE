@@ -9,6 +9,8 @@ import type { FieldReview, SceneReview } from './workflow-review';
  * ProductionProject (overall_script), không lặp lại theo từng tập.
  */
 export interface SceneBreakdownItem {
+  /** Backend scene id; absent for scenes the Creator added but has not saved yet. */
+  id?: string;
   scene_number: number;
   title: string;
   description: string;
@@ -32,6 +34,8 @@ export interface ContentBrief {
   scene_breakdown: SceneBreakdownItem[];
   /** Field-level reviewer verdicts (BR-39) — all reset to 'pending' on every (re)submit. */
   scene_reviews: SceneReview[];
+  /** This plan's verdict on the overall script; falls back to ProductionProject.script_review. */
+  script_review?: FieldReview;
   duration_review: FieldReview;
   token_review: FieldReview;
   status: WorkflowState;
@@ -40,10 +44,15 @@ export interface ContentBrief {
 }
 
 /**
- * 4. episode_package: Gói tập phim hoàn chỉnh ghép từ các phân cảnh
+ * 4. episode_package: Gói tập phim hoàn chỉnh ghép từ các phân cảnh.
+ * `id` is the backend production plan id — every MF-1 call is keyed by plan.
  */
 export interface EpisodePackage {
   id: string;
+  /** Latest backend episode package, once the Creator assembled one. */
+  package_id?: string;
+  /** Catalog episode created from the package, needed to publish it. */
+  catalog_episode_id?: string;
   project_id: string;
   episode_number: number;
   season_number: number;
