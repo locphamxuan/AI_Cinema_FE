@@ -1,13 +1,28 @@
 import type { StateCreator } from 'zustand';
-import type { EpisodePackage } from '@/types/workflow';
+import type { EpisodePackage, ProductionProject } from '@/types/workflow';
 import { PENDING_FIELD_REVIEW } from '@/types/workflow';
 import { EMPTY_PROJECT } from '@/features/workflow/lib/emptyProject';
 import type { EpisodeSlice, WorkflowStoreState } from '../types';
-import { toast } from '@/components/ui/Toast';
 import { withProjectUpdate } from './projectRoster';
 import { workflowService } from '@/services/workflowService';
 import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
+import { buildSceneJobs, draftStepId, isDraftStep } from '@/features/workflow/lib/jobAdapter';
 import { apiResult } from './apiResult';
+
+/** Episodes whose plan has gone past quota allocation can hold generation jobs. */
+const HAS_JOBS = new Set(['IN_PRODUCTION', 'EPISODE_SUBMITTED', 'CHANGES_REQUESTED', 'COMPLIANCE_PASSED', 'PUBLISHED']);
+
+/** Fills each episode's scene rows with its backend jobs, keeping the Creator's draft steps. */
+async function withJobs(project: ProductionProject, previous: ProductionProject | undefined): Promise<ProductionProject> {
+  const episodes = await Promise.all(
+    project.episodes.map(async (episode) => {
+      const previousRows = previous?.episodes.find((e) => e.id === episode.id)?.jobs;
+      const res = HAS_JOBS.has(episode.status) ? await workflowService.listJobs(episode.id) : null;
+      return { ...episode, ...buildSceneJobs(episode, res?.success ? res.data : [], previousRows) };
+    })
+  );
+  return { ...project, episodes };
+}
 
 const MILESTONE_STATUS = { pending: 'PLANNED', in_progress: 'IN_PROGRESS', completed: 'COMPLETED' } as const;
 
@@ -93,7 +108,8 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       set({ isLoading: false, error: res.message ?? 'Lỗi tải chi tiết dự án' });
       return;
     }
-    const adapted = adaptApiProjectToUiProject(res.data);
+    const previous = get().projects.find((p) => p.id === projectId);
+    const adapted = await withJobs(adaptApiProjectToUiProject(res.data), previous);
     set((state) => {
       const keepPackage = adapted.episodes.some((e) => e.id === state.activePackageId);
       const known = state.projects.some((p) => p.id === adapted.id);
@@ -170,31 +186,6 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     );
   },
 
-  addSceneJob: (packageId, sceneData) => {
-    const newJobId = `job-${Date.now()}`;
-    const newJob = {
-      ...sceneData,
-      id: newJobId,
-      status: 'pending' as const,
-      progress: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            jobs: [...ep.jobs, newJob],
-          };
-        }),
-      }))
-    );
-  },
-
   addGenerationStep: (packageId, jobId, step) => {
     set((state) =>
       withProjectUpdate(state, (project) => ({
@@ -208,7 +199,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
                 ? j
                 : {
                     ...j,
-                    generation_steps: [...j.generation_steps, { ...step, id: `step-${Date.now()}` }],
+                    generation_steps: [...j.generation_steps, { ...step, id: draftStepId() }],
                     updated_at: new Date().toISOString(),
                   }
             ),
@@ -231,7 +222,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
                 ? j
                 : {
                     ...j,
-                    generation_steps: j.generation_steps.map((s) => (s.id === stepId ? { ...s, ...data } : s)),
+                    generation_steps: j.generation_steps.map((s) => (s.id === stepId && isDraftStep(s) ? { ...s, ...data } : s)),
                     updated_at: new Date().toISOString(),
                   }
             ),
@@ -250,60 +241,12 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
           return {
             ...ep,
             jobs: ep.jobs.map((j) =>
-              j.id !== jobId ? j : { ...j, generation_steps: j.generation_steps.filter((s) => s.id !== stepId) }
+              j.id !== jobId ? j : { ...j, generation_steps: j.generation_steps.filter((s) => s.id !== stepId || !isDraftStep(s)) }
             ),
           };
         }),
       }))
     );
-  },
-
-  removeSceneJob: (packageId, jobId) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            jobs: ep.jobs.filter((j) => j.id !== jobId),
-            assets: ep.assets.filter((a) => a.job_id !== jobId),
-          };
-        }),
-      }))
-    );
-  },
-
-  submitEpisodePackage: (packageId) => {
-    const pkg = get().getPackage(packageId);
-    if (!pkg) return false;
-
-    const uncompleted = pkg.jobs.filter((j) => j.status !== 'completed');
-    if (uncompleted.length > 0) {
-      toast.warning(
-        'Chưa hoàn tất render!',
-        `Còn ${uncompleted.length} phân cảnh chưa render hoàn tất. Vui lòng sinh xong toàn bộ clip trước khi nộp bản dựng.`
-      );
-      return false;
-    }
-
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        updated_at: new Date().toISOString(),
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'EPISODE_SUBMITTED',
-            video_draft_url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-            updated_at: new Date().toISOString(),
-          };
-        }),
-      }))
-    );
-
-    return true;
   },
 
   createProject: async (data) => {

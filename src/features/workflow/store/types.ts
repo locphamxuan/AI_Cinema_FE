@@ -37,12 +37,10 @@ export interface EpisodeSlice {
   reviseProductionPlan: (packageId: string, updatedBrief: Partial<ContentBrief>) => Promise<boolean>;
   /** Rewrites the project-level overall script; bumps script_version and resets its review when the text changed. */
   updateOverallScript: (script: string) => void;
-  addSceneJob: (packageId: string, sceneData: Omit<GenerationJob, 'id' | 'status' | 'progress' | 'created_at' | 'updated_at'>) => void;
-  removeSceneJob: (packageId: string, jobId: string) => void;
+  /** Draft steps only — generated steps are backend jobs and stay read-only. */
   addGenerationStep: (packageId: string, jobId: string, step: Omit<GenerationStep, 'id'>) => void;
   updateGenerationStep: (packageId: string, jobId: string, stepId: string, data: Partial<GenerationStep>) => void;
   removeGenerationStep: (packageId: string, jobId: string, stepId: string) => void;
-  submitEpisodePackage: (packageId: string) => boolean;
   createProject: (data: {
     title: string;
     creator_id: string;
@@ -67,7 +65,12 @@ export interface EpisodeSlice {
 
 
 export interface ProductionSlice {
-  triggerGenerationJob: (packageId: string, jobId: string) => Promise<boolean>;
+  /** Loads the plan's generation jobs into the episode's scene rows, keeping draft steps. */
+  loadJobs: (packageId: string) => Promise<void>;
+  /** Generates the scene's draft steps, or regenerates its saved ones when it has no drafts (BR-41). */
+  triggerGenerationJob: (packageId: string, sceneJobId: string) => Promise<boolean>;
+  /** Completes every scene, assembles the episode package and submits it for review. */
+  submitEpisodePackage: (packageId: string) => Promise<boolean>;
 }
 
 export interface ReviewSlice {
