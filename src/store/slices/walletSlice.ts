@@ -1,17 +1,29 @@
 import type { StateCreator } from 'zustand';
-import { mockWallet, mockCheckInStreak } from '@/mocks/mockData';
-import { getTodayDayIndex, getTodayDateString } from '@/lib/dateUtils';
+import { getTodayDayIndex, getTodayDateString, VN_DAY_LABELS } from '@/lib/dateUtils';
 import type { AppState, WalletSlice } from './types';
 
+const createEmptyCheckInStreak = () => ({
+  days: VN_DAY_LABELS.map((label, idx) => ({
+    dayIndex: idx,
+    dayLabel: label,
+    reward: 10,
+    claimed: false,
+    isToday: idx === getTodayDayIndex(),
+  })),
+  currentStreak: 0,
+  lastCheckInDate: null,
+  todayClaimed: false,
+});
+
 export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (set, get) => ({
-  wallet: mockWallet,
-  checkInStreak: mockCheckInStreak,
+  wallet: { mainCoin: 0, bonusCoin: 0 },
+  checkInStreak: createEmptyCheckInStreak(),
 
   syncCheckInStreak: () => {
     const todayIdx = getTodayDayIndex();
     const todayStr = getTodayDateString();
     set((s) => {
-      const current = s.checkInStreak || mockCheckInStreak;
+      const current = s.checkInStreak && s.checkInStreak.days.length > 0 ? s.checkInStreak : createEmptyCheckInStreak();
       const isTodayClaimed = current.lastCheckInDate === todayStr;
       const updatedDays = current.days.map((d, idx) => ({
         ...d,

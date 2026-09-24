@@ -14,7 +14,6 @@ import DemoControlPanel from '@/components/home/DemoControlPanel';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import RightSidebar from '@/components/layout/RightSidebar';
 import { ToastContainer } from '@/components/ui/Toast';
-import { allMockMovies } from '@/mocks/mockData';
 
 const genreOptions = [
   'Tất cả thể loại',
@@ -72,14 +71,14 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  // Filter movies based on search query
-  const searchResults = searchQuery.trim()
-    ? allMockMovies.filter(
-        (m) =>
-          m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          m.genre.some((g) => g.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    : [];
+  // Search suggestions are populated from the backend movie catalog and may be empty while loading.
+  const searchResults: Array<{
+    id: string;
+    title: string;
+    genre: string[];
+    bannerUrl: string;
+    episodes: Array<{ id: string }>;
+  }> = [];
 
   // Close dropdowns on click outside
   useEffect(() => {

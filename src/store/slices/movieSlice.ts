@@ -1,12 +1,37 @@
 import type { StateCreator } from 'zustand';
-import { mockMovie } from '@/mocks/mockData';
+import type { Movie } from '@/types/movie';
 import type { AppState, MovieSlice } from './types';
 
+const emptyMovie: Movie = {
+  id: '',
+  title: 'Chưa có phim',
+  genre: [],
+  posterUrl: '',
+  bannerUrl: '',
+  description: 'Dữ liệu phim sẽ được tải từ backend sau khi API hoạt động.',
+  year: new Date().getFullYear(),
+  episodes: [],
+  aiCompliance: {
+    aiModel: '',
+    generatedDate: '',
+    complianceArticle: '',
+    reviewStatus: 'pending',
+    moderationScore: 0,
+    contentRating: '',
+    disclaimer: '',
+  },
+  totalEpisodes: 0,
+};
+
 export const createMovieSlice: StateCreator<AppState, [], [], MovieSlice> = (set, get) => ({
-  currentMovie: mockMovie,
+  currentMovie: emptyMovie,
 
   unlockEpisode: (episodeId) => {
     const state = get();
+    if (!state.currentMovie?.episodes?.length) {
+      return { success: false, error: 'Chưa có dữ liệu tập phim từ backend.' };
+    }
+
     const episode = state.currentMovie.episodes.find((ep) => ep.id === episodeId);
     if (!episode) return { success: false, error: 'Tập phim không tồn tại' };
     if (episode.isUnlocked || episode.isFree) return { success: true };

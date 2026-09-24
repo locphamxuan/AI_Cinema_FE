@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Movie } from '@/types/movie';
-import { allMockMovies } from '@/mocks/mockData';
 
 interface HeroBannerProps {
   movies?: Movie[];
@@ -13,16 +12,24 @@ interface HeroBannerProps {
 
 export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBannerProps) {
   // Determine movies list (up to 5 hot movies)
-  const movieList = movies && movies.length > 0 
-    ? movies.slice(0, 5) 
-    : movie 
-    ? [movie] 
-    : allMockMovies.slice(0, 5);
+  const movieList = movies && movies.length > 0
+    ? movies.slice(0, 5)
+    : movie
+      ? [movie]
+      : [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [myListMap, setMyListMap] = useState<Record<string, boolean>>({});
   const [isHovered, setIsHovered] = useState(false);
+
+  if (movieList.length === 0) {
+    return (
+      <div className="rounded-3xl border border-dashed border-slate-300 dark:border-white/10 bg-slate-100/80 dark:bg-slate-900/60 p-8 text-center text-sm text-slate-500 dark:text-slate-400">
+        Chưa có dữ liệu phim từ backend. API sẽ cập nhật danh sách phim sau khi kết nối service thực tế.
+      </div>
+    );
+  }
 
   // Auto-play timer for hero carousel (5 seconds)
   useEffect(() => {

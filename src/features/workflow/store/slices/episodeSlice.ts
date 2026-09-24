@@ -1,11 +1,11 @@
 import type { StateCreator } from 'zustand';
 import { EpisodePackage, ProductionProject, PENDING_FIELD_REVIEW } from '@/types/workflow';
-import { initialProject, mockAssignedProjects } from '@/features/workflow/mocks/workflowMock';
 import type { EpisodeSlice, WorkflowStoreState } from '../types';
 import { toast } from '@/components/ui/Toast';
 import { pendingPlanReviews } from '@/features/workflow/lib/planVerdict';
 import { withProjectUpdate } from './projectRoster';
 import { workflowService } from '@/services/workflowService';
+import { createEmptyProject, EMPTY_PROJECTS } from '../emptyState';
 
 function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumber: number, targetDurationMinutes: number): EpisodePackage {
   const now = new Date().toISOString();
@@ -49,8 +49,8 @@ function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumbe
 import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
 
 export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], EpisodeSlice> = (set, get) => ({
-  project: initialProject,
-  projects: mockAssignedProjects,
+  project: createEmptyProject(),
+  projects: EMPTY_PROJECTS,
   isLoading: false,
   error: null,
 
@@ -58,46 +58,70 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     set({ isLoading: true, error: null });
     try {
       const res = await workflowService.listProjects();
-      if (res.success && res.data) {
-        const rawList = Array.isArray(res.data) ? res.data : (res.data as { data?: any[] })?.data || [];
-        if (rawList.length > 0) {
-          const currentProjects = get().projects;
-          const adaptedProjects = rawList.map((p) => {
-            const adapted = adaptApiProjectToUiProject(p);
-            const existing = currentProjects.find((cp) => cp.id === adapted.id);
-            if (!existing) return adapted;
-            return {
-              ...adapted,
-              episodes: adapted.episodes.map((ep) => {
-                const existingEp = existing.episodes.find((e) => e.id === ep.id);
-                if (!existingEp) return ep;
-                return {
-                  ...ep,
-                  status: existingEp.status !== 'PLAN_DRAFT' ? existingEp.status : ep.status,
-                  quota_allocated: existingEp.quota_allocated || ep.quota_allocated,
-                  brief: {
-                    ...ep.brief,
-                    scene_reviews: existingEp.brief?.scene_reviews?.length ? existingEp.brief.scene_reviews : ep.brief?.scene_reviews,
-                    duration_review: existingEp.brief?.duration_review || ep.brief?.duration_review,
-                    token_review: existingEp.brief?.token_review || ep.brief?.token_review,
-                  },
-                };
-              }),
-            };
-          });
-          const currentActive = get().activeProjectId;
-          const foundActive = adaptedProjects.find((p) => p.id === currentActive) || adaptedProjects[0];
-          set({
-            projects: adaptedProjects,
-            project: foundActive,
-            activeProjectId: foundActive.id,
-            activePackageId: foundActive.episodes?.[0]?.id || '',
-          });
+      const rawList = res.success && res.data
+        ? (Array.isArray(res.data) ? res.data : (res.data as { data?: any[] })?.data || [])
+        : [];
+
+      if (rawList.length === 0) {
+        const existing = get().projects;
+        if (existing.length > 0) {
+          set({ isLoading: false });
+          return;
         }
+
+        set({
+          projects: [],
+          project: createEmptyProject(),
+          activeProjectId: '',
+          activePackageId: '',
+          isLoading: false,
+        });
+        return;
       }
-      set({ isLoading: false });
+
+      const currentProjects = get().projects;
+      const adaptedProjects = rawList.map((p) => {
+        const adapted = adaptApiProjectToUiProject(p);
+        const existing = currentProjects.find((cp) => cp.id === adapted.id);
+        if (!existing) return adapted;
+        return {
+          ...adapted,
+          episodes: adapted.episodes.map((ep) => {
+            const existingEp = existing.episodes.find((e) => e.id === ep.id);
+            if (!existingEp) return ep;
+            return {
+              ...ep,
+              status: existingEp.status !== 'PLAN_DRAFT' ? existingEp.status : ep.status,
+              quota_allocated: existingEp.quota_allocated || ep.quota_allocated,
+              brief: {
+                ...ep.brief,
+                scene_reviews: existingEp.brief?.scene_reviews?.length ? existingEp.brief.scene_reviews : ep.brief?.scene_reviews,
+                duration_review: existingEp.brief?.duration_review || ep.brief?.duration_review,
+                token_review: existingEp.brief?.token_review || ep.brief?.token_review,
+              },
+            };
+          }),
+        };
+      });
+      const currentActive = get().activeProjectId;
+      const foundActive = adaptedProjects.find((p) => p.id === currentActive) || adaptedProjects[0];
+      set({
+        projects: adaptedProjects,
+        project: foundActive,
+        activeProjectId: foundActive.id,
+        activePackageId: foundActive.episodes?.[0]?.id || '',
+        isLoading: false,
+      });
     } catch (err) {
-      set({ isLoading: false, error: err instanceof Error ? err.message : 'Lỗi tải dự án từ cơ sở dữ liệu' });
+      const existing = get().projects;
+      set({
+        isLoading: false,
+        error: err instanceof Error ? err.message : 'Lỗi tải dự án từ cơ sở dữ liệu',
+        projects: existing.length > 0 ? existing : [],
+        project: existing.length > 0 ? get().project : createEmptyProject(),
+        activeProjectId: existing.length > 0 ? get().activeProjectId : '',
+        activePackageId: existing.length > 0 ? get().activePackageId : '',
+      });
     }
   },
 
@@ -113,10 +137,26 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
           activePackageId: adapted.episodes?.[0]?.id || '',
           projects: state.projects.map((p) => (p.id === adapted.id ? adapted : p)),
         }));
+      } else {
+        const existing = get().projects.find((p) => p.id === projectId);
+        if (existing) {
+          set({
+            project: existing,
+            activeProjectId: existing.id,
+            activePackageId: existing.episodes?.[0]?.id || '',
+          });
+        }
       }
       set({ isLoading: false });
     } catch (err) {
-      set({ isLoading: false, error: err instanceof Error ? err.message : 'Lỗi tải chi tiết dự án' });
+      const existing = get().projects.find((p) => p.id === projectId);
+      set({
+        isLoading: false,
+        error: err instanceof Error ? err.message : 'Lỗi tải chi tiết dự án',
+        project: existing || createEmptyProject(),
+        activeProjectId: existing?.id || '',
+        activePackageId: existing?.episodes?.[0]?.id || '',
+      });
     }
   },
 
@@ -371,7 +411,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     return true;
   },
 
-  createProject: (data) => {
+  createProject: async (data) => {
     const milestones = data.milestones && data.milestones.length > 0 ? data.milestones : [
       {
         id: `ms-1-${Date.now()}`,
@@ -382,28 +422,8 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       }
     ];
 
-    const projectId = `proj-${Date.now()}`;
     const totalEpisodes = data.season_count * data.episodes_per_season;
-
-    // Call backend API in background to persist project if backend is up
-    workflowService.createProject({
-      title: data.title,
-      description: data.synopsis,
-      contentType: data.season_count > 1 || totalEpisodes > 1 ? 'SERIES' : 'MOVIE',
-      totalAiQuotaBudget: data.total_budget_tokens,
-      productionStartDate: data.production_start_date,
-      deadline: data.deadline,
-      plannedReleaseDate: data.planned_release_date,
-      defaultEpisodeDurationSeconds: (data.episode_target_durations[0] || 30) * 60,
-      episodeCount: totalEpisodes,
-      assignedCreatorId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-      milestones: milestones.map((m) => ({
-        title: m.title,
-        description: m.description,
-        targetDate: m.deadline,
-      })),
-    }).catch((e) => console.warn('Create project API call:', e));
-
+    const projectId = `proj-${Date.now()}`;
     const episodes: EpisodePackage[] = [];
     let episodeNumber = 1;
     for (let season = 1; season <= data.season_count; season += 1) {
@@ -414,7 +434,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       }
     }
 
-    const newProject: ProductionProject = {
+    const optimisticProject: ProductionProject = {
       id: projectId,
       title: data.title,
       genre: data.genre,
@@ -442,11 +462,48 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     };
 
     set((state) => ({
-      project: newProject,
-      projects: [newProject, ...state.projects],
-      activeProjectId: newProject.id,
-      activePackageId: episodes[0]?.id || '',
+      project: optimisticProject,
+      projects: [optimisticProject, ...state.projects.filter((p) => p.id !== optimisticProject.id)],
+      activeProjectId: optimisticProject.id,
+      activePackageId: optimisticProject.episodes[0]?.id || '',
     }));
+
+    const contentType: 'MOVIE' | 'SERIES' = data.season_count > 1 || totalEpisodes > 1 ? 'SERIES' : 'MOVIE';
+    const backendPayload = {
+      title: data.title,
+      description: data.synopsis,
+      contentType,
+      totalAiQuotaBudget: data.total_budget_tokens,
+      productionStartDate: data.production_start_date,
+      deadline: data.deadline,
+      plannedReleaseDate: data.planned_release_date,
+      defaultEpisodeDurationSeconds: (data.episode_target_durations[0] || 30) * 60,
+      episodeCount: totalEpisodes,
+      assignedCreatorId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+      milestones: milestones.map((m) => ({
+        title: m.title,
+        description: m.description,
+        targetDate: m.deadline,
+      })),
+    };
+
+    try {
+      const response = await workflowService.createProject(backendPayload);
+      if (response.success && response.data) {
+        const persistedProject = adaptApiProjectToUiProject(response.data);
+        set((state) => ({
+          project: persistedProject,
+          projects: [persistedProject, ...state.projects.filter((p) => p.id !== persistedProject.id)],
+          activeProjectId: persistedProject.id,
+          activePackageId: persistedProject.episodes?.[0]?.id || '',
+        }));
+        return persistedProject;
+      }
+    } catch (error) {
+      console.warn('Create project API call:', error);
+    }
+
+    return optimisticProject;
   },
 
   setActiveMilestone: (milestoneId) => {

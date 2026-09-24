@@ -1,5 +1,4 @@
 import type { StateCreator } from 'zustand';
-import { mockSubscriptionVIP, mockWallet } from '@/mocks/mockData';
 import { useWorkflowStore } from '../useWorkflowStore';
 import { emptySubscription, type AppState, type AuthSlice, type UserProfile } from './types';
 
@@ -36,8 +35,8 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
         user: creatorUser,
         isVIPMode: true,
         isAuthModalOpen: false,
-        subscription: mockSubscriptionVIP,
-        wallet: { mainCoin: 1500, bonusCoin: 500 },
+        subscription: emptySubscription,
+        wallet: { mainCoin: 0, bonusCoin: 0 },
       });
 
       return { success: true, redirectUrl: '/creator/projects' };
@@ -61,8 +60,8 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
         user: reviewerUser,
         isVIPMode: true,
         isAuthModalOpen: false,
-        subscription: mockSubscriptionVIP,
-        wallet: { mainCoin: 2000, bonusCoin: 1000 },
+        subscription: emptySubscription,
+        wallet: { mainCoin: 0, bonusCoin: 0 },
       });
 
       return { success: true, redirectUrl: '/reviewer' };
@@ -107,8 +106,8 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, 
         user: vipUser,
         isVIPMode: true,
         isAuthModalOpen: false,
-        subscription: mockSubscriptionVIP,
-        wallet: mockWallet,
+        subscription: emptySubscription,
+        wallet: { mainCoin: 0, bonusCoin: 0 },
       });
 
       return { success: true };

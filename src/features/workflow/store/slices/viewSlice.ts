@@ -5,8 +5,8 @@ export const createViewSlice: StateCreator<WorkflowStoreState, [], [], ViewSlice
   currentRole: 'creator',
   setRole: (role) => set({ currentRole: role }),
 
-  activeProjectId: 'proj-cyber-01',
-  activePackageId: 'pkg-ep-03',
+  activeProjectId: '',
+  activePackageId: '',
   setActiveProject: (id) => {
     const state = get();
     // Persist any in-progress edits on the currently open project back into
