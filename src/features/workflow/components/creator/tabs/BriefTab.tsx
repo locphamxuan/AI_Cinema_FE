@@ -30,23 +30,23 @@ export function BriefTab({
   updateContentBrief,
   reviseProductionPlan,
 }: BriefTabProps) {
-  const brief = currentPackage?.brief;
-  const reviewerTargetDuration = currentPackage?.target_duration_minutes ?? 25;
+  const brief = currentPackage.brief;
+  const reviewerTargetDuration = currentPackage.target_duration_minutes;
 
   const [draftScript, setDraftScript] = useState(overallScript || '');
-  const [productionApproach, setProductionApproach] = useState(brief?.production_approach || '');
-  const [draftTargetDuration, setDraftTargetDuration] = useState(brief?.target_duration_minutes || reviewerTargetDuration);
-  const [estimatedTokens, setEstimatedTokens] = useState(brief?.estimated_tokens || 0);
-  const [storyboardSummary, setStoryboardSummary] = useState(brief?.storyboard_summary || '');
-  const [scenes, setScenes] = useState<SceneBreakdownItem[]>(brief?.scene_breakdown || []);
+  const [productionApproach, setProductionApproach] = useState(brief.production_approach || '');
+  const [draftTargetDuration, setDraftTargetDuration] = useState(brief.target_duration_minutes || reviewerTargetDuration);
+  const [estimatedTokens, setEstimatedTokens] = useState(brief.estimated_tokens || 0);
+  const [storyboardSummary, setStoryboardSummary] = useState(brief.storyboard_summary || '');
+  const [scenes, setScenes] = useState<SceneBreakdownItem[]>(brief.scene_breakdown || []);
   const [isSaved, setIsSaved] = useState(false);
 
   const flaggedFields = [
     { label: 'Kịch bản tổng thể', review: scriptReview },
-    { label: 'Thời lượng đề xuất', review: brief?.duration_review },
-    { label: 'Token dự toán', review: brief?.token_review },
+    { label: 'Thời lượng đề xuất', review: brief.duration_review },
+    { label: 'Token dự toán', review: brief.token_review },
   ].filter((f) => f.review?.status === 'changes_requested');
-  const scenesNeedingRework = (brief?.scene_reviews || []).filter((sr) => sr.status === 'changes_requested');
+  const scenesNeedingRework = (brief.scene_reviews || []).filter((sr) => sr.status === 'changes_requested');
 
   const handleAddScene = () => {
     const nextNum = scenes.length + 1;

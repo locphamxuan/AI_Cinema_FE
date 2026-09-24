@@ -100,7 +100,7 @@ export function ReviewerWorkspacePage() {
   const currentPackage = hasSelection ? project.episodes.find((e) => e.id === activePackageId) || project.episodes[0] : undefined;
 
   const [isQuotaModalOpen, setIsQuotaModalOpen] = useState(false);
-  const [quotaToAllocate, setQuotaToAllocate] = useState(currentPackage?.quota_allocated || 500);
+  const [quotaToAllocate, setQuotaToAllocate] = useState(0);
 
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectFeedback, setRejectFeedback] = useState('');
@@ -155,12 +155,12 @@ export function ReviewerWorkspacePage() {
 
   const openQuotaModal = () => {
     if (!currentPackage) return;
-    const estimate = currentPackage.brief?.estimated_tokens || 400;
-    const avail = availableBudget(project);
-    const maxAvail = avail + (currentPackage.quota_allocated || 0);
+    // Start from what is already granted, else the Creator's estimate, never more than the budget left.
+    const estimate = currentPackage.brief.estimated_tokens;
+    const maxAvail = availableBudget(project) + currentPackage.quota_allocated;
     const initialQuota = currentPackage.quota_allocated > 0
       ? currentPackage.quota_allocated
-      : Math.min(estimate, Math.max(50, maxAvail));
+      : Math.min(estimate > 0 ? estimate : maxAvail, maxAvail);
     setQuotaToAllocate(initialQuota);
     setIsQuotaModalOpen(true);
   };

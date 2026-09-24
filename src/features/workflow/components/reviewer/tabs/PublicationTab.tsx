@@ -110,7 +110,7 @@ export function PublicationTab({ project }: PublicationTabProps) {
                   <div className="text-right hidden sm:block">
                     <span className="text-[10px] text-slate-400 dark:text-slate-500 block">Kế hoạch công chiếu:</span>
                     <span className="font-mono font-semibold text-slate-800 dark:text-slate-200 text-xs">
-                      {project.planned_release_date || '2026-12-15'}
+                      {project.planned_release_date || 'Chưa đặt'}
                     </span>
                   </div>
 
