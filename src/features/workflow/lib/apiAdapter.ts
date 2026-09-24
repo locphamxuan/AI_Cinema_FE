@@ -15,6 +15,7 @@ import type {
   WorkflowState,
 } from '@/types/workflow';
 import { buildSceneJobs } from './jobAdapter';
+import { buildReviewLog } from './reviewLog';
 import type {
   ApiEpisodePackage,
   ApiMilestone,
@@ -153,6 +154,7 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject): Epis
     },
     jobs: [],
     assets: [],
+    review_log: buildReviewLog(plan),
     created_at: plan.createdAt,
     updated_at: plan.updatedAt,
   };

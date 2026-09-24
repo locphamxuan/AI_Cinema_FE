@@ -249,8 +249,15 @@ export interface ApiScene {
   status: string;
 }
 
+/** A user as embedded in a response: who reviewed or granted something. */
+export interface ApiActor {
+  id: string;
+  fullName: string;
+}
+
 export interface ApiPlanReview {
   id: string;
+  reviewer?: ApiActor;
   field: PlanReviewField;
   sceneId: string | null;
   status: ReviewStatus;
@@ -266,6 +273,7 @@ export interface ApiQuotaAllocation {
   allocatedAmount: number | string;
   remainingAmount: number | string;
   status: QuotaAllocationStatus;
+  allocatedBy?: ApiActor | null;
   createdAt: string;
 }
 
@@ -285,6 +293,7 @@ export interface ApiComplianceVerdict {
 
 export interface ApiReview {
   id: string;
+  reviewer?: ApiActor;
   status: ReviewStatus;
   comments?: string | null;
   rejectionReason?: string | null;

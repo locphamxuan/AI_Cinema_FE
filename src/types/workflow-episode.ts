@@ -1,6 +1,6 @@
 import type { WorkflowState } from './workflow-role';
 import type { GenerationJob, GeneratedAsset } from './workflow-job';
-import type { FieldReview, SceneReview } from './workflow-review';
+import type { FieldReview, ReviewLog, SceneReview } from './workflow-review';
 
 /**
  * 1. content_brief: Episode Plan — kế hoạch sản xuất của một tập. Chỉ giữ mô tả
@@ -68,6 +68,8 @@ export interface EpisodePackage {
   brief: ContentBrief;
   jobs: GenerationJob[];
   assets: GeneratedAsset[];
+  /** Reviewer decisions on this episode's plan and cuts, newest first. */
+  review_log: ReviewLog[];
   created_at: string;
   updated_at: string;
 }
