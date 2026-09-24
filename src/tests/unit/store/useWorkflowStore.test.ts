@@ -5,7 +5,7 @@ import { availableBudget, derivePlanVerdict, summarizeFlaggedFields } from '@/fe
 import { creatorGroups, reviewerGroups } from '@/features/workflow/lib/projectGroups';
 import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
 import { initialProject, mockAssignedProjects, initialReviews } from '@/tests/fixtures/workflowFixtures';
-import { apiPackage, apiPlan, apiPlanReview, apiProject, apiScene } from '@/tests/fixtures/workflowApiFixtures';
+import { apiJob, apiPackage, apiPlan, apiPlanReview, apiProject, apiScene } from '@/tests/fixtures/workflowApiFixtures';
 import type { ApiProductionProject } from '@/types/workflow-api';
 
 vi.mock('@/services/workflowService', () => ({
@@ -29,6 +29,13 @@ vi.mock('@/services/workflowService', () => ({
     createCatalog: vi.fn(),
     createPublication: vi.fn(),
     publish: vi.fn(),
+    listJobs: vi.fn(),
+    createJob: vi.fn(),
+    runJob: vi.fn(),
+    retryJob: vi.fn(),
+    submitScene: vi.fn(),
+    createEpisodePackage: vi.fn(),
+    submitEpisodePackage: vi.fn(),
   },
 }));
 
@@ -37,7 +44,7 @@ const ok = <T,>(data: T) => Promise.resolve({ success: true, data });
 const fail = (message: string) => Promise.resolve({ success: false, data: null as never, message });
 
 /** Loads `project` into the store and makes every reload return it. */
-function useBackendProject(project: ApiProductionProject) {
+function serveBackendProject(project: ApiProductionProject) {
   api.getProject.mockImplementation(() => ok(project));
   useWorkflowStore.setState({
     project: adaptApiProjectToUiProject(project),
@@ -76,7 +83,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
 
     it('keeps the selected episode across reloads', async () => {
-      useBackendProject(apiProject([apiPlan(), apiPlan({ id: 'plan-2', episodeNumber: 2 })]));
+      serveBackendProject(apiProject([apiPlan(), apiPlan({ id: 'plan-2', episodeNumber: 2 })]));
       useWorkflowStore.setState({ activePackageId: 'plan-2' });
 
       await useWorkflowStore.getState().loadProject('project-1');
@@ -86,7 +93,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
 
   describe('Maker (Creator) plan submission', () => {
     it('deletes removed scenes, saves the rest and submits the plan with their ids', async () => {
-      useBackendProject(apiProject([apiPlan()]));
+      serveBackendProject(apiProject([apiPlan()]));
       const brief = useWorkflowStore.getState().getBrief('plan-1')!;
       useWorkflowStore.getState().updateContentBrief('plan-1', {
         scene_breakdown: [brief.scene_breakdown[0], { scene_number: 2, title: 'Cảnh mới', description: 'Mới', target_duration_sec: 30, estimated_tokens: 50 }],
@@ -114,7 +121,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
 
     it('stops and reports failure when a scene cannot be saved', async () => {
-      useBackendProject(apiProject([apiPlan()]));
+      serveBackendProject(apiProject([apiPlan()]));
       api.updateScene.mockReturnValue(fail('Total scene duration exceeds the plan target duration'));
 
       expect(await useWorkflowStore.getState().submitProductionPlan('plan-1')).toBe(false);
@@ -124,7 +131,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
 
   describe('Checker (Reviewer) field-level plan review (BR-39)', () => {
     it('opens the review round on the first verdict, then decides that row', async () => {
-      useBackendProject(apiProject([apiPlan({ status: 'SUBMITTED' })]));
+      serveBackendProject(apiProject([apiPlan({ status: 'SUBMITTED' })]));
       api.createPlanReview.mockReturnValue(
         ok([apiPlanReview('SCENE', { id: 'row-s1', sceneId: 'scene-1' }), apiPlanReview('DURATION', { id: 'row-d' })])
       );
@@ -136,7 +143,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
 
     it('decides the open row of a scene directly, sending the comment as the reason', async () => {
-      useBackendProject(apiProject([apiPlan({ status: 'UNDER_REVIEW', planReviews: [apiPlanReview('SCENE', { id: 'row-s2', sceneId: 'scene-2' })] })]));
+      serveBackendProject(apiProject([apiPlan({ status: 'UNDER_REVIEW', planReviews: [apiPlanReview('SCENE', { id: 'row-s2', sceneId: 'scene-2' })] })]));
       api.decidePlanReview.mockReturnValue(ok(apiPlanReview('SCENE')));
 
       await useWorkflowStore.getState().reviewScene('plan-1', 2, 'changes_requested', 'Thiếu mô tả');
@@ -145,7 +152,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
 
     it('does not re-decide a field already decided in this round', async () => {
-      useBackendProject(
+      serveBackendProject(
         apiProject([apiPlan({ status: 'UNDER_REVIEW', planReviews: [apiPlanReview('TOKEN_ESTIMATE', { status: 'APPROVED', decidedAt: 'x' })] })])
       );
       expect(await useWorkflowStore.getState().reviewPlanField('plan-1', 'token', 'changes_requested', 'x')).toBe(false);
@@ -153,7 +160,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
 
     it('sends every undecided field back when requesting changes', async () => {
-      useBackendProject(
+      serveBackendProject(
         apiProject([
           apiPlan({
             status: 'UNDER_REVIEW',
@@ -175,20 +182,20 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
 
   describe('Quota allocation', () => {
     it('grants an INITIAL quota, then only the difference as TOP_UP', async () => {
-      useBackendProject(apiProject([apiPlan({ status: 'APPROVED' })]));
+      serveBackendProject(apiProject([apiPlan({ status: 'APPROVED' })]));
       api.allocateQuota.mockReturnValue(ok({}) as never);
       await useWorkflowStore.getState().allocateQuota('plan-1', 400);
       expect(api.allocateQuota).toHaveBeenCalledWith('plan-1', { allocationType: 'INITIAL', allocatedAmount: 400 });
 
       const quota = [{ id: 'q1', allocationType: 'INITIAL' as const, allocatedAmount: '400', remainingAmount: '400', status: 'ACTIVE' as const, createdAt: '' }];
-      useBackendProject(apiProject([apiPlan({ status: 'APPROVED', quotaAllocations: quota })]));
+      serveBackendProject(apiProject([apiPlan({ status: 'APPROVED', quotaAllocations: quota })]));
       await useWorkflowStore.getState().allocateQuota('plan-1', 600);
       expect(api.allocateQuota).toHaveBeenLastCalledWith('plan-1', { allocationType: 'TOP_UP', allocatedAmount: 200 });
     });
 
     it('does nothing when the requested quota is not above the current one', async () => {
       const quota = [{ id: 'q1', allocationType: 'INITIAL' as const, allocatedAmount: '400', remainingAmount: '400', status: 'ACTIVE' as const, createdAt: '' }];
-      useBackendProject(apiProject([apiPlan({ status: 'APPROVED', quotaAllocations: quota })]));
+      serveBackendProject(apiProject([apiPlan({ status: 'APPROVED', quotaAllocations: quota })]));
       expect(await useWorkflowStore.getState().allocateQuota('plan-1', 400)).toBe(false);
       expect(api.allocateQuota).not.toHaveBeenCalled();
     });
@@ -199,7 +206,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     const submitted = () => apiProject([apiPlan({ status: 'APPROVED', episodePackages: [apiPackage()] })]);
 
     it('approves the cut, labels it and records every manual check as passed', async () => {
-      useBackendProject(submitted());
+      serveBackendProject(submitted());
       api.listPolicies.mockReturnValue(ok({ data: [{ id: 'policy-1', name: 'AI', type: 'AI_LABELING', version: '1', isActive: true }] }));
       api.createReview.mockReturnValue(ok({ id: 'review-1' }) as never);
       api.decideReview.mockReturnValue(ok({}) as never);
@@ -215,14 +222,14 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
 
     it('records nothing when any check failed — the cut goes back through "request changes"', async () => {
-      useBackendProject(submitted());
+      serveBackendProject(submitted());
       expect(await useWorkflowStore.getState().passCompliance('plan-1', { ...allPassed, COPYRIGHT: false }, 'INTRO_OUTRO')).toBe(false);
       expect(api.createReview).not.toHaveBeenCalled();
       expect(api.recordComplianceReview).not.toHaveBeenCalled();
     });
 
     it('creates the catalog episode on first publish, then publishes the package', async () => {
-      useBackendProject(submitted());
+      serveBackendProject(submitted());
       api.createCatalog.mockReturnValue(ok({ id: 'movie-1', episodes: [{ id: 'episode-1', currentPackageId: 'package-1' }] }));
       api.createPublication.mockReturnValue(ok({ id: 'pub-1' }) as never);
       api.publish.mockReturnValue(ok({}) as never);
@@ -233,12 +240,81 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     });
 
     it('requests content changes through a new review of the package', async () => {
-      useBackendProject(submitted());
+      serveBackendProject(submitted());
       api.createReview.mockReturnValue(ok({ id: 'review-2' }) as never);
       api.decideReview.mockReturnValue(ok({}) as never);
 
       expect(await useWorkflowStore.getState().requestContentChanges('plan-1', 'Âm thanh lệch')).toBe(true);
       expect(api.decideReview).toHaveBeenCalledWith('review-2', { decision: 'CHANGES_REQUESTED', rejectionReason: 'Âm thanh lệch' });
+    });
+  });
+
+  describe('Studio production (BR-40, BR-41)', () => {
+    const inProduction = (jobs = [apiJob('job-1', 'scene-1')]) => {
+      const quota = [{ id: 'q1', allocationType: 'INITIAL' as const, allocatedAmount: '500', remainingAmount: '400', status: 'ACTIVE' as const, createdAt: '' }];
+      serveBackendProject(apiProject([apiPlan({ status: 'APPROVED', quotaAllocations: quota, _count: { generationJobs: jobs.length } })]));
+      api.listJobs.mockReturnValue(ok(jobs));
+    };
+
+    it('creates and runs each draft step of a scene as a backend job', async () => {
+      inProduction([]);
+      const store = useWorkflowStore.getState();
+      store.addGenerationStep('plan-1', 'scene-2', { function_type: 'VIDEO', prompt: 'Toàn cảnh', status: 'pending', selected_model: '', token_cost: 0 });
+      store.addGenerationStep('plan-1', 'scene-2', { function_type: 'CUSTOM', custom_function: 'Lip sync', prompt: 'Khớp môi', status: 'pending', selected_model: '', token_cost: 0 });
+      api.createJob.mockReturnValueOnce(ok(apiJob('new-1', 'scene-2'))).mockReturnValueOnce(ok(apiJob('new-2', 'scene-2')));
+      api.runJob.mockReturnValue(ok(apiJob('x', 'scene-2')));
+
+      expect(await useWorkflowStore.getState().triggerGenerationJob('plan-1', 'scene-2')).toBe(true);
+      expect(api.createJob).toHaveBeenNthCalledWith(1, 'plan-1', { jobType: 'SCENE_VIDEO', prompt: 'Toàn cảnh', customFunction: undefined, sceneId: 'scene-2' });
+      expect(api.createJob).toHaveBeenNthCalledWith(2, 'plan-1', { jobType: 'CUSTOM', prompt: 'Khớp môi', customFunction: 'Lip sync', sceneId: 'scene-2' });
+      expect(api.runJob.mock.calls.map((c) => c[0])).toEqual(['new-1', 'new-2']);
+      expect(useWorkflowStore.getState().getJobs('plan-1').find((j) => j.id === 'scene-2')?.generation_steps).toEqual([]);
+    });
+
+    it('regenerates the saved steps through a retry when the scene has no drafts', async () => {
+      inProduction();
+      await useWorkflowStore.getState().loadProject('project-1');
+      api.retryJob.mockReturnValue(ok(apiJob('job-1b', 'scene-1')));
+      api.runJob.mockReturnValue(ok(apiJob('job-1b', 'scene-1')));
+
+      expect(await useWorkflowStore.getState().triggerGenerationJob('plan-1', 'scene-1')).toBe(true);
+      expect(api.retryJob).toHaveBeenCalledWith('job-1');
+      expect(api.runJob).toHaveBeenCalledWith('job-1b');
+      expect(api.createJob).not.toHaveBeenCalled();
+    });
+
+    it('keeps draft steps across a reload and lets only drafts be edited', async () => {
+      inProduction();
+      await useWorkflowStore.getState().loadProject('project-1');
+      const store = useWorkflowStore.getState();
+      store.addGenerationStep('plan-1', 'scene-1', { function_type: 'IMAGE', prompt: 'Poster', status: 'pending', selected_model: '', token_cost: 0 });
+      store.updateGenerationStep('plan-1', 'scene-1', 'job-1', { prompt: 'đổi' });
+
+      await useWorkflowStore.getState().loadProject('project-1');
+      const steps = useWorkflowStore.getState().getJobs('plan-1').find((j) => j.id === 'scene-1')!.generation_steps;
+      expect(steps.map((s) => s.prompt)).toEqual(['Mô tả job-1', 'Poster']);
+    });
+
+    it('completes the unfinished scenes, assembles the package and submits it', async () => {
+      inProduction();
+      serveBackendProject(
+        apiProject([apiPlan({ status: 'APPROVED', scenes: [apiScene(1, { status: 'COMPLETED' }), apiScene(2, { status: 'GENERATING' })] })])
+      );
+      api.submitScene.mockReturnValue(ok({}));
+      api.createEpisodePackage.mockReturnValue(ok(apiPackage({ id: 'package-9' })));
+      api.submitEpisodePackage.mockReturnValue(ok({}));
+
+      expect(await useWorkflowStore.getState().submitEpisodePackage('plan-1')).toBe(true);
+      expect(api.submitScene.mock.calls.map((c) => c[0])).toEqual(['scene-2']);
+      expect(api.submitEpisodePackage).toHaveBeenCalledWith('package-9');
+    });
+
+    it('stops before assembling when a scene cannot be completed', async () => {
+      inProduction();
+      api.submitScene.mockReturnValue(fail('Scene must have at least one VIDEO asset to be submitted'));
+
+      expect(await useWorkflowStore.getState().submitEpisodePackage('plan-1')).toBe(false);
+      expect(api.createEpisodePackage).not.toHaveBeenCalled();
     });
   });
 
@@ -298,18 +374,6 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
       };
       expect(derivePlanVerdict(project, brief)).toBe('CHANGES_REQUESTED');
       expect(summarizeFlaggedFields(project, brief)).toBe('• Token dự toán: Vượt ngân sách\n• Phân cảnh 2: Thiếu mô tả');
-    });
-  });
-
-  describe('Scene production token cost (BR-41)', () => {
-    it('settles each step with an output duration and cost that scale with output length', async () => {
-      const { settleGenerationStep } = await import('@/features/workflow/lib/tokenCost');
-      const short = settleGenerationStep({ function_type: 'VIDEO', prompt: 'cảnh ngắn' });
-      const long = settleGenerationStep({ function_type: 'VIDEO', prompt: 'x'.repeat(400) });
-
-      expect(long.output_duration).toBeGreaterThan(short.output_duration);
-      expect(long.token_cost).toBeGreaterThan(short.token_cost);
-      expect(short.token_cost).toBe(Math.round(short.output_duration * 3));
     });
   });
 

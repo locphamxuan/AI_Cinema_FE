@@ -1,5 +1,6 @@
 import type {
   ApiEpisodePackage,
+  ApiGenerationJob,
   ApiPlanReview,
   ApiProductionPlan,
   ApiProductionProject,
@@ -93,6 +94,27 @@ export function apiProject(plans: ApiProductionPlan[], overrides: Partial<ApiPro
     milestones: [],
     productionProjectGenres: [{ genre: { id: 'genre-1', name: 'Khoa học viễn tưởng' } }],
     productionPlans: plans,
+    ...overrides,
+  };
+}
+
+export function apiJob(id: string, sceneId: string, overrides: Partial<ApiGenerationJob> = {}): ApiGenerationJob {
+  return {
+    id,
+    jobType: 'SCENE_VIDEO',
+    status: 'COMPLETED',
+    sceneId,
+    attemptNumber: 1,
+    parentJobId: null,
+    rawPrompt: `Mô tả ${id}`,
+    customFunction: null,
+    estimatedTokenCost: 40,
+    resourceCost: '45',
+    outputDurationSeconds: '8',
+    errorMessage: null,
+    createdAt: at,
+    aiModel: { id: 'model-1', name: 'Veo 3' },
+    generatedAssets: [{ id: `asset-${id}`, assetType: 'VIDEO', storageKey: 'https://cdn/clip.m3u8', durationSeconds: 8 }],
     ...overrides,
   };
 }
