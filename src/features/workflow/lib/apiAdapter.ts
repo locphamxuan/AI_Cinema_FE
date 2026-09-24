@@ -14,6 +14,7 @@ import type {
   SceneReviewStatus,
   WorkflowState,
 } from '@/types/workflow';
+import { buildSceneJobs } from './jobAdapter';
 import type {
   ApiEpisodePackage,
   ApiMilestone,
@@ -116,7 +117,7 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject): Epis
   const allocated = activeQuota.reduce((sum, q) => sum + toNumber(q.allocatedAmount), 0);
   const remaining = activeQuota.reduce((sum, q) => sum + toNumber(q.remainingAmount), 0);
 
-  return {
+  const episode: EpisodePackage = {
     id: plan.id,
     package_id: pkg?.id,
     catalog_episode_id: pkg?.currentForEpisode?.id,
@@ -155,6 +156,8 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject): Epis
     created_at: plan.createdAt,
     updated_at: plan.updatedAt,
   };
+  // Jobs are listed per plan; the store fills them in for episodes in production.
+  return { ...episode, ...buildSceneJobs(episode, []) };
 }
 
 /** The detail endpoint returns every plan version, newest first per episode — keep the newest. */

@@ -375,6 +375,7 @@ export interface ApiGeneratedAsset {
   storageKey?: string | null;
   mimeType?: string | null;
   durationSeconds?: number | null;
+  createdAt?: string;
 }
 
 export interface ApiGenerationJob {

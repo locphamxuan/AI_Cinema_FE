@@ -53,7 +53,7 @@ class WorkflowService {
   }
 
   listGenres(): Promise<ApiResponse<Paginated<ApiGenre>>> {
-    return apiClient.get<Paginated<ApiGenre>>(ROUTES.GENRES);
+    return apiClient.get<Paginated<ApiGenre>>(`${ROUTES.GENRES}?limit=100`);
   }
 
   listPolicies(): Promise<ApiResponse<Paginated<ApiPolicy>>> {
@@ -120,8 +120,8 @@ class WorkflowService {
   }
 
   // Generation jobs (Studio)
-  listJobs(planId: string): Promise<ApiResponse<Paginated<ApiGenerationJob>>> {
-    return apiClient.get<Paginated<ApiGenerationJob>>(ROUTES.GENERATION_JOBS(planId));
+  listJobs(planId: string): Promise<ApiResponse<ApiGenerationJob[]>> {
+    return apiClient.get<ApiGenerationJob[]>(ROUTES.GENERATION_JOBS(planId));
   }
 
   createJob(planId: string, dto: CreateGenerationJobDto): Promise<ApiResponse<ApiGenerationJob>> {
@@ -130,6 +130,16 @@ class WorkflowService {
 
   runJob(jobId: string): Promise<ApiResponse<ApiGenerationJob>> {
     return apiClient.post<ApiGenerationJob>(ROUTES.JOB_RUN(jobId));
+  }
+
+  /** New attempt of a finished job — charged again (BR-41). */
+  retryJob(jobId: string, prompt?: string): Promise<ApiResponse<ApiGenerationJob>> {
+    return apiClient.post<ApiGenerationJob>(ROUTES.JOB_RETRY(jobId), prompt ? { prompt } : {});
+  }
+
+  /** Marks a generated scene COMPLETED; every scene must be before the episode is assembled. */
+  submitScene(sceneId: string): Promise<ApiResponse<unknown>> {
+    return apiClient.post<unknown>(ROUTES.SCENE_SUBMIT(sceneId), {});
   }
 
   // Episode packages, submission & content review
