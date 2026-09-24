@@ -5,8 +5,12 @@
  */
 
 import { PENDING_FIELD_REVIEW } from '@/types/workflow';
+import { API_ROUTES } from '@/constants/apiRoutes';
+import { languageLabel } from '@/constants/languages';
+import { formatDuration } from '@/services/movieAdapter';
 import type {
   EpisodePackage,
+  FinalCut,
   FieldReview,
   ProductionProject,
   ProjectMilestone,
@@ -99,6 +103,18 @@ function deriveEpisodeState(plan: ApiProductionPlan, pkg: ApiEpisodePackage | un
   }
 }
 
+function finalCutOf(pkg: ApiEpisodePackage, streamUrl: string): FinalCut {
+  return {
+    stream_url: streamUrl,
+    qualities: pkg.qualities,
+    subtitles: pkg.subtitles.map(({ language }) => ({
+      language,
+      label: languageLabel(language),
+      endpoint: API_ROUTES.WORKFLOW.PACKAGE_SUBTITLE(pkg.id, language),
+    })),
+  };
+}
+
 function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multiSeason: boolean): EpisodePackage {
   const reviews = latestReviews(plan);
   const pkg = plan.episodePackages[0];
@@ -132,11 +148,10 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multi
     title,
     target_duration_minutes: allottedMinutes,
     status,
-    total_duration: `${proposedMinutes}:00`,
+    total_duration: pkg?.durationSeconds ? formatDuration(pkg.durationSeconds) : `${proposedMinutes}:00`,
     actual_tokens_used: allocated - remaining,
     quota_allocated: allocated,
-    video_draft_url: '',
-    thumbnail_url: '',
+    final_cut: pkg?.streamUrl ? finalCutOf(pkg, pkg.streamUrl) : undefined,
     brief: {
       id: plan.id,
       project_id: project.id,

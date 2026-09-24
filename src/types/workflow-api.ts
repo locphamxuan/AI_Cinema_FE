@@ -305,6 +305,11 @@ export interface ApiEpisodePackage {
   id: string;
   packageVersion: number;
   createdAt: string;
+  /** Transcoded final cut: HLS master playlist, its renditions and total length. */
+  streamUrl: string | null;
+  qualities: string[];
+  durationSeconds: number | null;
+  subtitles: { language: string }[];
   submissions: { id: string; status: string; createdAt: string }[];
   reviews: ApiReview[];
   complianceChecks: ApiComplianceCheck[];

@@ -47,6 +47,20 @@ export interface ContentBrief {
  * 4. episode_package: Gói tập phim hoàn chỉnh ghép từ các phân cảnh.
  * `id` is the backend production plan id — every MF-1 call is keyed by plan.
  */
+export interface PackageSubtitle {
+  language: string;
+  label: string;
+  /** API endpoint of the WebVTT track; it needs the signed-in user's token. */
+  endpoint: string;
+}
+
+export interface FinalCut {
+  stream_url: string;
+  /** Renditions, lowest first, e.g. ['360p', '720p', '1080p']. */
+  qualities: string[];
+  subtitles: PackageSubtitle[];
+}
+
 export interface EpisodePackage {
   id: string;
   /** Latest backend episode package, once the Creator assembled one. */
@@ -63,8 +77,8 @@ export interface EpisodePackage {
   total_duration: string;
   actual_tokens_used: number;
   quota_allocated: number;
-  video_draft_url: string;
-  thumbnail_url: string;
+  /** The assembled cut the Reviewer audits; absent until the Creator submits one. */
+  final_cut?: FinalCut;
   brief: ContentBrief;
   jobs: GenerationJob[];
   assets: GeneratedAsset[];

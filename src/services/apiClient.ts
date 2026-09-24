@@ -144,6 +144,16 @@ class ApiClient {
     );
   }
 
+  /** Plain-text resource behind auth, e.g. a WebVTT subtitle track; null when it cannot be read. */
+  async getText(endpoint: string): Promise<string | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}${endpoint}`, { headers: this.getAuthHeader() });
+      return response.ok ? await response.text() : null;
+    } catch {
+      return null;
+    }
+  }
+
   delete<T>(endpoint: string, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' }, mockFallbackFn);
   }

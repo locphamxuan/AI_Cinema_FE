@@ -69,6 +69,21 @@ describe('adaptApiProjectToUiProject', () => {
     });
   });
 
+  it('exposes the assembled cut with its renditions, real duration and subtitle tracks', () => {
+    const episode = episodeOf({ status: 'APPROVED', episodePackages: [apiPackage()] });
+
+    expect(episode.total_duration).toBe('1:35');
+    expect(episode.final_cut).toEqual({
+      stream_url: 'https://cdn.example.com/package-1/master.m3u8',
+      qualities: ['360p', '720p', '1080p'],
+      subtitles: [
+        { language: 'vi', label: 'Tiếng Việt', endpoint: '/episode-packages/package-1/subtitles/vi' },
+        { language: 'en', label: 'English', endpoint: '/episode-packages/package-1/subtitles/en' },
+      ],
+    });
+    expect(episodeOf({ status: 'APPROVED' }).final_cut).toBeUndefined();
+  });
+
   describe('field reviews (BR-39)', () => {
     it('shows the latest verdict of every scene and plan field, with its review row', () => {
       const brief = episodeOf({
