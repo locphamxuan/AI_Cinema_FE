@@ -329,6 +329,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
         title: 'Phim thử',
         creator_id: 'creator-1',
         genre_ids: ['genre-1'],
+        subtitle_languages: ['vi', 'en'],
         synopsis: '',
         episodes: [
           { season_number: 1, duration_minutes: 20 },
@@ -346,6 +347,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
         expect.objectContaining({
           assignedCreatorId: 'creator-1',
           genreIds: ['genre-1'],
+          subtitleLanguages: ['vi', 'en'],
           contentType: 'SERIES',
           episodes: [
             { seasonNumber: 1, targetDurationSeconds: 1200 },

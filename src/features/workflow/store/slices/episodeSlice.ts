@@ -262,6 +262,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
         episodes: data.episodes.map((e) => ({ seasonNumber: e.season_number, targetDurationSeconds: e.duration_minutes * 60 })),
         assignedCreatorId: data.creator_id,
         genreIds: data.genre_ids,
+        subtitleLanguages: data.subtitle_languages,
         milestones: (data.milestones ?? []).map((m) => ({
           title: m.title,
           description: m.description,

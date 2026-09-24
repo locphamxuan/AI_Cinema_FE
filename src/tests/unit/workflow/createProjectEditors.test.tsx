@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SeasonEpisodesEditor } from '@/features/workflow/components/reviewer/modals/SeasonEpisodesEditor';
 import { GenrePicker } from '@/features/workflow/components/reviewer/modals/GenrePicker';
+import { SubtitleLanguagePicker } from '@/features/workflow/components/reviewer/modals/SubtitleLanguagePicker';
 import type { ApiGenre } from '@/types/workflow-api';
 
 function Seasons({ initial, onChange }: { initial: number[][]; onChange: (s: number[][]) => void }) {
@@ -89,5 +90,26 @@ describe('GenrePicker', () => {
 
     expect(onCreate).toHaveBeenCalledWith('Hậu tận thế');
     await waitFor(() => expect(onChange).toHaveBeenCalledWith(['hau-tan-the']));
+  });
+});
+
+describe('SubtitleLanguagePicker', () => {
+  it('adds a translation language after the source one', async () => {
+    const onChange = vi.fn();
+    render(<SubtitleLanguagePicker selected={['vi']} onChange={onChange} />);
+
+    await userEvent.click(screen.getByRole('button', { name: /English/ }));
+
+    expect(onChange).toHaveBeenCalledWith(['vi', 'en']);
+  });
+
+  it('keeps at least one subtitle language', async () => {
+    const onChange = vi.fn();
+    render(<SubtitleLanguagePicker selected={['vi']} onChange={onChange} />);
+
+    const only = screen.getByRole('button', { name: /Tiếng Việt/ });
+    expect(only).toBeDisabled();
+    await userEvent.click(only);
+    expect(onChange).not.toHaveBeenCalled();
   });
 });

@@ -84,6 +84,8 @@ export interface CreateProductionProjectDto {
   totalAiQuotaBudget: number;
   genreIds?: string[];
   policyIds?: string[];
+  /** BCP-47 codes every episode ships subtitles in; defaults to ["vi"]. */
+  subtitleLanguages?: string[];
   assignedCreatorId: string;
   /** Every episode in order with its season and allotted duration; seasons may differ in size. */
   episodes?: { seasonNumber: number; targetDurationSeconds: number }[];

@@ -45,6 +45,8 @@ export interface EpisodeSlice {
     title: string;
     creator_id: string;
     genre_ids: string[];
+    /** Languages every episode ships subtitles in; the first is the source language. */
+    subtitle_languages: string[];
     synopsis: string;
     /** Every episode in order with its season and the duration (minutes) the Reviewer allots it. */
     episodes: { season_number: number; duration_minutes: number }[];

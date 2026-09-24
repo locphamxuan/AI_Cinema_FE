@@ -9,6 +9,7 @@ import { workflowService } from '@/services/workflowService';
 import { toast } from '@/components/ui/Toast';
 import { GenrePicker } from './GenrePicker';
 import { SeasonEpisodesEditor } from './SeasonEpisodesEditor';
+import { SubtitleLanguagePicker } from './SubtitleLanguagePicker';
 
 export interface CreateProjectFormState {
   title: string;
@@ -19,6 +20,8 @@ export interface CreateProjectFormState {
   synopsis: string;
   /** One list per season, holding each episode's target duration in minutes; seasons may differ in size. */
   seasons: number[][];
+  /** BCP-47 codes of the subtitle languages; the first is the source language. */
+  subtitleLanguages: string[];
   budgetTokens: number;
   productionStartDate: string;
   deadline: string;
@@ -130,6 +133,11 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
         </div>
 
         <SeasonEpisodesEditor seasons={form.seasons} onChange={(seasons) => onChange('seasons', seasons)} />
+
+        <SubtitleLanguagePicker
+          selected={form.subtitleLanguages}
+          onChange={(languages) => onChange('subtitleLanguages', languages)}
+        />
 
         <div>
           {/* Ngân Sách AI Tokens */}

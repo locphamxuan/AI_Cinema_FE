@@ -16,38 +16,48 @@ import { AllocateQuotaModal } from './modals/AllocateQuotaModal';
 import { RejectPlanModal } from './modals/RejectPlanModal';
 import { CreateProjectModal, type CreateProjectFormState } from './modals/CreateProjectModal';
 import { toast } from '@/components/ui/Toast';
+import { DEFAULT_SUBTITLE_LANGUAGE } from '@/constants/languages';
 
 type ReviewerTab = 'overview' | 'plans' | 'audits' | 'publication' | 'tokens';
 
-const DEFAULT_FORM: CreateProjectFormState = {
+/** yyyy-mm-dd of today shifted by some days, in local time. */
+const dateFromToday = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toLocaleDateString('en-CA');
+};
+
+/** A fresh form: production starts today, wraps in 3 months and releases a month later. */
+const defaultForm = (): CreateProjectFormState => ({
   title: '',
   assignedCreator: '',
   genre: [],
   synopsis: '',
   seasons: [[30, 30, 30, 30, 30]],
+  subtitleLanguages: [DEFAULT_SUBTITLE_LANGUAGE],
   budgetTokens: 3000,
-  productionStartDate: '2026-09-17',
-  deadline: '2026-12-31',
-  releaseDate: '2027-01-15',
+  productionStartDate: dateFromToday(0),
+  deadline: dateFromToday(90),
+  releaseDate: dateFromToday(120),
   milestones: [
     {
       id: 'ms-init-1',
       title: 'Cột mốc 1: Khởi tạo kịch bản & phân cảnh',
-      startDate: '2026-09-17',
-      deadline: '2026-10-15',
+      startDate: dateFromToday(0),
+      deadline: dateFromToday(30),
       description: 'Hoàn thành bản kịch bản chi tiết và danh sách cảnh phim.',
       status: 'in_progress',
     },
     {
       id: 'ms-init-2',
       title: 'Cột mốc 2: Sản xuất AI Video & Nộp duyệt',
-      startDate: '2026-10-16',
-      deadline: '2026-11-15',
-      description: 'Render clip 4K và gửi Thẩm định viên kiểm định.',
+      startDate: dateFromToday(31),
+      deadline: dateFromToday(60),
+      description: 'Render clip và gửi Thẩm định viên kiểm định.',
       status: 'pending',
     },
   ],
-};
+});
 
 /**
  * Reviewer's entry point after login: left sidebar holds the film lists
@@ -84,7 +94,7 @@ export function ReviewerWorkspacePage() {
   }, [activeTab, activePackageId]);
 
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
-  const [createForm, setCreateForm] = useState<CreateProjectFormState>(DEFAULT_FORM);
+  const [createForm, setCreateForm] = useState<CreateProjectFormState>(defaultForm);
 
   const hasSelection = projects.some((p) => p.id === activeProjectId);
   const currentPackage = hasSelection ? project.episodes.find((e) => e.id === activePackageId) || project.episodes[0] : undefined;
@@ -122,6 +132,7 @@ export function ReviewerWorkspacePage() {
       title: createForm.title,
       creator_id: createForm.assignedCreator,
       genre_ids: createForm.genre,
+      subtitle_languages: createForm.subtitleLanguages,
       synopsis: createForm.synopsis,
       episodes: createForm.seasons.flatMap((durations, s) => durations.map((minutes) => ({ season_number: s + 1, duration_minutes: minutes }))),
       total_budget_tokens: createForm.budgetTokens,
@@ -133,7 +144,7 @@ export function ReviewerWorkspacePage() {
     if (!created) return;
 
     setIsCreateProjectOpen(false);
-    setCreateForm(DEFAULT_FORM);
+    setCreateForm(defaultForm());
     setActiveTab('overview');
   };
 
