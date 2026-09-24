@@ -320,7 +320,7 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
   });
 
   describe('Project creation', () => {
-    it('sends ids for the creator and genres and selects the new project', async () => {
+    it('sends ids, every episode with its season and allotted duration, and selects the new project', async () => {
       api.createProject.mockReturnValue(ok(apiProject([], { id: 'project-new' })));
       api.listProjects.mockReturnValue(ok({ data: [apiProject([], { id: 'project-new', productionPlans: undefined })] }));
       api.getProject.mockReturnValue(ok(apiProject([apiPlan()], { id: 'project-new' })));
@@ -330,8 +330,11 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
         creator_id: 'creator-1',
         genre_ids: ['genre-1'],
         synopsis: '',
-        total_episodes: 2,
-        episode_duration_minutes: 20,
+        episodes: [
+          { season_number: 1, duration_minutes: 20 },
+          { season_number: 1, duration_minutes: 25 },
+          { season_number: 2, duration_minutes: 30 },
+        ],
         total_budget_tokens: 1000,
         production_start_date: '2026-10-01',
         deadline: '2026-12-01',
@@ -340,7 +343,16 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
 
       expect(created).toBe(true);
       expect(api.createProject).toHaveBeenCalledWith(
-        expect.objectContaining({ assignedCreatorId: 'creator-1', genreIds: ['genre-1'], contentType: 'SERIES', episodeCount: 2, defaultEpisodeDurationSeconds: 1200 })
+        expect.objectContaining({
+          assignedCreatorId: 'creator-1',
+          genreIds: ['genre-1'],
+          contentType: 'SERIES',
+          episodes: [
+            { seasonNumber: 1, targetDurationSeconds: 1200 },
+            { seasonNumber: 1, targetDurationSeconds: 1500 },
+            { seasonNumber: 2, targetDurationSeconds: 1800 },
+          ],
+        })
       );
       expect(useWorkflowStore.getState().activeProjectId).toBe('project-new');
     });

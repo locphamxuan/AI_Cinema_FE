@@ -57,6 +57,9 @@ export function apiPlan(overrides: Partial<ApiProductionPlan> = {}): ApiProducti
   return {
     id: 'plan-1',
     episodeNumber: 1,
+    seasonNumber: 1,
+    seasonEpisodeNumber: overrides.episodeNumber ?? 1,
+    allottedDurationSeconds: 900,
     planVersion: 1,
     status: 'DRAFT',
     scriptText: 'Kịch bản tổng thể',

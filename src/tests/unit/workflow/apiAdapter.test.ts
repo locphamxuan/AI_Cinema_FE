@@ -98,3 +98,29 @@ describe('adaptApiProjectToUiProject', () => {
     });
   });
 });
+
+describe('seasons and allotted durations', () => {
+  const project = adaptApiProjectToUiProject(
+    apiProject([
+      apiPlan({ id: 's2e1', episodeNumber: 3, seasonNumber: 2, seasonEpisodeNumber: 1, allottedDurationSeconds: 1500 }),
+      apiPlan({ id: 's1e2', episodeNumber: 2, seasonNumber: 1, seasonEpisodeNumber: 2, allottedDurationSeconds: 1200, targetDurationSeconds: 900 }),
+      apiPlan({ id: 's1e1', episodeNumber: 1, seasonNumber: 1, seasonEpisodeNumber: 1 }),
+    ])
+  );
+
+  it('orders episodes by season, numbers them inside it and names the season in titles', () => {
+    expect(project.season_count).toBe(2);
+    expect(project.episodes.map((e) => [e.id, e.season_number, e.episode_number])).toEqual([
+      ['s1e1', 1, 1],
+      ['s1e2', 1, 2],
+      ['s2e1', 2, 1],
+    ]);
+    expect(project.episodes[2].title).toBe('Mùa 2 · Tập 1: Saigon 2077');
+  });
+
+  it("compares the Creator's proposed duration against the Reviewer's allotted one", () => {
+    const episode = project.episodes[1];
+    expect(episode.target_duration_minutes).toBe(20);
+    expect(episode.brief.target_duration_minutes).toBe(15);
+  });
+});
