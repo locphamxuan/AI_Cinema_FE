@@ -6,7 +6,8 @@ import HeroBanner from '@/components/home/HeroBanner';
 import CategoryPills from '@/components/home/CategoryPills';
 import MovieRow from '@/components/home/MovieRow';
 import TopTenRow from '@/components/home/TopTenRow';
-import { trendingMovies, recommendedMovies, top10Movies, allMockMovies } from '@/mocks/mockData';
+
+const emptyMovieList: any[] = [];
 
 export default function HomePage() {
   const { isAuthenticated, isVIPMode, currentMovie } = useAppStore();
@@ -17,7 +18,7 @@ export default function HomePage() {
   }
 
   // Top 5 hot movies for Full-Width Hero Carousel
-  const hotMovies = allMockMovies.slice(0, 5);
+  const hotMovies = emptyMovieList.slice(0, 5);
 
   // If logged in -> Show Full Premium OTT Streaming Dashboard
   return (
@@ -29,13 +30,13 @@ export default function HomePage() {
       <CategoryPills />
 
       {/* 3. Netflix-Style Top 10 Ranked Row */}
-      <TopTenRow movies={top10Movies} />
+      <TopTenRow movies={emptyMovieList} />
 
       {/* 4. Trending AI Movies Horizontal Row */}
       <MovieRow
         title="Phim AI Đang Thịnh Hành"
         subtitle="Các tác phẩm được cộng đồng xem nhiều nhất trong tuần"
-        movies={trendingMovies}
+        movies={emptyMovieList}
         exploreHref="/watch/ep-001"
       />
 
@@ -43,7 +44,7 @@ export default function HomePage() {
       <MovieRow
         title="Gợi Ý Dành Riêng Cho Bạn"
         subtitle="Dựa trên thể loại AI & Cyberpunk bạn vừa xem"
-        movies={recommendedMovies}
+        movies={emptyMovieList}
         exploreHref="/watch/ep-002"
       />
 
@@ -51,7 +52,7 @@ export default function HomePage() {
       <MovieRow
         title="Tác Phẩm Độc Quyền AI Cinema"
         subtitle="Sản xuất bằng mô hình Sora Vision Pro & CinemaGen v3.2"
-        movies={allMockMovies}
+        movies={emptyMovieList}
         exploreHref="/watch/ep-001"
       />
     </div>

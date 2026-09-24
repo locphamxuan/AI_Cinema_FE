@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { genreCategories } from '@/mocks/mockData';
+
+const genreCategories: string[] = [];
 
 interface CategoryPillsProps {
   onSelectCategory?: (category: string) => void;

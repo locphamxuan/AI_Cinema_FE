@@ -1,8 +1,9 @@
 'use client';
 
 import { useAppStore } from '@/store/useAppStore';
-import { quickActions } from '@/mocks/mockData';
 import { useState, useRef, useEffect, useCallback } from 'react';
+
+const quickActions: { id: string; label: string }[] = [];
 
 export default function SupportChatWidget() {
   const {

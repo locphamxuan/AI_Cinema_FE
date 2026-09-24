@@ -1,10 +1,11 @@
 import type { StateCreator } from 'zustand';
 import { ChatMessage, ChatPhase, SupportTicket } from '@/types/chat';
-import { mockInitialMessages, botResponses } from '@/mocks/mockData';
 import type { AppState, ChatSlice } from './types';
 
+const defaultSupportReply = 'Xin chào! Tôi đang chờ dữ liệu từ backend để trả lời chính xác cho bạn.';
+
 export const createChatSlice: StateCreator<AppState, [], [], ChatSlice> = (set, get) => ({
-  chatMessages: mockInitialMessages,
+  chatMessages: [],
   chatPhase: 'bot' as ChatPhase,
   chatIsOpen: false,
   chatTicket: null,
@@ -27,7 +28,7 @@ export const createChatSlice: StateCreator<AppState, [], [], ChatSlice> = (set, 
       const botMsg: ChatMessage = {
         id: `msg-${Date.now()}`,
         sender: 'bot',
-        content: botResponses['default'],
+        content: `Đã nhận yêu cầu của bạn. ${defaultSupportReply}`,
         timestamp: new Date().toISOString(),
       };
       set((s) => ({ chatMessages: [...s.chatMessages, botMsg] }));
@@ -54,7 +55,7 @@ export const createChatSlice: StateCreator<AppState, [], [], ChatSlice> = (set, 
       const botMsg: ChatMessage = {
         id: `msg-${Date.now()}`,
         sender: 'bot',
-        content: botResponses[actionId] || botResponses['default'],
+        content: `${actionLabels[actionId] || 'Yêu cầu của bạn'} đã được ghi nhận. ${defaultSupportReply}`,
         timestamp: new Date().toISOString(),
       };
       set((s) => ({ chatMessages: [...s.chatMessages, botMsg] }));

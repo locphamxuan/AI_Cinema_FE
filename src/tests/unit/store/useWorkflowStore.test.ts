@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { availableBudget, derivePlanVerdict, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
 import { creatorGroups, reviewerGroups } from '@/features/workflow/lib/projectGroups';
+import { workflowService } from '@/services/workflowService';
 
 describe('Zustand Workflow Store (src/features/workflow/store)', () => {
   beforeEach(() => {
+    vi.restoreAllMocks();
     useWorkflowStore.getState().resetDemoData();
   });
 
@@ -146,6 +148,85 @@ describe('Zustand Workflow Store (src/features/workflow/store)', () => {
     it('keeps every seeded episode inside the 30 minute MVP cap', () => {
       const { project } = useWorkflowStore.getState();
       expect(project.episodes.every((ep) => ep.target_duration_minutes <= 30 && ep.brief.target_duration_minutes <= 30)).toBe(true);
+    });
+  });
+
+  describe('Reviewer project creation', () => {
+    it('uses the backend response when creating a project and keeps the new project in the roster', async () => {
+      const mockApiProject = {
+        id: 'proj-api-001',
+        title: 'Phim API mới',
+        description: 'Mô tả từ backend',
+        contentType: 'SERIES',
+        defaultEpisodeDurationSeconds: 1800,
+        episodeCount: 1,
+        productionStartDate: '2026-09-25',
+        deadline: '2026-12-10',
+        plannedReleaseDate: '2026-12-20',
+        totalAiQuotaBudget: 2500,
+        remainingAiQuotaBudget: 2500,
+        assignedCreator: { id: 'user-1', fullName: 'Nguyễn Văn A', email: 'a@example.com', role: 'CONTENT_CREATOR', isActive: true, createdAt: '2026-09-24T00:00:00.000Z', updatedAt: '2026-09-24T00:00:00.000Z' },
+        createdBy: { id: 'reviewer-1', fullName: 'Lê Quốc Bảo', email: 'b@example.com', role: 'CONTENT_REVIEWER', isActive: true, createdAt: '2026-09-24T00:00:00.000Z', updatedAt: '2026-09-24T00:00:00.000Z' },
+        genres: [{ id: 'g1', genre: { id: 'g1', slug: 'sci-fi', name: 'Khoa học viễn tưởng' } }],
+        status: 'DRAFT',
+        milestones: [],
+        plans: [],
+        createdAt: '2026-09-24T00:00:00.000Z',
+        updatedAt: '2026-09-24T00:00:00.000Z',
+      } as any;
+
+      const spy = vi.spyOn(workflowService, 'createProject').mockResolvedValue({
+        success: true,
+        data: mockApiProject,
+        statusCode: 201,
+      });
+
+      const store = useWorkflowStore.getState();
+      await store.createProject({
+        title: 'Phim API mới',
+        creator_name: 'Nguyễn Văn A',
+        genre: ['Khoa học viễn tưởng'],
+        synopsis: 'Mô tả từ backend',
+        season_count: 1,
+        episodes_per_season: 1,
+        episode_target_durations: [30],
+        total_budget_tokens: 2500,
+        production_start_date: '2026-09-25',
+        deadline: '2026-12-10',
+        planned_release_date: '2026-12-20',
+      });
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(useWorkflowStore.getState().projects.some((project) => project.id === 'proj-api-001')).toBe(true);
+      expect(useWorkflowStore.getState().project.id).toBe('proj-api-001');
+    });
+
+    it('keeps the local roster when the backend returns an empty project list on login', async () => {
+      const store = useWorkflowStore.getState();
+      const created = await store.createProject({
+        title: 'Phim mới sau login',
+        creator_name: 'Nguyễn Văn A',
+        genre: ['Hành động'],
+        synopsis: 'Cần giữ lại sau logout/login',
+        season_count: 1,
+        episodes_per_season: 1,
+        episode_target_durations: [30],
+        total_budget_tokens: 1200,
+        production_start_date: '2026-09-25',
+        deadline: '2026-12-10',
+        planned_release_date: '2026-12-20',
+      });
+
+      vi.spyOn(workflowService, 'listProjects').mockResolvedValue({
+        success: true,
+        data: { data: [] },
+        statusCode: 200,
+      });
+
+      await useWorkflowStore.getState().loadProjects();
+
+      expect(useWorkflowStore.getState().projects.some((project) => project.id === created.id)).toBe(true);
+      expect(useWorkflowStore.getState().project.id).toBe(created.id);
     });
   });
 

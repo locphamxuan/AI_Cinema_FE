@@ -1,13 +1,13 @@
 import type { StateCreator } from 'zustand';
 import { ReviewLog } from '@/types/workflow';
-import { initialReviews } from '@/features/workflow/mocks/workflowMock';
 import type { ReviewSlice, WorkflowStoreState } from '../types';
 import { availableBudget } from '@/features/workflow/lib/planVerdict';
 import { withProjectUpdate } from './projectRoster';
 import { workflowService } from '@/services/workflowService';
+import { EMPTY_REVIEWS } from '../emptyState';
 
 export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewSlice> = (set, get) => ({
-  reviews: initialReviews,
+  reviews: EMPTY_REVIEWS,
 
   reviewScene: (packageId, sceneNumber, status, comment) => {
     set((state) =>

@@ -57,7 +57,7 @@ export interface EpisodeSlice {
     deadline: string;
     planned_release_date: string;
     milestones?: ProjectMilestone[];
-  }) => void;
+  }) => Promise<ProductionProject>;
   loadProjects: () => Promise<void>;
   loadProject: (projectId: string) => Promise<void>;
   isLoading: boolean;

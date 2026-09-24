@@ -13,6 +13,14 @@ import { createEpisodeSlice } from './slices/episodeSlice';
 import { createProductionSlice } from './slices/productionSlice';
 import { createReviewSlice } from './slices/reviewSlice';
 import { createComplianceSlice } from './slices/complianceSlice';
+import {
+  createEmptyProject,
+  EMPTY_COMPLIANCE_CHECKS,
+  EMPTY_LABELS,
+  EMPTY_PROJECTS,
+  EMPTY_PUBLICATIONS,
+  EMPTY_REVIEWS,
+} from './emptyState';
 import type { WorkflowStoreState } from './types';
 
 export const useWorkflowStore = create<WorkflowStoreState>()(

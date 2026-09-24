@@ -2,8 +2,16 @@
 
 import { useAppStore } from '@/store/useAppStore';
 import { useProductionStore } from '@/store/useProductionStore';
-import { subscriptionPlans } from '@/mocks/mockData';
 import { useState, useEffect, useMemo } from 'react';
+
+const subscriptionPlans: Array<{
+  id: string;
+  name: string;
+  price: number;
+  duration: number;
+  popular: boolean;
+  features: string[];
+}> = [];
 
 export default function SubscriptionManager() {
   const { subscription, toggleAutoRenew, isVIPMode } = useAppStore();
@@ -209,10 +217,10 @@ export default function SubscriptionManager() {
                 <p className="text-xs text-slate-500 dark:text-muted-light">/{plan.duration} ngày</p>
 
                 <ul className="mt-4 space-y-2">
-                  {plan.features.map((f, i) => (
-                    <li key={i} className="flex items-center gap-2 text-xs text-slate-600 dark:text-foreground/70">
+                  {plan.features.map((feature: string, index: number) => (
+                    <li key={index} className="flex items-center gap-2 text-xs text-slate-600 dark:text-foreground/70">
                       <span className="text-verified text-sm font-bold">✓</span>
-                      {f}
+                      {feature}
                     </li>
                   ))}
                 </ul>

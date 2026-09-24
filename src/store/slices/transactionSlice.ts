@@ -1,10 +1,9 @@
 import type { StateCreator } from 'zustand';
 import { Transaction } from '@/types/transaction';
-import { mockTransactions } from '@/mocks/mockData';
 import type { AppState, TransactionSlice } from './types';
 
 export const createTransactionSlice: StateCreator<AppState, [], [], TransactionSlice> = (set) => ({
-  transactions: mockTransactions,
+  transactions: [],
 
   addTransaction: (tx) => {
     const id = `TXN-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${String(
