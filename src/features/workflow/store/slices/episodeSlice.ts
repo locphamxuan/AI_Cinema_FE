@@ -1,6 +1,6 @@
 import type { StateCreator } from 'zustand';
 import { EpisodePackage, ProductionProject, PENDING_FIELD_REVIEW } from '@/types/workflow';
-import { initialProject, mockAssignedProjects } from '@/features/workflow/mocks/workflowMock';
+import { EMPTY_PROJECT } from '@/features/workflow/lib/emptyProject';
 import type { EpisodeSlice, WorkflowStoreState } from '../types';
 import { toast } from '@/components/ui/Toast';
 import { pendingPlanReviews } from '@/features/workflow/lib/planVerdict';
@@ -49,8 +49,8 @@ function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumbe
 import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
 
 export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], EpisodeSlice> = (set, get) => ({
-  project: initialProject,
-  projects: mockAssignedProjects,
+  project: EMPTY_PROJECT,
+  projects: [],
   isLoading: false,
   error: null,
 
@@ -60,7 +60,9 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
       const res = await workflowService.listProjects();
       if (res.success && res.data) {
         const rawList = Array.isArray(res.data) ? res.data : (res.data as { data?: any[] })?.data || [];
-        if (rawList.length > 0) {
+        if (rawList.length === 0) {
+          set({ projects: [], project: EMPTY_PROJECT, activeProjectId: '', activePackageId: '' });
+        } else {
           const currentProjects = get().projects;
           const adaptedProjects = rawList.map((p) => {
             const adapted = adaptApiProjectToUiProject(p);

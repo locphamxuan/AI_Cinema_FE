@@ -1,18 +1,13 @@
 import type { StateCreator } from 'zustand';
 import { ComplianceCheck, AIContentLabel, Publication } from '@/types/workflow';
-import {
-  initialComplianceChecks,
-  initialLabels,
-  initialPublications,
-} from '@/features/workflow/mocks/workflowMock';
 import type { ComplianceSlice, WorkflowStoreState } from '../types';
 import { withProjectUpdate } from './projectRoster';
 import { workflowService } from '@/services/workflowService';
 
 export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], ComplianceSlice> = (set, get) => ({
-  complianceChecks: initialComplianceChecks,
-  labels: initialLabels,
-  publications: initialPublications,
+  complianceChecks: {},
+  labels: {},
+  publications: {},
 
   saveComplianceCheck: (packageId, data, labelData) => {
     // A failed check must go back to the Creator (request changes), never be recorded as passed.

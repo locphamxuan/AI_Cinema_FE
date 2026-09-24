@@ -95,5 +95,5 @@ export type WorkflowStoreState = ViewSlice &
   ProductionSlice &
   ReviewSlice &
   ComplianceSlice & {
-    resetDemoData: () => void;
+    resetWorkspace: () => Promise<void>;
   };

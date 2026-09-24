@@ -2,10 +2,28 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { availableBudget, derivePlanVerdict, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
 import { creatorGroups, reviewerGroups } from '@/features/workflow/lib/projectGroups';
+import {
+  initialProject,
+  mockAssignedProjects,
+  initialReviews,
+  initialComplianceChecks,
+  initialLabels,
+  initialPublications,
+} from '@/tests/fixtures/workflowFixtures';
 
 describe('Zustand Workflow Store (src/features/workflow/store)', () => {
   beforeEach(() => {
-    useWorkflowStore.getState().resetDemoData();
+    useWorkflowStore.setState({
+      currentRole: 'creator',
+      activeProjectId: 'proj-cyber-01',
+      activePackageId: 'pkg-ep-03',
+      project: initialProject,
+      projects: mockAssignedProjects,
+      reviews: initialReviews,
+      complianceChecks: initialComplianceChecks,
+      labels: initialLabels,
+      publications: initialPublications,
+    });
   });
 
   describe('Maker (Creator) plan actions', () => {

@@ -1,13 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import {
-  initialProject,
-  mockAssignedProjects,
-  initialReviews,
-  initialComplianceChecks,
-  initialLabels,
-  initialPublications,
-} from '@/features/workflow/mocks/workflowMock';
+import { EMPTY_PROJECT } from '@/features/workflow/lib/emptyProject';
 import { createViewSlice } from './slices/viewSlice';
 import { createEpisodeSlice } from './slices/episodeSlice';
 import { createProductionSlice } from './slices/productionSlice';
@@ -24,22 +17,26 @@ export const useWorkflowStore = create<WorkflowStoreState>()(
       ...createReviewSlice(set, get, api),
       ...createComplianceSlice(set, get, api),
 
-      resetDemoData: () => {
+      resetWorkspace: async () => {
         set({
-          currentRole: 'creator',
-          activeProjectId: 'proj-cyber-01',
-          activePackageId: 'pkg-ep-03',
-          project: initialProject,
-          projects: mockAssignedProjects,
-          reviews: initialReviews,
-          complianceChecks: initialComplianceChecks,
-          labels: initialLabels,
-          publications: initialPublications,
+          activeProjectId: '',
+          activePackageId: '',
+          project: EMPTY_PROJECT,
+          projects: [],
+          reviews: [],
+          complianceChecks: {},
+          labels: {},
+          publications: {},
         });
+        await get().loadProjects();
       },
     }),
     {
       name: 'ai_cinema_workflow_store',
+      // v1 dropped the bundled demo projects — discard state persisted by v0
+      // so browsers stop showing them.
+      version: 1,
+      migrate: () => ({}),
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : {
         getItem: () => null,
         setItem: () => {},
