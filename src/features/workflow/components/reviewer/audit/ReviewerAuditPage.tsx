@@ -14,6 +14,8 @@ import { RequestChangesModal } from './RequestChangesModal';
 import { toast } from '@/components/ui/Toast';
 import { episodeLabel, episodeName, spansSeasons } from '@/features/workflow/lib/episodeLabel';
 import { isAwaitingAudit } from '@/features/workflow/lib/workflowState';
+import { useCan } from '@/hooks/useCan';
+import { PERMISSION } from '@/lib/permissions';
 
 export interface ReviewerAuditPageProps {
   packageId: string;
@@ -21,6 +23,7 @@ export interface ReviewerAuditPageProps {
 
 export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
   const { project, loadProjects, requestContentChanges, passCompliance, publishEpisode } = useWorkflowStore();
+  const can = useCan();
 
   const pkg = project.episodes.find((ep) => ep.id === packageId);
 
@@ -59,7 +62,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
   const isCompliancePassed = pkg.status === 'COMPLIANCE_PASSED' || pkg.status === 'PUBLISHED';
   const isPublished = pkg.status === 'PUBLISHED';
   // A cut is decided only while it waits for the Reviewer; a returned one waits for the Creator.
-  const canAudit = isAwaitingAudit(pkg.status);
+  const canAudit = isAwaitingAudit(pkg.status) && can(PERMISSION.EPISODE_REVIEW);
 
   const handleToggleChannel = (channel: string) => {
     if (selectedChannels.includes(channel)) {
@@ -155,6 +158,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
           <PublishStation
             packageId={pkg.id}
             isCompliancePassed={isCompliancePassed}
+            canPublish={can(PERMISSION.MOVIE_PUBLISH)}
             isPublished={isPublished}
             isPublishing={isPublishing}
             scheduledDate={scheduledDate}

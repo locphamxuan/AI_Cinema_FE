@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { toast } from '@/components/ui/Toast';
 import { quotaUsage } from '@/features/workflow/lib/quota';
+import { useCan } from '@/hooks/useCan';
+import { PERMISSION } from '@/lib/permissions';
 
 export interface QuotaRequestCardProps {
   episode: EpisodePackage;
@@ -16,6 +18,7 @@ export interface QuotaRequestCardProps {
 /** One pending top-up request: the Reviewer grants all or part of it, or turns it down with a reason. */
 export function QuotaRequestCard({ episode, request, availableBudget }: QuotaRequestCardProps) {
   const { approveQuotaRequest, rejectQuotaRequest } = useWorkflowStore();
+  const can = useCan();
   const [amount, setAmount] = useState(String(Math.min(request.requested_amount, availableBudget)));
   const [note, setNote] = useState('');
   const [isDeciding, setIsDeciding] = useState(false);
@@ -48,6 +51,8 @@ export function QuotaRequestCard({ episode, request, availableBudget }: QuotaReq
       </div>
       <p className="text-slate-700 dark:text-slate-300 bg-white dark:bg-[#12141A] p-2.5 rounded-lg border border-slate-200 dark:border-white/10">{request.reason}</p>
 
+      {can(PERMISSION.QUOTA_MANAGE) ? (
+        <>
       <div className="grid grid-cols-1 sm:grid-cols-[10rem_1fr] gap-3">
         <FormField label="Số token cấp">
           <input
@@ -79,6 +84,10 @@ export function QuotaRequestCard({ episode, request, availableBudget }: QuotaReq
           Cấp token
         </Button>
       </div>
+        </>
+      ) : (
+        <p className="text-slate-500 dark:text-slate-400">Chờ Reviewer quyết định.</p>
+      )}
     </li>
   );
 }

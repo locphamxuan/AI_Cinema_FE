@@ -1,10 +1,14 @@
+import type { WebRole } from '@/lib/permissions';
+
 export interface UserProfile {
   id: string;
   name: string;
   email: string;
   avatarUrl: string;
-  role: 'user' | 'vip' | 'admin' | 'creator' | 'reviewer';
+  role: WebRole;
   isVIP: boolean;
+  /** Permission keys the backend grants this account's role. */
+  permissions?: string[];
   vipExpiresAt?: string;
   createdAt?: string;
 }

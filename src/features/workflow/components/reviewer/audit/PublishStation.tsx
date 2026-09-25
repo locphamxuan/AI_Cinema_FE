@@ -13,6 +13,8 @@ const FIELD_CLASS =
 export interface PublishStationProps {
   packageId: string;
   isCompliancePassed: boolean;
+  /** The account may schedule and publish (movie:publish). */
+  canPublish: boolean;
   isPublished: boolean;
   isPublishing: boolean;
   scheduledDate: string;
@@ -28,6 +30,7 @@ export interface PublishStationProps {
 export function PublishStation({
   packageId,
   isCompliancePassed,
+  canPublish,
   isPublished,
   isPublishing,
   scheduledDate,
@@ -38,7 +41,7 @@ export function PublishStation({
   onToggleChannel,
   onPublish,
 }: PublishStationProps) {
-  const isLocked = !isCompliancePassed || isPublished;
+  const isLocked = !isCompliancePassed || isPublished || !canPublish;
 
   return (
     <section aria-labelledby="publish-title" className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#151822] p-5">
@@ -111,7 +114,7 @@ export function PublishStation({
         <button
           type="button"
           onClick={onPublish}
-          disabled={!isCompliancePassed || isPublishing}
+          disabled={isLocked || isPublishing}
           className="mt-5 w-full py-2.5 rounded-lg text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
         >
           {isPublishing ? 'Đang phát hành…' : 'Phát hành'}

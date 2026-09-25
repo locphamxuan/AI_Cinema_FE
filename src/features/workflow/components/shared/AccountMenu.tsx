@@ -2,20 +2,22 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Home, LogOut, RotateCcw } from 'lucide-react';
+import { Home, LayoutGrid, LogOut, RotateCcw } from 'lucide-react';
 
 export interface AccountMenuProps {
   name: string;
   roleLabel: string;
   onResetWorkspace: () => void;
   onLogout: () => void;
+  /** Other internal areas this account may enter. */
+  links?: { href: string; label: string }[];
 }
 
 const ITEM_CLASS =
   'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-left text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50';
 
 /** Avatar button that opens the few account-level actions, keeping the header itself uncluttered. */
-export function AccountMenu({ name, roleLabel, onResetWorkspace, onLogout }: AccountMenuProps) {
+export function AccountMenu({ name, roleLabel, onResetWorkspace, onLogout, links = [] }: AccountMenuProps) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -68,6 +70,11 @@ export function AccountMenu({ name, roleLabel, onResetWorkspace, onLogout }: Acc
           >
             <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" /> Tải lại dữ liệu
           </button>
+          {links.map((link) => (
+            <Link key={link.href} href={link.href} role="menuitem" onClick={() => setOpen(false)} className={ITEM_CLASS}>
+              <LayoutGrid className="w-3.5 h-3.5" aria-hidden="true" /> {link.label}
+            </Link>
+          ))}
           <button
             type="button"
             role="menuitem"

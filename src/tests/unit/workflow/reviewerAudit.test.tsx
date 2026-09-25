@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ReviewerAuditPage } from '@/features/workflow/components/reviewer/audit/ReviewerAuditPage';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { initialProject } from '@/tests/fixtures/workflowFixtures';
+import { signInAs } from '@/tests/support/signIn';
 import type { WorkflowState } from '@/types/workflow';
 
 vi.mock('@/features/workflow/components/shared/ClipVideo', () => ({ ClipVideo: () => null }));
@@ -24,7 +25,10 @@ describe('ReviewerAuditPage', () => {
     return episode;
   };
 
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    signInAs('reviewer');
+  });
 
   it('confirms compliance on a submitted cut with the label shown at intro and outro', () => {
     const episode = openAudit('EPISODE_SUBMITTED');

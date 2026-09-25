@@ -6,6 +6,7 @@ import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import { UserProfile, LoginCredentials, RegisterCredentials } from '@/types/auth';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { AREAS, homeAreaOf } from '@/lib/permissions';
 
 /** Roles as the backend's UserRole enum spells them. */
 export type BackendRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
@@ -16,6 +17,7 @@ interface BackendUser {
   fullName: string;
   role: BackendRole;
   isActive: boolean;
+  permissions?: string[];
 }
 
 interface AuthSession {
@@ -28,14 +30,10 @@ const ROLE_MAP: Record<BackendRole, UserProfile['role']> = {
   MEMBER: 'user',
   CONTENT_CREATOR: 'creator',
   CONTENT_REVIEWER: 'reviewer',
-  STAFF: 'admin',
+  STAFF: 'staff',
   ADMIN: 'admin',
 };
 
-const REDIRECT_BY_ROLE: Partial<Record<UserProfile['role'], string>> = {
-  creator: '/creator/projects',
-  reviewer: '/reviewer',
-};
 
 export function toUserProfile(user: BackendUser): UserProfile {
   const role = ROLE_MAP[user.role] ?? 'user';
@@ -45,12 +43,14 @@ export function toUserProfile(user: BackendUser): UserProfile {
     email: user.email,
     avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email)}`,
     role,
-    isVIP: role === 'creator' || role === 'reviewer' || role === 'admin',
+    isVIP: role !== 'user',
+    permissions: user.permissions ?? [],
   };
 }
 
 export function redirectUrlFor(role: UserProfile['role']): string | undefined {
-  return REDIRECT_BY_ROLE[role];
+  const area = homeAreaOf(role);
+  return area ? AREAS[area].path : undefined;
 }
 
 function persistSession(session: AuthSession): UserProfile {
@@ -103,7 +103,9 @@ export const authService = {
     if (!res.success) {
       return { ...res, data: null as unknown as UserProfile };
     }
-    return { ...res, data: toUserProfile(res.data) };
+    const profile = toUserProfile(res.data);
+    storage.set(STORAGE_KEYS.USER_DATA, profile);
+    return { ...res, data: profile };
   },
 
   logout(): void {

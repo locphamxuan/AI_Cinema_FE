@@ -1,5 +1,5 @@
-import { RoleGuard } from '@/features/workflow/components/shared/RoleGuard';
+import { AreaGuard } from '@/components/auth/AreaGuard';
 
 export default function ReviewerLayout({ children }: { children: React.ReactNode }) {
-  return <RoleGuard role="reviewer">{children}</RoleGuard>;
+  return <AreaGuard area="reviewer">{children}</AreaGuard>;
 }

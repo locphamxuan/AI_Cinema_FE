@@ -6,6 +6,8 @@ import { availableBudget, derivePlanVerdict, planFieldReviews, scriptReview } fr
 import { FieldReviewCard } from '../../shared/FieldReviewCard';
 import { episodeName } from '@/features/workflow/lib/episodeLabel';
 import { isPlanApproved } from '@/features/workflow/lib/workflowState';
+import { useCan } from '@/hooks/useCan';
+import { PERMISSION } from '@/lib/permissions';
 
 export interface PlanReviewTabProps {
   currentPackage?: EpisodePackage;
@@ -32,7 +34,8 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
 
   const isAlreadyApproved = currentPackage ? isPlanApproved(currentPackage.status) : false;
   // Only a submitted plan has a review round to decide in; a draft or a returned plan waits for the Creator.
-  const isReviewable = currentPackage?.status === 'PLAN_PENDING';
+  const can = useCan();
+  const isReviewable = currentPackage?.status === 'PLAN_PENDING' && can(PERMISSION.PLAN_REVIEW);
 
   return (
     <div className="bg-white dark:bg-[#161922] rounded-xl border border-slate-200 dark:border-white/10 p-5 sm:p-6 space-y-5 shadow-xs transition-colors">
@@ -57,7 +60,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
               <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>Đã cấp {currentPackage?.quota_allocated ?? 0} token</span>
             </div>
-          ) : (
+          ) : isReviewable ? (
             <>
               <button
                 type="button"
@@ -72,7 +75,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
               <button
                 type="button"
                 onClick={onAllocateQuota}
-                disabled={!canApprove}
+                disabled={!canApprove || !can(PERMISSION.QUOTA_MANAGE)}
                 title={canApprove ? undefined : 'Duyệt xong kịch bản, thời lượng, token và mọi cảnh thì mới cấp token được'}
                 className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition ${
                   canApprove
@@ -84,7 +87,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
                 Duyệt và cấp token
               </button>
             </>
-          )}
+          ) : null}
         </div>
       </div>
 

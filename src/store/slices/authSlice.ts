@@ -7,7 +7,7 @@ import { emptySubscription, type AppState, type AuthSlice, type UserProfile } fr
 // Wallet and subscription still come from mocks: the backend has no wallet/subscription
 // API yet (MF-2/MF-3). Only identity is real.
 function sessionStateFor(user: UserProfile) {
-  const isStaffSide = user.role === 'creator' || user.role === 'reviewer' || user.role === 'admin';
+  const isStaffSide = user.role !== undefined && user.role !== 'user' && user.role !== 'vip';
   return {
     isAuthenticated: true,
     user,
@@ -42,6 +42,12 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
 
     syncWorkflowRole(user);
     set(sessionStateFor(user));
+    // The Admin may have changed this role's permissions or the account's role since the last visit.
+    void authService.me().then((res) => {
+      if (!res.success || !res.data) return;
+      syncWorkflowRole(res.data);
+      set(sessionStateFor(res.data));
+    });
   },
 
   login: async (email, password) => {

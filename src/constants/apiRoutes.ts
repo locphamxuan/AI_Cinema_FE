@@ -45,6 +45,14 @@ export const API_ROUTES = {
     CONVERSATION: '/chat/conversation',
     ESCALATE: '/chat/escalate',
   },
+  // Accounts & permissions (Admin), member list (Staff)
+  ADMIN: {
+    USERS: '/users',
+    USER_DETAIL: (userId: string) => `/users/${userId}`,
+    PERMISSIONS: '/permissions',
+    ROLES: '/roles',
+    ROLE_PERMISSIONS: (role: string) => `/roles/${role}/permissions`,
+  },
   // Production Workflow & Governance
   WORKFLOW: {
     // Lookups

@@ -1,3 +1,4 @@
+import type { WebRole } from '@/lib/permissions';
 import { WalletState, CheckInStreak } from '@/types/wallet';
 import { Movie } from '@/types/movie';
 import { UserSubscription } from '@/types/subscription';
@@ -18,8 +19,10 @@ export interface UserProfile {
   name: string;
   email: string;
   avatarUrl: string;
-  role?: 'user' | 'vip' | 'admin' | 'creator' | 'reviewer';
+  role?: WebRole;
   isVIP: boolean;
+  /** Permission keys the backend grants this account's role. */
+  permissions?: string[];
 }
 
 export interface AuthSlice {

@@ -5,18 +5,23 @@ import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { useAppStore } from '@/store/useAppStore';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { Film } from 'lucide-react';
+import { AREAS, PERMISSION, ROLE_LABEL, canEnter, type Area } from '@/lib/permissions';
+import { useCan } from '@/hooks/useCan';
 import { AccountMenu } from './AccountMenu';
 
-/** Slim top bar for both role workspaces: who you are working as, theme, and the account menu — nothing else. */
+const AREA_ORDER: Area[] = ['creator', 'reviewer', 'staff', 'admin'];
+
+/** Slim top bar of every internal area: where you are, theme, and the account menu. */
 export function RoleNavHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { currentRole, resetWorkspace } = useWorkflowStore();
+  const { resetWorkspace } = useWorkflowStore();
   const { user, logout, openAuthModal } = useAppStore();
+  const can = useCan();
 
-  const isCreator = pathname.includes('/creator') || (!pathname.includes('/reviewer') && currentRole === 'creator');
-  const roleLabel = isCreator ? 'Người sản xuất nội dung' : 'Người kiểm duyệt nội dung';
-  const displayName = user?.name || (isCreator ? 'Huy' : 'Bảo');
+  const area = AREA_ORDER.find((a) => pathname.startsWith(`/${a}`)) ?? 'reviewer';
+  const readOnly = area === 'reviewer' && !can(PERMISSION.PROJECT_MANAGE) && !can(PERMISSION.PLAN_REVIEW);
+  const links = AREA_ORDER.filter((a) => a !== area && canEnter(a, user?.role)).map((a) => ({ href: AREAS[a].path, label: AREAS[a].label }));
 
   const handleLogout = () => {
     logout();
@@ -31,14 +36,21 @@ export function RoleNavHeader() {
           <div className="w-8 h-8 rounded-lg bg-purple-600/10 border border-purple-600/20 flex items-center justify-center shrink-0">
             <Film className="w-4 h-4 text-purple-600 dark:text-purple-400" aria-hidden="true" />
           </div>
-          <h1 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight truncate">
-            {isCreator ? 'Sản xuất nội dung' : 'Kiểm duyệt nội dung'}
-          </h1>
+          <h1 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight truncate">{AREAS[area].label}</h1>
+          {readOnly && (
+            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300">Chỉ xem</span>
+          )}
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           <ThemeToggle />
-          <AccountMenu name={displayName} roleLabel={roleLabel} onResetWorkspace={resetWorkspace} onLogout={handleLogout} />
+          <AccountMenu
+            name={user?.name ?? 'Tài khoản'}
+            roleLabel={ROLE_LABEL[user?.role ?? 'user']}
+            onResetWorkspace={resetWorkspace}
+            onLogout={handleLogout}
+            links={links}
+          />
         </div>
       </div>
     </header>

@@ -18,6 +18,8 @@ import { RejectPlanModal } from './modals/RejectPlanModal';
 import { CreateProjectModal, type CreateProjectFormState } from './modals/CreateProjectModal';
 import { toast } from '@/components/ui/Toast';
 import { DEFAULT_SUBTITLE_LANGUAGE } from '@/constants/languages';
+import { useCan } from '@/hooks/useCan';
+import { PERMISSION } from '@/lib/permissions';
 
 type ReviewerTab = 'overview' | 'plans' | 'audits' | 'publication' | 'tokens';
 
@@ -79,6 +81,7 @@ export function ReviewerWorkspacePage() {
     loadProjects,
   } = useWorkflowStore();
 
+  const can = useCan();
     maxEpisodeMinutes,
   useEffect(() => {
     loadProjects();
@@ -196,7 +199,7 @@ export function ReviewerWorkspacePage() {
         groups={reviewerGroups(projects)}
         selectedProjectId={hasSelection ? activeProjectId : undefined}
         onSelectProject={handleSelectProject}
-        onCreateProject={() => setIsCreateProjectOpen(true)}
+        onCreateProject={can(PERMISSION.PROJECT_MANAGE) ? () => setIsCreateProjectOpen(true) : undefined}
         navItems={navItems}
         activeNavKey={activeTab}
         onNavSelect={(key) => {

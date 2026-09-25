@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { PlanReviewTab } from '@/features/workflow/components/reviewer/tabs/PlanReviewTab';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { initialProject } from '@/tests/fixtures/workflowFixtures';
+import { signInAs } from '@/tests/support/signIn';
 import type { EpisodePackage, WorkflowState } from '@/types/workflow';
 
 const pendingPlan = initialProject.episodes.find((e) => e.status === 'PLAN_PENDING')!;
@@ -31,6 +32,7 @@ describe('PlanReviewTab', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    signInAs('reviewer');
     useWorkflowStore.setState({ project: initialProject, reviewPlanField, reviewScene });
   });
 
@@ -76,5 +78,14 @@ describe('PlanReviewTab', () => {
     renderTab(withBrief(approvedEverything, status));
     expect(screen.queryByRole('button', { name: 'Duyệt và cấp token' })).toBeNull();
     expect(screen.getByText(`Đã cấp ${pendingPlan.quota_allocated} token`)).toBeInTheDocument();
+  });
+
+  it('shows the Admin a submitted plan without any way to decide it', () => {
+    signInAs('admin');
+    renderTab(withBrief(approvedEverything));
+
+    expect(screen.queryByRole('button', { name: 'Duyệt và cấp token' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Trả về để sửa' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Duyệt thời lượng' })).not.toBeInTheDocument();
   });
 });
