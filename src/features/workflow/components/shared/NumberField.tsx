@@ -10,6 +10,8 @@ export interface NumberFieldProps {
   'aria-label'?: string;
   id?: string;
   disabled?: boolean;
+  /** Marks the value as out of an outside rule (kept as typed, shown as invalid). */
+  invalid?: boolean;
 }
 
 /**
@@ -34,6 +36,7 @@ export function NumberField({ value, min, max, onCommit, className, ...rest }: N
       value={draft}
       id={rest.id}
       disabled={rest.disabled}
+      aria-invalid={rest.invalid || undefined}
       aria-label={rest['aria-label']}
       onChange={(e) => {
         setDraft(e.target.value);

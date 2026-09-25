@@ -1,5 +1,8 @@
-/** MVP limits from the product spec (BR-31, LI-01). */
-export const MAX_EPISODE_MINUTES = 30;
+/** MVP limits from the product spec (LI-01); the episode length limit is a platform setting. */
+/** Episode length limit until the platform settings load; the Admin changes it in the settings. */
+export const DEFAULT_MAX_EPISODE_MINUTES = 60;
+/** Upper bound of a duration input when the Admin removed the limit. */
+export const UNLIMITED_EPISODE_MINUTES = 360;
 export const MIN_EPISODES_PER_SEASON = 3;
 export const MAX_EPISODES_PER_SEASON = 5;
 export const MAX_SEASONS = 10;

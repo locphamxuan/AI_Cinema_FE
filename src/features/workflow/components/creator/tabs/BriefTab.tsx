@@ -4,7 +4,7 @@ import type { ContentBrief, EpisodePackage, FieldReview, SceneBreakdownItem } fr
 import { SceneBreakdownEditor } from '../SceneBreakdownEditor';
 import { NumberField } from '@/features/workflow/components/shared/NumberField';
 import { toast } from '@/components/ui/Toast';
-import { MAX_EPISODE_MINUTES } from '@/features/workflow/lib/limits';
+import { UNLIMITED_EPISODE_MINUTES } from '@/features/workflow/lib/limits';
 
 export interface BriefTabProps {
   currentPackage: EpisodePackage;
@@ -13,6 +13,8 @@ export interface BriefTabProps {
   scriptVersion: number;
   scriptReview: FieldReview;
   updateOverallScript: (script: string) => void;
+  /** Longest episode the Admin allows; null means no limit. */
+  maxEpisodeMinutes: number | null;
   updateContentBrief: (packageId: string, data: Partial<ContentBrief>) => void;
   savePlanDraft: (packageId: string) => Promise<boolean>;
   submitProductionPlan: (packageId: string) => Promise<boolean>;
@@ -20,7 +22,6 @@ export interface BriefTabProps {
 
 const NEW_SCENE_SECONDS = 15;
 const NEW_SCENE_TOKENS = 60;
-const MAX_SCENE_SECONDS = MAX_EPISODE_MINUTES * 60;
 
 const INPUT =
   'w-full bg-white dark:bg-[#12141A] border border-slate-300 dark:border-white/15 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus-visible:border-purple-500 focus-visible:ring-1 focus-visible:ring-purple-500 disabled:opacity-60';
@@ -34,7 +35,9 @@ const timeFormat = new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '
 export function BriefTab({
   currentPackage,
   overallScript,
+  maxEpisodeMinutes,
   scriptVersion,
+  const maxMinutes = maxEpisodeMinutes ?? UNLIMITED_EPISODE_MINUTES;
   scriptReview,
   updateOverallScript,
   updateContentBrief,
@@ -202,13 +205,13 @@ export function BriefTab({
               id="proposed-duration"
               value={brief.target_duration_minutes}
               min={1}
-              max={MAX_EPISODE_MINUTES}
+              max={maxMinutes}
               disabled={!editable}
               onCommit={(minutes) => change({ target_duration_minutes: minutes })}
               className={INPUT}
             />
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-              Reviewer giao {allottedMinutes} phút, tối đa {MAX_EPISODE_MINUTES} phút. Nếu lệch nhiều, Reviewer sẽ xem lại khi duyệt.
+              Reviewer giao {allottedMinutes} phút{maxEpisodeMinutes !== null && `, tối đa ${maxEpisodeMinutes} phút`}. Nếu lệch nhiều, Reviewer sẽ xem lại khi duyệt.
             </p>
           </div>
           <div>
@@ -232,7 +235,7 @@ export function BriefTab({
         scenes={scenes}
         sceneReviews={brief.scene_reviews}
         editable={editable}
-        maxSceneSeconds={MAX_SCENE_SECONDS}
+        maxSceneSeconds={maxMinutes * 60}
         onAddScene={handleAddScene}
         onRemoveScene={handleRemoveScene}
         onSceneChange={handleSceneChange}

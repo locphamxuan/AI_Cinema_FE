@@ -37,6 +37,7 @@ export function CreatorWorkspacePage() {
     updateOverallScript,
     savePlanDraft,
     submitProductionPlan,
+    maxEpisodeMinutes,
     loadProjects,
   } = useWorkflowStore();
 
@@ -165,6 +166,7 @@ export function CreatorWorkspacePage() {
             )}
 
             {activeTab === 'tokens' && <TokensTab currentPackage={currentPackage} />}
+                maxEpisodeMinutes={maxEpisodeMinutes}
 
             {activeTab === 'reviews' && <ReviewsTab episodeReviews={episodeReviews} />}
           </div>

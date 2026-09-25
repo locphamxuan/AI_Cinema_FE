@@ -79,6 +79,7 @@ export function ReviewerWorkspacePage() {
     loadProjects,
   } = useWorkflowStore();
 
+    maxEpisodeMinutes,
   useEffect(() => {
     loadProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,6 +133,10 @@ export function ReviewerWorkspacePage() {
 
     const created = await createProject({
       title: createForm.title,
+    if (maxEpisodeMinutes !== null && createForm.seasons.flat().some((minutes) => minutes > maxEpisodeMinutes)) {
+      toast.error('Có tập dài hơn mức cho phép', `Mỗi tập tối đa ${maxEpisodeMinutes} phút. Giảm thời lượng các tập được đánh dấu đỏ rồi thử lại.`);
+      return;
+    }
       creator_id: createForm.assignedCreator,
       genre_ids: createForm.genre,
       subtitle_languages: createForm.subtitleLanguages,
@@ -274,6 +279,7 @@ export function ReviewerWorkspacePage() {
         onChange={(field, value) => setCreateForm((prev) => ({ ...prev, [field]: value }))}
       />
     </div>
+        maxEpisodeMinutes={maxEpisodeMinutes}
   );
 }
 

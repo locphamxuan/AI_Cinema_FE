@@ -4,6 +4,8 @@ import { vi } from 'vitest';
  * vi.mock('@/services/workflowService', () => import('@/tests/support/workflowServiceMock')). */
 export const workflowService = {
   listProjects: vi.fn(),
+  getPlatformSettings: vi.fn(() => Promise.resolve({ success: true, data: { maxEpisodeDurationSeconds: 3600, updatedAt: null } })),
+  updatePlatformSettings: vi.fn(),
   getProject: vi.fn(),
   createProject: vi.fn(),
   updateMilestone: vi.fn(),

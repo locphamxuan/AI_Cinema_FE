@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { EMPTY_PROJECT } from '@/features/workflow/lib/emptyProject';
 import { createViewSlice } from './slices/viewSlice';
+import { createSettingsSlice } from './slices/settingsSlice';
 import { createEpisodeSlice } from './slices/episodeSlice';
 import { createProductionSlice } from './slices/productionSlice';
 import { createReviewSlice } from './slices/reviewSlice';
@@ -12,6 +13,7 @@ export const useWorkflowStore = create<WorkflowStoreState>()(
   persist(
     (set, get, api) => ({
       ...createViewSlice(set, get, api),
+      ...createSettingsSlice(set, get, api),
       ...createEpisodeSlice(set, get, api),
       ...createProductionSlice(set, get, api),
       ...createReviewSlice(set, get, api),

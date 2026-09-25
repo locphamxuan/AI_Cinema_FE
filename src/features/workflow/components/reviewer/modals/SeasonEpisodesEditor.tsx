@@ -1,10 +1,18 @@
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { NumberField } from '@/features/workflow/components/shared/NumberField';
-import { clamp, MAX_EPISODE_MINUTES, MAX_EPISODES_PER_SEASON, MAX_SEASONS, MIN_EPISODES_PER_SEASON } from '@/features/workflow/lib/limits';
+import {
+  clamp,
+  MAX_EPISODES_PER_SEASON,
+  MAX_SEASONS,
+  MIN_EPISODES_PER_SEASON,
+  UNLIMITED_EPISODE_MINUTES,
+} from '@/features/workflow/lib/limits';
 
 export interface SeasonEpisodesEditorProps {
   /** One list per season, holding each episode's target duration in minutes. */
   seasons: number[][];
+  /** Longest episode the Admin allows; null means no limit. Longer episodes are flagged, not cut. */
+  maxMinutes: number | null;
   onChange: (seasons: number[][]) => void;
 }
 
@@ -15,9 +23,11 @@ const STEP_BUTTON =
 const sum = (values: number[]) => values.reduce((total, v) => total + v, 0);
 
 /** Seasons of the project, each with its own episode count and a duration typed per episode. */
-export function SeasonEpisodesEditor({ seasons, onChange }: SeasonEpisodesEditorProps) {
+export function SeasonEpisodesEditor({ seasons, maxMinutes, onChange }: SeasonEpisodesEditorProps) {
   const totalEpisodes = seasons.reduce((total, s) => total + s.length, 0);
   const totalMinutes = sum(seasons.flat());
+  const tooLong = (minutes: number) => maxMinutes !== null && minutes > maxMinutes;
+  const tooLongCount = seasons.flat().filter(tooLong).length;
 
   // A new season starts as a copy of the last one.
   const addSeason = () => onChange([...seasons, [...(seasons.at(-1) ?? Array(MIN_EPISODES_PER_SEASON).fill(DEFAULT_MINUTES))]]);
@@ -33,7 +43,7 @@ export function SeasonEpisodesEditor({ seasons, onChange }: SeasonEpisodesEditor
   const setDuration = (seasonIndex: number, episodeIndex: number, minutes: number) =>
     onChange(
       seasons.map((durations, i) =>
-        i !== seasonIndex ? durations : durations.map((d, e) => (e === episodeIndex ? clamp(minutes, 1, MAX_EPISODE_MINUTES) : d))
+        i !== seasonIndex ? durations : durations.map((d, e) => (e === episodeIndex ? clamp(minutes, 1, UNLIMITED_EPISODE_MINUTES) : d))
       )
     );
 
@@ -41,7 +51,7 @@ export function SeasonEpisodesEditor({ seasons, onChange }: SeasonEpisodesEditor
     <div className="space-y-2.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[11px] text-slate-500 dark:text-zinc-400">
-          Mỗi mùa {MIN_EPISODES_PER_SEASON}–{MAX_EPISODES_PER_SEASON} tập, mỗi tập tối đa {MAX_EPISODE_MINUTES} phút. Creator sẽ lên kế hoạch
+          Mỗi mùa {MIN_EPISODES_PER_SEASON}–{MAX_EPISODES_PER_SEASON} tập, {maxMinutes === null ? 'thời lượng tập không giới hạn' : `mỗi tập tối đa ${maxMinutes} phút`}. Creator sẽ lên kế hoạch
           theo thời lượng bạn giao cho từng tập.
         </p>
         <span className="text-[11px] font-mono font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10 px-2 py-0.5 rounded-md">
@@ -107,17 +117,20 @@ export function SeasonEpisodesEditor({ seasons, onChange }: SeasonEpisodesEditor
               {durations.map((minutes, episodeIndex) => (
                 <label
                   key={episodeIndex}
-                  className="flex flex-col gap-1 px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 focus-within:border-purple-500"
+                  className={`flex flex-col gap-1 px-2 py-1.5 rounded-lg bg-slate-50 dark:bg-white/[0.03] border ${
+                    tooLong(minutes) ? 'border-rose-400 dark:border-rose-500/60' : 'border-slate-200/80 dark:border-white/10'
+                  }`}
                 >
                   <span className="text-[10px] font-semibold text-slate-500 dark:text-zinc-400">Tập {episodeIndex + 1}</span>
                   <span className="flex items-baseline gap-1">
                     <NumberField
                       value={minutes}
                       min={1}
-                      max={MAX_EPISODE_MINUTES}
+                      max={UNLIMITED_EPISODE_MINUTES}
+                      invalid={tooLong(minutes)}
                       aria-label={`Thời lượng mùa ${seasonIndex + 1} tập ${episodeIndex + 1} (phút)`}
                       onCommit={(n) => setDuration(seasonIndex, episodeIndex, n)}
-                      className="w-full min-w-0 bg-transparent text-sm font-mono font-bold text-slate-800 dark:text-white focus:outline-none"
+                      className="w-full min-w-0 px-1.5 py-0.5 rounded-md bg-white dark:bg-[#0E1118] border border-slate-300 dark:border-white/15 text-sm font-mono font-bold text-slate-800 dark:text-white focus:outline-none focus:border-purple-500 aria-[invalid=true]:text-rose-600 aria-[invalid=true]:border-rose-400"
                     />
                     <span className="text-[10px] text-slate-400">phút</span>
                   </span>
@@ -127,6 +140,12 @@ export function SeasonEpisodesEditor({ seasons, onChange }: SeasonEpisodesEditor
           </fieldset>
         ))}
       </div>
+
+      {tooLongCount > 0 && (
+        <p role="alert" className="text-[11px] font-medium text-rose-600 dark:text-rose-400">
+          {tooLongCount} tập dài hơn mức tối đa {maxMinutes} phút. Giảm thời lượng các ô viền đỏ, hoặc nhờ Admin nâng mức tối đa.
+        </p>
+      )}
 
       {seasons.length < MAX_SEASONS && (
         <button

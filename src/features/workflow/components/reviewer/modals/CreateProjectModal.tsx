@@ -35,6 +35,8 @@ export interface CreateProjectModalProps {
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
   form: CreateProjectFormState;
+  /** Longest episode the Admin allows; null means no limit. */
+  maxEpisodeMinutes: number | null;
   onChange: <K extends keyof CreateProjectFormState>(field: K, value: CreateProjectFormState[K]) => void;
 }
 
@@ -46,7 +48,7 @@ const DATE_FIELDS = [
   { field: 'releaseDate', label: 'Công chiếu dự kiến', accent: 'text-emerald-500' },
 ] as const;
 
-export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: CreateProjectModalProps) {
+export function CreateProjectModal({ open, onClose, onSubmit, form, maxEpisodeMinutes, onChange }: CreateProjectModalProps) {
   const [creators, setCreators] = useState<ApiUser[]>([]);
   const [genres, setGenres] = useState<ApiGenre[]>([]);
 
@@ -120,7 +122,7 @@ export function CreateProjectModal({ open, onClose, onSubmit, form, onChange }: 
         </Section>
 
         <Section step={2} title="Mùa & tập">
-          <SeasonEpisodesEditor seasons={form.seasons} onChange={(seasons) => onChange('seasons', seasons)} />
+          <SeasonEpisodesEditor seasons={form.seasons} maxMinutes={maxEpisodeMinutes} onChange={(seasons) => onChange('seasons', seasons)} />
         </Section>
 
         <Section step={3} title="Phân công & ngân sách">

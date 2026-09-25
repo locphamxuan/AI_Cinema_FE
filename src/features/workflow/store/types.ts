@@ -105,7 +105,16 @@ export interface ComplianceSlice {
   passCompliance: (packageId: string, checks: Record<ManualComplianceCheck, boolean>, labelDisplayLocation: string) => Promise<boolean>;
   /** Puts the package in the catalog and publishes it; `scheduledAt` is recorded on the publication. */
   publishEpisode: (packageId: string, scheduledAt?: string) => Promise<boolean>;
+export interface SettingsSlice {
+  /** Longest episode in minutes the Admin allows; null means no limit. */
+  maxEpisodeMinutes: number | null;
+  loadPlatformSettings: () => Promise<void>;
+  /** Admin only; returns false (with a toast) when the backend refuses. */
+  savePlatformSettings: (maxEpisodeMinutes: number | null) => Promise<boolean>;
 }
+
+}
+  SettingsSlice &
 
 export type WorkflowStoreState = ViewSlice &
   EpisodeSlice &

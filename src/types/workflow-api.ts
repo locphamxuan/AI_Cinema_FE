@@ -20,6 +20,13 @@ export interface ApiUser {
   role: UserRole;
 }
 
+/** Platform-wide limits the Admin configures. */
+export interface ApiPlatformSetting {
+  /** Longest an episode may be allotted or planned, in seconds; null means no limit. */
+  maxEpisodeDurationSeconds: number | null;
+  updatedAt: string | null;
+}
+
 export interface ApiGenre {
   id: string;
   name: string;

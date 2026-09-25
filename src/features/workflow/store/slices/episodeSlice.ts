@@ -89,6 +89,7 @@ async function saveAndSubmitPlan(pkg: EpisodePackage, overallScript: string): Pr
     'Không gửi được kế hoạch'
   );
   return submitted !== null;
+    void get().loadPlatformSettings();
 }
 
 export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], EpisodeSlice> = (set, get) => ({

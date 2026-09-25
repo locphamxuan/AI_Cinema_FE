@@ -22,7 +22,6 @@ import type {
 import { buildSceneJobs } from './jobAdapter';
 import { buildReviewLog } from './reviewLog';
 import { episodeLabel } from './episodeLabel';
-import { MAX_EPISODE_MINUTES } from './limits';
 import type {
   ApiEpisodePackage,
   ApiMilestone,
@@ -45,7 +44,8 @@ const COMPLIANCE_CHECK_TYPES: ComplianceCheckType[] = [
   'REAL_PERSON_LIKENESS',
 ];
 
-const DEFAULT_EPISODE_SECONDS = MAX_EPISODE_MINUTES * 60;
+// Projects created before episodes carried their own duration were planned at 30 minutes.
+const DEFAULT_EPISODE_SECONDS = 30 * 60;
 
 const toNumber = (value: number | string | null | undefined): number => Number(value ?? 0) || 0;
 

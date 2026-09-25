@@ -7,11 +7,12 @@ import { GenrePicker } from '@/features/workflow/components/reviewer/modals/Genr
 import { SubtitleLanguagePicker } from '@/features/workflow/components/reviewer/modals/SubtitleLanguagePicker';
 import type { ApiGenre } from '@/types/workflow-api';
 
-function Seasons({ initial, onChange }: { initial: number[][]; onChange: (s: number[][]) => void }) {
+function Seasons({ initial, onChange, maxMinutes = 45 }: { initial: number[][]; onChange: (s: number[][]) => void; maxMinutes?: number | null }) {
   const [seasons, setSeasons] = useState(initial);
   return (
     <SeasonEpisodesEditor
       seasons={seasons}
+      maxMinutes={maxMinutes}
       onChange={(next) => {
         setSeasons(next);
         onChange(next);
@@ -46,7 +47,7 @@ describe('SeasonEpisodesEditor', () => {
     expect(screen.getByRole('button', { name: 'Thêm 1 tập ở mùa 1' })).toBeDisabled();
   });
 
-  it('lets a duration be typed freely and keeps it within the limit on blur', async () => {
+  it('keeps a duration over the Admin limit as typed and flags it instead of cutting it', async () => {
     const onChange = vi.fn();
     render(<Seasons initial={[[30, 30, 30]]} onChange={onChange} />);
 
@@ -56,10 +57,18 @@ describe('SeasonEpisodesEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith([[30, 18, 30]]);
 
     await userEvent.clear(field);
-    await userEvent.type(field, '99');
+    await userEvent.type(field, '50');
     await userEvent.tab();
-    expect(field).toHaveValue(30);
-    expect(onChange).toHaveBeenLastCalledWith([[30, 30, 30]]);
+    expect(field).toHaveValue(50);
+    expect(field).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByRole('alert')).toHaveTextContent('1 tập dài hơn mức tối đa 45 phút');
+  });
+
+  it('flags nothing when the Admin removed the limit', async () => {
+    render(<Seasons initial={[[120, 90, 30]]} onChange={vi.fn()} maxMinutes={null} />);
+
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText(/thời lượng tập không giới hạn/)).toBeInTheDocument();
   });
 
   it('removes a season but always keeps one', async () => {

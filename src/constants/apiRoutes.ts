@@ -59,6 +59,7 @@ export const API_ROUTES = {
     PROJECT_MILESTONES: (projectId: string) => `/production-projects/${projectId}/milestones`,
 
     // Milestones
+    PLATFORM_SETTINGS: '/platform-settings',
     MILESTONE_DETAIL: (milestoneId: string) => `/milestones/${milestoneId}`,
 
     // Production Plans

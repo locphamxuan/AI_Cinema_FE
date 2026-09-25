@@ -12,6 +12,7 @@ import type {
   ApiComplianceVerdict,
   ApiEpisodePackage,
   ApiGenre,
+  ApiPlatformSetting,
   ApiGenerationJob,
   ApiPlanReview,
   ApiPolicy,
@@ -61,6 +62,15 @@ class WorkflowService {
   /** Adds a genre; a name that exists (ignoring case) returns that genre instead. */
   createGenre(name: string): Promise<ApiResponse<ApiGenre>> {
     return apiClient.post<ApiGenre>(ROUTES.GENRES, { name });
+  getPlatformSettings(): Promise<ApiResponse<ApiPlatformSetting>> {
+    return apiClient.get<ApiPlatformSetting>(ROUTES.PLATFORM_SETTINGS);
+  }
+
+  /** Admin only. */
+  updatePlatformSettings(dto: { maxEpisodeDurationSeconds: number | null }): Promise<ApiResponse<ApiPlatformSetting>> {
+    return apiClient.patch<ApiPlatformSetting>(ROUTES.PLATFORM_SETTINGS, dto);
+  }
+
   }
 
   listGenres(): Promise<ApiResponse<Paginated<ApiGenre>>> {
