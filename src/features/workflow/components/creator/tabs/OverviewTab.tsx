@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import { ArrowRight, AlertCircle, Check } from 'lucide-react';
-import type { EpisodePackage, ProductionProject, ReviewLog, WorkflowState } from '@/types/workflow';
+import type { EpisodePackage, ProductionProject, ProjectMilestone, ReviewLog, WorkflowState } from '@/types/workflow';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { quotaUsage } from '@/features/workflow/lib/quota';
 import { MilestoneStatusDropdown } from './MilestoneStatusDropdown';
+import { CompleteMilestoneModal } from './CompleteMilestoneModal';
 
 export interface OverviewTabProps {
   project: ProductionProject;
@@ -58,6 +60,7 @@ export function OverviewTab({
   onGotoReviews,
 }: OverviewTabProps) {
   const { updateMilestoneStatus } = useWorkflowStore();
+  const [completing, setCompleting] = useState<ProjectMilestone>();
 
   const quota = quotaUsage(currentPackage);
   const jobs = currentPackage?.jobs ?? [];
@@ -145,16 +148,25 @@ export function OverviewTab({
                     {milestone.description && <span>{milestone.description} · </span>}
                     Hạn {milestone.deadline}
                   </p>
+                  {milestone.result && <p className="text-emerald-700 dark:text-emerald-400 mt-0.5">Kết quả: {milestone.result}</p>}
                 </div>
                 <MilestoneStatusDropdown
                   status={milestone.status}
-                  onChange={(status) => updateMilestoneStatus(milestone.id, status)}
+                  onChange={(status) =>
+                    status === 'completed' ? setCompleting(milestone) : updateMilestoneStatus(milestone.id, status)
+                  }
                 />
               </li>
             ))}
           </ul>
         )}
       </section>
+
+      <CompleteMilestoneModal
+        milestoneTitle={completing?.title}
+        onClose={() => setCompleting(undefined)}
+        onConfirm={(result) => updateMilestoneStatus(completing!.id, 'completed', result)}
+      />
 
       {latestFeedback && (
         <div role="alert" className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 flex items-start gap-3">

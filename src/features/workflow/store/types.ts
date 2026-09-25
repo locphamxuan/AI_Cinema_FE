@@ -60,7 +60,8 @@ export interface EpisodeSlice {
   loadProject: (projectId: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
-  updateMilestoneStatus: (milestoneId: string, status: 'pending' | 'in_progress' | 'completed') => Promise<boolean>;
+  /** Reports progress on a milestone; completing it needs what was achieved. */
+  updateMilestoneStatus: (milestoneId: string, status: 'pending' | 'in_progress' | 'completed', result?: string) => Promise<boolean>;
 }
 
 

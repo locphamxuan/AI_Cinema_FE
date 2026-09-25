@@ -48,6 +48,16 @@ export function MilestoneStatusDropdown({ status, onChange }: MilestoneStatusDro
 
   const currentConfig = MILESTONE_STATUS_CONFIG[status] ?? MILESTONE_STATUS_CONFIG.pending;
 
+  // A completed milestone cannot be reopened (the backend refuses it), so it is shown, not offered.
+  if (status === 'completed') {
+    return (
+      <span className="h-9 px-3 text-xs font-semibold rounded-lg inline-flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+        <span className={`w-2 h-2 rounded-full shrink-0 ${currentConfig.dot}`} aria-hidden="true" />
+        {currentConfig.label}
+      </span>
+    );
+  }
+
   return (
     <div ref={containerRef} className="relative inline-block text-left">
       <button

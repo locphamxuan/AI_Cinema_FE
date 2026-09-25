@@ -41,6 +41,7 @@ export interface ApiMilestone {
   startDate?: string | null;
   targetDate?: string | null;
   status: MilestoneStatus;
+  resultText?: string | null;
 }
 
 export interface ApiScene {

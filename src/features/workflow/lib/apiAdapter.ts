@@ -59,6 +59,7 @@ function adaptMilestone(m: ApiMilestone): ProjectMilestone {
     startDate: m.startDate ?? undefined,
     deadline: toDate(m.targetDate),
     status: m.status === 'IN_PROGRESS' ? 'in_progress' : m.status === 'COMPLETED' ? 'completed' : 'pending',
+    result: m.resultText ?? undefined,
   };
 }
 

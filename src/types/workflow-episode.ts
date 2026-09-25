@@ -104,6 +104,8 @@ export interface ProjectMilestone {
   deadline: string;
   description?: string;
   status: 'pending' | 'in_progress' | 'completed';
+  /** What the Creator reported when completing it. */
+  result?: string;
 }
 
 /**

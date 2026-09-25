@@ -278,9 +278,9 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     return true;
   },
 
-  updateMilestoneStatus: async (milestoneId, status) => {
+  updateMilestoneStatus: async (milestoneId, status, result) => {
     const updated = await apiResult(
-      workflowService.updateMilestone(milestoneId, { status: MILESTONE_STATUS[status] }),
+      workflowService.updateMilestone(milestoneId, { status: MILESTONE_STATUS[status], resultText: result }),
       'Không cập nhật được cột mốc'
     );
     if (!updated) return false;
