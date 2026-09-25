@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Cinema — Frontend
 
-## Getting Started
+Next.js workspace for viewers and for MF-1 (Creator and Reviewer production workflow).
 
-First, run the development server:
+## Getting started
+
+Requires Node.js 20.19+ and the backend (`AI-_Cinema_BE`) running on port 3001.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm ci
+cp .env.example .env.local   # /api is proxied to BACKEND_URL (default http://localhost:3001)
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Sign in as a Creator to reach `/creator`, or as a Reviewer to reach `/reviewer`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm test          # unit and component tests (API mocked)
+npm run lint
+npm run build
+```
 
-## Learn More
+`src/tests/integration/mf1Workflow.live.test.ts` walks the whole MF-1 flow through the
+workspace store against a running backend. It is skipped unless `MF1_LIVE_API` is set:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+MF1_LIVE_API=http://localhost:3001/api npx vitest run src/tests/integration/mf1Workflow.live.test.ts
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+It signs in as `creator01@aicinema.com` / `reviewer01@aicinema.com` with `Aicinema@123`
+(override with `MF1_LIVE_CREATOR`, `MF1_LIVE_REVIEWER`, `MF1_LIVE_PASSWORD`) and creates a
+new project each run, so point it at a local or test database.
