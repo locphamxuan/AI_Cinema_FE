@@ -25,14 +25,25 @@ describe('SeasonEpisodesEditor', () => {
     const onChange = vi.fn();
     render(<Seasons initial={[[30, 30, 30]]} onChange={onChange} />);
 
-    await userEvent.click(screen.getByRole('button', { name: '2 mùa' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Tăng số tập mùa 2' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Thêm mùa 2' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Thêm 1 tập ở mùa 2' }));
 
     expect(onChange).toHaveBeenLastCalledWith([
       [30, 30, 30],
       [30, 30, 30, 30],
     ]);
-    expect(screen.getByText('2 mùa · 7 tập')).toBeInTheDocument();
+    expect(screen.getByText('2 mùa · 7 tập · 210 phút')).toBeInTheDocument();
+  });
+
+  it('lets the episode count be typed, within the season limits', async () => {
+    const onChange = vi.fn();
+    render(<Seasons initial={[[30, 30, 30]]} onChange={onChange} />);
+
+    const count = screen.getByRole('spinbutton', { name: 'Số tập mùa 1' });
+    await userEvent.clear(count);
+    await userEvent.type(count, '5');
+    expect(onChange).toHaveBeenLastCalledWith([[30, 30, 30, 30, 30]]);
+    expect(screen.getByRole('button', { name: 'Thêm 1 tập ở mùa 1' })).toBeDisabled();
   });
 
   it('lets a duration be typed freely and keeps it within the limit on blur', async () => {
@@ -51,19 +62,14 @@ describe('SeasonEpisodesEditor', () => {
     expect(onChange).toHaveBeenLastCalledWith([[30, 30, 30]]);
   });
 
-  it('applies the common duration to one season only', async () => {
+  it('removes a season but always keeps one', async () => {
     const onChange = vi.fn();
-    render(<Seasons initial={[[30, 30, 30], [30, 30, 30]]} onChange={onChange} />);
+    render(<Seasons initial={[[30, 30, 30], [20, 20, 20]]} onChange={onChange} />);
 
-    const common = screen.getByLabelText('Thời lượng chung (phút)');
-    await userEvent.clear(common);
-    await userEvent.type(common, '25');
-    await userEvent.click(screen.getAllByRole('button', { name: 'Áp dụng 25 phút cho mùa này' })[1]);
+    await userEvent.click(screen.getByRole('button', { name: 'Xoá mùa 1' }));
 
-    expect(onChange).toHaveBeenLastCalledWith([
-      [30, 30, 30],
-      [25, 25, 25],
-    ]);
+    expect(onChange).toHaveBeenLastCalledWith([[20, 20, 20]]);
+    expect(screen.queryByRole('button', { name: /Xoá mùa/ })).not.toBeInTheDocument();
   });
 });
 
