@@ -24,3 +24,6 @@ export const canProduce = (status: WorkflowState) => PRODUCING.includes(status);
 
 /** The Reviewer decides on a cut only while it waits for a decision. */
 export const isAwaitingAudit = (status: WorkflowState) => status === 'EPISODE_SUBMITTED';
+
+/** A plan the Creator has not sent yet, or must rework: still editable. */
+export const isDraft = (episode: { status: WorkflowState }) => episode.status === 'PLAN_DRAFT' || episode.status === 'CHANGES_REQUESTED';

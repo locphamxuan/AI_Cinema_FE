@@ -2,20 +2,21 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Video, Play, LayoutDashboard, FileText, MessageSquare, Zap, Film } from 'lucide-react';
+import { Video, Play, LayoutDashboard, FileText, MessageSquare, Zap, Film, FilePen } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
 import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
+import { DraftsTab } from './tabs/DraftsTab';
 import { creatorGroups } from '@/features/workflow/lib/projectGroups';
 import { scriptReview } from '@/features/workflow/lib/planVerdict';
-import { isPlanApproved } from '@/features/workflow/lib/workflowState';
+import { isDraft, isPlanApproved } from '@/features/workflow/lib/workflowState';
 import { OverviewTab } from './tabs/OverviewTab';
 import { BriefTab } from './tabs/BriefTab';
 import { StudioLinkTab } from './tabs/StudioLinkTab';
 import { TokensTab } from './tabs/TokensTab';
 import { ReviewsTab } from './tabs/ReviewsTab';
 
-type CreatorTab = 'overview' | 'brief' | 'studio' | 'tokens' | 'reviews';
+type CreatorTab = 'overview' | 'drafts' | 'brief' | 'studio' | 'tokens' | 'reviews';
 
 /**
  * Creator's entry point after login: a left sidebar listing every assigned
@@ -67,6 +68,7 @@ export function CreatorWorkspacePage() {
 
   const navItems: SidebarNavItem[] = [
     { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
+    { key: 'drafts', label: 'Bản nháp', icon: FilePen, badge: project.episodes.filter(isDraft).length || undefined },
     { key: 'brief', label: 'Kịch bản', icon: FileText },
     { key: 'studio', label: 'Sản xuất', icon: Video },
     { key: 'reviews', label: 'Phản hồi', icon: MessageSquare, badge: latestFeedback ? 1 : undefined },
@@ -146,6 +148,16 @@ export function CreatorWorkspacePage() {
               />
             )}
 
+            {activeTab === 'drafts' && (
+              <DraftsTab
+                episodes={project.episodes}
+                onOpen={(packageId) => {
+                  setActivePackage(packageId);
+                  setActiveTab('brief');
+                }}
+              />
+            )}
+
             {activeTab === 'brief' && (
               <BriefTab
                 key={currentPackage.id}
@@ -154,6 +166,7 @@ export function CreatorWorkspacePage() {
                 updateContentBrief={updateContentBrief}
                 savePlanDraft={savePlanDraft}
                 submitProductionPlan={submitProductionPlan}
+                maxEpisodeMinutes={maxEpisodeMinutes}
               />
             )}
 
@@ -165,7 +178,6 @@ export function CreatorWorkspacePage() {
 
             {activeTab === 'reviews' && <ReviewsTab episodeReviews={episodeReviews} />}
           </div>
-                maxEpisodeMinutes={maxEpisodeMinutes}
         )}
       </main>
     </div>
