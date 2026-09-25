@@ -4,22 +4,38 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 
-const STORAGE_KEY = 'aicinema_saved_credentials';
+// Only the email is remembered; a password never goes to localStorage.
+const STORAGE_KEY = 'aicinema_saved_email';
+const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
 
+function savedEmail(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function rememberEmail(email: string, remember: boolean) {
+  try {
+    if (remember) localStorage.setItem(STORAGE_KEY, email.trim());
+    else localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+}
+
+/** Mounted afresh on every opening, so each opening starts from the saved email and the requested mode. */
 export default function AuthModal() {
-  const router = useRouter();
-  const {
-    isAuthModalOpen,
-    authModalMode,
-    initialAuthEmail,
-    closeAuthModal,
-    openAuthModal,
-    login,
-    register,
-  } = useAppStore();
+  const { isAuthModalOpen, authModalMode, initialAuthEmail } = useAppStore();
+  if (!isAuthModalOpen) return null;
+  return <AuthModalForm key={`${authModalMode}:${initialAuthEmail ?? ''}`} />;
+}
 
-  const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [email, setEmail] = useState('');
+function AuthModalForm() {
+  const router = useRouter();
+  const { authModalMode, initialAuthEmail, closeAuthModal, login, register } = useAppStore();
+
+  const [mode, setMode] = useState<'login' | 'register'>(authModalMode);
+  const [email, setEmail] = useState(() => initialAuthEmail || savedEmail() || '');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
@@ -27,38 +43,13 @@ export default function AuthModal() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Load saved credentials or default demo pre-fill on mount / open
+  // Earlier versions stored the password itself; drop it.
   useEffect(() => {
-    if (isAuthModalOpen) {
-      setMode(authModalMode);
-      setError(null);
+    try {
+      localStorage.removeItem(LEGACY_CREDENTIALS_KEY);
+    } catch {}
+  }, []);
 
-      // Check localStorage for saved credentials
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.email && parsed.password) {
-            setEmail(parsed.email);
-            setPassword(parsed.password);
-            setRememberMe(true);
-            return;
-          }
-        }
-      } catch {}
-
-      // Default pre-fill if initialAuthEmail provided
-      if (initialAuthEmail) {
-        setEmail(initialAuthEmail);
-      } else {
-        setEmail('');
-        setPassword('');
-        setRememberMe(true);
-      }
-    }
-  }, [isAuthModalOpen, authModalMode, initialAuthEmail]);
-
-  if (!isAuthModalOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,17 +59,7 @@ export default function AuthModal() {
     if (mode === 'login') {
       const res = await login(email, password);
       if (res.success) {
-        // Save or clear credentials in localStorage
-        try {
-          if (rememberMe) {
-            localStorage.setItem(
-              STORAGE_KEY,
-              JSON.stringify({ email: email.trim(), password: password })
-            );
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
-          }
-        } catch {}
+        rememberEmail(email, rememberMe);
 
         if (res.redirectUrl) {
           router.push(res.redirectUrl);
@@ -89,16 +70,7 @@ export default function AuthModal() {
     } else {
       const res = await register(name, email, password);
       if (res.success) {
-        try {
-          if (rememberMe) {
-            localStorage.setItem(
-              STORAGE_KEY,
-              JSON.stringify({ email: email.trim(), password: password })
-            );
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
-          }
-        } catch {}
+        rememberEmail(email, rememberMe);
       } else {
         setError(res.error || 'Đăng ký thất bại');
       }
