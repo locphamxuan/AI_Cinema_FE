@@ -65,10 +65,8 @@ export const API_ROUTES = {
     PROJECTS: '/production-projects',
     PROJECT_DETAIL: (projectId: string) => `/production-projects/${projectId}`,
     PROJECT_CANCEL: (projectId: string) => `/production-projects/${projectId}/cancel`,
-    PROJECT_MILESTONES: (projectId: string) => `/production-projects/${projectId}/milestones`,
 
     // Milestones
-    MILESTONE_DETAIL: (milestoneId: string) => `/milestones/${milestoneId}`,
 
     // Production Plans
     PROJECT_PLANS: (projectId: string) => `/production-projects/${projectId}/plans`,
@@ -76,9 +74,13 @@ export const API_ROUTES = {
     PLAN_SUBMIT: (planId: string) => `/production-plans/${planId}/submit`,
     PLAN_DRAFT: (planId: string) => `/production-plans/${planId}/draft`,
     PLAN_REVISIONS: (projectId: string, planId: string) => `/production-projects/${projectId}/plans/${planId}/revisions`,
+    PLAN_CONTINUITY: (planId: string) => `/production-plans/${planId}/continuity`,
 
     // Scenes
     SCENE_SUBMIT: (sceneId: string) => `/scenes/${sceneId}/submit`,
+    SCENE_DIRECTION: (sceneId: string) => `/scenes/${sceneId}/direction`,
+    SCENE_RESET: (sceneId: string) => `/scenes/${sceneId}/reset`,
+    SCENE_SUGGESTIONS: (sceneId: string) => `/scenes/${sceneId}/suggestions`,
 
     // Plan Reviews (Per-scene pre-production review)
     PLAN_REVIEWS: (planId: string) => `/production-plans/${planId}/plan-reviews`,

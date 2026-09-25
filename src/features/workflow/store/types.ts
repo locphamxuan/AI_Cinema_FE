@@ -59,8 +59,6 @@ export interface EpisodeSlice {
   loadProject: (projectId: string) => Promise<void>;
   isLoading: boolean;
   error: string | null;
-  /** Reports progress on a milestone; completing it needs what was achieved. */
-  updateMilestoneStatus: (milestoneId: string, status: 'pending' | 'in_progress' | 'completed', result?: string) => Promise<boolean>;
 }
 
 
@@ -79,6 +77,14 @@ export interface ProductionSlice {
   loadJobs: (packageId: string) => Promise<void>;
   /** Generates the scene's draft steps, or regenerates its saved ones when it has no drafts (BR-41). */
   triggerGenerationJob: (packageId: string, sceneJobId: string) => Promise<boolean>;
+  /** Regenerates one saved step with a revised prompt, as a new charged attempt (BR-41). */
+  regenerateStep: (packageId: string, sceneJobId: string, stepId: string, prompt: string) => Promise<boolean>;
+  /** Removes a saved step from its scene; tokens already spent are not refunded. */
+  discardStep: (packageId: string, sceneJobId: string, stepId: string) => Promise<boolean>;
+  /** Retitles a scene or refines its description while it is in production. */
+  updateSceneDirection: (sceneId: string, data: { title: string; description: string }) => Promise<boolean>;
+  /** Starts a scene over: removes everything generated for it (tokens are not refunded). */
+  resetScene: (sceneId: string) => Promise<boolean>;
   /** Completes every scene, assembles the episode package and submits it for review. */
   submitEpisodePackage: (packageId: string) => Promise<boolean>;
 }

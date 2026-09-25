@@ -43,6 +43,45 @@ describe('Workflow store — studio production', () => {
       expect(api.createJob).not.toHaveBeenCalled();
     });
 
+    it('regenerates one saved step with its revised prompt', async () => {
+      inProduction();
+      await useWorkflowStore.getState().loadProject('project-1');
+      api.retryJob.mockReturnValue(ok(apiJob('job-1b', 'scene-1')));
+      api.runJob.mockReturnValue(ok(apiJob('job-1b', 'scene-1')));
+
+      expect(await useWorkflowStore.getState().regenerateStep('plan-1', 'scene-1', 'job-1', '  góc máy thấp  ')).toBe(true);
+      expect(api.retryJob).toHaveBeenCalledWith('job-1', 'góc máy thấp');
+      expect(api.runJob).toHaveBeenCalledWith('job-1b');
+    });
+
+    it('drops a discarded step from its scene', async () => {
+      inProduction();
+      await useWorkflowStore.getState().loadProject('project-1');
+      api.discardJob.mockReturnValue(ok({ ...apiJob('job-1', 'scene-1'), status: 'CANCELLED' }));
+      api.listJobs.mockReturnValue(ok([{ ...apiJob('job-1', 'scene-1'), status: 'CANCELLED' }]));
+
+      expect(await useWorkflowStore.getState().discardStep('plan-1', 'scene-1', 'job-1')).toBe(true);
+      expect(api.discardJob).toHaveBeenCalledWith('job-1');
+      expect(useWorkflowStore.getState().getJobs('plan-1').find((j) => j.id === 'scene-1')?.generation_steps).toEqual([]);
+    });
+
+    it('saves a scene direction or starts the scene over, then reloads', async () => {
+      inProduction();
+      await useWorkflowStore.getState().loadProject('project-1');
+      api.getProject.mockClear();
+      api.updateSceneDirection.mockReturnValue(ok(apiScene(1)));
+      api.resetScene.mockReturnValue(ok(apiScene(1)));
+
+      expect(await useWorkflowStore.getState().updateSceneDirection('scene-1', { title: 'Chợ sớm', description: 'Sương' })).toBe(true);
+      expect(api.updateSceneDirection).toHaveBeenCalledWith('scene-1', { title: 'Chợ sớm', description: 'Sương' });
+      expect(await useWorkflowStore.getState().resetScene('scene-1')).toBe(true);
+      expect(api.resetScene).toHaveBeenCalledWith('scene-1');
+      expect(api.getProject).toHaveBeenCalledTimes(2);
+
+      api.resetScene.mockReturnValue(fail('running'));
+      expect(await useWorkflowStore.getState().resetScene('scene-1')).toBe(false);
+    });
+
     it('keeps draft steps across a reload and lets only drafts be edited', async () => {
       inProduction();
       await useWorkflowStore.getState().loadProject('project-1');

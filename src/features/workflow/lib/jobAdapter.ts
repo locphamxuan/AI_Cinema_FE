@@ -32,6 +32,9 @@ const FUNCTION_OF: Partial<Record<GenerationJobType, GenerationFunctionType>> = 
   BACKGROUND_AUDIO: 'AUDIO_MUSIC',
 };
 
+/** The Studio function of a backend job type (anything unlisted is a custom function). */
+export const functionTypeOf = (jobType: GenerationJobType): GenerationFunctionType => FUNCTION_OF[jobType] ?? 'CUSTOM';
+
 const STEP_STATUS: Record<GenerationJobStatus, JobStatus> = {
   PENDING: 'pending',
   QUEUED: 'pending',
@@ -68,7 +71,7 @@ export function latestAttempts(jobs: ApiGenerationJob[]): ApiGenerationJob[] {
 function toStep(job: ApiGenerationJob): GenerationStep {
   return {
     id: job.id,
-    function_type: FUNCTION_OF[job.jobType] ?? 'CUSTOM',
+    function_type: functionTypeOf(job.jobType),
     custom_function: job.customFunction ?? undefined,
     prompt: job.rawPrompt ?? '',
     selected_model: job.aiModel.name,

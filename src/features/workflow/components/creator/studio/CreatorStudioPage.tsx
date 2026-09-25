@@ -7,11 +7,14 @@ import { ArrowLeft } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { StudioPlayer } from './StudioPlayer';
 import { StudioTimeline } from './StudioTimeline';
-import { GeneratorPanel } from './GeneratorPanel';
 import { routeDefaults } from '@/features/workflow/lib/modelRouting';
 import { SubmitEpisodeModal } from './SubmitEpisodeModal';
 import { toast } from '@/components/ui/Toast';
-import type { GenerationStep } from '@/types/workflow';
+import type { GenerationFunctionType, GenerationStep } from '@/types/workflow';
+import { isDraftStep } from '@/features/workflow/lib/jobAdapter';
+import { SceneWorkspace } from './SceneWorkspace';
+import { useKeyedRequest } from './useKeyedRequest';
+import { workflowService } from '@/services/workflowService';
 import { canProduce } from '@/features/workflow/lib/workflowState';
 
 const LOCKED_REASON: Partial<Record<string, string>> = {
@@ -37,6 +40,10 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
     addGenerationStep,
     updateGenerationStep,
     removeGenerationStep,
+    regenerateStep,
+    discardStep,
+    updateSceneDirection,
+    resetScene,
     submitEpisodePackage,
     setActivePackage,
   } = useWorkflowStore();
@@ -49,6 +56,13 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [renderingJobId, setRenderingJobId] = useState<string | null>(null);
+
+  // Scene links are checked again whenever a scene's generated content or description changes.
+  const continuityKey = currentPackage
+    ? `${currentPackage.id}|${jobs.map((j) => `${j.id}:${j.generation_steps.filter((st) => !isDraftStep(st)).map((st) => `${st.id}${st.status}`).join('.')}`).join(',')}|${currentPackage.brief.scene_breakdown.map((sc) => sc.description).join('|')}`
+    : null;
+  const continuityLocked = !currentPackage || !canProduce(currentPackage.status);
+  const continuity = useKeyedRequest(continuityLocked ? null : continuityKey, () => workflowService.getPlanContinuity(currentPackage!.id));
 
   // Opened by URL (e.g. after a refresh): the project is not in memory yet.
   useEffect(() => {
@@ -86,14 +100,28 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
     if (ok) toast.success('Đã tạo xong', 'Kết quả đã được lưu vào cảnh này.');
   };
 
-  const handleAddStep = () => {
+  const selectedScene = currentPackage.brief.scene_breakdown.find((s) => s.id === selectedJob?.scene_id);
+
+  const handleAddStep = (function_type: GenerationFunctionType = 'VIDEO', prompt = '') => {
     if (!selectedJob) return;
     addGenerationStep(currentPackage.id, selectedJob.id, {
-      function_type: 'VIDEO',
-      prompt: '',
+      function_type,
+      prompt,
       status: 'pending',
-      ...routeDefaults(routing, { function_type: 'VIDEO' }),
+      ...routeDefaults(routing, { function_type }),
     });
+  };
+
+  const handleSaveScene = async (data: { title: string; description: string }) => {
+    const ok = await updateSceneDirection(selectedJob!.scene_id, data);
+    if (ok) toast.success('Đã lưu cảnh', 'Mô tả mới sẽ dùng cho các lần tạo sau.');
+    return ok;
+  };
+
+  const handleResetScene = async () => {
+    const ok = await resetScene(selectedJob!.scene_id);
+    if (ok) toast.success('Đã làm lại cảnh', 'Cảnh đã trống, bạn có thể tạo lại từ đầu.');
+    return ok;
   };
 
   const handleUpdateStep = (stepId: string, data: Partial<GenerationStep>) => {
@@ -102,6 +130,22 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
 
   const handleRemoveStep = (stepId: string) => {
     if (selectedJob) removeGenerationStep(currentPackage.id, selectedJob.id, stepId);
+  };
+
+  const handleRegenerateStep = async (stepId: string, prompt: string) => {
+    if (!selectedJob) return false;
+    setRenderingJobId(selectedJob.id);
+    const ok = await regenerateStep(currentPackage.id, selectedJob.id, stepId, prompt);
+    setRenderingJobId(null);
+    if (ok) toast.success('Đã tạo lại', 'Mục này đã được tạo lại với mô tả mới.');
+    return ok;
+  };
+
+  const handleDiscardStep = async (stepId: string) => {
+    if (!selectedJob) return false;
+    const ok = await discardStep(currentPackage.id, selectedJob.id, stepId);
+    if (ok) toast.success('Đã xóa mục', 'Mục này không còn nằm trong cảnh.');
+    return ok;
   };
 
   const handleSubmitToChecker = async () => {
@@ -189,21 +233,33 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
             onSelectJob={setSelectedJobId}
             onGenerate={handleGenerate}
             locked={locked}
+            continuity={locked ? undefined : continuity}
           />
         </div>
 
-        <div className="lg:col-span-5 space-y-6">
-          <GeneratorPanel
-            selectedJob={selectedJob}
-            steps={selectedJob?.generation_steps ?? []}
-            onAddStep={handleAddStep}
-            onUpdateStep={handleUpdateStep}
-            onRouteStep={(stepId, change) => selectedJob && routeStep(currentPackage.id, selectedJob.id, stepId, change)}
-            onRemoveStep={handleRemoveStep}
-            isGenerating={renderingJobId === selectedJob?.id}
-            onGenerateSelected={() => selectedJob && handleGenerate(selectedJob.id)}
-            locked={locked}
-          />
+        <div className="lg:col-span-5">
+          {selectedJob ? (
+            <SceneWorkspace
+              key={selectedJob.id}
+              job={selectedJob}
+              description={selectedScene?.description ?? ''}
+              locked={locked}
+              isGenerating={renderingJobId === selectedJob.id}
+              busy={renderingJobId !== null}
+              remainingQuota={remainingQuota}
+              onAddStep={handleAddStep}
+              onUpdateStep={handleUpdateStep}
+              onRouteStep={(stepId, change) => routeStep(currentPackage.id, selectedJob.id, stepId, change)}
+              onRemoveStep={handleRemoveStep}
+              onRegenerateStep={handleRegenerateStep}
+              onDiscardStep={handleDiscardStep}
+              onGenerate={() => handleGenerate(selectedJob.id)}
+              onSaveScene={handleSaveScene}
+              onResetScene={handleResetScene}
+            />
+          ) : (
+            <p className="p-5 rounded-xl border border-dashed border-slate-200 dark:border-white/10 text-sm text-slate-500 dark:text-slate-400">Kế hoạch chưa có cảnh nào.</p>
+          )}
         </div>
       </div>
 

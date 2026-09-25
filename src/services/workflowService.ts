@@ -26,6 +26,8 @@ import type {
   ApiRoute,
   ApiRoutingRow,
   ApiScene,
+  ApiSceneAdvice,
+  ApiPlanContinuity,
   ApiUser,
   CreateAiContentLabelDto,
   CreateEpisodePackageDto,
@@ -44,8 +46,6 @@ import type {
   RecordComplianceReviewDto,
   SubmitProductionPlanDto,
   SavePlanDraftDto,
-  UpdateMilestoneDto,
-  ApiMilestone,
 } from '@/types/workflow-api';
 
 const ROUTES = API_ROUTES.WORKFLOW;
@@ -100,10 +100,6 @@ class WorkflowService {
 
   createProject(dto: CreateProductionProjectDto): Promise<ApiResponse<ApiProductionProject>> {
     return apiClient.post<ApiProductionProject>(ROUTES.PROJECTS, dto);
-  }
-
-  updateMilestone(milestoneId: string, dto: UpdateMilestoneDto): Promise<ApiResponse<ApiMilestone>> {
-    return apiClient.patch<ApiMilestone>(ROUTES.MILESTONE_DETAIL(milestoneId), dto);
   }
 
   // Plans & scenes (Creator)
@@ -161,6 +157,31 @@ class WorkflowService {
   /** New attempt of a finished job — charged again (BR-41). */
   retryJob(jobId: string, prompt?: string): Promise<ApiResponse<ApiGenerationJob>> {
     return apiClient.post<ApiGenerationJob>(ROUTES.JOB_RETRY(jobId), prompt ? { prompt } : {});
+  }
+
+  /** Removes a step from its scene; the job stays for audit and its tokens are not refunded. */
+  discardJob(jobId: string): Promise<ApiResponse<ApiGenerationJob>> {
+    return apiClient.delete<ApiGenerationJob>(ROUTES.JOB_DETAIL(jobId));
+  }
+
+  /** Retitles a scene or refines its description during production (script and duration stay approved). */
+  updateSceneDirection(sceneId: string, dto: { title?: string; description?: string }): Promise<ApiResponse<ApiScene>> {
+    return apiClient.patch<ApiScene>(ROUTES.SCENE_DIRECTION(sceneId), dto);
+  }
+
+  /** Starts a scene over: its generations are removed (tokens are not refunded). */
+  resetScene(sceneId: string): Promise<ApiResponse<ApiScene>> {
+    return apiClient.post<ApiScene>(ROUTES.SCENE_RESET(sceneId), {});
+  }
+
+  /** What the scene still lacks and suggested prompts that follow the film and the previous scene. */
+  getSceneAdvice(sceneId: string): Promise<ApiResponse<ApiSceneAdvice>> {
+    return apiClient.get<ApiSceneAdvice>(ROUTES.SCENE_SUGGESTIONS(sceneId));
+  }
+
+  /** Where neighbouring scenes of the episode do not cut together, scene by scene. */
+  getPlanContinuity(planId: string): Promise<ApiResponse<ApiPlanContinuity>> {
+    return apiClient.get<ApiPlanContinuity>(ROUTES.PLAN_CONTINUITY(planId));
   }
 
   /** Marks a generated scene COMPLETED; every scene must be before the episode is assembled. */

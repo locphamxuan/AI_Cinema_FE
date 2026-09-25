@@ -107,6 +107,32 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
       return ok;
     },
 
+    regenerateStep: async (packageId, sceneJobId, stepId, prompt) => {
+      markGenerating(packageId, sceneJobId);
+      const job = await apiResult(workflowService.retryJob(stepId, prompt.trim()), 'Không tạo lại được');
+      const ok = Boolean(job && (await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại')));
+      await reload();
+      return ok;
+    },
+
+    discardStep: async (packageId, sceneJobId, stepId) => {
+      const ok = (await apiResult(workflowService.discardJob(stepId), 'Không xóa được mục này')) !== null;
+      if (ok) await get().loadJobs(packageId);
+      return ok;
+    },
+
+    updateSceneDirection: async (sceneId, data) => {
+      const ok = (await apiResult(workflowService.updateSceneDirection(sceneId, data), 'Không lưu được cảnh')) !== null;
+      if (ok) await reload();
+      return ok;
+    },
+
+    resetScene: async (sceneId) => {
+      const ok = (await apiResult(workflowService.resetScene(sceneId), 'Không làm lại được cảnh')) !== null;
+      if (ok) await reload();
+      return ok;
+    },
+
     submitEpisodePackage: async (packageId) => {
       const pkg = get().getPackage(packageId);
       if (!pkg) return false;

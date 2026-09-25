@@ -257,3 +257,21 @@ export interface ApiRoutingRow {
 export interface ApiRoute extends ApiRoutingRow {
   match: 'catalog' | 'specialist' | 'general';
 }
+
+/** What a scene still lacks and the prompts suggested for it (GET /scenes/:id/suggestions). */
+export interface ApiSceneAdvice {
+  source: 'ai' | 'rules';
+  summary: string;
+  gaps: { aspect: 'video' | 'voice' | 'audio' | 'lighting' | 'camera' | 'continuity'; message: string }[];
+  suggestions: { jobType: GenerationJobType; title: string; reason: string; prompt: string }[];
+  /** The neighbouring scenes this one has to cut together with. */
+  previousScene: { number: number; title: string } | null;
+  nextScene: { number: number; title: string } | null;
+}
+
+/** Breaks in continuity between neighbouring scenes of an episode (GET /production-plans/:id/continuity). */
+export interface ApiPlanContinuity {
+  source: 'ai' | 'rules';
+  summary: string;
+  scenes: { sceneId: string; sceneNumber: number; issues: string[] }[];
+}

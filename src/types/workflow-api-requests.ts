@@ -3,7 +3,7 @@
  * reviewer, allocator, publisher) always comes from the JWT, never the body.
  */
 
-import type { ApiLabelType, ComplianceCheckType, ComplianceResult, GenerationJobType, MilestoneStatus, ProductionContentType, QuotaAllocationType, ReviewDecisionValue } from './workflow-api-enums';
+import type { ApiLabelType, ComplianceCheckType, ComplianceResult, GenerationJobType, ProductionContentType, QuotaAllocationType, ReviewDecisionValue } from './workflow-api-enums';
 
 export interface CreateMilestoneDto {
   title: string;
@@ -31,15 +31,6 @@ export interface CreateProductionProjectDto {
   /** Every episode in order with its season and allotted duration; seasons may differ in size. */
   episodes?: { seasonNumber: number; targetDurationSeconds: number }[];
   milestones?: CreateMilestoneDto[];
-}
-
-export interface UpdateMilestoneDto {
-  title?: string;
-  description?: string;
-  startDate?: string;
-  targetDate?: string;
-  status?: MilestoneStatus;
-  resultText?: string;
 }
 
 /** The whole plan the Creator is still writing (or reworking after a change request); scenes left out are deleted. */
