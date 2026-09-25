@@ -2,7 +2,8 @@ import { vi } from 'vitest';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { workflowService } from '@/services/workflowService';
 import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
-import { initialProject, mockAssignedProjects } from '@/tests/fixtures/workflowFixtures';
+import { initialProject } from '@/tests/fixtures/workflowFixtures';
+import { mockAssignedProjects } from '@/tests/fixtures/workflowProjectFixtures';
 import type { ApiProductionProject } from '@/types/workflow-api';
 
 /** The mocked workflow API; the test file must mock '@/services/workflowService' first. */
