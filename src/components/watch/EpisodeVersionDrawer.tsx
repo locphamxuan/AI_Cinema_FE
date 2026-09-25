@@ -62,7 +62,7 @@ export default function EpisodeVersionDrawer({
 
         {/* Versions Timeline List */}
         <div className="space-y-4 flex-1">
-          {versions.map((ver, idx) => {
+          {versions.map((ver) => {
             const isSelected = ver.id === activeVersionId || (!activeVersionId && ver.isCurrent);
 
             return (
