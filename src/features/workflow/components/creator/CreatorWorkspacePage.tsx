@@ -186,5 +186,3 @@ export function CreatorWorkspacePage() {
     </div>
   );
 }
-
-export default CreatorWorkspacePage;

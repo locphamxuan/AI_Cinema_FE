@@ -56,5 +56,3 @@ export function RoleNavHeader() {
     </header>
   );
 }
-
-export default RoleNavHeader;

@@ -1,4 +1,4 @@
-import { PENDING_FIELD_REVIEW, type ProductionProject } from '@/types/workflow';
+import type { ProductionProject } from '@/types/workflow';
 
 /**
  * Placeholder for "no project selected" until loadProjects() fills the store

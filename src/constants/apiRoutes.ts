@@ -64,16 +64,10 @@ export const API_ROUTES = {
     // Production Projects
     PROJECTS: '/production-projects',
     PROJECT_DETAIL: (projectId: string) => `/production-projects/${projectId}`,
-    PROJECT_CANCEL: (projectId: string) => `/production-projects/${projectId}/cancel`,
-
-    // Milestones
 
     // Production Plans
-    PROJECT_PLANS: (projectId: string) => `/production-projects/${projectId}/plans`,
-    PLAN_DETAIL: (planId: string) => `/production-plans/${planId}`,
     PLAN_SUBMIT: (planId: string) => `/production-plans/${planId}/submit`,
     PLAN_DRAFT: (planId: string) => `/production-plans/${planId}/draft`,
-    PLAN_REVISIONS: (projectId: string, planId: string) => `/production-projects/${projectId}/plans/${planId}/revisions`,
     PLAN_CONTINUITY: (planId: string) => `/production-plans/${planId}/continuity`,
 
     // Scenes
@@ -97,18 +91,13 @@ export const API_ROUTES = {
     JOB_DETAIL: (jobId: string) => `/generation-jobs/${jobId}`,
     JOB_RUN: (jobId: string) => `/generation-jobs/${jobId}/run`,
     JOB_RETRY: (jobId: string) => `/generation-jobs/${jobId}/retry`,
-    JOB_CANCEL: (jobId: string) => `/generation-jobs/${jobId}/cancel`,
-    JOB_ASSETS: (jobId: string) => `/generation-jobs/${jobId}/generated-assets`,
-    JOB_COMPLETE: (jobId: string) => `/generation-jobs/${jobId}/complete`,
 
     // Episode Packages & Assembly
     PACKAGES: (planId: string) => `/production-plans/${planId}/episode-packages`,
-    PACKAGE_DETAIL: (packageId: string) => `/episode-packages/${packageId}`,
     PACKAGE_SUBTITLE: (packageId: string, language: string) => `/episode-packages/${packageId}/subtitles/${language}`,
     PACKAGE_SUBMISSIONS: (packageId: string) => `/episode-packages/${packageId}/submissions`,
     PACKAGE_REVIEWS: (packageId: string) => `/episode-packages/${packageId}/reviews`,
     PACKAGE_AI_LABELS: (packageId: string) => `/episode-packages/${packageId}/ai-content-labels`,
-    PACKAGE_COMPLIANCE_CHECKS: (packageId: string) => `/episode-packages/${packageId}/compliance-checks`,
     PACKAGE_COMPLIANCE_REVIEWS: (packageId: string) => `/episode-packages/${packageId}/compliance-reviews`,
 
     // AI model routing (BR-40)
@@ -117,18 +106,14 @@ export const API_ROUTES = {
 
     // Review & Compliance Decisions
     REVIEW_DETAIL: (reviewId: string) => `/reviews/${reviewId}`,
-    COMPLIANCE_CHECK_DETAIL: (checkId: string) => `/compliance-checks/${checkId}`,
 
     // Catalog & Final Movie Conversion
     CATALOG_FROM_PACKAGE: (packageId: string) => `/episode-packages/${packageId}/catalog`,
     MOVIES: '/movies',
-    MOVIE_DETAIL: (movieId: string) => `/movies/${movieId}`,
-    CATALOG_EPISODE_DETAIL: (episodeId: string) => `/catalog/episodes/${episodeId}`,
 
     // Publications
     EPISODE_PUBLICATIONS: (episodeId: string) => `/episodes/${episodeId}/publications`,
     PUBLICATION_PUBLISH: (publicationId: string) => `/publications/${publicationId}/publish`,
-    PUBLICATION_UNPUBLISH: (publicationId: string) => `/publications/${publicationId}/unpublish`,
   },
 } as const;
 

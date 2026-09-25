@@ -2,7 +2,7 @@ import type { EpisodePackage, QuotaRequest } from '@/types/workflow';
 import { canProduce } from './workflowState';
 
 /** Share of the quota used at which the Creator is warned to ask for a top-up. */
-export const QUOTA_WARNING_PERCENT = 90;
+const QUOTA_WARNING_PERCENT = 90;
 
 export interface QuotaUsage {
   used: number;

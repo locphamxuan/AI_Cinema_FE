@@ -230,4 +230,3 @@ class WorkflowService {
 }
 
 export const workflowService = new WorkflowService();
-export default workflowService;

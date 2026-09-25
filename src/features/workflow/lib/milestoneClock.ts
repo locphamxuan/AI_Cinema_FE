@@ -22,7 +22,7 @@ export interface TimedMilestone {
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** A `YYYY-MM-DD` (or ISO) date as local midnight, the way the dates were picked. */
-export function dayStart(value?: string | null): Date | null {
+function dayStart(value?: string | null): Date | null {
   if (!value) return null;
   const [y, m, d] = value.slice(0, 10).split('-').map(Number);
   return y && m && d ? new Date(y, m - 1, d) : null;
@@ -52,7 +52,7 @@ export function milestoneTimeline(milestones: ProjectMilestone[], productionStar
 }
 
 /** "3 ngày 4 giờ", "5 giờ 12 phút", "8 phút" — the two largest units. */
-export function formatDuration(ms: number): string {
+function formatDuration(ms: number): string {
   const minutes = Math.max(1, Math.floor(ms / 60_000));
   const days = Math.floor(minutes / 1440);
   const hours = Math.floor((minutes % 1440) / 60);

@@ -169,7 +169,7 @@ describe('Workflow store — projects, plans and milestones', () => {
     });
 
     it('derives the plan verdict and summarises only the flagged fields', () => {
-      const { project, getBrief } = useWorkflowStore.getState();
+      const { getBrief } = useWorkflowStore.getState();
       const brief = {
         ...getBrief('pkg-ep-03')!,
         token_review: { status: 'changes_requested' as const, comment: 'Vượt ngân sách' },

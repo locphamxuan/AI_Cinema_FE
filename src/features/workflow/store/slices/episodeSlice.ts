@@ -1,6 +1,5 @@
 import type { StateCreator } from 'zustand';
 import type { EpisodePackage, ProductionProject } from '@/types/workflow';
-import { PENDING_FIELD_REVIEW } from '@/types/workflow';
 import { EMPTY_PROJECT } from '@/features/workflow/lib/emptyProject';
 import type { EpisodeSlice, WorkflowStoreState } from '../types';
 import { withProjectUpdate } from './projectRoster';

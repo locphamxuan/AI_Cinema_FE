@@ -25,10 +25,10 @@ export function creatorGroups(projects: ProductionProject[]): ProjectGroup[] {
   ];
 }
 
-export type ReviewerStage = 'new' | 'planReview' | 'production' | 'released';
+type ReviewerStage = 'new' | 'planReview' | 'production' | 'released';
 
 /** Which stage of the pipeline a project is in, from the Reviewer's point of view. */
-export function reviewerStage(project: ProductionProject): ReviewerStage {
+function reviewerStage(project: ProductionProject): ReviewerStage {
   if (project.overall_status === 'COMPLETED') return 'released';
   if (project.overall_status === 'NOT_STARTED') return 'new';
   const awaitingPlanReview = project.episodes.some((ep) => ep.status === 'PLAN_PENDING' || ep.brief.status === 'CHANGES_REQUESTED');
