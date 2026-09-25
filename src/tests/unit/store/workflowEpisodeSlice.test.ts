@@ -152,19 +152,6 @@ describe('Workflow store — projects, plans and milestones', () => {
     });
   });
 
-  describe('Milestones', () => {
-    it('sends the backend status of a milestone and reloads, reporting a failure', async () => {
-      serveBackendProject(apiProject([apiPlan()]));
-      api.updateMilestone.mockReturnValue(ok({}) as never);
-      expect(await useWorkflowStore.getState().updateMilestoneStatus('m1', 'in_progress')).toBe(true);
-      expect(api.updateMilestone).toHaveBeenCalledWith('m1', { status: 'IN_PROGRESS' });
-      expect(api.getProject).toHaveBeenCalled();
-
-      api.updateMilestone.mockReturnValue(fail('not found'));
-      expect(await useWorkflowStore.getState().updateMilestoneStatus('m1', 'completed')).toBe(false);
-    });
-  });
-
   describe('Local plan helpers', () => {
     it('keeps a separate script for every episode and sends each plan its own', async () => {
       serveBackendProject(apiProject([apiPlan(), apiPlan({ id: 'plan-2', episodeNumber: 2, scriptText: 'Tập 2 cũ' })]));

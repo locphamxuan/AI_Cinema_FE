@@ -51,6 +51,13 @@ const toNumber = (value: number | string | null | undefined): number => Number(v
 
 const toDate = (iso: string | null | undefined): string => (iso ? iso.split('T')[0] : '');
 
+const MILESTONE_STATUS: Record<ApiMilestone['status'], ProjectMilestone['status']> = {
+  PLANNED: 'pending',
+  IN_PROGRESS: 'in_progress',
+  COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
+};
+
 function adaptMilestone(m: ApiMilestone): ProjectMilestone {
   return {
     id: m.id,
@@ -58,7 +65,7 @@ function adaptMilestone(m: ApiMilestone): ProjectMilestone {
     description: m.description ?? '',
     startDate: m.startDate ?? undefined,
     deadline: toDate(m.targetDate),
-    status: m.status === 'IN_PROGRESS' ? 'in_progress' : m.status === 'COMPLETED' ? 'completed' : 'pending',
+    status: MILESTONE_STATUS[m.status],
     result: m.resultText ?? undefined,
   };
 }

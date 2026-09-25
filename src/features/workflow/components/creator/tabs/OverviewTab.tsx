@@ -1,10 +1,6 @@
-import { useState } from 'react';
 import { ArrowRight, AlertCircle, Check } from 'lucide-react';
-import type { EpisodePackage, ProductionProject, ProjectMilestone, ReviewLog, WorkflowState } from '@/types/workflow';
-import { useWorkflowStore } from '@/store/useWorkflowStore';
+import type { EpisodePackage, ProductionProject, ReviewLog, WorkflowState } from '@/types/workflow';
 import { quotaUsage } from '@/features/workflow/lib/quota';
-import { MilestoneStatusDropdown } from './MilestoneStatusDropdown';
-import { CompleteMilestoneModal } from './CompleteMilestoneModal';
 
 export interface OverviewTabProps {
   project: ProductionProject;
@@ -59,13 +55,10 @@ export function OverviewTab({
   onGotoTokens,
   onGotoReviews,
 }: OverviewTabProps) {
-  const { updateMilestoneStatus } = useWorkflowStore();
-  const [completing, setCompleting] = useState<ProjectMilestone>();
 
   const quota = quotaUsage(currentPackage);
   const jobs = currentPackage?.jobs ?? [];
   const completedJobsCount = jobs.filter((j) => j.status === 'completed').length;
-  const milestones = project.milestones ?? [];
   const gotoOr = (handler: (() => void) | undefined) => () => (handler ?? onGotoBrief)();
   // A returned cut is fixed by regenerating in the Studio, a returned plan by editing the brief.
   const isCutFeedback = latestFeedback?.review_type === 'content';
@@ -133,40 +126,6 @@ export function OverviewTab({
           )}
         </div>
       </section>
-
-      <section className={`${CARD} p-5 space-y-3`} aria-label="Cột mốc dự án">
-        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Cột mốc dự án</h3>
-        {milestones.length === 0 ? (
-          <p className="text-xs text-slate-500 dark:text-slate-400">Reviewer chưa đặt cột mốc nào cho dự án này.</p>
-        ) : (
-          <ul className="divide-y divide-slate-100 dark:divide-white/5">
-            {milestones.map((milestone) => (
-              <li key={milestone.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-2.5">
-                <div className="min-w-0 text-xs">
-                  <p className="font-medium text-slate-800 dark:text-slate-200 truncate">{milestone.title}</p>
-                  <p className="text-slate-500 dark:text-slate-400 mt-0.5">
-                    {milestone.description && <span>{milestone.description} · </span>}
-                    Hạn {milestone.deadline}
-                  </p>
-                  {milestone.result && <p className="text-emerald-700 dark:text-emerald-400 mt-0.5">Kết quả: {milestone.result}</p>}
-                </div>
-                <MilestoneStatusDropdown
-                  status={milestone.status}
-                  onChange={(status) =>
-                    status === 'completed' ? setCompleting(milestone) : updateMilestoneStatus(milestone.id, status)
-                  }
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <CompleteMilestoneModal
-        milestoneTitle={completing?.title}
-        onClose={() => setCompleting(undefined)}
-        onConfirm={(result) => updateMilestoneStatus(completing!.id, 'completed', result)}
-      />
 
       {latestFeedback && (
         <div role="alert" className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 flex items-start gap-3">

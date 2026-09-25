@@ -158,12 +158,4 @@ describe.skipIf(!API)('MF-1 workflow against the live API', () => {
     expect(await state().publishEpisode(episodeId)).toBe(true);
     expect(episode().status).toBe('PUBLISHED');
   });
-
-  it('lets the Creator complete a milestone with its result', async () => {
-    await signIn(CREATOR);
-    await reload();
-    const [milestone] = state().project.milestones ?? [];
-    expect(await state().updateMilestoneStatus(milestone.id, 'completed', 'Xong kịch bản')).toBe(true);
-    expect(state().project.milestones?.[0]).toMatchObject({ status: 'completed', result: 'Xong kịch bản' });
-  });
 });

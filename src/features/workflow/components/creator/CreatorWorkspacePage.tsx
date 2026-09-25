@@ -14,6 +14,7 @@ import { OverviewTab } from './tabs/OverviewTab';
 import { BriefTab } from './tabs/BriefTab';
 import { StudioLinkTab } from './tabs/StudioLinkTab';
 import { TokensTab } from './tabs/TokensTab';
+import { MilestoneTimeline } from '@/features/workflow/components/shared/MilestoneTimeline';
 import { ReviewsTab } from './tabs/ReviewsTab';
 
 type CreatorTab = 'overview' | 'drafts' | 'brief' | 'studio' | 'tokens' | 'reviews';
@@ -129,6 +130,8 @@ export function CreatorWorkspacePage() {
                 )}
               </div>
             </div>
+
+            <MilestoneTimeline milestones={project.milestones ?? []} productionStart={project.production_start_date} />
 
             <EpisodeSwitcher episodes={project.episodes} selectedId={currentPackage.id} onSelect={setActivePackage} />
 

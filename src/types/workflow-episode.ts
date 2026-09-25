@@ -105,8 +105,9 @@ export interface ProjectMilestone {
   startDate?: string;
   deadline: string;
   description?: string;
-  status: 'pending' | 'in_progress' | 'completed';
-  /** What the Creator reported when completing it. */
+  /** Stored status; the phase shown to users is derived from the dates (milestoneClock). */
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  /** What the Creator noted as achieved. */
   result?: string;
 }
 

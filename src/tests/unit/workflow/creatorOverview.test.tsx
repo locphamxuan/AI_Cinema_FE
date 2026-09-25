@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { OverviewTab } from '@/features/workflow/components/creator/tabs/OverviewTab';
 import { initialProject } from '@/tests/fixtures/workflowFixtures';
-import { useWorkflowStore } from '@/store/useWorkflowStore';
 import type { ReviewLog, WorkflowState } from '@/types/workflow';
 
 const FEEDBACK: ReviewLog = {
@@ -16,10 +15,10 @@ const FEEDBACK: ReviewLog = {
   created_at: '2026-09-25T00:00:00Z',
 };
 
-const renderOverview = (status: WorkflowState, milestones = initialProject.milestones) =>
+const renderOverview = (status: WorkflowState) =>
   render(
     <OverviewTab
-      project={{ ...initialProject, milestones }}
+      project={initialProject}
       currentPackage={{ ...initialProject.episodes[0], status }}
       scenesCount={3}
       estimatedTokens={300}
@@ -68,42 +67,5 @@ describe('Creator OverviewTab', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: action }));
     expect(handlers[handler]).toHaveBeenCalled();
-  });
-
-  it('asks what was achieved before completing a milestone, then locks it', async () => {
-    const updateMilestoneStatus = vi.fn().mockResolvedValue(true);
-    useWorkflowStore.setState({ updateMilestoneStatus });
-    const milestone = { id: 'm1', title: 'Kịch bản', deadline: '2026-10-30', status: 'in_progress' as const };
-    const { rerender } = renderOverview('IN_PRODUCTION', [milestone]);
-
-    fireEvent.click(screen.getByRole('button', { name: 'Đổi trạng thái cột mốc' }));
-    fireEvent.click(screen.getByRole('option', { name: 'Hoàn thành' }));
-    expect(updateMilestoneStatus).not.toHaveBeenCalled();
-
-    const confirm = screen.getByRole('button', { name: 'Hoàn thành' });
-    expect(confirm).toBeDisabled();
-    fireEvent.change(screen.getByLabelText('Kết quả đạt được'), { target: { value: ' Xong kịch bản ' } });
-    fireEvent.click(confirm);
-    expect(updateMilestoneStatus).toHaveBeenCalledWith('m1', 'completed', 'Xong kịch bản');
-
-    rerender(
-      <OverviewTab
-        project={{ ...initialProject, milestones: [{ ...milestone, status: 'completed', result: 'Xong kịch bản' }] }}
-        currentPackage={{ ...initialProject.episodes[0], status: 'IN_PRODUCTION' }}
-        scenesCount={3}
-        estimatedTokens={300}
-        synopsis=""
-        canEnterStudio
-        onGotoBrief={vi.fn()}
-      />
-    );
-    expect(screen.queryByRole('button', { name: 'Đổi trạng thái cột mốc' })).toBeNull();
-    expect(screen.getByText('Kết quả: Xong kịch bản')).toBeInTheDocument();
-  });
-
-  it('lists only the milestones the Reviewer set, never placeholder ones', () => {
-    renderOverview('IN_PRODUCTION', []);
-    expect(screen.getByText('Reviewer chưa đặt cột mốc nào cho dự án này.')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Đổi trạng thái cột mốc' })).toBeNull();
   });
 });

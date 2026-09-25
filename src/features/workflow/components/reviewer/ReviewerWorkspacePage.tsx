@@ -5,6 +5,7 @@ import { LayoutDashboard, ClipboardCheck, ShieldCheck, Zap, Film, Tv } from 'luc
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
 import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
+import { MilestoneTimeline } from '../shared/MilestoneTimeline';
 import { reviewerGroups } from '@/features/workflow/lib/projectGroups';
 import { availableBudget, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
 import { pendingQuotaRequest } from '@/features/workflow/lib/quota';
@@ -227,6 +228,8 @@ export function ReviewerWorkspacePage() {
           </div>
         ) : (
           <div className="space-y-6">
+            <MilestoneTimeline milestones={project.milestones ?? []} productionStart={project.production_start_date} />
+
             {(activeTab === 'plans' || activeTab === 'audits') && (
               <EpisodeSwitcher episodes={project.episodes} selectedId={currentPackage.id} onSelect={setActivePackage} />
             )}

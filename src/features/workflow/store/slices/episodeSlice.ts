@@ -38,7 +38,6 @@ function keepUnsavedDrafts(project: ProductionProject, previous: ProductionProje
   };
 }
 
-const MILESTONE_STATUS = { pending: 'PLANNED', in_progress: 'IN_PROGRESS', completed: 'COMPLETED' } as const;
 
 /**
  * Saves the whole plan — script, duration, estimate and every scene — in one request.
@@ -292,16 +291,6 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     if (!created) return false;
     set({ activeProjectId: created.id, activePackageId: '' });
     await get().loadProjects();
-    return true;
-  },
-
-  updateMilestoneStatus: async (milestoneId, status, result) => {
-    const updated = await apiResult(
-      workflowService.updateMilestone(milestoneId, { status: MILESTONE_STATUS[status], resultText: result }),
-      'Không cập nhật được cột mốc'
-    );
-    if (!updated) return false;
-    await get().loadProject(get().activeProjectId);
     return true;
   },
 });
