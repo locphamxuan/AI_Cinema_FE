@@ -19,18 +19,18 @@ export function TokensTab({ currentPackage }: TokensTabProps) {
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">Token đã dùng</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Hạn mức do người kiểm duyệt cấp</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Số token Reviewer đã cấp cho tập này</p>
           </div>
         </div>
         <span className="text-sm font-mono font-bold text-amber-600 dark:text-amber-400">
-          {usage.used} / {usage.allocated} Tokens
+          {usage.used} / {usage.allocated} token
         </span>
       </div>
 
       <div className="space-y-4">
         <div className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 space-y-2">
           <div className="flex justify-between text-xs text-slate-700 dark:text-slate-300">
-            <span>Tiến độ tiêu thụ:</span>
+            <span>Đã dùng:</span>
             <span className="font-bold font-mono">{usage.percent.toFixed(1)}%</span>
           </div>
           <div className="w-full bg-slate-200 dark:bg-white/10 h-2.5 rounded-full overflow-hidden">
@@ -41,14 +41,14 @@ export function TokensTab({ currentPackage }: TokensTabProps) {
           </div>
           {usage.isWarning && (
             <p role="alert" className="text-xs text-rose-600 dark:text-rose-400">
-              Sắp hết hạn mức ({usage.remaining} token còn lại) — hãy xin thêm token bên dưới.
+              Sắp hết token (còn {usage.remaining}). Bạn có thể xin thêm ở bên dưới.
             </p>
           )}
         </div>
 
         <QuotaRequestPanel currentPackage={currentPackage} />
 
-        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Các phân cảnh đã tạo</h4>
+        <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Các cảnh</h4>
         <div className="space-y-2">
           {currentPackage.jobs.map((job) => (
             <div key={job.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs">
@@ -57,9 +57,9 @@ export function TokensTab({ currentPackage }: TokensTabProps) {
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{job.generation_steps.length} prompt</p>
               </div>
               <div className="text-right">
-                <span className="font-mono font-bold text-purple-600 dark:text-purple-400">{job.token_cost} Tokens</span>
+                <span className="font-mono font-bold text-purple-600 dark:text-purple-400">{job.token_cost} token</span>
                 <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                  {job.status === 'completed' ? '✓ Đã hoàn tất' : 'Chưa hoàn thành'}
+                  {job.status === 'completed' ? 'Đã tạo xong' : 'Chưa tạo'}
                 </div>
               </div>
             </div>

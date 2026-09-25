@@ -81,7 +81,7 @@ export function FieldReviewCard({ review, onReview, header, children, approveLab
               onClick={() => setIsReworking(false)}
               className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
             >
-              <X className="w-3 h-3" /> Huỷ
+              <X className="w-3 h-3" /> Hủy
             </button>
           </div>
         </div>

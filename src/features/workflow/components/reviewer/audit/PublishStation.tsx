@@ -105,7 +105,7 @@ export function PublishStation({
           href={`/watch/${packageId}`}
           className="mt-5 w-full py-2.5 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 flex items-center justify-center transition"
         >
-          Xem trên OTT
+          Xem trên nền tảng
         </Link>
       ) : (
         <button

@@ -22,14 +22,14 @@ export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJo
     <section aria-labelledby="timeline-title" className="bg-white dark:bg-[#151822] p-5 rounded-xl border border-slate-200 dark:border-white/10 space-y-3">
       <div className="flex items-baseline justify-between gap-3">
         <h2 id="timeline-title" className="text-sm font-semibold text-slate-900 dark:text-white">
-          Các phân cảnh
+          Các cảnh
         </h2>
         <span className="text-xs text-slate-500 dark:text-slate-400 tabular-nums">
           {doneCount}/{jobs.length} đã xong
         </span>
       </div>
 
-      {jobs.length === 0 && <p className="py-4 text-xs text-slate-400 dark:text-slate-500">Kế hoạch được duyệt chưa có phân cảnh nào.</p>}
+      {jobs.length === 0 && <p className="py-4 text-xs text-slate-400 dark:text-slate-500">Kế hoạch này chưa có cảnh nào.</p>}
 
       <ul className="space-y-2">
         {jobs.map((job) => {
@@ -79,7 +79,7 @@ export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJo
                   </>
                 ) : (
                   <>
-                    {job.status === 'failed' && <span className="text-xs text-rose-600 dark:text-rose-400">Lỗi</span>}
+                    {job.status === 'failed' && <span className="text-xs text-rose-600 dark:text-rose-400">Thất bại</span>}
                     {!locked && (
                       <button type="button" onClick={() => onGenerate(job.id)} className={`${ACTION_CLASS} bg-purple-600 hover:bg-purple-700 text-white`}>
                         Tạo clip

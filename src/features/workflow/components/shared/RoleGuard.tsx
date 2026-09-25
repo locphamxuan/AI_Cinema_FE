@@ -42,10 +42,10 @@ export function RoleGuard({ role, children }: RoleGuardProps) {
           <AlertCircle className="w-8 h-8" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Không đúng quyền truy cập</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Bạn không có quyền vào trang này</h2>
           <p className="text-sm text-slate-600 dark:text-slate-300">
-            Tài khoản hiện tại của bạn là <strong className={theirs.accent}>{theirs.label}</strong>. Trang này chỉ
-            dành riêng cho vai trò <strong className={mine.accent}>{mine.label}</strong>.
+            Bạn đang đăng nhập với vai trò <strong className={theirs.accent}>{theirs.label}</strong>. Trang này chỉ
+            dành cho <strong className={mine.accent}>{mine.label}</strong>.
           </p>
         </div>
         <div className="space-y-3">
@@ -64,7 +64,7 @@ export function RoleGuard({ role, children }: RoleGuardProps) {
             }}
             className="w-full py-3 px-4 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-700 dark:text-slate-200 font-semibold transition cursor-pointer"
           >
-            Đăng xuất & Đăng nhập tài khoản {mine.label}
+            Đăng xuất để vào bằng tài khoản {mine.label}
           </button>
         </div>
       </div>

@@ -33,8 +33,8 @@ describe('CreatorStudioPage', () => {
   it('hands in the cut once every scene is generated, then returns to the workspace', async () => {
     const episode = openStudio('IN_PRODUCTION');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Nộp bản dựng' }));
-    const confirm = screen.getAllByRole('button', { name: 'Nộp bản dựng' }).at(-1)!;
+    fireEvent.click(screen.getByRole('button', { name: 'Gửi bản dựng' }));
+    const confirm = screen.getAllByRole('button', { name: 'Gửi bản dựng' }).at(-1)!;
     fireEvent.click(confirm);
 
     await vi.waitFor(() => expect(push).toHaveBeenCalledWith('/creator'));
@@ -43,7 +43,7 @@ describe('CreatorStudioPage', () => {
 
   it('holds the submission until every scene is generated', () => {
     openStudio('IN_PRODUCTION', { jobs: produced.jobs.map((j, i) => (i === 0 ? { ...j, status: 'pending' } : j)) });
-    expect(screen.getByRole('button', { name: 'Nộp bản dựng' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Gửi bản dựng' })).toBeDisabled();
   });
 
   it('regenerates a scene the Reviewer sent back', () => {
@@ -59,7 +59,7 @@ describe('CreatorStudioPage', () => {
   ] as const)('locks a %s episode so its cut is not replaced', (status, reason) => {
     openStudio(status);
     expect(screen.getByRole('status')).toHaveTextContent(reason);
-    expect(screen.getByRole('button', { name: 'Nộp bản dựng' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Gửi bản dựng' })).toBeDisabled();
     // Nothing regenerates: the timeline offers no action and the panel's button is off.
     expect(screen.getAllByRole('button', { name: 'Tạo lại' }).every((b) => b.hasAttribute('disabled'))).toBe(true);
     expect(screen.getByRole('button', { name: /Thêm mục/ })).toBeDisabled();

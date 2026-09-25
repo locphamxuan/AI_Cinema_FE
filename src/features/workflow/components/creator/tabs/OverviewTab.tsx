@@ -72,10 +72,10 @@ export function OverviewTab({
 
   // The episode pipeline, in order; where it stands comes from its real workflow state.
   const stages = [
-    { title: 'Kịch bản & phân cảnh', description: 'Hoàn thiện kịch bản và dàn ý phân cảnh rồi nộp kế hoạch.', actionLabel: 'Soạn kịch bản', onAction: onGotoBrief },
-    { title: 'Duyệt kế hoạch & quota', description: 'Reviewer duyệt kế hoạch và cấp hạn ngạch AI token.', actionLabel: 'Xem token', onAction: gotoOr(onGotoTokens) },
-    { title: 'Sản xuất video AI', description: 'Tạo clip, lời thoại và âm thanh trong AI Studio rồi nộp bản dựng.', actionLabel: 'Vào AI Studio', onAction: gotoOr(onGotoStudio) },
-    { title: 'Kiểm định & công chiếu', description: 'Reviewer kiểm định chất lượng, pháp lý AI và xuất bản tập phim.', actionLabel: 'Xem phản hồi', onAction: gotoOr(onGotoReviews) },
+    { title: 'Kịch bản và cảnh', description: 'Viết kịch bản, chia cảnh rồi gửi kế hoạch.', actionLabel: 'Soạn kịch bản', onAction: onGotoBrief },
+    { title: 'Duyệt kế hoạch và cấp token', description: 'Reviewer duyệt kế hoạch và cấp token cho tập.', actionLabel: 'Xem token', onAction: gotoOr(onGotoTokens) },
+    { title: 'Sản xuất', description: 'Tạo clip, lời thoại, âm thanh trong Studio rồi gửi bản dựng.', actionLabel: 'Mở Studio', onAction: gotoOr(onGotoStudio) },
+    { title: 'Kiểm định và phát hành', description: 'Reviewer kiểm tra chất lượng, pháp lý rồi phát hành tập.', actionLabel: 'Xem phản hồi', onAction: gotoOr(onGotoReviews) },
   ];
   const activeIndex = currentPackage ? STAGE_OF[currentPackage.status] : 0;
   const isPublished = activeIndex >= stages.length;
@@ -115,10 +115,10 @@ export function OverviewTab({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100 dark:border-white/5">
           <div className="min-w-0">
             <p className="text-sm font-semibold text-slate-900 dark:text-white">
-              {isPublished ? 'Tập phim đã công chiếu' : currentStage.title}
+              {isPublished ? 'Tập đã phát hành' : currentStage.title}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              {isPublished ? 'Tập đã có mặt trong danh mục phim cho khán giả.' : currentStage.description}
+              {isPublished ? 'Khán giả đã xem được tập này.' : currentStage.description}
             </p>
           </div>
           {!isPublished && (
@@ -181,7 +181,7 @@ export function OverviewTab({
               onClick={isCutFeedback ? gotoOr(onGotoStudio) : onGotoBrief}
               className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium transition cursor-pointer"
             >
-              {isCutFeedback ? 'Mở AI Studio để sinh lại' : 'Mở kịch bản để sửa'}
+              {isCutFeedback ? 'Mở Studio để làm lại' : 'Mở kịch bản để sửa'}
             </button>
           </div>
         </div>
@@ -193,8 +193,8 @@ export function OverviewTab({
             <div className={`h-full rounded-full ${quota.isWarning ? 'bg-rose-500' : 'bg-purple-500'}`} style={{ width: `${quota.percent}%` }} />
           </div>
         </Stat>
-        <Stat label="Phân cảnh" value={scenesCount} hint={`Dự toán ${estimatedTokens} token`} />
-        <Stat label="Đã render" value={`${completedJobsCount} / ${jobs.length}`} hint={canEnterStudio ? undefined : 'Cần được cấp quota để vào Studio'} />
+        <Stat label="Cảnh" value={scenesCount} hint={`Dự tính ${estimatedTokens} token`} />
+        <Stat label="Đã tạo xong" value={`${completedJobsCount} / ${jobs.length}`} hint={canEnterStudio ? undefined : 'Cần được cấp token mới vào được Studio'} />
       </div>
 
       {jobs.length > 0 && (
@@ -206,7 +206,7 @@ export function OverviewTab({
                 <span className="font-medium text-slate-800 dark:text-slate-200 truncate">{job.title}</span>
                 <span className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
                   <span className={`w-1.5 h-1.5 rounded-full ${job.status === 'completed' ? 'bg-emerald-500' : 'bg-slate-400'}`} aria-hidden="true" />
-                  {job.status === 'completed' ? 'Hoàn tất' : 'Chờ sinh AI'}
+                  {job.status === 'completed' ? 'Hoàn tất' : 'Chưa tạo'}
                 </span>
               </li>
             ))}
@@ -233,7 +233,7 @@ export function OverviewTab({
               ['Số tập', `${project.total_episodes} tập`],
               ['Ngân sách', `${project.total_budget_tokens} token`],
               ['Reviewer', project.reviewer_name],
-              ['Công chiếu', project.planned_release_date],
+              ['Ngày phát hành', project.planned_release_date],
             ].map(([term, detail]) => (
               <div key={term}>
                 <dt className="text-[11px] text-slate-400">{term}</dt>

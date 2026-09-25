@@ -65,7 +65,7 @@ export function MilestoneStatusDropdown({ status, onChange }: MilestoneStatusDro
         onClick={() => setIsOpen((prev) => !prev)}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        aria-label="Thay đổi trạng thái giai đoạn"
+        aria-label="Đổi trạng thái cột mốc"
         className="h-9 px-3 text-xs font-semibold rounded-lg bg-white dark:bg-[#12141A] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/10 shadow-xs hover:border-purple-300 dark:hover:border-purple-500/40 hover:bg-slate-50 dark:hover:bg-white/[0.03] transition cursor-pointer flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
       >
         <span className={`w-2 h-2 rounded-full shrink-0 ${currentConfig.dot}`} aria-hidden="true" />

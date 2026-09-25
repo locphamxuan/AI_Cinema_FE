@@ -122,7 +122,7 @@ export function GenrePicker({ genres, selected, onChange, onCreate }: GenrePicke
         })}
         {visible.length === 0 && (
           <p className="text-[11px] text-slate-500 dark:text-zinc-400">
-            Chưa có &quot;{query.trim()}&quot; trong danh sách — bấm &quot;Thêm mới&quot; để tạo.
+            Chưa có &quot;{query.trim()}&quot;. Bấm &quot;Thêm mới&quot; để tạo.
           </p>
         )}
       </div>

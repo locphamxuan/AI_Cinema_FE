@@ -101,7 +101,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     set({ isLoading: true, error: null });
     const res = await workflowService.listProjects();
     if (!res.success) {
-      set({ isLoading: false, error: res.message ?? 'Lỗi tải dự án' });
+      set({ isLoading: false, error: res.message ?? 'Không tải được danh sách dự án' });
       return;
     }
     // The list carries no plans; keep the episodes already loaded for each project.
@@ -124,7 +124,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     set({ isLoading: true, error: null });
     const res = await workflowService.getProject(projectId);
     if (!res.success) {
-      set({ isLoading: false, error: res.message ?? 'Lỗi tải chi tiết dự án' });
+      set({ isLoading: false, error: res.message ?? 'Không tải được dự án' });
       return;
     }
     const previous = get().projects.find((p) => p.id === projectId);

@@ -25,11 +25,11 @@ export function StudioPlayer({ selectedJob, selectedAsset }: StudioPlayerProps) 
           <ClipVideo src={selectedAsset.url} className="w-full h-full object-contain" />
         ) : (
           <p className="absolute inset-0 flex items-center justify-center text-xs text-slate-400">
-            {selectedJob ? 'Phân cảnh chưa có clip video.' : 'Chọn một phân cảnh để xem.'}
+            {selectedJob ? 'Cảnh này chưa có clip.' : 'Chọn một cảnh để xem.'}
           </p>
         )}
         <figcaption className="absolute left-3 top-3 px-2.5 py-1 rounded-md bg-black/60 text-white text-xs">
-          {selectedJob ? selectedJob.title : 'Chọn một phân cảnh để xem'}
+          {selectedJob ? selectedJob.title : 'Chọn một cảnh để xem'}
         </figcaption>
       </div>
 

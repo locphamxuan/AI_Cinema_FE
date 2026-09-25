@@ -8,9 +8,9 @@ export type ManualComplianceCheck = Exclude<ComplianceCheckType, 'AI_LABEL_PRESE
 export const MANUAL_COMPLIANCE_CHECKS: { type: ManualComplianceCheck; title: string; description: string }[] = [
   { type: 'CONTENT_POLICY', title: 'Chính sách nội dung (Điều 44)', description: 'Nội dung phù hợp chính sách nền tảng, không có nội dung nhạy cảm.' },
   { type: 'LEGAL', title: 'Pháp lý (Nghị định 142)', description: 'Đáp ứng quy định pháp luật về nội dung do AI tạo.' },
-  { type: 'COPYRIGHT', title: 'Bản quyền', description: 'Không sử dụng tài sản vi phạm bản quyền.' },
-  { type: 'WATERMARK', title: 'Dấu mờ xác thực', description: 'Đã nhúng mã xác thực trong luồng video.' },
-  { type: 'REAL_PERSON_LIKENESS', title: 'Không mô phỏng người thật', description: 'Không tái hiện người hay sự kiện có thật (BR-43).' },
+  { type: 'COPYRIGHT', title: 'Bản quyền', description: 'Không dùng hình ảnh, âm thanh vi phạm bản quyền.' },
+  { type: 'WATERMARK', title: 'Dấu mờ xác thực', description: 'Video đã có mã xác thực.' },
+  { type: 'REAL_PERSON_LIKENESS', title: 'Không mô phỏng người thật', description: 'Không tái hiện người hay sự kiện có thật.' },
 ];
 
 export interface ComplianceStationProps {
@@ -91,12 +91,12 @@ export function ComplianceStation({
       </ul>
 
       <p className="text-xs text-slate-500 dark:text-slate-400 py-3 border-t border-slate-100 dark:border-white/5">
-        Nhãn AI (Điều 44) được gắn khi xác nhận và hiển thị {labelPlacement}; hệ thống tự kiểm tra sự có mặt của nhãn.
+        Nhãn AI (Điều 44) được gắn khi xác nhận và hiển thị {labelPlacement}; hệ thống tự kiểm tra nhãn này.
       </p>
 
       {!allChecked && !isCompliancePassed && (
         <p role="status" className="mb-3 text-xs text-amber-700 dark:text-amber-400">
-          Cần đạt tất cả các mục mới xác nhận được. Nếu có mục chưa đạt, dùng &quot;Yêu cầu sửa&quot; để trả về cho người sản xuất.
+          Chỉ xác nhận được khi đạt tất cả các mục. Nếu có mục chưa đạt, bấm &quot;Yêu cầu sửa&quot; để trả về cho Creator.
         </p>
       )}
 

@@ -58,7 +58,7 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
               <p className="text-slate-800 dark:text-slate-200 leading-relaxed">{overallScript || 'Chưa có kịch bản tổng thể.'}</p>
             </div>
             <div>
-              <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Các phân cảnh</h3>
+              <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Các cảnh</h3>
               <ol className="divide-y divide-slate-100 dark:divide-white/5">
                 {pkg.brief.scene_breakdown.map((sc) => (
                   <li key={sc.scene_number} className="py-3 first:pt-0 last:pb-0">
@@ -84,7 +84,7 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
               <li key={asset.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-slate-900 dark:text-white">
-                    Phân cảnh {pkg.jobs.find((j) => j.id === asset.job_id)?.scene_number ?? '?'} · {ASSET_LABEL[asset.asset_type]}
+                    Cảnh {pkg.jobs.find((j) => j.id === asset.job_id)?.scene_number ?? '?'} · {ASSET_LABEL[asset.asset_type]}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{asset.prompt}</p>
                 </div>
@@ -110,7 +110,7 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
               <div className="mt-2 h-1.5 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
                 <div className={`h-full rounded-full ${usedPercent >= 90 ? 'bg-amber-500' : 'bg-purple-500'}`} style={{ width: `${usedPercent}%` }} />
               </div>
-              {usedPercent >= 90 && <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">Đã dùng hơn 90% hạn mức được cấp.</p>}
+              {usedPercent >= 90 && <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">Đã dùng hơn 90% số token được cấp.</p>}
             </div>
 
             <ul className="divide-y divide-slate-100 dark:divide-white/5">

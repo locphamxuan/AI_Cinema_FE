@@ -14,16 +14,16 @@ export interface SubmitEpisodeModalProps {
 export function SubmitEpisodeModal({ open, onClose, onConfirm, isSubmitting, currentPackage, jobsCount }: SubmitEpisodeModalProps) {
   const rows: Array<[string, string]> = [
     ['Tập phim', currentPackage.title],
-    ['Số phân cảnh', `${jobsCount}`],
+    ['Số cảnh', `${jobsCount}`],
     ['Thời lượng', currentPackage.total_duration || 'Chưa có'],
     ['Token được cấp', `${currentPackage.quota_allocated}`],
     ['Token đã dùng', `${currentPackage.actual_tokens_used}`],
   ];
 
   return (
-    <Modal open={open} onClose={onClose} title="Nộp bản dựng">
+    <Modal open={open} onClose={onClose} title="Gửi bản dựng">
       <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-        Cả {jobsCount} phân cảnh đã tạo xong. Sau khi nộp, người kiểm duyệt sẽ xem nội dung và kiểm định pháp lý cho tập này.
+        Cả {jobsCount} cảnh đã tạo xong. Sau khi gửi, Reviewer sẽ kiểm tra nội dung và pháp lý của tập này.
       </p>
 
       <dl className="divide-y divide-slate-100 dark:divide-white/5 text-sm">
@@ -40,7 +40,7 @@ export function SubmitEpisodeModal({ open, onClose, onConfirm, isSubmitting, cur
           Hủy
         </Button>
         <Button variant="success" onClick={onConfirm} disabled={isSubmitting}>
-          {isSubmitting ? 'Đang nộp…' : 'Nộp bản dựng'}
+          {isSubmitting ? 'Đang gửi…' : 'Gửi bản dựng'}
         </Button>
       </div>
     </Modal>

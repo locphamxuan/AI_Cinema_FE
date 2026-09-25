@@ -21,7 +21,7 @@ export function SubtitleLanguagePicker({ selected, onChange }: SubtitleLanguageP
         <span className="text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
           <Captions className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Ngôn ngữ phụ đề
         </span>
-        <span className="text-[11px] text-slate-500 dark:text-zinc-400">Mỗi tập được xuất bản kèm phụ đề các ngôn ngữ này</span>
+        <span className="text-[11px] text-slate-500 dark:text-zinc-400">Mỗi tập phát hành kèm phụ đề các ngôn ngữ này</span>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {SUBTITLE_LANGUAGES.map(({ code, label }) => {

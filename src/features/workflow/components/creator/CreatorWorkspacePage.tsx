@@ -114,7 +114,7 @@ export function CreatorWorkspacePage() {
                     onClick={() => router.push(`/creator/studio/${currentPackage.id}`)}
                     className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-2 transition cursor-pointer shadow-sm"
                   >
-                    <Video className="w-4 h-4" /> Mở AI Studio
+                    <Video className="w-4 h-4" /> Mở Studio
                   </button>
                 )}
                 {currentPackage.status === 'PUBLISHED' && (
@@ -122,7 +122,7 @@ export function CreatorWorkspacePage() {
                     onClick={() => router.push(`/watch/${currentPackage.id}`)}
                     className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 transition cursor-pointer shadow-sm"
                   >
-                    <Play className="w-4 h-4" /> Xem trên OTT
+                    <Play className="w-4 h-4" /> Xem trên nền tảng
                   </button>
                 )}
               </div>

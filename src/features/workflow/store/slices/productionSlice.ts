@@ -83,9 +83,9 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
               customFunction: step.function_type === 'CUSTOM' ? step.custom_function : undefined,
               sceneId: row.scene_id,
             }),
-            'Không tạo được yêu cầu sinh'
+            'Không tạo được yêu cầu'
           );
-          if (!job || !(await apiResult(workflowService.runJob(job.id), 'Sinh nội dung thất bại'))) {
+          if (!job || !(await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại'))) {
             ok = false;
             break;
           }
@@ -96,7 +96,7 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
         // Regenerating: a new attempt of every saved step, charged again (BR-41).
         for (const step of saved) {
           const job = await apiResult(workflowService.retryJob(step.id), 'Không tạo lại được');
-          if (!job || !(await apiResult(workflowService.runJob(job.id), 'Sinh nội dung thất bại'))) {
+          if (!job || !(await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại'))) {
             ok = false;
             break;
           }
@@ -116,14 +116,14 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
       if (!scenes) return false;
 
       for (const scene of scenes.filter((s) => s.status !== 'COMPLETED')) {
-        if ((await apiResult(workflowService.submitScene(scene.id), `Phân cảnh ${scene.sceneNumber} chưa sẵn sàng`)) === null) {
+        if ((await apiResult(workflowService.submitScene(scene.id), `Cảnh ${scene.sceneNumber} chưa tạo xong`)) === null) {
           await reload();
           return false;
         }
       }
 
       const assembled = await apiResult(workflowService.createEpisodePackage(packageId), 'Không đóng gói được tập phim');
-      const submitted = assembled && (await apiResult(workflowService.submitEpisodePackage(assembled.id), 'Không nộp được bản dựng'));
+      const submitted = assembled && (await apiResult(workflowService.submitEpisodePackage(assembled.id), 'Không gửi được bản dựng'));
       await reload();
       return Boolean(submitted);
     },

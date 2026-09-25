@@ -66,7 +66,7 @@ export function AccountMenu({ name, roleLabel, onResetWorkspace, onLogout }: Acc
             }}
             className={ITEM_CLASS}
           >
-            <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" /> Tải lại dữ liệu từ máy chủ
+            <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" /> Tải lại dữ liệu
           </button>
           <button
             type="button"

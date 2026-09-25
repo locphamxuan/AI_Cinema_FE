@@ -190,7 +190,7 @@ describe('Workflow store — projects, plans and milestones', () => {
         ],
       };
       expect(derivePlanVerdict(project, brief)).toBe('CHANGES_REQUESTED');
-      expect(summarizeFlaggedFields(project, brief)).toBe('• Token dự toán: Vượt ngân sách\n• Phân cảnh 2: Thiếu mô tả');
+      expect(summarizeFlaggedFields(project, brief)).toBe('• Token dự tính: Vượt ngân sách\n• Cảnh 2: Thiếu mô tả');
     });
   });
 

@@ -15,7 +15,7 @@ import type { GenerationStep } from '@/types/workflow';
 import { canProduce } from '@/features/workflow/lib/workflowState';
 
 const LOCKED_REASON: Partial<Record<string, string>> = {
-  EPISODE_SUBMITTED: 'Bản dựng đang chờ Reviewer kiểm định; chỉ sửa được khi bị trả về.',
+  EPISODE_SUBMITTED: 'Bản dựng đang chờ Reviewer kiểm định. Bạn chỉ sửa được khi bản dựng bị trả về.',
   COMPLIANCE_PASSED: 'Bản dựng đã được duyệt và chờ phát hành.',
   PUBLISHED: 'Tập phim đã phát hành.',
 };
@@ -83,7 +83,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
     setRenderingJobId(jobId);
     const ok = await triggerGenerationJob(currentPackage.id, jobId);
     setRenderingJobId(null);
-    if (ok) toast.success('Đã tạo xong', 'Kết quả sinh đã được lưu cho phân cảnh này.');
+    if (ok) toast.success('Đã tạo xong', 'Kết quả đã được lưu vào cảnh này.');
   };
 
   const handleAddStep = () => {
@@ -111,8 +111,8 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
     if (success) {
       setIsSubmitModalOpen(false);
       toast.success(
-        'Đã nộp bản dựng thành công!',
-        'Gói tập phim đã được chuyển sang Thẩm định viên (Reviewer / Checker) để kiểm định nội dung & pháp lý.'
+        'Đã gửi bản dựng',
+        'Reviewer sẽ kiểm tra nội dung và pháp lý của tập này.'
       );
       router.push('/creator');
     }
@@ -138,10 +138,10 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
           <div className="bg-white dark:bg-[#151822] px-3.5 py-2 rounded-xl border border-slate-200/80 dark:border-white/10 flex items-center gap-3 shadow-xs">
             <div>
               <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-semibold uppercase tracking-wider">
-                Hạn Mức Quota
+                Token được cấp
               </span>
               <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">
-                {currentPackage.actual_tokens_used.toLocaleString()} / {currentPackage.quota_allocated.toLocaleString()} Tokens
+                {currentPackage.actual_tokens_used.toLocaleString()} / {currentPackage.quota_allocated.toLocaleString()} token
               </span>
             </div>
             <div className="h-6 w-px bg-slate-200 dark:border-white/10" />
@@ -156,7 +156,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
                     : 'text-indigo-600 dark:text-indigo-400'
                 }`}
               >
-                {remainingQuota.toLocaleString()} Tokens
+                {remainingQuota.toLocaleString()} token
               </span>
             </div>
           </div>
@@ -165,17 +165,17 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
             type="button"
             onClick={() => setIsSubmitModalOpen(true)}
             disabled={!canSubmit}
-            title={locked ? LOCKED_REASON[currentPackage.status] : allCompleted ? undefined : 'Cần tạo xong tất cả phân cảnh trước khi nộp'}
+            title={locked ? LOCKED_REASON[currentPackage.status] : allCompleted ? undefined : 'Tạo xong tất cả các cảnh rồi mới gửi được'}
             className="px-4 py-2 rounded-lg text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white transition cursor-pointer disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0B0C10]"
           >
-            Nộp bản dựng
+            Gửi bản dựng
           </button>
         </div>
       </div>
 
       {locked && (
         <p role="status" className="p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-600 dark:text-slate-300">
-          {LOCKED_REASON[currentPackage.status] ?? 'Tập phim chưa được cấp token để sản xuất.'}
+          {LOCKED_REASON[currentPackage.status] ?? 'Tập này chưa được cấp token nên chưa sản xuất được.'}
         </p>
       )}
 

@@ -43,7 +43,7 @@ describe('reviewLog', () => {
     expect(log.map((e) => [e.review_type, e.decision, e.feedback_notes, e.reviewer_name])).toEqual([
       ['content', 'changes_requested', 'Âm thanh lệch', 'Reviewer Một'],
       ['plan', 'approved', 'Đã cấp 400 token để bắt đầu sản xuất.', 'Reviewer Một'],
-      ['plan', 'changes_requested', '• Phân cảnh 2: Thiếu mô tả', 'Reviewer Một'],
+      ['plan', 'changes_requested', '• Cảnh 2: Thiếu mô tả', 'Reviewer Một'],
     ]);
     expect(log[1].quota_granted).toBe(400);
   });

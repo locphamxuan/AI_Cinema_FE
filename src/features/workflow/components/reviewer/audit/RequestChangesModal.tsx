@@ -12,7 +12,7 @@ export interface RequestChangesModalProps {
 
 export function RequestChangesModal({ open, onClose, onConfirm, feedback, onFeedbackChange }: RequestChangesModalProps) {
   return (
-    <Modal open={open} onClose={onClose} title="Yêu cầu chỉnh sửa" subtitle="Phản hồi sẽ được gửi cho người sản xuất nội dung." maxWidth="max-w-md">
+    <Modal open={open} onClose={onClose} title="Yêu cầu chỉnh sửa" subtitle="Creator sẽ nhận được phản hồi này." maxWidth="max-w-md">
       <FormField label="Cần sửa gì?">
         <textarea
           rows={4}

@@ -38,16 +38,16 @@ const FUNCTION_TYPES = Object.keys(FUNCTION_TYPE_META) as GenerationFunctionType
 
 const MATCH_HINT: Record<ModelMatch, string> = {
   catalog: '',
-  pending: 'Nhập chức năng bạn muốn làm, hệ thống sẽ tự tìm model phù hợp.',
-  specialist: 'Đã tìm được model chuyên biệt cho chức năng này.',
-  general: 'Chưa có model chuyên biệt, hệ thống dùng model đa năng để thực hiện.',
+  pending: 'Nhập việc bạn cần làm, hệ thống sẽ chọn model phù hợp.',
+  specialist: 'Đã có model riêng cho việc này.',
+  general: 'Chưa có model riêng cho việc này nên hệ thống dùng model đa năng.',
 };
 
 const STEP_STATUS_LABEL: Record<GenerationStep['status'], string> = {
   pending: 'Đang chờ',
   processing: 'Đang tạo',
   completed: 'Đã tạo',
-  failed: 'Lỗi',
+  failed: 'Thất bại',
 };
 
 const INPUT_CLASS =
@@ -99,11 +99,11 @@ export function GeneratorPanel({
   return (
     <section aria-labelledby="generator-title" className="bg-white dark:bg-[#151822] p-5 rounded-xl border border-slate-200 dark:border-white/10 space-y-5">
       <h2 id="generator-title" className="text-sm font-semibold text-slate-900 dark:text-white">
-        Nội dung phân cảnh
+        Nội dung cảnh
       </h2>
 
       <p className="text-sm text-slate-700 dark:text-slate-200">
-        {selectedJob ? `Cảnh ${selectedJob.scene_number}: ${selectedJob.title}` : 'Kế hoạch chưa có phân cảnh nào.'}
+        {selectedJob ? `Cảnh ${selectedJob.scene_number}: ${selectedJob.title}` : 'Kế hoạch chưa có cảnh nào.'}
       </p>
 
       <div className="space-y-3">
@@ -177,7 +177,7 @@ export function GeneratorPanel({
                     type="text"
                     value={step.custom_function ?? ''}
                     onChange={(e) => describeCustomFunction(step.id, e.target.value)}
-                    aria-label="Chức năng bạn muốn làm"
+                    aria-label="Việc bạn cần làm"
                     placeholder="Bạn muốn làm gì? Ví dụ: đồng bộ khẩu hình, dịch phụ đề, chỉnh màu…"
                     autoComplete="off"
                     className={INPUT_CLASS}

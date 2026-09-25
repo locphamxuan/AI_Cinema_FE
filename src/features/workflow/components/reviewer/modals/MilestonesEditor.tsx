@@ -39,9 +39,9 @@ export function MilestonesEditor({ milestones, defaultDeadline, onChange }: Mile
       <div className="flex items-center justify-between">
         <div>
           <label className="text-xs font-bold text-slate-800 dark:text-zinc-200 flex items-center gap-1.5">
-            <MilestoneIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Lộ Trình Cột Mốc Tiến Độ:
+            <MilestoneIcon className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Cột mốc
           </label>
-          <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">Mốc bàn giao kịch bản, video draft và nghiệm thu cho Creator</p>
+          <p className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">Những gì Creator cần bàn giao, kèm hạn chót</p>
         </div>
         <button
           type="button"
@@ -55,7 +55,7 @@ export function MilestonesEditor({ milestones, defaultDeadline, onChange }: Mile
 
       {milestones.length === 0 ? (
         <div className="text-center py-6 text-slate-400 dark:text-zinc-500 bg-white dark:bg-[#0E1118] rounded-xl border border-dashed border-slate-200 dark:border-white/10 text-xs">
-          Chưa có cột mốc nào. Bấm nút &quot;Thêm mốc&quot; ở trên để thiết lập tiến độ dự án.
+          Chưa có cột mốc nào. Bấm &quot;Thêm mốc&quot; để thêm.
         </div>
       ) : (
         <div className="space-y-2.5 max-h-52 overflow-y-auto pr-1">
@@ -69,7 +69,7 @@ export function MilestonesEditor({ milestones, defaultDeadline, onChange }: Mile
                   <span className="w-5 h-5 rounded-lg bg-purple-600/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-[10px]">
                     {index + 1}
                   </span>
-                  <span>Giai đoạn {index + 1}</span>
+                  <span>Mốc {index + 1}</span>
                 </span>
                 <button
                   type="button"
@@ -86,13 +86,13 @@ export function MilestonesEditor({ milestones, defaultDeadline, onChange }: Mile
                 required
                 value={ms.title}
                 onChange={(e) => handleUpdateMilestone(index, 'title', e.target.value)}
-                placeholder="Tên cột mốc (vd: Hoàn thành kịch bản phân cảnh 5 tập)…"
+                placeholder="Ví dụ: Chốt kịch bản 5 tập…"
                 className={`${fieldInputClass} text-xs py-1.5`}
               />
 
               <div className="grid grid-cols-2 gap-2.5">
                 <div>
-                  <label className="text-[10px] text-slate-500 dark:text-zinc-400 font-semibold block mb-1">Bắt Đầu:</label>
+                  <label className="text-[10px] text-slate-500 dark:text-zinc-400 font-semibold block mb-1">Bắt đầu</label>
                   <input
                     type="date"
                     required
@@ -102,7 +102,7 @@ export function MilestonesEditor({ milestones, defaultDeadline, onChange }: Mile
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-slate-500 dark:text-zinc-400 font-semibold block mb-1">Hạn Chót Nghiệm Thu:</label>
+                  <label className="text-[10px] text-slate-500 dark:text-zinc-400 font-semibold block mb-1">Hạn chót</label>
                   <input
                     type="date"
                     required
@@ -117,7 +117,7 @@ export function MilestonesEditor({ milestones, defaultDeadline, onChange }: Mile
                 type="text"
                 value={ms.description || ''}
                 onChange={(e) => handleUpdateMilestone(index, 'description', e.target.value)}
-                placeholder="Sản phẩm nghiệm thu (vd: Kịch bản phân cảnh, prompt mẫu, clip 4K)…"
+                placeholder="Cần bàn giao gì? Ví dụ: kịch bản đã chia cảnh, clip mẫu…"
                 className={`${fieldInputClass} text-[11px] py-1 text-slate-600 dark:text-zinc-400`}
               />
             </div>

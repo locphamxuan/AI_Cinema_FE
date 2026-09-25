@@ -31,7 +31,7 @@ export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, q
     <Modal open={open} onClose={onClose} title="Cấp token cho tập" subtitle={currentPackage?.title} maxWidth="max-w-md">
       <dl className="grid grid-cols-2 gap-3 text-sm">
         <div>
-          <dt className="text-xs text-slate-500 dark:text-slate-400">Creator dự toán</dt>
+          <dt className="text-xs text-slate-500 dark:text-slate-400">Creator dự tính</dt>
           <dd className="font-medium text-slate-900 dark:text-white tabular-nums">{estimate} token</dd>
         </div>
         <div>
@@ -68,10 +68,10 @@ export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, q
             onClick={() => setQuota(estimate)}
             className="text-xs text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
           >
-            Dùng đúng mức dự toán ({estimate} token)
+            Cấp đúng số dự tính ({estimate} token)
           </button>
         )}
-        {isOverBudget && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400">Ngân sách dự án không còn đủ để cấp thêm token.</p>}
+        {isOverBudget && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400">Ngân sách dự án không đủ. Giảm số token cấp hoặc tăng ngân sách dự án.</p>}
       </div>
 
       <div className="flex items-center justify-end gap-3 pt-2">

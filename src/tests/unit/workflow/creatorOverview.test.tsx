@@ -33,11 +33,11 @@ const currentStep = () => screen.getByRole('listitem', { current: 'step' });
 
 describe('Creator OverviewTab', () => {
   it.each([
-    ['PLAN_DRAFT', 'Kịch bản & phân cảnh'],
-    ['PLAN_PENDING', 'Duyệt kế hoạch & quota'],
-    ['IN_PRODUCTION', 'Sản xuất video AI'],
-    ['CUT_CHANGES_REQUESTED', 'Sản xuất video AI'],
-    ['EPISODE_SUBMITTED', 'Kiểm định & công chiếu'],
+    ['PLAN_DRAFT', 'Kịch bản và cảnh'],
+    ['PLAN_PENDING', 'Duyệt kế hoạch và cấp token'],
+    ['IN_PRODUCTION', 'Sản xuất'],
+    ['CUT_CHANGES_REQUESTED', 'Sản xuất'],
+    ['EPISODE_SUBMITTED', 'Kiểm định và phát hành'],
   ] as const)('places a %s episode at the "%s" stage', (status, stage) => {
     renderOverview(status);
     expect(currentStep()).toHaveTextContent(stage);
@@ -46,11 +46,11 @@ describe('Creator OverviewTab', () => {
   it('marks every stage done once the episode is published', () => {
     renderOverview('PUBLISHED');
     expect(screen.queryByRole('listitem', { current: 'step' })).toBeNull();
-    expect(screen.getByText('Tập phim đã công chiếu')).toBeInTheDocument();
+    expect(screen.getByText('Tập đã phát hành')).toBeInTheDocument();
   });
 
   it.each([
-    ['content', 'Mở AI Studio để sinh lại', 'onGotoStudio'],
+    ['content', 'Mở Studio để làm lại', 'onGotoStudio'],
     ['plan', 'Mở kịch bản để sửa', 'onGotoBrief'],
   ] as const)('sends %s feedback to the place it is fixed', (reviewType, action, handler) => {
     const handlers = { onGotoBrief: vi.fn(), onGotoStudio: vi.fn() };
@@ -76,7 +76,7 @@ describe('Creator OverviewTab', () => {
     const milestone = { id: 'm1', title: 'Kịch bản', deadline: '2026-10-30', status: 'in_progress' as const };
     const { rerender } = renderOverview('IN_PRODUCTION', [milestone]);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Thay đổi trạng thái giai đoạn' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Đổi trạng thái cột mốc' }));
     fireEvent.click(screen.getByRole('option', { name: 'Hoàn thành' }));
     expect(updateMilestoneStatus).not.toHaveBeenCalled();
 
@@ -97,13 +97,13 @@ describe('Creator OverviewTab', () => {
         onGotoBrief={vi.fn()}
       />
     );
-    expect(screen.queryByRole('button', { name: 'Thay đổi trạng thái giai đoạn' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Đổi trạng thái cột mốc' })).toBeNull();
     expect(screen.getByText('Kết quả: Xong kịch bản')).toBeInTheDocument();
   });
 
   it('lists only the milestones the Reviewer set, never placeholder ones', () => {
     renderOverview('IN_PRODUCTION', []);
     expect(screen.getByText('Reviewer chưa đặt cột mốc nào cho dự án này.')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Thay đổi trạng thái giai đoạn' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Đổi trạng thái cột mốc' })).toBeNull();
   });
 });

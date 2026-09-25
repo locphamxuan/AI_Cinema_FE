@@ -77,7 +77,7 @@ export function QuotaRequestPanel({ currentPackage }: QuotaRequestPanelProps) {
               maxLength={1000}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Vì sao hạn mức hiện tại không đủ…"
+              placeholder="Vì sao số token hiện có không đủ…"
               className={fieldTextareaClass}
             />
           </FormField>

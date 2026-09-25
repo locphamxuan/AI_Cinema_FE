@@ -43,18 +43,18 @@ const defaultForm = (): CreateProjectFormState => ({
   milestones: [
     {
       id: 'ms-init-1',
-      title: 'Cột mốc 1: Khởi tạo kịch bản & phân cảnh',
+      title: 'Kịch bản và chia cảnh',
       startDate: dateFromToday(0),
       deadline: dateFromToday(30),
-      description: 'Hoàn thành bản kịch bản chi tiết và danh sách cảnh phim.',
+      description: 'Chốt kịch bản và danh sách cảnh.',
       status: 'in_progress',
     },
     {
       id: 'ms-init-2',
-      title: 'Cột mốc 2: Sản xuất AI Video & Nộp duyệt',
+      title: 'Sản xuất và gửi duyệt',
       startDate: dateFromToday(31),
       deadline: dateFromToday(60),
-      description: 'Render clip và gửi Thẩm định viên kiểm định.',
+      description: 'Tạo clip, ghép tập và gửi Reviewer kiểm định.',
       status: 'pending',
     },
   ],
@@ -172,7 +172,7 @@ export function ReviewerWorkspacePage() {
     if (!(await allocateQuota(currentPackage.id, quotaToAllocate))) return;
     setIsQuotaModalOpen(false);
     toast.success(
-      'Duyệt kế hoạch thành công!',
+      'Đã duyệt kế hoạch',
       `Đã duyệt và cấp ${quotaToAllocate.toLocaleString()} token cho ${currentPackage.title}.`
     );
   };
@@ -182,7 +182,7 @@ export function ReviewerWorkspacePage() {
     if (!(await requestPlanChanges(currentPackage.id, rejectFeedback))) return;
     setIsRejectModalOpen(false);
     setRejectFeedback('');
-    toast.info('Đã trả về bản kế hoạch', 'Yêu cầu chỉnh sửa đã được gửi đến Creator.');
+    toast.info('Đã trả kế hoạch về', 'Creator sẽ thấy các ghi chú của bạn.');
   };
 
   return (

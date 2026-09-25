@@ -17,7 +17,7 @@ export function StudioLinkTab({ currentPackage, canEnterStudio, onGotoBrief }: S
         </div>
         <div>
           <h2 className="text-lg font-bold text-slate-900 dark:text-white">AI Production Studio Workspace</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Không gian điều khiển sinh video, thoại AI & lắp ghép timeline</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Nơi tạo clip, lời thoại, âm thanh và ghép thành tập</p>
         </div>
       </div>
 
@@ -25,9 +25,9 @@ export function StudioLinkTab({ currentPackage, canEnterStudio, onGotoBrief }: S
         <div className="p-6 bg-purple-50/50 dark:bg-purple-500/5 border border-purple-200 dark:border-purple-500/20 rounded-2xl text-center space-y-4">
           <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400 mx-auto" />
           <div>
-            <h3 className="text-base font-bold text-slate-900 dark:text-white">Studio Đã Sẵn Sàng Hoạt Động</h3>
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">Studio đã mở</h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-              Hạn mức token: <span className="font-bold text-amber-600 dark:text-amber-400 font-mono">{currentPackage.quota_allocated} Tokens</span>
+              Token được cấp: <span className="font-bold text-amber-600 dark:text-amber-400 font-mono">{currentPackage.quota_allocated} token</span>
             </p>
           </div>
           <Link
@@ -43,7 +43,7 @@ export function StudioLinkTab({ currentPackage, canEnterStudio, onGotoBrief }: S
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">Studio chưa mở</h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-              Kế hoạch của tập này cần được người kiểm duyệt duyệt và cấp token trước khi bạn bắt đầu tạo clip.
+              Reviewer cần duyệt kế hoạch và cấp token cho tập này trước khi bạn tạo clip.
             </p>
           </div>
           <button

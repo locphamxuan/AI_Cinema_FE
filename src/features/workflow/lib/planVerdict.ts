@@ -36,8 +36,8 @@ export function summarizeFlaggedFields(project: Pick<ProductionProject, 'script_
   };
   add('Kịch bản tổng thể', scriptReview(project, brief));
   add('Thời lượng đề xuất', brief?.duration_review);
-  add('Token dự toán', brief?.token_review);
-  (brief?.scene_reviews || []).forEach((sr) => add(`Phân cảnh ${sr.scene_number}`, sr));
+  add('Token dự tính', brief?.token_review);
+  (brief?.scene_reviews || []).forEach((sr) => add(`Cảnh ${sr.scene_number}`, sr));
   return flagged.join('\n');
 }
 

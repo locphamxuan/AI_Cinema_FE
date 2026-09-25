@@ -31,7 +31,7 @@ export function CompleteMilestoneModal({ milestoneTitle, onClose, onConfirm }: C
       open={milestoneTitle !== undefined}
       onClose={close}
       title="Hoàn thành cột mốc"
-      subtitle={`${milestoneTitle ?? ''} — sau khi hoàn thành sẽ không mở lại được.`}
+      subtitle={`${milestoneTitle ?? ''} · Đã hoàn thành thì không mở lại được.`}
       maxWidth="max-w-md"
     >
       <FormField label="Kết quả đạt được">
@@ -41,7 +41,7 @@ export function CompleteMilestoneModal({ milestoneTitle, onClose, onConfirm }: C
           maxLength={1000}
           value={result}
           onChange={(e) => setResult(e.target.value)}
-          placeholder="VD: Đã chốt kịch bản 5 tập và danh sách phân cảnh."
+          placeholder="Ví dụ: đã chốt kịch bản 5 tập và danh sách cảnh…"
           className={fieldTextareaClass}
         />
       </FormField>

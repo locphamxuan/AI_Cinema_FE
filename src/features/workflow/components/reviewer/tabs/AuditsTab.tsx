@@ -19,42 +19,42 @@ export function AuditsTab({ project }: AuditsTabProps) {
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-            Đã Phát Hành
+            Đã phát hành
           </span>
         );
       case 'COMPLIANCE_PASSED':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-            Đạt Chuẩn Pháp Lý
+            Đạt chuẩn pháp lý
           </span>
         );
       case 'EPISODE_SUBMITTED':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-500 shrink-0 animate-pulse" />
-            Chờ Thẩm Định Video
+            Chờ kiểm định
           </span>
         );
       case 'CUT_CHANGES_REQUESTED':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
-            Yêu Cầu Sửa Đổi
+            Cần sửa
           </span>
         );
       case 'PLAN_PENDING':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-            Chờ Duyệt Quota
+            Chờ cấp token
           </span>
         );
       default:
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-white/10">
             <span className="w-1.5 h-1.5 rounded-full bg-slate-400 shrink-0" />
-            Đang Sản Xuất
+            Đang sản xuất
           </span>
         );
     }
@@ -70,10 +70,10 @@ export function AuditsTab({ project }: AuditsTabProps) {
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">
-              Trạm Kiểm Định Tuân Thủ & Pháp Lý Video
+              Kiểm định bản dựng
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-              Rà soát Điều 44 Luật AI, Nghị định 142 và kiểm duyệt bản dựng trước khi phát hành OTT
+              Kiểm tra bản dựng theo Điều 44 Luật AI và Nghị định 142 trước khi phát hành
             </p>
           </div>
         </div>
@@ -81,7 +81,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
         <div className="self-start sm:self-auto">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-300 font-mono text-xs font-semibold">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-            {passedCount}/{project.episodes.length} Tập Đã Đạt Chuẩn
+            {passedCount}/{project.episodes.length} tập đạt chuẩn
           </span>
         </div>
       </div>
@@ -121,7 +121,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
                   <span className="text-slate-300 dark:text-slate-700">•</span>
                   <span className="flex items-center gap-1 font-mono">
                     <Zap className="w-3.5 h-3.5 text-purple-500" />
-                    {ep.actual_tokens_used.toLocaleString()} Tokens
+                    {ep.actual_tokens_used.toLocaleString()} token
                   </span>
                 </div>
               </div>
@@ -129,7 +129,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
               {/* Action Bar */}
               <div className="pt-2 border-t border-slate-200/60 dark:border-white/5 flex items-center justify-between gap-2">
                 <span className="text-[11px] text-slate-400 dark:text-slate-500">
-                  {isPassed ? 'Sẵn sàng phân phối' : isPendingAudit ? 'Bản dựng chờ duyệt' : 'Chờ hoàn tất bản dựng'}
+                  {isPassed ? 'Sẵn sàng phát hành' : isPendingAudit ? 'Bản dựng chờ duyệt' : 'Chưa có bản dựng'}
                 </span>
 
                 <Link
@@ -140,7 +140,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
                       : 'bg-white dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10'
                   }`}
                 >
-                  <span>{isPendingAudit ? 'Kiểm Định Ngay' : isPassed ? 'Xem Báo Cáo' : 'Kiểm Định Chi Tiết'}</span>
+                  <span>{isPendingAudit ? 'Kiểm định' : isPassed ? 'Xem kết quả' : 'Xem chi tiết'}</span>
                   <ArrowRight className="w-3 h-3" />
                 </Link>
               </div>

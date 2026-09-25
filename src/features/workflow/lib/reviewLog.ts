@@ -10,7 +10,7 @@ import type { ApiPlanReview, ApiProductionPlan, ApiReview, ReviewStatus } from '
 const FIELD_LABEL: Record<Exclude<ApiPlanReview['field'], 'SCENE'>, string> = {
   OVERALL_SCRIPT: 'Kịch bản tổng thể',
   DURATION: 'Thời lượng đề xuất',
-  TOKEN_ESTIMATE: 'Token dự toán',
+  TOKEN_ESTIMATE: 'Token dự tính',
 };
 
 const DECISION: Partial<Record<ReviewStatus, ReviewLog['decision']>> = {
@@ -42,7 +42,7 @@ function roundEntry(plan: ApiProductionPlan, round: ApiPlanReview[]): ReviewLog 
   const reviewer = round.find((r) => r.decidedAt === decidedAt)?.reviewer;
   const flagged = round.filter((r) => r.status !== 'APPROVED');
   const label = (r: ApiPlanReview) =>
-    r.field === 'SCENE' ? `Phân cảnh ${plan.scenes.find((s) => s.id === r.sceneId)?.sceneNumber ?? ''}`.trim() : FIELD_LABEL[r.field];
+    r.field === 'SCENE' ? `Cảnh ${plan.scenes.find((s) => s.id === r.sceneId)?.sceneNumber ?? ''}`.trim() : FIELD_LABEL[r.field];
 
   return {
     id: `plan-round-${round[0].id}`,

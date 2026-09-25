@@ -9,7 +9,7 @@ export interface AuditPlayerProps {
 export function AuditPlayer({ pkg }: AuditPlayerProps) {
   const cut = pkg.final_cut;
   const clip = cut ? cut.stream_url : pkg.assets.find((a) => a.asset_type === 'video' && a.url)?.url;
-  const facts = [`${pkg.jobs.length} phân cảnh`, `${pkg.assets.length} kết quả sinh`, pkg.total_duration].filter(Boolean);
+  const facts = [`${pkg.jobs.length} cảnh`, `${pkg.assets.length} kết quả đã tạo`, pkg.total_duration].filter(Boolean);
 
   return (
     <figure className="rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-[#151822]">

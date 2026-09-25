@@ -82,15 +82,15 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
     setIsPublishing(false);
     if (ok) {
       toast.success(
-        'Đã phát hành tập phim!',
-        `${label} đã được phát sóng công khai lên nền tảng OTT với đầy đủ nhãn tuân thủ AI.`
+        'Đã phát hành',
+        `${label} đã lên nền tảng, kèm nhãn nội dung AI.`
       );
     }
   };
 
   const handleRequestChanges = async () => {
     if (!rejectFeedback.trim()) {
-      toast.warning('Thiếu thông tin', 'Vui lòng nhập lý do yêu cầu chỉnh sửa!');
+      toast.warning('Thiếu thông tin', 'Nhập nội dung cần sửa rồi gửi lại.');
       return;
     }
     const ok = await requestContentChanges(pkg.id, rejectFeedback.trim());
@@ -99,7 +99,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
     setRejectFeedback('');
     toast.info(
       'Đã gửi yêu cầu chỉnh sửa',
-      'Phản hồi yêu cầu chỉnh sửa nội dung đã được chuyển về cho Creator.'
+      'Creator sẽ thấy phản hồi của bạn.'
     );
   };
 
