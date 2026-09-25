@@ -8,6 +8,11 @@ import EpisodeVersionDrawer from './EpisodeVersionDrawer';
 import { QualitySelect, type QualityLevel } from './QualitySelect';
 import Hls from 'hls.js';
 
+function defaultVersion(episode: Episode | null): EpisodeVersion | null {
+  if (!episode?.versions?.length) return null;
+  return episode.versions.find((v) => v.isCurrent) || episode.versions[0];
+}
+
 interface WatchPlayerSectionProps {
   episodeId?: string;
 }
@@ -16,8 +21,9 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   const { currentMovie, isVIPMode, openUnlockModal, selectEpisode, isCatalogLoading } = useAppStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
-  const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
-  const [activeVersion, setActiveVersion] = useState<EpisodeVersion | null>(null);
+  // The episode picked in the list (for the route it was picked on) and the version picked for it.
+  const [picked, setPicked] = useState<{ route?: string; episodeId: string } | null>(null);
+  const [pickedVersion, setPickedVersion] = useState<{ episodeId: string; version: EpisodeVersion } | null>(null);
   const [showComplianceDrawer, setShowComplianceDrawer] = useState(false);
   const [showVersionDrawer, setShowVersionDrawer] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,18 +36,11 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
     if (episodeId) selectEpisode(episodeId);
   }, [episodeId, selectEpisode]);
 
-  // Determine current episode and its default version
-  useEffect(() => {
-    const ep = currentMovie?.episodes.find((e) => e.id === episodeId) || currentMovie?.episodes[0] || null;
-    setCurrentEpisode(ep);
-
-    if (ep?.versions && ep.versions.length > 0) {
-      const defaultVer = ep.versions.find((v) => v.isCurrent) || ep.versions[0];
-      setActiveVersion(defaultVer);
-    } else {
-      setActiveVersion(null);
-    }
-  }, [episodeId, currentMovie?.episodes]);
+  // The route's episode unless one was picked from the list since; its current version unless another was picked.
+  const shownId = picked && picked.route === episodeId ? picked.episodeId : episodeId;
+  const currentEpisode = currentMovie?.episodes.find((e) => e.id === shownId) || currentMovie?.episodes[0] || null;
+  const activeVersion =
+    pickedVersion && pickedVersion.episodeId === currentEpisode?.id ? pickedVersion.version : defaultVersion(currentEpisode);
 
   // Can the user play this episode?
   const canPlay = currentEpisode
@@ -129,18 +128,15 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   const handleEpisodeClick = (ep: Episode) => {
     const canPlayEp = isVIPMode || ep.isFree || ep.isUnlocked;
     if (canPlayEp) {
-      setCurrentEpisode(ep);
-      if (ep.versions && ep.versions.length > 0) {
-        const defaultVer = ep.versions.find((v) => v.isCurrent) || ep.versions[0];
-        setActiveVersion(defaultVer);
-      }
+      setPicked({ route: episodeId, episodeId: ep.id });
+      setPickedVersion(null);
     } else {
       openUnlockModal(ep.id);
     }
   };
 
   const handleSelectVersion = (version: EpisodeVersion) => {
-    setActiveVersion(version);
+    if (currentEpisode) setPickedVersion({ episodeId: currentEpisode.id, version });
     setShowVersionDrawer(false);
     setVersionToast(`Đã chuyển sang ${version.versionNumber}: ${version.versionTitle}`);
     setTimeout(() => setVersionToast(null), 3500);

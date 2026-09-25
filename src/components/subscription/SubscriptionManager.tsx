@@ -6,19 +6,23 @@ import { subscriptionPlans } from '@/mocks/mockData';
 import { useState, useEffect, useMemo } from 'react';
 
 export default function SubscriptionManager() {
-  const { subscription, toggleAutoRenew, isVIPMode } = useAppStore();
+  const { subscription, toggleAutoRenew } = useAppStore();
   const { devices, revokeDevice, revokeAllOtherDevices } = useDeviceStore();
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   // Calculate hours until renewal
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+
   const hoursUntilRenewal = useMemo(() => {
     if (!subscription.endDate) return null;
     const end = new Date(subscription.endDate).getTime();
-    const now = Date.now();
     const diffMs = end - now;
     if (diffMs <= 0) return 0;
     return Math.round(diffMs / (1000 * 60 * 60) * 10) / 10; // 1 decimal
-  }, [subscription.endDate]);
+  }, [subscription.endDate, now]);
 
   const showRenewalWarning = hoursUntilRenewal !== null && hoursUntilRenewal <= 24 && hoursUntilRenewal > 0 && subscription.autoRenew;
 
