@@ -28,10 +28,22 @@ import type {
   ApiMilestone,
   ApiPlanReview,
   ApiProductionPlan,
+  ApiComplianceCheck,
   ApiProductionProject,
   ApiQuotaRequest,
+  ComplianceCheckType,
   ReviewStatus,
 } from '@/types/workflow-api';
+
+/** Every check type the backend requires for BR-42, AI_LABEL_PRESENCE included. */
+const COMPLIANCE_CHECK_TYPES: ComplianceCheckType[] = [
+  'AI_LABEL_PRESENCE',
+  'CONTENT_POLICY',
+  'LEGAL',
+  'COPYRIGHT',
+  'WATERMARK',
+  'REAL_PERSON_LIKENESS',
+];
 
 const DEFAULT_EPISODE_SECONDS = MAX_EPISODE_MINUTES * 60;
 
@@ -79,6 +91,19 @@ function latestReviews(plan: ApiProductionPlan): Map<string, ApiPlanReview> {
   return latest;
 }
 
+/**
+ * BR-42 as the backend computes it: the latest check of every type must PASS,
+ * so a check that failed and was re-run later no longer counts.
+ */
+export function isCompliant(checks: ApiComplianceCheck[]): boolean {
+  const latest = new Map<string, ApiComplianceCheck>();
+  for (const check of checks) {
+    const current = latest.get(check.checkType);
+    if (!current || (check.checkedAt ?? '') >= (current.checkedAt ?? '')) latest.set(check.checkType, check);
+  }
+  return COMPLIANCE_CHECK_TYPES.every((type) => latest.get(type)?.result === 'PASS');
+}
+
 /** Where the episode is in MF-1, derived from the plan and its latest package. */
 function deriveEpisodeState(plan: ApiProductionPlan, pkg: ApiEpisodePackage | undefined): WorkflowState {
   const episode = pkg?.currentForEpisode;
@@ -86,9 +111,9 @@ function deriveEpisodeState(plan: ApiProductionPlan, pkg: ApiEpisodePackage | un
 
   if (pkg) {
     const review = pkg.reviews[0];
-    if (review?.status === 'CHANGES_REQUESTED' || review?.status === 'REJECTED') return 'CHANGES_REQUESTED';
-    const checks = pkg.complianceChecks;
-    if (checks.length > 0 && checks.every((c) => c.result === 'PASS')) return 'COMPLIANCE_PASSED';
+    if (review?.status === 'CHANGES_REQUESTED' || review?.status === 'REJECTED') return 'CUT_CHANGES_REQUESTED';
+    // Ready to publish once the cut is approved, which the backend only allows on a compliant package.
+    if (review?.status === 'APPROVED' && isCompliant(pkg.complianceChecks)) return 'COMPLIANCE_PASSED';
     if (pkg.submissions.length > 0) return 'EPISODE_SUBMITTED';
   }
 
@@ -171,6 +196,8 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multi
     actual_tokens_used: allocated - remaining,
     quota_allocated: allocated,
     quota_requests: plan.quotaRequests.map((r) => adaptQuotaRequest(r, plan)),
+    is_labelled: (pkg?.aiContentLabels.length ?? 0) > 0,
+    is_compliant: pkg ? isCompliant(pkg.complianceChecks) : false,
     final_cut: pkg?.streamUrl ? finalCutOf(pkg, pkg.streamUrl) : undefined,
     brief: {
       id: plan.id,
@@ -212,7 +239,7 @@ function latestPlans(plans: ApiProductionPlan[]): ApiProductionPlan[] {
 
 function overallStatus(api: ApiProductionProject, episodes: EpisodePackage[]): ProductionProject['overall_status'] {
   if (api.status === 'COMPLETED' || (episodes.length > 0 && episodes.every((e) => e.status === 'PUBLISHED'))) return 'COMPLETED';
-  if (episodes.some((e) => e.status === 'CHANGES_REQUESTED')) return 'CHANGES_REQUESTED';
+  if (episodes.some((e) => e.status === 'CHANGES_REQUESTED' || e.status === 'CUT_CHANGES_REQUESTED')) return 'CHANGES_REQUESTED';
   if (episodes.some((e) => e.status === 'PLAN_PENDING' || e.status === 'EPISODE_SUBMITTED')) return 'PENDING_REVIEW';
   if (episodes.some((e) => e.status !== 'PLAN_DRAFT')) return 'IN_PROGRESS';
   return 'NOT_STARTED';

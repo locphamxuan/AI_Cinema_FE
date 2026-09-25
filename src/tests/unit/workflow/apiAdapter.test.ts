@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
+import { adaptApiProjectToUiProject, isCompliant } from '@/features/workflow/lib/apiAdapter';
 import { apiPackage, apiPlan, apiPlanReview, apiProject } from '@/tests/fixtures/workflowApiFixtures';
+
+const CHECK_TYPES = ['AI_LABEL_PRESENCE', 'CONTENT_POLICY', 'LEGAL', 'COPYRIGHT', 'WATERMARK', 'REAL_PERSON_LIKENESS'] as const;
+const passedChecks = (checkedAt = '2026-09-02T00:00:00Z') =>
+  CHECK_TYPES.map((checkType) => ({ id: checkType, checkType, result: 'PASS' as 'PASS' | 'FAIL', checkedAt }));
 
 const episodeOf = (...args: Parameters<typeof apiPlan>) => adaptApiProjectToUiProject(apiProject([apiPlan(...args)])).episodes[0];
 
@@ -54,19 +58,32 @@ describe('adaptApiProjectToUiProject', () => {
 
     it('follows the latest package through submission, content review, compliance and publication', () => {
       const withPackage = (pkg: ReturnType<typeof apiPackage>) => episodeOf({ status: 'APPROVED', episodePackages: [pkg] });
-      const pass = (checkType: 'CONTENT_POLICY' | 'LEGAL') => ({ id: checkType, checkType, result: 'PASS' as const, checkedAt: null });
       const review = (status: 'APPROVED' | 'CHANGES_REQUESTED') => ({ id: 'r1', status, decidedAt: null, createdAt: '' });
+      const approved = (complianceChecks: ReturnType<typeof passedChecks>) => apiPackage({ reviews: [review('APPROVED')], complianceChecks });
 
       expect(withPackage(apiPackage()).status).toBe('EPISODE_SUBMITTED');
-      expect(withPackage(apiPackage({ reviews: [review('CHANGES_REQUESTED')] })).status).toBe('CHANGES_REQUESTED');
-      expect(withPackage(apiPackage({ complianceChecks: [pass('CONTENT_POLICY'), { ...pass('LEGAL'), result: 'FAIL' }] })).status).toBe('EPISODE_SUBMITTED');
-      expect(withPackage(apiPackage({ complianceChecks: [pass('CONTENT_POLICY'), pass('LEGAL')] })).status).toBe('COMPLIANCE_PASSED');
+      expect(withPackage(apiPackage({ reviews: [review('CHANGES_REQUESTED')] })).status).toBe('CUT_CHANGES_REQUESTED');
+      // Compliance alone does not finish the audit: the cut is ready only once it is also approved.
+      expect(withPackage(apiPackage({ complianceChecks: passedChecks() })).status).toBe('EPISODE_SUBMITTED');
+      expect(withPackage(approved(passedChecks())).status).toBe('COMPLIANCE_PASSED');
+      expect(withPackage(approved(passedChecks().slice(1))).status).toBe('EPISODE_SUBMITTED');
 
       const published = withPackage(apiPackage({ currentForEpisode: { id: 'episode-9', productionStatus: 'PUBLISHED', publications: [] } }));
       expect(published.status).toBe('PUBLISHED');
       expect(published.package_id).toBe('package-1');
       expect(published.catalog_episode_id).toBe('episode-9');
     });
+  });
+
+  it('judges compliance by the latest check of each type, like the backend (BR-42)', () => {
+    const failedEarlier = { id: 'old', checkType: 'LEGAL' as const, result: 'FAIL' as const, checkedAt: '2026-09-01T00:00:00Z' };
+    expect(isCompliant([failedEarlier, ...passedChecks()])).toBe(true);
+    expect(isCompliant([...passedChecks(), { ...failedEarlier, checkedAt: '2026-09-03T00:00:00Z' }])).toBe(false);
+    expect(isCompliant(passedChecks().filter((c) => c.checkType !== 'AI_LABEL_PRESENCE'))).toBe(false);
+
+    const labels = [{ id: 'label-1', labelType: 'AI_GENERATED' as const, labelText: 'AI' }];
+    const episode = episodeOf({ status: 'APPROVED', episodePackages: [apiPackage({ complianceChecks: passedChecks(), aiContentLabels: labels })] });
+    expect(episode).toMatchObject({ is_labelled: true, is_compliant: true });
   });
 
   it('exposes the assembled cut with its renditions, real duration and subtitle tracks', () => {

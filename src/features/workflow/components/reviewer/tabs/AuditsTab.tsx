@@ -36,7 +36,7 @@ export function AuditsTab({ project }: AuditsTabProps) {
             Chờ Thẩm Định Video
           </span>
         );
-      case 'CHANGES_REQUESTED':
+      case 'CUT_CHANGES_REQUESTED':
         return (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-rose-500/10 text-rose-700 dark:text-rose-300 border border-rose-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />

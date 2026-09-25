@@ -27,6 +27,6 @@ export function pendingQuotaRequest(episode: Pick<EpisodePackage, 'quota_request
 
 /** A top-up can be asked for once the episode has a quota and until its cut is handed in. */
 export function canRequestQuota(episode: Pick<EpisodePackage, 'status' | 'quota_allocated' | 'quota_requests'>): boolean {
-  const producing = episode.status === 'QUOTA_ALLOCATED' || episode.status === 'IN_PRODUCTION' || episode.status === 'CHANGES_REQUESTED';
+  const producing = episode.status === 'QUOTA_ALLOCATED' || episode.status === 'IN_PRODUCTION' || episode.status === 'CUT_CHANGES_REQUESTED';
   return producing && episode.quota_allocated > 0 && !pendingQuotaRequest(episode);
 }

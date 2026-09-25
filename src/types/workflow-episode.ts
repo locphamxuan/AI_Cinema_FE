@@ -79,6 +79,10 @@ export interface EpisodePackage {
   quota_allocated: number;
   /** Top-up requests for this episode, newest first; at most one is pending. */
   quota_requests: QuotaRequest[];
+  /** The current package carries an AI content label (Điều 44). */
+  is_labelled: boolean;
+  /** The latest result of every compliance check of the current package is PASS (BR-42). */
+  is_compliant: boolean;
   /** The assembled cut the Reviewer audits; absent until the Creator submits one. */
   final_cut?: FinalCut;
   brief: ContentBrief;

@@ -64,6 +64,7 @@ export function CreatorWorkspacePage() {
   const canEnterStudio =
     currentPackage?.status === 'QUOTA_ALLOCATED' ||
     currentPackage?.status === 'IN_PRODUCTION' ||
+    currentPackage?.status === 'CUT_CHANGES_REQUESTED' ||
     currentPackage?.status === 'EPISODE_SUBMITTED' ||
     currentPackage?.status === 'COMPLIANCE_PASSED' ||
     currentPackage?.status === 'PUBLISHED';

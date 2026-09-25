@@ -26,6 +26,7 @@ const STAGE_OF: Record<WorkflowState, number> = {
   QUOTA_ALLOCATED: 2,
   IN_PRODUCTION: 2,
   EPISODE_SUBMITTED: 3,
+  CUT_CHANGES_REQUESTED: 2,
   COMPLIANCE_PASSED: 3,
   PUBLISHED: 4,
 };
@@ -63,6 +64,8 @@ export function OverviewTab({
   const completedJobsCount = jobs.filter((j) => j.status === 'completed').length;
   const milestones = project.milestones ?? [];
   const gotoOr = (handler: (() => void) | undefined) => () => (handler ?? onGotoBrief)();
+  // A returned cut is fixed by regenerating in the Studio, a returned plan by editing the brief.
+  const isCutFeedback = latestFeedback?.review_type === 'content';
 
   // The episode pipeline, in order; where it stands comes from its real workflow state.
   const stages = [
@@ -157,14 +160,16 @@ export function OverviewTab({
         <div role="alert" className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" aria-hidden="true" />
           <div className="flex-1 text-xs space-y-2">
-            <h4 className="font-semibold text-rose-700 dark:text-rose-400">Reviewer yêu cầu chỉnh sửa</h4>
+            <h4 className="font-semibold text-rose-700 dark:text-rose-400">
+              {isCutFeedback ? 'Reviewer trả bản dựng về' : 'Reviewer yêu cầu chỉnh sửa kế hoạch'}
+            </h4>
             <p className="text-slate-700 dark:text-slate-200 bg-white dark:bg-[#151822] p-2.5 rounded-lg border border-rose-500/20">{latestFeedback.feedback_notes}</p>
             <button
               type="button"
-              onClick={onGotoBrief}
+              onClick={isCutFeedback ? gotoOr(onGotoStudio) : onGotoBrief}
               className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium transition cursor-pointer"
             >
-              Mở kịch bản để sửa
+              {isCutFeedback ? 'Mở AI Studio để sinh lại' : 'Mở kịch bản để sửa'}
             </button>
           </div>
         </div>

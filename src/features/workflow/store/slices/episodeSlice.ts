@@ -10,7 +10,7 @@ import { buildSceneJobs, draftStepId, isDraftStep } from '@/features/workflow/li
 import { apiResult } from './apiResult';
 
 /** Episodes whose plan has gone past quota allocation can hold generation jobs. */
-const HAS_JOBS = new Set(['IN_PRODUCTION', 'EPISODE_SUBMITTED', 'CHANGES_REQUESTED', 'COMPLIANCE_PASSED', 'PUBLISHED']);
+const HAS_JOBS = new Set(['IN_PRODUCTION', 'EPISODE_SUBMITTED', 'CUT_CHANGES_REQUESTED', 'COMPLIANCE_PASSED', 'PUBLISHED']);
 
 /** Fills each episode's scene rows with its backend jobs, keeping the Creator's draft steps. */
 async function withJobs(project: ProductionProject, previous: ProductionProject | undefined): Promise<ProductionProject> {
