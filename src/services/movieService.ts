@@ -10,10 +10,15 @@ import { allMockMovies, mockMovie } from '@/mocks/mockData';
 export const movieService = {
   async getMovies(genre?: string): Promise<ApiResponse<Movie[]>> {
     const query = genre && genre !== 'all' ? `?genre=${encodeURIComponent(genre)}` : '';
-    return apiClient.get<Movie[]>(`${API_ROUTES.MOVIES.LIST}${query}`, {}, () => {
+    const res = await apiClient.get<any>(`${API_ROUTES.MOVIES.LIST}${query}`, {}, () => {
       if (!genre || genre === 'all') return allMockMovies;
       return allMockMovies.filter((m) => m.genre.includes(genre));
     });
+    if (res.success && res.data) {
+      const list = Array.isArray(res.data) ? res.data : (res.data.items || []);
+      return { ...res, data: list };
+    }
+    return res;
   },
 
   async getMovieById(id: string): Promise<ApiResponse<Movie | null>> {

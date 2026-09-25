@@ -29,7 +29,7 @@ describe('Wallet Service (src/services/walletService.ts)', () => {
     expect(res.data.days).toHaveLength(7);
     const today = res.data.days.find((d) => d.isToday);
     expect(today).toBeDefined();
-    expect(today?.dayLabel).toBe('T4'); // Today is Wednesday (T4)
+    expect(today?.dayLabel).toBe(VN_DAY_LABELS[getTodayDayIndex()]);
   });
 
   it('calculates coin deduction prioritizing main coin', async () => {

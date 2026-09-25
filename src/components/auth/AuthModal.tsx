@@ -89,6 +89,11 @@ export default function AuthModal() {
         setError(res.error || 'Đăng nhập thất bại');
       }
     } else {
+      if (password.length < 8) {
+        setError('Mật khẩu phải có tối thiểu 8 ký tự!');
+        setLoading(false);
+        return;
+      }
       const res = await register(name, email, password);
       if (res.success) {
         try {
@@ -257,7 +262,7 @@ export default function AuthModal() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder={mode === 'login' ? 'Nhập mật khẩu...' : 'Tạo mật khẩu...'}
+                placeholder={mode === 'login' ? 'Nhập mật khẩu...' : 'Tạo mật khẩu (tối thiểu 8 ký tự)...'}
                 className="w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
               />
             </div>

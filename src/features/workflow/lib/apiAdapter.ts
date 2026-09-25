@@ -65,6 +65,26 @@ export function adaptApiPlanToEpisodePackage(plan: ApiProductionPlan, project: A
   };
 }
 
+function mapBEProjectStatus(status?: string): 'NOT_STARTED' | 'IN_PROGRESS' | 'PENDING_REVIEW' | 'CHANGES_REQUESTED' | 'COMPLETED' {
+  switch (status) {
+    case 'DRAFT':
+    case 'NOT_STARTED':
+      return 'NOT_STARTED';
+    case 'ACTIVE':
+    case 'IN_PROGRESS':
+      return 'IN_PROGRESS';
+    case 'COMPLETED':
+      return 'COMPLETED';
+    case 'CANCELLED':
+    case 'CHANGES_REQUESTED':
+      return 'CHANGES_REQUESTED';
+    case 'PENDING_REVIEW':
+      return 'PENDING_REVIEW';
+    default:
+      return 'IN_PROGRESS';
+  }
+}
+
 export function adaptApiProjectToUiProject(api: ApiProductionProject): ProductionProject {
   const genres = api.genres?.map((g) => g.genre?.name).filter(Boolean) as string[] || [];
   const milestones = (api.milestones || []).map(adaptApiMilestoneToUi);
@@ -132,7 +152,7 @@ export function adaptApiProjectToUiProject(api: ApiProductionProject): Productio
     creator_name: api.assignedCreator?.fullName || 'Trần Minh Huy',
     reviewer_name: api.createdBy?.fullName || 'Lê Quốc Bảo',
     creator_role: 'Đạo diễn / Maker',
-    overall_status: (api.status as any) || 'IN_PROGRESS',
+    overall_status: mapBEProjectStatus(api.status),
     active_episode_title: episodes[0]?.title || '',
     progress_percent: 0,
     milestones,
