@@ -16,6 +16,8 @@ export const MANUAL_COMPLIANCE_CHECKS: { type: ManualComplianceCheck; title: str
 export interface ComplianceStationProps {
   isCompliancePassed: boolean;
   isPassingCompliance: boolean;
+  /** The cut waits for the Reviewer's decision; otherwise nothing can be confirmed. */
+  canConfirm: boolean;
   checks: Record<ManualComplianceCheck, boolean>;
   onCheckChange: (type: ManualComplianceCheck, value: boolean) => void;
   displayLocation: DisplayLocation;
@@ -54,6 +56,7 @@ function CheckRow({ title, description, checked, disabled, onChange }: CheckRowP
 export function ComplianceStation({
   isCompliancePassed,
   isPassingCompliance,
+  canConfirm,
   checks,
   onCheckChange,
   displayLocation,
@@ -100,7 +103,7 @@ export function ComplianceStation({
       <button
         type="button"
         onClick={onConfirm}
-        disabled={isPassingCompliance || isCompliancePassed || !allChecked}
+        disabled={isPassingCompliance || isCompliancePassed || !allChecked || !canConfirm}
         className="w-full py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition bg-purple-600 hover:bg-purple-700 text-white disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
       >
         {isCompliancePassed && <Check className="w-4 h-4" aria-hidden="true" />}

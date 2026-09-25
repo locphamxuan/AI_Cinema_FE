@@ -5,6 +5,7 @@ import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { availableBudget, derivePlanVerdict, planFieldReviews, scriptReview } from '@/features/workflow/lib/planVerdict';
 import { FieldReviewCard } from '../../shared/FieldReviewCard';
 import { episodeName } from '@/features/workflow/lib/episodeLabel';
+import { isPlanApproved } from '@/features/workflow/lib/workflowState';
 
 export interface PlanReviewTabProps {
   currentPackage?: EpisodePackage;
@@ -29,12 +30,9 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
   const fieldReviews = brief ? planFieldReviews(project, brief) : [];
   const approvedCount = fieldReviews.filter((r) => r.status === 'approved').length;
 
-  const isAlreadyApproved =
-    currentPackage?.status === 'QUOTA_ALLOCATED' ||
-    currentPackage?.status === 'IN_PRODUCTION' ||
-    currentPackage?.status === 'EPISODE_SUBMITTED' ||
-    currentPackage?.status === 'COMPLIANCE_PASSED' ||
-    currentPackage?.status === 'PUBLISHED';
+  const isAlreadyApproved = currentPackage ? isPlanApproved(currentPackage.status) : false;
+  // Only a submitted plan has a review round to decide in; a draft or a returned plan waits for the Creator.
+  const isReviewable = currentPackage?.status === 'PLAN_PENDING';
 
   return (
     <div className="bg-white dark:bg-[#161922] rounded-xl border border-slate-200 dark:border-white/10 p-5 sm:p-6 space-y-5 shadow-xs transition-colors">
@@ -94,6 +92,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
         <div className="space-y-5">
           {/* Overall script — reviewed once per project (BR-39) */}
           <FieldReviewCard
+            readOnly={!isReviewable}
             review={scriptReview(project, brief)}
             onReview={(status, comment) => reviewPlanField(packageId, 'script', status, comment)}
             approveLabel="Duyệt kịch bản"
@@ -111,6 +110,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
           {/* Duration & token estimate vs project baseline */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <FieldReviewCard
+            readOnly={!isReviewable}
               review={brief.duration_review}
               onReview={(status, comment) => reviewPlanField(packageId, 'duration', status, comment)}
               approveLabel="Duyệt thời lượng"
@@ -122,6 +122,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
               </p>
             </FieldReviewCard>
             <FieldReviewCard
+            readOnly={!isReviewable}
               review={brief.token_review}
               onReview={(status, comment) => reviewPlanField(packageId, 'token', status, comment)}
               approveLabel="Duyệt token dự toán"
@@ -153,6 +154,7 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
             <div className="space-y-2.5">
               {brief.scene_breakdown.map((sc) => (
                 <FieldReviewCard
+            readOnly={!isReviewable}
                   key={sc.scene_number}
                   review={brief.scene_reviews.find((sr) => sr.scene_number === sc.scene_number) ?? PENDING_FIELD_REVIEW}
                   onReview={(status, comment) => reviewScene(packageId, sc.scene_number, status, comment)}

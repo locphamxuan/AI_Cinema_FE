@@ -1,4 +1,5 @@
 import type { EpisodePackage, QuotaRequest } from '@/types/workflow';
+import { canProduce } from './workflowState';
 
 /** Share of the quota used at which the Creator is warned to ask for a top-up. */
 export const QUOTA_WARNING_PERCENT = 90;
@@ -27,6 +28,5 @@ export function pendingQuotaRequest(episode: Pick<EpisodePackage, 'quota_request
 
 /** A top-up can be asked for once the episode has a quota and until its cut is handed in. */
 export function canRequestQuota(episode: Pick<EpisodePackage, 'status' | 'quota_allocated' | 'quota_requests'>): boolean {
-  const producing = episode.status === 'QUOTA_ALLOCATED' || episode.status === 'IN_PRODUCTION' || episode.status === 'CUT_CHANGES_REQUESTED';
-  return producing && episode.quota_allocated > 0 && !pendingQuotaRequest(episode);
+  return canProduce(episode.status) && episode.quota_allocated > 0 && !pendingQuotaRequest(episode);
 }

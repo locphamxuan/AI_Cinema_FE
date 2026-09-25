@@ -63,6 +63,8 @@ export interface GeneratorPanelProps {
   onRemoveStep: (stepId: string) => void;
   isGenerating: boolean;
   onGenerateSelected: () => void;
+  /** Generation is closed, e.g. while the cut waits for the Reviewer. */
+  locked?: boolean;
 }
 
 export function GeneratorPanel({
@@ -74,6 +76,7 @@ export function GeneratorPanel({
   onRemoveStep,
   isGenerating,
   onGenerateSelected,
+  locked = false,
 }: GeneratorPanelProps) {
   // Route a custom function once the Creator pauses typing, not on every key.
   const routeTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
@@ -202,7 +205,7 @@ export function GeneratorPanel({
         <button
           type="button"
           onClick={onAddStep}
-          disabled={!selectedJob}
+          disabled={!selectedJob || locked}
           className="w-full py-2 rounded-lg border border-dashed border-slate-300 dark:border-white/15 text-slate-600 dark:text-slate-300 hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-300 text-xs font-medium flex items-center justify-center gap-1.5 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
         >
           <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm mục
@@ -219,7 +222,7 @@ export function GeneratorPanel({
           <button
             type="button"
             onClick={onGenerateSelected}
-            disabled={isGenerating || toRun.length === 0}
+            disabled={isGenerating || toRun.length === 0 || locked}
             className="w-full py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
           >
             {isGenerating ? 'Đang tạo…' : drafts.length > 0 || steps.length === 0 ? 'Tạo clip' : 'Tạo lại'}

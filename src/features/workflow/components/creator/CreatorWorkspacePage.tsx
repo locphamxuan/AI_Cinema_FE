@@ -8,6 +8,7 @@ import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSideba
 import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
 import { creatorGroups } from '@/features/workflow/lib/projectGroups';
 import { scriptReview } from '@/features/workflow/lib/planVerdict';
+import { isPlanApproved } from '@/features/workflow/lib/workflowState';
 import { OverviewTab } from './tabs/OverviewTab';
 import { BriefTab } from './tabs/BriefTab';
 import { StudioLinkTab } from './tabs/StudioLinkTab';
@@ -61,13 +62,7 @@ export function CreatorWorkspacePage() {
   const latestFeedback = newestReview?.decision === 'changes_requested' ? newestReview : undefined;
   const episodeReviews = currentPackage?.review_log ?? [];
 
-  const canEnterStudio =
-    currentPackage?.status === 'QUOTA_ALLOCATED' ||
-    currentPackage?.status === 'IN_PRODUCTION' ||
-    currentPackage?.status === 'CUT_CHANGES_REQUESTED' ||
-    currentPackage?.status === 'EPISODE_SUBMITTED' ||
-    currentPackage?.status === 'COMPLIANCE_PASSED' ||
-    currentPackage?.status === 'PUBLISHED';
+  const canEnterStudio = currentPackage ? isPlanApproved(currentPackage.status) : false;
 
   const navItems: SidebarNavItem[] = [
     { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },

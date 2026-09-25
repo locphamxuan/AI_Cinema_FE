@@ -7,13 +7,15 @@ export interface StudioTimelineProps {
   renderingJobId: string | null;
   onSelectJob: (id: string) => void;
   onGenerate: (id: string) => void;
+  /** Generation is closed, e.g. while the cut waits for the Reviewer. */
+  locked?: boolean;
 }
 
 const ACTION_CLASS =
   'px-3 py-1.5 rounded-md text-xs font-medium transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50';
 
 /** The plan's scenes in order: pick one to edit, then create or redo its clip. */
-export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJob, onGenerate }: StudioTimelineProps) {
+export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJob, onGenerate, locked = false }: StudioTimelineProps) {
   const doneCount = jobs.filter((j) => j.status === 'completed').length;
 
   return (
@@ -69,16 +71,20 @@ export function StudioTimeline({ jobs, selectedJobId, renderingJobId, onSelectJo
                     <span className="inline-flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-400">
                       <Check className="w-3.5 h-3.5" aria-hidden="true" /> Xong
                     </span>
-                    <button type="button" onClick={() => onGenerate(job.id)} className={`${ACTION_CLASS} text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10`}>
-                      Tạo lại
-                    </button>
+                    {!locked && (
+                      <button type="button" onClick={() => onGenerate(job.id)} className={`${ACTION_CLASS} text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10`}>
+                        Tạo lại
+                      </button>
+                    )}
                   </>
                 ) : (
                   <>
                     {job.status === 'failed' && <span className="text-xs text-rose-600 dark:text-rose-400">Lỗi</span>}
-                    <button type="button" onClick={() => onGenerate(job.id)} className={`${ACTION_CLASS} bg-purple-600 hover:bg-purple-700 text-white`}>
-                      Tạo clip
-                    </button>
+                    {!locked && (
+                      <button type="button" onClick={() => onGenerate(job.id)} className={`${ACTION_CLASS} bg-purple-600 hover:bg-purple-700 text-white`}>
+                        Tạo clip
+                      </button>
+                    )}
                   </>
                 )}
               </div>

@@ -12,6 +12,13 @@ import { routeDefaults } from '@/features/workflow/lib/modelRouting';
 import { SubmitEpisodeModal } from './SubmitEpisodeModal';
 import { toast } from '@/components/ui/Toast';
 import type { GenerationStep } from '@/types/workflow';
+import { canProduce } from '@/features/workflow/lib/workflowState';
+
+const LOCKED_REASON: Partial<Record<string, string>> = {
+  EPISODE_SUBMITTED: 'Bản dựng đang chờ Reviewer kiểm định; chỉ sửa được khi bị trả về.',
+  COMPLIANCE_PASSED: 'Bản dựng đã được duyệt và chờ phát hành.',
+  PUBLISHED: 'Tập phim đã phát hành.',
+};
 
 export interface CreatorStudioPageProps {
   episodeId: string;
@@ -112,6 +119,8 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
   };
 
   const allCompleted = jobs.length > 0 && jobs.every((j) => j.status === 'completed');
+  const locked = !canProduce(currentPackage.status);
+  const canSubmit = allCompleted && !locked;
   const remainingQuota = currentPackage.quota_allocated - currentPackage.actual_tokens_used;
 
   return (
@@ -155,14 +164,20 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
           <button
             type="button"
             onClick={() => setIsSubmitModalOpen(true)}
-            disabled={!allCompleted}
-            title={allCompleted ? undefined : 'Cần tạo xong tất cả phân cảnh trước khi nộp'}
+            disabled={!canSubmit}
+            title={locked ? LOCKED_REASON[currentPackage.status] : allCompleted ? undefined : 'Cần tạo xong tất cả phân cảnh trước khi nộp'}
             className="px-4 py-2 rounded-lg text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white transition cursor-pointer disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0B0C10]"
           >
             Nộp bản dựng
           </button>
         </div>
       </div>
+
+      {locked && (
+        <p role="status" className="p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-sm text-slate-600 dark:text-slate-300">
+          {LOCKED_REASON[currentPackage.status] ?? 'Tập phim chưa được cấp token để sản xuất.'}
+        </p>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-7 space-y-6">
@@ -173,6 +188,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
             renderingJobId={renderingJobId}
             onSelectJob={setSelectedJobId}
             onGenerate={handleGenerate}
+            locked={locked}
           />
         </div>
 
@@ -186,6 +202,7 @@ export function CreatorStudioPage({ episodeId }: CreatorStudioPageProps) {
             onRemoveStep={handleRemoveStep}
             isGenerating={renderingJobId === selectedJob?.id}
             onGenerateSelected={() => selectedJob && handleGenerate(selectedJob.id)}
+            locked={locked}
           />
         </div>
       </div>

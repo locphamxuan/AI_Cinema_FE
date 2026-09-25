@@ -13,6 +13,7 @@ import { PublishStation } from './PublishStation';
 import { RequestChangesModal } from './RequestChangesModal';
 import { toast } from '@/components/ui/Toast';
 import { episodeLabel, episodeName, spansSeasons } from '@/features/workflow/lib/episodeLabel';
+import { isAwaitingAudit } from '@/features/workflow/lib/workflowState';
 
 export interface ReviewerAuditPageProps {
   packageId: string;
@@ -57,6 +58,8 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
   const label = episodeLabel(pkg, spansSeasons(project.episodes));
   const isCompliancePassed = pkg.status === 'COMPLIANCE_PASSED' || pkg.status === 'PUBLISHED';
   const isPublished = pkg.status === 'PUBLISHED';
+  // A cut is decided only while it waits for the Reviewer; a returned one waits for the Creator.
+  const canAudit = isAwaitingAudit(pkg.status);
 
   const handleToggleChannel = (channel: string) => {
     if (selectedChannels.includes(channel)) {
@@ -119,13 +122,15 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={() => setShowRejectModal(true)}
-              className="px-3.5 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-500/30 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
-            >
-              Yêu cầu sửa
-            </button>
+            {canAudit && (
+              <button
+                type="button"
+                onClick={() => setShowRejectModal(true)}
+                className="px-3.5 py-2 rounded-lg border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-700 dark:hover:text-rose-400 hover:border-rose-200 dark:hover:border-rose-500/30 transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50"
+              >
+                Yêu cầu sửa
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -140,6 +145,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
           <ComplianceStation
             isCompliancePassed={isCompliancePassed}
             isPassingCompliance={isPassingCompliance}
+            canConfirm={canAudit}
             checks={checks}
             onCheckChange={(type, value) => setChecks((prev) => ({ ...prev, [type]: value }))}
             displayLocation={displayLocation}

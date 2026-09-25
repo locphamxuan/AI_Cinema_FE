@@ -8,16 +8,16 @@ import { workflowService } from '@/services/workflowService';
 import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
 import { buildSceneJobs, draftStepId, isDraftStep } from '@/features/workflow/lib/jobAdapter';
 import { apiResult } from './apiResult';
+import { isPlanApproved } from '@/features/workflow/lib/workflowState';
 
 /** Episodes whose plan has gone past quota allocation can hold generation jobs. */
-const HAS_JOBS = new Set(['IN_PRODUCTION', 'EPISODE_SUBMITTED', 'CUT_CHANGES_REQUESTED', 'COMPLIANCE_PASSED', 'PUBLISHED']);
 
 /** Fills each episode's scene rows with its backend jobs, keeping the Creator's draft steps. */
 async function withJobs(project: ProductionProject, previous: ProductionProject | undefined): Promise<ProductionProject> {
   const episodes = await Promise.all(
     project.episodes.map(async (episode) => {
       const previousRows = previous?.episodes.find((e) => e.id === episode.id)?.jobs;
-      const res = HAS_JOBS.has(episode.status) ? await workflowService.listJobs(episode.id) : null;
+      const res = isPlanApproved(episode.status) ? await workflowService.listJobs(episode.id) : null;
       return { ...episode, ...buildSceneJobs(episode, res?.success ? res.data : [], previousRows) };
     })
   );
