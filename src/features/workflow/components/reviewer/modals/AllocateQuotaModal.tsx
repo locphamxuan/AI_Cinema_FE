@@ -2,7 +2,7 @@ import { Minus, Plus } from 'lucide-react';
 import type { EpisodePackage } from '@/types/workflow';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
-import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { fieldInputClass } from '@/components/ui/FormField';
 import { clamp } from '@/features/workflow/lib/limits';
 
 export interface AllocateQuotaModalProps {
@@ -14,8 +14,6 @@ export interface AllocateQuotaModalProps {
   onQuotaChange: (value: number) => void;
   /** Project budget not yet granted to any episode — the hard ceiling for this grant. */
   availableBudget: number;
-  notes: string;
-  onNotesChange: (value: string) => void;
 }
 
 const MIN_QUOTA = 50;
@@ -23,7 +21,7 @@ const STEP = 50;
 const STEPPER_CLASS =
   'w-9 h-9 rounded-lg border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 disabled:opacity-40 disabled:cursor-not-allowed';
 
-export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, quota, onQuotaChange, availableBudget, notes, onNotesChange }: AllocateQuotaModalProps) {
+export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, quota, onQuotaChange, availableBudget }: AllocateQuotaModalProps) {
   const ceiling = Math.max(MIN_QUOTA, availableBudget + (currentPackage?.quota_allocated || 0));
   const estimate = currentPackage?.brief.estimated_tokens ?? 0;
   const isOverBudget = ceiling < MIN_QUOTA;
@@ -33,7 +31,7 @@ export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, q
     <Modal open={open} onClose={onClose} title="Cấp token cho tập" subtitle={currentPackage?.title} maxWidth="max-w-md">
       <dl className="grid grid-cols-2 gap-3 text-sm">
         <div>
-          <dt className="text-xs text-slate-500 dark:text-slate-400">Creator dự toán</dt>
+          <dt className="text-xs text-slate-500 dark:text-slate-400">Creator dự tính</dt>
           <dd className="font-medium text-slate-900 dark:text-white tabular-nums">{estimate} token</dd>
         </div>
         <div>
@@ -70,24 +68,10 @@ export function AllocateQuotaModal({ open, onClose, onConfirm, currentPackage, q
             onClick={() => setQuota(estimate)}
             className="text-xs text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
           >
-            Dùng đúng mức dự toán ({estimate} token)
+            Cấp đúng số dự tính ({estimate} token)
           </button>
         )}
-        {isOverBudget && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400">Ngân sách dự án không còn đủ để cấp thêm token.</p>}
-      </div>
-
-      <div className="space-y-1.5">
-        <label htmlFor="quota-notes" className="block text-xs font-medium text-slate-600 dark:text-slate-300">
-          Ghi chú cho người sản xuất
-        </label>
-        <textarea
-          id="quota-notes"
-          rows={3}
-          value={notes}
-          onChange={(e) => onNotesChange(e.target.value)}
-          placeholder="Không bắt buộc…"
-          className={fieldTextareaClass}
-        />
+        {isOverBudget && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400">Ngân sách dự án không đủ. Giảm số token cấp hoặc tăng ngân sách dự án.</p>}
       </div>
 
       <div className="flex items-center justify-end gap-3 pt-2">

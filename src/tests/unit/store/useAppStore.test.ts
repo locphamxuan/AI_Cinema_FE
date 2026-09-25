@@ -1,5 +1,35 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { useAppStore } from '@/store/useAppStore';
+import type { Episode, Movie } from '@/types/movie';
+
+const paidEpisode = (n: number): Episode => ({
+  id: `ep-00${n}`,
+  episodeNumber: n,
+  title: `Tập ${n}`,
+  duration: '25:00',
+  hlsUrl: '',
+  qualities: [],
+  subtitles: [],
+  thumbnailUrl: '',
+  price: 50,
+  isFree: false,
+  isPreview: false,
+  isUnlocked: false,
+  synopsis: '',
+});
+
+const fixtureMovie: Movie = {
+  id: 'movie-fixture',
+  title: 'Phim thử nghiệm',
+  genre: [],
+  posterUrl: '',
+  bannerUrl: '',
+  description: '',
+  year: 2026,
+  totalEpisodes: 3,
+  episodes: [3, 4, 5].map(paidEpisode),
+  aiCompliance: { complianceArticle: '', reviewStatus: 'approved', contentRating: '', disclaimer: '' },
+};
 
 describe('Zustand App Store (src/store/useAppStore.ts)', () => {
   beforeEach(() => {
@@ -7,33 +37,10 @@ describe('Zustand App Store (src/store/useAppStore.ts)', () => {
     const store = useAppStore.getState();
     store.logout();
     store.setWalletBalance(0, 0);
-
     useAppStore.setState({
       chatMessages: [],
-      currentMovie: {
-        id: 'demo-movie',
-        title: 'Demo Movie',
-        genre: ['AI', 'Action'],
-        posterUrl: '',
-        bannerUrl: '',
-        description: 'Demo movie for logic tests',
-        year: 2025,
-        episodes: [
-          { id: 'ep-003', episodeNumber: 3, title: 'Episode 3', duration: '44m', hlsUrl: '', thumbnailUrl: '', price: 50, isFree: false, isPreview: false, isUnlocked: false, synopsis: 'Test episode' },
-          { id: 'ep-004', episodeNumber: 4, title: 'Episode 4', duration: '52m', hlsUrl: '', thumbnailUrl: '', price: 50, isFree: false, isPreview: false, isUnlocked: false, synopsis: 'Test episode' },
-          { id: 'ep-005', episodeNumber: 5, title: 'Episode 5', duration: '60m', hlsUrl: '', thumbnailUrl: '', price: 50, isFree: false, isPreview: false, isUnlocked: false, synopsis: 'Test episode' },
-        ],
-        aiCompliance: {
-          aiModel: 'Demo Model',
-          generatedDate: new Date().toISOString(),
-          complianceArticle: 'Article 44',
-          reviewStatus: 'approved',
-          moderationScore: 99,
-          contentRating: 'T16',
-          disclaimer: 'Demo',
-        },
-        totalEpisodes: 3,
-      },
+      currentMovie: fixtureMovie,
+      movies: [fixtureMovie],
       checkInStreak: {
         days: Array.from({ length: 7 }, (_, idx) => ({
           dayIndex: idx,

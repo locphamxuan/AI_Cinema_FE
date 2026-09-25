@@ -8,6 +8,8 @@ export interface FieldReviewCardProps {
   header: React.ReactNode;
   children?: React.ReactNode;
   approveLabel?: string;
+  /** Shows the verdict only, e.g. while the plan waits for the Creator. */
+  readOnly?: boolean;
 }
 
 const TONE: Record<SceneReviewStatus, string> = {
@@ -20,7 +22,7 @@ const TONE: Record<SceneReviewStatus, string> = {
  * One reviewable plan field (script, duration, token estimate or a scene):
  * shows its verdict and lets the Reviewer approve it or send it back with a comment (BR-39).
  */
-export function FieldReviewCard({ review, onReview, header, children, approveLabel = 'Duyệt' }: FieldReviewCardProps) {
+export function FieldReviewCard({ review, onReview, header, children, approveLabel = 'Duyệt', readOnly = false }: FieldReviewCardProps) {
   const [isReworking, setIsReworking] = useState(false);
   const [comment, setComment] = useState('');
 
@@ -57,7 +59,7 @@ export function FieldReviewCard({ review, onReview, header, children, approveLab
         </div>
       )}
 
-      {isReworking ? (
+      {readOnly ? null : isReworking ? (
         <div className="space-y-2 pt-1">
           <textarea
             autoFocus
@@ -79,7 +81,7 @@ export function FieldReviewCard({ review, onReview, header, children, approveLab
               onClick={() => setIsReworking(false)}
               className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
             >
-              <X className="w-3 h-3" /> Huỷ
+              <X className="w-3 h-3" /> Hủy
             </button>
           </div>
         </div>

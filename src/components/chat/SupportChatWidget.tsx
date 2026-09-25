@@ -1,16 +1,14 @@
 'use client';
 
 import { useAppStore } from '@/store/useAppStore';
-import { useState, useRef, useEffect, useCallback } from 'react';
-
-const quickActions: { id: string; label: string }[] = [];
+import { quickActions } from '@/mocks/mockData';
+import { useState, useRef, useEffect } from 'react';
 
 export default function SupportChatWidget() {
   const {
     chatMessages,
     chatPhase,
     chatIsOpen,
-    chatTicket,
     estimatedWaitMinutes,
     toggleChat,
     sendMessage,
@@ -20,7 +18,7 @@ export default function SupportChatWidget() {
   } = useAppStore();
 
   const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [typedFor, setTypedFor] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,15 +34,14 @@ export default function SupportChatWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  // Simulate typing indicator when bot responds
+  // Simulated typing indicator: shown after a user message until its reply delay has passed.
+  const lastMsg = chatMessages[chatMessages.length - 1];
+  const isTyping = lastMsg?.sender === 'user' && typedFor !== lastMsg.id;
   useEffect(() => {
-    const lastMsg = chatMessages[chatMessages.length - 1];
-    if (lastMsg?.sender === 'user') {
-      setIsTyping(true);
-      const timer = setTimeout(() => setIsTyping(false), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [chatMessages]);
+    if (lastMsg?.sender !== 'user') return;
+    const timer = setTimeout(() => setTypedFor(lastMsg.id), 1500);
+    return () => clearTimeout(timer);
+  }, [lastMsg]);
 
   const handleSend = () => {
     if (!inputValue.trim()) return;

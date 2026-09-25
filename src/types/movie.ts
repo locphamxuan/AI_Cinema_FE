@@ -1,9 +1,9 @@
 export interface AIComplianceInfo {
-  aiModel: string;
-  generatedDate: string;
+  aiModel?: string;
+  generatedDate?: string;
   complianceArticle: string;
   reviewStatus: 'approved' | 'pending' | 'flagged';
-  moderationScore: number;
+  moderationScore?: number;
   contentRating: string;
   disclaimer: string;
 }
@@ -26,12 +26,21 @@ export interface EpisodeVersion {
   duration: string;
 }
 
+export interface SubtitleTrack {
+  language: string;
+  label: string;
+  src: string;
+}
+
 export interface Episode {
   id: string;
   episodeNumber: number;
   title: string;
   duration: string;
   hlsUrl: string;
+  /** HLS renditions the episode is encoded in, lowest first, e.g. ['360p', '720p', '1080p']. */
+  qualities: string[];
+  subtitles: SubtitleTrack[];
   thumbnailUrl: string;
   price: number;
   isFree: boolean;
@@ -54,8 +63,7 @@ export interface Movie {
   aiCompliance: AIComplianceInfo;
   totalEpisodes: number;
   matchScore?: number; // Ví dụ: 98 (98% Phù hợp)
-  quality?: string;    // '4K UHD', 'HD'
-  audioQuality?: string; // 'Dolby Atmos', 'Spatial Audio'
+  quality?: string;    // highest rendition of its episodes, e.g. '1080p'
   ageRating?: string;  // 'T16', 'T18', 'P'
   badge?: string;      // 'Mới', 'Thịnh hành', 'Độc quyền AI'
 }

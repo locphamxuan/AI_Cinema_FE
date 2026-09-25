@@ -13,7 +13,7 @@ export interface RejectPlanModalProps {
 /** Confirms sending the plan back; the text starts as a summary of every field the Reviewer flagged. */
 export function RejectPlanModal({ open, onClose, onConfirm, feedback, onFeedbackChange }: RejectPlanModalProps) {
   return (
-    <Modal open={open} onClose={onClose} title="Trả kế hoạch về để sửa" subtitle="Người sản xuất sẽ thấy nội dung này cùng các ghi chú ở từng mục." maxWidth="max-w-md">
+    <Modal open={open} onClose={onClose} title="Trả kế hoạch về để sửa" subtitle="Creator sẽ thấy nội dung này cùng ghi chú ở từng mục." maxWidth="max-w-md">
       <FormField label="Nội dung phản hồi">
         <textarea
           rows={6}

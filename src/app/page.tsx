@@ -7,18 +7,26 @@ import CategoryPills from '@/components/home/CategoryPills';
 import MovieRow from '@/components/home/MovieRow';
 import TopTenRow from '@/components/home/TopTenRow';
 
-const emptyMovieList: any[] = [];
-
 export default function HomePage() {
-  const { isAuthenticated, isVIPMode, currentMovie } = useAppStore();
+  const { isAuthenticated, isVIPMode, movies, selectedGenre, isCatalogLoading, catalogError } = useAppStore();
 
   // If not logged in -> Show Netflix-style Landing Page
   if (!isAuthenticated) {
     return <LandingHero />;
   }
 
-  // Top 5 hot movies for Full-Width Hero Carousel
-  const hotMovies = emptyMovieList.slice(0, 5);
+  // The catalog comes back newest first; the hero and top rows take the head of it.
+  const hotMovies = movies.slice(0, 5);
+  const visibleMovies = selectedGenre === 'Tất cả' ? movies : movies.filter((m) => m.genre.includes(selectedGenre));
+  const freeFirstEpisode = visibleMovies.filter((m) => m.episodes[0]?.isFree);
+
+  if (movies.length === 0) {
+    return (
+      <div className="py-24 text-center text-sm text-muted-light">
+        {isCatalogLoading ? 'Đang tải danh sách phim...' : catalogError || 'Chưa có phim nào được phát hành.'}
+      </div>
+    );
+  }
 
   // If logged in -> Show Full Premium OTT Streaming Dashboard
   return (
@@ -30,31 +38,27 @@ export default function HomePage() {
       <CategoryPills />
 
       {/* 3. Netflix-Style Top 10 Ranked Row */}
-      <TopTenRow movies={emptyMovieList} />
+      <TopTenRow movies={movies.slice(0, 10)} />
 
-      {/* 4. Trending AI Movies Horizontal Row */}
-      <MovieRow
-        title="Phim AI Đang Thịnh Hành"
-        subtitle="Các tác phẩm được cộng đồng xem nhiều nhất trong tuần"
-        movies={emptyMovieList}
-        exploreHref="/watch/ep-001"
-      />
+      {/* 4. Latest releases, filtered by the selected genre pill */}
+      {visibleMovies.length > 0 ? (
+        <MovieRow
+          title="Phim AI Mới Phát Hành"
+          subtitle={selectedGenre === 'Tất cả' ? 'Các tác phẩm vừa được phát hành' : `Thể loại ${selectedGenre}`}
+          movies={visibleMovies}
+        />
+      ) : (
+        <p className="px-1 text-sm text-muted-light">Chưa có phim thuộc thể loại {selectedGenre}.</p>
+      )}
 
-      {/* 5. Personalized Recommendation Row */}
-      <MovieRow
-        title="Gợi Ý Dành Riêng Cho Bạn"
-        subtitle="Dựa trên thể loại AI & Cyberpunk bạn vừa xem"
-        movies={emptyMovieList}
-        exploreHref="/watch/ep-002"
-      />
-
-      {/* 6. AI Cinema Studio Originals */}
-      <MovieRow
-        title="Tác Phẩm Độc Quyền AI Cinema"
-        subtitle="Sản xuất bằng mô hình Sora Vision Pro & CinemaGen v3.2"
-        movies={emptyMovieList}
-        exploreHref="/watch/ep-001"
-      />
+      {/* 5. Movies whose first episode is free to watch */}
+      {freeFirstEpisode.length > 0 && (
+        <MovieRow
+          title="Xem Miễn Phí Tập Đầu"
+          subtitle="Tập 1 không tốn Coin"
+          movies={freeFirstEpisode}
+        />
+      )}
     </div>
   );
 }

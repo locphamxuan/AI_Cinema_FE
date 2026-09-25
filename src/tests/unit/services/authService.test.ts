@@ -1,86 +1,78 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { authService, mapBERoleToFE, mapBEUserToFEProfile } from '@/services/authService';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { authService, redirectUrlFor, toUserProfile } from '@/services/authService';
+import { STORAGE_KEYS } from '@/lib/storage';
 
-describe('Auth Service (src/services/authService.ts)', () => {
+const session = {
+  accessToken: 'access-token',
+  refreshToken: 'refresh-token',
+  user: {
+    id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+    email: 'reviewer@aicinema.com',
+    fullName: 'Le Quoc Bao',
+    role: 'CONTENT_REVIEWER' as const,
+    isActive: true,
+  },
+};
+
+function mockFetch(body: unknown, ok = true, status = 200) {
+  const fetchMock = vi.fn().mockResolvedValue({
+    ok,
+    status,
+    json: async () => body,
+  });
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
+
+describe('authService', () => {
   beforeEach(() => {
-    storage.remove(STORAGE_KEYS.AUTH_TOKEN);
-    storage.remove(STORAGE_KEYS.USER_DATA);
+    localStorage.clear();
+    vi.unstubAllGlobals();
   });
 
-  describe('Role & Profile Mapping', () => {
-    it('maps BE roles correctly to FE roles', () => {
-      expect(mapBERoleToFE('CONTENT_CREATOR')).toBe('creator');
-      expect(mapBERoleToFE('CONTENT_REVIEWER')).toBe('reviewer');
-      expect(mapBERoleToFE('ADMIN')).toBe('admin');
-      expect(mapBERoleToFE('STAFF')).toBe('admin');
-      expect(mapBERoleToFE('MEMBER')).toBe('user');
-      expect(mapBERoleToFE(undefined)).toBe('user');
-    });
-
-    it('transforms BE user response into FE UserProfile', () => {
-      const beUser = {
-        id: 'uuid-1234',
-        email: 'creator@aicinema.vn',
-        fullName: 'Đạo Diễn Test',
-        role: 'CONTENT_CREATOR',
-        isActive: true,
-      };
-
-      const profile = mapBEUserToFEProfile(beUser);
-      expect(profile.id).toBe('uuid-1234');
-      expect(profile.name).toBe('Đạo Diễn Test');
-      expect(profile.email).toBe('creator@aicinema.vn');
-      expect(profile.role).toBe('creator');
-      expect(profile.isVIP).toBe(true);
-      expect(profile.avatarUrl).toBeDefined();
-    });
+  it('maps backend roles onto the UI role model', () => {
+    expect(toUserProfile(session.user).role).toBe('reviewer');
+    expect(toUserProfile({ ...session.user, role: 'CONTENT_CREATOR' }).role).toBe('creator');
+    expect(toUserProfile({ ...session.user, role: 'MEMBER' }).role).toBe('user');
   });
 
-  describe('Login & Demo Fallback', () => {
-    it('supports demo login for creator@gmail.com with password 1', async () => {
-      const res = await authService.login({
-        email: 'creator@gmail.com',
-        password: '1',
-      });
-
-      expect(res.success).toBe(true);
-      expect(res.data.user.role).toBe('creator');
-      expect(res.data.redirectUrl).toBe('/creator/projects');
-      expect(storage.getString(STORAGE_KEYS.AUTH_TOKEN)).toBeDefined();
-    });
-
-    it('supports demo login for reviewer@gmail.com with password 1', async () => {
-      const res = await authService.login({
-        email: 'reviewer@gmail.com',
-        password: '1',
-      });
-
-      expect(res.success).toBe(true);
-      expect(res.data.user.role).toBe('reviewer');
-      expect(res.data.redirectUrl).toBe('/reviewer');
-    });
-
-    it('fails on invalid password without demo fallback', async () => {
-      const res = await authService.login({
-        email: 'nonexistent@example.com',
-        password: 'wrongpassword',
-      });
-
-      expect(res.success).toBe(false);
-      expect(res.message).toBeDefined();
-    });
+  it('sends creators and reviewers to their workspace after login', () => {
+    expect(redirectUrlFor('creator')).toBe('/creator/projects');
+    expect(redirectUrlFor('reviewer')).toBe('/reviewer');
+    expect(redirectUrlFor('user')).toBeUndefined();
   });
 
-  describe('Logout', () => {
-    it('clears stored token and user data on logout', async () => {
-      storage.set(STORAGE_KEYS.AUTH_TOKEN, 'test_token');
-      storage.set(STORAGE_KEYS.USER_DATA, { id: '1', name: 'Test' });
+  it('stores the tokens so later requests are authenticated', async () => {
+    const fetchMock = mockFetch(session);
 
-      const res = await authService.logout();
-      expect(res.success).toBe(true);
-      expect(storage.getString(STORAGE_KEYS.AUTH_TOKEN)).toBe('');
-      expect(storage.get(STORAGE_KEYS.USER_DATA, null)).toBeNull();
-    });
+    const res = await authService.login({ email: 'Reviewer@AiCinema.com ', password: 'secret123' });
+
+    expect(res.success).toBe(true);
+    expect(res.data.name).toBe('Le Quoc Bao');
+    expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBe('access-token');
+    expect(localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)).toBe('refresh-token');
+
+    const [, init] = fetchMock.mock.calls[0];
+    expect(JSON.parse(init.body as string).email).toBe('reviewer@aicinema.com');
+  });
+
+  it('reports the backend error and keeps no session on bad credentials', async () => {
+    mockFetch({ message: 'Incorrect email or password' }, false, 401);
+
+    const res = await authService.login({ email: 'reviewer@aicinema.com', password: 'wrong' });
+
+    expect(res.success).toBe(false);
+    expect(res.message).toBe('Incorrect email or password');
+    expect(authService.hasSession()).toBe(false);
+  });
+
+  it('clears the stored session on logout', async () => {
+    mockFetch(session);
+    await authService.login({ email: 'reviewer@aicinema.com', password: 'secret123' });
+
+    authService.logout();
+
+    expect(authService.hasSession()).toBe(false);
+    expect(authService.getStoredUser()).toBeNull();
   });
 });

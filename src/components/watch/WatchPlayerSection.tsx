@@ -5,89 +5,56 @@ import { useAppStore } from '@/store/useAppStore';
 import { Episode, EpisodeVersion } from '@/types/movie';
 import ComplianceDrawer from './ComplianceDrawer';
 import EpisodeVersionDrawer from './EpisodeVersionDrawer';
-import Hls from 'hls.js';
+import { QualitySelect } from './QualitySelect';
+import EpisodePlaylist from './EpisodePlaylist';
+import { useHlsPlayer } from './useHlsPlayer';
+
+function defaultVersion(episode: Episode | null): EpisodeVersion | null {
+  if (!episode?.versions?.length) return null;
+  return episode.versions.find((v) => v.isCurrent) || episode.versions[0];
+}
 
 interface WatchPlayerSectionProps {
   episodeId?: string;
 }
 
 export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProps) {
-  const { currentMovie, isVIPMode, subscription, openUnlockModal } = useAppStore();
+  const { currentMovie, isVIPMode, subscription, openUnlockModal, selectEpisode, isCatalogLoading } = useAppStore();
+  // An active membership opens every episode, like VIP (MF-2).
+  const hasPass = isVIPMode || subscription?.status === 'active';
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hlsRef = useRef<Hls | null>(null);
-  const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
-  const [activeVersion, setActiveVersion] = useState<EpisodeVersion | null>(null);
+  // The episode picked in the list (for the route it was picked on) and the version picked for it.
+  const [picked, setPicked] = useState<{ route?: string; episodeId: string } | null>(null);
+  const [pickedVersion, setPickedVersion] = useState<{ episodeId: string; version: EpisodeVersion } | null>(null);
   const [showComplianceDrawer, setShowComplianceDrawer] = useState(false);
   const [showVersionDrawer, setShowVersionDrawer] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [versionToast, setVersionToast] = useState<string | null>(null);
 
-  // Determine current episode and its default version
   useEffect(() => {
-    const ep = currentMovie.episodes.find((e) => e.id === episodeId) || currentMovie.episodes[0];
-    setCurrentEpisode(ep);
+    if (episodeId) selectEpisode(episodeId);
+  }, [episodeId, selectEpisode]);
 
-    if (ep?.versions && ep.versions.length > 0) {
-      const defaultVer = ep.versions.find((v) => v.isCurrent) || ep.versions[0];
-      setActiveVersion(defaultVer);
-    } else {
-      setActiveVersion(null);
-    }
-  }, [episodeId, currentMovie.episodes]);
+  // The route's episode unless one was picked from the list since; its current version unless another was picked.
+  const shownId = picked && picked.route === episodeId ? picked.episodeId : episodeId;
+  const currentEpisode = currentMovie?.episodes.find((e) => e.id === shownId) || currentMovie?.episodes[0] || null;
+  const activeVersion =
+    pickedVersion && pickedVersion.episodeId === currentEpisode?.id ? pickedVersion.version : defaultVersion(currentEpisode);
 
-  // Can the user play this episode? (Step 3: Mở quyền xem toàn bộ phim)
+  // Can the user play this episode?
   const canPlay = currentEpisode
-    ? isVIPMode || subscription?.status === 'active' || currentEpisode.isFree || currentEpisode.isUnlocked
+    ? hasPass || currentEpisode.isFree || currentEpisode.isUnlocked
     : false;
 
   // Stream URL: use active version's HLS URL if available, else episode default
   const streamUrl = activeVersion ? activeVersion.hlsUrl : currentEpisode?.hlsUrl;
 
-  // Setup HLS player
-  useEffect(() => {
-    if (!currentEpisode || !videoRef.current || !streamUrl) return;
-
-    const video = videoRef.current;
-
-    if (hlsRef.current) {
-      hlsRef.current.destroy();
-      hlsRef.current = null;
-    }
-
-    if (canPlay) {
-      if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(streamUrl);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          video.play().catch(() => {});
-        });
-        hlsRef.current = hls;
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = streamUrl;
-        video.addEventListener('loadedmetadata', () => {
-          video.play().catch(() => {});
-        });
-      }
-    } else {
-      // For locked episodes, load but limit to 30s preview
-      if (currentEpisode.isPreview) {
-        if (Hls.isSupported()) {
-          const hls = new Hls();
-          hls.loadSource(streamUrl);
-          hls.attachMedia(video);
-          hlsRef.current = hls;
-        }
-      }
-    }
-
-    return () => {
-      if (hlsRef.current) {
-        hlsRef.current.destroy();
-        hlsRef.current = null;
-      }
-    };
-  }, [currentEpisode, canPlay, streamUrl]);
+  const { levels, level, selectLevel: handleSelectLevel } = useHlsPlayer(videoRef, {
+    enabled: !!currentEpisode,
+    streamUrl,
+    canPlay,
+    isPreview: !!currentEpisode?.isPreview,
+  });
 
   // 30s trailer limit for locked content
   useEffect(() => {
@@ -106,26 +73,29 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   }, [canPlay, currentEpisode, openUnlockModal]);
 
   const handleEpisodeClick = (ep: Episode) => {
-    const canPlayEp = isVIPMode || ep.isFree || ep.isUnlocked;
+    const canPlayEp = hasPass || ep.isFree || ep.isUnlocked;
     if (canPlayEp) {
-      setCurrentEpisode(ep);
-      if (ep.versions && ep.versions.length > 0) {
-        const defaultVer = ep.versions.find((v) => v.isCurrent) || ep.versions[0];
-        setActiveVersion(defaultVer);
-      }
+      setPicked({ route: episodeId, episodeId: ep.id });
+      setPickedVersion(null);
     } else {
       openUnlockModal(ep.id);
     }
   };
 
   const handleSelectVersion = (version: EpisodeVersion) => {
-    setActiveVersion(version);
+    if (currentEpisode) setPickedVersion({ episodeId: currentEpisode.id, version });
     setShowVersionDrawer(false);
     setVersionToast(`Đã chuyển sang ${version.versionNumber}: ${version.versionTitle}`);
     setTimeout(() => setVersionToast(null), 3500);
   };
 
-  if (!currentEpisode) return null;
+  if (!currentMovie || !currentEpisode) {
+    return (
+      <div className="py-24 text-center text-sm text-muted-light">
+        {isCatalogLoading ? 'Đang tải phim...' : 'Không tìm thấy tập phim này hoặc tập chưa được phát hành.'}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col lg:flex-row gap-8">
@@ -146,7 +116,18 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
               playsInline
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
-            />
+            >
+              {currentEpisode.subtitles.map((track, index) => (
+                <track
+                  key={`${currentEpisode.id}-${track.language}`}
+                  kind="subtitles"
+                  src={track.src}
+                  srcLang={track.language}
+                  label={track.label}
+                  default={index === 0}
+                />
+              ))}
+            </video>
 
             {/* Locked Overlay */}
             {!canPlay && (
@@ -205,9 +186,15 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                   👑 VIP Member
                 </span>
               )}
-              <span className="quality-badge">4K UHD</span>
-              <span className="quality-badge">HDR10+</span>
-              <span className="quality-badge">Dolby Atmos</span>
+              {currentEpisode.qualities.length > 0 && (
+                <span className="quality-badge">{currentEpisode.qualities.at(-1)}</span>
+              )}
+              {currentEpisode.subtitles.length > 0 && (
+                <span className="quality-badge" title="Phụ đề có sẵn">
+                  CC · {currentEpisode.subtitles.map((track) => track.label).join(', ')}
+                </span>
+              )}
+              {levels.length > 1 && <QualitySelect levels={levels} value={level} onChange={handleSelectLevel} />}
               <span className="text-muted-light text-xs font-mono">{currentEpisode.duration}</span>
             </div>
 
@@ -286,102 +273,13 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
         />
       </div>
 
-      {/* RIGHT: Episode List / Playlist */}
-      <div className="w-full lg:w-88 shrink-0 space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <h3 className="text-sm font-bold text-slate-700 dark:text-muted-light uppercase tracking-wider">
-            Danh sách tập ({currentMovie.totalEpisodes} tập)
-          </h3>
-          <span className="text-xs text-neon font-mono font-semibold">HLS Audio Synced</span>
-        </div>
-
-        <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1 no-scrollbar">
-          {currentMovie.episodes.map((ep) => {
-            const isActive = currentEpisode?.id === ep.id;
-            const canPlayEp = isVIPMode || ep.isFree || ep.isUnlocked;
-
-            return (
-              <button
-                key={ep.id}
-                onClick={() => handleEpisodeClick(ep)}
-                className={`w-full flex items-center gap-3.5 p-3 rounded-2xl text-left transition-all cursor-pointer border ${
-                  isActive
-                    ? 'bg-white dark:bg-ruby/[0.08] border-ruby/60 shadow-lg shadow-ruby/15 ring-1 ring-ruby/30'
-                    : 'bg-white dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 shadow-sm'
-                }`}
-              >
-                {/* Thumbnail */}
-                <div className="relative w-28 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-200 dark:bg-[#161922] border border-slate-200 dark:border-white/10">
-                  <img
-                    src={ep.thumbnailUrl}
-                    alt={ep.title}
-                    className="w-full h-full object-cover"
-                  />
-                  {!canPlayEp && (
-                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                      <span className="text-base">🔒</span>
-                    </div>
-                  )}
-                  {isActive && isPlaying && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <div className="flex items-end gap-1 h-4">
-                        {[1, 2, 3, 4].map((i) => (
-                          <div
-                            key={i}
-                            className="w-1 bg-ruby rounded-full animate-pulse"
-                            style={{
-                              height: `${6 + i * 3}px`,
-                              animationDelay: `${i * 0.15}s`,
-                            }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Episode Details */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`text-xs font-bold ${
-                        isActive ? 'text-ruby' : 'text-slate-500 dark:text-muted-light'
-                      }`}
-                    >
-                      Tập {ep.episodeNumber}
-                    </span>
-                    {ep.isFree && (
-                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-verified/20 border border-verified/30 text-verified font-bold">
-                        FREE
-                      </span>
-                    )}
-                    {ep.versions && (
-                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-muted-light font-mono">
-                        {ep.currentVersion || 'v1.0'}
-                      </span>
-                    )}
-                  </div>
-
-                  <p
-                    className={`text-sm truncate font-semibold mt-0.5 ${
-                      isActive ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-muted-light'
-                    }`}
-                  >
-                    {ep.title}
-                  </p>
-
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-[10px] text-muted font-mono">{ep.duration}</span>
-                    {!canPlayEp && !ep.isFree && (
-                      <span className="text-[11px] text-coin font-bold">🪙 {ep.price} Coin</span>
-                    )}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <EpisodePlaylist
+        movie={currentMovie}
+        currentEpisodeId={currentEpisode.id}
+        isPlaying={isPlaying}
+        canPlay={(ep) => hasPass || ep.isFree || ep.isUnlocked}
+        onSelect={handleEpisodeClick}
+      />
     </div>
   );
 }

@@ -1,127 +1,157 @@
 import type { StateCreator } from 'zustand';
-import { GeneratedAsset } from '@/types/workflow';
 import type { ProductionSlice, WorkflowStoreState } from '../types';
 import { toast } from '@/components/ui/Toast';
-import { settleGenerationStep } from '@/features/workflow/lib/tokenCost';
+import { workflowService } from '@/services/workflowService';
+import { buildSceneJobs, isDraftStep, JOB_TYPE_OF } from '@/features/workflow/lib/jobAdapter';
+import { routeDefaults } from '@/features/workflow/lib/modelRouting';
 import { withProjectUpdate } from './projectRoster';
+import { apiResult } from './apiResult';
 
-export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], ProductionSlice> = (set, get) => ({
-  triggerGenerationJob: async (packageId, jobId) => {
-    const pkg = get().getPackage(packageId);
-    if (!pkg) return false;
+export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], ProductionSlice> = (set, get) => {
+  const reload = () => get().loadProject(get().activeProjectId);
 
-    const job = pkg.jobs.find((j) => j.id === jobId);
-    if (!job || job.generation_steps.length === 0) return false;
+  /** Marks a scene row as generating while its jobs run. */
+  const markGenerating = (packageId: string, sceneJobId: string) =>
+    set((state) =>
+      withProjectUpdate(state, (project) => ({
+        ...project,
+        episodes: project.episodes.map((ep) =>
+          ep.id !== packageId ? ep : { ...ep, jobs: ep.jobs.map((j) => (j.id === sceneJobId ? { ...j, status: 'processing' } : j)) }
+        ),
+      }))
+    );
 
-    // Check token quota against the estimated cost; actual cost is settled from output length below
-    const currentTokens = pkg.actual_tokens_used;
-    const quota = pkg.quota_allocated;
-    const estimatedCost = job.generation_steps.reduce((sum, s) => sum + s.token_cost, 0);
+  return {
+    routing: [],
 
-    if (quota > 0 && currentTokens + estimatedCost > quota) {
-      toast.error(
-        'Vượt quá hạn mức Token Quota!',
-        `Đã dùng ${currentTokens}/${quota} Tokens, cần thêm ${estimatedCost} Tokens. Vui lòng xin cấp thêm Quota.`
+    loadRouting: async () => {
+      if (get().routing.length > 0) return;
+      const res = await workflowService.getRouting();
+      if (res.success) set({ routing: res.data });
+    },
+
+    routeStep: async (packageId, sceneJobId, stepId, change) => {
+      get().updateGenerationStep(packageId, sceneJobId, stepId, { ...change, ...routeDefaults(get().routing, change) });
+      const described = change.function_type === 'CUSTOM' ? change.custom_function?.trim() : '';
+      if (!described) return;
+
+      const res = await workflowService.resolveRoute('CUSTOM', described);
+      if (!res.success) return;
+      const step = get().getJobs(packageId).find((j) => j.id === sceneJobId)?.generation_steps.find((s) => s.id === stepId);
+      // A newer description replaced this one while the request was in flight.
+      if (step?.function_type !== 'CUSTOM' || step.custom_function?.trim() !== described) return;
+      get().updateGenerationStep(packageId, sceneJobId, stepId, {
+        selected_model: res.data.model,
+        token_cost: res.data.estimatedTokenCost,
+        model_match: res.data.match,
+      });
+    },
+
+    loadJobs: async (packageId) => {
+      const res = await workflowService.listJobs(packageId);
+      if (!res.success) return;
+      set((state) =>
+        withProjectUpdate(state, (project) => ({
+          ...project,
+          episodes: project.episodes.map((ep) => (ep.id === packageId ? { ...ep, ...buildSceneJobs(ep, res.data, ep.jobs) } : ep)),
+        }))
       );
-      return false;
-    }
+    },
 
-    // Step 1: Set job + every step to processing
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'IN_PRODUCTION',
-            jobs: ep.jobs.map((j) =>
-              j.id === jobId
-                ? {
-                    ...j,
-                    status: 'processing',
-                    progress: 25,
-                    generation_steps: j.generation_steps.map((s) => ({ ...s, status: 'processing' })),
-                    updated_at: new Date().toISOString(),
-                  }
-                : j
-            ),
-          };
-        }),
-      }))
-    );
+    triggerGenerationJob: async (packageId, sceneJobId) => {
+      const row = get().getJobs(packageId).find((j) => j.id === sceneJobId);
+      if (!row) return false;
 
-    // Step 2: Animated progression simulation
-    await new Promise((resolve) => setTimeout(resolve, 600));
+      // A custom step needs its function described before the backend can route it.
+      const drafts = row.generation_steps.filter(
+        (s) => isDraftStep(s) && s.prompt.trim() && (s.function_type !== 'CUSTOM' || s.custom_function?.trim())
+      );
+      const saved = row.generation_steps.filter((s) => !isDraftStep(s));
+      if (drafts.length === 0 && saved.length === 0) {
+        toast.warning('Chưa có nội dung', 'Thêm ít nhất một mục có mô tả trước khi tạo clip.');
+        return false;
+      }
 
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            jobs: ep.jobs.map((j) => (j.id === jobId ? { ...j, progress: 70 } : j)),
-          };
-        }),
-      }))
-    );
+      markGenerating(packageId, sceneJobId);
+      let ok = true;
+      if (drafts.length > 0) {
+        for (const step of drafts) {
+          const job = await apiResult(
+            workflowService.createJob(packageId, {
+              jobType: JOB_TYPE_OF[step.function_type],
+              prompt: step.prompt,
+              customFunction: step.function_type === 'CUSTOM' ? step.custom_function : undefined,
+              sceneId: row.scene_id,
+            }),
+            'Không tạo được yêu cầu'
+          );
+          if (!job || !(await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại'))) {
+            ok = false;
+            break;
+          }
+          // The step is now a backend job; drop the draft so a reload does not show it twice.
+          get().removeGenerationStep(packageId, sceneJobId, step.id);
+        }
+      } else {
+        // Regenerating: a new attempt of every saved step, charged again (BR-41).
+        for (const step of saved) {
+          const job = await apiResult(workflowService.retryJob(step.id), 'Không tạo lại được');
+          if (!job || !(await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại'))) {
+            ok = false;
+            break;
+          }
+        }
+      }
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
+      await reload();
+      return ok;
+    },
 
-    // Step 3: Complete job + every step with output-based token cost, create one output asset for the scene
-    const settledSteps = job.generation_steps.map((s) => ({ ...s, status: 'completed' as const, ...settleGenerationStep(s) }));
-    const cost = settledSteps.reduce((sum, s) => sum + s.token_cost, 0);
-    const newAssetId = `asset-${Date.now()}`;
-    const newAsset: GeneratedAsset = {
-      id: newAssetId,
-      job_id: jobId,
-      scene_id: job.scene_id,
-      asset_type: 'video',
-      url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-      thumbnail_url: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80',
-      duration_seconds: 20,
-      resolution: '3840x2160 (4K)',
-      file_size_mb: 78.5,
-      metadata: {
-        fps: 60,
-        codec: 'H.265 / HEVC',
-        model: job.generation_steps.map((s) => s.selected_model).join(', '),
-        seed: Math.floor(Math.random() * 1000000),
-        prompt: job.generation_steps.map((s) => s.prompt).join(' | '),
-      },
-      created_at: new Date().toISOString(),
-    };
+    regenerateStep: async (packageId, sceneJobId, stepId, prompt) => {
+      markGenerating(packageId, sceneJobId);
+      const job = await apiResult(workflowService.retryJob(stepId, prompt.trim()), 'Không tạo lại được');
+      const ok = Boolean(job && (await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại')));
+      await reload();
+      return ok;
+    },
 
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        consumed_tokens: project.consumed_tokens + cost,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'IN_PRODUCTION',
-            actual_tokens_used: ep.actual_tokens_used + cost,
-            jobs: ep.jobs.map((j) =>
-              j.id === jobId
-                ? {
-                    ...j,
-                    status: 'completed',
-                    progress: 100,
-                    token_cost: cost,
-                    generation_steps: settledSteps,
-                    output_asset_id: newAssetId,
-                    updated_at: new Date().toISOString(),
-                  }
-                : j
-            ),
-            assets: [...ep.assets.filter((a) => a.job_id !== jobId), newAsset],
-          };
-        }),
-      }))
-    );
+    discardStep: async (packageId, sceneJobId, stepId) => {
+      const ok = (await apiResult(workflowService.discardJob(stepId), 'Không xóa được mục này')) !== null;
+      if (ok) await get().loadJobs(packageId);
+      return ok;
+    },
 
-    return true;
-  },
-});
+    updateSceneDirection: async (sceneId, data) => {
+      const ok = (await apiResult(workflowService.updateSceneDirection(sceneId, data), 'Không lưu được cảnh')) !== null;
+      if (ok) await reload();
+      return ok;
+    },
+
+    resetScene: async (sceneId) => {
+      const ok = (await apiResult(workflowService.resetScene(sceneId), 'Không làm lại được cảnh')) !== null;
+      if (ok) await reload();
+      return ok;
+    },
+
+    submitEpisodePackage: async (packageId) => {
+      const pkg = get().getPackage(packageId);
+      if (!pkg) return false;
+
+      const detail = await apiResult(workflowService.getProject(pkg.project_id), 'Không tải được kế hoạch');
+      const scenes = detail?.productionPlans?.find((p) => p.id === packageId)?.scenes;
+      if (!scenes) return false;
+
+      for (const scene of scenes.filter((s) => s.status !== 'COMPLETED')) {
+        if ((await apiResult(workflowService.submitScene(scene.id), `Cảnh ${scene.sceneNumber} chưa tạo xong`)) === null) {
+          await reload();
+          return false;
+        }
+      }
+
+      const assembled = await apiResult(workflowService.createEpisodePackage(packageId), 'Không đóng gói được tập phim');
+      const submitted = assembled && (await apiResult(workflowService.submitEpisodePackage(assembled.id), 'Không gửi được bản dựng'));
+      await reload();
+      return Boolean(submitted);
+    },
+  };
+};

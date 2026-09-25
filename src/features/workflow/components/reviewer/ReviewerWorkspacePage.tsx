@@ -5,8 +5,10 @@ import { LayoutDashboard, ClipboardCheck, ShieldCheck, Zap, Film, Tv } from 'luc
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
 import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
+import { MilestoneTimeline } from '../shared/MilestoneTimeline';
 import { reviewerGroups } from '@/features/workflow/lib/projectGroups';
 import { availableBudget, summarizeFlaggedFields } from '@/features/workflow/lib/planVerdict';
+import { pendingQuotaRequest } from '@/features/workflow/lib/quota';
 import { OverviewTab } from './tabs/OverviewTab';
 import { PlanReviewTab } from './tabs/PlanReviewTab';
 import { AuditsTab } from './tabs/AuditsTab';
@@ -16,40 +18,50 @@ import { AllocateQuotaModal } from './modals/AllocateQuotaModal';
 import { RejectPlanModal } from './modals/RejectPlanModal';
 import { CreateProjectModal, type CreateProjectFormState } from './modals/CreateProjectModal';
 import { toast } from '@/components/ui/Toast';
+import { DEFAULT_SUBTITLE_LANGUAGE } from '@/constants/languages';
+import { useCan } from '@/hooks/useCan';
+import { PERMISSION } from '@/lib/permissions';
 
 type ReviewerTab = 'overview' | 'plans' | 'audits' | 'publication' | 'tokens';
 
-const DEFAULT_FORM: CreateProjectFormState = {
+/** yyyy-mm-dd of today shifted by some days, in local time. */
+const dateFromToday = (days: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date.toLocaleDateString('en-CA');
+};
+
+/** A fresh form: production starts today, wraps in 3 months and releases a month later. */
+const defaultForm = (): CreateProjectFormState => ({
   title: '',
-  assignedCreator: 'Trần Minh Huy',
-  genre: ['Khoa học viễn tưởng', 'Hành động AI'],
+  assignedCreator: '',
+  genre: [],
   synopsis: '',
-  seasonCount: 1,
-  episodesPerSeason: 5,
-  episodeDurations: [30, 30, 30, 30, 30],
+  seasons: [[30, 30, 30, 30, 30]],
+  subtitleLanguages: [DEFAULT_SUBTITLE_LANGUAGE],
   budgetTokens: 3000,
-  productionStartDate: '2026-09-17',
-  deadline: '2026-12-31',
-  releaseDate: '2027-01-15',
+  productionStartDate: dateFromToday(0),
+  deadline: dateFromToday(90),
+  releaseDate: dateFromToday(120),
   milestones: [
     {
       id: 'ms-init-1',
-      title: 'Cột mốc 1: Khởi tạo kịch bản & phân cảnh',
-      startDate: '2026-09-17',
-      deadline: '2026-10-15',
-      description: 'Hoàn thành bản kịch bản chi tiết và danh sách cảnh phim.',
+      title: 'Kịch bản và chia cảnh',
+      startDate: dateFromToday(0),
+      deadline: dateFromToday(30),
+      description: 'Chốt kịch bản và danh sách cảnh.',
       status: 'in_progress',
     },
     {
       id: 'ms-init-2',
-      title: 'Cột mốc 2: Sản xuất AI Video & Nộp duyệt',
-      startDate: '2026-10-16',
-      deadline: '2026-11-15',
-      description: 'Render clip 4K và gửi Thẩm định viên kiểm định.',
+      title: 'Sản xuất và gửi duyệt',
+      startDate: dateFromToday(31),
+      deadline: dateFromToday(60),
+      description: 'Tạo clip, ghép tập và gửi Reviewer kiểm định.',
       status: 'pending',
     },
   ],
-};
+});
 
 /**
  * Reviewer's entry point after login: left sidebar holds the film lists
@@ -68,7 +80,9 @@ export function ReviewerWorkspacePage() {
     allocateQuota,
     requestPlanChanges,
     loadProjects,
+    maxEpisodeMinutes,
   } = useWorkflowStore();
+  const can = useCan();
 
   useEffect(() => {
     loadProjects();
@@ -86,14 +100,13 @@ export function ReviewerWorkspacePage() {
   }, [activeTab, activePackageId]);
 
   const [isCreateProjectOpen, setIsCreateProjectOpen] = useState(false);
-  const [createForm, setCreateForm] = useState<CreateProjectFormState>(DEFAULT_FORM);
+  const [createForm, setCreateForm] = useState<CreateProjectFormState>(defaultForm);
 
   const hasSelection = projects.some((p) => p.id === activeProjectId);
   const currentPackage = hasSelection ? project.episodes.find((e) => e.id === activePackageId) || project.episodes[0] : undefined;
 
   const [isQuotaModalOpen, setIsQuotaModalOpen] = useState(false);
-  const [quotaToAllocate, setQuotaToAllocate] = useState(currentPackage?.quota_allocated || 500);
-  const [quotaNotes, setQuotaNotes] = useState('Đạt tiêu chuẩn nội dung. Cấp phép hạn mức Token sản xuất.');
+  const [quotaToAllocate, setQuotaToAllocate] = useState(0);
 
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectFeedback, setRejectFeedback] = useState('');
@@ -103,13 +116,14 @@ export function ReviewerWorkspacePage() {
     ? project.episodes.filter((e) => e.status === 'EPISODE_SUBMITTED' || e.status === 'COMPLIANCE_PASSED')
     : [];
   const publishReadyEpisodes = hasSelection ? project.episodes.filter((e) => e.status === 'COMPLIANCE_PASSED') : [];
+  const quotaRequestCount = hasSelection ? project.episodes.filter((e) => pendingQuotaRequest(e)).length : 0;
 
   const navItems: SidebarNavItem[] = [
     { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
     { key: 'plans', label: 'Duyệt kế hoạch', icon: ClipboardCheck, badge: pendingPlanEpisodes.length || undefined },
     { key: 'audits', label: 'Kiểm định', icon: ShieldCheck },
     { key: 'publication', label: 'Xuất bản', icon: Tv, badge: publishReadyEpisodes.length || undefined },
-    { key: 'tokens', label: 'Token', icon: Zap },
+    { key: 'tokens', label: 'Token', icon: Zap, badge: quotaRequestCount || undefined },
   ];
 
   const handleSelectProject = (projectId: string) => {
@@ -117,63 +131,67 @@ export function ReviewerWorkspacePage() {
     setActiveTab('overview');
   };
 
-  const handleCreateProjectSubmit = (e: React.FormEvent) => {
+  const handleCreateProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!createForm.title.trim()) return;
+    if (!createForm.title.trim() || !createForm.assignedCreator) return;
+    if (maxEpisodeMinutes !== null && createForm.seasons.flat().some((minutes) => minutes > maxEpisodeMinutes)) {
+      toast.error('Có tập dài hơn mức cho phép', `Mỗi tập tối đa ${maxEpisodeMinutes} phút. Giảm thời lượng các tập được đánh dấu đỏ rồi thử lại.`);
+      return;
+    }
 
-    createProject({
+    const created = await createProject({
       title: createForm.title,
-      creator_name: createForm.assignedCreator,
-      genre: createForm.genre.length > 0 ? createForm.genre : ['Khoa học viễn tưởng'],
-      synopsis: createForm.synopsis || 'Dự án điện ảnh ứng dụng công nghệ GenAI thế hệ mới.',
-      season_count: createForm.seasonCount,
-      episodes_per_season: createForm.episodesPerSeason,
-      episode_target_durations: createForm.episodeDurations,
+      creator_id: createForm.assignedCreator,
+      genre_ids: createForm.genre,
+      subtitle_languages: createForm.subtitleLanguages,
+      synopsis: createForm.synopsis,
+      episodes: createForm.seasons.flatMap((durations, s) => durations.map((minutes) => ({ season_number: s + 1, duration_minutes: minutes }))),
       total_budget_tokens: createForm.budgetTokens,
       production_start_date: createForm.productionStartDate,
       deadline: createForm.deadline,
       planned_release_date: createForm.releaseDate,
       milestones: createForm.milestones,
     });
+    if (!created) return;
 
     setIsCreateProjectOpen(false);
-    setCreateForm(DEFAULT_FORM);
+    setCreateForm(defaultForm());
     setActiveTab('overview');
   };
 
   const openRejectModal = () => {
-    if (currentPackage) setRejectFeedback(summarizeFlaggedFields(project, currentPackage.brief));
+    if (currentPackage) setRejectFeedback(summarizeFlaggedFields(currentPackage.brief));
     setIsRejectModalOpen(true);
   };
 
   const openQuotaModal = () => {
     if (!currentPackage) return;
-    const estimate = currentPackage.brief?.estimated_tokens || 400;
-    const avail = availableBudget(project);
-    const maxAvail = avail + (currentPackage.quota_allocated || 0);
+    // Start from what is already granted, else the Creator's estimate, never more than the budget left.
+    const estimate = currentPackage.brief.estimated_tokens;
+    const maxAvail = availableBudget(project) + currentPackage.quota_allocated;
     const initialQuota = currentPackage.quota_allocated > 0
       ? currentPackage.quota_allocated
-      : Math.min(estimate, Math.max(50, maxAvail));
+      : Math.min(estimate > 0 ? estimate : maxAvail, maxAvail);
     setQuotaToAllocate(initialQuota);
     setIsQuotaModalOpen(true);
   };
 
-  const handleAllocateQuotaConfirm = () => {
+  const handleAllocateQuotaConfirm = async () => {
     if (!currentPackage) return;
-    allocateQuota(currentPackage.id, quotaToAllocate, quotaNotes);
+    if (!(await allocateQuota(currentPackage.id, quotaToAllocate))) return;
     setIsQuotaModalOpen(false);
     toast.success(
-      'Duyệt kế hoạch thành công!',
+      'Đã duyệt kế hoạch',
       `Đã duyệt và cấp ${quotaToAllocate.toLocaleString()} token cho ${currentPackage.title}.`
     );
   };
 
-  const handleRequestChangesConfirm = () => {
+  const handleRequestChangesConfirm = async () => {
     if (!currentPackage || !rejectFeedback.trim()) return;
-    requestPlanChanges(currentPackage.id, rejectFeedback);
+    if (!(await requestPlanChanges(currentPackage.id, rejectFeedback))) return;
     setIsRejectModalOpen(false);
     setRejectFeedback('');
-    toast.info('Đã trả về bản kế hoạch', 'Yêu cầu chỉnh sửa đã được gửi đến Creator.');
+    toast.info('Đã trả kế hoạch về', 'Creator sẽ thấy các ghi chú của bạn.');
   };
 
   return (
@@ -182,7 +200,7 @@ export function ReviewerWorkspacePage() {
         groups={reviewerGroups(projects)}
         selectedProjectId={hasSelection ? activeProjectId : undefined}
         onSelectProject={handleSelectProject}
-        onCreateProject={() => setIsCreateProjectOpen(true)}
+        onCreateProject={can(PERMISSION.PROJECT_MANAGE) ? () => setIsCreateProjectOpen(true) : undefined}
         navItems={navItems}
         activeNavKey={activeTab}
         onNavSelect={(key) => {
@@ -210,6 +228,8 @@ export function ReviewerWorkspacePage() {
           </div>
         ) : (
           <div className="space-y-6">
+            <MilestoneTimeline milestones={project.milestones ?? []} productionStart={project.production_start_date} />
+
             {(activeTab === 'plans' || activeTab === 'audits') && (
               <EpisodeSwitcher episodes={project.episodes} selectedId={currentPackage.id} onSelect={setActivePackage} />
             )}
@@ -247,8 +267,6 @@ export function ReviewerWorkspacePage() {
         quota={quotaToAllocate}
         availableBudget={availableBudget(project)}
         onQuotaChange={setQuotaToAllocate}
-        notes={quotaNotes}
-        onNotesChange={setQuotaNotes}
       />
 
       <RejectPlanModal
@@ -264,10 +282,9 @@ export function ReviewerWorkspacePage() {
         onClose={() => setIsCreateProjectOpen(false)}
         onSubmit={handleCreateProjectSubmit}
         form={createForm}
+        maxEpisodeMinutes={maxEpisodeMinutes}
         onChange={(field, value) => setCreateForm((prev) => ({ ...prev, [field]: value }))}
       />
     </div>
   );
 }
-
-export default ReviewerWorkspacePage;

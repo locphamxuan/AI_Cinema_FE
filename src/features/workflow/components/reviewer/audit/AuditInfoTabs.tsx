@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { EpisodePackage } from '@/types/workflow';
-import { useWorkflowStore } from '@/store/useWorkflowStore';
 
 export interface AuditInfoTabsProps {
   pkg: EpisodePackage;
@@ -8,11 +7,17 @@ export interface AuditInfoTabsProps {
 
 type Tab = 'script' | 'clips' | 'tokens';
 
+const ASSET_LABEL: Record<EpisodePackage['assets'][number]['asset_type'], string> = {
+  video: 'Video',
+  image: 'Hình ảnh',
+  audio: 'Âm thanh',
+  text: 'Văn bản',
+};
+
 const CARD = 'rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#151822]';
 
 /** Reference material for the audit: what was planned, what was rendered, what it cost. */
 export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
-  const overallScript = useWorkflowStore((s) => s.project.overall_script);
   const [tab, setTab] = useState<Tab>('script');
 
   const usedPercent = pkg.quota_allocated > 0 ? Math.min(100, Math.round((pkg.actual_tokens_used / pkg.quota_allocated) * 100)) : 0;
@@ -47,11 +52,11 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
         {tab === 'script' && (
           <div className="space-y-5">
             <div>
-              <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Kịch bản tổng thể</h3>
-              <p className="text-slate-800 dark:text-slate-200 leading-relaxed">{overallScript || 'Chưa có kịch bản tổng thể.'}</p>
+              <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Kịch bản tập này</h3>
+              <p className="text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line">{pkg.brief.script_text || 'Chưa có kịch bản.'}</p>
             </div>
             <div>
-              <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Các phân cảnh</h3>
+              <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Các cảnh</h3>
               <ol className="divide-y divide-slate-100 dark:divide-white/5">
                 {pkg.brief.scene_breakdown.map((sc) => (
                   <li key={sc.scene_number} className="py-3 first:pt-0 last:pb-0">
@@ -73,17 +78,17 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
 
         {tab === 'clips' && (
           <ul className="divide-y divide-slate-100 dark:divide-white/5">
-            {pkg.assets.map((asset, idx) => (
+            {pkg.assets.map((asset) => (
               <li key={asset.id} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
-                {/* eslint-disable-next-line @next/next/no-img-element -- external mock CDN thumbnail, not a static asset */}
-                <img src={asset.thumbnail_url} alt="" width={80} height={48} loading="lazy" className="w-20 h-12 object-cover rounded-md shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-slate-900 dark:text-white">Phân cảnh {idx + 1}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{asset.metadata.prompt}</p>
+                  <p className="font-medium text-slate-900 dark:text-white">
+                    Cảnh {pkg.jobs.find((j) => j.id === asset.job_id)?.scene_number ?? '?'} · {ASSET_LABEL[asset.asset_type]}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{asset.prompt}</p>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 text-right shrink-0 tabular-nums">
-                  {asset.duration_seconds} giây
-                  <span className="block">{asset.resolution}</span>
+                  {asset.duration_seconds !== null && `${asset.duration_seconds} giây`}
+                  <span className="block">{asset.model}</span>
                 </p>
               </li>
             ))}
@@ -103,7 +108,7 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
               <div className="mt-2 h-1.5 rounded-full bg-slate-100 dark:bg-white/10 overflow-hidden">
                 <div className={`h-full rounded-full ${usedPercent >= 90 ? 'bg-amber-500' : 'bg-purple-500'}`} style={{ width: `${usedPercent}%` }} />
               </div>
-              {usedPercent >= 90 && <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">Đã dùng hơn 90% hạn mức được cấp.</p>}
+              {usedPercent >= 90 && <p className="mt-2 text-xs text-amber-700 dark:text-amber-400">Đã dùng hơn 90% số token được cấp.</p>}
             </div>
 
             <ul className="divide-y divide-slate-100 dark:divide-white/5">

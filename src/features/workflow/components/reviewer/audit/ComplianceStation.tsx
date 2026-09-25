@@ -1,16 +1,25 @@
 import { Check } from 'lucide-react';
 import type { DisplayLocation } from '@/types/workflow';
+import type { ComplianceCheckType } from '@/types/workflow-api';
+
+/** Checks the Reviewer answers by hand; AI_LABEL_PRESENCE is evaluated by the backend from the package's labels. */
+export type ManualComplianceCheck = Exclude<ComplianceCheckType, 'AI_LABEL_PRESENCE'>;
+
+export const MANUAL_COMPLIANCE_CHECKS: { type: ManualComplianceCheck; title: string; description: string }[] = [
+  { type: 'CONTENT_POLICY', title: 'Chính sách nội dung (Điều 44)', description: 'Nội dung phù hợp chính sách nền tảng, không có nội dung nhạy cảm.' },
+  { type: 'LEGAL', title: 'Pháp lý (Nghị định 142)', description: 'Đáp ứng quy định pháp luật về nội dung do AI tạo.' },
+  { type: 'COPYRIGHT', title: 'Bản quyền', description: 'Không dùng hình ảnh, âm thanh vi phạm bản quyền.' },
+  { type: 'WATERMARK', title: 'Dấu mờ xác thực', description: 'Video đã có mã xác thực.' },
+  { type: 'REAL_PERSON_LIKENESS', title: 'Không mô phỏng người thật', description: 'Không tái hiện người hay sự kiện có thật.' },
+];
 
 export interface ComplianceStationProps {
   isCompliancePassed: boolean;
   isPassingCompliance: boolean;
-  article44Passed: boolean;
-  onArticle44Change: (value: boolean) => void;
-  decree142Passed: boolean;
-  onDecree142Change: (value: boolean) => void;
-  watermarkVerified: boolean;
-  onWatermarkChange: (value: boolean) => void;
-  certificationId?: string;
+  /** The cut waits for the Reviewer's decision; otherwise nothing can be confirmed. */
+  canConfirm: boolean;
+  checks: Record<ManualComplianceCheck, boolean>;
+  onCheckChange: (type: ManualComplianceCheck, value: boolean) => void;
   displayLocation: DisplayLocation;
   onConfirm: () => void;
 }
@@ -47,17 +56,13 @@ function CheckRow({ title, description, checked, disabled, onChange }: CheckRowP
 export function ComplianceStation({
   isCompliancePassed,
   isPassingCompliance,
-  article44Passed,
-  onArticle44Change,
-  decree142Passed,
-  onDecree142Change,
-  watermarkVerified,
-  onWatermarkChange,
-  certificationId,
+  canConfirm,
+  checks,
+  onCheckChange,
   displayLocation,
   onConfirm,
 }: ComplianceStationProps) {
-  const allChecked = article44Passed && decree142Passed && watermarkVerified;
+  const allChecked = MANUAL_COMPLIANCE_CHECKS.every((c) => checks[c.type]);
   const labelPlacement = displayLocation === 'INTRO_OUTRO' ? 'ở đầu và cuối phim (5 giây)' : 'trong suốt thời lượng phim';
 
   return (
@@ -73,44 +78,32 @@ export function ComplianceStation({
       </div>
 
       <ul className="mt-2 divide-y divide-slate-100 dark:divide-white/5">
-        <CheckRow
-          title="Nhãn nội dung AI (Điều 44)"
-          description="Có thông báo nội dung do AI tạo ở 5 giây đầu."
-          checked={article44Passed}
-          disabled={isCompliancePassed}
-          onChange={onArticle44Change}
-        />
-        <CheckRow
-          title="Dấu mờ bản quyền (Nghị định 142)"
-          description="Đã nhúng mã xác thực trong luồng video."
-          checked={decree142Passed}
-          disabled={isCompliancePassed}
-          onChange={onDecree142Change}
-        />
-        <CheckRow
-          title="An toàn nội dung"
-          description="Kiểm duyệt tự động đạt 99,4%, không phát hiện vi phạm bản quyền hay nội dung nhạy cảm."
-          checked={watermarkVerified}
-          disabled={isCompliancePassed}
-          onChange={onWatermarkChange}
-        />
+        {MANUAL_COMPLIANCE_CHECKS.map((c) => (
+          <CheckRow
+            key={c.type}
+            title={c.title}
+            description={c.description}
+            checked={checks[c.type]}
+            disabled={isCompliancePassed}
+            onChange={(value) => onCheckChange(c.type, value)}
+          />
+        ))}
       </ul>
 
       <p className="text-xs text-slate-500 dark:text-slate-400 py-3 border-t border-slate-100 dark:border-white/5">
-        Nhãn AI sẽ hiển thị {labelPlacement}.
-        {certificationId && <span className="block mt-0.5 font-mono">Mã chứng nhận {certificationId}</span>}
+        Nhãn AI (Điều 44) được gắn khi xác nhận và hiển thị {labelPlacement}; hệ thống tự kiểm tra nhãn này.
       </p>
 
       {!allChecked && !isCompliancePassed && (
         <p role="status" className="mb-3 text-xs text-amber-700 dark:text-amber-400">
-          Cần đạt cả ba mục mới xác nhận được. Nếu có mục chưa đạt, dùng &quot;Yêu cầu sửa&quot; để trả về cho người sản xuất.
+          Chỉ xác nhận được khi đạt tất cả các mục. Nếu có mục chưa đạt, bấm &quot;Yêu cầu sửa&quot; để trả về cho Creator.
         </p>
       )}
 
       <button
         type="button"
         onClick={onConfirm}
-        disabled={isPassingCompliance || isCompliancePassed || !allChecked}
+        disabled={isPassingCompliance || isCompliancePassed || !allChecked || !canConfirm}
         className="w-full py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition bg-purple-600 hover:bg-purple-700 text-white disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
       >
         {isCompliancePassed && <Check className="w-4 h-4" aria-hidden="true" />}

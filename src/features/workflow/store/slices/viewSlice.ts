@@ -24,6 +24,8 @@ export const createViewSlice: StateCreator<WorkflowStoreState, [], [], ViewSlice
     } else {
       set({ activeProjectId: id, projects: roster });
     }
+    // Roster entries come from the list endpoint without episodes; fetch the detail.
+    void get().loadProject(id);
   },
   setActivePackage: (id) => set({ activePackageId: id }),
 });

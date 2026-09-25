@@ -9,7 +9,8 @@ export type WorkflowState =
   | 'QUOTA_ALLOCATED'     // Checker approved plan and assigned AI token quota
   | 'IN_PRODUCTION'       // Maker is generating video/audio assets in Studio
   | 'EPISODE_SUBMITTED'   // Maker completed assembly and submitted episode package
-  | 'CHANGES_REQUESTED'   // Checker requested plan or content revisions
+  | 'CHANGES_REQUESTED'   // Checker sent the plan back for revisions
+  | 'CUT_CHANGES_REQUESTED' // Checker sent the assembled cut back; Maker regenerates in Studio
   | 'COMPLIANCE_PASSED'   // Checker validated Article 44 & Decree 142 AI compliance
   | 'PUBLISHED';          // Published live to OTT streaming catalog
 

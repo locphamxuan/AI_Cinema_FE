@@ -10,6 +10,8 @@ export type SceneReviewStatus = 'pending' | 'approved' | 'changes_requested';
 export interface FieldReview {
   status: SceneReviewStatus;
   comment?: string;
+  /** Backend PlanReview row this verdict is recorded on, once a review round exists. */
+  review_id?: string;
 }
 
 /** Plan fields the Reviewer signs off besides the individual scenes. */
@@ -38,4 +40,22 @@ export interface ReviewLog {
   feedback_notes: string;
   quota_granted?: number;
   created_at: string;
+}
+
+/**
+ * Creator's request for more tokens on an episode whose quota runs low; the
+ * Reviewer grants all or part of it as a top-up, or turns it down.
+ */
+export interface QuotaRequest {
+  id: string;
+  requested_amount: number;
+  /** Tokens actually granted; set once approved. */
+  granted_amount?: number;
+  reason: string;
+  status: 'pending' | 'approved' | 'rejected';
+  requested_by_name: string;
+  decided_by_name?: string;
+  decision_note?: string;
+  created_at: string;
+  decided_at?: string;
 }

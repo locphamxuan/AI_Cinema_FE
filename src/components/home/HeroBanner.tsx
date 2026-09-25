@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Movie } from '@/types/movie';
 
@@ -12,24 +12,12 @@ interface HeroBannerProps {
 
 export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBannerProps) {
   // Determine movies list (up to 5 hot movies)
-  const movieList = movies && movies.length > 0
-    ? movies.slice(0, 5)
-    : movie
-      ? [movie]
-      : [];
+  const movieList = movies && movies.length > 0 ? movies.slice(0, 5) : movie ? [movie] : [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [myListMap, setMyListMap] = useState<Record<string, boolean>>({});
   const [isHovered, setIsHovered] = useState(false);
-
-  if (movieList.length === 0) {
-    return (
-      <div className="rounded-3xl border border-dashed border-slate-300 dark:border-white/10 bg-slate-100/80 dark:bg-slate-900/60 p-8 text-center text-sm text-slate-500 dark:text-slate-400">
-        Chưa có dữ liệu phim từ backend. API sẽ cập nhật danh sách phim sau khi kết nối service thực tế.
-      </div>
-    );
-  }
 
   // Auto-play timer for hero carousel (5 seconds)
   useEffect(() => {
@@ -51,6 +39,7 @@ export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBan
   };
 
   const currentMovie = movieList[currentIndex] || movieList[0];
+  if (!currentMovie) return null;
   const isAdded = !!myListMap[currentMovie.id];
 
   const toggleMyList = (id: string) => {
@@ -134,12 +123,11 @@ export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBan
           <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md">
             {currentMovie.ageRating || 'T16'}
           </span>
-          <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md hidden sm:inline-block">
-            {currentMovie.quality || '4K Ultra HD'}
-          </span>
-          <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md hidden sm:inline-block">
-            {currentMovie.audioQuality || 'Dolby Atmos'}
-          </span>
+          {currentMovie.quality && (
+            <span className="px-2 py-0.5 rounded bg-white/15 border border-white/25 text-white text-xs font-semibold backdrop-blur-md hidden sm:inline-block">
+              {currentMovie.quality}
+            </span>
+          )}
 
           {isVIPMode && (
             <span className="px-2 py-0.5 rounded bg-amber-400/25 border border-amber-400/40 text-amber-300 text-xs font-bold">
@@ -174,7 +162,7 @@ export default function HeroBanner({ movies, movie, isVIPMode = false }: HeroBan
         <div className="flex flex-wrap items-center gap-3">
           {/* Primary Xem Ngay Button (Emerald Green like in ONFLIX reference image, retaining option for ruby theme) */}
           <Link
-            href={`/watch/${currentMovie.episodes[0]?.id || 'ep-001'}`}
+            href={`/watch/${currentMovie.episodes[0]?.id}`}
             className="px-7 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-full text-sm sm:text-base flex items-center gap-2.5 shadow-xl shadow-emerald-500/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <span className="text-lg">▶</span>

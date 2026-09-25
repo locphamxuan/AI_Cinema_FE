@@ -1,308 +1,36 @@
 /**
- * AI Cinema - Workflow Production API Interfaces and DTOs
- * Perfectly aligned with NestJS + Prisma backend schemas
+ * Response shapes of the NestJS MF-1 endpoints; they only list the fields the
+ * workspace reads. Decimal columns arrive as strings, hence `number | string`.
+ * Enums and request DTOs live in their own files and are re-exported here.
  */
 
-// ==========================================
-// 1. ENUMS (matching Prisma schema exactly)
-// ==========================================
+import type { ApiLabelType, AssetType, ComplianceCheckType, ComplianceResult, EpisodeProductionStatus, GenerationJobStatus, GenerationJobType, MilestoneStatus, PlanReviewField, ProductionPlanStatus, ProductionProjectStatus, QuotaAllocationStatus, QuotaAllocationType, QuotaRequestStatus, ReviewStatus, UserRole } from './workflow-api-enums';
 
-export type UserRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
+export type * from './workflow-api-enums';
+export type * from './workflow-api-requests';
 
-export type ProductionProjectStatus = 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-
-export type ProductionContentType = 'MOVIE' | 'SERIES';
-
-export type MilestoneStatus = 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-
-export type ProductionPlanStatus = 'DRAFT' | 'SUBMITTED' | 'UNDER_REVIEW' | 'CHANGES_REQUESTED' | 'APPROVED';
-
-export type SceneStatus =
-  | 'DRAFT'
-  | 'SUBMITTED'
-  | 'UNDER_REVIEW'
-  | 'CHANGES_REQUESTED'
-  | 'APPROVED'
-  | 'GENERATING'
-  | 'COMPLETED';
-
-export type PlanReviewStatus = 'PENDING' | 'IN_REVIEW' | 'APPROVED' | 'REJECTED' | 'CHANGES_REQUESTED';
-
-export type ReviewStatus = 'PENDING' | 'IN_REVIEW' | 'APPROVED' | 'REJECTED' | 'CHANGES_REQUESTED';
-
-export type QuotaAllocationType = 'INITIAL' | 'TOP_UP';
-
-export type QuotaAllocationStatus = 'ACTIVE' | 'CONSUMED' | 'RETURNED' | 'SUPERSEDED';
-
-export type GenerationJobType =
-  | 'SCRIPT'
-  | 'VOICE'
-  | 'BACKGROUND_AUDIO'
-  | 'SUBTITLE'
-  | 'TRANSLATION'
-  | 'POSTER'
-  | 'THUMBNAIL'
-  | 'VIDEO_ASSEMBLY';
-
-export type GenerationJobStatus = 'PENDING' | 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
-
-export type AssetType =
-  | 'SCRIPT'
-  | 'DUB_AUDIO'
-  | 'BACKGROUND_AUDIO'
-  | 'SUBTITLE'
-  | 'POSTER'
-  | 'THUMBNAIL'
-  | 'VIDEO';
-
-export type GeneratedAssetStatus = 'GENERATED' | 'VALIDATION_FAILED' | 'REJECTED' | 'ACCEPTED';
-
-export type EpisodePackageStatus = 'ASSEMBLED' | 'SUPERSEDED';
-
-export type SubmissionType = 'PLAN' | 'SCENE' | 'EPISODE';
-
-export type SubmissionStatus = 'SUBMITTED' | 'UNDER_REVIEW' | 'CHANGES_REQUESTED' | 'APPROVED' | 'REJECTED';
-
-export type ApiLabelType = 'AI_GENERATED' | 'AI_EDITED' | 'AI_ASSISTED';
-
-export type ComplianceCheckType = 'AI_LABEL_PRESENCE' | 'CONTENT_POLICY' | 'COPYRIGHT' | 'LEGAL';
-
-export type ComplianceResult = 'PENDING' | 'PASS' | 'FAIL';
-
-export type EpisodeProductionStatus = 'DRAFT' | 'PUBLISHED' | 'UNPUBLISHED' | 'ARCHIVED';
-
-// ==========================================
-// 2. REQUEST DTO INTERFACES
-// ==========================================
-
-export interface CreateProjectMilestoneDto {
-  title: string;
-  description?: string;
-  startDate?: string;
-  targetDate?: string;
+export interface Paginated<T> {
+  data: T[];
 }
-
-export interface CreateProductionProjectDto {
-  title: string;
-  description?: string;
-  contentType: ProductionContentType;
-  defaultEpisodeDurationSeconds?: number;
-  episodeCount?: number;
-  productionStartDate: string;
-  deadline: string;
-  plannedReleaseDate: string;
-  totalAiQuotaBudget: number;
-  genreIds?: string[];
-  policyIds?: string[];
-  assignedCreatorId: string;
-  milestones?: CreateProjectMilestoneDto[];
-}
-
-export interface UpdateProductionProjectDto {
-  title?: string;
-  description?: string;
-  defaultEpisodeDurationSeconds?: number;
-  deadline?: string;
-  plannedReleaseDate?: string;
-  totalAiQuotaBudget?: number;
-  genreIds?: string[];
-  policyIds?: string[];
-}
-
-export interface CancelProductionProjectDto {
-  cancelledReason?: string;
-}
-
-export interface CreateMilestoneDto {
-  title: string;
-  description?: string;
-  startDate?: string;
-  targetDate?: string;
-}
-
-export interface UpdateMilestoneDto {
-  title?: string;
-  description?: string;
-  startDate?: string;
-  targetDate?: string;
-  status?: MilestoneStatus;
-  resultText?: string;
-}
-
-export interface SubmitProductionPlanSceneDto {
-  sceneNumber: number;
-  title: string;
-  scriptText?: string;
-  targetDurationSeconds: number;
-}
-
-export interface SubmitProductionPlanDto {
-  scriptText: string;
-  productionApproach: string;
-  targetDurationSeconds: number;
-  estimatedAiResourceUsage: number;
-  scenes: SubmitProductionPlanSceneDto[];
-}
-
-export interface UpdateProductionPlanDto {
-  scriptText?: string;
-  productionApproach?: string;
-  targetDurationSeconds?: number;
-  targetLanguages?: string[];
-  estimatedAiResourceUsage?: number;
-}
-
-export interface CreateProductionPlanRevisionDto {
-  createdById: string;
-  scriptText?: string;
-  productionApproach?: string;
-  targetDurationSeconds?: number;
-  targetLanguages?: string[];
-  estimatedAiResourceUsage?: number;
-}
-
-export interface CreateSceneDto {
-  sceneNumber: number;
-  title: string;
-  scriptText?: string;
-  targetDurationSeconds: number;
-}
-
-export interface UpdateSceneDto {
-  title?: string;
-  sceneNumber?: number;
-  scriptText?: string;
-  targetDurationSeconds?: number;
-}
-
-export interface SubmitSceneDto {
-  submittedById: string;
-}
-
-export interface CreatePlanReviewDto {
-  reviewerId: string;
-  sceneIds?: string[];
-  comments?: string;
-}
-
-export interface DecidePlanReviewDto {
-  decision: 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED';
-  comments?: string;
-  rejectionReason?: string;
-}
-
-export interface CreateQuotaAllocationDto {
-  allocationType: QuotaAllocationType;
-  allocatedAmount: number;
-  allocatedById?: string;
-}
-
-export interface CreateGenerationJobDto {
-  createdById: string;
-  aiModelId: string;
-  jobType: GenerationJobType;
-  sceneId?: string;
-  parentJobId?: string;
-  configSnapshot?: Record<string, unknown>;
-}
-
-export interface CreateGeneratedAssetDto {
-  assetType: AssetType;
-  language?: string;
-  contentText?: string;
-  storageKey?: string;
-  mimeType?: string;
-  fileSizeBytes?: number;
-  checksumSha256?: string;
-  durationSeconds?: number;
-  resolution?: string;
-  metadata?: Record<string, unknown>;
-}
-
-export interface CompleteGenerationJobDto {
-  resourceCost?: number;
-}
-
-export interface CreateEpisodePackageDto {
-  assembledById?: string;
-  assemblyJobId?: string;
-  assetIds?: string[];
-}
-
-export interface CreateEpisodeSubmissionDto {
-  submittedById: string;
-}
-
-export interface CreateReviewDto {
-  reviewerId: string;
-  submissionId?: string;
-  comments?: string;
-}
-
-export interface DecideReviewDto {
-  decision: 'APPROVED' | 'CHANGES_REQUESTED' | 'REJECTED';
-  comments?: string;
-  rejectionReason?: string;
-}
-
-export interface CreateAiContentLabelDto {
-  labelType: ApiLabelType;
-  labelText: string;
-  displayLocation?: string;
-  appliedById?: string;
-  policyId: string;
-}
-
-export interface CreateComplianceCheckDto {
-  checkType: ComplianceCheckType;
-  policyId: string;
-  result?: ComplianceResult;
-  checkedBySystem?: string;
-  failureReason?: string;
-}
-
-export interface DecideComplianceCheckDto {
-  result: ComplianceResult;
-  checkedById?: string;
-  failureReason?: string;
-}
-
-export interface CreateCatalogDto {
-  createdById: string;
-  title?: string;
-  synopsis?: string;
-  releaseDate?: string;
-}
-
-export interface UpdateCatalogEpisodeDto {
-  title?: string;
-}
-
-export interface CreatePublicationDto {
-  packageId: string;
-  publishedById: string;
-  scheduledAt?: string;
-}
-
-// ==========================================
-// 3. BACKEND API ENTITIES & RESPONSES
-// ==========================================
 
 export interface ApiUser {
   id: string;
   email: string;
   fullName: string;
   role: UserRole;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+}
+
+/** Platform-wide limits the Admin configures. */
+export interface ApiPlatformSetting {
+  /** Longest an episode may be allotted or planned, in seconds; null means no limit. */
+  maxEpisodeDurationSeconds: number | null;
+  updatedAt: string | null;
 }
 
 export interface ApiGenre {
   id: string;
   name: string;
-  slug: string;
-  description?: string;
+  description?: string | null;
 }
 
 export interface ApiPolicy {
@@ -310,216 +38,240 @@ export interface ApiPolicy {
   name: string;
   type: string;
   version: string;
-  documentReference?: string;
-  content: Record<string, unknown>;
-  effectiveFrom: string;
-  effectiveTo?: string;
   isActive: boolean;
 }
 
 export interface ApiMilestone {
   id: string;
-  productionProjectId: string;
   title: string;
-  description?: string;
-  startDate?: string;
-  targetDate?: string;
+  description?: string | null;
+  startDate?: string | null;
+  targetDate?: string | null;
   status: MilestoneStatus;
-  resultText?: string;
-  completedAt?: string;
-  createdAt: string;
-  updatedAt: string;
+  resultText?: string | null;
 }
 
 export interface ApiScene {
   id: string;
-  productionPlanId: string;
   sceneNumber: number;
   title: string;
-  scriptText?: string;
-  description?: string;
+  description?: string | null;
+  scriptText?: string | null;
   targetDurationSeconds: number;
-  status: SceneStatus;
-  createdAt: string;
-  updatedAt: string;
+  estimatedTokens: number;
+  status: string;
+}
+
+/** A user as embedded in a response: who reviewed or granted something. */
+export interface ApiActor {
+  id: string;
+  fullName: string;
 }
 
 export interface ApiPlanReview {
   id: string;
-  productionPlanId: string;
-  sceneId?: string;
-  reviewerId: string;
-  status: PlanReviewStatus;
-  comments?: string;
-  rejectionReason?: string;
-  decidedAt?: string;
+  reviewer?: ApiActor;
+  field: PlanReviewField;
+  sceneId: string | null;
+  status: ReviewStatus;
+  comments?: string | null;
+  rejectionReason?: string | null;
+  decidedAt: string | null;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface ApiQuotaAllocation {
   id: string;
-  productionPlanId: string;
-  productionProjectId: string;
   allocationType: QuotaAllocationType;
-  allocatedAmount: number;
-  remainingAmount: number;
+  allocatedAmount: number | string;
+  remainingAmount: number | string;
   status: QuotaAllocationStatus;
-  allocatedById?: string;
+  allocatedBy?: ApiActor | null;
   createdAt: string;
-  updatedAt: string;
 }
 
-export interface ApiGeneratedAsset {
+/** A Creator's request for more tokens on a plan; approving it grants a TOP_UP allocation. */
+export interface ApiQuotaRequest {
   id: string;
-  generationJobId: string;
-  assetType: AssetType;
-  language?: string;
-  contentText?: string;
-  storageKey?: string;
-  mimeType?: string;
-  fileSizeBytes?: number;
-  checksumSha256?: string;
-  durationSeconds?: number;
-  resolution?: string;
-  metadata?: Record<string, unknown>;
-  status: GeneratedAssetStatus;
-  isSelected: boolean;
+  requestedAmount: number;
+  reason: string;
+  status: QuotaRequestStatus;
+  decisionNote: string | null;
+  quotaAllocationId: string | null;
+  requestedBy?: ApiActor | null;
+  decidedBy?: ApiActor | null;
   createdAt: string;
-  updatedAt: string;
-}
-
-export interface ApiGenerationJob {
-  id: string;
-  productionPlanId: string;
-  sceneId?: string;
-  aiModelId: string;
-  jobType: GenerationJobType;
-  attemptNumber: number;
-  parentJobId?: string;
-  configSnapshot?: Record<string, unknown>;
-  status: GenerationJobStatus;
-  resourceCost?: number;
-  quotaAllocationId?: string;
-  queuedAt?: string;
-  completedAt?: string;
-  createdById: string;
-  createdAt: string;
-  updatedAt: string;
-  generatedAssets?: ApiGeneratedAsset[];
-}
-
-export interface ApiAiContentLabel {
-  id: string;
-  episodePackageId: string;
-  labelType: ApiLabelType;
-  labelText: string;
-  displayLocation?: string;
-  appliedById?: string;
-  policyId: string;
-  createdAt: string;
+  decidedAt: string | null;
 }
 
 export interface ApiComplianceCheck {
   id: string;
-  episodePackageId: string;
   checkType: ComplianceCheckType;
-  policyId: string;
   result: ComplianceResult;
-  checkedById?: string;
-  checkedBySystem?: string;
-  failureReason?: string;
-  checkedAt?: string;
-  createdAt: string;
-  updatedAt: string;
+  failureReason?: string | null;
+  checkedAt: string | null;
+}
+
+/** Result of recording a full compliance review: the package verdict plus every stored check. */
+export interface ApiComplianceVerdict {
+  verdict: ComplianceResult;
+  checks: ApiComplianceCheck[];
 }
 
 export interface ApiReview {
   id: string;
-  episodePackageId: string;
-  reviewerId: string;
-  submissionId?: string;
+  reviewer?: ApiActor;
   status: ReviewStatus;
-  comments?: string;
-  rejectionReason?: string;
-  decidedAt?: string;
+  comments?: string | null;
+  rejectionReason?: string | null;
+  decidedAt: string | null;
   createdAt: string;
-  updatedAt: string;
 }
 
-export interface ApiEpisodePackage {
+export interface ApiAiContentLabel {
   id: string;
-  productionPlanId: string;
-  packageVersion: number;
-  assembledById?: string;
-  assemblyJobId?: string;
-  status: EpisodePackageStatus;
-  createdAt: string;
-  updatedAt: string;
-  assets?: ApiGeneratedAsset[];
-  complianceChecks?: ApiComplianceCheck[];
-  aiContentLabels?: ApiAiContentLabel[];
-  reviews?: ApiReview[];
+  labelType: ApiLabelType;
+  labelText: string;
+  displayLocation?: string | null;
 }
 
-export interface ApiProductionPlan {
+/** Movie returned when a package enters the catalog; only its episodes are read. */
+export interface ApiCatalogEntry {
   id: string;
-  productionProjectId: string;
-  episodeNumber: number;
-  planVersion: number;
-  previousPlanId?: string;
-  scriptText?: string;
-  productionApproach?: string;
-  targetDurationSeconds?: number;
-  targetLanguages: string[];
-  estimatedAiResourceUsage?: number;
-  status: ProductionPlanStatus;
-  totalSceneCount: number;
-  completedSceneCount: number;
-  createdById: string;
-  createdAt: string;
-  updatedAt: string;
-  scenes?: ApiScene[];
-  planReviews?: ApiPlanReview[];
-  quotaAllocations?: ApiQuotaAllocation[];
-  generationJobs?: ApiGenerationJob[];
-  episodePackages?: ApiEpisodePackage[];
-}
-
-export interface ApiProductionProject {
-  id: string;
-  title: string;
-  description?: string;
-  contentType: ProductionContentType;
-  status: ProductionProjectStatus;
-  createdById: string;
-  assignedCreatorId: string;
-  episodeCount: number;
-  productionStartDate: string;
-  deadline: string;
-  plannedReleaseDate: string;
-  defaultEpisodeDurationSeconds?: number;
-  totalAiQuotaBudget: number;
-  remainingAiQuotaBudget: number;
-  cancelledReason?: string;
-  createdAt: string;
-  updatedAt: string;
-  milestones?: ApiMilestone[];
-  plans?: ApiProductionPlan[];
-  genres?: { genre: ApiGenre }[];
-  policies?: { policy: ApiPolicy }[];
-  assignedCreator?: ApiUser;
-  createdBy?: ApiUser;
+  episodes: { id: string; currentPackageId: string | null }[];
 }
 
 export interface ApiPublication {
   id: string;
   episodeId: string;
   episodePackageId: string;
-  scheduledAt?: string;
-  publishedAt?: string;
-  unpublishedAt?: string;
-  publishedById: string;
+  scheduledAt: string | null;
+  publishedAt: string | null;
+}
+
+export interface ApiEpisodePackage {
+  id: string;
+  packageVersion: number;
+  createdAt: string;
+  /** Transcoded final cut: HLS master playlist, its renditions and total length. */
+  streamUrl: string | null;
+  qualities: string[];
+  durationSeconds: number | null;
+  subtitles: { language: string }[];
+  submissions: { id: string; status: string; createdAt: string }[];
+  reviews: ApiReview[];
+  complianceChecks: ApiComplianceCheck[];
+  aiContentLabels: ApiAiContentLabel[];
+  currentForEpisode: {
+    id: string;
+    productionStatus: EpisodeProductionStatus;
+    publications: ApiPublication[];
+  } | null;
+}
+
+export interface ApiProductionPlan {
+  id: string;
+  /** Running number across the project; seasonEpisodeNumber is the number viewers see. */
+  episodeNumber: number;
+  seasonNumber: number;
+  seasonEpisodeNumber: number;
+  /** Duration the Reviewer allotted this episode at project creation. */
+  allottedDurationSeconds?: number | null;
+  planVersion: number;
+  status: ProductionPlanStatus;
+  scriptText?: string | null;
+  productionApproach?: string | null;
+  targetDurationSeconds?: number | null;
+  estimatedAiResourceUsage?: number | string | null;
   createdAt: string;
   updatedAt: string;
+  scenes: ApiScene[];
+  planReviews: ApiPlanReview[];
+  quotaAllocations: ApiQuotaAllocation[];
+  /** Top-up requests, newest first. */
+  quotaRequests: ApiQuotaRequest[];
+  _count: { generationJobs: number };
+  episodePackages: ApiEpisodePackage[];
+}
+
+export interface ApiProductionProject {
+  id: string;
+  title: string;
+  description?: string | null;
+  status: ProductionProjectStatus;
+  episodeCount: number;
+  productionStartDate?: string | null;
+  deadline?: string | null;
+  plannedReleaseDate?: string | null;
+  defaultEpisodeDurationSeconds?: number | null;
+  totalAiQuotaBudget: number | string;
+  remainingAiQuotaBudget: number | string;
+  createdAt: string;
+  updatedAt: string;
+  assignedCreator?: { id: string; fullName: string } | null;
+  createdBy?: { id: string; fullName: string } | null;
+  milestones?: ApiMilestone[];
+  productionProjectGenres?: { genre: { id: string; name: string } }[];
+  /** Only returned by the detail endpoint. */
+  productionPlans?: ApiProductionPlan[];
+}
+
+export interface ApiGeneratedAsset {
+  id: string;
+  assetType: AssetType;
+  contentText?: string | null;
+  storageKey?: string | null;
+  mimeType?: string | null;
+  durationSeconds?: number | null;
+  createdAt?: string;
+}
+
+export interface ApiGenerationJob {
+  id: string;
+  jobType: GenerationJobType;
+  status: GenerationJobStatus;
+  sceneId: string | null;
+  attemptNumber: number;
+  parentJobId: string | null;
+  rawPrompt: string | null;
+  customFunction: string | null;
+  estimatedTokenCost: number;
+  resourceCost: number | string | null;
+  outputDurationSeconds: number | string | null;
+  errorMessage: string | null;
+  createdAt: string;
+  aiModel: { id: string; name: string };
+  generatedAssets: ApiGeneratedAsset[];
+}
+
+/** Model a job type is routed to, with its planning estimate (BR-40, BR-41). */
+export interface ApiRoutingRow {
+  jobType: GenerationJobType;
+  provider: string;
+  model: string;
+  modality: string;
+  estimatedTokenCost: number;
+}
+
+/** Route of one job, including a described CUSTOM function. */
+export interface ApiRoute extends ApiRoutingRow {
+  match: 'catalog' | 'specialist' | 'general';
+}
+
+/** What a scene still lacks and the prompts suggested for it (GET /scenes/:id/suggestions). */
+export interface ApiSceneAdvice {
+  source: 'ai' | 'rules';
+  summary: string;
+  gaps: { aspect: 'video' | 'voice' | 'audio' | 'lighting' | 'camera' | 'continuity'; message: string }[];
+  suggestions: { jobType: GenerationJobType; title: string; reason: string; prompt: string }[];
+  /** The neighbouring scenes this one has to cut together with. */
+  previousScene: { number: number; title: string } | null;
+  nextScene: { number: number; title: string } | null;
+}
+
+/** Breaks in continuity between neighbouring scenes of an episode (GET /production-plans/:id/continuity). */
+export interface ApiPlanContinuity {
+  source: 'ai' | 'rules';
+  summary: string;
+  scenes: { sceneId: string; sceneNumber: number; issues: string[] }[];
 }

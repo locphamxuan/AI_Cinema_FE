@@ -25,10 +25,10 @@ export function creatorGroups(projects: ProductionProject[]): ProjectGroup[] {
   ];
 }
 
-export type ReviewerStage = 'new' | 'planReview' | 'production' | 'released';
+type ReviewerStage = 'new' | 'planReview' | 'production' | 'released';
 
 /** Which stage of the pipeline a project is in, from the Reviewer's point of view. */
-export function reviewerStage(project: ProductionProject): ReviewerStage {
+function reviewerStage(project: ProductionProject): ReviewerStage {
   if (project.overall_status === 'COMPLETED') return 'released';
   if (project.overall_status === 'NOT_STARTED') return 'new';
   const awaitingPlanReview = project.episodes.some((ep) => ep.status === 'PLAN_PENDING' || ep.brief.status === 'CHANGES_REQUESTED');
@@ -42,6 +42,6 @@ export function reviewerGroups(projects: ProductionProject[]): ProjectGroup[] {
     { key: 'new', label: 'Dự án mới', emptyText: 'Chưa có dự án mới.', projects: inStage('new') },
     { key: 'planReview', label: 'Chờ duyệt kế hoạch', emptyText: 'Không có kế hoạch nào đang chờ duyệt.', projects: inStage('planReview') },
     { key: 'production', label: 'Đang sản xuất', emptyText: 'Chưa có phim nào đang sản xuất.', projects: inStage('production') },
-    { key: 'released', label: 'Đã công chiếu', emptyText: 'Chưa có phim nào công chiếu.', projects: inStage('released') },
+    { key: 'released', label: 'Đã phát hành', emptyText: 'Chưa có phim nào phát hành.', projects: inStage('released') },
   ];
 }

@@ -3,84 +3,69 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
+import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
 
-const STORAGE_KEY = 'aicinema_saved_credentials';
+// Only the email is remembered; a password never goes to localStorage.
+const STORAGE_KEY = 'aicinema_saved_email';
+const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
+// Same rule as the backend's RegisterRequestDto.
+const MIN_PASSWORD_LENGTH = 6;
 
+function savedEmail(): string | null {
+  try {
+    return localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function rememberEmail(email: string, remember: boolean) {
+  try {
+    if (remember) localStorage.setItem(STORAGE_KEY, email.trim());
+    else localStorage.removeItem(STORAGE_KEY);
+  } catch {}
+}
+
+/** Mounted afresh on every opening, so each opening starts from the saved email and the requested mode. */
 export default function AuthModal() {
-  const router = useRouter();
-  const {
-    isAuthModalOpen,
-    authModalMode,
-    initialAuthEmail,
-    closeAuthModal,
-    openAuthModal,
-    login,
-    register,
-  } = useAppStore();
+  const { isAuthModalOpen, authModalMode, initialAuthEmail } = useAppStore();
+  if (!isAuthModalOpen) return null;
+  return <AuthModalForm key={`${authModalMode}:${initialAuthEmail ?? ''}`} />;
+}
 
-  const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [email, setEmail] = useState('');
+function AuthModalForm() {
+  const router = useRouter();
+  const { authModalMode, initialAuthEmail, closeAuthModal, login, register } = useAppStore();
+
+  const [mode, setMode] = useState<AuthMode>(authModalMode);
+  const [email, setEmail] = useState(() => initialAuthEmail || savedEmail() || '');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Load saved credentials or default demo pre-fill on mount / open
+  // Earlier versions stored the password itself; drop it.
   useEffect(() => {
-    if (isAuthModalOpen) {
-      setMode(authModalMode);
-      setError(null);
+    try {
+      localStorage.removeItem(LEGACY_CREDENTIALS_KEY);
+    } catch {}
+  }, []);
 
-      // Check localStorage for saved credentials
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (parsed.email && parsed.password) {
-            setEmail(parsed.email);
-            setPassword(parsed.password);
-            setRememberMe(true);
-            return;
-          }
-        }
-      } catch {}
-
-      // Default pre-fill if initialAuthEmail provided
-      if (initialAuthEmail) {
-        setEmail(initialAuthEmail);
-      } else {
-        setEmail('');
-        setPassword('');
-        setRememberMe(true);
-      }
-    }
-  }, [isAuthModalOpen, authModalMode, initialAuthEmail]);
-
-  if (!isAuthModalOpen) return null;
+  const switchMode = (next: AuthMode) => {
+    setMode(next);
+    setError(null);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 350));
-
     if (mode === 'login') {
       const res = await login(email, password);
       if (res.success) {
-        try {
-          if (rememberMe) {
-            localStorage.setItem(
-              STORAGE_KEY,
-              JSON.stringify({ email: email.trim(), password: password })
-            );
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
-          }
-        } catch {}
+        rememberEmail(email, rememberMe);
 
         if (res.redirectUrl) {
           router.push(res.redirectUrl);
@@ -88,24 +73,12 @@ export default function AuthModal() {
       } else {
         setError(res.error || 'Đăng nhập thất bại');
       }
+    } else if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(`Mật khẩu phải có tối thiểu ${MIN_PASSWORD_LENGTH} ký tự!`);
     } else {
-      if (password.length < 8) {
-        setError('Mật khẩu phải có tối thiểu 8 ký tự!');
-        setLoading(false);
-        return;
-      }
       const res = await register(name, email, password);
       if (res.success) {
-        try {
-          if (rememberMe) {
-            localStorage.setItem(
-              STORAGE_KEY,
-              JSON.stringify({ email: email.trim(), password: password })
-            );
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
-          }
-        } catch {}
+        rememberEmail(email, rememberMe);
       } else {
         setError(res.error || 'Đăng ký thất bại');
       }
@@ -154,37 +127,7 @@ export default function AuthModal() {
           </p>
         </div>
 
-        {/* Mode Tabs */}
-        <div className="flex bg-slate-100 dark:bg-black/40 rounded-xl p-1 mb-5 border border-slate-200 dark:border-white/10">
-          <button
-            type="button"
-            onClick={() => {
-              setMode('login');
-              setError(null);
-            }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              mode === 'login'
-                ? 'bg-ruby text-white shadow-md shadow-ruby/30'
-                : 'text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-foreground'
-            }`}
-          >
-            Đăng Nhập
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setMode('register');
-              setError(null);
-            }}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              mode === 'register'
-                ? 'bg-ruby text-white shadow-md shadow-ruby/30'
-                : 'text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-foreground'
-            }`}
-          >
-            Đăng Ký
-          </button>
-        </div>
+        <ModeTabs mode={mode} onChange={switchMode} />
 
         {/* Error Message */}
         {error && (
@@ -228,45 +171,11 @@ export default function AuthModal() {
             />
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-muted-light">
-                Mật khẩu
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-              >
-                {showPassword ? (
-                  <>
-                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                    </svg>
-                    <span>Ẩn</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    <span>Hiện</span>
-                  </>
-                )}
-              </button>
-            </div>
-            <div className="relative">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={mode === 'login' ? 'Nhập mật khẩu...' : 'Tạo mật khẩu (tối thiểu 8 ký tự)...'}
-                className="w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
-              />
-            </div>
-          </div>
+          <PasswordField
+            value={password}
+            onChange={setPassword}
+            placeholder={mode === 'login' ? 'Nhập mật khẩu...' : `Tạo mật khẩu (tối thiểu ${MIN_PASSWORD_LENGTH} ký tự)...`}
+          />
 
           {/* Remember Me Checkbox */}
           <div className="flex items-center justify-between text-xs pt-1">
@@ -322,10 +231,7 @@ export default function AuthModal() {
               Chưa có tài khoản?{' '}
               <button
                 type="button"
-                onClick={() => {
-                  setMode('register');
-                  setError(null);
-                }}
+                onClick={() => switchMode('register')}
                 className="text-ruby font-bold hover:underline cursor-pointer"
               >
                 Đăng ký ngay
@@ -336,10 +242,7 @@ export default function AuthModal() {
               Đã có tài khoản?{' '}
               <button
                 type="button"
-                onClick={() => {
-                  setMode('login');
-                  setError(null);
-                }}
+                onClick={() => switchMode('login')}
                 className="text-ruby font-bold hover:underline cursor-pointer"
               >
                 Đăng nhập

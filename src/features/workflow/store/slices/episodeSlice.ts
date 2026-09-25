@@ -1,163 +1,134 @@
 import type { StateCreator } from 'zustand';
-import { EpisodePackage, ProductionProject, PENDING_FIELD_REVIEW } from '@/types/workflow';
+import type { EpisodePackage, ProductionProject } from '@/types/workflow';
+import { EMPTY_PROJECT } from '@/features/workflow/lib/emptyProject';
 import type { EpisodeSlice, WorkflowStoreState } from '../types';
-import { toast } from '@/components/ui/Toast';
-import { pendingPlanReviews } from '@/features/workflow/lib/planVerdict';
 import { withProjectUpdate } from './projectRoster';
 import { workflowService } from '@/services/workflowService';
-import { createEmptyProject, EMPTY_PROJECTS } from '../emptyState';
+import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
+import { buildSceneJobs, draftStepId, isDraftStep } from '@/features/workflow/lib/jobAdapter';
+import { apiResult } from './apiResult';
+import { isPlanApproved } from '@/features/workflow/lib/workflowState';
 
-function buildBlankEpisode(projectId: string, episodeNumber: number, seasonNumber: number, targetDurationMinutes: number): EpisodePackage {
-  const now = new Date().toISOString();
-  const episodeId = `pkg-${projectId}-${episodeNumber}`;
+/** Episodes whose plan has gone past quota allocation can hold generation jobs. */
+
+/** Fills each episode's scene rows with its backend jobs, keeping the Creator's draft steps. */
+async function withJobs(project: ProductionProject, previous: ProductionProject | undefined): Promise<ProductionProject> {
+  const episodes = await Promise.all(
+    project.episodes.map(async (episode) => {
+      const previousRows = previous?.episodes.find((e) => e.id === episode.id)?.jobs;
+      const res = isPlanApproved(episode.status) ? await workflowService.listJobs(episode.id) : null;
+      return { ...episode, ...buildSceneJobs(episode, res?.success ? res.data : [], previousRows) };
+    })
+  );
+  return { ...project, episodes };
+}
+
+/**
+ * Reloading the project must not wipe what the Creator typed but has not saved yet
+ * (another episode, or the overall script): those briefs are carried over.
+ */
+function keepUnsavedDrafts(project: ProductionProject, previous: ProductionProject | undefined): ProductionProject {
+  if (!previous) return project;
+  const unsaved = new Map(previous.episodes.filter((e) => e.brief.has_unsaved_changes).map((e) => [e.id, e.brief]));
+  if (unsaved.size === 0) return project;
   return {
-    id: episodeId,
-    project_id: projectId,
-    episode_number: episodeNumber,
-    season_number: seasonNumber,
-    title: `Tập ${episodeNumber}: Chưa đặt tên`,
-    target_duration_minutes: targetDurationMinutes,
-    status: 'PLAN_DRAFT',
-    total_duration: '',
-    actual_tokens_used: 0,
-    quota_allocated: 0,
-    video_draft_url: '',
-    thumbnail_url: '',
-    brief: {
-      id: `brief-${episodeId}`,
-      project_id: projectId,
-      episode_id: episodeId,
-      title: `Tập ${episodeNumber}: Chưa đặt tên`,
-      scene_count: 0,
-      target_duration_minutes: targetDurationMinutes,
-      estimated_tokens: 0,
-      production_approach: '',
-      storyboard_summary: '',
-      scene_breakdown: [],
-      ...pendingPlanReviews([]),
-      status: 'PLAN_DRAFT',
-      created_at: now,
-      updated_at: now,
-    },
-    jobs: [],
-    assets: [],
-    created_at: now,
-    updated_at: now,
+    ...project,
+    episodes: project.episodes.map((e) => (unsaved.has(e.id) ? { ...e, brief: unsaved.get(e.id)! } : e)),
   };
 }
 
-import { adaptApiProjectToUiProject } from '@/features/workflow/lib/apiAdapter';
+
+/**
+ * Saves the whole plan — script, duration, estimate and every scene — in one request.
+ * Returns the server id of each scene number, or null when the save failed.
+ */
+async function saveDraftToServer(pkg: EpisodePackage): Promise<Map<number, string> | null> {
+  const { brief } = pkg;
+  const scenes = await apiResult(
+    workflowService.savePlanDraft(pkg.id, {
+      scriptText: brief.script_text,
+      targetDurationSeconds: brief.target_duration_minutes * 60,
+      estimatedAiResourceUsage: brief.estimated_tokens,
+      scenes: brief.scene_breakdown.map((s) => ({
+        id: s.id,
+        sceneNumber: s.scene_number,
+        title: s.title,
+        description: s.description,
+        targetDurationSeconds: s.target_duration_sec,
+        estimatedTokens: s.estimated_tokens,
+      })),
+    }),
+    'Không lưu được kế hoạch'
+  );
+  return scenes && new Map(scenes.map((s) => [s.sceneNumber, s.id]));
+}
+
+/** Saves the plan, then submits it for review (BR-39): two requests however many scenes it has. */
+async function saveAndSubmitPlan(pkg: EpisodePackage): Promise<boolean> {
+  const ids = await saveDraftToServer(pkg);
+  if (!ids) return false;
+  const submitted = await apiResult(
+    workflowService.submitPlan(pkg.id, {
+      scriptText: pkg.brief.script_text,
+      targetDurationSeconds: pkg.brief.target_duration_minutes * 60,
+      estimatedAiResourceUsage: pkg.brief.estimated_tokens,
+      scenes: pkg.brief.scene_breakdown.map((s) => ({ sceneId: ids.get(s.scene_number)!, scriptText: s.description })),
+    }),
+    'Không gửi được kế hoạch'
+  );
+  return submitted !== null;
+}
 
 export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], EpisodeSlice> = (set, get) => ({
-  project: createEmptyProject(),
-  projects: EMPTY_PROJECTS,
+  project: EMPTY_PROJECT,
+  projects: [],
   isLoading: false,
   error: null,
 
   loadProjects: async () => {
     set({ isLoading: true, error: null });
-    try {
-      const res = await workflowService.listProjects();
-      const rawList = res.success && res.data
-        ? (Array.isArray(res.data) ? res.data : (res.data as { data?: any[] })?.data || [])
-        : [];
-
-      if (rawList.length === 0) {
-        const existing = get().projects;
-        if (existing.length > 0) {
-          set({ isLoading: false });
-          return;
-        }
-
-        set({
-          projects: [],
-          project: createEmptyProject(),
-          activeProjectId: '',
-          activePackageId: '',
-          isLoading: false,
-        });
-        return;
-      }
-
-      const currentProjects = get().projects;
-      const adaptedProjects = rawList.map((p) => {
-        const adapted = adaptApiProjectToUiProject(p);
-        const existing = currentProjects.find((cp) => cp.id === adapted.id);
-        if (!existing) return adapted;
-        return {
-          ...adapted,
-          episodes: adapted.episodes.map((ep) => {
-            const existingEp = existing.episodes.find((e) => e.id === ep.id);
-            if (!existingEp) return ep;
-            return {
-              ...ep,
-              status: existingEp.status !== 'PLAN_DRAFT' ? existingEp.status : ep.status,
-              quota_allocated: existingEp.quota_allocated || ep.quota_allocated,
-              brief: {
-                ...ep.brief,
-                scene_reviews: existingEp.brief?.scene_reviews?.length ? existingEp.brief.scene_reviews : ep.brief?.scene_reviews,
-                duration_review: existingEp.brief?.duration_review || ep.brief?.duration_review,
-                token_review: existingEp.brief?.token_review || ep.brief?.token_review,
-              },
-            };
-          }),
-        };
-      });
-      const currentActive = get().activeProjectId;
-      const foundActive = adaptedProjects.find((p) => p.id === currentActive) || adaptedProjects[0];
-      set({
-        projects: adaptedProjects,
-        project: foundActive,
-        activeProjectId: foundActive.id,
-        activePackageId: foundActive.episodes?.[0]?.id || '',
-        isLoading: false,
-      });
-    } catch (err) {
-      const existing = get().projects;
-      set({
-        isLoading: false,
-        error: err instanceof Error ? err.message : 'Lỗi tải dự án từ cơ sở dữ liệu',
-        projects: existing.length > 0 ? existing : [],
-        project: existing.length > 0 ? get().project : createEmptyProject(),
-        activeProjectId: existing.length > 0 ? get().activeProjectId : '',
-        activePackageId: existing.length > 0 ? get().activePackageId : '',
-      });
+    void get().loadPlatformSettings();
+    const res = await workflowService.listProjects();
+    if (!res.success) {
+      set({ isLoading: false, error: res.message ?? 'Không tải được danh sách dự án' });
+      return;
+    }
+    // The list carries no plans; keep the episodes already loaded for each project.
+    const loaded = new Map(get().projects.map((p) => [p.id, p]));
+    const projects = res.data.data.map((api) => {
+      const adapted = adaptApiProjectToUiProject(api);
+      return { ...adapted, episodes: loaded.get(adapted.id)?.episodes ?? [] };
+    });
+    const active = projects.find((p) => p.id === get().activeProjectId) ?? projects[0];
+    set({ projects, isLoading: false });
+    if (active) {
+      await get().loadProject(active.id);
+    } else {
+      set({ project: EMPTY_PROJECT, activeProjectId: '', activePackageId: '' });
     }
   },
 
   loadProject: async (projectId: string) => {
+    if (!projectId) return;
     set({ isLoading: true, error: null });
-    try {
-      const res = await workflowService.getProject(projectId);
-      if (res.success && res.data) {
-        const adapted = adaptApiProjectToUiProject(res.data);
-        set((state) => ({
-          project: adapted,
-          activeProjectId: adapted.id,
-          activePackageId: adapted.episodes?.[0]?.id || '',
-          projects: state.projects.map((p) => (p.id === adapted.id ? adapted : p)),
-        }));
-      } else {
-        const existing = get().projects.find((p) => p.id === projectId);
-        if (existing) {
-          set({
-            project: existing,
-            activeProjectId: existing.id,
-            activePackageId: existing.episodes?.[0]?.id || '',
-          });
-        }
-      }
-      set({ isLoading: false });
-    } catch (err) {
-      const existing = get().projects.find((p) => p.id === projectId);
-      set({
-        isLoading: false,
-        error: err instanceof Error ? err.message : 'Lỗi tải chi tiết dự án',
-        project: existing || createEmptyProject(),
-        activeProjectId: existing?.id || '',
-        activePackageId: existing?.episodes?.[0]?.id || '',
-      });
+    const res = await workflowService.getProject(projectId);
+    if (!res.success) {
+      set({ isLoading: false, error: res.message ?? 'Không tải được dự án' });
+      return;
     }
+    const previous = get().projects.find((p) => p.id === projectId);
+    const adapted = keepUnsavedDrafts(await withJobs(adaptApiProjectToUiProject(res.data), previous), previous);
+    set((state) => {
+      const keepPackage = adapted.episodes.some((e) => e.id === state.activePackageId);
+      const known = state.projects.some((p) => p.id === adapted.id);
+      return {
+        isLoading: false,
+        project: adapted,
+        activeProjectId: adapted.id,
+        activePackageId: keepPackage ? state.activePackageId : adapted.episodes[0]?.id ?? '',
+        projects: known ? state.projects.map((p) => (p.id === adapted.id ? adapted : p)) : [adapted, ...state.projects],
+      };
+    });
   },
 
   getPackage: (packageId) => {
@@ -195,109 +166,39 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     );
   },
 
-  submitProductionPlan: (packageId) => {
+  submitProductionPlan: async (packageId) => {
     const pkg = get().getPackage(packageId);
-    if (pkg?.brief) {
-      // Fire-and-forget or await backend sync
-      workflowService.submitPlan(packageId, {
-        scriptText: pkg.brief.storyboard_summary || 'Kịch bản phân cảnh',
-        productionApproach: pkg.brief.production_approach || 'AI Standard',
-        targetDurationSeconds: (pkg.target_duration_minutes || 30) * 60,
-        estimatedAiResourceUsage: pkg.brief.estimated_tokens || 500,
-        scenes: pkg.brief.scene_breakdown.map((s) => ({
-          sceneNumber: s.scene_number,
-          title: s.title,
-          scriptText: s.description,
-          targetDurationSeconds: s.target_duration_sec,
-        })),
-      }).catch((e) => console.warn('Submit plan API call:', e));
+    if (!pkg) return false;
+    const ok = await saveAndSubmitPlan(pkg);
+    if (!ok) {
+      await get().loadProject(get().activeProjectId);
+      return false;
     }
-
+    // Show the plan as sent right away; the full reload (review rows, scene ids) follows in the background.
     set((state) =>
       withProjectUpdate(state, (project) => ({
         ...project,
-        overall_status: 'PENDING_REVIEW',
-        updated_at: new Date().toISOString(),
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'PLAN_PENDING',
-            brief: {
-              ...ep.brief,
-              status: 'PLAN_PENDING',
-              ...pendingPlanReviews(ep.brief.scene_breakdown),
-              updated_at: new Date().toISOString(),
-            },
-          };
-        }),
+        episodes: project.episodes.map((ep) =>
+          ep.id === packageId ? { ...ep, status: 'PLAN_PENDING', brief: { ...ep.brief, status: 'PLAN_PENDING', has_unsaved_changes: false } } : ep
+        ),
       }))
     );
+    void get().loadProject(get().activeProjectId);
+    return true;
   },
 
-  reviseProductionPlan: (packageId, updatedBrief) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        overall_status: 'PENDING_REVIEW',
-        updated_at: new Date().toISOString(),
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          const scenes = updatedBrief.scene_breakdown || ep.brief.scene_breakdown;
-          return {
-            ...ep,
-            status: 'PLAN_PENDING',
-            brief: {
-              ...ep.brief,
-              ...updatedBrief,
-              status: 'PLAN_PENDING',
-              ...pendingPlanReviews(scenes),
-              updated_at: new Date().toISOString(),
-            },
-          };
-        }),
-      }))
-    );
-  },
-
-  updateOverallScript: (script) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => {
-        if (script === project.overall_script) return project;
-        return {
-          ...project,
-          overall_script: script,
-          script_version: project.script_version + 1,
-          script_review: PENDING_FIELD_REVIEW,
-          updated_at: new Date().toISOString(),
-        };
-      })
-    );
-  },
-
-  addSceneJob: (packageId, sceneData) => {
-    const newJobId = `job-${Date.now()}`;
-    const newJob = {
-      ...sceneData,
-      id: newJobId,
-      status: 'pending' as const,
-      progress: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            jobs: [...ep.jobs, newJob],
-          };
-        }),
-      }))
-    );
+  savePlanDraft: async (packageId) => {
+    const pkg = get().getPackage(packageId);
+    if (!pkg) return false;
+    const ids = await saveDraftToServer(pkg);
+    if (!ids) return false;
+    // Only the server ids are taken back: whatever was typed while saving stays.
+    const current = get().getPackage(packageId)!.brief;
+    get().updateContentBrief(packageId, {
+      scene_breakdown: current.scene_breakdown.map((s) => ({ ...s, id: s.id ?? ids.get(s.scene_number) })),
+      has_unsaved_changes: current.updated_at !== pkg.brief.updated_at,
+    });
+    return true;
   },
 
   addGenerationStep: (packageId, jobId, step) => {
@@ -313,7 +214,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
                 ? j
                 : {
                     ...j,
-                    generation_steps: [...j.generation_steps, { ...step, id: `step-${Date.now()}` }],
+                    generation_steps: [...j.generation_steps, { ...step, id: draftStepId() }],
                     updated_at: new Date().toISOString(),
                   }
             ),
@@ -336,7 +237,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
                 ? j
                 : {
                     ...j,
-                    generation_steps: j.generation_steps.map((s) => (s.id === stepId ? { ...s, ...data } : s)),
+                    generation_steps: j.generation_steps.map((s) => (s.id === stepId && isDraftStep(s) ? { ...s, ...data } : s)),
                     updated_at: new Date().toISOString(),
                   }
             ),
@@ -355,7 +256,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
           return {
             ...ep,
             jobs: ep.jobs.map((j) =>
-              j.id !== jobId ? j : { ...j, generation_steps: j.generation_steps.filter((s) => s.id !== stepId) }
+              j.id !== jobId ? j : { ...j, generation_steps: j.generation_steps.filter((s) => s.id !== stepId || !isDraftStep(s)) }
             ),
           };
         }),
@@ -363,166 +264,32 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
     );
   },
 
-  removeSceneJob: (packageId, jobId) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            jobs: ep.jobs.filter((j) => j.id !== jobId),
-            assets: ep.assets.filter((a) => a.job_id !== jobId),
-          };
-        }),
-      }))
-    );
-  },
-
-  submitEpisodePackage: (packageId) => {
-    const pkg = get().getPackage(packageId);
-    if (!pkg) return false;
-
-    const uncompleted = pkg.jobs.filter((j) => j.status !== 'completed');
-    if (uncompleted.length > 0) {
-      toast.warning(
-        'Chưa hoàn tất render!',
-        `Còn ${uncompleted.length} phân cảnh chưa render hoàn tất. Vui lòng sinh xong toàn bộ clip trước khi nộp bản dựng.`
-      );
-      return false;
-    }
-
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        updated_at: new Date().toISOString(),
-        episodes: project.episodes.map((ep) => {
-          if (ep.id !== packageId) return ep;
-          return {
-            ...ep,
-            status: 'EPISODE_SUBMITTED',
-            video_draft_url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
-            updated_at: new Date().toISOString(),
-          };
-        }),
-      }))
-    );
-
-    return true;
-  },
-
   createProject: async (data) => {
-    const milestones = data.milestones && data.milestones.length > 0 ? data.milestones : [
-      {
-        id: `ms-1-${Date.now()}`,
-        title: 'Khởi tạo kịch bản & phân cảnh',
+    const created = await apiResult(
+      workflowService.createProject({
+        title: data.title,
+        description: data.synopsis,
+        contentType: data.episodes.length > 1 ? 'SERIES' : 'MOVIE',
+        totalAiQuotaBudget: data.total_budget_tokens,
+        productionStartDate: data.production_start_date,
         deadline: data.deadline,
-        description: 'Tạo bản thảo kịch bản chi tiết và danh sách cảnh phim.',
-        status: 'in_progress' as const,
-      }
-    ];
-
-    const totalEpisodes = data.season_count * data.episodes_per_season;
-    const projectId = `proj-${Date.now()}`;
-    const episodes: EpisodePackage[] = [];
-    let episodeNumber = 1;
-    for (let season = 1; season <= data.season_count; season += 1) {
-      for (let i = 0; i < data.episodes_per_season; i += 1) {
-        const duration = data.episode_target_durations[episodeNumber - 1] ?? data.episode_target_durations[0] ?? 30;
-        episodes.push(buildBlankEpisode(projectId, episodeNumber, season, duration));
-        episodeNumber += 1;
-      }
-    }
-
-    const optimisticProject: ProductionProject = {
-      id: projectId,
-      title: data.title,
-      genre: data.genre,
-      synopsis: data.synopsis,
-      overall_script: '',
-      script_version: 1,
-      script_review: PENDING_FIELD_REVIEW,
-      season_count: data.season_count,
-      episodes_per_season: data.episodes_per_season,
-      total_episodes: totalEpisodes,
-      total_budget_tokens: data.total_budget_tokens,
-      allocated_tokens: 0,
-      consumed_tokens: 0,
-      production_start_date: data.production_start_date,
-      deadline: data.deadline,
-      planned_release_date: data.planned_release_date,
-      creator_name: data.creator_name?.trim() || 'Trần Minh Huy',
-      reviewer_name: 'Lê Quốc Bảo',
-      overall_status: 'NOT_STARTED',
-      milestones,
-      active_milestone_id: milestones[0]?.id,
-      episodes,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-
-    set((state) => ({
-      project: optimisticProject,
-      projects: [optimisticProject, ...state.projects.filter((p) => p.id !== optimisticProject.id)],
-      activeProjectId: optimisticProject.id,
-      activePackageId: optimisticProject.episodes[0]?.id || '',
-    }));
-
-    const contentType: 'MOVIE' | 'SERIES' = data.season_count > 1 || totalEpisodes > 1 ? 'SERIES' : 'MOVIE';
-    const backendPayload = {
-      title: data.title,
-      description: data.synopsis,
-      contentType,
-      totalAiQuotaBudget: data.total_budget_tokens,
-      productionStartDate: data.production_start_date,
-      deadline: data.deadline,
-      plannedReleaseDate: data.planned_release_date,
-      defaultEpisodeDurationSeconds: (data.episode_target_durations[0] || 30) * 60,
-      episodeCount: totalEpisodes,
-      assignedCreatorId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
-      milestones: milestones.map((m) => ({
-        title: m.title,
-        description: m.description,
-        targetDate: m.deadline,
-      })),
-    };
-
-    try {
-      const response = await workflowService.createProject(backendPayload);
-      if (response.success && response.data) {
-        const persistedProject = adaptApiProjectToUiProject(response.data);
-        set((state) => ({
-          project: persistedProject,
-          projects: [persistedProject, ...state.projects.filter((p) => p.id !== persistedProject.id)],
-          activeProjectId: persistedProject.id,
-          activePackageId: persistedProject.episodes?.[0]?.id || '',
-        }));
-        return persistedProject;
-      }
-    } catch (error) {
-      console.warn('Create project API call:', error);
-    }
-
-    return optimisticProject;
-  },
-
-  setActiveMilestone: (milestoneId) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        active_milestone_id: milestoneId,
-        updated_at: new Date().toISOString(),
-      }))
+        plannedReleaseDate: data.planned_release_date,
+        episodes: data.episodes.map((e) => ({ seasonNumber: e.season_number, targetDurationSeconds: e.duration_minutes * 60 })),
+        assignedCreatorId: data.creator_id,
+        genreIds: data.genre_ids,
+        subtitleLanguages: data.subtitle_languages,
+        milestones: (data.milestones ?? []).map((m) => ({
+          title: m.title,
+          description: m.description,
+          startDate: m.startDate || undefined,
+          targetDate: m.deadline || undefined,
+        })),
+      }),
+      'Không tạo được dự án'
     );
-  },
-
-  updateMilestoneStatus: (milestoneId, status) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => ({
-        ...project,
-        milestones: project.milestones?.map((m) => (m.id === milestoneId ? { ...m, status } : m)),
-        updated_at: new Date().toISOString(),
-      }))
-    );
+    if (!created) return false;
+    set({ activeProjectId: created.id, activePackageId: '' });
+    await get().loadProjects();
+    return true;
   },
 });

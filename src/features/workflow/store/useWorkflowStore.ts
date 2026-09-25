@@ -1,53 +1,40 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import {
-  initialProject,
-  mockAssignedProjects,
-  initialReviews,
-  initialComplianceChecks,
-  initialLabels,
-  initialPublications,
-} from '@/features/workflow/mocks/workflowMock';
+import { EMPTY_PROJECT } from '@/features/workflow/lib/emptyProject';
 import { createViewSlice } from './slices/viewSlice';
+import { createSettingsSlice } from './slices/settingsSlice';
 import { createEpisodeSlice } from './slices/episodeSlice';
 import { createProductionSlice } from './slices/productionSlice';
 import { createReviewSlice } from './slices/reviewSlice';
 import { createComplianceSlice } from './slices/complianceSlice';
-import {
-  createEmptyProject,
-  EMPTY_COMPLIANCE_CHECKS,
-  EMPTY_LABELS,
-  EMPTY_PROJECTS,
-  EMPTY_PUBLICATIONS,
-  EMPTY_REVIEWS,
-} from './emptyState';
 import type { WorkflowStoreState } from './types';
 
 export const useWorkflowStore = create<WorkflowStoreState>()(
   persist(
     (set, get, api) => ({
       ...createViewSlice(set, get, api),
+      ...createSettingsSlice(set, get, api),
       ...createEpisodeSlice(set, get, api),
       ...createProductionSlice(set, get, api),
       ...createReviewSlice(set, get, api),
       ...createComplianceSlice(set, get, api),
 
-      resetDemoData: () => {
+      resetWorkspace: async () => {
         set({
-          currentRole: 'creator',
-          activeProjectId: 'proj-cyber-01',
-          activePackageId: 'pkg-ep-03',
-          project: initialProject,
-          projects: mockAssignedProjects,
-          reviews: initialReviews,
-          complianceChecks: initialComplianceChecks,
-          labels: initialLabels,
-          publications: initialPublications,
+          activeProjectId: '',
+          activePackageId: '',
+          project: EMPTY_PROJECT,
+          projects: [],
         });
+        await get().loadProjects();
       },
     }),
     {
       name: 'ai_cinema_workflow_store',
+      // Project data now always comes from the backend; v2 discards the
+      // project snapshots persisted by earlier versions.
+      version: 2,
+      migrate: () => ({}),
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : {
         getItem: () => null,
         setItem: () => {},
@@ -57,12 +44,6 @@ export const useWorkflowStore = create<WorkflowStoreState>()(
         currentRole: state.currentRole,
         activeProjectId: state.activeProjectId,
         activePackageId: state.activePackageId,
-        project: state.project,
-        projects: state.projects,
-        reviews: state.reviews,
-        complianceChecks: state.complianceChecks,
-        labels: state.labels,
-        publications: state.publications,
       }),
     }
   )

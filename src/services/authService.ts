@@ -1,243 +1,124 @@
 /**
- * AI Cinema - Authentication Service
- * Directly connected to NestJS Backend Auth API & Neon PostgreSQL Database
+ * AI Cinema - Authentication Service (NestJS backend)
  */
 
 import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
-import { UserProfile, LoginCredentials, RegisterCredentials, AuthResponse } from '@/types/auth';
+import { UserProfile, LoginCredentials, RegisterCredentials } from '@/types/auth';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { AREAS, homeAreaOf } from '@/lib/permissions';
 
-export interface BEUserResponse {
+/** Roles as the backend's UserRole enum spells them. */
+export type BackendRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
+
+interface BackendUser {
   id: string;
   email: string;
   fullName: string;
-  role: string;
+  role: BackendRole;
   isActive: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  permissions?: string[];
 }
 
-export interface BELoginResponse {
+interface AuthSession {
   accessToken: string;
-  user: BEUserResponse;
+  refreshToken: string;
+  user: BackendUser;
 }
 
-export interface BERegisterResponse {
-  message: string;
-  user: BEUserResponse;
-}
+const ROLE_MAP: Record<BackendRole, UserProfile['role']> = {
+  MEMBER: 'user',
+  CONTENT_CREATOR: 'creator',
+  CONTENT_REVIEWER: 'reviewer',
+  STAFF: 'staff',
+  ADMIN: 'admin',
+};
 
-/**
- * Maps Backend UserRole enum to Frontend role format
- */
-export function mapBERoleToFE(beRole?: string): 'user' | 'vip' | 'admin' | 'creator' | 'reviewer' {
-  switch (beRole) {
-    case 'CONTENT_CREATOR':
-      return 'creator';
-    case 'CONTENT_REVIEWER':
-      return 'reviewer';
-    case 'ADMIN':
-    case 'STAFF':
-      return 'admin';
-    default:
-      return 'user';
-  }
-}
 
-/**
- * Transforms Backend User data into Frontend UserProfile
- */
-export function mapBEUserToFEProfile(beUser: BEUserResponse): UserProfile {
-  const role = mapBERoleToFE(beUser.role);
-  const isVIP = role === 'creator' || role === 'reviewer' || role === 'admin';
+export function toUserProfile(user: BackendUser): UserProfile {
+  const role = ROLE_MAP[user.role] ?? 'user';
   return {
-    id: beUser.id,
-    name: beUser.fullName || beUser.email.split('@')[0],
-    email: beUser.email,
-    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(beUser.fullName || beUser.email)}`,
+    id: user.id,
+    name: user.fullName,
+    email: user.email,
+    avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user.email)}`,
     role,
-    isVIP,
-    createdAt: beUser.createdAt,
+    isVIP: role !== 'user',
+    permissions: user.permissions ?? [],
   };
 }
 
+export function redirectUrlFor(role: UserProfile['role']): string | undefined {
+  const area = homeAreaOf(role);
+  return area ? AREAS[area].path : undefined;
+}
+
+function persistSession(session: AuthSession): UserProfile {
+  const profile = toUserProfile(session.user);
+  storage.set(STORAGE_KEYS.AUTH_TOKEN, session.accessToken);
+  storage.set(STORAGE_KEYS.REFRESH_TOKEN, session.refreshToken);
+  storage.set(STORAGE_KEYS.USER_DATA, profile);
+  return profile;
+}
+
 export const authService = {
-  /**
-   * Login with real Backend API (/api/auth/login).
-   * Falls back to demo account profiles only for designated demo emails with password '1' if BE is offline.
-   */
-  async login(credentials: LoginCredentials): Promise<ApiResponse<AuthResponse>> {
-    const trimmedEmail = credentials.email.trim().toLowerCase();
+  async login(credentials: LoginCredentials): Promise<ApiResponse<UserProfile>> {
+    const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.LOGIN, {
+      email: credentials.email.trim().toLowerCase(),
+      password: credentials.password,
+    });
 
-    // Fast-path for quick demo accounts with password '1' to avoid 400 Bad Request (@MinLength(8) in BE DTO)
-    if (credentials.password === '1') {
-      let demoRole: 'user' | 'vip' | 'admin' | 'creator' | 'reviewer' | null = null;
-      let demoName = '';
-      let demoRedirect: string | undefined;
-
-      if (trimmedEmail === 'creator@gmail.com') {
-        demoRole = 'creator';
-        demoName = 'Đạo diễn Trần Minh Huy (Maker)';
-        demoRedirect = '/creator/projects';
-      } else if (trimmedEmail === 'reviewer@gmail.com') {
-        demoRole = 'reviewer';
-        demoName = 'Thẩm định viên Lê Quốc Bảo (Checker)';
-        demoRedirect = '/reviewer';
-      } else if (trimmedEmail === 'vipdemo@gmail.com') {
-        demoRole = 'vip';
-        demoName = 'Phạm Xuân Lộc (Khán Giả VIP)';
-      } else if (trimmedEmail === 'userdemo@gmail.com') {
-        demoRole = 'user';
-        demoName = 'Phạm Xuân Lộc (Khán Giả)';
-      }
-
-      if (demoRole) {
-        const demoUser: UserProfile = {
-          id: `demo-${demoRole}-01`,
-          name: demoName,
-          email: trimmedEmail,
-          avatarUrl: `https://api.dicebear.com/7.x/avataaars/svg?seed=${demoRole}`,
-          role: demoRole,
-          isVIP: demoRole === 'vip' || demoRole === 'creator' || demoRole === 'reviewer',
-        };
-        const token = 'mock_jwt_token_' + Date.now();
-        storage.set(STORAGE_KEYS.AUTH_TOKEN, token);
-        storage.set(STORAGE_KEYS.USER_DATA, demoUser);
-
-        if (credentials.rememberMe) {
-          storage.set(STORAGE_KEYS.REMEMBERED_EMAIL, trimmedEmail);
-          storage.set(STORAGE_KEYS.REMEMBERED_PASSWORD, credentials.password);
-        } else {
-          storage.remove(STORAGE_KEYS.REMEMBERED_PASSWORD);
-        }
-
-        return {
-          success: true,
-          data: {
-            user: demoUser,
-            token,
-            redirectUrl: demoRedirect,
-          },
-          statusCode: 200,
-          message: 'Đăng nhập thành công với tài khoản demo',
-        };
-      }
+    if (!res.success) {
+      return { ...res, data: null as unknown as UserProfile };
     }
 
-    // Call real Backend API first (no mock override)
-    const res = await apiClient.post<BELoginResponse>(
-      API_ROUTES.AUTH.LOGIN,
-      {
-        email: trimmedEmail,
-        password: credentials.password,
-      },
-      { useMockFallback: false }
-    );
-
-    if (res.success && res.data?.accessToken && res.data?.user) {
-      const userProfile = mapBEUserToFEProfile(res.data.user);
-      const token = res.data.accessToken;
-
-      let redirectUrl: string | undefined;
-      if (userProfile.role === 'creator') {
-        redirectUrl = '/creator/projects';
-      } else if (userProfile.role === 'reviewer') {
-        redirectUrl = '/reviewer';
-      }
-
-      storage.set(STORAGE_KEYS.AUTH_TOKEN, token);
-      storage.set(STORAGE_KEYS.USER_DATA, userProfile);
-
-      if (credentials.rememberMe) {
-        storage.set(STORAGE_KEYS.REMEMBERED_EMAIL, trimmedEmail);
-        storage.set(STORAGE_KEYS.REMEMBERED_PASSWORD, credentials.password);
-      } else {
-        storage.remove(STORAGE_KEYS.REMEMBERED_PASSWORD);
-      }
-
-      return {
-        success: true,
-        data: {
-          user: userProfile,
-          token,
-          redirectUrl,
-        },
-        statusCode: res.statusCode || 200,
-      };
+    const profile = persistSession(res.data);
+    if (credentials.rememberMe) {
+      storage.set(STORAGE_KEYS.REMEMBERED_EMAIL, credentials.email);
+    } else {
+      storage.remove(STORAGE_KEYS.REMEMBERED_EMAIL);
     }
 
-    return {
-      success: false,
-      data: null as unknown as AuthResponse,
-      message: res.message || 'Email hoặc mật khẩu không chính xác. Vui lòng kiểm tra lại!',
-      statusCode: res.statusCode || 401,
-    };
+    return { ...res, data: profile };
   },
 
-  /**
-   * Register with real Backend API (/api/auth/register) -> saves to PostgreSQL users table.
-   */
-  async register(credentials: RegisterCredentials): Promise<ApiResponse<AuthResponse>> {
-    const trimmedEmail = credentials.email.trim().toLowerCase();
-    const trimmedName = credentials.name.trim();
+  /** Members sign up for themselves; creator/reviewer accounts are provisioned by an admin. */
+  async register(credentials: RegisterCredentials): Promise<ApiResponse<UserProfile>> {
+    const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.REGISTER, {
+      email: credentials.email.trim().toLowerCase(),
+      password: credentials.password,
+      fullName: credentials.name.trim(),
+      role: 'MEMBER',
+    });
 
-    const res = await apiClient.post<BERegisterResponse>(
-      API_ROUTES.AUTH.REGISTER,
-      {
-        email: trimmedEmail,
-        password: credentials.password,
-        fullName: trimmedName,
-        name: trimmedName,
-        role: 'MEMBER',
-      },
-      { useMockFallback: false }
-    );
-
-    if (res.success && res.data?.user) {
-      const userProfile = mapBEUserToFEProfile(res.data.user);
-      const token = 'token_' + userProfile.id;
-
-      storage.set(STORAGE_KEYS.AUTH_TOKEN, token);
-      storage.set(STORAGE_KEYS.USER_DATA, userProfile);
-
-      return {
-        success: true,
-        data: {
-          user: userProfile,
-          token,
-        },
-        statusCode: res.statusCode || 201,
-        message: res.data.message || 'Đăng ký tài khoản thành công',
-      };
+    if (!res.success) {
+      return { ...res, data: null as unknown as UserProfile };
     }
 
-    return {
-      success: false,
-      data: null as unknown as AuthResponse,
-      message: res.message || 'Đăng ký không thành công. Vui lòng thử lại!',
-      statusCode: res.statusCode || 400,
-    };
+    return { ...res, data: persistSession(res.data) };
   },
 
-  async logout(): Promise<ApiResponse<{ success: boolean }>> {
+  async me(): Promise<ApiResponse<UserProfile>> {
+    const res = await apiClient.get<BackendUser>(API_ROUTES.AUTH.PROFILE);
+    if (!res.success) {
+      return { ...res, data: null as unknown as UserProfile };
+    }
+    const profile = toUserProfile(res.data);
+    storage.set(STORAGE_KEYS.USER_DATA, profile);
+    return { ...res, data: profile };
+  },
+
+  logout(): void {
     storage.remove(STORAGE_KEYS.AUTH_TOKEN);
+    storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
     storage.remove(STORAGE_KEYS.USER_DATA);
-    return {
-      success: true,
-      data: { success: true },
-      statusCode: 200,
-    };
   },
 
-  async getCurrentUser(): Promise<ApiResponse<UserProfile>> {
-    const savedUser = storage.get<UserProfile | null>(STORAGE_KEYS.USER_DATA, null);
-    if (savedUser) {
-      return { success: true, data: savedUser, statusCode: 200 };
-    }
-    return apiClient.get<UserProfile>(
-      API_ROUTES.AUTH.PROFILE,
-      { useMockFallback: false }
-    );
+  getStoredUser(): UserProfile | null {
+    return storage.get<UserProfile | null>(STORAGE_KEYS.USER_DATA, null);
+  },
+
+  hasSession(): boolean {
+    return Boolean(storage.getString(STORAGE_KEYS.AUTH_TOKEN));
   },
 };

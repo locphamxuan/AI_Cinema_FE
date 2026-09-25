@@ -1,3 +1,4 @@
+import type { WebRole } from '@/lib/permissions';
 import { WalletState, CheckInStreak } from '@/types/wallet';
 import { Movie } from '@/types/movie';
 import { UserSubscription, SubscriptionPlan } from '@/types/subscription';
@@ -18,16 +19,19 @@ export interface UserProfile {
   name: string;
   email: string;
   avatarUrl: string;
-  role?: 'user' | 'vip' | 'admin' | 'creator' | 'reviewer';
+  role?: WebRole;
   isVIP: boolean;
+  /** Permission keys the backend grants this account's role. */
+  permissions?: string[];
 }
 
 export interface AuthSlice {
   isAuthenticated: boolean;
   user: UserProfile | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
-  register: (name: string, email: string, password: string, role?: 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN') => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  restoreSession: () => void;
   isAuthModalOpen: boolean;
   authModalMode: 'login' | 'register';
   initialAuthEmail: string;
@@ -58,8 +62,21 @@ export interface WalletSlice {
   depositCoins: (amountVND: number, mainCoin: number, bonusCoin: number, method: string) => void;
 }
 
+export interface CatalogGenre {
+  id: string;
+  name: string;
+}
+
 export interface MovieSlice {
-  currentMovie: Movie;
+  movies: Movie[];
+  genres: CatalogGenre[];
+  isCatalogLoading: boolean;
+  catalogError: string | null;
+  /** Fetches published movies and genres once; later calls are no-ops unless `force`. */
+  loadCatalog: (force?: boolean) => Promise<void>;
+  /** Movie that contains the episode being watched, or null until the catalog has it. */
+  currentMovie: Movie | null;
+  selectEpisode: (episodeId: string) => Promise<void>;
   unlockEpisode: (episodeId: string) => { success: boolean; error?: string };
   isUnlockModalOpen: boolean;
   selectedEpisodeId: string | null;

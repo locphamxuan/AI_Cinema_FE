@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 export default function DemoControlPanel() {
   const pathname = usePathname();
   const isDashboard = pathname.startsWith('/creator') || pathname.startsWith('/reviewer');
-  const { user, isVIPMode, wallet, toggleVIPMode, setWalletBalance, isAuthenticated } = useAppStore();
+  const { isVIPMode, wallet, toggleVIPMode, setWalletBalance, isAuthenticated } = useAppStore();
   const [isOpen, setIsOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 

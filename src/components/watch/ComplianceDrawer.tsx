@@ -45,10 +45,14 @@ export default function ComplianceDrawer({ isOpen, onClose, compliance }: Compli
 
           {/* Info Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <InfoItem label="Mô hình AI" value={compliance.aiModel} />
-            <InfoItem label="Ngày tạo nội dung" value={new Date(compliance.generatedDate).toLocaleDateString('vi-VN')} />
+            {compliance.aiModel && <InfoItem label="Mô hình AI" value={compliance.aiModel} />}
+            {compliance.generatedDate && (
+              <InfoItem label="Ngày tạo nội dung" value={new Date(compliance.generatedDate).toLocaleDateString('vi-VN')} />
+            )}
             <InfoItem label="Điều luật tuân thủ" value={compliance.complianceArticle} />
-            <InfoItem label="Điểm kiểm duyệt" value={`${compliance.moderationScore}/100`} />
+            {compliance.moderationScore !== undefined && (
+              <InfoItem label="Điểm kiểm duyệt" value={`${compliance.moderationScore}/100`} />
+            )}
             <InfoItem label="Phân loại nội dung" value={compliance.contentRating} />
           </div>
 

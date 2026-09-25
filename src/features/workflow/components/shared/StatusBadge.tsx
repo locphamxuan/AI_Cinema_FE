@@ -8,6 +8,7 @@ const STATUS_CONFIG: Record<WorkflowState, { label: string; tone: 'neutral' | 'a
   IN_PRODUCTION: { label: 'Đang sản xuất', tone: 'blue' },
   EPISODE_SUBMITTED: { label: 'Chờ kiểm định', tone: 'purple' },
   CHANGES_REQUESTED: { label: 'Cần chỉnh sửa', tone: 'rose' },
+  CUT_CHANGES_REQUESTED: { label: 'Bản dựng cần sửa', tone: 'rose' },
   COMPLIANCE_PASSED: { label: 'Đã kiểm định', tone: 'emerald' },
   PUBLISHED: { label: 'Đã phát hành', tone: 'emerald' },
 };
@@ -34,6 +35,7 @@ const DOT_TONE: Record<WorkflowState, string> = {
   IN_PRODUCTION: 'bg-blue-500',
   EPISODE_SUBMITTED: 'bg-purple-500',
   CHANGES_REQUESTED: 'bg-rose-500 animate-pulse',
+  CUT_CHANGES_REQUESTED: 'bg-rose-500 animate-pulse',
   COMPLIANCE_PASSED: 'bg-emerald-500',
   PUBLISHED: 'bg-emerald-500',
 };

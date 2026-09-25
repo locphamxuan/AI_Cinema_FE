@@ -38,13 +38,13 @@ function EpisodeAction({ episode, onReviewPlan }: { episode: EpisodePackage; onR
     case 'COMPLIANCE_PASSED':
       return (
         <Link href={`/reviewer/audit/${episode.id}`} className={PRIMARY_ACTION}>
-          Thẩm định <ArrowRight className="w-3 h-3" aria-hidden="true" />
+          Kiểm định <ArrowRight className="w-3 h-3" aria-hidden="true" />
         </Link>
       );
     case 'PUBLISHED':
       return (
         <Link href={`/watch/${episode.id}`} className={SECONDARY_ACTION}>
-          Xem OTT
+          Xem trên nền tảng
         </Link>
       );
     default:
@@ -59,9 +59,9 @@ export function OverviewTab({ project, pendingPlanCount, submittedCount, onRevie
     <div className="space-y-5">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="Chờ duyệt kế hoạch" value={pendingPlanCount} highlight={pendingPlanCount > 0} />
-        <Stat label="Chờ thẩm định video" value={submittedCount} highlight={submittedCount > 0} />
-        <Stat label="Đã xuất bản" value={`${publishedCount} / ${project.total_episodes}`} />
-        <Stat label="Token đã cấp" value={`${project.consumed_tokens} / ${project.allocated_tokens}`} />
+        <Stat label="Chờ kiểm định" value={submittedCount} highlight={submittedCount > 0} />
+        <Stat label="Đã phát hành" value={`${publishedCount} / ${project.total_episodes}`} />
+        <Stat label="Token đã dùng / đã cấp" value={`${project.consumed_tokens} / ${project.allocated_tokens}`} />
       </div>
 
       <section className={`${CARD} overflow-hidden`} aria-label="Danh sách tập phim">
@@ -90,9 +90,9 @@ export function OverviewTab({ project, pendingPlanCount, submittedCount, onRevie
                   <tr key={ep.id} className="hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
                     <td className="py-3 px-5">
                       <p className="font-semibold text-slate-900 dark:text-white truncate max-w-[240px]">
-                        Tập {ep.episode_number}: {ep.title.replace(/^Tập \d+:\s*/, '')}
+                        {ep.title}
                       </p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">{ep.brief.scene_breakdown.length} phân cảnh</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{ep.brief.scene_breakdown.length} cảnh</p>
                     </td>
                     <td className="py-3 px-4 whitespace-nowrap">
                       <StatusBadge status={ep.status} />

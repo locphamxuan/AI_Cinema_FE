@@ -28,8 +28,6 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 400));
-
     const res = await login(email, password);
     if (res.success) {
       if (res.redirectUrl) {

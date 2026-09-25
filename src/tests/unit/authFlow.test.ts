@@ -13,15 +13,9 @@ describe('auth flow', () => {
       ok: true,
       status: 201,
       json: async () => ({
-        user: {
-          id: 'user-123',
-          name: 'Alice',
-          email: 'alice@example.com',
-          avatarUrl: 'https://example.com/avatar.png',
-          role: 'user',
-          isVIP: false,
-        },
-        token: 'jwt-token-123',
+        accessToken: 'jwt-access-123',
+        refreshToken: 'jwt-refresh-123',
+        user: { id: 'user-123', fullName: 'Alice', email: 'alice@example.com', role: 'MEMBER', isActive: true },
       }),
     });
 
@@ -36,7 +30,6 @@ describe('auth flow', () => {
     expect(requestInit).toMatchObject({ method: 'POST' });
     expect(JSON.parse(String(requestInit.body))).toMatchObject({
       fullName: 'Alice',
-      name: 'Alice',
       email: 'alice@example.com',
       password: 'secret123',
       role: 'MEMBER',

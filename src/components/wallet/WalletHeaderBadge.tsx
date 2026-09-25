@@ -9,15 +9,18 @@ export default function WalletHeaderBadge() {
   const [prevMainCoin, setPrevMainCoin] = useState(wallet.mainCoin);
   const [prevBonusCoin, setPrevBonusCoin] = useState(wallet.bonusCoin);
 
+  // A balance change starts the pulse (adjusting state while rendering, as React recommends).
+  if (wallet.mainCoin !== prevMainCoin || wallet.bonusCoin !== prevBonusCoin) {
+    setPrevMainCoin(wallet.mainCoin);
+    setPrevBonusCoin(wallet.bonusCoin);
+    setCoinAnimating(true);
+  }
+
   useEffect(() => {
-    if (wallet.mainCoin !== prevMainCoin || wallet.bonusCoin !== prevBonusCoin) {
-      setCoinAnimating(true);
-      setPrevMainCoin(wallet.mainCoin);
-      setPrevBonusCoin(wallet.bonusCoin);
-      const timer = setTimeout(() => setCoinAnimating(false), 600);
-      return () => clearTimeout(timer);
-    }
-  }, [wallet.mainCoin, wallet.bonusCoin, prevMainCoin, prevBonusCoin]);
+    if (!coinAnimating) return;
+    const timer = setTimeout(() => setCoinAnimating(false), 600);
+    return () => clearTimeout(timer);
+  }, [coinAnimating]);
 
   const todayClaimed = checkInStreak.todayClaimed;
 

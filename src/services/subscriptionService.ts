@@ -22,7 +22,7 @@ export const subscriptionService = {
     );
   },
 
-  async cancelSubscription(_currentSubscription?: UserSubscription): Promise<ApiResponse<UserSubscription>> {
+  async cancelSubscription(): Promise<ApiResponse<UserSubscription>> {
     return apiClient.post<UserSubscription>(
       API_ROUTES.SUBSCRIPTIONS.CANCEL,
       {}

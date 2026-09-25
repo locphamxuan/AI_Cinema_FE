@@ -1,36 +1,35 @@
 import type { GenerationJob, GeneratedAsset } from '@/types/workflow';
+import { ClipVideo } from '../../shared/ClipVideo';
 
 export interface StudioPlayerProps {
   selectedJob?: GenerationJob;
   selectedAsset?: GeneratedAsset;
 }
 
-const FALLBACK_FRAME = 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&auto=format&fit=crop&q=80';
-
-/** Preview of the selected scene's rendered clip, with its basic facts underneath. */
+/** Preview of the selected scene's generated clip, with its basic facts underneath. */
 export function StudioPlayer({ selectedJob, selectedAsset }: StudioPlayerProps) {
   const facts = selectedAsset && selectedJob
     ? [
-        ['Độ phân giải', selectedAsset.resolution],
-        ['Thời lượng', `${selectedAsset.duration_seconds} giây`],
-        ['Dung lượng', `${selectedAsset.file_size_mb} MB`],
+        ['Model', selectedAsset.model],
+        ['Thời lượng', selectedAsset.duration_seconds !== null ? `${selectedAsset.duration_seconds} giây` : '—'],
+        ['Số mục', `${selectedJob.generation_steps.length}`],
         ['Token đã dùng', `${selectedJob.token_cost}`],
       ]
     : [];
+  const isVideo = selectedAsset?.asset_type === 'video' && selectedAsset.url;
 
   return (
     <figure className="bg-white dark:bg-[#151822] rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
       <div className="relative aspect-video bg-black">
-        {/* eslint-disable-next-line @next/next/no-img-element -- external mock CDN thumbnail, not a static asset */}
-        <img
-          src={selectedAsset?.thumbnail_url || FALLBACK_FRAME}
-          alt={selectedJob ? `Khung hình của ${selectedJob.title}` : 'Chưa chọn phân cảnh'}
-          width={1280}
-          height={720}
-          className="w-full h-full object-cover opacity-90"
-        />
+        {isVideo ? (
+          <ClipVideo src={selectedAsset.url} className="w-full h-full object-contain" />
+        ) : (
+          <p className="absolute inset-0 flex items-center justify-center text-xs text-slate-400">
+            {selectedJob ? 'Cảnh này chưa có clip.' : 'Chọn một cảnh để xem.'}
+          </p>
+        )}
         <figcaption className="absolute left-3 top-3 px-2.5 py-1 rounded-md bg-black/60 text-white text-xs">
-          {selectedJob ? selectedJob.title : 'Chọn một phân cảnh để xem'}
+          {selectedJob ? selectedJob.title : 'Chọn một cảnh để xem'}
         </figcaption>
       </div>
 

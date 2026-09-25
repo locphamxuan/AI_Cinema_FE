@@ -2,18 +2,22 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Video, Play, LayoutDashboard, FileText, MessageSquare, Zap, Film } from 'lucide-react';
+import { Video, Play, LayoutDashboard, FileText, MessageSquare, Zap, Film, FilePen } from 'lucide-react';
 import { useWorkflowStore } from '@/store/useWorkflowStore';
 import { WorkspaceSidebar, type SidebarNavItem } from '../shared/WorkspaceSidebar';
 import { EpisodeSwitcher } from '../shared/EpisodeSwitcher';
+import { DraftsTab } from './tabs/DraftsTab';
 import { creatorGroups } from '@/features/workflow/lib/projectGroups';
+import { scriptReview } from '@/features/workflow/lib/planVerdict';
+import { isDraft, isPlanApproved } from '@/features/workflow/lib/workflowState';
 import { OverviewTab } from './tabs/OverviewTab';
 import { BriefTab } from './tabs/BriefTab';
 import { StudioLinkTab } from './tabs/StudioLinkTab';
 import { TokensTab } from './tabs/TokensTab';
+import { MilestoneTimeline } from '@/features/workflow/components/shared/MilestoneTimeline';
 import { ReviewsTab } from './tabs/ReviewsTab';
 
-type CreatorTab = 'overview' | 'brief' | 'studio' | 'tokens' | 'reviews';
+type CreatorTab = 'overview' | 'drafts' | 'brief' | 'studio' | 'tokens' | 'reviews';
 
 /**
  * Creator's entry point after login: a left sidebar listing every assigned
@@ -32,10 +36,9 @@ export function CreatorWorkspacePage() {
     activePackageId,
     setActivePackage,
     updateContentBrief,
-    updateOverallScript,
+    savePlanDraft,
     submitProductionPlan,
-    reviseProductionPlan,
-    reviews,
+    maxEpisodeMinutes,
     loadProjects,
   } = useWorkflowStore();
 
@@ -57,23 +60,16 @@ export function CreatorWorkspacePage() {
   const hasSelection = projects.some((p) => p.id === activeProjectId);
   const currentPackage = hasSelection ? project.episodes.find((e) => e.id === activePackageId) || project.episodes[0] : undefined;
 
-  const quotaPercent = project.allocated_tokens > 0 ? (project.consumed_tokens / project.allocated_tokens) * 100 : 0;
-  const isQuotaWarning = quotaPercent >= 90;
+  // Only the newest decision is still open for the Creator; older change requests were already answered.
+  const newestReview = currentPackage?.review_log[0];
+  const latestFeedback = newestReview?.decision === 'changes_requested' ? newestReview : undefined;
+  const episodeReviews = currentPackage?.review_log ?? [];
 
-  const latestFeedback = currentPackage
-    ? reviews.filter((r) => r.episode_package_id === currentPackage.id && r.decision === 'changes_requested')[0]
-    : undefined;
-  const episodeReviews = currentPackage ? reviews.filter((r) => r.episode_package_id === currentPackage.id) : [];
-
-  const canEnterStudio =
-    currentPackage?.status === 'QUOTA_ALLOCATED' ||
-    currentPackage?.status === 'IN_PRODUCTION' ||
-    currentPackage?.status === 'EPISODE_SUBMITTED' ||
-    currentPackage?.status === 'COMPLIANCE_PASSED' ||
-    currentPackage?.status === 'PUBLISHED';
+  const canEnterStudio = currentPackage ? isPlanApproved(currentPackage.status) : false;
 
   const navItems: SidebarNavItem[] = [
     { key: 'overview', label: 'Tổng quan', icon: LayoutDashboard },
+    { key: 'drafts', label: 'Bản nháp', icon: FilePen, badge: project.episodes.filter(isDraft).length || undefined },
     { key: 'brief', label: 'Kịch bản', icon: FileText },
     { key: 'studio', label: 'Sản xuất', icon: Video },
     { key: 'reviews', label: 'Phản hồi', icon: MessageSquare, badge: latestFeedback ? 1 : undefined },
@@ -121,7 +117,7 @@ export function CreatorWorkspacePage() {
                     onClick={() => router.push(`/creator/studio/${currentPackage.id}`)}
                     className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-2 transition cursor-pointer shadow-sm"
                   >
-                    <Video className="w-4 h-4" /> Mở AI Studio
+                    <Video className="w-4 h-4" /> Mở Studio
                   </button>
                 )}
                 {currentPackage.status === 'PUBLISHED' && (
@@ -129,11 +125,13 @@ export function CreatorWorkspacePage() {
                     onClick={() => router.push(`/watch/${currentPackage.id}`)}
                     className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 transition cursor-pointer shadow-sm"
                   >
-                    <Play className="w-4 h-4" /> Xem trên OTT
+                    <Play className="w-4 h-4" /> Xem trên nền tảng
                   </button>
                 )}
               </div>
             </div>
+
+            <MilestoneTimeline milestones={project.milestones ?? []} productionStart={project.production_start_date} />
 
             <EpisodeSwitcher episodes={project.episodes} selectedId={currentPackage.id} onSelect={setActivePackage} />
 
@@ -141,7 +139,6 @@ export function CreatorWorkspacePage() {
               <OverviewTab
                 project={project}
                 currentPackage={currentPackage}
-                isQuotaWarning={isQuotaWarning}
                 scenesCount={currentPackage.brief?.scene_breakdown?.length ?? 0}
                 estimatedTokens={currentPackage.brief?.estimated_tokens ?? 0}
                 synopsis={project.synopsis}
@@ -154,17 +151,25 @@ export function CreatorWorkspacePage() {
               />
             )}
 
+            {activeTab === 'drafts' && (
+              <DraftsTab
+                episodes={project.episodes}
+                onOpen={(packageId) => {
+                  setActivePackage(packageId);
+                  setActiveTab('brief');
+                }}
+              />
+            )}
+
             {activeTab === 'brief' && (
               <BriefTab
                 key={currentPackage.id}
                 currentPackage={currentPackage}
-                overallScript={project.overall_script}
-                scriptVersion={project.script_version}
-                scriptReview={project.script_review}
-                updateOverallScript={updateOverallScript}
+                scriptReview={scriptReview(currentPackage.brief)}
                 updateContentBrief={updateContentBrief}
+                savePlanDraft={savePlanDraft}
                 submitProductionPlan={submitProductionPlan}
-                reviseProductionPlan={reviseProductionPlan}
+                maxEpisodeMinutes={maxEpisodeMinutes}
               />
             )}
 
@@ -172,7 +177,7 @@ export function CreatorWorkspacePage() {
               <StudioLinkTab currentPackage={currentPackage} canEnterStudio={canEnterStudio} onGotoBrief={() => setActiveTab('brief')} />
             )}
 
-            {activeTab === 'tokens' && <TokensTab currentPackage={currentPackage} quotaPercent={quotaPercent} isQuotaWarning={isQuotaWarning} />}
+            {activeTab === 'tokens' && <TokensTab currentPackage={currentPackage} />}
 
             {activeTab === 'reviews' && <ReviewsTab episodeReviews={episodeReviews} />}
           </div>
@@ -181,5 +186,3 @@ export function CreatorWorkspacePage() {
     </div>
   );
 }
-
-export default CreatorWorkspacePage;

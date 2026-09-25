@@ -3,19 +3,21 @@
 import { useAppStore } from '@/store/useAppStore';
 import { useState, useCallback, useEffect } from 'react';
 
-function ConfettiEffect() {
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; color: string; delay: number }>>([]);
+const CONFETTI_COLORS = ['#E50914', '#8B5CF6', '#F59E0B', '#10B981', '#3B82F6', '#EC4899'];
 
-  useEffect(() => {
-    const colors = ['#E50914', '#8B5CF6', '#F59E0B', '#10B981', '#3B82F6', '#EC4899'];
-    const newParticles = Array.from({ length: 40 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      delay: Math.random() * 0.5,
-    }));
-    setParticles(newParticles);
-  }, []);
+function drawParticles() {
+  return Array.from({ length: 40 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+    delay: Math.random() * 0.5,
+    width: 6 + Math.random() * 8,
+    height: 6 + Math.random() * 8,
+  }));
+}
+
+function ConfettiEffect() {
+  const [particles] = useState(drawParticles);
 
   return (
     <div className="confetti-container">
@@ -27,8 +29,8 @@ function ConfettiEffect() {
             left: `${p.x}%`,
             backgroundColor: p.color,
             animationDelay: `${p.delay}s`,
-            width: `${6 + Math.random() * 8}px`,
-            height: `${6 + Math.random() * 8}px`,
+            width: `${p.width}px`,
+            height: `${p.height}px`,
           }}
         />
       ))}

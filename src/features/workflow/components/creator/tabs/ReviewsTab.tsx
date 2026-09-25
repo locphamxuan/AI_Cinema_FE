@@ -13,8 +13,8 @@ export function ReviewsTab({ episodeReviews }: ReviewsTabProps) {
           <MessageSquare className="w-5 h-5" />
         </div>
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white">Phản hồi từ người kiểm duyệt</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Lịch sử duyệt và yêu cầu chỉnh sửa</p>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white">Phản hồi của Reviewer</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Các lần duyệt và yêu cầu sửa</p>
         </div>
       </div>
 
@@ -34,20 +34,20 @@ export function ReviewsTab({ episodeReviews }: ReviewsTabProps) {
                       : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-500/20'
                   }`}
                 >
-                  {rev.decision === 'approved' ? 'ĐÃ PHÊ DUYỆT' : 'YÊU CẦU CHỈNH SỬA'}
+                  {rev.decision === 'approved' ? 'Đã duyệt' : rev.decision === 'rejected' ? 'Từ chối' : 'Cần sửa'}
                 </span>
               </div>
               <p className="text-slate-700 dark:text-slate-300 bg-white dark:bg-[#12141A] p-2.5 rounded-lg border border-slate-200 dark:border-white/10 leading-relaxed">
                 {rev.feedback_notes}
               </p>
-              {rev.quota_granted && (
+              {rev.quota_granted !== undefined && rev.quota_granted > 0 && (
                 <p className="text-[11px] text-amber-700 dark:text-amber-400 font-mono font-medium">Được cấp thêm {rev.quota_granted} token</p>
               )}
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-8 text-xs text-slate-400 dark:text-slate-500">Chưa có nhật ký thẩm định nào cho tập phim này.</div>
+        <div className="text-center py-8 text-xs text-slate-400 dark:text-slate-500">Tập này chưa có phản hồi nào.</div>
       )}
     </div>
   );
