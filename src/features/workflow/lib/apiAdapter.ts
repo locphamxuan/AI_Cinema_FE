@@ -208,8 +208,6 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multi
       scene_count: scenes.length,
       target_duration_minutes: proposedMinutes,
       estimated_tokens: toNumber(plan.estimatedAiResourceUsage),
-      production_approach: plan.productionApproach ?? '',
-      storyboard_summary: plan.scriptText ?? '',
       scene_breakdown: scenes,
       scene_reviews: scenes.map((s) => ({ scene_number: s.scene_number, ...toFieldReview(reviews.get(`scene:${s.id}`)) })),
       script_review: toFieldReview(reviews.get('OVERALL_SCRIPT')),

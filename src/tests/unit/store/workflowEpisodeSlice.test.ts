@@ -70,6 +70,43 @@ describe('Workflow store — projects, plans and milestones', () => {
       expect(await useWorkflowStore.getState().submitProductionPlan('plan-1')).toBe(false);
       expect(api.submitPlan).not.toHaveBeenCalled();
     });
+
+    it('saves a draft to the server without submitting it, taking back the new scene ids', async () => {
+      serveBackendProject(apiProject([apiPlan()]));
+      const brief = useWorkflowStore.getState().getBrief('plan-1')!;
+      useWorkflowStore.getState().updateContentBrief('plan-1', {
+        target_duration_minutes: 12,
+        scene_breakdown: [...brief.scene_breakdown, { scene_number: 3, title: 'Cảnh mới', description: '', target_duration_sec: 20, estimated_tokens: 40 }],
+        has_unsaved_changes: true,
+      });
+      api.updateScene.mockImplementation((id: string) => ok(apiScene(Number(id.slice(-1)), { id })));
+      api.createScene.mockReturnValue(ok(apiScene(3, { id: 'scene-new' })));
+      api.updatePlan.mockReturnValue(ok(apiPlan()));
+
+      expect(await useWorkflowStore.getState().savePlanDraft('plan-1')).toBe(true);
+
+      expect(api.updatePlan).toHaveBeenCalledWith('plan-1', {
+        scriptText: 'Kịch bản tổng thể',
+        targetDurationSeconds: 720,
+        estimatedAiResourceUsage: brief.estimated_tokens,
+      });
+      expect(api.submitPlan).not.toHaveBeenCalled();
+      const saved = useWorkflowStore.getState().getBrief('plan-1')!;
+      expect(saved.scene_breakdown.at(-1)!.id).toBe('scene-new');
+      expect(saved.has_unsaved_changes).toBe(false);
+    });
+
+    it('keeps unsaved edits of an episode when the project reloads', async () => {
+      serveBackendProject(apiProject([apiPlan(), apiPlan({ id: 'plan-2', episodeNumber: 2 })]));
+      useWorkflowStore.getState().updateContentBrief('plan-2', { target_duration_minutes: 7, has_unsaved_changes: true });
+      useWorkflowStore.getState().updateOverallScript('Bản đang viết');
+
+      await useWorkflowStore.getState().loadProject('project-1');
+
+      const state = useWorkflowStore.getState();
+      expect(state.getBrief('plan-2')!.target_duration_minutes).toBe(7);
+      expect(state.project.overall_script).toBe('Bản đang viết');
+    });
   });
 
   describe('Project creation', () => {
@@ -127,15 +164,14 @@ describe('Workflow store — projects, plans and milestones', () => {
   });
 
   describe('Local plan helpers', () => {
-    it('bumps script_version and resets its review only when the overall script changes', () => {
+    it('resets the script review only when the overall script changes, leaving the version to the server', () => {
       const before = useWorkflowStore.getState().project;
       useWorkflowStore.getState().updateOverallScript(before.overall_script);
-      expect(useWorkflowStore.getState().project.script_version).toBe(before.script_version);
       expect(useWorkflowStore.getState().project.script_review.status).toBe('approved');
 
       useWorkflowStore.getState().updateOverallScript('Kịch bản mới');
       const after = useWorkflowStore.getState().project;
-      expect(after.script_version).toBe(before.script_version + 1);
+      expect(after.script_version).toBe(before.script_version);
       expect(after.script_review.status).toBe('pending');
     });
 

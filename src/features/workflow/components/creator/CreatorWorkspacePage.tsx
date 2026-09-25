@@ -35,7 +35,8 @@ export function CreatorWorkspacePage() {
     setActivePackage,
     updateContentBrief,
     updateOverallScript,
-    reviseProductionPlan,
+    savePlanDraft,
+    submitProductionPlan,
     loadProjects,
   } = useWorkflowStore();
 
@@ -154,7 +155,8 @@ export function CreatorWorkspacePage() {
                 scriptReview={scriptReview(project, currentPackage.brief)}
                 updateOverallScript={updateOverallScript}
                 updateContentBrief={updateContentBrief}
-                reviseProductionPlan={reviseProductionPlan}
+                savePlanDraft={savePlanDraft}
+                submitProductionPlan={submitProductionPlan}
               />
             )}
 

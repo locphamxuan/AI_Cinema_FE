@@ -43,6 +43,7 @@ import type {
   Paginated,
   RecordComplianceReviewDto,
   SubmitProductionPlanDto,
+  UpdateProductionPlanDto,
   UpdateMilestoneDto,
   UpdateSceneDto,
   ApiMilestone,
@@ -98,6 +99,10 @@ class WorkflowService {
   }
 
   // Plans & scenes (Creator)
+
+  updatePlan(planId: string, dto: UpdateProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
+    return apiClient.patch<ApiProductionPlan>(ROUTES.PLAN_DETAIL(planId), dto);
+  }
 
   submitPlan(planId: string, dto: SubmitProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
     return apiClient.post<ApiProductionPlan>(ROUTES.PLAN_SUBMIT(planId), dto);

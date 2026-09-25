@@ -80,7 +80,6 @@ describe.skipIf(!API)('MF-1 workflow against the live API', () => {
     state().updateContentBrief(episodeId, {
       target_duration_minutes: 8,
       estimated_tokens: 400,
-      production_approach: 'Cinematic',
       scene_breakdown: [1, 2].map((n) => ({
         scene_number: n,
         title: `Cảnh ${n}`,

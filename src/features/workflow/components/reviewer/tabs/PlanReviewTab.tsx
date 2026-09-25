@@ -135,13 +135,6 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
             </FieldReviewCard>
           </div>
 
-          {brief.production_approach && (
-            <div className="bg-slate-50/60 dark:bg-white/[0.02] p-4 rounded-xl border border-slate-200/80 dark:border-white/5 space-y-1.5">
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Cách thực hiện dự kiến</span>
-              <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">{brief.production_approach}</p>
-            </div>
-          )}
-
           {/* Scene-by-scene review */}
           <div className="space-y-3">
             <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">

@@ -11,6 +11,7 @@ export const workflowService = {
   updateScene: vi.fn(),
   deleteScene: vi.fn(),
   submitPlan: vi.fn(),
+  updatePlan: vi.fn(),
   createPlanReview: vi.fn(),
   decidePlanReview: vi.fn(),
   allocateQuota: vi.fn(),

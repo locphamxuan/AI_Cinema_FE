@@ -32,10 +32,11 @@ export interface EpisodeSlice {
 
   /** Edits the local plan draft; nothing reaches the backend until the plan is submitted. */
   updateContentBrief: (packageId: string, briefData: Partial<ContentBrief>) => void;
+  /** Saves the plan as a draft on the server (scenes, script, duration, estimate) without submitting it. */
+  savePlanDraft: (packageId: string) => Promise<boolean>;
   /** Saves the draft's scenes, then submits the plan for review. */
   submitProductionPlan: (packageId: string) => Promise<boolean>;
-  reviseProductionPlan: (packageId: string, updatedBrief: Partial<ContentBrief>) => Promise<boolean>;
-  /** Rewrites the project-level overall script; bumps script_version and resets its review when the text changed. */
+  /** Rewrites the project-level overall script and resets its review when the text changed; the version comes from the server. */
   updateOverallScript: (script: string) => void;
   /** Draft steps only — generated steps are backend jobs and stay read-only. */
   addGenerationStep: (packageId: string, jobId: string, step: Omit<GenerationStep, 'id'>) => void;

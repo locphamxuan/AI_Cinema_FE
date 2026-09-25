@@ -28,10 +28,9 @@ export interface ContentBrief {
   target_duration_minutes: number;
   /** Planning estimate summed from scene_breakdown — not a hard quota (BR-38). */
   estimated_tokens: number;
-  /** How the Creator plans to produce/assemble assets (model/prompt strategy). */
-  production_approach: string;
-  storyboard_summary: string;
   scene_breakdown: SceneBreakdownItem[];
+  /** The Creator edited the plan since it was last saved to the server. */
+  has_unsaved_changes?: boolean;
   /** Field-level reviewer verdicts (BR-39) — all reset to 'pending' on every (re)submit. */
   scene_reviews: SceneReview[];
   /** This plan's verdict on the overall script; falls back to ProductionProject.script_review. */

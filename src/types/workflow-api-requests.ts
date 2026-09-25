@@ -42,9 +42,15 @@ export interface UpdateMilestoneDto {
   resultText?: string;
 }
 
+/** Draft of a plan the Creator is still writing (or reworking after a change request). */
+export interface UpdateProductionPlanDto {
+  scriptText?: string;
+  targetDurationSeconds?: number;
+  estimatedAiResourceUsage?: number;
+}
+
 export interface SubmitProductionPlanDto {
   scriptText: string;
-  productionApproach: string;
   targetDurationSeconds: number;
   estimatedAiResourceUsage: number;
   /** Final script of every existing scene of the plan. */
