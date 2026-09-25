@@ -1,0 +1,37 @@
+import { vi } from 'vitest';
+
+/** Every workflow API call the store makes, as a mock; tests load it with
+ * vi.mock('@/services/workflowService', () => import('@/tests/support/workflowServiceMock')). */
+export const workflowService = {
+  listProjects: vi.fn(),
+  getProject: vi.fn(),
+  createProject: vi.fn(),
+  updateMilestone: vi.fn(),
+  createScene: vi.fn(),
+  updateScene: vi.fn(),
+  deleteScene: vi.fn(),
+  submitPlan: vi.fn(),
+  createPlanReview: vi.fn(),
+  decidePlanReview: vi.fn(),
+  allocateQuota: vi.fn(),
+  requestQuota: vi.fn(),
+  approveQuotaRequest: vi.fn(),
+  rejectQuotaRequest: vi.fn(),
+  createReview: vi.fn(),
+  decideReview: vi.fn(),
+  listPolicies: vi.fn(),
+  createAiContentLabel: vi.fn(),
+  recordComplianceReview: vi.fn(),
+  createCatalog: vi.fn(),
+  createPublication: vi.fn(),
+  publish: vi.fn(),
+  listJobs: vi.fn(),
+  createJob: vi.fn(),
+  runJob: vi.fn(),
+  retryJob: vi.fn(),
+  submitScene: vi.fn(),
+  createEpisodePackage: vi.fn(),
+  submitEpisodePackage: vi.fn(),
+  getRouting: vi.fn(),
+  resolveRoute: vi.fn(),
+};
