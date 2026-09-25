@@ -14,8 +14,9 @@ export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], Com
     passCompliance: async (packageId, checks, labelDisplayLocation) => {
       // A failed check goes back to the Creator through "request changes", never recorded as passed.
       if (MANUAL_COMPLIANCE_CHECKS.some((c) => !checks[c.type])) return false;
-      const pkgId = get().getPackage(packageId)?.package_id;
-      if (!pkgId) return false;
+      const pkg = get().getPackage(packageId);
+      const pkgId = pkg?.package_id;
+      if (!pkg || !pkgId) return false;
 
       const policies = await apiResult(workflowService.listPolicies(), 'Không tải được chính sách');
       const policy = policies?.data.find((p) => p.isActive);
@@ -24,33 +25,38 @@ export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], Com
         return false;
       }
 
-      // The catalog only accepts a package whose latest review is APPROVED.
-      const review = await apiResult(workflowService.createReview(pkgId), 'Không tạo được phiên duyệt');
-      if (!review) return reload().then(() => false);
-      if (!(await apiResult(workflowService.decideReview(review.id, { decision: 'APPROVED' }), 'Không duyệt được bản dựng'))) {
-        return reload().then(() => false);
+      // BR-42 order: label, then every check, then approve — the backend refuses to approve a
+      // package that is not compliant. Steps already done on an earlier attempt are skipped.
+      if (!pkg.is_labelled) {
+        const label = await apiResult(
+          workflowService.createAiContentLabel(pkgId, {
+            labelType: 'AI_GENERATED',
+            labelText: AI_LABEL_TEXT,
+            displayLocation: labelDisplayLocation,
+            policyId: policy.id,
+          }),
+          'Không gắn được nhãn AI'
+        );
+        if (!label) return reload().then(() => false);
       }
 
-      const label = await apiResult(
-        workflowService.createAiContentLabel(pkgId, {
-          labelType: 'AI_GENERATED',
-          labelText: AI_LABEL_TEXT,
-          displayLocation: labelDisplayLocation,
-          policyId: policy.id,
-        }),
-        'Không gắn được nhãn AI'
-      );
-      if (!label) return reload().then(() => false);
+      if (!pkg.is_compliant) {
+        const recorded = await apiResult(
+          workflowService.recordComplianceReview(pkgId, {
+            policyId: policy.id,
+            checks: MANUAL_COMPLIANCE_CHECKS.map((c) => ({ checkType: c.type, result: 'PASS' })),
+          }),
+          'Không lưu được kết quả kiểm định'
+        );
+        if (!recorded || recorded.verdict !== 'PASS') return reload().then(() => false);
+      }
 
-      const recorded = await apiResult(
-        workflowService.recordComplianceReview(pkgId, {
-          policyId: policy.id,
-          checks: MANUAL_COMPLIANCE_CHECKS.map((c) => ({ checkType: c.type, result: 'PASS' })),
-        }),
-        'Không lưu được kết quả kiểm định'
-      );
+      // The catalog only accepts a package whose latest review is APPROVED.
+      const review = await apiResult(workflowService.createReview(pkgId), 'Không tạo được phiên duyệt');
+      const approved =
+        review && (await apiResult(workflowService.decideReview(review.id, { decision: 'APPROVED' }), 'Không duyệt được bản dựng'));
       await reload();
-      return recorded !== null;
+      return Boolean(approved);
     },
 
     publishEpisode: async (packageId, scheduledAt) => {
