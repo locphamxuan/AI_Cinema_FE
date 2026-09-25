@@ -12,7 +12,7 @@ interface WatchPlayerSectionProps {
 }
 
 export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProps) {
-  const { currentMovie, isVIPMode, openUnlockModal } = useAppStore();
+  const { currentMovie, isVIPMode, subscription, openUnlockModal } = useAppStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
@@ -35,9 +35,9 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
     }
   }, [episodeId, currentMovie.episodes]);
 
-  // Can the user play this episode?
+  // Can the user play this episode? (Step 3: Mở quyền xem toàn bộ phim)
   const canPlay = currentEpisode
-    ? isVIPMode || currentEpisode.isFree || currentEpisode.isUnlocked
+    ? isVIPMode || subscription?.status === 'active' || currentEpisode.isFree || currentEpisode.isUnlocked
     : false;
 
   // Stream URL: use active version's HLS URL if available, else episode default

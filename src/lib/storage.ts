@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: 'ai_cinema_auth_token',
   USER_DATA: 'ai_cinema_user_data',
   WALLET_DATA: 'ai_cinema_wallet_data',
+  SUBSCRIPTION_DATA: 'ai_cinema_subscription_data',
 } as const;
 
 export const storage = {
