@@ -33,15 +33,41 @@ const fixtureMovie: Movie = {
 
 describe('Zustand App Store (src/store/useAppStore.ts)', () => {
   beforeEach(() => {
-    // Reset store state
+    const todayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
     const store = useAppStore.getState();
     store.logout();
-    store.setWalletBalance(120, 80);
-    useAppStore.setState({ currentMovie: fixtureMovie, movies: [fixtureMovie] });
+    store.setWalletBalance(0, 0);
+    useAppStore.setState({
+      chatMessages: [],
+      currentMovie: fixtureMovie,
+      movies: [fixtureMovie],
+      checkInStreak: {
+        days: Array.from({ length: 7 }, (_, idx) => ({
+          dayIndex: idx,
+          dayLabel: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'][idx],
+          reward: 10,
+          claimed: idx < todayIdx,
+          isToday: idx === todayIdx,
+        })),
+        currentStreak: 0,
+        lastCheckInDate: null,
+        todayClaimed: false,
+      },
+    });
   });
 
   describe('Dual Wallet & Coin Deduction', () => {
+    it('starts with API-ready empty state instead of seeded mock data', () => {
+      const state = useAppStore.getState();
+      expect(state.wallet.mainCoin).toBe(0);
+      expect(state.wallet.bonusCoin).toBe(0);
+      expect(state.chatMessages).toEqual([]);
+      expect(state.checkInStreak.currentStreak).toBe(0);
+    });
+
     it('initializes with default coin balance', () => {
+      const store = useAppStore.getState();
+      store.setWalletBalance(120, 80);
       const state = useAppStore.getState();
       expect(state.wallet.mainCoin).toBe(120);
       expect(state.wallet.bonusCoin).toBe(80);
@@ -100,7 +126,24 @@ describe('Zustand App Store (src/store/useAppStore.ts)', () => {
 
     it('prevents duplicate check-ins on the same day', () => {
       const store = useAppStore.getState();
-      const success = store.claimDailyCheckIn();
+      const first = store.claimDailyCheckIn();
+      expect(first).toBe(true);
+
+      const second = store.claimDailyCheckIn();
+      expect(second).toBe(false);
+    });
+
+    it('maintains todayClaimed after store sync / page reload simulation', () => {
+      const store = useAppStore.getState();
+      expect(store.claimDailyCheckIn()).toBe(true);
+      expect(useAppStore.getState().checkInStreak.todayClaimed).toBe(true);
+
+      // Simulate F5 page refresh sync
+      store.syncCheckInStreak();
+      expect(useAppStore.getState().checkInStreak.todayClaimed).toBe(true);
+
+      // Cannot claim again
+      const success = useAppStore.getState().claimDailyCheckIn();
       expect(success).toBe(false);
     });
   });

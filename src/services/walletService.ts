@@ -6,7 +6,8 @@ import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import { WalletState, CheckInStreak } from '@/types/wallet';
 import { Transaction } from '@/types/transaction';
-import { mockCheckInStreak, mockTransactions } from '@/mocks/mockData';
+import { mockCheckInStreak, mockTransactions, getInitialCheckInStreak } from '@/mocks/mockData';
+import { getTodayDayIndex, getTodayDateString } from '@/lib/dateUtils';
 
 export interface UnlockEpisodeResult {
   success: boolean;
@@ -23,7 +24,7 @@ export const walletService = {
   },
 
   async getCheckInStreak(): Promise<ApiResponse<CheckInStreak>> {
-    return apiClient.get<CheckInStreak>(API_ROUTES.WALLET.STREAK, {}, () => mockCheckInStreak);
+    return apiClient.get<CheckInStreak>(API_ROUTES.WALLET.STREAK, {}, () => getInitialCheckInStreak());
   },
 
   async claimDailyReward(_currentStreak?: CheckInStreak, _currentWallet?: WalletState): Promise<ApiResponse<{ streak: CheckInStreak; wallet: WalletState; reward: number }>> {
@@ -32,12 +33,25 @@ export const walletService = {
       {},
       {},
       () => {
-        const streak = _currentStreak || mockCheckInStreak;
+        const todayIdx = getTodayDayIndex();
+        const todayStr = getTodayDateString();
+        const baseStreak = _currentStreak || getInitialCheckInStreak();
+        const reward = baseStreak.days[todayIdx]?.reward ?? 10;
         const wallet = _currentWallet || { mainCoin: 120, bonusCoin: 100 };
         return {
-          streak: { ...streak, currentStreak: streak.currentStreak + 1, todayClaimed: true },
-          wallet: { ...wallet, bonusCoin: wallet.bonusCoin + 10 },
-          reward: 10,
+          streak: {
+            ...baseStreak,
+            currentStreak: todayIdx + 1,
+            todayClaimed: true,
+            lastCheckInDate: todayStr,
+            days: baseStreak.days.map((d, idx) => ({
+              ...d,
+              claimed: idx <= todayIdx,
+              isToday: idx === todayIdx,
+            })),
+          },
+          wallet: { ...wallet, bonusCoin: wallet.bonusCoin + reward },
+          reward,
         };
       }
     );

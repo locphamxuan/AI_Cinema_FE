@@ -1,10 +1,13 @@
 export type SubscriptionStatus = 'active' | 'expired' | 'cancelled' | 'none';
 
+export type BillingCycle = 'week' | 'month' | 'year';
+
 export interface SubscriptionPlan {
   id: string;
   name: string;
   price: number;
   duration: number; // days
+  billingCycle?: BillingCycle;
   features: string[];
   popular?: boolean;
 }
@@ -16,4 +19,5 @@ export interface UserSubscription {
   endDate: string | null;
   autoRenew: boolean;
   paymentMethod: string;
+  cancelledBefore24h?: boolean;
 }

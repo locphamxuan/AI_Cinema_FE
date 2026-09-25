@@ -19,7 +19,9 @@ interface WatchPlayerSectionProps {
 }
 
 export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProps) {
-  const { currentMovie, isVIPMode, openUnlockModal, selectEpisode, isCatalogLoading } = useAppStore();
+  const { currentMovie, isVIPMode, subscription, openUnlockModal, selectEpisode, isCatalogLoading } = useAppStore();
+  // An active membership opens every episode, like VIP (MF-2).
+  const hasPass = isVIPMode || subscription?.status === 'active';
   const videoRef = useRef<HTMLVideoElement>(null);
   // The episode picked in the list (for the route it was picked on) and the version picked for it.
   const [picked, setPicked] = useState<{ route?: string; episodeId: string } | null>(null);
@@ -41,7 +43,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
 
   // Can the user play this episode?
   const canPlay = currentEpisode
-    ? isVIPMode || currentEpisode.isFree || currentEpisode.isUnlocked
+    ? hasPass || currentEpisode.isFree || currentEpisode.isUnlocked
     : false;
 
   // Stream URL: use active version's HLS URL if available, else episode default
@@ -71,7 +73,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   }, [canPlay, currentEpisode, openUnlockModal]);
 
   const handleEpisodeClick = (ep: Episode) => {
-    const canPlayEp = isVIPMode || ep.isFree || ep.isUnlocked;
+    const canPlayEp = hasPass || ep.isFree || ep.isUnlocked;
     if (canPlayEp) {
       setPicked({ route: episodeId, episodeId: ep.id });
       setPickedVersion(null);
@@ -275,7 +277,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
         movie={currentMovie}
         currentEpisodeId={currentEpisode.id}
         isPlaying={isPlaying}
-        canPlay={(ep) => isVIPMode || ep.isFree || ep.isUnlocked}
+        canPlay={(ep) => hasPass || ep.isFree || ep.isUnlocked}
         onSelect={handleEpisodeClick}
       />
     </div>

@@ -1,191 +1,208 @@
 'use client';
 
 import { useAppStore } from '@/store/useAppStore';
+import { useNow } from '@/hooks/useNow';
 import { useState, useEffect, useMemo } from 'react';
+import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import { subscriptionPlans } from '@/mocks/subscription';
+import type { SubscriptionPlan } from '@/types/subscription';
+import CurrentPlanCard from './CurrentPlanCard';
 import DeviceManager from './DeviceManager';
-import PlanCatalog from './PlanCatalog';
+import PaymentModal from './PaymentModal';
+import PlanCatalog, { type BillingCycleFilter } from './PlanCatalog';
+import SubscriptionFlowTracker from './SubscriptionFlowTracker';
+import SubscriptionSimulator, { type SubscriptionNotice } from './SubscriptionSimulator';
+
+const HOUR_MS = 3_600_000;
+
+function formatCountdown(msLeft: number | null): string {
+  if (msLeft === null) return '';
+  if (msLeft <= 0) return 'Đã hết hạn';
+  const hours = Math.floor(msLeft / HOUR_MS);
+  const minutes = Math.floor((msLeft % HOUR_MS) / 60_000);
+  const seconds = Math.floor((msLeft % 60_000) / 1000);
+  return `${hours}h ${minutes}m ${seconds}s`;
+}
 
 export default function SubscriptionManager() {
-  const { subscription, toggleAutoRenew } = useAppStore();
+  const { subscription, cancelSubscription, activateSubscription } = useAppStore();
 
-  // Calculate hours until renewal
-  const [now, setNow] = useState(Date.now);
+  // Selected billing cycle filter
+  const [selectedCycle, setSelectedCycle] = useState<BillingCycleFilter>('all');
+
+  // Payment confirmation modal state
+  const [selectedPlanForPayment, setSelectedPlanForPayment] = useState<SubscriptionPlan | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('Thẻ Visa / Mastercard (****4242)');
+  const [notification, setNotification] = useState<SubscriptionNotice | null>(null);
+
+  // Hours and the live countdown until the plan renews or ends.
+  const now = useNow(1000).getTime();
+  const msLeft = subscription.endDate ? new Date(subscription.endDate).getTime() - now : null;
+  const hoursUntilRenewal = msLeft === null ? null : msLeft <= 0 ? 0 : Math.round((msLeft / HOUR_MS) * 10) / 10;
+  const countdown = formatCountdown(msLeft);
+
+  // Mainflow 2 logic: is inside 24h window?
+  const isExpiringWithin24h = hoursUntilRenewal !== null && hoursUntilRenewal <= 24 && hoursUntilRenewal > 0;
+  const showRenewalWarning = isExpiringWithin24h && subscription.autoRenew;
+
+  // Auto clear notification after 6 seconds
   useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), 60_000);
-    return () => clearInterval(timer);
-  }, []);
+    if (!notification) return;
+    const timer = setTimeout(() => setNotification(null), 6000);
+    return () => clearTimeout(timer);
+  }, [notification]);
 
-  const hoursUntilRenewal = useMemo(() => {
-    if (!subscription.endDate) return null;
-    const end = new Date(subscription.endDate).getTime();
-    const diffMs = end - now;
-    if (diffMs <= 0) return 0;
-    return Math.round(diffMs / (1000 * 60 * 60) * 10) / 10; // 1 decimal
-  }, [subscription.endDate, now]);
+  const handleCancelClick = () => {
+    const res = cancelSubscription();
+    setNotification({
+      type: res.cancelledBefore24h ? 'success' : 'warning',
+      text: res.message,
+    });
+  };
 
-  const showRenewalWarning = hoursUntilRenewal !== null && hoursUntilRenewal <= 24 && hoursUntilRenewal > 0 && subscription.autoRenew;
+  const handleConfirmPayment = () => {
+    if (!selectedPlanForPayment) return;
+    const res = activateSubscription(selectedPlanForPayment, selectedPaymentMethod);
+    setSelectedPlanForPayment(null);
+    setNotification({
+      type: 'success',
+      text: res.message || 'Đăng ký gói thành công!',
+    });
+  };
 
-  // Countdown timer
-  const [countdown, setCountdown] = useState('');
-  useEffect(() => {
-    if (!subscription.endDate || !subscription.autoRenew) return;
-
-    const update = () => {
-      const end = new Date(subscription.endDate!).getTime();
-      const now = Date.now();
-      const diff = end - now;
-      if (diff <= 0) {
-        setCountdown('Đã hết hạn');
-        return;
-      }
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      setCountdown(`${hours}h ${minutes}m ${seconds}s`);
-    };
-
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  }, [subscription.endDate, subscription.autoRenew]);
+  const filteredPlans = useMemo(() => {
+    if (selectedCycle === 'all') return subscriptionPlans.slice(0, 3);
+    return subscriptionPlans.filter((p) => p.billingCycle === selectedCycle);
+  }, [selectedCycle]);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">🎬 Quản Lý Gói Hội Viên</h1>
-        <p className="text-muted-light text-sm mt-1">Quản lý gói dịch vụ, thanh toán và gia hạn tự động</p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Page Header with Mainflow 2 Badge */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-black text-slate-900 dark:text-foreground tracking-tight">
+              🎬 Đăng Ký Gói Thành Viên & Tự Động Gia Hạn
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-500/30">
+              Mainflow 2
+            </span>
+          </div>
+          <p className="text-slate-500 dark:text-muted-light text-xs sm:text-sm mt-1">
+            Mở quyền xem toàn bộ phim không giới hạn • Theo dõi mốc 24h gia hạn tự động
+          </p>
+        </div>
+
+        {/* Live Status Badge */}
+        {subscription.plan && (
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            {subscription.autoRenew ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Tự động gia hạn: BẬT
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                Dừng khi hết hạn
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* 24h Renewal Warning Banner */}
-      {showRenewalWarning && (
-        <div className="glass-card p-5 border-2 border-coin/50 glow-coin animate-slide-down">
-          <div className="flex items-start gap-3">
-            <span className="text-3xl">⚠️</span>
-            <div className="flex-1">
-              <h3 className="text-base font-bold text-coin">Cảnh báo gia hạn tự động</h3>
-              <p className="text-sm text-foreground/80 mt-1">
-                Gói của bạn sẽ tự động gia hạn sau <span className="font-bold text-coin">{countdown}</span> nữa.
-                Hệ thống sẽ trừ phí tự động <span className="font-bold text-foreground">{subscription.plan?.price.toLocaleString('vi-VN')}₫</span>.
-                Bạn có thể tắt tự động gia hạn trước mốc thời gian này.
-              </p>
-              <div className="flex flex-wrap gap-3 mt-4">
-                <button
-                  onClick={() => { toggleAutoRenew(); }}
-                  className="px-4 py-2 rounded-xl bg-danger/20 text-danger font-medium text-sm hover:bg-danger/30 transition-colors"
-                >
-                  ❌ Hủy gia hạn tự động
-                </button>
-                <button
-                  className="px-4 py-2 rounded-xl bg-white/10 text-foreground font-medium text-sm hover:bg-white/15 transition-colors"
-                >
-                  💳 Đổi phương thức thanh toán
-                </button>
-              </div>
-            </div>
-          </div>
+      {/* Floating Alert Notification */}
+      {notification && (
+        <div
+          className={`p-4 rounded-2xl border text-sm flex items-start gap-3 animate-slide-down ${
+            notification.type === 'success'
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+              : notification.type === 'warning'
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-800 dark:text-amber-300'
+                : 'bg-blue-500/10 border-blue-500/30 text-blue-700 dark:text-blue-300'
+          }`}
+        >
+          {notification.type === 'success' ? (
+            <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-500" />
+          ) : (
+            <AlertTriangle className="w-5 h-5 shrink-0 text-amber-500" />
+          )}
+          <div className="flex-1 font-medium">{notification.text}</div>
+          <button
+            onClick={() => setNotification(null)}
+            className="text-xs opacity-60 hover:opacity-100 cursor-pointer font-bold"
+          >
+            ✕
+          </button>
         </div>
       )}
 
-      {/* Current Plan Card */}
-      {subscription.plan ? (
-        <div className="glass-card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-coin to-coin-dark flex items-center justify-center text-2xl">
-                👑
+      {/* 24h Renewal Warning Banner (Mainflow 2 core feature) */}
+      {showRenewalWarning && (
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-rose-500/15 to-purple-500/15 border-2 border-amber-500/40 shadow-lg shadow-amber-500/10 animate-slide-down">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <AlertTriangle className="w-6 h-6 animate-bounce" />
+            </div>
+            <div className="flex-1 space-y-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-amber-600 dark:text-amber-400">
+                  Cảnh báo mốc 24h: Chuẩn bị thu phí tự động gia hạn
+                </h3>
+                <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-amber-500 text-black">
+                  Mốc &lt; 24h
+                </span>
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-foreground">{subscription.plan.name}</h2>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                  subscription.status === 'active'
-                    ? 'bg-verified/20 text-verified'
-                    : subscription.status === 'cancelled'
-                      ? 'bg-danger/20 text-danger'
-                      : 'bg-warning/20 text-warning'
-                }`}>
-                  {subscription.status === 'active' ? '✅ Đang hoạt động'
-                    : subscription.status === 'cancelled' ? '❌ Đã hủy'
-                      : '⏳ Hết hạn'}
+              <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                Gói <strong className="text-slate-900 dark:text-white">{subscription.plan?.name}</strong> của bạn sẽ tự
+                động gia hạn sau{' '}
+                <span className="font-mono font-bold text-amber-600 dark:text-amber-400 text-sm px-1.5 py-0.5 rounded bg-amber-500/10">
+                  {countdown}
+                </span>
+                . Hệ thống sẽ tự động trừ phí chu kỳ tiếp theo:{' '}
+                <strong className="text-purple-600 dark:text-purple-400">
+                  {subscription.plan?.price.toLocaleString('vi-VN')}₫
+                </strong>
+                .
+              </p>
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleCancelClick}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs transition cursor-pointer shadow-sm active:scale-95 flex items-center gap-1.5"
+                >
+                  <XCircle className="w-3.5 h-3.5" />
+                  <span>Hủy gia hạn tự động</span>
+                </button>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  (Nếu hủy, bạn vẫn giữ quyền xem đến khi hết hạn gói)
                 </span>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold gradient-text-coin">{subscription.plan.price.toLocaleString('vi-VN')}₫</p>
-              <p className="text-xs text-muted-light">/{subscription.plan.duration} ngày</p>
-            </div>
           </div>
-
-          {/* Plan Details Grid */}
-          <div className="grid grid-cols-2 gap-3 mb-5">
-            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-              <p className="text-[10px] text-slate-500 dark:text-muted-light uppercase font-bold">Ngày bắt đầu</p>
-              <p className="text-sm font-semibold text-slate-900 dark:text-foreground">
-                {subscription.startDate
-                  ? new Date(subscription.startDate).toLocaleDateString('vi-VN')
-                  : '—'}
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-              <p className="text-[10px] text-slate-500 dark:text-muted-light uppercase font-bold">Ngày hết hạn</p>
-              <p className="text-sm font-semibold text-slate-900 dark:text-foreground">
-                {subscription.endDate
-                  ? new Date(subscription.endDate).toLocaleDateString('vi-VN')
-                  : '—'}
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-              <p className="text-[10px] text-slate-500 dark:text-muted-light uppercase font-bold">Thanh toán qua</p>
-              <p className="text-sm font-semibold text-slate-900 dark:text-foreground">{subscription.paymentMethod || '—'}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-              <p className="text-[10px] text-slate-500 dark:text-muted-light uppercase font-bold">Thời gian còn lại</p>
-              <p className="text-sm font-bold text-coin">{countdown || '—'}</p>
-            </div>
-          </div>
-
-          {/* Features */}
-          <div className="mb-5">
-            <p className="text-xs text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold mb-2">Quyền lợi gói</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              {subscription.plan.features.map((feature, i) => (
-                <div key={i} className="flex items-center gap-2 text-sm text-slate-700 dark:text-foreground/80">
-                  <span className="text-verified font-bold">✓</span>
-                  {feature}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Auto-Renew Toggle */}
-          <div className="flex items-center justify-between p-4 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
-            <div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-foreground">Tự động gia hạn (Auto-renewal)</p>
-              <p className="text-xs text-slate-500 dark:text-muted-light mt-0.5">
-                {subscription.autoRenew
-                  ? 'Gói sẽ tự động gia hạn khi hết hạn'
-                  : 'Gói sẽ hết hạn và không gia hạn'}
-              </p>
-            </div>
-            <button
-              onClick={toggleAutoRenew}
-              className={`toggle-switch ${subscription.autoRenew ? 'active' : 'inactive'}`}
-              aria-label="Toggle auto-renewal"
-            />
-          </div>
-        </div>
-      ) : (
-        /* No Plan */
-        <div className="glass-card p-8 text-center">
-          <div className="text-5xl mb-4">🎬</div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-foreground">Bạn chưa có gói hội viên</h2>
-          <p className="text-slate-500 dark:text-muted-light text-sm mt-2">Đăng ký gói để xem phim không giới hạn và hưởng nhiều ưu đãi hấp dẫn</p>
         </div>
       )}
 
-      <PlanCatalog />
+      <SubscriptionFlowTracker />
 
+      <CurrentPlanCard countdown={countdown} onCancel={handleCancelClick} />
+      <PlanCatalog
+        plans={filteredPlans}
+        cycle={selectedCycle}
+        onCycleChange={setSelectedCycle}
+        onChoose={setSelectedPlanForPayment}
+      />
+      <SubscriptionSimulator onNotify={setNotification} />
       <DeviceManager />
+      {selectedPlanForPayment && (
+        <PaymentModal
+          plan={selectedPlanForPayment}
+          method={selectedPaymentMethod}
+          onMethodChange={setSelectedPaymentMethod}
+          onClose={() => setSelectedPlanForPayment(null)}
+          onConfirm={handleConfirmPayment}
+        />
+      )}
     </div>
   );
 }

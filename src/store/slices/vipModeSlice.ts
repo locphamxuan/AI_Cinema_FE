@@ -1,5 +1,4 @@
 import type { StateCreator } from 'zustand';
-import { mockSubscriptionVIP } from '@/mocks/mockData';
 import { emptySubscription, type AppState, type VipModeSlice } from './types';
 
 export const createVipModeSlice: StateCreator<AppState, [], [], VipModeSlice> = (set) => ({
@@ -10,7 +9,7 @@ export const createVipModeSlice: StateCreator<AppState, [], [], VipModeSlice> = 
       return {
         isVIPMode: newIsVIP,
         user: state.user ? { ...state.user, isVIP: newIsVIP } : null,
-        subscription: newIsVIP ? mockSubscriptionVIP : emptySubscription,
+        subscription: emptySubscription,
       };
     }),
 });

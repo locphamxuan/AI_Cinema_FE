@@ -1,7 +1,7 @@
 import type { WebRole } from '@/lib/permissions';
 import { WalletState, CheckInStreak } from '@/types/wallet';
 import { Movie } from '@/types/movie';
-import { UserSubscription } from '@/types/subscription';
+import { UserSubscription, SubscriptionPlan } from '@/types/subscription';
 import { Transaction } from '@/types/transaction';
 import { ChatMessage, ChatPhase, SupportTicket } from '@/types/chat';
 
@@ -54,6 +54,7 @@ export interface WalletSlice {
   wallet: WalletState;
   checkInStreak: CheckInStreak;
   claimDailyCheckIn: () => boolean;
+  syncCheckInStreak: () => void;
   setWalletBalance: (main: number, bonus: number) => void;
   isDepositModalOpen: boolean;
   openDepositModal: () => void;
@@ -86,7 +87,10 @@ export interface MovieSlice {
 export interface SubscriptionSlice {
   subscription: UserSubscription;
   toggleAutoRenew: () => void;
-  cancelSubscription: () => void;
+  cancelSubscription: () => { success: boolean; message: string; cancelledBefore24h: boolean };
+  activateSubscription: (plan: SubscriptionPlan, paymentMethod?: string) => { success: boolean; message?: string };
+  simulateExpiryTime: (hoursRemaining: number) => void;
+  renewSubscription: () => { success: boolean; message: string };
 }
 
 export interface TransactionSlice {

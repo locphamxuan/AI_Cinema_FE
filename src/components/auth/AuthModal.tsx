@@ -8,6 +8,8 @@ import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
 // Only the email is remembered; a password never goes to localStorage.
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
+// Same rule as the backend's RegisterRequestDto.
+const MIN_PASSWORD_LENGTH = 6;
 
 function savedEmail(): string | null {
   try {
@@ -71,6 +73,8 @@ function AuthModalForm() {
       } else {
         setError(res.error || 'Đăng nhập thất bại');
       }
+    } else if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(`Mật khẩu phải có tối thiểu ${MIN_PASSWORD_LENGTH} ký tự!`);
     } else {
       const res = await register(name, email, password);
       if (res.success) {
@@ -170,7 +174,7 @@ function AuthModalForm() {
           <PasswordField
             value={password}
             onChange={setPassword}
-            placeholder={mode === 'login' ? 'Nhập mật khẩu...' : 'Tạo mật khẩu...'}
+            placeholder={mode === 'login' ? 'Nhập mật khẩu...' : `Tạo mật khẩu (tối thiểu ${MIN_PASSWORD_LENGTH} ký tự)...`}
           />
 
           {/* Remember Me Checkbox */}

@@ -8,12 +8,15 @@ import type { ProjectGroup } from '@/features/workflow/lib/projectGroups';
 
 type ProjectStatus = NonNullable<ProductionProject['overall_status']>;
 
-const STATUS_META: Record<ProjectStatus, { label: string; dot: string }> = {
+const STATUS_META: Record<string, { label: string; dot: string }> = {
   NOT_STARTED: { label: 'Chưa bắt đầu', dot: 'bg-slate-400' },
+  DRAFT: { label: 'Bản nháp', dot: 'bg-slate-400' },
   IN_PROGRESS: { label: 'Đang thực hiện', dot: 'bg-purple-500' },
+  ACTIVE: { label: 'Đang hoạt động', dot: 'bg-purple-500' },
   PENDING_REVIEW: { label: 'Chờ duyệt', dot: 'bg-amber-500' },
   CHANGES_REQUESTED: { label: 'Cần chỉnh sửa', dot: 'bg-rose-500' },
   COMPLETED: { label: 'Hoàn thành', dot: 'bg-emerald-500' },
+  CANCELLED: { label: 'Đã hủy', dot: 'bg-slate-500' },
 };
 
 export interface SidebarNavItem {
@@ -35,7 +38,8 @@ export interface WorkspaceSidebarProps {
 }
 
 function ProjectRow({ project, isSelected, onSelect }: { project: ProductionProject; isSelected: boolean; onSelect: () => void }) {
-  const status = STATUS_META[project.overall_status || 'NOT_STARTED'];
+  const statusKey = project.overall_status || 'NOT_STARTED';
+  const status = STATUS_META[statusKey] || STATUS_META.NOT_STARTED;
 
   return (
     <button

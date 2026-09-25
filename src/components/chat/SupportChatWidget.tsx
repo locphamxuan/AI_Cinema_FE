@@ -14,6 +14,7 @@ export default function SupportChatWidget() {
     sendMessage,
     handleQuickAction,
     escalateToAgent,
+    isRightSidebarOpen,
   } = useAppStore();
 
   const [inputValue, setInputValue] = useState('');
@@ -261,7 +262,9 @@ export default function SupportChatWidget() {
           bottom: `${bottomOffset}px`,
           touchAction: 'none',
         }}
-        className={`fixed right-4 sm:right-6 w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-2xl transition-transform z-50 select-none ${
+        className={`fixed right-4 sm:right-6 w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-2xl transition-all duration-200 select-none ${
+          isRightSidebarOpen ? 'opacity-0 pointer-events-none scale-75 z-20' : 'opacity-100 scale-100 z-40'
+        } ${
           isDragging
             ? 'cursor-grabbing scale-110 ring-4 ring-neon/50 shadow-neon/50'
             : 'cursor-grab hover:scale-105 active:scale-95'
