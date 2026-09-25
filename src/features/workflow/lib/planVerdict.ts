@@ -3,15 +3,15 @@ import type { ContentBrief, FieldReview, ProductionProject } from '@/types/workf
 
 export type PlanVerdict = 'PENDING' | 'APPROVED' | 'CHANGES_REQUESTED';
 
-/** The overall-script verdict of an episode plan. */
-export function scriptReview(project: Pick<ProductionProject, 'script_review'>, brief: ContentBrief | undefined): FieldReview {
-  return brief?.script_review ?? project?.script_review ?? PENDING_FIELD_REVIEW;
+/** The script verdict of an episode plan. */
+export function scriptReview(brief: ContentBrief | undefined): FieldReview {
+  return brief?.script_review ?? PENDING_FIELD_REVIEW;
 }
 
-/** Every field review of an episode plan: overall script, duration, token estimate and each scene (BR-39). */
-export function planFieldReviews(project: Pick<ProductionProject, 'script_review'>, brief: ContentBrief): FieldReview[] {
+/** Every field review of an episode plan: script, duration, token estimate and each scene (BR-39). */
+export function planFieldReviews(brief: ContentBrief): FieldReview[] {
   return [
-    scriptReview(project, brief),
+    scriptReview(brief),
     brief?.duration_review || PENDING_FIELD_REVIEW,
     brief?.token_review || PENDING_FIELD_REVIEW,
     ...(brief?.scene_reviews || []),
@@ -19,9 +19,9 @@ export function planFieldReviews(project: Pick<ProductionProject, 'script_review
 }
 
 /** Overall verdict of an episode plan, aggregated from its field reviews. */
-export function derivePlanVerdict(project: Pick<ProductionProject, 'script_review'>, brief: ContentBrief): PlanVerdict {
+export function derivePlanVerdict(brief: ContentBrief): PlanVerdict {
   if (!brief) return 'PENDING';
-  const reviews = planFieldReviews(project, brief);
+  const reviews = planFieldReviews(brief);
   if (reviews.some((r) => r.status === 'changes_requested')) return 'CHANGES_REQUESTED';
   const sceneReviews = brief.scene_reviews || [];
   const allApproved = sceneReviews.length > 0 && reviews.every((r) => r.status === 'approved');
@@ -29,12 +29,12 @@ export function derivePlanVerdict(project: Pick<ProductionProject, 'script_revie
 }
 
 /** One line per flagged field with the Reviewer's comment — the default text when sending a plan back. */
-export function summarizeFlaggedFields(project: Pick<ProductionProject, 'script_review'>, brief: ContentBrief): string {
+export function summarizeFlaggedFields(brief: ContentBrief): string {
   const flagged: string[] = [];
   const add = (label: string, review?: FieldReview) => {
     if (review?.status === 'changes_requested') flagged.push(`• ${label}: ${review.comment ?? 'cần chỉnh sửa'}`);
   };
-  add('Kịch bản tổng thể', scriptReview(project, brief));
+  add('Kịch bản', scriptReview(brief));
   add('Thời lượng đề xuất', brief?.duration_review);
   add('Token dự tính', brief?.token_review);
   (brief?.scene_reviews || []).forEach((sr) => add(`Cảnh ${sr.scene_number}`, sr));

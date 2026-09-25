@@ -79,10 +79,10 @@ export function ReviewerWorkspacePage() {
     allocateQuota,
     requestPlanChanges,
     loadProjects,
-  } = useWorkflowStore();
-
-  const can = useCan();
     maxEpisodeMinutes,
+  } = useWorkflowStore();
+  const can = useCan();
+
   useEffect(() => {
     loadProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,13 +133,13 @@ export function ReviewerWorkspacePage() {
   const handleCreateProjectSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!createForm.title.trim() || !createForm.assignedCreator) return;
-
-    const created = await createProject({
-      title: createForm.title,
     if (maxEpisodeMinutes !== null && createForm.seasons.flat().some((minutes) => minutes > maxEpisodeMinutes)) {
       toast.error('Có tập dài hơn mức cho phép', `Mỗi tập tối đa ${maxEpisodeMinutes} phút. Giảm thời lượng các tập được đánh dấu đỏ rồi thử lại.`);
       return;
     }
+
+    const created = await createProject({
+      title: createForm.title,
       creator_id: createForm.assignedCreator,
       genre_ids: createForm.genre,
       subtitle_languages: createForm.subtitleLanguages,
@@ -159,7 +159,7 @@ export function ReviewerWorkspacePage() {
   };
 
   const openRejectModal = () => {
-    if (currentPackage) setRejectFeedback(summarizeFlaggedFields(project, currentPackage.brief));
+    if (currentPackage) setRejectFeedback(summarizeFlaggedFields(currentPackage.brief));
     setIsRejectModalOpen(true);
   };
 
@@ -279,10 +279,10 @@ export function ReviewerWorkspacePage() {
         onClose={() => setIsCreateProjectOpen(false)}
         onSubmit={handleCreateProjectSubmit}
         form={createForm}
+        maxEpisodeMinutes={maxEpisodeMinutes}
         onChange={(field, value) => setCreateForm((prev) => ({ ...prev, [field]: value }))}
       />
     </div>
-        maxEpisodeMinutes={maxEpisodeMinutes}
   );
 }
 

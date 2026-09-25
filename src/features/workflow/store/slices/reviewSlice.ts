@@ -34,7 +34,7 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
       const scene = brief.scene_breakdown.find((s) => s.id === target.sceneId);
       return brief.scene_reviews.find((r) => r.scene_number === scene?.scene_number);
     }
-    if (target.field === 'OVERALL_SCRIPT') return scriptReview(get().project, brief);
+    if (target.field === 'OVERALL_SCRIPT') return scriptReview(brief);
     return target.field === 'DURATION' ? brief.duration_review : brief.token_review;
   };
 
@@ -75,7 +75,7 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
     requestPlanChanges: async (packageId, feedbackNotes) => {
       const brief = get().getBrief(packageId);
       if (!brief) return false;
-      const undecided = planFieldReviews(get().project, brief).filter((r) => r.status === 'pending' && r.review_id);
+      const undecided = planFieldReviews(brief).filter((r) => r.status === 'pending' && r.review_id);
       for (const review of undecided) {
         const decided = await apiResult(
           workflowService.decidePlanReview(review.review_id!, { decision: 'CHANGES_REQUESTED', rejectionReason: feedbackNotes }),

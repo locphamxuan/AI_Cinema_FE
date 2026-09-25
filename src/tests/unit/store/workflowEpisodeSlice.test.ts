@@ -35,22 +35,27 @@ describe('Workflow store — projects, plans and milestones', () => {
   });
 
   describe('Maker (Creator) plan submission', () => {
-    it('deletes removed scenes, saves the rest and submits the plan with their ids', async () => {
+    it('saves the whole plan in one request, then submits it with the scene ids the server gave', async () => {
       serveBackendProject(apiProject([apiPlan()]));
       const brief = useWorkflowStore.getState().getBrief('plan-1')!;
       useWorkflowStore.getState().updateContentBrief('plan-1', {
         scene_breakdown: [brief.scene_breakdown[0], { scene_number: 2, title: 'Cảnh mới', description: 'Mới', target_duration_sec: 30, estimated_tokens: 50 }],
       });
-      api.deleteScene.mockReturnValue(ok({}));
-      api.updateScene.mockReturnValue(ok(apiScene(1)));
-      api.createScene.mockReturnValue(ok(apiScene(3, { id: 'scene-new' })));
+      api.savePlanDraft.mockReturnValue(ok([apiScene(1), apiScene(2, { id: 'scene-new' })]));
       api.submitPlan.mockReturnValue(ok(apiPlan({ status: 'SUBMITTED' })));
 
       expect(await useWorkflowStore.getState().submitProductionPlan('plan-1')).toBe(true);
 
-      expect(api.deleteScene).toHaveBeenCalledWith('scene-2');
-      expect(api.updateScene).toHaveBeenCalledWith('scene-1', expect.objectContaining({ sceneNumber: 1 }));
-      expect(api.createScene).toHaveBeenCalledWith('plan-1', expect.objectContaining({ title: 'Cảnh mới' }));
+      expect(api.savePlanDraft).toHaveBeenCalledTimes(1);
+      expect(api.savePlanDraft).toHaveBeenCalledWith(
+        'plan-1',
+        expect.objectContaining({
+          scenes: [
+            expect.objectContaining({ id: 'scene-1', sceneNumber: 1 }),
+            expect.objectContaining({ id: undefined, sceneNumber: 2, title: 'Cảnh mới' }),
+          ],
+        })
+      );
       expect(api.submitPlan).toHaveBeenCalledWith(
         'plan-1',
         expect.objectContaining({
@@ -63,15 +68,15 @@ describe('Workflow store — projects, plans and milestones', () => {
       );
     });
 
-    it('stops and reports failure when a scene cannot be saved', async () => {
+    it('stops and reports failure when the plan cannot be saved', async () => {
       serveBackendProject(apiProject([apiPlan()]));
-      api.updateScene.mockReturnValue(fail('Total scene duration exceeds the plan target duration'));
+      api.savePlanDraft.mockReturnValue(fail('Only a DRAFT or CHANGES_REQUESTED plan can be edited'));
 
       expect(await useWorkflowStore.getState().submitProductionPlan('plan-1')).toBe(false);
       expect(api.submitPlan).not.toHaveBeenCalled();
     });
 
-    it('saves a draft to the server without submitting it, taking back the new scene ids', async () => {
+    it('saves a draft without submitting it, taking back the new scene ids', async () => {
       serveBackendProject(apiProject([apiPlan()]));
       const brief = useWorkflowStore.getState().getBrief('plan-1')!;
       useWorkflowStore.getState().updateContentBrief('plan-1', {
@@ -79,17 +84,14 @@ describe('Workflow store — projects, plans and milestones', () => {
         scene_breakdown: [...brief.scene_breakdown, { scene_number: 3, title: 'Cảnh mới', description: '', target_duration_sec: 20, estimated_tokens: 40 }],
         has_unsaved_changes: true,
       });
-      api.updateScene.mockImplementation((id: string) => ok(apiScene(Number(id.slice(-1)), { id })));
-      api.createScene.mockReturnValue(ok(apiScene(3, { id: 'scene-new' })));
-      api.updatePlan.mockReturnValue(ok(apiPlan()));
+      api.savePlanDraft.mockReturnValue(ok([apiScene(1), apiScene(2), apiScene(3, { id: 'scene-new' })]));
 
       expect(await useWorkflowStore.getState().savePlanDraft('plan-1')).toBe(true);
 
-      expect(api.updatePlan).toHaveBeenCalledWith('plan-1', {
-        scriptText: 'Kịch bản tổng thể',
-        targetDurationSeconds: 720,
-        estimatedAiResourceUsage: brief.estimated_tokens,
-      });
+      expect(api.savePlanDraft).toHaveBeenCalledWith(
+        'plan-1',
+        expect.objectContaining({ scriptText: 'Kịch bản tổng thể', targetDurationSeconds: 720, estimatedAiResourceUsage: brief.estimated_tokens })
+      );
       expect(api.submitPlan).not.toHaveBeenCalled();
       const saved = useWorkflowStore.getState().getBrief('plan-1')!;
       expect(saved.scene_breakdown.at(-1)!.id).toBe('scene-new');
@@ -98,14 +100,14 @@ describe('Workflow store — projects, plans and milestones', () => {
 
     it('keeps unsaved edits of an episode when the project reloads', async () => {
       serveBackendProject(apiProject([apiPlan(), apiPlan({ id: 'plan-2', episodeNumber: 2 })]));
-      useWorkflowStore.getState().updateContentBrief('plan-2', { target_duration_minutes: 7, has_unsaved_changes: true });
-      useWorkflowStore.getState().updateOverallScript('Bản đang viết');
+      useWorkflowStore.getState().updateContentBrief('plan-2', { target_duration_minutes: 7, script_text: 'Bản đang viết', has_unsaved_changes: true });
 
       await useWorkflowStore.getState().loadProject('project-1');
 
       const state = useWorkflowStore.getState();
       expect(state.getBrief('plan-2')!.target_duration_minutes).toBe(7);
-      expect(state.project.overall_script).toBe('Bản đang viết');
+      expect(state.getBrief('plan-2')!.script_text).toBe('Bản đang viết');
+      expect(state.getBrief('plan-1')!.script_text).toBe('Kịch bản tổng thể');
     });
   });
 
@@ -164,15 +166,15 @@ describe('Workflow store — projects, plans and milestones', () => {
   });
 
   describe('Local plan helpers', () => {
-    it('resets the script review only when the overall script changes, leaving the version to the server', () => {
-      const before = useWorkflowStore.getState().project;
-      useWorkflowStore.getState().updateOverallScript(before.overall_script);
-      expect(useWorkflowStore.getState().project.script_review.status).toBe('approved');
+    it('keeps a separate script for every episode and sends each plan its own', async () => {
+      serveBackendProject(apiProject([apiPlan(), apiPlan({ id: 'plan-2', episodeNumber: 2, scriptText: 'Tập 2 cũ' })]));
+      useWorkflowStore.getState().updateContentBrief('plan-2', { script_text: 'Tập 2 mới' });
+      api.savePlanDraft.mockReturnValue(ok([]));
 
-      useWorkflowStore.getState().updateOverallScript('Kịch bản mới');
-      const after = useWorkflowStore.getState().project;
-      expect(after.script_version).toBe(before.script_version);
-      expect(after.script_review.status).toBe('pending');
+      await useWorkflowStore.getState().savePlanDraft('plan-2');
+
+      expect(useWorkflowStore.getState().getBrief('plan-1')!.script_text).toBe('Kịch bản tổng thể');
+      expect(api.savePlanDraft).toHaveBeenCalledWith('plan-2', expect.objectContaining({ scriptText: 'Tập 2 mới' }));
     });
 
     it('computes the available project budget from allocated tokens', () => {
@@ -189,8 +191,8 @@ describe('Workflow store — projects, plans and milestones', () => {
           { scene_number: 2, status: 'changes_requested' as const, comment: 'Thiếu mô tả' },
         ],
       };
-      expect(derivePlanVerdict(project, brief)).toBe('CHANGES_REQUESTED');
-      expect(summarizeFlaggedFields(project, brief)).toBe('• Token dự tính: Vượt ngân sách\n• Cảnh 2: Thiếu mô tả');
+      expect(derivePlanVerdict(brief)).toBe('CHANGES_REQUESTED');
+      expect(summarizeFlaggedFields(brief)).toBe('• Token dự tính: Vượt ngân sách\n• Cảnh 2: Thiếu mô tả');
     });
   });
 

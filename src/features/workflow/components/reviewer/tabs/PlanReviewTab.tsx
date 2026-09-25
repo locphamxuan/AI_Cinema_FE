@@ -27,9 +27,9 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
   );
   const cleanTitle = episodeName(currentPackage?.title) || 'Chưa đặt tên';
   const budgetLeft = availableBudget(project);
-  const verdict = brief ? derivePlanVerdict(project, brief) : 'PENDING';
+  const verdict = brief ? derivePlanVerdict(brief) : 'PENDING';
   const canApprove = verdict === 'APPROVED';
-  const fieldReviews = brief ? planFieldReviews(project, brief) : [];
+  const fieldReviews = brief ? planFieldReviews(brief) : [];
   const approvedCount = fieldReviews.filter((r) => r.status === 'approved').length;
 
   const isAlreadyApproved = currentPackage ? isPlanApproved(currentPackage.status) : false;
@@ -93,20 +93,20 @@ export function PlanReviewTab({ currentPackage, onRequestChanges, onAllocateQuot
 
       {brief ? (
         <div className="space-y-5">
-          {/* Overall script — reviewed once per project (BR-39) */}
+          {/* This episode's script (BR-39) */}
           <FieldReviewCard
             readOnly={!isReviewable}
-            review={scriptReview(project, brief)}
+            review={scriptReview(brief)}
             onReview={(status, comment) => reviewPlanField(packageId, 'script', status, comment)}
             approveLabel="Duyệt kịch bản"
             header={
               <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 inline-block" /> Kịch bản tổng thể · bản {project.script_version}
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-500 inline-block" /> Kịch bản tập này · bản {brief.plan_version}
               </span>
             }
           >
             <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-normal">
-              {project.overall_script || 'Creator chưa nhập kịch bản tổng thể.'}
+              {brief.script_text || 'Creator chưa viết kịch bản cho tập này.'}
             </p>
           </FieldReviewCard>
 

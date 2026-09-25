@@ -42,11 +42,19 @@ export interface UpdateMilestoneDto {
   resultText?: string;
 }
 
-/** Draft of a plan the Creator is still writing (or reworking after a change request). */
-export interface UpdateProductionPlanDto {
+/** The whole plan the Creator is still writing (or reworking after a change request); scenes left out are deleted. */
+export interface SavePlanDraftDto {
   scriptText?: string;
   targetDurationSeconds?: number;
   estimatedAiResourceUsage?: number;
+  scenes: {
+    id?: string;
+    sceneNumber: number;
+    title: string;
+    description?: string;
+    targetDurationSeconds: number;
+    estimatedTokens?: number;
+  }[];
 }
 
 export interface SubmitProductionPlanDto {
@@ -56,17 +64,6 @@ export interface SubmitProductionPlanDto {
   /** Final script of every existing scene of the plan. */
   scenes: { sceneId: string; scriptText: string }[];
 }
-
-export interface CreateSceneDto {
-  sceneNumber: number;
-  title: string;
-  scriptText?: string;
-  description?: string;
-  targetDurationSeconds: number;
-  estimatedTokens?: number;
-}
-
-export type UpdateSceneDto = Partial<CreateSceneDto>;
 
 export interface CreatePlanReviewDto {
   /** Defaults to every scene of the plan; the plan-level fields are always included. */

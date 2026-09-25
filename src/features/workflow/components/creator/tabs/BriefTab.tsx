@@ -8,16 +8,13 @@ import { UNLIMITED_EPISODE_MINUTES } from '@/features/workflow/lib/limits';
 
 export interface BriefTabProps {
   currentPackage: EpisodePackage;
-  /** Project-level overall script shared by every episode plan (with its version and Reviewer verdict). */
-  overallScript: string;
-  scriptVersion: number;
+  /** The Reviewer's verdict on this episode's script. */
   scriptReview: FieldReview;
-  updateOverallScript: (script: string) => void;
-  /** Longest episode the Admin allows; null means no limit. */
-  maxEpisodeMinutes: number | null;
   updateContentBrief: (packageId: string, data: Partial<ContentBrief>) => void;
   savePlanDraft: (packageId: string) => Promise<boolean>;
   submitProductionPlan: (packageId: string) => Promise<boolean>;
+  /** Longest episode the Admin allows; null means no limit. */
+  maxEpisodeMinutes: number | null;
 }
 
 const NEW_SCENE_SECONDS = 15;
@@ -34,16 +31,13 @@ const timeFormat = new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '
  */
 export function BriefTab({
   currentPackage,
-  overallScript,
-  maxEpisodeMinutes,
-  scriptVersion,
-  const maxMinutes = maxEpisodeMinutes ?? UNLIMITED_EPISODE_MINUTES;
   scriptReview,
-  updateOverallScript,
   updateContentBrief,
   savePlanDraft,
   submitProductionPlan,
+  maxEpisodeMinutes,
 }: BriefTabProps) {
+  const maxMinutes = maxEpisodeMinutes ?? UNLIMITED_EPISODE_MINUTES;
   const brief = currentPackage.brief;
   const scenes = brief.scene_breakdown;
   const allottedMinutes = currentPackage.target_duration_minutes;
@@ -56,7 +50,7 @@ export function BriefTab({
   const overBudget = sceneSeconds > brief.target_duration_minutes * 60;
 
   const flaggedFields = [
-    { label: 'Kịch bản tổng thể', review: scriptReview },
+    { label: 'Kịch bản', review: scriptReview },
     { label: 'Thời lượng đề xuất', review: brief.duration_review },
     { label: 'Token dự tính', review: brief.token_review },
   ].filter((f) => f.review?.status === 'changes_requested');
@@ -178,19 +172,16 @@ export function BriefTab({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <label htmlFor="overall-script" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-            Kịch bản tổng thể <span className="text-slate-400 font-medium">· dùng chung cho cả phim, bản {scriptVersion}</span>
+          <label htmlFor="episode-script" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+            Kịch bản tập này <span className="text-slate-400 font-medium">· bản {brief.plan_version}</span>
           </label>
           <textarea
-            id="overall-script"
+            id="episode-script"
             rows={9}
-            value={overallScript}
+            value={brief.script_text}
             disabled={!editable}
-            onChange={(e) => {
-              updateOverallScript(e.target.value);
-              change({});
-            }}
-            placeholder="Bối cảnh, nhân vật chính, mạch truyện, cao trào và kết thúc…"
+            onChange={(e) => change({ script_text: e.target.value })}
+            placeholder="Bối cảnh, nhân vật, diễn biến và kết thúc của tập…"
             className={`${INPUT} p-3 leading-relaxed font-sans`}
           />
         </div>

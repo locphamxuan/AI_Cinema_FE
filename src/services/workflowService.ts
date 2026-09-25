@@ -38,15 +38,13 @@ import type {
   CreateQuotaRequestDto,
   RejectQuotaRequestDto,
   CreateReviewDto,
-  CreateSceneDto,
   GenerationJobType,
   DecideReviewDto,
   Paginated,
   RecordComplianceReviewDto,
   SubmitProductionPlanDto,
-  UpdateProductionPlanDto,
+  SavePlanDraftDto,
   UpdateMilestoneDto,
-  UpdateSceneDto,
   ApiMilestone,
 } from '@/types/workflow-api';
 
@@ -62,6 +60,8 @@ class WorkflowService {
   /** Adds a genre; a name that exists (ignoring case) returns that genre instead. */
   createGenre(name: string): Promise<ApiResponse<ApiGenre>> {
     return apiClient.post<ApiGenre>(ROUTES.GENRES, { name });
+  }
+
   getPlatformSettings(): Promise<ApiResponse<ApiPlatformSetting>> {
     return apiClient.get<ApiPlatformSetting>(ROUTES.PLATFORM_SETTINGS);
   }
@@ -69,8 +69,6 @@ class WorkflowService {
   /** Admin only. */
   updatePlatformSettings(dto: { maxEpisodeDurationSeconds: number | null }): Promise<ApiResponse<ApiPlatformSetting>> {
     return apiClient.patch<ApiPlatformSetting>(ROUTES.PLATFORM_SETTINGS, dto);
-  }
-
   }
 
   listGenres(): Promise<ApiResponse<Paginated<ApiGenre>>> {
@@ -110,8 +108,9 @@ class WorkflowService {
 
   // Plans & scenes (Creator)
 
-  updatePlan(planId: string, dto: UpdateProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
-    return apiClient.patch<ApiProductionPlan>(ROUTES.PLAN_DETAIL(planId), dto);
+  /** Saves the whole plan in one request; returns its scenes with their ids. */
+  savePlanDraft(planId: string, dto: SavePlanDraftDto): Promise<ApiResponse<ApiScene[]>> {
+    return apiClient.put<ApiScene[]>(ROUTES.PLAN_DRAFT(planId), dto);
   }
 
   submitPlan(planId: string, dto: SubmitProductionPlanDto): Promise<ApiResponse<ApiProductionPlan>> {
@@ -119,17 +118,6 @@ class WorkflowService {
   }
 
 
-  createScene(planId: string, dto: CreateSceneDto): Promise<ApiResponse<ApiScene>> {
-    return apiClient.post<ApiScene>(ROUTES.PLAN_SCENES(planId), dto);
-  }
-
-  updateScene(sceneId: string, dto: UpdateSceneDto): Promise<ApiResponse<ApiScene>> {
-    return apiClient.patch<ApiScene>(ROUTES.SCENE_DETAIL(sceneId), dto);
-  }
-
-  deleteScene(sceneId: string): Promise<ApiResponse<unknown>> {
-    return apiClient.delete<unknown>(ROUTES.SCENE_DETAIL(sceneId));
-  }
 
   // Plan reviews & quota (Reviewer)
   createPlanReview(planId: string, dto: CreatePlanReviewDto = {}): Promise<ApiResponse<ApiPlanReview[]>> {

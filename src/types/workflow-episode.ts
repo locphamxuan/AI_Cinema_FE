@@ -5,8 +5,7 @@ import type { FieldReview, QuotaRequest, ReviewLog, SceneReview } from './workfl
 /**
  * 1. content_brief: Episode Plan — kế hoạch sản xuất của một tập. Chỉ giữ mô tả
  * phân cảnh ở bước lập kế hoạch — prompt AI thuộc bước sản xuất (Studio),
- * xem GenerationStep trong workflow-job.ts. Kịch bản tổng thể nằm ở cấp
- * ProductionProject (overall_script), không lặp lại theo từng tập.
+ * xem GenerationStep trong workflow-job.ts. Mỗi tập có kịch bản riêng (script_text).
  */
 export interface SceneBreakdownItem {
   /** Backend scene id; absent for scenes the Creator added but has not saved yet. */
@@ -28,13 +27,17 @@ export interface ContentBrief {
   target_duration_minutes: number;
   /** Planning estimate summed from scene_breakdown — not a hard quota (BR-38). */
   estimated_tokens: number;
+  /** This episode's own script (the plan's scriptText). */
+  script_text: string;
+  /** Version of this episode's plan; a revision after a change request is the next one. */
+  plan_version: number;
   scene_breakdown: SceneBreakdownItem[];
   /** The Creator edited the plan since it was last saved to the server. */
   has_unsaved_changes?: boolean;
   /** Field-level reviewer verdicts (BR-39) — all reset to 'pending' on every (re)submit. */
   scene_reviews: SceneReview[];
-  /** This plan's verdict on the overall script; falls back to ProductionProject.script_review. */
-  script_review?: FieldReview;
+  /** The Reviewer's verdict on this episode's script. */
+  script_review: FieldReview;
   duration_review: FieldReview;
   token_review: FieldReview;
   status: WorkflowState;
@@ -115,10 +118,6 @@ export interface ProductionProject {
   title: string;
   genre: string[];
   synopsis: string;
-  /** Overall script of the whole movie/series, shared by every episode plan. */
-  overall_script: string;
-  script_version: number;
-  script_review: FieldReview;
   season_count: number;
   total_episodes: number;
   total_budget_tokens: number;

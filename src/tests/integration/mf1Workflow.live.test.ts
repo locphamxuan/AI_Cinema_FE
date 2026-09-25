@@ -76,8 +76,8 @@ describe.skipIf(!API)('MF-1 workflow against the live API', () => {
   it('lets the Creator plan scenes and submit the plan', async () => {
     await signIn(CREATOR);
     await reload();
-    state().updateOverallScript('Kịch bản tổng thể của phim');
     state().updateContentBrief(episodeId, {
+      script_text: 'Kịch bản tập 1',
       target_duration_minutes: 8,
       estimated_tokens: 400,
       scene_breakdown: [1, 2].map((n) => ({

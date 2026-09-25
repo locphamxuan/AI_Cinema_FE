@@ -36,8 +36,6 @@ export interface EpisodeSlice {
   savePlanDraft: (packageId: string) => Promise<boolean>;
   /** Saves the draft's scenes, then submits the plan for review. */
   submitProductionPlan: (packageId: string) => Promise<boolean>;
-  /** Rewrites the project-level overall script and resets its review when the text changed; the version comes from the server. */
-  updateOverallScript: (script: string) => void;
   /** Draft steps only — generated steps are backend jobs and stay read-only. */
   addGenerationStep: (packageId: string, jobId: string, step: Omit<GenerationStep, 'id'>) => void;
   updateGenerationStep: (packageId: string, jobId: string, stepId: string, data: Partial<GenerationStep>) => void;
@@ -105,6 +103,8 @@ export interface ComplianceSlice {
   passCompliance: (packageId: string, checks: Record<ManualComplianceCheck, boolean>, labelDisplayLocation: string) => Promise<boolean>;
   /** Puts the package in the catalog and publishes it; `scheduledAt` is recorded on the publication. */
   publishEpisode: (packageId: string, scheduledAt?: string) => Promise<boolean>;
+}
+
 export interface SettingsSlice {
   /** Longest episode in minutes the Admin allows; null means no limit. */
   maxEpisodeMinutes: number | null;
@@ -113,10 +113,8 @@ export interface SettingsSlice {
   savePlatformSettings: (maxEpisodeMinutes: number | null) => Promise<boolean>;
 }
 
-}
-  SettingsSlice &
-
 export type WorkflowStoreState = ViewSlice &
+  SettingsSlice &
   EpisodeSlice &
   ProductionSlice &
   ReviewSlice &

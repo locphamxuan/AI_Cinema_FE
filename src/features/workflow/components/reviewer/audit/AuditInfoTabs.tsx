@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { EpisodePackage } from '@/types/workflow';
-import { useWorkflowStore } from '@/store/useWorkflowStore';
 
 export interface AuditInfoTabsProps {
   pkg: EpisodePackage;
@@ -19,7 +18,6 @@ const CARD = 'rounded-xl border border-slate-200 dark:border-white/10 bg-white d
 
 /** Reference material for the audit: what was planned, what was rendered, what it cost. */
 export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
-  const overallScript = useWorkflowStore((s) => s.project.overall_script);
   const [tab, setTab] = useState<Tab>('script');
 
   const usedPercent = pkg.quota_allocated > 0 ? Math.min(100, Math.round((pkg.actual_tokens_used / pkg.quota_allocated) * 100)) : 0;
@@ -54,8 +52,8 @@ export function AuditInfoTabs({ pkg }: AuditInfoTabsProps) {
         {tab === 'script' && (
           <div className="space-y-5">
             <div>
-              <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Kịch bản tổng thể</h3>
-              <p className="text-slate-800 dark:text-slate-200 leading-relaxed">{overallScript || 'Chưa có kịch bản tổng thể.'}</p>
+              <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Kịch bản tập này</h3>
+              <p className="text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line">{pkg.brief.script_text || 'Chưa có kịch bản.'}</p>
             </div>
             <div>
               <h3 className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1.5">Các cảnh</h3>

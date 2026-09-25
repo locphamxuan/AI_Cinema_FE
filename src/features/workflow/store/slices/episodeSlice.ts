@@ -1,5 +1,5 @@
 import type { StateCreator } from 'zustand';
-import type { EpisodePackage, ProductionProject, SceneBreakdownItem } from '@/types/workflow';
+import type { EpisodePackage, ProductionProject } from '@/types/workflow';
 import { PENDING_FIELD_REVIEW } from '@/types/workflow';
 import { EMPTY_PROJECT } from '@/features/workflow/lib/emptyProject';
 import type { EpisodeSlice, WorkflowStoreState } from '../types';
@@ -34,7 +34,6 @@ function keepUnsavedDrafts(project: ProductionProject, previous: ProductionProje
   if (unsaved.size === 0) return project;
   return {
     ...project,
-    overall_script: previous.overall_script,
     episodes: project.episodes.map((e) => (unsaved.has(e.id) ? { ...e, brief: unsaved.get(e.id)! } : e)),
   };
 }
@@ -42,54 +41,44 @@ function keepUnsavedDrafts(project: ProductionProject, previous: ProductionProje
 const MILESTONE_STATUS = { pending: 'PLANNED', in_progress: 'IN_PROGRESS', completed: 'COMPLETED' } as const;
 
 /**
- * Writes the draft's scenes to the plan: removed ones are deleted, the rest
- * updated or created. Returns the scenes with their server ids, in order.
+ * Saves the whole plan — script, duration, estimate and every scene — in one request.
+ * Returns the server id of each scene number, or null when the save failed.
  */
-async function syncScenes(pkg: EpisodePackage): Promise<SceneBreakdownItem[] | null> {
-  const project = await apiResult(workflowService.getProject(pkg.project_id), 'Không tải được kế hoạch');
-  const saved = project?.productionPlans?.find((p) => p.id === pkg.id)?.scenes;
-  if (!saved) return null;
-
-  const kept = new Set(pkg.brief.scene_breakdown.map((s) => s.id));
-  for (const scene of saved.filter((s) => !kept.has(s.id))) {
-    if ((await apiResult(workflowService.deleteScene(scene.id), 'Không xoá được cảnh')) === null) return null;
-  }
-
-  const synced: SceneBreakdownItem[] = [];
-  for (const s of pkg.brief.scene_breakdown) {
-    const dto = {
-      sceneNumber: s.scene_number,
-      title: s.title,
-      description: s.description,
-      scriptText: s.description,
-      targetDurationSeconds: s.target_duration_sec,
-      estimatedTokens: s.estimated_tokens,
-    };
-    const scene = await apiResult(
-      s.id ? workflowService.updateScene(s.id, dto) : workflowService.createScene(pkg.id, dto),
-      `Không lưu được cảnh ${s.scene_number}`
-    );
-    if (!scene) return null;
-    synced.push({ ...s, id: scene.id });
-  }
-  return synced;
+async function saveDraftToServer(pkg: EpisodePackage): Promise<Map<number, string> | null> {
+  const { brief } = pkg;
+  const scenes = await apiResult(
+    workflowService.savePlanDraft(pkg.id, {
+      scriptText: brief.script_text,
+      targetDurationSeconds: brief.target_duration_minutes * 60,
+      estimatedAiResourceUsage: brief.estimated_tokens,
+      scenes: brief.scene_breakdown.map((s) => ({
+        id: s.id,
+        sceneNumber: s.scene_number,
+        title: s.title,
+        description: s.description,
+        targetDurationSeconds: s.target_duration_sec,
+        estimatedTokens: s.estimated_tokens,
+      })),
+    }),
+    'Không lưu được kế hoạch'
+  );
+  return scenes && new Map(scenes.map((s) => [s.sceneNumber, s.id]));
 }
 
-/** Saves the scenes, then submits the plan with the overall script (BR-39). */
-async function saveAndSubmitPlan(pkg: EpisodePackage, overallScript: string): Promise<boolean> {
-  const scenes = await syncScenes(pkg);
-  if (!scenes) return false;
+/** Saves the plan, then submits it for review (BR-39): two requests however many scenes it has. */
+async function saveAndSubmitPlan(pkg: EpisodePackage): Promise<boolean> {
+  const ids = await saveDraftToServer(pkg);
+  if (!ids) return false;
   const submitted = await apiResult(
     workflowService.submitPlan(pkg.id, {
-      scriptText: overallScript,
+      scriptText: pkg.brief.script_text,
       targetDurationSeconds: pkg.brief.target_duration_minutes * 60,
       estimatedAiResourceUsage: pkg.brief.estimated_tokens,
-      scenes: scenes.map((s) => ({ sceneId: s.id!, scriptText: s.description })),
+      scenes: pkg.brief.scene_breakdown.map((s) => ({ sceneId: ids.get(s.scene_number)!, scriptText: s.description })),
     }),
     'Không gửi được kế hoạch'
   );
   return submitted !== null;
-    void get().loadPlatformSettings();
 }
 
 export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], EpisodeSlice> = (set, get) => ({
@@ -100,6 +89,7 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
 
   loadProjects: async () => {
     set({ isLoading: true, error: null });
+    void get().loadPlatformSettings();
     const res = await workflowService.listProjects();
     if (!res.success) {
       set({ isLoading: false, error: res.message ?? 'Không tải được danh sách dự án' });
@@ -181,49 +171,36 @@ export const createEpisodeSlice: StateCreator<WorkflowStoreState, [], [], Episod
   submitProductionPlan: async (packageId) => {
     const pkg = get().getPackage(packageId);
     if (!pkg) return false;
-    const ok = await saveAndSubmitPlan(pkg, get().project.overall_script);
-    // A sent plan is on the server now: the reload must show it, not the local draft.
-    if (ok) get().updateContentBrief(packageId, { has_unsaved_changes: false });
-    await get().loadProject(get().activeProjectId);
-    return ok;
+    const ok = await saveAndSubmitPlan(pkg);
+    if (!ok) {
+      await get().loadProject(get().activeProjectId);
+      return false;
+    }
+    // Show the plan as sent right away; the full reload (review rows, scene ids) follows in the background.
+    set((state) =>
+      withProjectUpdate(state, (project) => ({
+        ...project,
+        episodes: project.episodes.map((ep) =>
+          ep.id === packageId ? { ...ep, status: 'PLAN_PENDING', brief: { ...ep.brief, status: 'PLAN_PENDING', has_unsaved_changes: false } } : ep
+        ),
+      }))
+    );
+    void get().loadProject(get().activeProjectId);
+    return true;
   },
 
   savePlanDraft: async (packageId) => {
     const pkg = get().getPackage(packageId);
     if (!pkg) return false;
-    const scenes = await syncScenes(pkg);
-    if (!scenes) return false;
-    const saved = await apiResult(
-      workflowService.updatePlan(pkg.id, {
-        scriptText: get().project.overall_script,
-        targetDurationSeconds: pkg.brief.target_duration_minutes * 60,
-        estimatedAiResourceUsage: pkg.brief.estimated_tokens,
-      }),
-      'Không lưu được bản nháp'
-    );
-    if (!saved) return false;
+    const ids = await saveDraftToServer(pkg);
+    if (!ids) return false;
     // Only the server ids are taken back: whatever was typed while saving stays.
-    const ids = new Map(scenes.map((s) => [s.scene_number, s.id]));
     const current = get().getPackage(packageId)!.brief;
     get().updateContentBrief(packageId, {
       scene_breakdown: current.scene_breakdown.map((s) => ({ ...s, id: s.id ?? ids.get(s.scene_number) })),
       has_unsaved_changes: current.updated_at !== pkg.brief.updated_at,
     });
     return true;
-  },
-
-  updateOverallScript: (script) => {
-    set((state) =>
-      withProjectUpdate(state, (project) => {
-        if (script === project.overall_script) return project;
-        return {
-          ...project,
-          overall_script: script,
-          script_review: PENDING_FIELD_REVIEW,
-          updated_at: new Date().toISOString(),
-        };
-      })
-    );
   },
 
   addGenerationStep: (packageId, jobId, step) => {

@@ -59,6 +59,7 @@ export const API_ROUTES = {
     USERS: '/users',
     GENRES: '/genres',
     POLICIES: '/policies',
+    PLATFORM_SETTINGS: '/platform-settings',
 
     // Production Projects
     PROJECTS: '/production-projects',
@@ -67,18 +68,16 @@ export const API_ROUTES = {
     PROJECT_MILESTONES: (projectId: string) => `/production-projects/${projectId}/milestones`,
 
     // Milestones
-    PLATFORM_SETTINGS: '/platform-settings',
     MILESTONE_DETAIL: (milestoneId: string) => `/milestones/${milestoneId}`,
 
     // Production Plans
     PROJECT_PLANS: (projectId: string) => `/production-projects/${projectId}/plans`,
     PLAN_DETAIL: (planId: string) => `/production-plans/${planId}`,
     PLAN_SUBMIT: (planId: string) => `/production-plans/${planId}/submit`,
+    PLAN_DRAFT: (planId: string) => `/production-plans/${planId}/draft`,
     PLAN_REVISIONS: (projectId: string, planId: string) => `/production-projects/${projectId}/plans/${planId}/revisions`,
-    PLAN_SCENES: (planId: string) => `/production-plans/${planId}/scenes`,
 
     // Scenes
-    SCENE_DETAIL: (sceneId: string) => `/scenes/${sceneId}`,
     SCENE_SUBMIT: (sceneId: string) => `/scenes/${sceneId}/submit`,
 
     // Plan Reviews (Per-scene pre-production review)

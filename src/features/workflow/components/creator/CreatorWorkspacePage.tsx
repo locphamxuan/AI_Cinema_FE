@@ -34,7 +34,6 @@ export function CreatorWorkspacePage() {
     activePackageId,
     setActivePackage,
     updateContentBrief,
-    updateOverallScript,
     savePlanDraft,
     submitProductionPlan,
     maxEpisodeMinutes,
@@ -151,10 +150,7 @@ export function CreatorWorkspacePage() {
               <BriefTab
                 key={currentPackage.id}
                 currentPackage={currentPackage}
-                overallScript={project.overall_script}
-                scriptVersion={project.script_version}
-                scriptReview={scriptReview(project, currentPackage.brief)}
-                updateOverallScript={updateOverallScript}
+                scriptReview={scriptReview(currentPackage.brief)}
                 updateContentBrief={updateContentBrief}
                 savePlanDraft={savePlanDraft}
                 submitProductionPlan={submitProductionPlan}
@@ -166,10 +162,10 @@ export function CreatorWorkspacePage() {
             )}
 
             {activeTab === 'tokens' && <TokensTab currentPackage={currentPackage} />}
-                maxEpisodeMinutes={maxEpisodeMinutes}
 
             {activeTab === 'reviews' && <ReviewsTab episodeReviews={episodeReviews} />}
           </div>
+                maxEpisodeMinutes={maxEpisodeMinutes}
         )}
       </main>
     </div>

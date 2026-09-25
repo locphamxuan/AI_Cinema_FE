@@ -208,6 +208,8 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multi
       scene_count: scenes.length,
       target_duration_minutes: proposedMinutes,
       estimated_tokens: toNumber(plan.estimatedAiResourceUsage),
+      script_text: plan.scriptText ?? '',
+      plan_version: plan.planVersion,
       scene_breakdown: scenes,
       scene_reviews: scenes.map((s) => ({ scene_number: s.scene_number, ...toFieldReview(reviews.get(`scene:${s.id}`)) })),
       script_review: toFieldReview(reviews.get('OVERALL_SCRIPT')),
@@ -255,7 +257,6 @@ export function adaptApiProjectToUiProject(api: ApiProductionProject): Productio
   const milestones = (api.milestones ?? []).map(adaptMilestone);
   const total = toNumber(api.totalAiQuotaBudget);
   const allocated = total - toNumber(api.remainingAiQuotaBudget);
-  const scriptPlan = plans.find((p) => p.planReviews.some((r) => r.field === 'OVERALL_SCRIPT')) ?? plans[0];
   const published = episodes.filter((e) => e.status === 'PUBLISHED').length;
 
   return {
@@ -263,9 +264,6 @@ export function adaptApiProjectToUiProject(api: ApiProductionProject): Productio
     title: api.title,
     genre: (api.productionProjectGenres ?? []).map((g) => g.genre.name),
     synopsis: api.description ?? '',
-    overall_script: scriptPlan?.scriptText ?? '',
-    script_version: scriptPlan?.planVersion ?? 1,
-    script_review: scriptPlan ? toFieldReview(latestReviews(scriptPlan).get('OVERALL_SCRIPT')) : PENDING_FIELD_REVIEW,
     season_count: seasonCount,
     total_episodes: api.episodeCount,
     total_budget_tokens: total,
