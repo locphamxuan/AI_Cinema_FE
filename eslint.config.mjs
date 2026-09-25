@@ -18,7 +18,7 @@ const eslintConfig = defineConfig([
     // this — large files are a signal to extract a component/hook/slice.
     files: ["src/**/*.{ts,tsx}"],
     rules: {
-      "max-lines": ["warn", { max: 300, skipBlankLines: true, skipComments: true }],
+      "max-lines": ["error", { max: 300, skipBlankLines: false, skipComments: false }],
     },
   },
   {
