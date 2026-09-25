@@ -32,6 +32,8 @@ const mockNotifications = [
   { id: 'n3', title: 'Gói VIP của bạn sẽ gia hạn sau 20 giờ', time: '5 giờ trước', isNew: false },
 ];
 
+const DASHBOARD_PATHS = ['/creator', '/reviewer', '/staff', '/admin'];
+
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const {
@@ -98,7 +100,9 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const isDashboard = pathname.startsWith('/creator') || pathname.startsWith('/reviewer');
+  const isDashboard = DASHBOARD_PATHS.some((path) => pathname.startsWith(path));
+  // The chat assistant and the VIP/coin panel serve members; staff-side accounts never see them.
+  const isMemberSide = !user || user.role === 'user' || user.role === 'vip';
 
   return (
     <>
@@ -442,7 +446,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       {/* Main Content Area */}
       <main
         className={
-          pathname.startsWith('/creator') || pathname.startsWith('/reviewer')
+          isDashboard
             ? 'flex-1 w-full p-0 m-0 bg-[#F8FAFC] dark:bg-[#0B0C10] transition-colors'
             : pathname === '/' && !isAuthenticated
             ? 'flex-1 w-full'
@@ -459,8 +463,12 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <UnlockEpisodeModal />
 
       {/* Global Floating Controls */}
-      <DemoControlPanel />
-      <SupportChatWidget />
+      {isMemberSide && !isDashboard && (
+        <>
+          <DemoControlPanel />
+          <SupportChatWidget />
+        </>
+      )}
       <ToastContainer />
     </>
   );
