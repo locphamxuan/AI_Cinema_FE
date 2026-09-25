@@ -25,8 +25,8 @@ export interface UserProfile {
 export interface AuthSlice {
   isAuthenticated: boolean;
   user: UserProfile | null;
-  login: (email: string, password: string) => { success: boolean; error?: string; redirectUrl?: string };
-  register: (name: string, email: string, password: string) => { success: boolean; error?: string };
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   isAuthModalOpen: boolean;
   authModalMode: 'login' | 'register';
