@@ -81,13 +81,14 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
 
   const handlePublishNow = async () => {
     setIsPublishing(true);
-    const ok = await publishEpisode(pkg.id, new Date(scheduledDate).toISOString());
+    const releaseAt = new Date(scheduledDate);
+    const ok = await publishEpisode(pkg.id, releaseAt.toISOString());
     setIsPublishing(false);
-    if (ok) {
-      toast.success(
-        'Đã phát hành',
-        `${label} đã lên nền tảng, kèm nhãn nội dung AI.`
-      );
+    if (!ok) return;
+    if (releaseAt > new Date()) {
+      toast.success('Đã lên lịch', `${label} sẽ tự lên nền tảng lúc ${releaseAt.toLocaleString('vi-VN')}.`);
+    } else {
+      toast.success('Đã phát hành', `${label} đã lên nền tảng, kèm nhãn nội dung AI.`);
     }
   };
 
@@ -160,6 +161,7 @@ export function ReviewerAuditPage({ packageId }: ReviewerAuditPageProps) {
             isCompliancePassed={isCompliancePassed}
             canPublish={can(PERMISSION.MOVIE_PUBLISH)}
             isPublished={isPublished}
+            scheduledAt={pkg.scheduled_at}
             isPublishing={isPublishing}
             scheduledDate={scheduledDate}
             onScheduledDateChange={setScheduledDate}

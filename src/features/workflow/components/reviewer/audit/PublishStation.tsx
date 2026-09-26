@@ -16,6 +16,8 @@ export interface PublishStationProps {
   /** The account may schedule and publish (movie:publish). */
   canPublish: boolean;
   isPublished: boolean;
+  /** Release time already scheduled; the backend publishes the episode then. */
+  scheduledAt?: string;
   isPublishing: boolean;
   scheduledDate: string;
   onScheduledDateChange: (value: string) => void;
@@ -32,6 +34,7 @@ export function PublishStation({
   isCompliancePassed,
   canPublish,
   isPublished,
+  scheduledAt,
   isPublishing,
   scheduledDate,
   onScheduledDateChange,
@@ -41,7 +44,9 @@ export function PublishStation({
   onToggleChannel,
   onPublish,
 }: PublishStationProps) {
-  const isLocked = !isCompliancePassed || isPublished || !canPublish;
+  const isScheduled = Boolean(scheduledAt) && !isPublished;
+  const isLocked = !isCompliancePassed || isPublished || isScheduled || !canPublish;
+  const isFuture = new Date(scheduledDate) > new Date();
 
   return (
     <section aria-labelledby="publish-title" className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#151822] p-5">
@@ -49,6 +54,12 @@ export function PublishStation({
         <h2 id="publish-title" className="text-sm font-semibold text-slate-900 dark:text-white">
           <span className="text-slate-400 font-normal mr-1.5">2.</span>Phát hành
         </h2>
+        {isScheduled && (
+          <span className="inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true" />
+            Đã lên lịch {new Date(scheduledAt!).toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' })}
+          </span>
+        )}
         {isPublished && (
           <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
@@ -117,7 +128,7 @@ export function PublishStation({
           disabled={isLocked || isPublishing}
           className="mt-5 w-full py-2.5 rounded-lg text-sm font-medium bg-purple-600 hover:bg-purple-700 text-white disabled:bg-slate-100 dark:disabled:bg-white/5 disabled:text-slate-400 dark:disabled:text-slate-500 disabled:cursor-not-allowed cursor-pointer transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#151822]"
         >
-          {isPublishing ? 'Đang phát hành…' : 'Phát hành'}
+          {isPublishing ? 'Đang xử lý…' : isScheduled ? 'Đã lên lịch' : isFuture ? 'Lên lịch phát hành' : 'Phát hành ngay'}
         </button>
       )}
     </section>

@@ -195,6 +195,7 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multi
     id: plan.id,
     package_id: pkg?.id,
     catalog_episode_id: pkg?.currentForEpisode?.id,
+    scheduled_at: pkg?.currentForEpisode?.publications.find((p) => !p.publishedAt && p.scheduledAt)?.scheduledAt ?? undefined,
     project_id: project.id,
     ...numbered,
     title,
@@ -246,6 +247,7 @@ function latestPlans(plans: ApiProductionPlan[]): ApiProductionPlan[] {
 }
 
 function overallStatus(api: ApiProductionProject, episodes: EpisodePackage[]): ProductionProject['overall_status'] {
+  if (api.status === 'CANCELLED') return 'CANCELLED';
   if (api.status === 'COMPLETED' || (episodes.length > 0 && episodes.every((e) => e.status === 'PUBLISHED'))) return 'COMPLETED';
   if (episodes.some((e) => e.status === 'CHANGES_REQUESTED' || e.status === 'CUT_CHANGES_REQUESTED')) return 'CHANGES_REQUESTED';
   if (episodes.some((e) => e.status === 'PLAN_PENDING' || e.status === 'EPISODE_SUBMITTED')) return 'PENDING_REVIEW';
