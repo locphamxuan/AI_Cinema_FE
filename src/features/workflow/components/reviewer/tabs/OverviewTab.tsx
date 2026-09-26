@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import type { EpisodePackage, ProductionProject } from '@/types/workflow';
 import { StatusBadge } from '../../shared/StatusBadge';
+import { CancelProjectControl } from '../../shared/CancelProjectControl';
+import { ProjectActivityLog } from '../../shared/ProjectActivityLog';
 
 export interface ReviewerOverviewTabProps {
   project: ProductionProject;
@@ -57,6 +59,9 @@ export function OverviewTab({ project, pendingPlanCount, submittedCount, onRevie
 
   return (
     <div className="space-y-5">
+      <div className="flex justify-end empty:hidden">
+        <CancelProjectControl project={project} />
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <Stat label="Chờ duyệt kế hoạch" value={pendingPlanCount} highlight={pendingPlanCount > 0} />
         <Stat label="Chờ kiểm định" value={submittedCount} highlight={submittedCount > 0} />
@@ -117,6 +122,8 @@ export function OverviewTab({ project, pendingPlanCount, submittedCount, onRevie
           </table>
         </div>
       </section>
+
+      <ProjectActivityLog projectId={project.id} />
     </div>
   );
 }

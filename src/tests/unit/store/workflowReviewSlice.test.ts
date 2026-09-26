@@ -102,4 +102,14 @@ describe('Workflow store — plan review and quota', () => {
       expect(api.getProject).toHaveBeenCalled();
     });
   });
+
+  it('cancels the project with the reason and reloads it', async () => {
+    serveBackendProject(apiProject([apiPlan({ status: 'APPROVED' })]));
+    api.cancelProject.mockReturnValue(ok({}) as never);
+    api.listProjects.mockReturnValue(ok({ data: [] }) as never);
+
+    expect(await useWorkflowStore.getState().cancelProject('project-1', 'Đổi kế hoạch')).toBe(true);
+    expect(api.cancelProject).toHaveBeenCalledWith('project-1', 'Đổi kế hoạch');
+    expect(api.getProject).toHaveBeenCalledWith('project-1');
+  });
 });
