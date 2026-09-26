@@ -50,7 +50,11 @@ export function DraftsTab({ episodes, onOpen }: DraftsTabProps) {
                     {brief.has_unsaved_changes ? (
                       <span className="text-amber-600 dark:text-amber-400 font-medium">Có thay đổi chưa lưu</span>
                     ) : (
-                      `Sửa lần cuối ${timeFormat.format(new Date(brief.updated_at))}`
+                      (() => {
+                        if (!brief.updated_at) return null;
+                        const d = new Date(brief.updated_at);
+                        return isNaN(d.getTime()) ? null : `Sửa lần cuối ${timeFormat.format(d)}`;
+                      })()
                     )}
                   </p>
                 </button>

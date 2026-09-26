@@ -224,13 +224,13 @@ function adaptPlan(plan: ApiProductionPlan, project: ApiProductionProject, multi
       token_review: toFieldReview(reviews.get('TOKEN_ESTIMATE')),
       status,
       created_at: plan.createdAt,
-      updated_at: plan.updatedAt,
+      updated_at: plan.updatedAt ?? plan.createdAt ?? new Date().toISOString(),
     },
     jobs: [],
     assets: [],
     review_log: buildReviewLog(plan),
     created_at: plan.createdAt,
-    updated_at: plan.updatedAt,
+    updated_at: plan.updatedAt ?? plan.createdAt ?? new Date().toISOString(),
   };
   // Jobs are listed per plan; the store fills them in for episodes in production.
   return { ...episode, ...buildSceneJobs(episode, []) };
