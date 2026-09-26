@@ -73,10 +73,22 @@ describe('Workflow store — compliance and publishing', () => {
       api.createCatalog.mockReturnValue(ok({ id: 'movie-1', episodes: [{ id: 'episode-1', currentPackageId: 'package-1' }] }));
       api.createPublication.mockReturnValue(ok({ id: 'pub-1' }) as never);
       api.publish.mockReturnValue(ok({}) as never);
+      const now = new Date(Date.now() - 60_000).toISOString();
 
-      expect(await useWorkflowStore.getState().publishEpisode('plan-1', '2026-10-01T13:00:00.000Z')).toBe(true);
-      expect(api.createPublication).toHaveBeenCalledWith('episode-1', { packageId: 'package-1', scheduledAt: '2026-10-01T13:00:00.000Z' });
+      expect(await useWorkflowStore.getState().publishEpisode('plan-1', now)).toBe(true);
+      expect(api.createPublication).toHaveBeenCalledWith('episode-1', { packageId: 'package-1', scheduledAt: now });
       expect(api.publish).toHaveBeenCalledWith('pub-1');
+    });
+
+    it('only schedules a future release and leaves publishing to the backend scheduler', async () => {
+      serveBackendProject(submitted());
+      api.createCatalog.mockReturnValue(ok({ id: 'movie-1', episodes: [{ id: 'episode-1', currentPackageId: 'package-1' }] }));
+      api.createPublication.mockReturnValue(ok({ id: 'pub-1' }) as never);
+      const later = new Date(Date.now() + 86_400_000).toISOString();
+
+      expect(await useWorkflowStore.getState().publishEpisode('plan-1', later)).toBe(true);
+      expect(api.createPublication).toHaveBeenCalledWith('episode-1', { packageId: 'package-1', scheduledAt: later });
+      expect(api.publish).not.toHaveBeenCalled();
     });
 
     it('requests content changes through a new review of the package', async () => {

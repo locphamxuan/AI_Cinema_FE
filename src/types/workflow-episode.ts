@@ -69,6 +69,8 @@ export interface EpisodePackage {
   package_id?: string;
   /** Catalog episode created from the package, needed to publish it. */
   catalog_episode_id?: string;
+  /** Release time of a publication that is scheduled and not live yet (Schedule Film). */
+  scheduled_at?: string;
   project_id: string;
   episode_number: number;
   season_number: number;
@@ -132,7 +134,7 @@ export interface ProductionProject {
   reviewer_name: string;
   creator_role?: string;
   thumbnail_url?: string;
-  overall_status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'PENDING_REVIEW' | 'CHANGES_REQUESTED' | 'COMPLETED';
+  overall_status?: 'NOT_STARTED' | 'IN_PROGRESS' | 'PENDING_REVIEW' | 'CHANGES_REQUESTED' | 'COMPLETED' | 'CANCELLED';
   active_episode_title?: string;
   progress_percent?: number;
   milestones?: ProjectMilestone[];

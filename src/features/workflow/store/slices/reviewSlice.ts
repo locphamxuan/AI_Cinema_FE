@@ -137,5 +137,14 @@ export const createReviewSlice: StateCreator<WorkflowStoreState, [], [], ReviewS
       await reload();
       return decided !== null;
     },
+
+    cancelProject: async (projectId, reason) => {
+      const ok = (await apiResult(workflowService.cancelProject(projectId, reason), 'Không hủy được dự án')) !== null;
+      if (ok) {
+        await get().loadProjects();
+        await get().loadProject(projectId);
+      }
+      return ok;
+    },
   };
 };

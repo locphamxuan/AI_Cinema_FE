@@ -76,7 +76,11 @@ export const createComplianceSlice: StateCreator<WorkflowStoreState, [], [], Com
       );
       if (!publication) return reload().then(() => false);
 
-      // The backend has no scheduler yet, so the episode goes live now; scheduledAt is kept on the publication.
+      // A future time is left to the backend scheduler, which puts the episode live then.
+      if (scheduledAt && new Date(scheduledAt) > new Date()) {
+        await reload();
+        return true;
+      }
       const published = await apiResult(workflowService.publish(publication.id), 'Không phát hành được');
       await reload();
       return published !== null;

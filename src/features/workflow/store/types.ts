@@ -102,12 +102,14 @@ export interface ReviewSlice {
   approveQuotaRequest: (requestId: string, amount?: number, note?: string) => Promise<boolean>;
   rejectQuotaRequest: (requestId: string, note: string) => Promise<boolean>;
   requestContentChanges: (packageId: string, feedbackNotes: string) => Promise<boolean>;
+  /** Stops the whole project (Reviewer); queued generations are cancelled. */
+  cancelProject: (projectId: string, reason: string) => Promise<boolean>;
 }
 
 export interface ComplianceSlice {
   /** Approves the submitted cut, attaches the AI label and records every compliance check (BR-42). */
   passCompliance: (packageId: string, checks: Record<ManualComplianceCheck, boolean>, labelDisplayLocation: string) => Promise<boolean>;
-  /** Puts the package in the catalog and publishes it; `scheduledAt` is recorded on the publication. */
+  /** Puts the package in the catalog and publishes it now, or schedules it when `scheduledAt` is in the future. */
   publishEpisode: (packageId: string, scheduledAt?: string) => Promise<boolean>;
 }
 

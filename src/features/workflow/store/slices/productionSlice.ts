@@ -6,6 +6,8 @@ import { buildSceneJobs, isDraftStep, JOB_TYPE_OF } from '@/features/workflow/li
 import { routeDefaults } from '@/features/workflow/lib/modelRouting';
 import { withProjectUpdate } from './projectRoster';
 import { apiResult } from './apiResult';
+import { waitForJob } from '@/features/workflow/lib/jobPolling';
+import type { ApiGenerationJob } from '@/types/workflow';
 
 export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], ProductionSlice> = (set, get) => {
   const reload = () => get().loadProject(get().activeProjectId);
@@ -20,6 +22,21 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
         ),
       }))
     );
+
+  /** Starts a job; a queued one is collected so every started job can be awaited together. */
+  const start = async (job: ApiGenerationJob | null, started: ApiGenerationJob[]) => {
+    const running = job && (await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại'));
+    if (running) started.push(running);
+    return Boolean(running);
+  };
+
+  /** Waits for every started job; true unless one of them failed. */
+  const finish = async (started: ApiGenerationJob[]) => {
+    const done = await Promise.all(started.map((job) => waitForJob(job)));
+    const failed = done.filter((job) => job.status === 'FAILED');
+    if (failed.length > 0) toast.error('Tạo nội dung thất bại', failed[0].errorMessage ?? 'Dịch vụ AI không trả kết quả.');
+    return failed.length === 0;
+  };
 
   return {
     routing: [],
@@ -74,6 +91,7 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
 
       markGenerating(packageId, sceneJobId);
       let ok = true;
+      const started: ApiGenerationJob[] = [];
       if (drafts.length > 0) {
         for (const step of drafts) {
           const job = await apiResult(
@@ -85,7 +103,7 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
             }),
             'Không tạo được yêu cầu'
           );
-          if (!job || !(await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại'))) {
+          if (!(await start(job, started))) {
             ok = false;
             break;
           }
@@ -96,13 +114,14 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
         // Regenerating: a new attempt of every saved step, charged again (BR-41).
         for (const step of saved) {
           const job = await apiResult(workflowService.retryJob(step.id), 'Không tạo lại được');
-          if (!job || !(await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại'))) {
+          if (!(await start(job, started))) {
             ok = false;
             break;
           }
         }
       }
 
+      ok = (await finish(started)) && ok;
       await reload();
       return ok;
     },
@@ -110,7 +129,8 @@ export const createProductionSlice: StateCreator<WorkflowStoreState, [], [], Pro
     regenerateStep: async (packageId, sceneJobId, stepId, prompt) => {
       markGenerating(packageId, sceneJobId);
       const job = await apiResult(workflowService.retryJob(stepId, prompt.trim()), 'Không tạo lại được');
-      const ok = Boolean(job && (await apiResult(workflowService.runJob(job.id), 'Tạo nội dung thất bại')));
+      const started: ApiGenerationJob[] = [];
+      const ok = (await start(job, started)) && (await finish(started));
       await reload();
       return ok;
     },

@@ -6,7 +6,7 @@ import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import { WalletState, CheckInStreak } from '@/types/wallet';
 import { Transaction } from '@/types/transaction';
-import { mockCheckInStreak, mockTransactions, getInitialCheckInStreak } from '@/mocks/mockData';
+import { mockTransactions, getInitialCheckInStreak } from '@/mocks/mockData';
 import { getTodayDayIndex, getTodayDateString } from '@/lib/dateUtils';
 
 export interface UnlockEpisodeResult {

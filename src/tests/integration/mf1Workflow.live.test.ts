@@ -21,7 +21,8 @@ vi.mock('@/components/ui/Toast', () => ({
   },
 }));
 
-describe.skipIf(!API)('MF-1 workflow against the live API', () => {
+// A backend with a job queue finishes generations in the background, polled every few seconds.
+describe.skipIf(!API)('MF-1 workflow against the live API', { timeout: 180_000 }, () => {
   type Store = typeof import('@/store/useWorkflowStore')['useWorkflowStore'];
   let store: Store;
   let signIn: (email: string) => Promise<void>;

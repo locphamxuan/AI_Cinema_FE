@@ -1,6 +1,8 @@
 import { ArrowRight, AlertCircle, Check } from 'lucide-react';
 import type { EpisodePackage, ProductionProject, ReviewLog, WorkflowState } from '@/types/workflow';
 import { quotaUsage } from '@/features/workflow/lib/quota';
+import { CancelProjectControl } from '../../shared/CancelProjectControl';
+import { ProjectActivityLog } from '../../shared/ProjectActivityLog';
 
 export interface OverviewTabProps {
   project: ProductionProject;
@@ -76,6 +78,7 @@ export function OverviewTab({
 
   return (
     <div className="space-y-5">
+      <CancelProjectControl project={project} />
       {/* Where the episode stands and the one thing to do next */}
       <section className={`${CARD} p-5 space-y-4`} aria-label="Giai đoạn sản xuất">
         <ol className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -202,6 +205,8 @@ export function OverviewTab({
           </dl>
         </div>
       </details>
+
+      <ProjectActivityLog projectId={project.id} />
     </div>
   );
 }

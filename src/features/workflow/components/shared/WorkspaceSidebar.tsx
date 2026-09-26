@@ -6,8 +6,6 @@ import { Clapperboard, Plus, ChevronDown } from 'lucide-react';
 import type { ProductionProject } from '@/types/workflow';
 import type { ProjectGroup } from '@/features/workflow/lib/projectGroups';
 
-type ProjectStatus = NonNullable<ProductionProject['overall_status']>;
-
 const STATUS_META: Record<string, { label: string; dot: string }> = {
   NOT_STARTED: { label: 'Chưa bắt đầu', dot: 'bg-slate-400' },
   DRAFT: { label: 'Bản nháp', dot: 'bg-slate-400' },
