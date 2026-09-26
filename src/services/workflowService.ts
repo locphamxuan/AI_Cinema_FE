@@ -26,6 +26,7 @@ import type {
   ApiRoute,
   ApiRoutingRow,
   ApiScene,
+  ApiProductionEvent,
   ApiSceneAdvice,
   ApiPlanContinuity,
   ApiUser,
@@ -98,6 +99,16 @@ class WorkflowService {
     return apiClient.get<ApiProductionProject>(ROUTES.PROJECT_DETAIL(projectId));
   }
 
+  /** Stops a project; queued generations are cancelled and nothing more can be produced. */
+  cancelProject(projectId: string, reason: string): Promise<ApiResponse<ApiProductionProject>> {
+    return apiClient.post<ApiProductionProject>(ROUTES.PROJECT_CANCEL(projectId), { reason });
+  }
+
+  /** The project's production events, newest first. */
+  getProjectEvents(projectId: string): Promise<ApiResponse<ApiProductionEvent[]>> {
+    return apiClient.get<ApiProductionEvent[]>(ROUTES.PROJECT_EVENTS(projectId));
+  }
+
   createProject(dto: CreateProductionProjectDto): Promise<ApiResponse<ApiProductionProject>> {
     return apiClient.post<ApiProductionProject>(ROUTES.PROJECTS, dto);
   }
@@ -150,6 +161,11 @@ class WorkflowService {
     return apiClient.post<ApiGenerationJob>(ROUTES.GENERATION_JOBS(planId), dto);
   }
 
+  getJob(jobId: string): Promise<ApiResponse<ApiGenerationJob>> {
+    return apiClient.get<ApiGenerationJob>(ROUTES.JOB_DETAIL(jobId));
+  }
+
+  /** Starts a job; with the backend queue it comes back QUEUED and is polled with getJob. */
   runJob(jobId: string): Promise<ApiResponse<ApiGenerationJob>> {
     return apiClient.post<ApiGenerationJob>(ROUTES.JOB_RUN(jobId));
   }

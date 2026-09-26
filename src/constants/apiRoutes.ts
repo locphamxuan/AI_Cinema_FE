@@ -64,6 +64,8 @@ export const API_ROUTES = {
     // Production Projects
     PROJECTS: '/production-projects',
     PROJECT_DETAIL: (projectId: string) => `/production-projects/${projectId}`,
+    PROJECT_CANCEL: (projectId: string) => `/production-projects/${projectId}/cancel`,
+    PROJECT_EVENTS: (projectId: string) => `/production-projects/${projectId}/events`,
 
     // Production Plans
     PLAN_SUBMIT: (planId: string) => `/production-plans/${planId}/submit`,

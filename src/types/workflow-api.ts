@@ -226,6 +226,17 @@ export interface ApiGeneratedAsset {
   createdAt?: string;
 }
 
+/** One production event of a project (PROJECT_OVERVIEW.md §4.1.4). */
+export interface ApiProductionEvent {
+  id: string;
+  action: string;
+  entityType: string;
+  actorType: 'USER' | 'SYSTEM';
+  payload: Record<string, unknown> | null;
+  createdAt: string;
+  actor: { id: string; fullName: string; role: string } | null;
+}
+
 export interface ApiGenerationJob {
   id: string;
   jobType: GenerationJobType;
