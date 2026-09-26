@@ -14,10 +14,12 @@ export interface ApiResponse<T> {
 
 export interface RequestOptions extends RequestInit {
   useMockFallback?: boolean;
+  _isRetry?: boolean;
 }
 
 class ApiClient {
   private baseUrl: string;
+  private refreshPromise: Promise<boolean> | null = null;
 
   constructor(baseUrl: string = API_BASE_URL) {
     this.baseUrl = baseUrl;
@@ -28,16 +30,59 @@ class ApiClient {
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
+  private async tryRefreshToken(): Promise<boolean> {
+    if (this.refreshPromise) return this.refreshPromise;
+
+    this.refreshPromise = (async () => {
+      const refreshToken = storage.getString(STORAGE_KEYS.REFRESH_TOKEN);
+      if (!refreshToken) return false;
+
+      try {
+        const res = await fetch(`${this.baseUrl}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+        });
+
+        if (!res.ok) {
+          storage.remove(STORAGE_KEYS.AUTH_TOKEN);
+          storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
+          storage.remove(STORAGE_KEYS.USER_DATA);
+          return false;
+        }
+
+        const body = await res.json();
+        const session = body?.data ?? body;
+        if (session?.accessToken) {
+          storage.set(STORAGE_KEYS.AUTH_TOKEN, session.accessToken);
+          if (session.refreshToken) {
+            storage.set(STORAGE_KEYS.REFRESH_TOKEN, session.refreshToken);
+          }
+          return true;
+        }
+        return false;
+      } catch {
+        return false;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
+  }
+
   async request<T>(
     endpoint: string,
     options: RequestOptions = {},
     mockFallbackFn?: () => Promise<T> | T
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
+    const authHeaders = this.getAuthHeader();
     const headers = {
       'Content-Type': 'application/json',
-      ...this.getAuthHeader(),
+      ...authHeaders,
       ...options.headers,
+      ...(options._isRetry ? authHeaders : {}),
     };
 
     // Use real database by default in development and production environments.
@@ -52,6 +97,18 @@ class ApiClient {
       });
 
       if (!response.ok) {
+        // Automatically attempt token refresh on 401 Unauthorized
+        if (
+          response.status === 401 &&
+          !options._isRetry &&
+          !endpoint.includes('/auth/login') &&
+          !endpoint.includes('/auth/refresh')
+        ) {
+          const refreshed = await this.tryRefreshToken();
+          if (refreshed) {
+            return this.request<T>(endpoint, { ...options, _isRetry: true }, mockFallbackFn);
+          }
+        }
         if (shouldFallback && mockFallbackFn) {
           try {
             const fallbackData = await mockFallbackFn();
@@ -148,6 +205,13 @@ class ApiClient {
   async getText(endpoint: string): Promise<string | null> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, { headers: this.getAuthHeader() });
+      if (response.status === 401) {
+        const refreshed = await this.tryRefreshToken();
+        if (refreshed) {
+          const retryRes = await fetch(`${this.baseUrl}${endpoint}`, { headers: this.getAuthHeader() });
+          return retryRes.ok ? await retryRes.text() : null;
+        }
+      }
       return response.ok ? await response.text() : null;
     } catch {
       return null;

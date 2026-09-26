@@ -40,6 +40,8 @@ export function CreatorWorkspacePage() {
     submitProductionPlan,
     maxEpisodeMinutes,
     loadProjects,
+    isLoading,
+    error,
   } = useWorkflowStore();
 
   const [activeTab, setActiveTab] = useState<CreatorTab>('overview');
@@ -93,15 +95,50 @@ export function CreatorWorkspacePage() {
       />
 
       <main ref={mainRef} className="flex-1 bg-[#F8FAFC] dark:bg-[#0B0C10] p-4 sm:p-6 lg:p-8 overflow-y-auto transition-colors">
-        {!hasSelection || !currentPackage ? (
+        {isLoading && projects.length === 0 ? (
+          <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
+            <div className="w-8 h-8 rounded-full border-2 border-purple-600 border-t-transparent animate-spin" />
+            <p className="text-xs text-slate-500 dark:text-slate-400">Đang tải danh sách phim từ hệ thống...</p>
+          </div>
+        ) : error ? (
+          <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
+            <div className="w-14 h-14 rounded-2xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center text-rose-500">
+              <Film className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Không thể tải dự án</h2>
+              <p className="text-xs text-rose-500 mt-1">{error}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => loadProjects()}
+              className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition cursor-pointer"
+            >
+              Thử lại
+            </button>
+          </div>
+        ) : !hasSelection || !currentPackage ? (
           <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-20">
             <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
               <Film className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Chọn một phim để bắt đầu</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Danh sách phim nằm ở thanh bên trái.</p>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                {projects.length === 0 ? 'Chưa có dự án nào được giao' : 'Chọn một phim để bắt đầu'}
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                {projects.length === 0 ? 'Tài khoản của bạn hiện chưa có dự án được phân công.' : 'Danh sách phim nằm ở thanh bên trái.'}
+              </p>
             </div>
+            {projects.length === 0 && (
+              <button
+                type="button"
+                onClick={() => loadProjects()}
+                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold transition cursor-pointer"
+              >
+                Tải lại dữ liệu
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-6">
