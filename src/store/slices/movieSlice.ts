@@ -18,13 +18,29 @@ export const createMovieSlice: StateCreator<AppState, [], [], MovieSlice> = (set
     if (isCatalogLoading || (!force && movies.length > 0)) return;
 
     set({ isCatalogLoading: true, catalogError: null });
-    const [moviesRes, genresRes] = await Promise.all([movieService.getMovies(), movieService.getGenres()]);
-    set({
-      movies: moviesRes.success ? moviesRes.data : [],
-      genres: genresRes.success ? genresRes.data.map(({ id, name }) => ({ id, name })) : [],
-      isCatalogLoading: false,
-      catalogError: moviesRes.success ? null : moviesRes.message || 'Không tải được danh sách phim',
-    });
+    try {
+      const [moviesRes, genresRes] = await Promise.all([movieService.getMovies(), movieService.getGenres()]);
+      if (moviesRes.success && Array.isArray(moviesRes.data)) {
+        set({
+          movies: moviesRes.data,
+          genres: genresRes.success && Array.isArray(genresRes.data) ? genresRes.data.map(({ id, name }) => ({ id, name })) : [],
+          isCatalogLoading: false,
+          catalogError: null,
+        });
+      } else {
+        set({
+          movies: [],
+          isCatalogLoading: false,
+          catalogError: moviesRes.message || 'Không thể tải danh sách phim từ máy chủ',
+        });
+      }
+    } catch (err) {
+      set({
+        movies: [],
+        isCatalogLoading: false,
+        catalogError: err instanceof Error ? err.message : 'Lỗi kết nối cơ sở dữ liệu',
+      });
+    }
   },
 
   selectEpisode: async (episodeId) => {

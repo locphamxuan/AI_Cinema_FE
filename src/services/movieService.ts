@@ -5,7 +5,7 @@
 import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type { Movie } from '@/types/movie';
-import { adaptApiMovie, type ApiCatalogMovie, type ApiGenre } from './movieAdapter';
+import { adaptApiMovie, adaptApiMovies, type ApiCatalogMovie, type ApiGenre } from './movieAdapter';
 
 const CATALOG_PAGE_SIZE = 100;
 
@@ -18,7 +18,7 @@ export const movieService = {
     const res = await apiClient.get<{ items: ApiCatalogMovie[] }>(
       `${API_ROUTES.MOVIES.LIST}?limit=${CATALOG_PAGE_SIZE}`
     );
-    return mapResponse(res, (data) => data.items.map(adaptApiMovie));
+    return mapResponse(res, (data) => adaptApiMovies(data.items));
   },
 
   async getMovieById(id: string): Promise<ApiResponse<Movie>> {

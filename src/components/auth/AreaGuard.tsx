@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, ArrowRight, LogIn } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
@@ -13,6 +13,8 @@ export interface AreaGuardProps {
   children: ReactNode;
 }
 
+const subscribeNoop = () => () => {};
+
 /**
  * Lets into an internal area only the roles allowed there (lib/permissions AREAS).
  * Everyone else gets a notice with the way to their own area or to sign in.
@@ -21,6 +23,17 @@ export interface AreaGuardProps {
 export function AreaGuard({ area, children }: AreaGuardProps) {
   const router = useRouter();
   const { user, logout, openAuthModal } = useAppStore();
+  // Avoid hydration mismatch between server-render (no session in SSR) and client-render (session in localStorage).
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-6">
+        <div className="w-8 h-8 rounded-full border-2 border-purple-600 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
   // Right after a reload the store has not restored the session yet; the stored profile decides meanwhile.
   const account = user ?? authService.getStoredUser();
 
