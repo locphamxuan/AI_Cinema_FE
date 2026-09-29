@@ -143,24 +143,7 @@ export default function HomePage() {
       )}
 
       {/* 3. Main Content Stream */}
-      {!isCatalogLoading && movies.length === 0 ? (
-        <div className="flex flex-col items-center justify-center min-h-[50vh] text-center px-4">
-          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-4">
-            <Film className="w-8 h-8 text-red-500 animate-pulse" />
-          </div>
-          <h2 className="text-xl font-bold text-white mb-2">Đang đồng bộ kho phim AI...</h2>
-          <p className="text-sm text-slate-400 max-w-md mb-6">
-            Hệ thống đang đồng bộ danh mục phim AI từ cơ sở dữ liệu. Bấm nút dưới để kết nối và làm mới dữ liệu.
-          </p>
-          <button
-            type="button"
-            onClick={() => loadCatalog(true)}
-            className="px-6 py-2.5 rounded-xl bg-[#E50914] hover:bg-red-700 text-white font-bold text-sm transition-all cursor-pointer shadow-lg shadow-red-600/30"
-          >
-            Tải Lại Kho Phim
-          </button>
-        </div>
-      ) : searchQuery || activeNavTab !== 'kham-pha' ? (
+      {searchQuery || activeNavTab !== 'kham-pha' ? (
         /* Grid layout for search / filtered views */
         <div className="px-4 sm:px-8 md:px-12 py-6">
           <NetflixMovieRow

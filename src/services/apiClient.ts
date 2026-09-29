@@ -76,7 +76,15 @@ class ApiClient {
     options: RequestOptions = {},
     mockFallbackFn?: () => Promise<T> | T
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseUrl}${endpoint}`;
+    let url = `${this.baseUrl}${endpoint}`;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      if (typeof window !== 'undefined') {
+        url = `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+      } else {
+        const port = process.env.PORT || 3000;
+        url = `http://localhost:${port}${url.startsWith('/') ? '' : '/'}${url}`;
+      }
+    }
     const authHeaders = this.getAuthHeader();
     const headers = {
       'Content-Type': 'application/json',

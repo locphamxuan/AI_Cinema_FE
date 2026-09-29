@@ -58,6 +58,7 @@ export function formatDuration(seconds: number | null): string {
 
 /** Highest rendition any episode offers, e.g. '1080p'; undefined when nothing is transcoded. */
 function bestQuality(qualities: string[]): string | undefined {
+  if (!Array.isArray(qualities) || qualities.length === 0) return undefined;
   return [...qualities].sort((a, b) => parseInt(b, 10) - parseInt(a, 10))[0];
 }
 
@@ -69,7 +70,7 @@ function adaptEpisode(ep: ApiCatalogEpisode, fallbackImage: string): Episode {
     title: ep.title,
     duration: formatDuration(ep.durationSeconds) || '24:30',
     hlsUrl: ep.streamUrl ?? '',
-    qualities: ep.qualities.length > 0 ? ep.qualities : ['1080p', '720p', '480p'],
+    qualities: Array.isArray(ep.qualities) && ep.qualities.length > 0 ? ep.qualities : ['1080p', '720p', '480p'],
     subtitles: (ep.currentPackage?.subtitles ?? []).map(({ language }) => ({
       language,
       label: languageLabel(language),
@@ -102,21 +103,26 @@ export function adaptApiMovie(api: ApiCatalogMovie): Movie {
     rulesetVersion: 'ND142_V1',
   };
 
-  const isSeries = api.episodes.length > 1;
+  const isSeries = (api.episodes?.length ?? 0) > 1;
+
+  const rawGenres: any[] = Array.isArray(api.genres) ? api.genres : [];
+  const genreNames = rawGenres
+    .map((g) => g?.genre?.name ?? g?.name ?? (typeof g === 'string' ? g : null))
+    .filter((name): name is string => typeof name === 'string' && name.trim().length > 0);
 
   return {
     id: api.id,
     title: api.title,
-    genre: api.genres.length > 0 ? api.genres.map((g) => g.genre.name) : ['Khoa học viễn tưởng', 'Cyberpunk'],
+    genre: genreNames.length > 0 ? genreNames : ['Khoa học viễn tưởng', 'Cyberpunk'],
     posterUrl,
     bannerUrl: api.bannerUrl ?? posterUrl,
     description: api.description ?? api.synopsis ?? '',
     contentBrief: api.synopsis ?? api.description ?? '',
     year: api.releaseYear ?? new Date(api.createdAt).getFullYear(),
-    totalEpisodes: api.episodes.length,
+    totalEpisodes: api.episodes?.length ?? 0,
     ageRating,
-    episodes: api.episodes.map((ep) => adaptEpisode(ep, posterUrl)),
-    quality: bestQuality(api.episodes.flatMap((ep) => ep.qualities)) || '4K Ultra HD',
+    episodes: (api.episodes ?? []).map((ep) => adaptEpisode(ep, posterUrl)),
+    quality: bestQuality((api.episodes ?? []).flatMap((ep) => ep.qualities ?? [])) || '4K Ultra HD',
     aiCompliance,
     isSeries,
     rating: +(8.8 + ((api.title.charCodeAt(0) % 10) / 10)).toFixed(1),
