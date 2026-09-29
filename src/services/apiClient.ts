@@ -77,6 +77,10 @@ class ApiClient {
     mockFallbackFn?: () => Promise<T> | T
   ): Promise<ApiResponse<T>> {
     let url = `${this.baseUrl}${endpoint}`;
+    // Never make direct calls to port 3001 from the browser - route to same-origin /api
+    if (url.includes('3001')) {
+      url = url.replace(/https?:\/\/[^/]+:3001(\/api)?/, '/api');
+    }
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       if (typeof window !== 'undefined') {
         url = `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
