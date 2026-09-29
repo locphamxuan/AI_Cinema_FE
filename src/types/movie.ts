@@ -6,6 +6,11 @@ export interface AIComplianceInfo {
   moderationScore?: number;
   contentRating: string;
   disclaimer: string;
+  rulesetVersion?: string; // 'ND142_V1'
+  displayLocation?: 'TOP_LEFT' | 'TOP_RIGHT' | 'BOTTOM_LEFT' | 'BOTTOM_RIGHT';
+  partnerStudio?: string;
+  aiToolsUsed?: string[];
+  certificationId?: string;
 }
 
 export type VersionStatus = 'published' | 'archived' | 'in_review';
@@ -66,4 +71,13 @@ export interface Movie {
   quality?: string;    // highest rendition of its episodes, e.g. '1080p'
   ageRating?: string;  // 'T16', 'T18', 'P'
   badge?: string;      // 'Mới', 'Thịnh hành', 'Độc quyền AI'
+  // Netflix-style OTT & Article 44 Compliance extensions
+  rating?: number;     // e.g. 9.4 IMDb rating
+  partnerStudio?: string;
+  aiToolsUsed?: string[];
+  contentBrief?: string;
+  isSeries?: boolean;
+  continueProgress?: number; // e.g. 65 (% watched)
+  continueEpisodeNumber?: number;
+  top10Rank?: number; // 1 - 10
 }

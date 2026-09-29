@@ -7,3 +7,4 @@ export * from './wallet';
 export * from './subscription';
 export * from './transactions';
 export * from './chatData';
+export * from './moviesData';

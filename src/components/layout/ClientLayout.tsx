@@ -109,22 +109,23 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
 
   const signedIn = isAuthenticated && !!user;
   const isDashboard = DASHBOARD_PATHS.some((path) => pathname.startsWith(path));
+  const isHome = pathname === '/';
   // The chat assistant and the VIP/coin panel serve members; staff-side accounts never see them.
   const isMemberSide = !user || user.role === 'user' || user.role === 'vip';
 
   return (
     <>
-      {/* The consumer header is hidden on the Creator, Reviewer, Staff and Admin dashboards. */}
-      {!isDashboard && <ConsumerHeader signedIn={signedIn} />}
+      {/* The consumer header is hidden on Home (uses dedicated NetflixNavbar) and Dashboards. */}
+      {!isDashboard && !isHome && <ConsumerHeader signedIn={signedIn} />}
 
-      {signedIn && !isDashboard && <RightSidebar />}
+      {signedIn && !isDashboard && !isHome && <RightSidebar />}
 
       <main
         className={
           isDashboard
             ? 'flex-1 w-full p-0 m-0 bg-[#F8FAFC] dark:bg-[#0B0C10] transition-colors'
-            : pathname === '/' && !isAuthenticated
-              ? 'flex-1 w-full'
+            : isHome
+              ? 'flex-1 w-full p-0 m-0 bg-[#0A0C10] text-white overflow-x-hidden'
               : 'flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 transition-all'
         }
       >
