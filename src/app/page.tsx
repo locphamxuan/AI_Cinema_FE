@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import type { Movie } from '@/types/movie';
 import NetflixNavbar from '@/components/home/NetflixNavbar';
@@ -11,15 +11,20 @@ import ContinueWatchingRow from '@/components/home/ContinueWatchingRow';
 import MovieDetailQuickModal from '@/components/home/MovieDetailQuickModal';
 
 export default function HomePage() {
-  const { movies, isCatalogLoading } = useAppStore();
+  const { movies, isCatalogLoading, loadCatalog } = useAppStore();
   const [activeNavTab, setActiveNavTab] = useState('kham-pha');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMovieModal, setSelectedMovieModal] = useState<Movie | null>(null);
   const [selectedGenrePill, setSelectedGenrePill] = useState('Tất cả');
 
-  // Hero Spotlight Movie: Cyber Saigon 2077
+  useEffect(() => {
+    loadCatalog();
+  }, [loadCatalog]);
+
+  // Hero Spotlight Movie: select first movie with rich banner, or first movie in catalog
   const heroMovie = useMemo(() => {
-    return movies.find((m) => m.id === 'cyber-saigon-2077') || movies[0];
+    if (!movies || movies.length === 0) return null;
+    return movies.find((m) => m.bannerUrl && m.bannerUrl.length > 0 && m.episodes.length > 0) || movies[0];
   }, [movies]);
 
   // Filtered by Search or NavTab
@@ -83,6 +88,21 @@ export default function HomePage() {
           movie={heroMovie}
           onOpenDetailModal={(m) => setSelectedMovieModal(m)}
         />
+      )}
+
+      {/* Loading Skeleton if movies are still fetching from database */}
+      {!searchQuery && activeNavTab === 'kham-pha' && !heroMovie && isCatalogLoading && (
+        <div className="relative w-full h-[75vh] min-h-[580px] bg-[#0E1118] animate-pulse flex items-end px-4 sm:px-8 md:px-16 pb-20 select-none">
+          <div className="space-y-4 max-w-xl">
+            <div className="h-6 w-36 bg-white/10 rounded-full" />
+            <div className="h-10 sm:h-14 w-72 sm:w-96 bg-white/15 rounded-xl" />
+            <div className="h-16 w-full bg-white/5 rounded-lg" />
+            <div className="flex gap-3 pt-2">
+              <div className="h-12 w-36 bg-red-600/30 rounded-xl" />
+              <div className="h-12 w-36 bg-white/10 rounded-xl" />
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Spacing compensation if hero is not shown */}
