@@ -1,5 +1,5 @@
-import { CreatorWorkspacePage } from '@/features/workflow/components/creator/CreatorWorkspacePage';
+import { ProjectListPage } from '@/features/production/components/list/ProjectListPage';
 
 export default function Page() {
-  return <CreatorWorkspacePage />;
+  return <ProjectListPage />;
 }

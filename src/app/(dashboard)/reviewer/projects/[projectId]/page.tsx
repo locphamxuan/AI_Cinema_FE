@@ -1,21 +1,11 @@
-'use client';
+import { Suspense } from 'react';
+import { ProjectDetailPage } from '@/features/production/components/project/ProjectDetailPage';
 
-import { useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { useWorkflowStore } from '@/store/useWorkflowStore';
-import { ReviewerWorkspacePage } from '@/features/workflow/components/reviewer/ReviewerWorkspacePage';
-
-export default function ReviewerProjectWorkspacePage() {
-  const params = useParams();
-  const projectId = params?.projectId as string;
-  const { setActiveProject } = useWorkflowStore();
-
-  useEffect(() => {
-    if (projectId) {
-      setActiveProject(projectId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-sync when the URL param itself changes
-  }, [projectId]);
-
-  return <ReviewerWorkspacePage />;
+export default function Page() {
+  // The open tab is read from ?tab=, which needs a Suspense boundary.
+  return (
+    <Suspense>
+      <ProjectDetailPage />
+    </Suspense>
+  );
 }
