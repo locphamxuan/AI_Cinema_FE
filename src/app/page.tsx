@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Film, Sparkles, Filter, X, Search, ShieldCheck, Flame, Tv, Clapperboard, Award } from 'lucide-react';
+import { X,  Flame } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import type { Movie } from '@/types/movie';
 import NetflixNavbar from '@/components/home/NetflixNavbar';
@@ -10,10 +10,10 @@ import NetflixTopTenRow from '@/components/home/NetflixTopTenRow';
 import NetflixMovieRow from '@/components/home/NetflixMovieRow';
 import ContinueWatchingRow from '@/components/home/ContinueWatchingRow';
 import MovieDetailQuickModal from '@/components/home/MovieDetailQuickModal';
-import StudioPartnerShowcase from '@/components/home/StudioPartnerShowcase';
 import ComplianceTrustBanner from '@/components/home/ComplianceTrustBanner';
 import CinemaEnterpriseFooter from '@/components/home/CinemaEnterpriseFooter';
 import MotchillFilterBar from '@/components/home/MotchillFilterBar';
+import { filterMovies, type MovieFormat, type MovieSort } from '@/components/home/filterMovies';
 
 export default function HomePage() {
   const { movies, isCatalogLoading, loadCatalog } = useAppStore();
@@ -21,31 +21,16 @@ export default function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMovieModal, setSelectedMovieModal] = useState<Movie | null>(null);
   const [selectedGenrePill, setSelectedGenrePill] = useState('Tất cả');
-  const [selectedFormat, setSelectedFormat] = useState<'all' | 'series' | 'single'>('all');
-  const [selectedStudioFilter, setSelectedStudioFilter] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<'latest' | 'rating' | 'popular'>('latest');
+  const [selectedFormat, setSelectedFormat] = useState<MovieFormat>('all');
+  const [sortBy, setSortBy] = useState<MovieSort>('latest');
   const [activeHeroId, setActiveHeroId] = useState<string | null>(null);
 
   useEffect(() => {
     loadCatalog();
   }, [loadCatalog]);
 
-  // Featured Blockbuster Movies for Hero Spotlight Carousel
-  const featuredMovies = useMemo(() => {
-    if (!movies || movies.length === 0) return [];
-    const cyber = movies.find((m) => m.title.includes('Cyber Saigon 2077'));
-    const huyenThoai = movies.find((m) => m.title.includes('Huyền Thoại Đại Ngàn'));
-    const saoHoa = movies.find((m) => m.title.includes('Sao Hỏa 2099'));
-    const voLam = movies.find((m) => m.title.includes('Võ Lâm Mộng Cảnh'));
-
-    const list = [cyber, huyenThoai, saoHoa, voLam].filter(Boolean) as Movie[];
-    // Fill up to 4 if needed
-    for (const m of movies) {
-      if (list.length >= 4) break;
-      if (!list.some((item) => item.id === m.id)) list.push(m);
-    }
-    return list;
-  }, [movies]);
+  // The newest released movies lead the hero carousel.
+  const featuredMovies = useMemo(() => movies.slice(0, 4), [movies]);
 
   // Active Hero Spotlight Movie
   const heroMovie = useMemo(() => {
@@ -57,82 +42,16 @@ export default function HomePage() {
     return featuredMovies[0] || movies[0];
   }, [movies, activeHeroId, featuredMovies]);
 
-  // Filtered by Search, NavTab, Motchill Filters, Genre Pill, or Studio
-  const filteredMovies = useMemo(() => {
-    let result = [...movies];
-
-    // Search text query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(
-        (m) =>
-          m.title.toLowerCase().includes(q) ||
-          m.genre.some((g) => g.toLowerCase().includes(q)) ||
-          m.description.toLowerCase().includes(q) ||
-          (m.partnerStudio && m.partnerStudio.toLowerCase().includes(q))
-      );
-    }
-
-    // Studio filter
-    if (selectedStudioFilter) {
-      result = result.filter(
-        (m) => m.partnerStudio && m.partnerStudio.toLowerCase().includes(selectedStudioFilter.toLowerCase())
-      );
-    }
-
-    // Genre pill
-    if (selectedGenrePill !== 'Tất cả') {
-      result = result.filter((m) =>
-        m.genre.some((g) => g.toLowerCase().includes(selectedGenrePill.toLowerCase()))
-      );
-    }
-
-    // Format filter (Series vs Single Movie per Motchill style)
-    const effectiveFormat =
-      activeNavTab === 'phim-bo'
-        ? 'series'
-        : activeNavTab === 'phim-le'
-        ? 'single'
-        : selectedFormat;
-
-    if (effectiveFormat === 'series') {
-      result = result.filter((m) => m.isSeries || m.totalEpisodes > 1);
-    } else if (effectiveFormat === 'single') {
-      result = result.filter((m) => !m.isSeries && m.totalEpisodes <= 1);
-    }
-
-    // Anime / 3D AI filter
-    if (activeNavTab === 'anime-ai') {
-      result = result.filter((m) =>
-        m.genre.some(
-          (g) =>
-            g.toLowerCase().includes('hoạt hình') ||
-            g.toLowerCase().includes('anime') ||
-            g.toLowerCase().includes('3d') ||
-            g.toLowerCase().includes('fantasy')
-        )
-      );
-    }
-
-    // Sorting
-    const effectiveSort = activeNavTab === 'bang-xep-hang' ? 'rating' : sortBy;
-    if (effectiveSort === 'rating') {
-      result = [...result].sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    } else if (effectiveSort === 'popular') {
-      result = [...result].sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
-    } else if (effectiveSort === 'latest') {
-      result = [...result].sort((a, b) => (b.year || 2026) - (a.year || 2026));
-    }
-
-    return result;
-  }, [movies, searchQuery, activeNavTab, selectedGenrePill, selectedStudioFilter, selectedFormat, sortBy]);
+  const filteredMovies = useMemo(
+    () => filterMovies(movies, { search: searchQuery, navTab: activeNavTab, genre: selectedGenrePill, format: selectedFormat, sortBy }),
+    [movies, searchQuery, activeNavTab, selectedGenrePill, selectedFormat, sortBy],
+  );
 
   // Reset all filters back to Discovery default
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedGenrePill('Tất cả');
     setSelectedFormat('all');
-    setSelectedStudioFilter(null);
     setSortBy('latest');
     setActiveNavTab('kham-pha');
   };
@@ -166,13 +85,11 @@ export default function HomePage() {
   const isFilteringActive =
     !!searchQuery.trim() ||
     activeNavTab !== 'kham-pha' ||
-    !!selectedStudioFilter ||
     selectedGenrePill !== 'Tất cả' ||
     selectedFormat !== 'all' ||
     sortBy !== 'latest';
 
   const getFilteredTitle = () => {
-    if (selectedStudioFilter) return `Phim Thuộc Studio: ${selectedStudioFilter}`;
     if (activeNavTab === 'phim-bo' || selectedFormat === 'series') return 'Series Phim Bộ AI Dài Tập';
     if (activeNavTab === 'phim-le' || selectedFormat === 'single') return 'Phim Lẻ AI Điện Ảnh';
     if (activeNavTab === 'anime-ai') return 'Anime & 3D AI Fantasy Siêu Nhiên';
@@ -191,8 +108,7 @@ export default function HomePage() {
           onSelectTab={(tab) => {
             setActiveNavTab(tab);
             setSearchQuery('');
-            setSelectedStudioFilter(null);
-            if (tab === 'phim-bo') setSelectedFormat('series');
+                    if (tab === 'phim-bo') setSelectedFormat('series');
             else if (tab === 'phim-le') setSelectedFormat('single');
             else if (tab === 'bang-xep-hang') setSortBy('rating');
             else if (tab === 'kham-pha') {
@@ -203,7 +119,6 @@ export default function HomePage() {
           }}
           onSearchChange={(q) => {
             setSearchQuery(q);
-            if (q) setSelectedStudioFilter(null);
           }}
         />
 
@@ -245,8 +160,6 @@ export default function HomePage() {
             if (f === 'series' && activeNavTab !== 'phim-bo') setActiveNavTab('phim-bo');
             else if (f === 'single' && activeNavTab !== 'phim-le') setActiveNavTab('phim-le');
           }}
-          selectedStudio={selectedStudioFilter}
-          onSelectStudio={(s) => setSelectedStudioFilter(s)}
           sortBy={sortBy}
           onSelectSortBy={(sort) => setSortBy(sort)}
           onReset={handleResetFilters}
@@ -301,8 +214,8 @@ export default function HomePage() {
 
             {/* Row 2: Cyberpunk & Viễn Tưởng Mới Phát Hành */}
             <NetflixMovieRow
-              title="Phim Cyberpunk & Viễn Tưởng Đột Phá"
-              subtitle="Độ phân giải 4K HDR tạo sinh siêu thực"
+              title="Khoa Học Viễn Tưởng"
+              subtitle="Thế giới tương lai qua lăng kính AI"
               badge="HOT"
               movies={cyberpunkSciFiMovies}
               onOpenDetail={(m) => setSelectedMovieModal(m)}
@@ -311,27 +224,19 @@ export default function HomePage() {
 
             {/* Row 3: Gắn nhãn tuân thủ Điều 44 Luật AI */}
             <NetflixMovieRow
-              title="Dự Án Độc Quyền Đã Kiểm Duyệt (Compliance Passed - Điều 44)"
-              subtitle="Chứng nhận minh bạch công nghệ theo Điều 18 NĐ 142/2026/NĐ-CP"
-              badge="VERIFIED"
+              title="Đã Kiểm Duyệt & Gắn Nhãn AI"
+              subtitle="Mọi tập đều qua kiểm duyệt nội dung, pháp lý và mang nhãn nội dung AI trước khi phát hành"
+              badge="NHÃN AI"
               movies={complianceVerifiedMovies}
               onOpenDetail={(m) => setSelectedMovieModal(m)}
               aspectRatio="16/9"
             />
 
-            {/* Feature 4: Studio Partners Marketplace Showcase */}
-            <StudioPartnerShowcase
-              onSelectStudio={(studioName) => {
-                setSelectedStudioFilter(studioName);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-            />
-
             {/* Row 5: 3D AI Fantasy & Võ Thuật Kỳ Ảo */}
             <NetflixMovieRow
-              title="3D AI Fantasy & Anime Siêu Thực"
-              subtitle="Tác phẩm kỳ ảo tạo sinh bằng Pipeline Unreal Engine & Gen-AI"
-              badge="3D CGI"
+              title="Hoạt Hình & Giả Tưởng"
+              subtitle="Thế giới kỳ ảo tạo bằng AI"
+              badge="HOẠT HÌNH"
               movies={fantasy3DMovies}
               onOpenDetail={(m) => setSelectedMovieModal(m)}
               aspectRatio="2/3"
@@ -340,7 +245,7 @@ export default function HomePage() {
             {/* Row 6: Hành Động & Trinh Thám Giật Gân */}
             <NetflixMovieRow
               title="Hành Động & Trinh Thám Giật Gân"
-              subtitle="Kịch tính và nghẹt thở cùng công nghệ tạo hình diễn viên AI"
+              subtitle="Kịch tính, bí ẩn và nghẹt thở"
               movies={actionThrillerMovies}
               onOpenDetail={(m) => setSelectedMovieModal(m)}
               aspectRatio="16/9"

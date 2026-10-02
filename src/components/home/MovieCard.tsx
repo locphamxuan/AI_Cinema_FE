@@ -48,11 +48,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
           <div className="absolute inset-x-0 bottom-0 p-3 flex flex-col justify-end">
             {/* Match Score & Specs */}
             <div className="flex items-center gap-1.5 mb-1 text-[10px]">
-              <span className="text-emerald-400 font-bold">
-                {movie.matchScore || 98}% Phù hợp
-              </span>
               <span className="px-1.5 py-0.5 rounded bg-white/20 border border-white/25 text-white/90 text-[10px] font-semibold">
-                {movie.ageRating || 'T16'}
+                {movie.ageRating}
               </span>
               {movie.quality && (
                 <span className="px-1.5 py-0.5 rounded bg-white/20 border border-white/25 text-white/90 text-[10px] font-semibold">

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Play, Plus, Check, Heart, ChevronDown, Sparkles, ShieldCheck, Star } from 'lucide-react';
+import { Play, Plus, Check, Heart, ChevronDown,  ShieldCheck } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 interface NetflixMovieCardProps {
@@ -87,18 +87,13 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
             <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">
               {movie.title}
             </h3>
-            <span className="text-[10px] font-black text-amber-500 dark:text-amber-400 shrink-0 flex items-center gap-0.5">
-              <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
-              {movie.rating || 9.0}
-            </span>
           </div>
 
           <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mb-2">
-            <span className="text-emerald-600 dark:text-emerald-400 font-bold">{movie.matchScore || 98}% Match</span>
             <span className="px-1.5 py-0.2 rounded bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-white font-semibold text-[10px]">
-              {movie.ageRating || 'T16'}
+              {movie.ageRating}
             </span>
-            <span>{movie.year || 2026}</span>
+            <span>{movie.year}</span>
           </div>
 
           {/* Genre list tags */}
@@ -111,11 +106,6 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
                 {g}
               </span>
             ))}
-            {movie.partnerStudio && (
-              <span className="text-[9px] text-purple-600 dark:text-purple-300 font-medium truncate max-w-[130px] px-1.5 py-0.5 rounded bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20">
-                {movie.partnerStudio}
-              </span>
-            )}
           </div>
 
           {/* Hover Quick Action Buttons */}

@@ -1,15 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Filter, SlidersHorizontal, RotateCcw, Sparkles } from 'lucide-react';
+import { Filter, SlidersHorizontal, RotateCcw } from 'lucide-react';
 
 interface MotchillFilterBarProps {
   selectedGenre: string;
   onSelectGenre: (genre: string) => void;
   selectedFormat: 'all' | 'series' | 'single';
   onSelectFormat: (format: 'all' | 'series' | 'single') => void;
-  selectedStudio: string | null;
-  onSelectStudio: (studio: string | null) => void;
   sortBy: 'latest' | 'rating' | 'popular';
   onSelectSortBy: (sort: 'latest' | 'rating' | 'popular') => void;
   onReset: () => void;
@@ -21,8 +19,6 @@ export default function MotchillFilterBar({
   onSelectGenre,
   selectedFormat,
   onSelectFormat,
-  selectedStudio,
-  onSelectStudio,
   sortBy,
   onSelectSortBy,
   onReset,
@@ -42,17 +38,7 @@ export default function MotchillFilterBar({
     'Hoạt hình',
   ];
 
-  const studios = [
-    { label: 'Tất cả Studio', value: null },
-    { label: 'CyberSaigon AI', value: 'CyberSaigon' },
-    { label: 'Lạc Long 3D VFX', value: 'Lạc Long' },
-    { label: 'AstroNova Studio', value: 'AstroNova' },
-    { label: 'Đông Phương Animation', value: 'Đông Phương' },
-    { label: 'Titan Mecha Dynamics', value: 'Titan' },
-    { label: 'NeoTokyo Synthetic', value: 'NeoTokyo' },
-  ];
-
-  const isFiltered = selectedGenre !== 'Tất cả' || selectedFormat !== 'all' || selectedStudio !== null || sortBy !== 'latest';
+  const isFiltered = selectedGenre !== 'Tất cả' || selectedFormat !== 'all' || sortBy !== 'latest';
 
   return (
     <div className="my-6 px-4 sm:px-8 md:px-14">
@@ -150,24 +136,6 @@ export default function MotchillFilterBar({
                   Phim Lẻ
                 </button>
               </div>
-            </div>
-
-            {/* Studio Filter */}
-            <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 mb-2 block uppercase text-[10px] tracking-wider">
-                Studio Đối Tác Sản Xuất
-              </label>
-              <select
-                value={selectedStudio || ''}
-                onChange={(e) => onSelectStudio(e.target.value ? e.target.value : null)}
-                className="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs font-semibold outline-none focus:border-red-600 transition"
-              >
-                {studios.map((st) => (
-                  <option key={st.label} value={st.value || ''} className="bg-white dark:bg-[#12151E] text-slate-900 dark:text-white">
-                    {st.label}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {/* Sorting */}
