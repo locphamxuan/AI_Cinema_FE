@@ -80,9 +80,9 @@ export const API_ROUTES = {
     CHANGE_REQUEST_REJECT: (id: string) => `/change-requests/${id}/reject`,
     HANDOFF: (movieId: string) => `/projects/${movieId}/handoff`,
     STUDIO_CHANGE: (movieId: string) => `/projects/${movieId}/studio-change`,
-    DUE_DATES: (movieId: string) => `/projects/${movieId}/due-dates`,
     HANDOFFS: (movieId: string) => `/projects/${movieId}/handoffs`,
     BRIEF: (movieId: string, handoffId: string) => `/projects/${movieId}/handoffs/${handoffId}/brief`,
+    PORTAL_LINK: (movieId: string) => `/projects/${movieId}/handoffs/portal-link`,
     EPISODE_MEDIA: (episodeId: string) => `/episodes/${episodeId}/media`,
     EPISODE_MEDIA_UPLOAD: (episodeId: string) => `/episodes/${episodeId}/media/upload`,
     MEDIA_ASSET: (id: string) => `/media-assets/${id}`,
@@ -97,6 +97,15 @@ export const API_ROUTES = {
     PRICE_ALERTS: '/admin/price-alerts',
     PRICE_ALERT_REQUEST_CHANGE: (id: string) => `/admin/price-alerts/${id}/request-change`,
     PRICE_ALERT_RESOLVE: (id: string) => `/admin/price-alerts/${id}/resolve`,
+  },
+  // The outside studio's portal: no account, the emailed link token is the credential
+  STUDIO_PORTAL: {
+    OVERVIEW: (token: string) => `/studio-portal/${token}`,
+    RESPOND: (token: string) => `/studio-portal/${token}/response`,
+    BRIEF: (token: string) => `/studio-portal/${token}/brief`,
+    IDEA_FILE: (token: string, fileId: string) => `/studio-portal/${token}/idea-files/${fileId}`,
+    MEDIA: (token: string, episodeId: string) => `/studio-portal/${token}/episodes/${episodeId}/media`,
+    MEDIA_UPLOAD: (token: string, episodeId: string) => `/studio-portal/${token}/episodes/${episodeId}/media/upload`,
   },
 } as const;
 

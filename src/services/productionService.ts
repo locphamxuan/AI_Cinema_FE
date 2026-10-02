@@ -9,7 +9,6 @@ import type {
   ChangeRequest,
   ComplianceInput,
   CreateProjectInput,
-  DueDateInput,
   Episode,
   FeeLedger,
   Genre,
@@ -56,6 +55,16 @@ export function projectsUrl({ page = 1, limit = 12, search, status }: ProjectQue
   return `${R.PROJECTS}?${params.toString()}`;
 }
 
+/** Multipart body of an episode delivery: the video plus the AI Disclosure as JSON. */
+export function mediaForm(file: File, input: MediaMetadataInput): FormData {
+  const form = new FormData();
+  form.append('file', file);
+  form.append('proposedLabelType', input.proposedLabelType);
+  if (input.submissionNote) form.append('submissionNote', input.submissionNote);
+  form.append('aiDisclosure', JSON.stringify(input.aiDisclosure));
+  return form;
+}
+
 export const productionService = {
   // ---- Projects (steps 1–2) ----
   listProjects: (query?: ProjectQuery) => apiClient.get<Page<ProjectSummary>>(projectsUrl(query)),
@@ -93,13 +102,13 @@ export const productionService = {
   rejectChange: (id: string, response: string) => apiClient.post<ChangeRequest>(R.CHANGE_REQUEST_REJECT(id), { response }),
 
   // ---- Studio handoff (steps 3–4) ----
-  handOff: (movieId: string, studio: StudioInput, dueDates: DueDateInput[]) =>
-    apiClient.post<unknown>(R.HANDOFF(movieId), { ...studio, dueDates }),
+  handOff: (movieId: string, studio: StudioInput) =>
+    apiClient.post<unknown>(R.HANDOFF(movieId), studio),
   changeStudio: (movieId: string, studio: StudioInput, reason: string) =>
     apiClient.post<unknown>(R.STUDIO_CHANGE(movieId), { ...studio, reason }),
-  setDueDates: (movieId: string, dueDates: DueDateInput[]) => apiClient.put<unknown>(R.DUE_DATES(movieId), { dueDates }),
   listHandoffs: (movieId: string) => apiClient.get<StudioHandoff[]>(R.HANDOFFS(movieId)),
   downloadBrief: (movieId: string, handoffId: string) => apiClient.getBlob(R.BRIEF(movieId, handoffId)),
+  resendPortalLink: (movieId: string) => apiClient.post<StudioHandoff[]>(R.PORTAL_LINK(movieId)),
 
   // ---- Media delivery (steps 5–7) ----
   listMedia: (episodeId: string) => apiClient.get<MediaAsset[]>(R.EPISODE_MEDIA(episodeId)),
@@ -108,14 +117,8 @@ export const productionService = {
     episodeId: string,
     input: MediaMetadataInput & { sourceMethod: 'HLS_URL' | 'REMOTE_FILE'; sourceUrl: string },
   ) => apiClient.post<MediaAsset>(R.EPISODE_MEDIA(episodeId), input),
-  uploadMedia(episodeId: string, file: File, input: MediaMetadataInput) {
-    const form = new FormData();
-    form.append('file', file);
-    form.append('proposedLabelType', input.proposedLabelType);
-    if (input.submissionNote) form.append('submissionNote', input.submissionNote);
-    form.append('aiDisclosure', JSON.stringify(input.aiDisclosure));
-    return apiClient.postForm<MediaAsset>(R.EPISODE_MEDIA_UPLOAD(episodeId), form);
-  },
+  uploadMedia: (episodeId: string, file: File, input: MediaMetadataInput) =>
+    apiClient.postForm<MediaAsset>(R.EPISODE_MEDIA_UPLOAD(episodeId), mediaForm(file, input)),
   retryMedia: (mediaAssetId: string) => apiClient.post<MediaAsset>(R.MEDIA_RETRY(mediaAssetId)),
 
   // ---- Review, AI label, compliance (steps 8–11) ----
