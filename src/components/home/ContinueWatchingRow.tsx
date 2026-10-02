@@ -2,7 +2,7 @@
 
 import { useRef } from 'react';
 import Link from 'next/link';
-import { Play, RotateCcw, ChevronLeft, ChevronRight, Info } from 'lucide-react';
+import { Play,  ChevronLeft, ChevronRight, Info } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 interface ContinueWatchingRowProps {

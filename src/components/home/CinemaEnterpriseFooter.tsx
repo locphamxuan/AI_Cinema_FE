@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Film, ShieldCheck, Cpu, Wallet, HelpCircle, FileText, ExternalLink } from 'lucide-react';
+import { Film, ShieldCheck } from 'lucide-react';
 
 export default function CinemaEnterpriseFooter() {
   return (
