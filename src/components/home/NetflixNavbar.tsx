@@ -2,17 +2,26 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search, Bell,  ChevronDown, User, LogOut, Wallet, Film, ShieldCheck, Settings } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 
-interface NetflixNavbarProps {
-  activeTab: string;
-  onSelectTab: (tab: string) => void;
-  onSearchChange?: (query: string) => void;
-}
+/** Viewer navigation: discovery, the browse page, and browse shortcuts opened with a filter set. */
+const NAV_LINKS = [
+  { href: '/', label: 'Khám Phá' },
+  { href: '/phim', label: 'Lọc Phim' },
+  { href: '/phim?loai=bo', label: 'Phim Bộ' },
+  { href: '/phim?loai=le', label: 'Phim Lẻ' },
+  { href: `/phim?the-loai=${encodeURIComponent('Hoạt hình')}`, label: 'Hoạt Hình' },
+];
 
-export default function NetflixNavbar({ activeTab, onSelectTab, onSearchChange }: NetflixNavbarProps) {
+export default function NetflixNavbar() {
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const router = useRouter();
+  // The link whose path and query match the page exactly is the current one.
+  const here = `${pathname}${params.toString() ? `?${params.toString()}` : ''}`;
   const { user, isAuthenticated, wallet, openAuthModal, logout, openDepositModal } = useAppStore();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -40,18 +49,10 @@ export default function NetflixNavbar({ activeTab, onSelectTab, onSearchChange }
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onSearchChange) onSearchChange(searchQuery);
+    const q = searchQuery.trim();
+    router.push(q ? `/phim?q=${encodeURIComponent(q)}` : '/phim');
   };
 
-  // Motchill-inspired navigation categories (removed "phim chieu rap" per user request)
-  const navLinks = [
-    { id: 'kham-pha', label: 'Khám Phá' },
-    { id: 'phim-bo', label: 'Phim Bộ AI' },
-    { id: 'phim-le', label: 'Phim Lẻ AI' },
-    { id: 'anime-ai', label: 'Anime & 3D' },
-    { id: 'the-loai', label: 'Thể Loại' },
-    { id: 'bang-xep-hang', label: 'Bảng Xếp Hạng' },
-  ];
 
   return (
     <nav
@@ -79,12 +80,13 @@ export default function NetflixNavbar({ activeTab, onSelectTab, onSearchChange }
 
           {/* Navigation Category Items */}
           <div className="hidden md:flex items-center gap-5 lg:gap-6">
-            {navLinks.map((link) => {
-              const isActive = activeTab === link.id;
+            {NAV_LINKS.map((link) => {
+              const isActive = decodeURIComponent(here) === decodeURIComponent(link.href);
               return (
-                <button
-                  key={link.id}
-                  onClick={() => onSelectTab(link.id)}
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`text-sm font-semibold transition-all relative py-1 cursor-pointer ${
                     isActive
                       ? isScrolled
@@ -99,7 +101,7 @@ export default function NetflixNavbar({ activeTab, onSelectTab, onSearchChange }
                   {isActive && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#E50914] rounded-full shadow-[0_0_8px_#E50914]" />
                   )}
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -121,11 +123,8 @@ export default function NetflixNavbar({ activeTab, onSelectTab, onSearchChange }
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    if (onSearchChange) onSearchChange(e.target.value);
-                  }}
-                  placeholder="Tìm phim AI, diễn viên, studio..."
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Tìm theo tên phim…"
                   autoFocus
                   className="w-full bg-transparent text-xs outline-none px-2 text-inherit placeholder-slate-400"
                 />
@@ -134,7 +133,6 @@ export default function NetflixNavbar({ activeTab, onSelectTab, onSearchChange }
                   onClick={() => {
                     setIsSearchOpen(false);
                     setSearchQuery('');
-                    if (onSearchChange) onSearchChange('');
                   }}
                   className="text-xs text-slate-400 hover:text-red-500"
                 >

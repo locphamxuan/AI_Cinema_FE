@@ -110,7 +110,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
 
   const signedIn = isAuthenticated && !!user;
   const isDashboard = DASHBOARD_PATHS.some((path) => pathname.startsWith(path));
-  const isHome = pathname === '/';
+  // The viewer's discovery and browse pages carry their own navbar.
+  const isHome = pathname === '/' || pathname === '/phim';
   // The chat assistant and the VIP/coin panel serve members; staff-side accounts never see them.
   const isMemberSide = !user || user.role === 'user' || user.role === 'vip';
 
