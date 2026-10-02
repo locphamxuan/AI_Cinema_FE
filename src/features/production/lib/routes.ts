@@ -25,6 +25,7 @@ export const productionPaths = {
 export function notificationHref(link: string | null, role: WebRole | undefined): string | null {
   if (!link) return null;
   if (link.startsWith('/admin/price-alerts')) return '/admin?tab=price-alerts';
+  if (link === '/tokens') return '/reviewer/tokens';
   const match = /^\/projects\/([^/?#]+)(?:\/(episodes)\/([^/?#]+)|\/([a-z-]+))?/.exec(link);
   if (!match) return link.startsWith('/') ? link : null;
   const [, movieId, , episodeId, section] = match;

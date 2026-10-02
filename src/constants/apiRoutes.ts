@@ -98,6 +98,13 @@ export const API_ROUTES = {
     PRICE_ALERT_REQUEST_CHANGE: (id: string) => `/admin/price-alerts/${id}/request-change`,
     PRICE_ALERT_RESOLVE: (id: string) => `/admin/price-alerts/${id}/resolve`,
   },
+  // Token budget: the Reviewer's own wallet, and the Admin's grants
+  REVIEWER_TOKENS: {
+    ME: '/reviewer-tokens/me',
+    ADMIN_LIST: '/admin/reviewer-tokens',
+    ADMIN_WALLET: (reviewerId: string) => `/admin/reviewer-tokens/${reviewerId}`,
+    ADMIN_ENTRIES: (reviewerId: string) => `/admin/reviewer-tokens/${reviewerId}/entries`,
+  },
   // The outside studio's portal: no account, the emailed link token is the credential
   STUDIO_PORTAL: {
     OVERVIEW: (token: string) => `/studio-portal/${token}`,

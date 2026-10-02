@@ -3,24 +3,26 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { ArrowRight, BadgeAlert, KeyRound, Settings, Users } from 'lucide-react';
+import { ArrowRight, BadgeAlert, Coins, KeyRound, Settings, Users } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
 import { AccountsPanel } from './AccountsPanel';
 import { RolePermissionsPanel } from './RolePermissionsPanel';
 import { PlatformSettingsPanel } from './PlatformSettingsPanel';
 import { PriceAlertsPanel } from './PriceAlertsPanel';
+import { ReviewerTokensPanel } from './ReviewerTokensPanel';
 
-type Tab = 'accounts' | 'permissions' | 'settings' | 'price-alerts';
+type Tab = 'accounts' | 'permissions' | 'settings' | 'price-alerts' | 'reviewer-tokens';
 
 const TABS: { key: Tab; label: string; icon: typeof Users; permission: PermissionKey }[] = [
   { key: 'accounts', label: 'Tài khoản', icon: Users, permission: PERMISSION.USER_READ },
   { key: 'permissions', label: 'Phân quyền', icon: KeyRound, permission: PERMISSION.ROLE_MANAGE },
   { key: 'settings', label: 'Cài đặt nền tảng', icon: Settings, permission: PERMISSION.PLATFORM_SETTINGS_MANAGE },
   { key: 'price-alerts', label: 'Cảnh báo giá', icon: BadgeAlert, permission: PERMISSION.PRICE_ALERT_MANAGE },
+  { key: 'reviewer-tokens', label: 'Token Reviewer', icon: Coins, permission: PERMISSION.TOKEN_BUDGET_MANAGE },
 ];
 
-/** Admin console: accounts, permissions, platform settings and price alerts, each shown only with its permission. */
+/** Admin console: accounts, permissions, settings, price alerts and Reviewer Token, each shown only with its permission. */
 export function AdminPage() {
   const can = useCan();
   const tabs = TABS.filter((t) => can(t.permission));
@@ -33,7 +35,7 @@ export function AdminPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">Quản trị</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tài khoản, phân quyền, cài đặt nền tảng và giám sát giá.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tài khoản, phân quyền, cài đặt nền tảng, giám sát giá và Token của Reviewer.</p>
         </div>
         <div className="flex items-center gap-3 text-xs font-semibold">
           {can(PERMISSION.PROJECT_READ_ALL) && (
@@ -71,6 +73,7 @@ export function AdminPage() {
       {current?.key === 'permissions' && <RolePermissionsPanel />}
       {current?.key === 'settings' && <PlatformSettingsPanel />}
       {current?.key === 'price-alerts' && <PriceAlertsPanel />}
+      {current?.key === 'reviewer-tokens' && <ReviewerTokensPanel />}
     </main>
   );
 }
