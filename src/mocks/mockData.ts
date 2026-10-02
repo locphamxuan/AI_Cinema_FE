@@ -1,10 +1,9 @@
 /**
  * Barrel for demo/seed data, split by domain into wallet.ts, subscription.ts,
- * transactions.ts, chatData.ts. Keep importing from
+ * transactions.ts, chatData.ts (no backend for these yet; movies come from the catalog API). Keep importing from
  * '@/mocks/mockData' — it still re-exports everything.
  */
 export * from './wallet';
 export * from './subscription';
 export * from './transactions';
 export * from './chatData';
-export * from './moviesData';

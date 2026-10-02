@@ -21,7 +21,7 @@ export const API_ROUTES = {
   MOVIES: {
     LIST: '/movies',
     DETAIL: (id: string) => `/movies/${id}`,
-    EPISODE_SUBTITLE: (episodeId: string, language: string) => `/catalog/episodes/${episodeId}/subtitles/${language}`,
+    EPISODES: (id: string) => `/movies/${id}/episodes`,
   },
   GENRES: {
     LIST: '/genres',

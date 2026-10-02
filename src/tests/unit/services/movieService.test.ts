@@ -1,122 +1,106 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { movieService } from '@/services/movieService';
-import type { ApiCatalogMovie } from '@/services/movieAdapter';
+import type { ApiCatalogEpisode, ApiCatalogMovie } from '@/services/movieAdapter';
 
 const apiMovie: ApiCatalogMovie = {
-  id: '7b3f1019-4149-47cc-85e0-005e9449bff1',
-  title: 'Robot & Tri Kỷ',
-  synopsis: 'Một robot quản gia thế hệ thứ 7...',
-  description: null,
-  posterUrl: 'https://picsum.photos/seed/robotLove9/400/600',
+  id: 'm1',
+  title: 'EXECUTE',
+  synopsis: 'Phim ngắn khoa học viễn tưởng u tối.',
+  ageRating: 'T16',
+  releaseYear: 2023,
+  defaultLanguage: 'vi',
+  posterUrl: 'https://thumb.example/execute.jpg',
   bannerUrl: null,
-  releaseYear: 2026,
-  ageRating: 'P',
-  createdAt: '2026-09-24T08:00:00.000Z',
-  genres: [{ genre: { id: 'g1', name: 'Lãng mạn' } }],
-  episodes: [
-    {
-      id: 'ep-1',
-      episodeNumber: 1,
-      title: 'Khởi Nguồn',
-      synopsis: null,
-      thumbnailUrl: null,
-      durationSeconds: 1530,
-      coinPrice: 0,
-      streamUrl: 'https://example.com/ep1.m3u8',
-      qualities: ['360p', '720p', '1080p'],
-      currentPackage: { subtitles: [{ language: 'vi' }, { language: 'en' }] },
-    },
-    {
-      id: 'ep-2',
-      episodeNumber: 2,
-      title: 'Tín Hiệu Ẩn',
-      synopsis: 'AI bắt đầu gửi tín hiệu.',
-      thumbnailUrl: 'https://example.com/ep2.jpg',
-      durationSeconds: 1335,
-      coinPrice: 50,
-      streamUrl: null,
-      qualities: [],
-      currentPackage: null,
-    },
-  ],
+  trailerUrl: null,
+  aiGenerated: true,
+  genres: [{ id: 'g1', name: 'Khoa học viễn tưởng' }],
 };
 
-const jsonResponse = (body: unknown) =>
-  new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } });
+const episode = (n: number, overrides: Partial<ApiCatalogEpisode> = {}): ApiCatalogEpisode => ({
+  id: `ep-${n}`,
+  movieId: 'm1',
+  seasonNumber: 1,
+  seasonTitle: 'Mùa 1',
+  episodeNumber: n,
+  title: `Tập ${n}`,
+  synopsis: null,
+  thumbnailUrl: null,
+  availability: 'AVAILABLE',
+  notice: null,
+  isFreeStarter: n <= 2,
+  coinPrice: 3,
+  durationSeconds: 1530,
+  qualities: ['1080p'],
+  aiLabel: { labelType: 'AI_GENERATED', labelText: 'Phim được tạo bằng trí tuệ nhân tạo (AI)', displayLocation: 'TOP_RIGHT' },
+  publishedAt: '2026-10-03T00:00:00.000Z',
+  ...overrides,
+});
 
-describe('Movie Service (src/services/movieService.ts)', () => {
-  const fetchMock = vi.fn();
+const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
 
-  beforeEach(() => {
-    fetchMock.mockReset();
-    vi.stubGlobal('fetch', fetchMock);
+/** Answers by path: the list, then each movie's episodes. */
+function routeFetch(routes: Record<string, unknown>) {
+  const fetchMock = vi.fn(async (url: string) => {
+    const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
+    return path in routes ? json(routes[path]) : json({ message: 'not found' }, 404);
   });
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
 
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
+describe('movieService', () => {
+  beforeEach(() => vi.unstubAllGlobals());
+  afterEach(() => vi.unstubAllGlobals());
 
-  it('adapts the public catalog list to UI movies', async () => {
-    fetchMock.mockResolvedValue(jsonResponse({ items: [apiMovie], total: 1, page: 1, limit: 100 }));
+  it('reads the paginated catalog and the released episodes of each movie', async () => {
+    const fetchMock = routeFetch({
+      '/movies': { data: [apiMovie], meta: { totalItems: 1, currentPage: 1, totalPages: 1 } },
+      '/movies/m1/episodes': [episode(1), episode(2), episode(3, { qualities: ['720p'] })],
+    });
 
     const res = await movieService.getMovies();
 
     expect(fetchMock.mock.calls[0][0]).toContain('/movies?limit=100');
-    expect(res.success).toBe(true);
     const [movie] = res.data;
     expect(movie).toMatchObject({
-      id: apiMovie.id,
-      genre: ['Lãng mạn'],
+      id: 'm1',
+      genre: ['Khoa học viễn tưởng'],
       description: apiMovie.synopsis,
-      bannerUrl: apiMovie.posterUrl,
-      year: 2026,
-      totalEpisodes: 2,
-      ageRating: 'P',
+      year: 2023,
+      totalEpisodes: 3,
+      isSeries: true,
       quality: '1080p',
+      top10Rank: 1,
     });
-    expect(movie.aiCompliance.contentRating).toContain('mọi lứa tuổi');
-    expect(movie.aiCompliance.moderationScore).toBeUndefined();
+    expect(movie.aiCompliance).toMatchObject({ disclaimer: 'Phim được tạo bằng trí tuệ nhân tạo (AI)', displayLocation: 'TOP_RIGHT' });
+    // Nothing the catalog does not say: no invented studio, AI tools, scores or watch progress.
+    expect(movie.partnerStudio).toBeUndefined();
+    expect(movie.aiToolsUsed).toBeUndefined();
+    expect(movie.rating).toBeUndefined();
+    expect(movie.continueProgress).toBeUndefined();
   });
 
-  it('marks only free episodes as unlocked and formats their duration', async () => {
-    fetchMock.mockResolvedValue(jsonResponse(apiMovie));
+  it('frees the starter episodes (BR-03) and keeps the price of the others', async () => {
+    routeFetch({ '/movies/m1': apiMovie, '/movies/m1/episodes': [episode(1), episode(3)] });
 
-    const res = await movieService.getMovieById(apiMovie.id);
+    const res = await movieService.getMovieById('m1');
 
     const [free, paid] = res.data.episodes;
-    expect(free).toMatchObject({ duration: '25:30', price: 0, isFree: true, isUnlocked: true, isPreview: true });
+    expect(free).toMatchObject({ duration: '25:30', isFree: true, isUnlocked: true, isPreview: true, hlsUrl: '' });
     expect(free.thumbnailUrl).toBe(apiMovie.posterUrl);
-    expect(paid).toMatchObject({ duration: '22:15', price: 50, isFree: false, isUnlocked: false, hlsUrl: '' });
-  });
-
-  it('exposes the renditions and a subtitle track per language of each episode', async () => {
-    fetchMock.mockResolvedValue(jsonResponse(apiMovie));
-
-    const res = await movieService.getMovieById(apiMovie.id);
-
-    const [first, second] = res.data.episodes;
-    expect(first.qualities).toEqual(['360p', '720p', '1080p']);
-    expect(first.subtitles).toEqual([
-      { language: 'vi', label: 'Tiếng Việt', src: '/api/catalog/episodes/ep-1/subtitles/vi' },
-      { language: 'en', label: 'English', src: '/api/catalog/episodes/ep-1/subtitles/en' },
-    ]);
-    expect(second.subtitles).toEqual([]);
+    expect(paid).toMatchObject({ price: 3, isFree: false, isUnlocked: false });
   });
 
   it('returns genres from the paginated genre endpoint', async () => {
-    fetchMock.mockResolvedValue(jsonResponse({ data: [{ id: 'g1', name: 'Lãng mạn', description: null }], meta: {} }));
-
+    routeFetch({ '/genres': { data: [{ id: 'g1', name: 'Lãng mạn', description: null }], meta: {} } });
     const res = await movieService.getGenres();
-
     expect(res.data).toEqual([{ id: 'g1', name: 'Lãng mạn', description: null }]);
   });
 
-  it('reports a failed request without inventing data', async () => {
-    fetchMock.mockResolvedValue(new Response(JSON.stringify({ message: 'boom' }), { status: 500 }));
-
+  it('reports a failed request without inventing movies', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(json({ message: 'boom' }, 500)));
     const res = await movieService.getMovies();
-
     expect(res.success).toBe(false);
-    expect(res.data).toBeNull();
+    expect(res.data).toEqual([]);
   });
 });

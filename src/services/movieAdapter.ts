@@ -1,33 +1,39 @@
 import type { AIComplianceInfo, Episode, Movie } from '@/types/movie';
-import { API_BASE_URL, API_ROUTES } from '@/constants/apiRoutes';
-import { languageLabel } from '@/constants/languages';
 
-/** Shapes returned by the public catalog endpoints (GET /movies, GET /movies/:id). */
-export interface ApiCatalogEpisode {
-  id: string;
-  episodeNumber: number;
-  title: string;
-  synopsis: string | null;
-  thumbnailUrl: string | null;
-  durationSeconds: number | null;
-  coinPrice: number;
-  streamUrl: string | null;
-  qualities: string[];
-  currentPackage: { subtitles: { language: string }[] } | null;
-}
-
+/** A movie of the public catalog (GET /movies, GET /movies/:id) — never the studio, fee or people in charge. */
 export interface ApiCatalogMovie {
   id: string;
   title: string;
   synopsis: string | null;
-  description: string | null;
+  ageRating: string | null;
+  releaseYear: number | null;
+  defaultLanguage: string;
   posterUrl: string | null;
   bannerUrl: string | null;
-  releaseYear: number | null;
-  ageRating: string | null;
-  createdAt: string;
-  genres: { genre: { id: string; name: string } }[];
-  episodes: ApiCatalogEpisode[];
+  trailerUrl: string | null;
+  aiGenerated: boolean;
+  genres: { id: string; name: string }[];
+}
+
+/** A released episode (GET /movies/:id/episodes). The stream itself is not part of the catalog. */
+export interface ApiCatalogEpisode {
+  id: string;
+  movieId: string;
+  seasonNumber: number;
+  seasonTitle: string | null;
+  episodeNumber: number;
+  title: string;
+  synopsis: string | null;
+  thumbnailUrl: string | null;
+  availability: 'AVAILABLE' | 'UNDER_REVISION';
+  notice: string | null;
+  /** BR-03: the first episodes of every movie are free. */
+  isFreeStarter: boolean;
+  coinPrice: number | null;
+  durationSeconds: number | null;
+  qualities: string[];
+  aiLabel: { labelType: string; labelText: string; displayLocation: string | null } | null;
+  publishedAt: string | null;
 }
 
 export interface ApiGenre {
@@ -36,18 +42,12 @@ export interface ApiGenre {
   description: string | null;
 }
 
-// Every published episode passed compliance and carries the AI label required by
-// the AI-labeling policy seeded in the backend (Điều 44 Luật 134/2025/QH15, Điều 18 NĐ 142/2026).
-const AI_LABEL_ARTICLE = 'Điều 44 Luật số 134/2025/QH15 và Điều 18 Nghị định số 142/2026/NĐ-CP';
-const AI_LABEL_DISCLAIMER =
-  'Nội dung hình ảnh, âm thanh và kịch bản của phim được tạo bằng Trí tuệ Nhân tạo. Không có diễn viên thật tham gia.';
-
 const RATING_LABELS: Record<string, string> = {
-  P: 'P - Phim phổ biến cho mọi lứa tuổi',
-  T13: 'T13 - Phim dành cho khán giả từ 13 tuổi',
   T16: 'T16 - Phim dành cho khán giả từ 16 tuổi',
   T18: 'T18 - Phim dành cho khán giả từ 18 tuổi',
 };
+
+const LABEL_LOCATIONS = ['TOP_LEFT', 'TOP_RIGHT', 'BOTTOM_LEFT', 'BOTTOM_RIGHT'] as const;
 
 export function formatDuration(seconds: number | null): string {
   if (!seconds) return '';
@@ -56,96 +56,70 @@ export function formatDuration(seconds: number | null): string {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-/** Highest rendition any episode offers, e.g. '1080p'; undefined when nothing is transcoded. */
+/** Highest rendition any episode offers, e.g. '1080p'. */
 function bestQuality(qualities: string[]): string | undefined {
-  if (!Array.isArray(qualities) || qualities.length === 0) return undefined;
+  if (qualities.length === 0) return undefined;
   return [...qualities].sort((a, b) => parseInt(b, 10) - parseInt(a, 10))[0];
 }
 
 function adaptEpisode(ep: ApiCatalogEpisode, fallbackImage: string): Episode {
-  const isFree = ep.coinPrice === 0;
   return {
     id: ep.id,
     episodeNumber: ep.episodeNumber,
     title: ep.title,
-    duration: formatDuration(ep.durationSeconds) || '24:30',
-    hlsUrl: ep.streamUrl ?? '',
-    qualities: Array.isArray(ep.qualities) && ep.qualities.length > 0 ? ep.qualities : ['1080p', '720p', '480p'],
-    subtitles: (ep.currentPackage?.subtitles ?? []).map(({ language }) => ({
-      language,
-      label: languageLabel(language),
-      src: `${API_BASE_URL}${API_ROUTES.MOVIES.EPISODE_SUBTITLE(ep.id, language)}`,
-    })),
+    duration: formatDuration(ep.durationSeconds),
+    // Playback (unlock and stream) is not served by the catalog yet.
+    hlsUrl: '',
+    qualities: ep.qualities,
+    subtitles: [],
     thumbnailUrl: ep.thumbnailUrl ?? fallbackImage,
-    price: ep.coinPrice,
-    isFree,
-    isPreview: isFree && ep.episodeNumber === 1,
-    isUnlocked: isFree,
+    price: ep.coinPrice ?? 0,
+    isFree: ep.isFreeStarter,
+    isPreview: ep.isFreeStarter && ep.episodeNumber === 1,
+    isUnlocked: ep.isFreeStarter,
     synopsis: ep.synopsis ?? '',
   };
 }
 
-export function adaptApiMovie(api: ApiCatalogMovie): Movie {
-  const posterUrl = api.posterUrl ?? api.bannerUrl ?? '';
-  const ageRating = api.ageRating ?? 'T16';
-  const aiTools = ['Midjourney v6.1', 'Runway Gen-3 Alpha', 'ElevenLabs Audio', 'Topaz Video AI 4K'];
-  const partnerStudio = 'V-Nexus AI Studio (Độc quyền)';
-
-  const aiCompliance: AIComplianceInfo = {
-    complianceArticle: AI_LABEL_ARTICLE,
-    reviewStatus: 'approved',
-    contentRating: RATING_LABELS[ageRating] || ageRating,
-    disclaimer: AI_LABEL_DISCLAIMER,
-    partnerStudio,
-    aiToolsUsed: aiTools,
-    certificationId: `VN-AI-2026-${api.id.slice(0, 8).toUpperCase()}`,
-    displayLocation: 'TOP_RIGHT',
-    rulesetVersion: 'ND142_V1',
-  };
-
-  const isSeries = (api.episodes?.length ?? 0) > 1;
-
-  const rawGenres: any[] = Array.isArray(api.genres) ? api.genres : [];
-  const genreNames = rawGenres
-    .map((g) => g?.genre?.name ?? g?.name ?? (typeof g === 'string' ? g : null))
-    .filter((name): name is string => typeof name === 'string' && name.trim().length > 0);
-
+/** The AI label the Reviewer applied (BR-40), as the first released episode carries it. */
+function aiCompliance(api: ApiCatalogMovie, episodes: ApiCatalogEpisode[]): AIComplianceInfo {
+  const label = episodes.find((e) => e.aiLabel)?.aiLabel;
+  const location = LABEL_LOCATIONS.find((l) => l === label?.displayLocation);
   return {
-    id: api.id,
-    title: api.title,
-    genre: genreNames.length > 0 ? genreNames : ['Khoa học viễn tưởng', 'Cyberpunk'],
-    posterUrl,
-    bannerUrl: api.bannerUrl ?? posterUrl,
-    description: api.description ?? api.synopsis ?? '',
-    contentBrief: api.synopsis ?? api.description ?? '',
-    year: api.releaseYear ?? new Date(api.createdAt).getFullYear(),
-    totalEpisodes: api.episodes?.length ?? 0,
-    ageRating,
-    episodes: (api.episodes ?? []).map((ep) => adaptEpisode(ep, posterUrl)),
-    quality: bestQuality((api.episodes ?? []).flatMap((ep) => ep.qualities ?? [])) || '4K Ultra HD',
-    aiCompliance,
-    isSeries,
-    rating: +(8.8 + ((api.title.charCodeAt(0) % 10) / 10)).toFixed(1),
-    matchScore: 92 + (api.title.length % 7),
-    badge: isSeries ? 'Series Độc Quyền AI' : 'Điện Ảnh AI',
-    partnerStudio,
-    aiToolsUsed: aiTools,
+    complianceArticle: 'Nhãn nội dung AI do Reviewer gắn trước khi phát hành (BR-40)',
+    reviewStatus: 'approved',
+    contentRating: api.ageRating ? (RATING_LABELS[api.ageRating] ?? api.ageRating) : 'Mọi lứa tuổi',
+    disclaimer: label?.labelText ?? 'Phim được tạo bằng trí tuệ nhân tạo (AI).',
+    ...(location ? { displayLocation: location } : {}),
   };
 }
 
-export function adaptApiMovies(apiList: ApiCatalogMovie[]): Movie[] {
-  return apiList.map((api, index) => {
-    const movie = adaptApiMovie(api);
-    if (index < 10) {
-      movie.top10Rank = index + 1;
-    }
-    if (index === 0) {
-      movie.continueProgress = 65;
-      movie.continueEpisodeNumber = 1;
-    } else if (index === 1 && movie.episodes.length > 1) {
-      movie.continueProgress = 40;
-      movie.continueEpisodeNumber = 2;
-    }
-    return movie;
-  });
+export function adaptApiMovie(api: ApiCatalogMovie, episodes: ApiCatalogEpisode[] = []): Movie {
+  const posterUrl = api.posterUrl ?? api.bannerUrl ?? '';
+  const isSeries = episodes.length > 1;
+  return {
+    id: api.id,
+    title: api.title,
+    genre: api.genres.map((g) => g.name),
+    posterUrl,
+    bannerUrl: api.bannerUrl ?? posterUrl,
+    description: api.synopsis ?? '',
+    contentBrief: api.synopsis ?? '',
+    year: api.releaseYear ?? new Date().getFullYear(),
+    totalEpisodes: episodes.length,
+    ageRating: api.ageRating ?? 'Mọi lứa tuổi',
+    episodes: episodes.map((ep) => adaptEpisode(ep, posterUrl)),
+    quality: bestQuality(episodes.flatMap((ep) => ep.qualities)) ?? 'HD',
+    aiCompliance: aiCompliance(api, episodes),
+    isSeries,
+    badge: isSeries ? 'Series AI' : 'Phim AI',
+  };
+}
+
+/** Newest first, as the catalog lists them; the first ten make the top-10 row. */
+export function adaptApiMovies(list: { movie: ApiCatalogMovie; episodes: ApiCatalogEpisode[] }[]): Movie[] {
+  return list.map(({ movie, episodes }, index) => ({
+    ...adaptApiMovie(movie, episodes),
+    ...(index < 10 ? { top10Rank: index + 1 } : {}),
+  }));
 }
