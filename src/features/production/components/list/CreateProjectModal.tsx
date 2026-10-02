@@ -7,7 +7,15 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
 import { useAction } from '../../hooks/useAction';
-import { EpisodeRowsEditor, emptyEpisode, episodesValid, toEpisodeInput, type EpisodeDraft } from '../shared/EpisodeRowsEditor';
+import {
+  EpisodeRowsEditor,
+  MilestoneQuickFill,
+  emptyEpisode,
+  episodesValid,
+  spreadMilestones,
+  toEpisodeInput,
+  type EpisodeDraft,
+} from '../shared/EpisodeRowsEditor';
 import { GenrePicker } from '../shared/GenrePicker';
 
 const MIN_IDEA_LENGTH = 20;
@@ -33,6 +41,13 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
     idea.trim().length >= MIN_IDEA_LENGTH &&
     genreIds.length > 0 &&
     seasons.every((s) => episodesValid(s.episodes));
+
+  // Milestones follow the episode order across seasons.
+  const fillMilestones = (first: string, gapDays: number) => {
+    const total = seasons.reduce((n, s) => n + s.episodes.length, 0);
+    const days = spreadMilestones(first, gapDays, total);
+    setSeasons(seasons.map((s, i) => ({ ...s, episodes: s.episodes.map((ep, j) => ({ ...ep, milestone: days[firstNumbers[i] - 1 + j] })) })));
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +87,9 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
         </FormField>
 
         <fieldset className="space-y-3">
-          <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Mùa và tập (thời lượng do bạn đặt, không giới hạn)</legend>
+          <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Mùa và tập — thời lượng (không giới hạn) và mốc hoàn thành từng tập</legend>
+          <p className="text-[11px] text-slate-500">Mốc là ngày tập phải xong; Creator đặt hạn cho studio không được trễ hơn mốc.</p>
+          <MilestoneQuickFill onApply={fillMilestones} />
           {seasons.map((season, i) => (
             <div key={i} className="rounded-xl border border-slate-200 dark:border-white/10 p-3 space-y-2">
               <div className="flex items-center gap-2">

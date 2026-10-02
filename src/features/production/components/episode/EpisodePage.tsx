@@ -126,7 +126,8 @@ export function EpisodePage() {
               stacked
               items={[
                 ['Thời lượng mục tiêu', formatDuration(episode.targetDurationSeconds)],
-                ['Hạn giao', formatDay(episode.dueDate)],
+                ['Mốc hoàn thành', formatDay(episode.milestoneDate)],
+                ['Hạn studio', formatDay(episode.dueDate)],
                 ['Giá Coin', formatNumber(episode.coinPrice)],
                 ['Studio', project.data.studioName ?? '—'],
               ]}
