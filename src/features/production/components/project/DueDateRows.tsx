@@ -1,46 +1,33 @@
 'use client';
 
-import { fieldInputClass } from '@/components/ui/FormField';
 import { getTodayDateString } from '@/lib/dateUtils';
 import type { Episode } from '@/types/production';
 import { formatDay, toDateInput } from '../../lib/format';
 
-/** A due date the API accepts: not in the past and not after the Reviewer's milestone (YYYY-MM-DD compares as text). */
-export function dueDateFits(dueDate: string, episode: Pick<Episode, 'milestoneDate'>): boolean {
-  const milestone = toDateInput(episode.milestoneDate);
-  return dueDate >= getTodayDateString() && (!milestone || dueDate <= milestone);
+/** The Reviewer's deadline of an episode can be handed to a studio: set, and not already past. */
+export function deadlineUsable(episode: Pick<Episode, 'milestoneDate'>): boolean {
+  const deadline = toDateInput(episode.milestoneDate);
+  return !!deadline && deadline >= getTodayDateString();
 }
 
-export function DueDateRows({ episodes, dates, onChange }: { episodes: Episode[]; dates: Record<string, string>; onChange: (d: Record<string, string>) => void }) {
-  const min = getTodayDateString();
+/** Read-only: the studio is due on the deadline the Reviewer set for each episode (BR-38). */
+export function DeadlineList({ episodes }: { episodes: Episode[] }) {
   return (
-    <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+    <ul className="space-y-1.5 max-h-72 overflow-y-auto pr-1 text-xs">
       {episodes.map((ep) => {
-        const value = dates[ep.id] ?? '';
-        const late = !!value && !dueDateFits(value, ep);
+        const usable = deadlineUsable(ep);
         return (
-          <label key={ep.id} className="flex items-center justify-between gap-3 text-xs">
-            <span className="min-w-0">
-              <span className="block text-slate-700 dark:text-slate-200 truncate">
-                #{ep.episodeNumber} {ep.title}
-              </span>
-              <span className={`block text-[11px] ${late ? 'text-rose-600' : 'text-slate-500'}`}>
-                Mốc Reviewer: {formatDay(ep.milestoneDate)}
-                {late && ' — hạn phải trong khoảng hôm nay tới mốc'}
-              </span>
+          <li key={ep.id} className="flex items-center justify-between gap-3">
+            <span className="min-w-0 truncate text-slate-700 dark:text-slate-200">
+              #{ep.episodeNumber} {ep.title}
             </span>
-            <input
-              type="date"
-              min={min}
-              max={toDateInput(ep.milestoneDate) || undefined}
-              value={value}
-              onChange={(e) => onChange({ ...dates, [ep.id]: e.target.value })}
-              className={`${fieldInputClass} py-1 w-40 shrink-0 ${late ? 'border-rose-500' : ''}`}
-              aria-label={`Hạn giao tập ${ep.episodeNumber}`}
-            />
-          </label>
+            <span className={`shrink-0 font-semibold ${usable ? 'text-slate-800 dark:text-slate-100' : 'text-rose-600'}`}>
+              {ep.milestoneDate ? formatDay(ep.milestoneDate) : 'Chưa đặt'}
+              {ep.milestoneDate && !usable && ' (đã qua)'}
+            </span>
+          </li>
         );
       })}
-    </div>
+    </ul>
   );
 }

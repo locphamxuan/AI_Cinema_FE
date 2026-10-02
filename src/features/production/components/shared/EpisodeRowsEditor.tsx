@@ -11,7 +11,7 @@ export interface EpisodeDraft {
   title: string;
   /** Minutes; the API takes seconds. No platform limit (BR-31), only the API's 12 h. */
   minutes: number;
-  /** YYYY-MM-DD: when the episode must be done; the studio due date cannot be later. */
+  /** YYYY-MM-DD: the episode's deadline; the studio is due that day. */
   milestone: string;
 }
 
@@ -84,8 +84,8 @@ export function EpisodeRowsEditor({
             min={today}
             value={ep.milestone}
             onChange={(e) => update(i, { milestone: e.target.value })}
-            aria-label={`Mốc hoàn thành tập ${firstNumber + i}`}
-            title="Mốc hoàn thành — hạn studio không được trễ hơn"
+            aria-label={`Thời hạn tập ${firstNumber + i}`}
+            title="Thời hạn — studio phải giao tập này trước ngày này"
             className={`${fieldInputClass} py-1.5 w-40 ${ep.milestone && !milestoneValid(ep.milestone) ? 'border-rose-500' : ''}`}
           />
           <Button
@@ -114,13 +114,13 @@ export function MilestoneQuickFill({ onApply }: { onApply: (first: string, gapDa
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl bg-slate-50 dark:bg-white/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
       <CalendarRange className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-      <span>Điền nhanh mốc: tập đầu</span>
+      <span>Điền nhanh thời hạn: tập đầu</span>
       <input
         type="date"
         min={getTodayDateString()}
         value={first}
         onChange={(e) => setFirst(e.target.value)}
-        aria-label="Mốc của tập đầu tiên"
+        aria-label="Thời hạn của tập đầu tiên"
         className={`${fieldInputClass} py-1 w-40`}
       />
       <span>, mỗi tập sau cách</span>
@@ -130,7 +130,7 @@ export function MilestoneQuickFill({ onApply }: { onApply: (first: string, gapDa
         max={365}
         value={gap}
         onChange={(e) => setGap(Number(e.target.value))}
-        aria-label="Số ngày giữa hai mốc"
+        aria-label="Số ngày giữa hai thời hạn"
         className={`${fieldInputClass} py-1 w-16 text-center`}
       />
       <span>ngày</span>

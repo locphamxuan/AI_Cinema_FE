@@ -39,12 +39,6 @@ export interface StudioInput {
   studioContact?: string;
 }
 
-export interface DueDateInput {
-  episodeId: string;
-  /** YYYY-MM-DD */
-  dueDate: string;
-}
-
 export interface MediaMetadataInput {
   proposedLabelType: LabelType;
   submissionNote?: string;

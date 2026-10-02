@@ -3,7 +3,7 @@ import { notificationHref, productionBaseFor, productionPaths } from '@/features
 import { projectCapabilities } from '@/features/production/lib/capabilities';
 import { addDays, formatDay, formatDuration } from '@/features/production/lib/format';
 import { milestoneValid, spreadMilestones, toEpisodeInput } from '@/features/production/components/shared/EpisodeRowsEditor';
-import { dueDateFits } from '@/features/production/components/project/DueDateRows';
+import { deadlineUsable } from '@/features/production/components/project/DueDateRows';
 import { getTodayDateString } from '@/lib/dateUtils';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
 
@@ -92,11 +92,9 @@ describe('episode milestones', () => {
     });
   });
 
-  it('keeps a studio due date between today and the milestone', () => {
-    const milestoneDate = `${addDays(today, 10)}T00:00:00.000Z`;
-    expect(dueDateFits(addDays(today, 10), { milestoneDate })).toBe(true);
-    expect(dueDateFits(addDays(today, 11), { milestoneDate })).toBe(false);
-    expect(dueDateFits(addDays(today, -1), { milestoneDate })).toBe(false);
-    expect(dueDateFits(addDays(today, 400), { milestoneDate: null })).toBe(true);
+  it('hands a studio only deadlines that are set and not past', () => {
+    expect(deadlineUsable({ milestoneDate: `${today}T00:00:00.000Z` })).toBe(true);
+    expect(deadlineUsable({ milestoneDate: `${addDays(today, -1)}T00:00:00.000Z` })).toBe(false);
+    expect(deadlineUsable({ milestoneDate: null })).toBe(false);
   });
 });

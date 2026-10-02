@@ -152,9 +152,18 @@ describe('ProjectDetailPage', () => {
     render(<ProjectDetailPage />);
 
     await userEvent.click(await screen.findByRole('button', { name: /Bàn giao cho studio/ }));
-    expect(await screen.findByRole('dialog')).toHaveTextContent('Hạn giao từng tập');
-    // The brief cannot go out before every episode has a due date.
-    expect(screen.getByRole('button', { name: 'Gửi brief' })).toBeDisabled();
+    // Admin proposals are for the Reviewer only (BR-55).
+    expect(screen.queryByRole('tab', { name: /Đề xuất của Admin/ })).not.toBeInTheDocument();
+    const dialog = await screen.findByRole('dialog');
+    // Each episode is due on the Reviewer's deadline; the Creator only names the studio.
+    expect(dialog).toHaveTextContent('Thời hạn từng tập');
+    expect(dialog).toHaveTextContent('31/12/2026');
+    expect(within(dialog).queryByLabelText(/Hạn giao tập/)).not.toBeInTheDocument();
+    const send = screen.getByRole('button', { name: 'Gửi brief' });
+    expect(send).toBeDisabled();
+    await userEvent.type(screen.getByLabelText('Tên studio'), 'Studio Ánh Trăng');
+    await userEvent.type(screen.getByLabelText('Email nhận brief'), 'studio@x.vn');
+    expect(send).toBeEnabled();
   });
 
   it('lets the Admin propose changes but not cancel or reassign (BR-55)', async () => {
