@@ -77,6 +77,7 @@ export function StudioTab() {
         <Panel title="Studio hiện tại">
           {project.studioName ? (
             <Facts
+              stacked
               items={[
                 ['Studio', project.studioName],
                 ['Email', project.studioEmail ?? '—'],

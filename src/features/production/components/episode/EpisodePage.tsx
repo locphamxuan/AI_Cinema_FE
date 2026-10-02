@@ -123,6 +123,7 @@ export function EpisodePage() {
         <div className="lg:col-span-2 space-y-5">
           <Panel title="Thông tin tập">
             <Facts
+              stacked
               items={[
                 ['Thời lượng mục tiêu', formatDuration(episode.targetDurationSeconds)],
                 ['Hạn giao', formatDay(episode.dueDate)],

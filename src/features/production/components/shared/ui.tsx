@@ -72,9 +72,10 @@ export function Empty({ children }: { children: ReactNode }) {
 }
 
 /** Label/value pairs in two columns. */
-export function Facts({ items }: { items: [string, ReactNode][] }) {
+/** Label/value pairs; `stacked` keeps one pair per row for narrow side panels. */
+export function Facts({ items, stacked = false }: { items: [string, ReactNode][]; stacked?: boolean }) {
   return (
-    <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
+    <dl className={`grid grid-cols-1 ${stacked ? '' : 'sm:grid-cols-2'} gap-x-6 gap-y-2 text-xs`}>
       {items.map(([label, value]) => (
         <div key={label} className="flex gap-2 min-w-0">
           <dt className="text-slate-500 dark:text-slate-400 shrink-0 w-32">{label}</dt>
