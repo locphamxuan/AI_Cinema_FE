@@ -144,6 +144,7 @@ export const EVENT_LABEL: Record<string, string> = {
   PROJECT_CREATED: 'Tạo dự án',
   PROJECT_UPDATED: 'Sửa thông tin dự án',
   IDEA_FILE_UPLOADED: 'Tải file ý tưởng',
+  IDEA_FILE_DELETED: 'Xoá file ý tưởng',
   FEE_ALLOCATED: 'Cấp phí sản xuất',
   FEE_TOPPED_UP: 'Cấp thêm phí sản xuất',
   FEE_CORRECTED: 'Điều chỉnh phí sản xuất',

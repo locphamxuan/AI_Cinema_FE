@@ -71,6 +71,7 @@ export const API_ROUTES = {
     SEASON_EPISODES: (seasonId: string) => `/seasons/${seasonId}/episodes`,
     EPISODE: (episodeId: string) => `/episodes/${episodeId}`,
     IDEA_FILES: (movieId: string) => `/projects/${movieId}/idea-files`,
+    IDEA_FILE: (movieId: string, fileId: string) => `/projects/${movieId}/idea-files/${fileId}`,
     IDEA_FILE_CONTENT: (movieId: string, fileId: string) => `/projects/${movieId}/idea-files/${fileId}/content`,
     FEE: (movieId: string) => `/projects/${movieId}/fee`,
     FEE_ENTRIES: (movieId: string) => `/projects/${movieId}/fee/entries`,

@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { Download, Pencil, Upload, UserPlus, XCircle } from 'lucide-react';
+import { useState } from 'react';
+import { Pencil, UserPlus, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -10,12 +10,11 @@ import type { AgeRating, Person } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
 import { EDITABLE_PROJECT, OPEN_PROJECT, isIn } from '../../lib/capabilities';
-import { formatBytes, formatDateTime, saveBlob } from '../../lib/format';
+import { formatDateTime } from '../../lib/format';
 import { GenrePicker } from '../shared/GenrePicker';
-import { Empty, Facts, Panel, TextPromptModal } from '../shared/ui';
+import { Facts, Panel, TextPromptModal } from '../shared/ui';
+import { IdeaFilesPanel } from './IdeaFilesPanel';
 import { useProject } from './ProjectContext';
-
-const IDEA_ACCEPT = '.pdf,.docx,.png,.jpg,.jpeg,.webp';
 
 export function OverviewTab() {
   const { project, caps, reload } = useProject();
@@ -72,15 +71,16 @@ export function OverviewTab() {
           </div>
         </Panel>
 
-        <IdeaFilesPanel canUpload={caps.manage && open} />
+        <IdeaFilesPanel canManage={caps.manage && open} />
       </div>
 
       <div className="space-y-5">
         <Panel title="Phân công">
           <Facts
+            stacked
             items={[
-              ['Reviewer', project.reviewer.fullName],
-              ['Content Creator', project.creator?.fullName ?? 'Chưa giao'],
+              ['Reviewer phụ trách', project.reviewer.fullName],
+              ['Creator phụ trách', project.creator?.fullName ?? 'Chưa giao Creator'],
             ]}
           />
           {caps.manage && open && (
@@ -124,57 +124,6 @@ export function OverviewTab() {
         onConfirm={cancel}
       />
     </div>
-  );
-}
-
-function IdeaFilesPanel({ canUpload }: { canUpload: boolean }) {
-  const { project, reload } = useProject();
-  const input = useRef<HTMLInputElement>(null);
-  const { busy, run } = useAction();
-
-  const upload = async (file: File | undefined) => {
-    if (!file) return;
-    if (await run(() => productionService.uploadIdeaFile(project.id, file), 'Đã tải file ý tưởng')) await reload();
-    if (input.current) input.current.value = '';
-  };
-
-  const download = async (fileId: string, name: string) => {
-    const blob = await productionService.downloadIdeaFile(project.id, fileId);
-    if (blob) saveBlob(blob, name);
-  };
-
-  return (
-    <Panel
-      title="File ý tưởng"
-      description="Đi kèm brief gửi studio. PDF, DOCX hoặc ảnh, tối đa 20 MB; tải lại cùng tên sẽ tạo phiên bản mới."
-      actions={
-        canUpload && (
-          <>
-            <input ref={input} type="file" accept={IDEA_ACCEPT} className="hidden" onChange={(e) => upload(e.target.files?.[0])} />
-            <Button size="sm" variant="secondary" disabled={busy} onClick={() => input.current?.click()}>
-              <Upload className="w-3.5 h-3.5" aria-hidden="true" /> {busy ? 'Đang tải…' : 'Tải lên'}
-            </Button>
-          </>
-        )
-      }
-    >
-      {project.ideaFiles.length === 0 ? (
-        <Empty>Chưa có file nào.</Empty>
-      ) : (
-        <ul className="divide-y divide-slate-100 dark:divide-white/5 text-xs">
-          {project.ideaFiles.map((f) => (
-            <li key={f.id} className="flex items-center justify-between gap-3 py-2">
-              <span className="min-w-0 truncate text-slate-800 dark:text-slate-200">
-                {f.fileName} <span className="text-slate-400">· v{f.version} · {formatBytes(f.sizeBytes)}</span>
-              </span>
-              <Button size="sm" variant="ghost" onClick={() => download(f.id, f.fileName)} aria-label={`Tải ${f.fileName}`}>
-                <Download className="w-3.5 h-3.5" />
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </Panel>
   );
 }
 

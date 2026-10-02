@@ -62,8 +62,8 @@ export const productionService = {
   getProject: (movieId: string) => apiClient.get<ProjectDetail>(R.PROJECT(movieId)),
   createProject: (input: CreateProjectInput) => apiClient.post<ProjectDetail>(R.PROJECTS, input),
   updateProject: (movieId: string, input: UpdateProjectInput) => apiClient.patch<ProjectDetail>(R.PROJECT(movieId), input),
-  assignCreator: (movieId: string, creatorId: string) => apiClient.post<ProjectDetail>(R.ASSIGN(movieId), { creatorId }),
-  cancelProject: (movieId: string, reason: string) => apiClient.post<ProjectDetail>(R.CANCEL(movieId), { reason }),
+  assignCreator: (movieId: string, creatorId: string) => apiClient.post<null>(R.ASSIGN(movieId), { creatorId }),
+  cancelProject: (movieId: string, reason: string) => apiClient.post<null>(R.CANCEL(movieId), { reason }),
   listEvents: (movieId: string) => apiClient.get<ProjectEvent[]>(R.EVENTS(movieId)),
 
   addSeason: (movieId: string, input: NewSeasonInput) => apiClient.post<unknown>(R.SEASONS(movieId), input),
@@ -76,6 +76,7 @@ export const productionService = {
     form.append('file', file);
     return apiClient.postForm<IdeaFile>(R.IDEA_FILES(movieId), form);
   },
+  deleteIdeaFile: (movieId: string, fileId: string) => apiClient.delete<null>(R.IDEA_FILE(movieId, fileId)),
   downloadIdeaFile: (movieId: string, fileId: string) => apiClient.getBlob(R.IDEA_FILE_CONTENT(movieId, fileId)),
 
   // ---- Production fee (Token, BR-45/46/50) ----
