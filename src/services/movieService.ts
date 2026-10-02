@@ -18,7 +18,10 @@ export const movieService = {
     const res = await apiClient.get<{ items: ApiCatalogMovie[] }>(
       `${API_ROUTES.MOVIES.LIST}?limit=${CATALOG_PAGE_SIZE}`
     );
-    return mapResponse(res, (data) => adaptApiMovies(data.items));
+    return mapResponse(res, (data: any) => {
+      const list = data?.items || data?.movies || (Array.isArray(data) ? data : []);
+      return adaptApiMovies(list);
+    });
   },
 
   async getMovieById(id: string): Promise<ApiResponse<Movie>> {
