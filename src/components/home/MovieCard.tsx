@@ -38,7 +38,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
           {/* AI Compliance Micro-Tag */}
           <div className="absolute top-2 right-2 z-10 px-1.5 py-0.5 rounded bg-black/70 border border-white/20 text-[9px] text-white/90 font-medium backdrop-blur-md">
-            AI • Đ.44
+            Nhãn AI
           </div>
 
           {/* Gradient Overlay */}
