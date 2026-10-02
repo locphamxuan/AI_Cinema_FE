@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { Film } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import type { Movie } from '@/types/movie';
 import NetflixNavbar from '@/components/home/NetflixNavbar';
@@ -21,10 +22,14 @@ export default function HomePage() {
     loadCatalog();
   }, [loadCatalog]);
 
-  // Hero Spotlight Movie: select first movie with rich banner, or first movie in catalog
+  // Hero Spotlight Movie: prioritize Cyber Saigon 2077, or first movie with banner
   const heroMovie = useMemo(() => {
     if (!movies || movies.length === 0) return null;
-    return movies.find((m) => m.bannerUrl && m.bannerUrl.length > 0 && m.episodes.length > 0) || movies[0];
+    return (
+      movies.find((m) => m.title.includes('Cyber Saigon 2077')) ||
+      movies.find((m) => m.bannerUrl && m.bannerUrl.length > 0 && m.episodes.length > 0) ||
+      movies[0]
+    );
   }, [movies]);
 
   // Filtered by Search or NavTab
