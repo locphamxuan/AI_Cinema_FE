@@ -14,7 +14,7 @@ export async function getDbMovies() {
       m.id,
       m.title,
       m.synopsis,
-      m.description,
+      m.idea_description as description,
       m.poster_url as "posterUrl",
       m.banner_url as "bannerUrl",
       m.release_year as "releaseYear",
@@ -35,22 +35,23 @@ export async function getDbMovies() {
             'episodeNumber', e.episode_number,
             'title', e.title,
             'synopsis', e.synopsis,
-            'thumbnailUrl', e.thumbnail_url,
-            'durationSeconds', e.duration_seconds,
-            'coinPrice', e.coin_price,
-            'streamUrl', e.stream_url,
-            'qualities', e.qualities,
+            'thumbnailUrl', COALESCE(e.thumbnail_url, m.poster_url),
+            'durationSeconds', COALESCE(ma.duration_seconds, e.target_duration_seconds, 600),
+            'coinPrice', COALESCE(e.coin_price, 0),
+            'streamUrl', COALESCE(ma.stream_url, 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'),
+            'qualities', COALESCE(to_jsonb(ma.qualities), jsonb_build_array('1080p', '720p', '480p')),
             'currentPackage', jsonb_build_object('subtitles', jsonb_build_array(jsonb_build_object('language', 'vi'), jsonb_build_object('language', 'en')))
           )
-        ) FILTER (WHERE e.id IS NOT NULL AND e.production_status = 'PUBLISHED'),
+        ) FILTER (WHERE e.id IS NOT NULL AND e.status = 'PUBLISHED'),
         '[]'
       ) as episodes
     FROM movies m
     LEFT JOIN movie_genres mg ON mg.movie_id = m.id
     LEFT JOIN genres g ON g.id = mg.genre_id
     LEFT JOIN episodes e ON e.movie_id = m.id
+    LEFT JOIN media_assets ma ON (ma.id = e.approved_media_asset_id OR ma.episode_id = e.id)
     GROUP BY m.id
-    HAVING COUNT(CASE WHEN e.production_status = 'PUBLISHED' THEN 1 END) > 0
+    HAVING COUNT(CASE WHEN e.status = 'PUBLISHED' THEN 1 END) > 0
     ORDER BY m.created_at DESC;
   `;
 
