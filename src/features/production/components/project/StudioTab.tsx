@@ -14,6 +14,7 @@ import { useResource } from '../../hooks/useResource';
 import { BEFORE_APPROVAL_EPISODE, DELIVERY_PROJECT, isIn } from '../../lib/capabilities';
 import { formatDateTime, formatNumber, saveBlob, toDateInput } from '../../lib/format';
 import { Empty, ErrorNote, Facts, Loading, Panel } from '../shared/ui';
+import { DueDateRows, dueDateFits } from './DueDateRows';
 import { useProject } from './ProjectContext';
 
 const EMAIL_STATUS = {
@@ -140,36 +141,23 @@ function cleanStudio(s: StudioInput): StudioInput {
 
 const studioValid = (s: StudioInput) => s.studioName.trim().length >= 2 && /\S+@\S+\.\S+/.test(s.studioEmail);
 
-function DueDateRows({ episodes, dates, onChange }: { episodes: Episode[]; dates: Record<string, string>; onChange: (d: Record<string, string>) => void }) {
-  const min = getTodayDateString();
-  return (
-    <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
-      {episodes.map((ep) => (
-        <label key={ep.id} className="flex items-center justify-between gap-3 text-xs">
-          <span className="text-slate-700 dark:text-slate-200 truncate">
-            #{ep.episodeNumber} {ep.title}
-          </span>
-          <input
-            type="date"
-            min={min}
-            value={dates[ep.id] ?? ''}
-            onChange={(e) => onChange({ ...dates, [ep.id]: e.target.value })}
-            className={`${fieldInputClass} py-1 w-40`}
-            aria-label={`Hạn giao tập ${ep.episodeNumber}`}
-          />
-        </label>
-      ))}
-    </div>
-  );
-}
-
 function HandOffModal({ episodes, onClose, onDone }: { episodes: Episode[]; onClose: () => void; onDone: () => Promise<void> }) {
   const { project, reload } = useProject();
   const [studio, setStudio] = useState<StudioInput>({ studioName: '', studioEmail: '', studioContact: '' });
-  const [dates, setDates] = useState<Record<string, string>>(() => Object.fromEntries(episodes.map((e) => [e.id, toDateInput(e.dueDate)])));
+  const [dates, setDates] = useState<Record<string, string>>(() =>
+    Object.fromEntries(episodes.map((e) => [e.id, toDateInput(e.dueDate) || toDateInput(e.milestoneDate)])),
+  );
   const [fillAll, setFillAll] = useState('');
   const { busy, run } = useAction();
-  const allDated = episodes.every((e) => dates[e.id]);
+  const allDated = episodes.every((e) => dates[e.id] && dueDateFits(dates[e.id], e));
+  // One date for everyone, but never past an episode's own milestone.
+  const applyAll = () => {
+    const capped = episodes.map((ep) => {
+      const milestone = toDateInput(ep.milestoneDate);
+      return [ep.id, milestone && fillAll > milestone ? milestone : fillAll];
+    });
+    setDates(Object.fromEntries(capped));
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,10 +174,10 @@ function HandOffModal({ episodes, onClose, onDone }: { episodes: Episode[]; onCl
         <StudioFields value={studio} onChange={setStudio} />
         <div className="space-y-2">
           <div className="flex flex-wrap items-end justify-between gap-2">
-            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Hạn giao từng tập (bắt buộc)</span>
+            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Hạn giao từng tập (bắt buộc, không trễ hơn mốc Reviewer)</span>
             <div className="flex items-center gap-2">
               <input type="date" min={getTodayDateString()} value={fillAll} onChange={(e) => setFillAll(e.target.value)} className={`${fieldInputClass} py-1 w-40`} aria-label="Hạn chung" />
-              <Button type="button" size="sm" variant="secondary" disabled={!fillAll} onClick={() => setDates(Object.fromEntries(episodes.map((ep) => [ep.id, fillAll])))}>
+              <Button type="button" size="sm" variant="secondary" disabled={!fillAll} onClick={applyAll}>
                 Áp cho tất cả
               </Button>
             </div>
@@ -249,6 +237,7 @@ function DueDatesModal({ episodes, onClose }: { episodes: Episode[]; onClose: ()
   const [dates, setDates] = useState<Record<string, string>>(initial);
   const { busy, run } = useAction();
   const changed = episodes.filter((e) => dates[e.id] && dates[e.id] !== initial[e.id]);
+  const allFit = changed.every((e) => dueDateFits(dates[e.id], e));
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -267,7 +256,7 @@ function DueDatesModal({ episodes, onClose }: { episodes: Episode[]; onClose: ()
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || changed.length === 0}>
+          <Button type="submit" disabled={busy || changed.length === 0 || !allFit}>
             Lưu {changed.length > 0 && `(${changed.length})`}
           </Button>
         </div>
