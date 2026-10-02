@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { Play, Info, Plus, Check, Volume2, VolumeX, ShieldCheck, Sparkles, Star, Film, ChevronRight } from 'lucide-react';
+import { Play, Info, Plus, Check, Volume2, VolumeX, ShieldCheck, Sparkles } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 interface CinematicHeroBillboardProps {
@@ -19,12 +19,10 @@ export default function CinematicHeroBillboard({
   onOpenDetailModal,
 }: CinematicHeroBillboardProps) {
   const [isMuted, setIsMuted] = useState(true);
-  const [isAdded, setIsAdded] = useState(false);
+  // Remembered per movie, so another hero starts un-added.
+  const [addedId, setAddedId] = useState<string | null>(null);
+  const isAdded = addedId === movie.id;
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
-
-  useEffect(() => {
-    setIsAdded(false);
-  }, [movie.id]);
 
   const toggleSound = () => {
     setIsMuted(!isMuted);
@@ -76,18 +74,12 @@ export default function CinematicHeroBillboard({
           {/* Dieu 44 Compliance Verified */}
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold backdrop-blur-md shadow-sm shadow-emerald-500/10">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            Điều 44 Verified
-          </span>
-
-          {/* IMDb / Rating Score */}
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-400/20 border border-amber-400/30 text-amber-300 text-xs font-bold backdrop-blur-md">
-            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-            {movie.rating || 9.4} / 10
+            Đã gắn nhãn AI
           </span>
 
           {/* Season & Year */}
           <span className="text-slate-300/80 text-xs font-medium hidden sm:inline">
-            {movie.year || 2026} · {movie.totalEpisodes > 1 ? `Mùa 1 · ${movie.totalEpisodes} Tập` : 'Phim Điện Ảnh'}
+            {movie.year} · {movie.totalEpisodes > 1 ? `Mùa 1 · ${movie.totalEpisodes} Tập` : 'Phim Điện Ảnh'}
           </span>
         </div>
 
@@ -98,12 +90,6 @@ export default function CinematicHeroBillboard({
 
         {/* Studio Partner & Genre Pills */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
-          {movie.partnerStudio && (
-            <span className="inline-flex items-center gap-1.5 text-xs text-purple-300 font-semibold px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 backdrop-blur-md">
-              <Film className="w-3 h-3 text-purple-400" />
-              Studio: {movie.partnerStudio}
-            </span>
-          )}
           {movie.genre.map((g) => (
             <span
               key={g}
@@ -144,7 +130,7 @@ export default function CinematicHeroBillboard({
           {/* Thêm Vào Danh Sách */}
           <button
             type="button"
-            onClick={() => setIsAdded(!isAdded)}
+            onClick={() => setAddedId(isAdded ? null : movie.id)}
             className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 backdrop-blur-xl active:scale-95 cursor-pointer border ${
               isAdded
                 ? 'bg-emerald-500/25 border-emerald-500 text-emerald-300 shadow-lg shadow-emerald-500/20'

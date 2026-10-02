@@ -1,8 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Play, Sparkles, Star, ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play,  ShieldCheck } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 interface NetflixTopTenRowProps {
@@ -115,10 +114,8 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
                       {movie.title}
                     </p>
                     <div className="flex items-center justify-between text-[10px] text-slate-300 mt-1">
-                      <span className="text-emerald-400 font-bold">{movie.matchScore || 98}% Match</span>
-                      <span className="text-amber-400 font-bold flex items-center gap-0.5">
-                        <Star className="w-2.5 h-2.5 fill-amber-400" /> {movie.rating || 9.0}
-                      </span>
+                      <span>{movie.genre.slice(0, 2).join(' · ')}</span>
+                      <span>{movie.year}</span>
                     </div>
                   </div>
                 </div>

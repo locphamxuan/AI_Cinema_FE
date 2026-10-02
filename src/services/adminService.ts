@@ -35,6 +35,15 @@ export interface RolePermissions {
   lockedPermissions: string[];
 }
 
+export interface AccountUpdate {
+  fullName?: string;
+  email?: string;
+  /** Sets a new password and signs the account out everywhere. */
+  password?: string;
+  role?: UserRole;
+  isActive?: boolean;
+}
+
 export interface AccountQuery {
   page?: number;
   search?: string;
@@ -54,8 +63,18 @@ export const adminService = {
     return apiClient.get<AccountPage>(accountsUrl(query));
   },
 
-  updateAccount(userId: string, dto: { role?: UserRole; isActive?: boolean }): Promise<ApiResponse<AccountRow>> {
+  /** A staff account (Creator, Reviewer, Staff, Admin); members sign up themselves. */
+  createAccount(dto: { email: string; fullName: string; role: UserRole; password: string }): Promise<ApiResponse<AccountRow>> {
+    return apiClient.post<AccountRow>(ROUTES.USERS, dto);
+  },
+
+  updateAccount(userId: string, dto: AccountUpdate): Promise<ApiResponse<AccountRow>> {
     return apiClient.patch<AccountRow>(ROUTES.USER_DETAIL(userId), dto);
+  },
+
+  /** Only an account with no activity; the backend answers 409 for one to lock instead. */
+  deleteAccount(userId: string): Promise<ApiResponse<null>> {
+    return apiClient.delete<null>(ROUTES.USER_DETAIL(userId));
   },
 
   listPermissions(): Promise<ApiResponse<PermissionRow[]>> {

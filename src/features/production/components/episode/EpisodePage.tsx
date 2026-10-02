@@ -15,7 +15,7 @@ import { EPISODE_STATUS } from '../../lib/labels';
 import { formatDay, formatDuration, formatNumber } from '../../lib/format';
 import { baseFromPath, productionPaths } from '../../lib/routes';
 import { ErrorNote, Facts, Loading, Panel, StatusPill } from '../shared/ui';
-import { DeliverMediaPanel } from './DeliverMediaPanel';
+import { DeliverMediaPanel, deliverAsCreator } from './DeliverMediaPanel';
 import { HlsPreview } from './HlsPreview';
 import { MediaVersions } from './MediaVersions';
 import { PublishPanel } from './PublishPanel';
@@ -126,8 +126,7 @@ export function EpisodePage() {
               stacked
               items={[
                 ['Thời lượng mục tiêu', formatDuration(episode.targetDurationSeconds)],
-                ['Mốc hoàn thành', formatDay(episode.milestoneDate)],
-                ['Hạn studio', formatDay(episode.dueDate)],
+                ['Thời hạn', formatDay(episode.milestoneDate)],
                 ['Giá Coin', formatNumber(episode.coinPrice)],
                 ['Studio', project.data.studioName ?? '—'],
               ]}
@@ -135,7 +134,9 @@ export function EpisodePage() {
             {episode.synopsis && <p className="mt-3 text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">{episode.synopsis}</p>}
           </Panel>
 
-          {canDeliver && <DeliverMediaPanel episodeId={episode.id} onDelivered={refreshAll} />}
+          {canDeliver && (
+            <DeliverMediaPanel title="Giao thay studio" deliver={deliverAsCreator(episode.id)} onDelivered={refreshAll} />
+          )}
 
           <Panel title="Các bản studio đã giao" description={processing ? 'Đang xử lý video…' : undefined}>
             <MediaVersions

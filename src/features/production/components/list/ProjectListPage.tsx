@@ -51,7 +51,9 @@ export function ProjectListPage() {
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             {isCreator
               ? 'Các dự án được giao cho bạn: bàn giao studio, giao tập và theo dõi kiểm duyệt.'
-              : 'Đặt hàng studio sản xuất, duyệt tập, gắn nhãn AI và phát hành.'}
+              : base === '/admin'
+                ? 'Mọi dự án phim trên nền tảng. Admin xem và gửi đề xuất sửa cho Reviewer, không sửa trực tiếp (BR-55).'
+                : 'Đặt hàng studio sản xuất, duyệt tập, gắn nhãn AI và phát hành.'}
           </p>
         </div>
         {canCreate && (

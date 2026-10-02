@@ -20,7 +20,8 @@ import NotificationBell from './header/NotificationBell';
 import UserMenu from './header/UserMenu';
 import VipPassToggle from './header/VipPassToggle';
 
-const DASHBOARD_PATHS = ['/creator', '/reviewer', '/staff', '/admin'];
+// Work areas without the consumer header, sidebar and widgets; /studio/ is the outside studio's portal.
+const DASHBOARD_PATHS = ['/creator', '/reviewer', '/staff', '/admin', '/studio/'];
 
 function GuestActions() {
   const { openAuthModal } = useAppStore();

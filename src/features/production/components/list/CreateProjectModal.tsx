@@ -87,8 +87,8 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
         </FormField>
 
         <fieldset className="space-y-3">
-          <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Mùa và tập — thời lượng (không giới hạn) và mốc hoàn thành từng tập</legend>
-          <p className="text-[11px] text-slate-500">Mốc là ngày tập phải xong; Creator đặt hạn cho studio không được trễ hơn mốc.</p>
+          <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Mùa và tập — thời lượng (không giới hạn) và thời hạn từng tập</legend>
+          <p className="text-[11px] text-slate-500">Thời hạn là ngày studio phải giao tập; Creator bàn giao theo đúng thời hạn này.</p>
           <MilestoneQuickFill onApply={fillMilestones} />
           {seasons.map((season, i) => (
             <div key={i} className="rounded-xl border border-slate-200 dark:border-white/10 p-3 space-y-2">

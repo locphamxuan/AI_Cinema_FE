@@ -21,6 +21,7 @@ export const PERMISSION = {
   USER_MANAGE: 'user:manage',
   ROLE_MANAGE: 'role:manage',
   PLATFORM_SETTINGS_MANAGE: 'platform:settings.manage',
+  TOKEN_BUDGET_MANAGE: 'token-budget:manage',
 } as const;
 
 export type PermissionKey = (typeof PERMISSION)[keyof typeof PERMISSION];

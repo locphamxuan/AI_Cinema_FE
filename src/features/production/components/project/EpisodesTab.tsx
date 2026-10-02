@@ -58,8 +58,7 @@ export function EpisodesTab() {
                     <th className="px-4 py-2 font-medium">Tập</th>
                     <th className="px-4 py-2 font-medium">Trạng thái</th>
                     <th className="px-4 py-2 font-medium hidden md:table-cell">Thời lượng</th>
-                    <th className="px-4 py-2 font-medium hidden md:table-cell">Mốc hoàn thành</th>
-                    <th className="px-4 py-2 font-medium hidden md:table-cell">Hạn studio</th>
+                    <th className="px-4 py-2 font-medium hidden md:table-cell">Thời hạn</th>
                     <th className="px-4 py-2 font-medium hidden lg:table-cell">Bản mới nhất</th>
                     <th className="px-4 py-2 font-medium hidden sm:table-cell text-right">Giá Coin</th>
                     <th className="px-2 py-2 w-16" />
@@ -68,7 +67,7 @@ export function EpisodesTab() {
                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                   {season.episodes.map((ep) => {
                     const latest = ep.mediaAssets[0];
-                    const overdue = !!ep.dueDate && ep.dueDate.slice(0, 10) < now && isIn(ep.status, ['AWAITING_MEDIA', 'CHANGES_REQUESTED']);
+                    const overdue = !!ep.milestoneDate && ep.milestoneDate.slice(0, 10) < now && isIn(ep.status, ['AWAITING_MEDIA', 'CHANGES_REQUESTED']);
                     return (
                       <tr key={ep.id} className="hover:bg-slate-50 dark:hover:bg-white/5">
                         <td className="px-4 py-2.5 text-slate-500">{ep.episodeNumber}</td>
@@ -85,12 +84,9 @@ export function EpisodesTab() {
                           {latest?.durationSeconds ? `${formatDuration(latest.durationSeconds)} / ` : ''}
                           {formatDuration(ep.targetDurationSeconds)}
                         </td>
-                        <td className="px-4 py-2.5 hidden md:table-cell text-slate-600 dark:text-slate-300">
-                          {ep.milestoneDate ? formatDay(ep.milestoneDate) : <span className="text-amber-600">Chưa đặt</span>}
-                        </td>
                         <td className={`px-4 py-2.5 hidden md:table-cell ${overdue ? 'text-rose-600 font-semibold' : 'text-slate-600 dark:text-slate-300'}`}>
                           {overdue && <AlertTriangle className="inline w-3 h-3 mr-1" aria-label="Trễ hạn" />}
-                          {formatDay(ep.dueDate)}
+                          {ep.milestoneDate ? formatDay(ep.milestoneDate) : <span className="text-amber-600">Chưa đặt</span>}
                         </td>
                         <td className="px-4 py-2.5 hidden lg:table-cell text-slate-600 dark:text-slate-300">
                           {latest ? `v${latest.version} · ${INGEST_STATUS[latest.ingestStatus].label}` : '—'}

@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Search, Bell, Sparkles, ChevronDown, User, LogOut, Wallet, Film, ShieldCheck, Settings } from 'lucide-react';
+import { Search, Bell,  ChevronDown, User, LogOut, Wallet, Film, ShieldCheck, Settings } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 
@@ -14,8 +13,7 @@ interface NetflixNavbarProps {
 }
 
 export default function NetflixNavbar({ activeTab, onSelectTab, onSearchChange }: NetflixNavbarProps) {
-  const router = useRouter();
-  const { user, isAuthenticated, wallet, openAuthModal, logout, openDepositModal, theme } = useAppStore();
+  const { user, isAuthenticated, wallet, openAuthModal, logout, openDepositModal } = useAppStore();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

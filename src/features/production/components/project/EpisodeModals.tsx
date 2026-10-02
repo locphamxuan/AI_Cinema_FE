@@ -8,7 +8,7 @@ import { getTodayDateString } from '@/lib/dateUtils';
 import { productionService } from '@/services/productionService';
 import type { Episode, Season } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
-import { formatDay, toDateInput } from '../../lib/format';
+import { toDateInput } from '../../lib/format';
 import {
   EpisodeRowsEditor,
   MAX_EPISODE_MINUTES,
@@ -119,8 +119,6 @@ export function EditEpisodeModal({ episode, onClose }: { episode: Episode; onClo
   const [synopsis, setSynopsis] = useState(episode.synopsis ?? '');
   const { busy, run } = useAction();
   const moved = milestone !== initialMilestone;
-  // The studio is already due on this day; the milestone cannot come before it.
-  const studioDue = toDateInput(episode.dueDate);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -141,12 +139,12 @@ export function EditEpisodeModal({ episode, onClose }: { episode: Episode; onClo
   };
 
   return (
-    <Modal open onClose={onClose} title={`Sửa tập ${episode.episodeNumber}`} subtitle="Đổi thời lượng mục tiêu được tới khi tập được duyệt (BR-31).">
+    <Modal open onClose={onClose} title={`Sửa tập ${episode.episodeNumber}`} subtitle="Đổi thời lượng mục tiêu và thời hạn được tới khi tập được duyệt (BR-31).">
       <EpisodeForm
         title={title}
         minutes={minutes}
         milestone={milestone}
-        milestoneMin={studioDue}
+        handedOff={!!episode.dueDate}
         milestoneRequired={moved}
         synopsis={synopsis}
         onTitle={setTitle}
@@ -166,8 +164,8 @@ function EpisodeForm(props: {
   title: string;
   minutes: number;
   milestone: string;
-  /** Earliest allowed milestone besides today, e.g. the studio due date already set. */
-  milestoneMin?: string;
+  /** The studio already works on it: a new deadline applies to the studio too. */
+  handedOff?: boolean;
   /** False when editing and the milestone is left as it was. */
   milestoneRequired?: boolean;
   synopsis: string;
@@ -181,8 +179,7 @@ function EpisodeForm(props: {
   onCancel: () => void;
 }) {
   const today = getTodayDateString();
-  const earliest = props.milestoneMin && props.milestoneMin > today ? props.milestoneMin : today;
-  const milestoneOk = props.milestoneRequired === false || (milestoneValid(props.milestone) && props.milestone >= earliest);
+  const milestoneOk = props.milestoneRequired === false || milestoneValid(props.milestone);
   const valid = props.title.trim() && props.minutes > 0 && props.minutes <= MAX_EPISODE_MINUTES && milestoneOk;
   return (
     <form onSubmit={props.onSubmit} className="space-y-4">
@@ -200,10 +197,10 @@ function EpisodeForm(props: {
             className={fieldInputClass}
           />
         </FormField>
-        <FormField label="Mốc hoàn thành">
+        <FormField label="Thời hạn">
           <input
             type="date"
-            min={earliest}
+            min={today}
             value={props.milestone}
             onChange={(e) => props.onMilestone(e.target.value)}
             required={props.milestoneRequired !== false}
@@ -211,9 +208,7 @@ function EpisodeForm(props: {
           />
         </FormField>
       </div>
-      {props.milestoneMin && (
-        <p className="text-[11px] text-slate-500">Studio đang có hạn {formatDay(props.milestoneMin)}; mốc không được sớm hơn ngày này.</p>
-      )}
+      {props.handedOff && <p className="text-[11px] text-slate-500">Đã bàn giao: studio cũng phải giao theo thời hạn mới.</p>}
       <FormField label="Tóm tắt tập">
         <textarea rows={3} value={props.synopsis} onChange={(e) => props.onSynopsis(e.target.value)} maxLength={5000} className={fieldTextareaClass} />
       </FormField>

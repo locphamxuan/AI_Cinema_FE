@@ -1,35 +1,35 @@
 'use client';
 
 import { useState } from 'react';
-import { CalendarClock, Download, Repeat, Send } from 'lucide-react';
-import { Badge } from '@/components/ui/Badge';
+import { LinkIcon, Repeat, Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { getTodayDateString } from '@/lib/dateUtils';
 import { productionService } from '@/services/productionService';
 import type { Episode, StudioInput } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
-import { BEFORE_APPROVAL_EPISODE, DELIVERY_PROJECT, isIn } from '../../lib/capabilities';
-import { formatDateTime, formatNumber, saveBlob, toDateInput } from '../../lib/format';
+import { DELIVERY_PROJECT, isIn } from '../../lib/capabilities';
+import { saveBlob } from '../../lib/format';
 import { Empty, ErrorNote, Facts, Loading, Panel } from '../shared/ui';
-import { DueDateRows, dueDateFits } from './DueDateRows';
+import { DeadlineList, deadlineUsable } from './DueDateRows';
+import { HandoffCard } from './HandoffCard';
 import { useProject } from './ProjectContext';
 
-const EMAIL_STATUS = {
-  QUEUED: { label: 'Đang gửi', tone: 'amber' },
-  SENT: { label: 'Đã gửi email', tone: 'emerald' },
-  FAILED: { label: 'Gửi email lỗi', tone: 'rose' },
-} as const;
-
-/** Steps 3–4: the Creator sends the brief to an outside studio and sets when each episode is due (BR-13, BR-38). */
+/** Steps 3–4: the Creator sends the brief to an outside studio, due on the Reviewer's deadlines (BR-13, BR-38). */
 export function StudioTab() {
   const { project, caps } = useProject();
-  const [mode, setMode] = useState<'handoff' | 'change' | 'dates' | null>(null);
+  const [mode, setMode] = useState<'handoff' | 'change' | null>(null);
   const history = useResource(`handoffs:${project.id}:${project.updatedAt}`, () => productionService.listHandoffs(project.id));
   const episodes = project.seasons.flatMap((s) => s.episodes);
   const delivering = isIn(project.status, DELIVERY_PROJECT);
+
+  const current = history.data?.[0];
+  const { busy, run } = useAction();
+  // A new link replaces the old one, e.g. when the studio lost the email.
+  const resendLink = async () => {
+    if (await run(() => productionService.resendPortalLink(project.id), 'Đã gửi link mới; link cũ hết hiệu lực')) await history.reload();
+  };
 
   const download = async (handoffId: string) => {
     const blob = await productionService.downloadBrief(project.id, handoffId);
@@ -45,30 +45,7 @@ export function StudioTab() {
           {history.data?.length === 0 && <Empty>Chưa bàn giao cho studio nào.</Empty>}
           <ol className="space-y-3">
             {history.data?.map((h, i) => (
-              <li key={h.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-3 text-xs space-y-1.5">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-semibold text-slate-900 dark:text-white">
-                    {h.studioName} {i === 0 && <Badge tone="purple">Hiện tại</Badge>}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    {h.emailMessage && <Badge tone={EMAIL_STATUS[h.emailMessage.status].tone}>{EMAIL_STATUS[h.emailMessage.status].label}</Badge>}
-                    {h.briefFileKey && (
-                      <Button size="sm" variant="ghost" onClick={() => download(h.id)}>
-                        <Download className="w-3.5 h-3.5" aria-hidden="true" /> Brief
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                <p className="text-slate-500 dark:text-slate-400">
-                  {h.studioEmail}
-                  {h.studioContact && ` · ${h.studioContact}`} · Phí in trong brief: {formatNumber(h.productionFeeTokens)} Token
-                </p>
-                {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi: {h.changeReason}</p>}
-                {h.emailMessage?.errorMessage && <p className="text-rose-600">{h.emailMessage.errorMessage}</p>}
-                <p className="text-slate-400">
-                  {h.createdBy.fullName} · {formatDateTime(h.createdAt)}
-                </p>
-              </li>
+              <HandoffCard key={h.id} handoff={h} current={i === 0} onDownload={() => download(h.id)} />
             ))}
           </ol>
         </Panel>
@@ -94,15 +71,18 @@ export function StudioTab() {
                 <Send className="w-3.5 h-3.5" aria-hidden="true" /> Bàn giao cho studio
               </Button>
             )}
+            {caps.handoff && delivering && current?.studioResponse === 'DECLINED' && (
+              <p className="text-xs text-rose-600">Studio đã từ chối dự án — hãy đổi sang studio khác.</p>
+            )}
+            {caps.handoff && delivering && current && current.studioResponse !== 'DECLINED' && (
+              <Button size="sm" variant="secondary" className="w-full" disabled={busy} onClick={resendLink}>
+                <LinkIcon className="w-3.5 h-3.5" aria-hidden="true" /> Gửi lại link cổng studio
+              </Button>
+            )}
             {caps.handoff && delivering && (
-              <>
-                <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('dates')}>
-                  <CalendarClock className="w-3.5 h-3.5" aria-hidden="true" /> Đặt / dời hạn giao
-                </Button>
-                <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
-                  <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi studio
-                </Button>
-              </>
+              <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
+                <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi studio
+              </Button>
             )}
             {caps.creator && project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Reviewer hoàn tất kế hoạch.</p>}
             {project.status === 'ASSIGNED' && !caps.handoff && (
@@ -114,7 +94,6 @@ export function StudioTab() {
 
       {mode === 'handoff' && <HandOffModal episodes={episodes} onClose={() => setMode(null)} onDone={history.reload} />}
       {mode === 'change' && <ChangeStudioModal onClose={() => setMode(null)} onDone={history.reload} />}
-      {mode === 'dates' && <DueDatesModal episodes={episodes.filter((e) => isIn(e.status, BEFORE_APPROVAL_EPISODE))} onClose={() => setMode(null)} />}
     </div>
   );
 }
@@ -144,51 +123,34 @@ const studioValid = (s: StudioInput) => s.studioName.trim().length >= 2 && /\S+@
 function HandOffModal({ episodes, onClose, onDone }: { episodes: Episode[]; onClose: () => void; onDone: () => Promise<void> }) {
   const { project, reload } = useProject();
   const [studio, setStudio] = useState<StudioInput>({ studioName: '', studioEmail: '', studioContact: '' });
-  const [dates, setDates] = useState<Record<string, string>>(() =>
-    Object.fromEntries(episodes.map((e) => [e.id, toDateInput(e.dueDate) || toDateInput(e.milestoneDate)])),
-  );
-  const [fillAll, setFillAll] = useState('');
   const { busy, run } = useAction();
-  const allDated = episodes.every((e) => dates[e.id] && dueDateFits(dates[e.id], e));
-  // One date for everyone, but never past an episode's own milestone.
-  const applyAll = () => {
-    const capped = episodes.map((ep) => {
-      const milestone = toDateInput(ep.milestoneDate);
-      return [ep.id, milestone && fillAll > milestone ? milestone : fillAll];
-    });
-    setDates(Object.fromEntries(capped));
-  };
+  const deadlinesReady = episodes.every(deadlineUsable);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const dueDates = episodes.map((ep) => ({ episodeId: ep.id, dueDate: dates[ep.id] }));
-    if (await run(() => productionService.handOff(project.id, cleanStudio(studio), dueDates), 'Đã gửi brief cho studio')) {
+    if (await run(() => productionService.handOff(project.id, cleanStudio(studio)), 'Đã gửi brief cho studio')) {
       await Promise.all([reload(), onDone()]);
       onClose();
     }
   };
 
   return (
-    <Modal open onClose={onClose} title="Bàn giao cho studio" subtitle="Brief PDF (ý tưởng, cấu trúc tập, hạn giao, phí) được email cho studio." icon={<Send className="w-4 h-4" />} maxWidth="max-w-2xl">
+    <Modal open onClose={onClose} title="Bàn giao cho studio" subtitle="Brief PDF (ý tưởng, cấu trúc tập, thời hạn, phí) và link cổng studio được email cho studio." icon={<Send className="w-4 h-4" />} maxWidth="max-w-2xl">
       <form onSubmit={submit} className="space-y-4">
         <StudioFields value={studio} onChange={setStudio} />
         <div className="space-y-2">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">Hạn giao từng tập (bắt buộc, không trễ hơn mốc Reviewer)</span>
-            <div className="flex items-center gap-2">
-              <input type="date" min={getTodayDateString()} value={fillAll} onChange={(e) => setFillAll(e.target.value)} className={`${fieldInputClass} py-1 w-40`} aria-label="Hạn chung" />
-              <Button type="button" size="sm" variant="secondary" disabled={!fillAll} onClick={applyAll}>
-                Áp cho tất cả
-              </Button>
-            </div>
-          </div>
-          <DueDateRows episodes={episodes} dates={dates} onChange={setDates} />
+          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Thời hạn từng tập</p>
+          <p className="text-[11px] text-slate-500">Studio phải giao đúng thời hạn Reviewer đã đặt; muốn đổi thời hạn hãy báo Reviewer.</p>
+          <DeadlineList episodes={episodes} />
+          {!deadlinesReady && (
+            <p className="text-[11px] text-rose-600">Có tập chưa có thời hạn hoặc thời hạn đã qua — Reviewer cần cập nhật trước khi bàn giao.</p>
+          )}
         </div>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !studioValid(studio) || !allDated}>
+          <Button type="submit" disabled={busy || !studioValid(studio) || !deadlinesReady}>
             {busy ? 'Đang gửi…' : 'Gửi brief'}
           </Button>
         </div>
@@ -212,7 +174,7 @@ function ChangeStudioModal({ onClose, onDone }: { onClose: () => void; onDone: (
   };
 
   return (
-    <Modal open onClose={onClose} title="Đổi studio" subtitle="Studio mới nhận brief mới; hạn giao có thể dời sau." icon={<Repeat className="w-4 h-4" />}>
+    <Modal open onClose={onClose} title="Đổi studio" subtitle="Studio mới nhận brief mới với thời hạn Reviewer đã đặt." icon={<Repeat className="w-4 h-4" />}>
       <form onSubmit={submit} className="space-y-4">
         <StudioFields value={studio} onChange={setStudio} />
         <FormField label="Lý do đổi studio">
@@ -224,40 +186,6 @@ function ChangeStudioModal({ onClose, onDone }: { onClose: () => void; onDone: (
           </Button>
           <Button type="submit" disabled={busy || !studioValid(studio) || reason.trim().length < 5}>
             Đổi studio
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
-
-function DueDatesModal({ episodes, onClose }: { episodes: Episode[]; onClose: () => void }) {
-  const { project, reload } = useProject();
-  const initial = Object.fromEntries(episodes.map((e) => [e.id, toDateInput(e.dueDate)]));
-  const [dates, setDates] = useState<Record<string, string>>(initial);
-  const { busy, run } = useAction();
-  const changed = episodes.filter((e) => dates[e.id] && dates[e.id] !== initial[e.id]);
-  const allFit = changed.every((e) => dueDateFits(dates[e.id], e));
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const dueDates = changed.map((ep) => ({ episodeId: ep.id, dueDate: dates[ep.id] }));
-    if (await run(() => productionService.setDueDates(project.id, dueDates), 'Đã cập nhật hạn giao')) {
-      await reload();
-      onClose();
-    }
-  };
-
-  return (
-    <Modal open onClose={onClose} title="Hạn giao" subtitle="Chỉ các tập chưa được duyệt mới dời được hạn." icon={<CalendarClock className="w-4 h-4" />}>
-      <form onSubmit={submit} className="space-y-4">
-        {episodes.length === 0 ? <Empty>Không còn tập nào cần hạn giao.</Empty> : <DueDateRows episodes={episodes} dates={dates} onChange={setDates} />}
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Huỷ
-          </Button>
-          <Button type="submit" disabled={busy || changed.length === 0 || !allFit}>
-            Lưu {changed.length > 0 && `(${changed.length})`}
           </Button>
         </div>
       </form>

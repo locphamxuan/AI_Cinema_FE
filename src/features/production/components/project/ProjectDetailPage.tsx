@@ -31,6 +31,9 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]['key'];
 
+/** Admin proposals are between the Admin and the Reviewer (BR-55); the Creator does not see them. */
+const tabsFor = (base: string) => (base === '/creator' ? TABS.filter((t) => t.key !== 'changes') : TABS);
+
 /** One movie project, for its Reviewer, its Creator and the Admin; actions follow role, ownership and status. */
 export function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -41,8 +44,9 @@ export function ProjectDetailPage() {
   const userId = useAppStore((s) => s.user?.id);
   const can = useCan();
 
+  const tabs = tabsFor(base);
   const requested = searchParams.get('tab');
-  const [tab, setTab] = useState<TabKey>(TABS.some((t) => t.key === requested) ? (requested as TabKey) : 'overview');
+  const [tab, setTab] = useState<TabKey>(tabs.some((t) => t.key === requested) ? (requested as TabKey) : 'overview');
   const project = useResource(`project:${projectId}`, () => productionService.getProject(projectId));
 
   const selectTab = (key: TabKey) => {
@@ -97,7 +101,7 @@ export function ProjectDetailPage() {
         )}
 
         <div role="tablist" aria-label="Mục của dự án" className="flex gap-1 border-b border-slate-200 dark:border-white/10 overflow-x-auto">
-          {TABS.map(({ key, label }) => (
+          {tabs.map(({ key, label }) => (
             <button
               key={key}
               type="button"
@@ -123,7 +127,7 @@ export function ProjectDetailPage() {
           {tab === 'episodes' && <EpisodesTab />}
           {tab === 'studio' && <StudioTab />}
           {tab === 'fee' && <FeeTab />}
-          {tab === 'changes' && <ChangeRequestsTab />}
+          {tab === 'changes' && base !== '/creator' && <ChangeRequestsTab />}
           {tab === 'activity' && <ActivityTab />}
         </div>
       </main>

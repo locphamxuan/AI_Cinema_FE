@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { X, Play, Lock, CheckCircle, ShieldCheck, Sparkles, Building2, Cpu, Calendar, Star, Info } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { X, Play, Lock, CheckCircle, ShieldCheck,  Calendar,  Info } from 'lucide-react';
 import type { Movie, Episode } from '@/types/movie';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -13,6 +13,7 @@ interface MovieDetailQuickModalProps {
 
 export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQuickModalProps) {
   const { wallet, openUnlockModal, openAuthModal, isAuthenticated } = useAppStore();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'episodes' | 'compliance' | 'brief'>('episodes');
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
   const handleEpisodeClick = (ep: Episode) => {
     if (ep.isFree || ep.isUnlocked) {
       // Navigate to watch page
-      window.location.href = `/watch/${ep.id}`;
+      router.push(`/watch/${ep.id}`);
       return;
     }
     // Need unlock
@@ -82,14 +83,8 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
               <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white font-black text-[10px] uppercase tracking-wider">
                 {movie.badge || 'Độc Quyền AI'}
               </span>
-              <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
-                {movie.matchScore || 98}% Phù hợp
-              </span>
               <span className="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white text-xs font-semibold">
-                {movie.quality || '4K HDR'}
-              </span>
-              <span className="text-amber-400 text-xs font-bold flex items-center gap-1">
-                <Star className="w-3.5 h-3.5 fill-amber-400" /> {movie.rating || 9.4}/10
+                {movie.quality}
               </span>
             </div>
 
@@ -241,56 +236,22 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
                 </div>
               </div>
 
-              {/* Grid Specs */}
+              {/* What the platform actually knows about the episodes it released */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
                   <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                    <Building2 className="w-4 h-4 text-purple-400" />
-                    <span>Studio Đối Tác Sản Xuất</span>
-                  </div>
-                  <p className="text-sm font-bold text-white">
-                    {movie.partnerStudio || movie.aiCompliance.partnerStudio || 'CyberSaigon AI Studios'}
-                  </p>
-                  <p className="text-[11px] text-slate-400">Đơn vị ký cam kết bản quyền & trách nhiệm nội dung số.</p>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                    <Cpu className="w-4 h-4 text-cyan-400" />
-                    <span>Mô Hình AI Đã Sử Dụng</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {(movie.aiToolsUsed || movie.aiCompliance.aiToolsUsed || ['Runway Gen-3', 'ElevenLabs', 'Midjourney']).map((tool) => (
-                      <span key={tool} className="px-2 py-0.5 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-mono font-semibold">
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span>Điểm Kiểm Duyệt & Nhãn Hiển Thị</span>
+                    <span>Nhãn nội dung AI</span>
                   </div>
-                  <p className="text-sm font-bold text-white flex items-center gap-2">
-                    <span>Điểm an toàn: {movie.aiCompliance.moderationScore || 98.5}/100</span>
-                    <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono">ĐẠT CHUẨN</span>
-                  </p>
-                  <p className="text-[11px] text-slate-400">
-                    Vị trí nhãn nhận biết AI: <strong>{movie.aiCompliance.displayLocation || 'TOP_RIGHT'}</strong>
-                  </p>
+                  <p className="text-sm font-bold text-white">{movie.aiCompliance.disclaimer}</p>
+                  <p className="text-[11px] text-slate-400">Reviewer gắn nhãn cho từng tập sau khi kiểm duyệt nội dung và pháp lý.</p>
                 </div>
-
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
                   <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                     <Calendar className="w-4 h-4 text-amber-400" />
-                    <span>Mã Cấp Phép & Ngày Thẩm Định</span>
+                    <span>Phân loại độ tuổi</span>
                   </div>
-                  <p className="text-sm font-mono font-bold text-amber-300">
-                    {movie.aiCompliance.certificationId || 'VN-AIC-2026-00441'}
-                  </p>
-                  <p className="text-[11px] text-slate-400">Được phê duyệt bởi Reviewer Checker Hub.</p>
+                  <p className="text-sm font-bold text-white">{movie.aiCompliance.contentRating}</p>
                 </div>
               </div>
 
@@ -307,21 +268,19 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
               <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
                 <h4 className="font-bold text-white text-sm flex items-center gap-2">
                   <Info className="w-4 h-4 text-[#8B5CF6]" />
-                  <span>Tóm Tắt Kịch Bản & Ý Niệm Sáng Tác (Content Brief)</span>
+                  <span>Tóm tắt phim</span>
                 </h4>
                 <p>
-                  {movie.contentBrief ||
-                    'Tác phẩm viễn tưởng lấy bối cảnh tương lai gần, khai thác sự phát triển vượt bậc của trí tuệ nhân tạo và những xung đột triết học giữa ký ức tự nhiên và nhận thức nhân tạo.'}
+                  {movie.contentBrief || 'Chưa có tóm tắt.'}
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
-                <h4 className="font-bold text-white text-sm">Hồ Sơ Bản Quyền & Phát Hành</h4>
+                <h4 className="font-bold text-white text-sm">Phát hành trên AI Cinema</h4>
                 <ul className="list-disc list-inside space-y-1 text-slate-400 text-xs">
-                  <li>Phân phối độc quyền trên nền tảng AI Cinema OTT Platform.</li>
-                  <li>Tỷ lệ phân chia doanh thu Maker-Checker: 70% Studio đối tác - 30% Hạ tầng sàn.</li>
-                  <li>Bản quyền Master Video thuộc về {movie.partnerStudio || 'Studio sáng tác'}.</li>
-                  <li>Phụ đề đã dịch: Tiếng Việt, Tiếng Anh (WebVTT tiêu chuẩn).</li>
+                  <li>Mỗi tập được kiểm duyệt nội dung và pháp lý trước khi phát hành.</li>
+                  <li>Các tập đầu của mỗi phim xem miễn phí; các tập sau mở khoá bằng Coin.</li>
+                  <li>Mọi tập đều mang nhãn nội dung AI.</li>
                 </ul>
               </div>
             </div>

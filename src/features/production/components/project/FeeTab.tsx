@@ -5,6 +5,7 @@ import { Coins } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
+import { announceTokensChanged, reviewerTokenService } from '@/services/reviewerTokenService';
 import type { TokenEntryType } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
@@ -19,6 +20,8 @@ export function FeeTab() {
   const { project, caps, reload } = useProject();
   const ledger = useResource(`fee:${project.id}`, () => productionService.getFee(project.id));
   const settings = useResource(caps.feeAllocate ? 'settings' : null, productionService.getPlatformSettings);
+  const wallet = useResource(caps.feeAllocate ? 'reviewer-tokens:me' : null, reviewerTokenService.mine);
+  const balance = wallet.data?.balanceTokens;
   const total = ledger.data?.totalTokens ?? project.productionFeeTokens;
   const initial = total === 0;
   const canWrite =
@@ -31,7 +34,9 @@ export function FeeTab() {
   const type: TokenEntryType = initial ? 'INITIAL' : entryType;
   const value = Number(amount);
   const amountValid = Number.isInteger(value) && value !== 0 && (type === 'CORRECTION' ? total + value > 0 : value > 0);
-  const valid = amountValid && (type === 'INITIAL' || reason.trim().length > 0);
+  // A fee is paid from the Reviewer's budget; lowering it gives Token back.
+  const affordable = balance === undefined || value <= balance;
+  const valid = amountValid && affordable && (type === 'INITIAL' || reason.trim().length > 0);
   const rate = settings.data?.tokenRateVnd;
 
   const submit = async (e: React.FormEvent) => {
@@ -43,7 +48,8 @@ export function FeeTab() {
     if (done) {
       setAmount('');
       setReason('');
-      await Promise.all([ledger.reload(), reload()]);
+      announceTokensChanged();
+      await Promise.all([ledger.reload(), reload(), wallet.reload()]);
     }
   };
 
@@ -122,6 +128,11 @@ export function FeeTab() {
               <input type="number" step={1} value={amount} onChange={(e) => setAmount(e.target.value)} required className={fieldInputClass} />
             </FormField>
             {rate && amountValid && <p className="text-[11px] text-slate-500">≈ {formatNumber(value * rate)} ₫</p>}
+            {balance !== undefined && (
+              <p className={`text-[11px] ${affordable ? 'text-slate-500' : 'text-rose-600'}`}>
+                Bạn còn {formatNumber(balance)} Token{!affordable && ' — không đủ, hãy xin Admin cấp thêm'}.
+              </p>
+            )}
             {type !== 'INITIAL' && (
               <FormField label="Lý do (bắt buộc, BR-46)">
                 <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} className={fieldTextareaClass} />

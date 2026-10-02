@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShieldCheck, CheckCircle2, Cpu, Eye, Lock, Coins, Sparkles, ArrowRight } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, Cpu,  Coins,  ArrowRight } from 'lucide-react';
 
 export default function ComplianceTrustBanner() {
   const steps = [

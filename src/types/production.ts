@@ -100,6 +100,12 @@ export interface StudioHandoff {
   createdAt: string;
   createdBy: Person;
   emailMessage?: { status: 'QUEUED' | 'SENT' | 'FAILED'; sentAt: string | null; errorMessage: string | null } | null;
+  /** The studio's answer through its portal link. */
+  studioResponse: 'ACCEPTED' | 'DECLINED' | null;
+  respondedAt: string | null;
+  declineReason: string | null;
+  /** Whether the emailed portal link still works (revoked on a studio change or a new link). */
+  portalActive: boolean;
 }
 
 export interface RevisionSummary {

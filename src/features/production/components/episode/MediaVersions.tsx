@@ -73,7 +73,8 @@ export function MediaVersions({
               {v.submissionNote && <p className="text-slate-600 dark:text-slate-300">Ghi chú: {v.submissionNote}</p>}
               <div className="flex items-center justify-between gap-2">
                 <p className="text-slate-400">
-                  {v.submittedBy.fullName} · {formatDateTime(v.createdAt)}
+                  {v.studioHandoff ? `Studio ${v.studioHandoff.studioName}` : `${v.submittedBy?.fullName ?? '—'} (giao thay studio)`} ·{' '}
+                  {formatDateTime(v.createdAt)}
                 </p>
                 {onRetry && i === 0 && v.ingestStatus === 'FAILED' && (
                   <Button

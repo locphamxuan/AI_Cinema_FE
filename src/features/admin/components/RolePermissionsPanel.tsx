@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 import { Lock } from 'lucide-react';
 import { adminService, type PermissionRow, type RolePermissions } from '@/services/adminService';
