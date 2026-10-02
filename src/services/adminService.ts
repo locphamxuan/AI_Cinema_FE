@@ -3,7 +3,7 @@
  */
 import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
-import type { UserRole } from '@/types/workflow-api-enums';
+import type { UserRole } from '@/types/production';
 
 const ROUTES = API_ROUTES.ADMIN;
 
@@ -23,7 +23,8 @@ export interface AccountPage {
 
 export interface PermissionRow {
   key: string;
-  area: 'production' | 'operations' | 'admin';
+  /** Catalog group, e.g. 'movie-project' or 'administration'. */
+  area: string;
   description: string;
 }
 

@@ -6,7 +6,7 @@ import { fieldInputClass } from '@/components/ui/FormField';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
-import type { UserRole } from '@/types/workflow-api-enums';
+import type { UserRole } from '@/types/production';
 import { BACKEND_ROLE_LABEL, BACKEND_ROLES } from '../roles';
 
 const dateFormat = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });

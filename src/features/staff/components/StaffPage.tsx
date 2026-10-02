@@ -13,17 +13,18 @@ interface Module {
   title: string;
   description: string;
   icon: LucideIcon;
-  permission: PermissionKey;
-  /** Built in MF-5; shown as a placeholder until then. */
+  /** None: open to every Staff account (public data). */
+  permission?: PermissionKey;
+  /** Built in MF-5; shown as a placeholder until then, the backend has no permission for it yet. */
   comingSoon?: boolean;
 }
 
 const MODULES: Module[] = [
-  { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).', icon: BarChart3, permission: PERMISSION.FILM_ANALYTICS_READ },
+  { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).', icon: BarChart3 },
   { key: 'members', title: 'Thông tin member', description: 'Tài khoản member (chỉ đọc).', icon: Users, permission: PERMISSION.MEMBER_OPS_READ },
-  { key: 'billing', title: 'Coin và giao dịch', description: 'Số dư Coin, giao dịch, gói thành viên (chỉ đọc).', icon: Coins, permission: PERMISSION.BILLING_READ, comingSoon: true },
-  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones, permission: PERMISSION.SUPPORT_MANAGE, comingSoon: true },
-  { key: 'marketing', title: 'Marketing', description: 'Chiến dịch cho phim sắp và đã phát hành.', icon: Megaphone, permission: PERMISSION.MARKETING_MANAGE, comingSoon: true },
+  { key: 'billing', title: 'Coin và giao dịch', description: 'Số dư Coin, giao dịch, gói thành viên (chỉ đọc).', icon: Coins, comingSoon: true },
+  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones, comingSoon: true },
+  { key: 'marketing', title: 'Marketing', description: 'Chiến dịch cho phim sắp và đã phát hành.', icon: Megaphone, comingSoon: true },
 ];
 
 const CARD = 'bg-white dark:bg-[#151822] rounded-xl border border-slate-200/80 dark:border-white/10';
@@ -31,7 +32,7 @@ const CARD = 'bg-white dark:bg-[#151822] rounded-xl border border-slate-200/80 d
 /** Staff operations dashboard (MF-5): only the modules this role holds a permission for (BR-21). */
 export function StaffPage() {
   const can = useCan();
-  const modules = MODULES.filter((m) => can(m.permission));
+  const modules = MODULES.filter((m) => !m.permission || can(m.permission));
 
   return (
     <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
@@ -56,7 +57,7 @@ export function StaffPage() {
           ))}
       </div>
 
-      {can(PERMISSION.FILM_ANALYTICS_READ) && <FilmsSection />}
+      <FilmsSection />
       {can(PERMISSION.MEMBER_OPS_READ) && <MembersSection />}
     </main>
   );
