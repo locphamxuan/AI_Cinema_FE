@@ -45,6 +45,13 @@ export function toDateInput(iso: string | null | undefined): string {
   return iso ? iso.slice(0, 10) : '';
 }
 
+/** YYYY-MM-DD plus `days`, computed on the calendar (no time zone shift). */
+export function addDays(ymd: string, days: number): string {
+  const [y, m, d] = ymd.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d + days));
+  return date.toISOString().slice(0, 10);
+}
+
 /** <input type="datetime-local"> value → ISO string with the browser's offset. */
 export function localDateTimeToIso(value: string): string {
   return new Date(value).toISOString();

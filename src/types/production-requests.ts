@@ -5,6 +5,8 @@ import type { AiDisclosure } from './production-media';
 export interface NewEpisodeInput {
   title: string;
   targetDurationSeconds: number;
+  /** YYYY-MM-DD, set by the Reviewer; the studio due date cannot be later. */
+  milestoneDate: string;
   synopsis?: string;
 }
 

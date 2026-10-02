@@ -61,6 +61,8 @@ export interface Episode {
   synopsis: string | null;
   status: EpisodeStatus;
   targetDurationSeconds: number;
+  /** Reviewer milestone; null only on episodes created before milestones existed. */
+  milestoneDate: string | null;
   dueDate: string | null;
   approvedMediaAssetId: string | null;
   coinPrice: number | null;
