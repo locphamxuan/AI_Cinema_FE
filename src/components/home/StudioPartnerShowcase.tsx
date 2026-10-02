@@ -107,19 +107,19 @@ export default function StudioPartnerShowcase({ onSelectStudio }: StudioPartnerS
             </div>
 
             {/* Studio Avatar & Body */}
-            <div className="p-4 pt-0 relative z-10 flex-1 flex flex-col justify-between">
-              <div className="flex items-center gap-3 -mt-6 mb-3">
+            <div className="p-4 pt-3.5 relative z-10 flex-1 flex flex-col justify-between">
+              <div className="flex items-center gap-3 mb-3">
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-xl border-2 border-white dark:border-[#151821] group-hover:scale-105 transition-transform"
+                  className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-black text-sm shadow-md border-2 border-slate-100 dark:border-white/10 group-hover:scale-105 transition-transform shrink-0"
                   style={{ backgroundColor: studio.accentColor }}
                 >
                   {studio.logoInitial}
                 </div>
-                <div className="min-w-0 flex-1 pt-4">
+                <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors truncate">
                     {studio.name}
                   </h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{studio.tagline}</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{studio.tagline}</p>
                 </div>
               </div>
 

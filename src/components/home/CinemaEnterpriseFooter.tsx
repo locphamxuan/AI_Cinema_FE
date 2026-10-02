@@ -43,7 +43,7 @@ export default function CinemaEnterpriseFooter() {
               <li><Link href="/" className="hover:text-white transition">Top 10 Phim AI Hôm Nay</Link></li>
               <li><Link href="/" className="hover:text-white transition">Series AI Cyberpunk 2077</Link></li>
               <li><Link href="/" className="hover:text-white transition">Phim 3D AI Fantasy</Link></li>
-              <li><Link href="/" className="hover:text-white transition">Phim Chiếu Rạp Độc Quyền</Link></li>
+              <li><Link href="/" className="hover:text-white transition">Phim Lẻ AI Tuyển Chọn</Link></li>
               <li><Link href="/" className="hover:text-white transition">Bảng Xếp Hạng Đánh Giá Cao</Link></li>
             </ul>
           </div>
