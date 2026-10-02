@@ -56,21 +56,27 @@ function EyeIcon({ open }: { open: boolean }) {
 }
 
 interface PasswordFieldProps {
+  id: string;
+  label: string;
+  autoComplete: string;
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
 }
 
 /** Password input with a show/hide toggle. */
-export function PasswordField({ value, onChange, placeholder }: PasswordFieldProps) {
+export function PasswordField({ id, label, autoComplete, value, onChange, placeholder }: PasswordFieldProps) {
   const [visible, setVisible] = useState(false);
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="block text-xs font-semibold text-slate-700 dark:text-muted-light">Mật khẩu</label>
+        <label htmlFor={id} className="block text-xs font-semibold text-slate-700 dark:text-muted-light">
+          {label}
+        </label>
         <button
           type="button"
           onClick={() => setVisible(!visible)}
+          aria-label={visible ? `Ẩn ${label.toLowerCase()}` : `Hiện ${label.toLowerCase()}`}
           className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
         >
           <EyeIcon open={!visible} />
@@ -78,8 +84,10 @@ export function PasswordField({ value, onChange, placeholder }: PasswordFieldPro
         </button>
       </div>
       <input
+        id={id}
         type={visible ? 'text' : 'password'}
         required
+        autoComplete={autoComplete}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
