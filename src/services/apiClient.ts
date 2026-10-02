@@ -76,7 +76,19 @@ class ApiClient {
     options: RequestOptions = {},
     mockFallbackFn?: () => Promise<T> | T
   ): Promise<ApiResponse<T>> {
-    const url = `${this.baseUrl}${endpoint}`;
+    let url = `${this.baseUrl}${endpoint}`;
+    // Never make direct calls to port 3001 from the browser - route to same-origin /api
+    if (url.includes('3001')) {
+      url = url.replace(/https?:\/\/[^/]+:3001(\/api)?/, '/api');
+    }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      if (typeof window !== 'undefined') {
+        url = `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
+      } else {
+        const port = process.env.PORT || 3000;
+        url = `http://localhost:${port}${url.startsWith('/') ? '' : '/'}${url}`;
+      }
+    }
     const authHeaders = this.getAuthHeader();
     // A FormData body sets its own multipart boundary.
     const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;

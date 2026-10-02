@@ -2,9 +2,12 @@
  * AI Cinema - API Endpoints Registry
  */
 
-// Same-origin by default so the Next.js rewrite in next.config.ts proxies to the backend
-// and the browser never makes a cross-origin call.
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+// Same-origin by default so the Next.js rewrite or route handlers proxy to the backend
+// and the browser never makes a cross-origin call or fails if port 3001 is offline.
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('3001')
+    ? process.env.NEXT_PUBLIC_API_URL
+    : '/api';
 
 export const API_ROUTES = {
   // Auth
