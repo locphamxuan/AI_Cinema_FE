@@ -140,7 +140,9 @@ class ApiClient {
         };
       }
 
-      const data = await response.json();
+      // 204 No Content (assign, cancel, delete…) has no body to parse.
+      const empty = response.status === 204 || response.headers?.get('content-length') === '0';
+      const data = (empty ? null : await response.json()) as T;
       return { success: true, data, statusCode: response.status };
     } catch (error) {
       if (shouldFallback && mockFallbackFn) {
