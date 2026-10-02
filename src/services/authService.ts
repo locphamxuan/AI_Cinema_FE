@@ -4,12 +4,10 @@
 
 import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
-import { UserProfile, LoginCredentials, RegisterCredentials } from '@/types/auth';
+import type { AuthRole as BackendRole, LoginCredentials, RegisterCredentials, UserProfile } from '@/types/auth';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { AREAS, homeAreaOf } from '@/lib/permissions';
 
-/** Roles as the backend's UserRole enum spells them. */
-export type BackendRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
 
 interface BackendUser {
   id: string;
@@ -82,13 +80,13 @@ export const authService = {
     return { ...res, data: profile };
   },
 
-  /** Members sign up for themselves; creator/reviewer accounts are provisioned by an admin. */
+  /** Members sign up for themselves (18+, BR-54); every other role is created by the Admin. */
   async register(credentials: RegisterCredentials): Promise<ApiResponse<UserProfile>> {
     const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.REGISTER, {
       email: credentials.email.trim().toLowerCase(),
       password: credentials.password,
       fullName: credentials.name.trim(),
-      role: 'MEMBER',
+      dateOfBirth: credentials.dateOfBirth,
     });
 
     if (!res.success) {

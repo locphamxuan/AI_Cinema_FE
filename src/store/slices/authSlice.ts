@@ -1,7 +1,6 @@
 import type { StateCreator } from 'zustand';
 import { mockSubscriptionVIP } from '@/mocks/mockData';
 import { authService, redirectUrlFor } from '@/services/authService';
-import { useWorkflowStore } from '../useWorkflowStore';
 import { emptySubscription, type AppState, type AuthSlice, type UserProfile } from './types';
 
 // Wallet and subscription still come from mocks: the backend has no wallet/subscription
@@ -15,12 +14,6 @@ function sessionStateFor(user: UserProfile) {
     isAuthModalOpen: false,
     subscription: isStaffSide ? mockSubscriptionVIP : emptySubscription,
   };
-}
-
-function syncWorkflowRole(user: UserProfile) {
-  if (user.role === 'creator' || user.role === 'reviewer') {
-    useWorkflowStore.getState().setRole(user.role);
-  }
 }
 
 export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) => ({
@@ -40,12 +33,10 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
     const user = authService.getStoredUser();
     if (!user) return;
 
-    syncWorkflowRole(user);
     set(sessionStateFor(user));
     // The Admin may have changed this role's permissions or the account's role since the last visit.
     void authService.me().then((res) => {
       if (!res.success || !res.data) return;
-      syncWorkflowRole(res.data);
       set(sessionStateFor(res.data));
     });
   },
@@ -56,18 +47,17 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
       return { success: false, error: res.message ?? 'Email hoặc mật khẩu không chính xác.' };
     }
 
-    syncWorkflowRole(res.data);
     set(sessionStateFor(res.data));
 
     return { success: true, redirectUrl: redirectUrlFor(res.data.role ?? 'user') };
   },
 
-  register: async (name, email, password) => {
-    if (!name.trim() || !email.trim() || !password) {
+  register: async (name, email, password, dateOfBirth) => {
+    if (!name.trim() || !email.trim() || !password || !dateOfBirth) {
       return { success: false, error: 'Vui lòng điền đầy đủ thông tin đăng ký!' };
     }
 
-    const res = await authService.register({ name, email, password });
+    const res = await authService.register({ name, email, password, dateOfBirth });
     if (!res.success || !res.data) {
       return { success: false, error: res.message ?? 'Đăng ký không thành công.' };
     }
