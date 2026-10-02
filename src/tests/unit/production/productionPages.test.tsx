@@ -59,6 +59,7 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
             synopsis: null,
             status: 'DRAFT',
             targetDurationSeconds: 1200,
+            milestoneDate: '2026-12-31T00:00:00.000Z',
             dueDate: null,
             approvedMediaAssetId: null,
             coinPrice: null,

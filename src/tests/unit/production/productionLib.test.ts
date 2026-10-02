@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { notificationHref, productionBaseFor, productionPaths } from '@/features/production/lib/routes';
 import { projectCapabilities } from '@/features/production/lib/capabilities';
-import { formatDay, formatDuration } from '@/features/production/lib/format';
+import { addDays, formatDay, formatDuration } from '@/features/production/lib/format';
+import { milestoneValid, spreadMilestones, toEpisodeInput } from '@/features/production/components/shared/EpisodeRowsEditor';
+import { dueDateFits } from '@/features/production/components/project/DueDateRows';
+import { getTodayDateString } from '@/lib/dateUtils';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
 
 const grant = (...keys: PermissionKey[]) => (p: PermissionKey) => keys.includes(p);
@@ -63,5 +66,37 @@ describe('formatting', () => {
 
   it('reads a due date as a calendar day whatever the time zone', () => {
     expect(formatDay('2026-10-15T00:00:00.000Z')).toBe(new Date(2026, 9, 15).toLocaleDateString('vi-VN'));
+  });
+});
+
+describe('episode milestones', () => {
+  const today = getTodayDateString();
+
+  it('adds calendar days across month and year ends', () => {
+    expect(addDays('2026-10-30', 3)).toBe('2026-11-02');
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+  });
+
+  it('spreads milestones a fixed number of days apart', () => {
+    expect(spreadMilestones('2026-11-01', 7, 3)).toEqual(['2026-11-01', '2026-11-08', '2026-11-15']);
+  });
+
+  it('needs a milestone from today on and sends it with the episode', () => {
+    expect(milestoneValid('')).toBe(false);
+    expect(milestoneValid(addDays(today, -1))).toBe(false);
+    expect(milestoneValid(today)).toBe(true);
+    expect(toEpisodeInput({ title: ' Tập 1 ', minutes: 15, milestone: '2026-11-01' })).toEqual({
+      title: 'Tập 1',
+      targetDurationSeconds: 900,
+      milestoneDate: '2026-11-01',
+    });
+  });
+
+  it('keeps a studio due date between today and the milestone', () => {
+    const milestoneDate = `${addDays(today, 10)}T00:00:00.000Z`;
+    expect(dueDateFits(addDays(today, 10), { milestoneDate })).toBe(true);
+    expect(dueDateFits(addDays(today, 11), { milestoneDate })).toBe(false);
+    expect(dueDateFits(addDays(today, -1), { milestoneDate })).toBe(false);
+    expect(dueDateFits(addDays(today, 400), { milestoneDate: null })).toBe(true);
   });
 });
