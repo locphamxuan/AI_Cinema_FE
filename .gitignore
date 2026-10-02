@@ -53,3 +53,6 @@ next-env.d.ts
 CLAUDE.md
 TESTING.md
 .codegraph/
+
+# Local context file
+PROJECT_OVERVIEW.md
