@@ -32,5 +32,6 @@ export interface RegisterCredentials {
   name: string;
   email: string;
   password: string;
-  role?: AuthRole;
+  /** YYYY-MM-DD; Members must be 18 or older (BR-54). */
+  dateOfBirth: string;
 }

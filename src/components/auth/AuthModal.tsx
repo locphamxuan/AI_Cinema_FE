@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
+import { MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
 
 // Only the email is remembered; a password never goes to localStorage.
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
 // Same rule as the backend's RegisterRequestDto.
-const MIN_PASSWORD_LENGTH = 6;
 
 function savedEmail(): string | null {
   try {
@@ -41,6 +41,7 @@ function AuthModalForm() {
   const [email, setEmail] = useState(() => initialAuthEmail || savedEmail() || '');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -73,10 +74,10 @@ function AuthModalForm() {
       } else {
         setError(res.error || 'Đăng nhập thất bại');
       }
-    } else if (password.length < MIN_PASSWORD_LENGTH) {
-      setError(`Mật khẩu phải có tối thiểu ${MIN_PASSWORD_LENGTH} ký tự!`);
+    } else if (registrationError(password, dateOfBirth)) {
+      setError(registrationError(password, dateOfBirth));
     } else {
-      const res = await register(name, email, password);
+      const res = await register(name, email, password, dateOfBirth);
       if (res.success) {
         rememberEmail(email, rememberMe);
       } else {
@@ -157,6 +158,23 @@ function AuthModalForm() {
             </div>
           )}
 
+          {mode === 'register' && (
+            <div>
+              <label htmlFor="auth-dob" className="block text-xs font-semibold text-slate-700 dark:text-muted-light mb-1">
+                Ngày sinh (từ 18 tuổi)
+              </label>
+              <input
+                id="auth-dob"
+                type="date"
+                required
+                max={latestAdultBirthDate()}
+                value={dateOfBirth}
+                onChange={(e) => setDateOfBirth(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all dark:[color-scheme:dark]"
+              />
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-muted-light mb-1">
               Địa chỉ Email
@@ -174,7 +192,7 @@ function AuthModalForm() {
           <PasswordField
             value={password}
             onChange={setPassword}
-            placeholder={mode === 'login' ? 'Nhập mật khẩu...' : `Tạo mật khẩu (tối thiểu ${MIN_PASSWORD_LENGTH} ký tự)...`}
+            placeholder={mode === 'login' ? 'Nhập mật khẩu...' : `Tạo mật khẩu (tối thiểu ${MIN_PASSWORD_LENGTH} ký tự, có chữ và số)...`}
           />
 
           {/* Remember Me Checkbox */}

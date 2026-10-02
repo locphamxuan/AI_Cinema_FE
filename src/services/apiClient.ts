@@ -78,8 +78,10 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     const authHeaders = this.getAuthHeader();
+    // A FormData body sets its own multipart boundary.
+    const isForm = typeof FormData !== 'undefined' && options.body instanceof FormData;
     const headers = {
-      'Content-Type': 'application/json',
+      ...(isForm ? {} : { 'Content-Type': 'application/json' }),
       ...authHeaders,
       ...options.headers,
       ...(options._isRetry ? authHeaders : {}),
@@ -138,7 +140,9 @@ class ApiClient {
         };
       }
 
-      const data = await response.json();
+      // 204 No Content (assign, cancel, delete…) has no body to parse.
+      const empty = response.status === 204 || response.headers?.get('content-length') === '0';
+      const data = (empty ? null : await response.json()) as T;
       return { success: true, data, statusCode: response.status };
     } catch (error) {
       if (shouldFallback && mockFallbackFn) {
@@ -199,6 +203,23 @@ class ApiClient {
       },
       mockFallbackFn
     );
+  }
+
+  /** Multipart upload, e.g. an idea file or an episode video. */
+  postForm<T>(endpoint: string, form: FormData) {
+    return this.request<T>(endpoint, { method: 'POST', body: form });
+  }
+
+  /** File behind auth (a brief PDF, an idea file); null when it cannot be read. */
+  async getBlob(endpoint: string): Promise<Blob | null> {
+    const load = () => fetch(`${this.baseUrl}${endpoint}`, { headers: this.getAuthHeader() });
+    try {
+      let response = await load();
+      if (response.status === 401 && (await this.tryRefreshToken())) response = await load();
+      return response.ok ? await response.blob() : null;
+    } catch {
+      return null;
+    }
   }
 
   /** Plain-text resource behind auth, e.g. a WebVTT subtitle track; null when it cannot be read. */

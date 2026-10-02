@@ -21,7 +21,7 @@ describe('auth flow', () => {
 
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await useAppStore.getState().register('Alice', 'alice@example.com', 'secret123');
+    const result = await useAppStore.getState().register('Alice', 'alice@example.com', 'secret123', '2000-05-14');
 
     expect(result.success).toBe(true);
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -32,7 +32,7 @@ describe('auth flow', () => {
       fullName: 'Alice',
       email: 'alice@example.com',
       password: 'secret123',
-      role: 'MEMBER',
+      dateOfBirth: '2000-05-14',
     });
     expect(useAppStore.getState().isAuthenticated).toBe(true);
     expect(useAppStore.getState().user?.email).toBe('alice@example.com');

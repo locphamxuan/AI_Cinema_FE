@@ -120,6 +120,15 @@
 }
 
 /* ===== BASE STYLES ===== */
+/* A native <select> popup does not inherit the field's translucent background, so give options an opaque one. */
+.dark select option {
+  background-color: var(--card);
+  color: var(--foreground);
+}
+.dark select option:disabled {
+  color: var(--muted-color);
+}
+
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(100, 116, 139, 0.25) transparent;

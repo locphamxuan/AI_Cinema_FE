@@ -3,7 +3,7 @@ import { Lock } from 'lucide-react';
 import { adminService, type PermissionRow, type RolePermissions } from '@/services/adminService';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
-import type { UserRole } from '@/types/workflow-api-enums';
+import type { UserRole } from '@/types/production';
 import { BACKEND_ROLE_LABEL, BACKEND_ROLES, PERMISSION_AREA_LABEL } from '../roles';
 
 type Matrix = Record<UserRole, Set<string>>;

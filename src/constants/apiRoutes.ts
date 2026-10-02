@@ -53,69 +53,50 @@ export const API_ROUTES = {
     ROLES: '/roles',
     ROLE_PERMISSIONS: (role: string) => `/roles/${role}/permissions`,
   },
-  // Production Workflow & Governance
-  WORKFLOW: {
-    // Lookups
-    USERS: '/users',
-    GENRES: '/genres',
-    POLICIES: '/policies',
-    PLATFORM_SETTINGS: '/platform-settings',
-
-    // Production Projects
-    PROJECTS: '/production-projects',
-    PROJECT_DETAIL: (projectId: string) => `/production-projects/${projectId}`,
-    PROJECT_CANCEL: (projectId: string) => `/production-projects/${projectId}/cancel`,
-    PROJECT_EVENTS: (projectId: string) => `/production-projects/${projectId}/events`,
-
-    // Production Plans
-    PLAN_SUBMIT: (planId: string) => `/production-plans/${planId}/submit`,
-    PLAN_DRAFT: (planId: string) => `/production-plans/${planId}/draft`,
-    PLAN_CONTINUITY: (planId: string) => `/production-plans/${planId}/continuity`,
-
-    // Scenes
-    SCENE_SUBMIT: (sceneId: string) => `/scenes/${sceneId}/submit`,
-    SCENE_DIRECTION: (sceneId: string) => `/scenes/${sceneId}/direction`,
-    SCENE_RESET: (sceneId: string) => `/scenes/${sceneId}/reset`,
-    SCENE_SUGGESTIONS: (sceneId: string) => `/scenes/${sceneId}/suggestions`,
-
-    // Plan Reviews (Per-scene pre-production review)
-    PLAN_REVIEWS: (planId: string) => `/production-plans/${planId}/plan-reviews`,
-    PLAN_REVIEW_DETAIL: (planReviewId: string) => `/plan-reviews/${planReviewId}`,
-
-    // Quota Allocations
-    QUOTA_ALLOCATIONS: (planId: string) => `/production-plans/${planId}/quota-allocations`,
-    QUOTA_REQUESTS: (planId: string) => `/production-plans/${planId}/quota-requests`,
-    QUOTA_REQUEST_APPROVE: (requestId: string) => `/quota-requests/${requestId}/approve`,
-    QUOTA_REQUEST_REJECT: (requestId: string) => `/quota-requests/${requestId}/reject`,
-
-    // Generation Jobs & Assets
-    GENERATION_JOBS: (planId: string) => `/production-plans/${planId}/generation-jobs`,
-    JOB_DETAIL: (jobId: string) => `/generation-jobs/${jobId}`,
-    JOB_RUN: (jobId: string) => `/generation-jobs/${jobId}/run`,
-    JOB_RETRY: (jobId: string) => `/generation-jobs/${jobId}/retry`,
-
-    // Episode Packages & Assembly
-    PACKAGES: (planId: string) => `/production-plans/${planId}/episode-packages`,
-    PACKAGE_SUBTITLE: (packageId: string, language: string) => `/episode-packages/${packageId}/subtitles/${language}`,
-    PACKAGE_SUBMISSIONS: (packageId: string) => `/episode-packages/${packageId}/submissions`,
-    PACKAGE_REVIEWS: (packageId: string) => `/episode-packages/${packageId}/reviews`,
-    PACKAGE_AI_LABELS: (packageId: string) => `/episode-packages/${packageId}/ai-content-labels`,
-    PACKAGE_COMPLIANCE_REVIEWS: (packageId: string) => `/episode-packages/${packageId}/compliance-reviews`,
-
-    // AI model routing (BR-40)
-    AI_MODEL_ROUTING: '/ai-models/routing',
-    AI_MODEL_ROUTE: '/ai-models/route',
-
-    // Review & Compliance Decisions
-    REVIEW_DETAIL: (reviewId: string) => `/reviews/${reviewId}`,
-
-    // Catalog & Final Movie Conversion
-    CATALOG_FROM_PACKAGE: (packageId: string) => `/episode-packages/${packageId}/catalog`,
-    MOVIES: '/movies',
-
-    // Publications
-    EPISODE_PUBLICATIONS: (episodeId: string) => `/episodes/${episodeId}/publications`,
-    PUBLICATION_PUBLISH: (publicationId: string) => `/publications/${publicationId}/publish`,
+  PLATFORM_SETTINGS: '/platform-settings',
+  NOTIFICATIONS: {
+    LIST: '/notifications',
+    UNREAD_COUNT: '/notifications/unread-count',
+    READ_ALL: '/notifications/read-all',
+    READ: (id: string) => `/notifications/${id}/read`,
+  },
+  // MF-1: movie projects ordered from outside studios, steps 1–16
+  PRODUCTION: {
+    PROJECTS: '/projects',
+    PROJECT: (movieId: string) => `/projects/${movieId}`,
+    ASSIGN: (movieId: string) => `/projects/${movieId}/assign`,
+    CANCEL: (movieId: string) => `/projects/${movieId}/cancel`,
+    EVENTS: (movieId: string) => `/projects/${movieId}/events`,
+    SEASONS: (movieId: string) => `/projects/${movieId}/seasons`,
+    SEASON_EPISODES: (seasonId: string) => `/seasons/${seasonId}/episodes`,
+    EPISODE: (episodeId: string) => `/episodes/${episodeId}`,
+    IDEA_FILES: (movieId: string) => `/projects/${movieId}/idea-files`,
+    IDEA_FILE: (movieId: string, fileId: string) => `/projects/${movieId}/idea-files/${fileId}`,
+    IDEA_FILE_CONTENT: (movieId: string, fileId: string) => `/projects/${movieId}/idea-files/${fileId}/content`,
+    FEE: (movieId: string) => `/projects/${movieId}/fee`,
+    FEE_ENTRIES: (movieId: string) => `/projects/${movieId}/fee/entries`,
+    CHANGE_REQUESTS: (movieId: string) => `/projects/${movieId}/change-requests`,
+    CHANGE_REQUEST_ACCEPT: (id: string) => `/change-requests/${id}/accept`,
+    CHANGE_REQUEST_REJECT: (id: string) => `/change-requests/${id}/reject`,
+    HANDOFF: (movieId: string) => `/projects/${movieId}/handoff`,
+    STUDIO_CHANGE: (movieId: string) => `/projects/${movieId}/studio-change`,
+    DUE_DATES: (movieId: string) => `/projects/${movieId}/due-dates`,
+    HANDOFFS: (movieId: string) => `/projects/${movieId}/handoffs`,
+    BRIEF: (movieId: string, handoffId: string) => `/projects/${movieId}/handoffs/${handoffId}/brief`,
+    EPISODE_MEDIA: (episodeId: string) => `/episodes/${episodeId}/media`,
+    EPISODE_MEDIA_UPLOAD: (episodeId: string) => `/episodes/${episodeId}/media/upload`,
+    MEDIA_ASSET: (id: string) => `/media-assets/${id}`,
+    MEDIA_RETRY: (id: string) => `/media-assets/${id}/retry`,
+    REVIEW_SHEET: (id: string) => `/media-assets/${id}/review-sheet`,
+    REVIEWS: (id: string) => `/media-assets/${id}/reviews`,
+    AI_LABELS: (id: string) => `/media-assets/${id}/ai-content-labels`,
+    COMPLIANCE: (id: string) => `/media-assets/${id}/compliance-checks`,
+    COIN_PRICE: (episodeId: string) => `/episodes/${episodeId}/coin-price`,
+    PUBLICATIONS: (episodeId: string) => `/episodes/${episodeId}/publications`,
+    UNPUBLISH: (publicationId: string) => `/publications/${publicationId}/unpublish`,
+    PRICE_ALERTS: '/admin/price-alerts',
+    PRICE_ALERT_REQUEST_CHANGE: (id: string) => `/admin/price-alerts/${id}/request-change`,
+    PRICE_ALERT_RESOLVE: (id: string) => `/admin/price-alerts/${id}/resolve`,
   },
 } as const;
 

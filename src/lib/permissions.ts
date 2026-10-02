@@ -1,27 +1,22 @@
 /**
- * Permission keys the backend checks (AI-_Cinema_BE src/common/auth/permissions.ts).
+ * Permission keys the backend checks (AI_Cinema_BE src/common/auth/permissions.ts).
  * Which role holds which key is edited by the Admin; the web only reads the list
  * the backend returns for the signed-in account.
  */
 export const PERMISSION = {
-  PRODUCTION_READ: 'production:read',
-  PROJECT_MANAGE: 'production:project.manage',
-  MILESTONE_UPDATE: 'production:milestone.update',
-  PLAN_WRITE: 'production:plan.write',
-  PLAN_REVIEW: 'production:plan.review',
-  QUOTA_REQUEST: 'production:quota.request',
-  QUOTA_MANAGE: 'production:quota.manage',
-  PRODUCTION_GENERATE: 'production:generate',
-  EPISODE_SUBMIT: 'episode:submit',
-  EPISODE_REVIEW: 'episode:review',
-  MOVIE_PUBLISH: 'movie:publish',
+  // MF-1 — movie projects
+  PROJECT_MANAGE: 'project:manage',
+  PROJECT_FEE_ALLOCATE: 'project:fee.allocate',
+  PROJECT_READ_ALL: 'project:read.all',
+  PROJECT_SUGGEST: 'project:suggest',
+  STUDIO_HANDOFF: 'studio:handoff',
+  MEDIA_INGEST: 'media:ingest',
+  CONTENT_REVIEW: 'content:review',
+  EPISODE_PUBLISH: 'episode:publish',
+  PRICE_ALERT_MANAGE: 'price-alert:manage',
   GENRE_MANAGE: 'genre:manage',
-  GENRE_STYLE_MANAGE: 'genre-style:manage',
-  FILM_ANALYTICS_READ: 'film:analytics.read',
+  // Administration
   MEMBER_OPS_READ: 'member:ops.read',
-  BILLING_READ: 'billing:read',
-  SUPPORT_MANAGE: 'support:manage',
-  MARKETING_MANAGE: 'marketing:manage',
   USER_READ: 'user:read',
   USER_MANAGE: 'user:manage',
   ROLE_MANAGE: 'role:manage',
@@ -38,7 +33,7 @@ export type Area = 'creator' | 'reviewer' | 'staff' | 'admin';
 
 export const AREAS: Record<Area, { label: string; path: string; roles: WebRole[] }> = {
   creator: { label: 'Sản xuất nội dung', path: '/creator/projects', roles: ['creator'] },
-  // The Admin oversees production read-only (PROJECT_OVERVIEW.md §2.2); actions follow permissions.
+  // The Admin oversees every project and proposes changes (BR-55); actions follow permissions.
   reviewer: { label: 'Kiểm duyệt nội dung', path: '/reviewer', roles: ['reviewer', 'admin'] },
   staff: { label: 'Vận hành', path: '/staff', roles: ['staff', 'admin'] },
   admin: { label: 'Quản trị', path: '/admin', roles: ['admin'] },

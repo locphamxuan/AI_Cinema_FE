@@ -2,26 +2,30 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, KeyRound, Settings, Users } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { ArrowRight, BadgeAlert, KeyRound, Settings, Users } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
 import { AccountsPanel } from './AccountsPanel';
 import { RolePermissionsPanel } from './RolePermissionsPanel';
 import { PlatformSettingsPanel } from './PlatformSettingsPanel';
+import { PriceAlertsPanel } from './PriceAlertsPanel';
 
-type Tab = 'accounts' | 'permissions' | 'settings';
+type Tab = 'accounts' | 'permissions' | 'settings' | 'price-alerts';
 
 const TABS: { key: Tab; label: string; icon: typeof Users; permission: PermissionKey }[] = [
   { key: 'accounts', label: 'Tài khoản', icon: Users, permission: PERMISSION.USER_READ },
   { key: 'permissions', label: 'Phân quyền', icon: KeyRound, permission: PERMISSION.ROLE_MANAGE },
-  { key: 'settings', label: 'Cài đặt sản xuất', icon: Settings, permission: PERMISSION.PLATFORM_SETTINGS_MANAGE },
+  { key: 'settings', label: 'Cài đặt nền tảng', icon: Settings, permission: PERMISSION.PLATFORM_SETTINGS_MANAGE },
+  { key: 'price-alerts', label: 'Cảnh báo giá', icon: BadgeAlert, permission: PERMISSION.PRICE_ALERT_MANAGE },
 ];
 
-/** Admin console: accounts, role permissions and platform settings, each shown only with its permission. */
+/** Admin console: accounts, permissions, platform settings and price alerts, each shown only with its permission. */
 export function AdminPage() {
   const can = useCan();
   const tabs = TABS.filter((t) => can(t.permission));
-  const [active, setActive] = useState<Tab>('accounts');
+  const requested = useSearchParams().get('tab');
+  const [active, setActive] = useState<Tab>(TABS.some((t) => t.key === requested) ? (requested as Tab) : 'accounts');
   const current = tabs.find((t) => t.key === active) ?? tabs[0];
 
   return (
@@ -29,10 +33,10 @@ export function AdminPage() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">Quản trị</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tài khoản, phân quyền và cài đặt của nền tảng.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Tài khoản, phân quyền, cài đặt nền tảng và giám sát giá.</p>
         </div>
         <div className="flex items-center gap-3 text-xs font-semibold">
-          {can(PERMISSION.PRODUCTION_READ) && (
+          {can(PERMISSION.PROJECT_READ_ALL) && (
             <Link href="/reviewer" className="inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 hover:underline">
               Xem dự án sản xuất <ArrowRight className="w-3 h-3" aria-hidden="true" />
             </Link>
@@ -66,6 +70,7 @@ export function AdminPage() {
       {current?.key === 'accounts' && <AccountsPanel />}
       {current?.key === 'permissions' && <RolePermissionsPanel />}
       {current?.key === 'settings' && <PlatformSettingsPanel />}
+      {current?.key === 'price-alerts' && <PriceAlertsPanel />}
     </main>
   );
 }
