@@ -2,6 +2,9 @@ import type { UserRole } from '@/types/production';
 
 export const BACKEND_ROLES: UserRole[] = ['MEMBER', 'CONTENT_CREATOR', 'CONTENT_REVIEWER', 'STAFF', 'ADMIN'];
 
+/** Roles the Admin can create accounts for; members sign up themselves. */
+export const STAFF_ROLES: UserRole[] = ['CONTENT_CREATOR', 'CONTENT_REVIEWER', 'STAFF', 'ADMIN'];
+
 export const BACKEND_ROLE_LABEL: Record<UserRole, string> = {
   MEMBER: 'Member',
   CONTENT_CREATOR: 'Content Creator',

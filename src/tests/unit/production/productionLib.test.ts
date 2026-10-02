@@ -13,7 +13,7 @@ describe('production routes', () => {
   it('sends Creators to /creator and everyone else to /reviewer', () => {
     expect(productionBaseFor('creator')).toBe('/creator');
     expect(productionBaseFor('reviewer')).toBe('/reviewer');
-    expect(productionBaseFor('admin')).toBe('/reviewer');
+    expect(productionBaseFor('admin')).toBe('/admin');
     expect(productionPaths.project('/creator', 'm1', 'studio')).toBe('/creator/projects/m1?tab=studio');
   });
 
@@ -22,8 +22,8 @@ describe('production routes', () => {
     ['/projects/m1/episodes/e1', 'reviewer', '/reviewer/projects/m1/episodes/e1'],
     ['/projects/m1/change-requests', 'reviewer', '/reviewer/projects/m1?tab=changes'],
     ['/projects/m1/studio', 'creator', '/creator/projects/m1?tab=studio'],
-    ['/projects/m1', 'admin', '/reviewer/projects/m1'],
-    ['/admin/price-alerts', 'admin', '/admin?tab=price-alerts'],
+    ['/projects/m1', 'admin', '/admin/projects/m1'],
+    ['/admin/price-alerts', 'admin', '/admin/price-alerts'],
   ] as const)('opens the notification link %s for a %s at %s', (link, role, href) => {
     expect(notificationHref(link, role)).toBe(href);
   });

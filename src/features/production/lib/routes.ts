@@ -1,14 +1,16 @@
 import type { WebRole } from '@/lib/permissions';
 
-/** Production lives under /creator for Content Creators and under /reviewer for Reviewers and the Admin. */
-export type ProductionBase = '/creator' | '/reviewer';
+/** Production lives under /creator for Content Creators, /reviewer for Reviewers and /admin for the Admin. */
+export type ProductionBase = '/creator' | '/reviewer' | '/admin';
 
 export function productionBaseFor(role: WebRole | undefined): ProductionBase {
-  return role === 'creator' ? '/creator' : '/reviewer';
+  if (role === 'creator') return '/creator';
+  return role === 'admin' ? '/admin' : '/reviewer';
 }
 
 export function baseFromPath(pathname: string): ProductionBase {
-  return pathname.startsWith('/creator') ? '/creator' : '/reviewer';
+  if (pathname.startsWith('/creator')) return '/creator';
+  return pathname.startsWith('/admin') ? '/admin' : '/reviewer';
 }
 
 export const productionPaths = {
@@ -24,7 +26,7 @@ export const productionPaths = {
  */
 export function notificationHref(link: string | null, role: WebRole | undefined): string | null {
   if (!link) return null;
-  if (link.startsWith('/admin/price-alerts')) return '/admin?tab=price-alerts';
+  if (link.startsWith('/admin/price-alerts')) return '/admin/price-alerts';
   if (link === '/tokens') return '/reviewer/tokens';
   const match = /^\/projects\/([^/?#]+)(?:\/(episodes)\/([^/?#]+)|\/([a-z-]+))?/.exec(link);
   if (!match) return link.startsWith('/') ? link : null;

@@ -1,5 +1,8 @@
+'use client';
+
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Lock, Search, Unlock } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lock, Pencil, Search, Trash2, Unlock, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { adminService, type AccountPage, type AccountRow } from '@/services/adminService';
 import { toast } from '@/components/ui/Toast';
 import { fieldInputClass } from '@/components/ui/FormField';
@@ -8,10 +11,11 @@ import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import type { UserRole } from '@/types/production';
 import { BACKEND_ROLE_LABEL, BACKEND_ROLES } from '../roles';
+import { AccountFormModal, DeleteAccountModal } from './AccountFormModal';
 
 const dateFormat = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-/** Every account, with its role and whether it may sign in; the Admin changes both here. */
+/** Every account: the Admin creates staff accounts, edits, locks or deletes them here. */
 export function AccountsPanel() {
   const can = useCan();
   const canManage = can(PERMISSION.USER_MANAGE);
@@ -23,6 +27,8 @@ export function AccountsPanel() {
   const [result, setResult] = useState<AccountPage | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<AccountRow | 'new' | null>(null);
+  const [deleting, setDeleting] = useState<AccountRow | null>(null);
 
   const load = useCallback(async () => {
     const res = await adminService.listAccounts({ page, search, role: role || undefined });
@@ -64,7 +70,12 @@ export function AccountsPanel() {
             {result ? `${result.meta.totalItems} tài khoản` : 'Đang tải…'}. Đổi vai trò hoặc khoá tài khoản có hiệu lực ngay.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {canManage && (
+            <Button size="sm" onClick={() => setEditing('new')}>
+              <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> Tạo tài khoản
+            </Button>
+          )}
           <label className="relative">
             <span className="sr-only">Tìm theo tên hoặc email</span>
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
@@ -154,7 +165,17 @@ export function AccountsPanel() {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-slate-500 dark:text-slate-400">{dateFormat.format(new Date(account.createdAt))}</td>
-                  <td className="py-3 px-5 text-right">
+                  <td className="py-3 px-5 text-right whitespace-nowrap">
+                    {canManage && (
+                      <Button size="sm" variant="ghost" aria-label={`Sửa ${account.fullName}`} onClick={() => setEditing(account)}>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                    {canManage && !isMe && (
+                      <Button size="sm" variant="ghost" aria-label={`Xoá ${account.fullName}`} onClick={() => setDeleting(account)}>
+                        <Trash2 className="w-3.5 h-3.5 text-rose-600" />
+                      </Button>
+                    )}
                     {canManage && !isMe && (
                       <button
                         type="button"
@@ -186,6 +207,16 @@ export function AccountsPanel() {
           </tbody>
         </table>
       </div>
+
+      {editing && (
+        <AccountFormModal
+          account={editing === 'new' ? null : editing}
+          isMe={editing !== 'new' && editing.id === myId}
+          onClose={() => setEditing(null)}
+          onSaved={load}
+        />
+      )}
+      {deleting && <DeleteAccountModal account={deleting} onClose={() => setDeleting(null)} onDeleted={load} />}
 
       {totalPages > 1 && (
         <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-100 dark:border-white/5 text-xs">

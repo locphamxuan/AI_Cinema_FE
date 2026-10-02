@@ -147,7 +147,7 @@ function HistoryModal({ reviewer, onClose }: { reviewer: ReviewerBudgetRow; onCl
       {wallet.data && (
         <div className="space-y-4">
           <TokenTotalsCards totals={wallet.data} rateVnd={wallet.data.tokenRateVnd} />
-          <TokenHistoryTable wallet={wallet.data} projectHref={(id) => productionPaths.project('/reviewer', id, 'fee')} />
+          <TokenHistoryTable wallet={wallet.data} projectHref={(id) => productionPaths.project('/admin', id, 'fee')} />
         </div>
       )}
     </Modal>

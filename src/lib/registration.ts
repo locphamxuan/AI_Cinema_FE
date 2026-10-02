@@ -6,6 +6,13 @@ export const MIN_MEMBER_AGE = 18;
 
 const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d).+$/;
 
+export const PASSWORD_HINT = `Mật khẩu ${MIN_PASSWORD_LENGTH}–${MAX_PASSWORD_LENGTH} ký tự, có ít nhất một chữ cái và một chữ số.`;
+
+/** The backend's password rule (sign-up, and passwords the Admin sets). */
+export function passwordValid(password: string): boolean {
+  return password.length >= MIN_PASSWORD_LENGTH && password.length <= MAX_PASSWORD_LENGTH && PASSWORD_RULE.test(password);
+}
+
 /** The latest date of birth that is old enough today, as YYYY-MM-DD (the date input's `max`). */
 export function latestAdultBirthDate(today: Date = new Date()): string {
   const cutoff = new Date(today.getFullYear() - MIN_MEMBER_AGE, today.getMonth(), today.getDate());
