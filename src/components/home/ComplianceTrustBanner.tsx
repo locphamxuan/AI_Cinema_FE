@@ -1,99 +1,140 @@
 'use client';
 
 import Link from 'next/link';
-import { ShieldCheck, CheckCircle2, Cpu, Eye, Lock, Coins, Sparkles, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Cpu, Coins, Sparkles, ArrowRight, CheckCircle2, FileCheck, Layers, Award, ArrowUpRight } from 'lucide-react';
 
 export default function ComplianceTrustBanner() {
   const steps = [
     {
       number: '01',
-      title: 'Studio Nộp Hồ Sơ Kỹ Thuật (Maker)',
-      desc: 'Khai báo 100% công cụ AI (Runway, Sora, Midjourney), kịch bản gốc và nộp bản dựng video master chất lượng cao.',
+      phase: 'KHỞI TẠO & SÁNG TÁC',
+      role: 'Maker Studio',
+      title: 'Hồ Sơ Kỹ Thuật & Khai Báo Model AI',
+      desc: 'Studio nộp kịch bản phân cảnh, prompt kỹ thuật và video master 4K. Minh bạch 100% công cụ tạo sinh (Sora, Runway, Midjourney).',
+      badge: 'Bản Quyền Gốc',
+      badgeClass: 'text-purple-300 bg-purple-500/15 border-purple-500/30',
       icon: Cpu,
-      color: '#8B5CF6',
+      iconColor: 'text-purple-400',
+      iconBg: 'bg-purple-500/15 border-purple-500/30 shadow-purple-500/20',
+      metric: 'Kiểm tra bản quyền & Deepfake tự động',
+      tag: 'Khai báo minh bạch',
     },
     {
       number: '02',
-      title: 'Thẩm Định & Gắn Nhãn Điều 44 (Checker)',
-      desc: 'Ban kiểm duyệt đánh giá 4 vòng: An toàn nội dung, không xâm phạm hình tượng người thật, cấp chứng nhận nhãn AI bắt buộc.',
+      phase: 'THẨM ĐỊNH ĐỘC LẬP',
+      role: 'Reviewer Checker',
+      title: 'Kiểm Duyệt & Cấp Tem Điều 44',
+      desc: 'Hội đồng thẩm định độc lập rà soát 4 lớp an toàn: đạo đức nội dung, quyền nhân thân, cấp chứng chỉ số và gắn nhãn AI bắt buộc.',
+      badge: 'Chuẩn Điều 44',
+      badgeClass: 'text-emerald-300 bg-emerald-500/15 border-emerald-500/30',
       icon: ShieldCheck,
-      color: '#10B981',
+      iconColor: 'text-emerald-400',
+      iconBg: 'bg-emerald-500/15 border-emerald-500/30 shadow-emerald-500/20',
+      metric: 'Cấp chứng nhận số VN-AIC 2026',
+      tag: 'Đạt chuẩn xuất bản',
     },
     {
       number: '03',
-      title: 'Phát Hành OTT & Doanh Thu Ví Coin (Viewer)',
-      desc: 'Mã hóa HLS đa độ phân giải 4K HDR. Người xem mở khóa tập bằng ví Coin với 70% doanh thu chuyển thẳng cho Studio.',
+      phase: 'CÔNG CHIẾU & DOANH THU',
+      role: 'Viewer & OTT',
+      title: 'Phát Hành 4K & Doanh Thu Tự Động',
+      desc: 'Mã hóa HLS đa luồng phát hành độc quyền trên AI Cinema. Khán giả mở khóa bằng ví Coin, đối soát doanh thu 70/30 tự động.',
+      badge: 'Chia Sẻ 70/30',
+      badgeClass: 'text-amber-300 bg-amber-500/15 border-amber-500/30',
       icon: Coins,
-      color: '#E50914',
+      iconColor: 'text-amber-400',
+      iconBg: 'bg-amber-500/15 border-amber-500/30 shadow-amber-500/20',
+      metric: 'Chia sẻ 70% doanh thu cho Studio',
+      tag: 'Ví Coin tức thời',
     },
   ];
 
   return (
     <div className="my-12 px-4 sm:px-8 md:px-14">
-      <div className="relative rounded-3xl overflow-hidden bg-white dark:bg-gradient-to-br dark:from-[#12151E] dark:via-[#0E1118] dark:to-[#151821] border border-slate-200 dark:border-white/10 p-6 sm:p-10 shadow-sm dark:shadow-2xl transition-colors">
-        {/* Ambient Glows for Dark mode */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl pointer-events-none hidden dark:block" />
-        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none hidden dark:block" />
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#0D1019] via-[#090C14] to-[#121624] border border-slate-800/80 dark:border-white/10 p-6 sm:p-10 shadow-2xl text-white transition-all">
+        {/* Ambient Cinema Neon Glows */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-emerald-500/15 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent pointer-events-none" />
 
         <div className="relative z-10">
-          {/* Badge & Title */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100 dark:border-white/10">
-            <div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold mb-2.5 shadow-sm">
-                <ShieldCheck className="w-4 h-4" />
-                <span>Tiêu Chuẩn Pháp Lý Việt Nam</span>
+          {/* Top Header */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-10 pb-6 border-b border-white/10">
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold mb-3.5 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34D399]" />
+                <span>Bảo Chứng Bản Quyền & Tiêu Chuẩn Điện Ảnh AI 2026</span>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                Quy Trình Kiểm Duyệt & Gắn Nhãn Tuân Thủ Điều 44 Luật AI
+              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug">
+                Hệ Sinh Thái Phim AI Minh Bạch Theo Điều 44 Luật AI
               </h3>
-              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-3xl leading-relaxed">
-                Nền tảng OTT đầu tiên tại Việt Nam áp dụng mô hình Maker - Checker nghiêm ngặt, thực thi Điều 44 Luật số 134/2025/QH15 và Điều 18 Nghị định số 142/2026/NĐ-CP về minh bạch nội dung tạo sinh bởi Trí tuệ Nhân tạo.
+              <p className="text-xs sm:text-sm text-slate-300 mt-2.5 leading-relaxed">
+                Nền tảng OTT đầu tiên tại Việt Nam chuẩn hóa mô hình <strong className="text-white">Maker - Checker</strong> nghiêm ngặt, thực thi Điều 44 Luật số 134/2025/QH15 và Điều 18 NĐ 142/2026/NĐ-CP nhằm bảo vệ quyền tác giả, minh bạch mô hình tạo sinh và bảo đảm nguồn thu công bằng cho các AI Studio đối tác.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
               <Link
                 href="/reviewer"
-                className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 border border-slate-200 dark:border-white/20 text-slate-800 dark:text-white font-bold text-xs flex items-center gap-2 transition backdrop-blur-md"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-lg shadow-purple-600/30 hover:scale-105 active:scale-95 cursor-pointer"
               >
-                <span>Xem Cổng Kiểm Duyệt</span>
-                <ArrowRight className="w-3.5 h-3.5 text-emerald-500" />
+                <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                <span>Cổng Thẩm Định Maker-Checker</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
 
-          {/* 3 Step Pipeline Cards */}
+          {/* 3 Step Interactive Pipeline Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {steps.map((step) => {
+            {steps.map((step, idx) => {
               const Icon = step.icon;
               return (
                 <div
                   key={step.number}
-                  className="p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/15 transition-all duration-300 relative group flex flex-col justify-between"
+                  className="group relative rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-white/20 p-5 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl flex flex-col justify-between"
                 >
+                  {/* Top Phase Header */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
-                        style={{ backgroundColor: `${step.color}15`, border: `1px solid ${step.color}30` }}
+                        className={`w-11 h-11 rounded-xl flex items-center justify-center border shadow-md ${step.iconBg}`}
                       >
-                        <Icon className="w-5 h-5" style={{ color: step.color }} />
+                        <Icon className={`w-5 h-5 ${step.iconColor}`} />
                       </div>
-                      <span className="text-xs font-mono font-black text-slate-400 dark:text-slate-500">BƯỚC {step.number}</span>
+
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border font-mono ${step.badgeClass}`}>
+                          {step.badge}
+                        </span>
+                        <span className="text-xl font-black font-mono text-white/25 group-hover:text-white/50 transition-colors">
+                          {step.number}
+                        </span>
+                      </div>
                     </div>
 
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-2 group-hover:text-red-600 dark:group-hover:text-slate-100 transition-colors">
+                    <div className="text-[11px] font-mono uppercase tracking-wider text-slate-400 font-bold mb-1">
+                      {step.phase}
+                    </div>
+
+                    <h4 className="text-sm sm:text-base font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">
                       {step.title}
                     </h4>
 
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    <p className="text-xs text-slate-300/80 leading-relaxed mb-4">
                       {step.desc}
                     </p>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-slate-200 dark:border-white/5 flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Đạt tiêu chuẩn xuất bản</span>
+                  {/* Bottom Distinct Indicator */}
+                  <div className="pt-3.5 mt-3 border-t border-white/10 flex items-center justify-between text-[11px]">
+                    <div className="flex items-center gap-1.5 text-slate-300 font-medium">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span>{step.metric}</span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
+                      {step.tag}
+                    </span>
                   </div>
                 </div>
               );
