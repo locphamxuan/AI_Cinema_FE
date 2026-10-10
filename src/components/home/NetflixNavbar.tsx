@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search, Bell,  ChevronDown, User, LogOut, Wallet, Film, ShieldCheck, Settings } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import ThemeToggle from '@/components/theme/ThemeToggle';
+import NotificationBell from '@/components/layout/header/NotificationBell';
 
 /** Viewer navigation: discovery, the browse page, and browse shortcuts opened with a filter set. */
 const NAV_LINKS = [
@@ -166,19 +167,8 @@ export default function NetflixNavbar() {
             <ThemeToggle />
           </div>
 
-          {/* Notification Bell */}
-          <button
-            type="button"
-            className={`relative w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer hidden sm:flex ${
-              isScrolled
-                ? 'bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-700 dark:text-slate-200'
-                : 'bg-white/10 hover:bg-white/20 text-white'
-            }`}
-            title="Thông báo phim mới cập nhật"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E50914] animate-pulse" />
-          </button>
+          {/* Notification Bell Dropdown */}
+          <NotificationBell isScrolled={isScrolled} />
 
           {/* Coin Wallet Badge */}
           <button
