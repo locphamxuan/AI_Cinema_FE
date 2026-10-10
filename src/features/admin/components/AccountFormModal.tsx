@@ -8,7 +8,8 @@ import { useAction } from '@/features/production/hooks/useAction';
 import { PASSWORD_HINT, passwordValid } from '@/lib/registration';
 import { adminService, type AccountRow } from '@/services/adminService';
 import type { UserRole } from '@/types/production';
-import { BACKEND_ROLE_LABEL, BACKEND_ROLES, STAFF_ROLES } from '../roles';
+import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_TONE, STAFF_ROLES } from '../roles';
+import { Select } from '@/components/ui/Select';
 
 /**
  * Creates a staff account (members sign up themselves), or edits any account: name, email, role and,
@@ -67,13 +68,18 @@ export function AccountFormModal({
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} required className={fieldInputClass} />
         </FormField>
         <FormField label="Vai trò">
-          <select value={role} disabled={isMe} onChange={(e) => setRole(e.target.value as UserRole)} className={fieldInputClass}>
-            {roles.map((r) => (
-              <option key={r} value={r}>
-                {BACKEND_ROLE_LABEL[r]}
-              </option>
-            ))}
-          </select>
+          <Select
+            value={role}
+            disabled={isMe}
+            onChange={(val) => setRole(val as UserRole)}
+            options={roles.map((r) => ({
+              value: r,
+              label: BACKEND_ROLE_LABEL[r],
+              tone: ROLE_TONE[r],
+            }))}
+            size="md"
+            aria-label="Vai trò"
+          />
         </FormField>
         <FormField label={creating ? 'Mật khẩu ban đầu' : 'Mật khẩu mới (để trống nếu giữ nguyên)'}>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" maxLength={72} required={creating} className={fieldInputClass} />

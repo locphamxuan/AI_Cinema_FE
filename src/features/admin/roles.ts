@@ -13,6 +13,14 @@ export const BACKEND_ROLE_LABEL: Record<UserRole, string> = {
   ADMIN: 'Admin',
 };
 
+export const ROLE_TONE: Record<UserRole, 'purple' | 'emerald' | 'blue' | 'amber' | 'neutral'> = {
+  ADMIN: 'purple',
+  CONTENT_REVIEWER: 'emerald',
+  CONTENT_CREATOR: 'blue',
+  STAFF: 'amber',
+  MEMBER: 'neutral',
+};
+
 /** Groups of the permission catalog (AI_Cinema_BE PERMISSION_CATALOG `area`). */
 export const PERMISSION_AREA_LABEL: Record<string, string> = {
   'movie-project': 'Dự án phim (MF-1)',

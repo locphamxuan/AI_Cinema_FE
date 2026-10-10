@@ -10,8 +10,24 @@ import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import type { UserRole } from '@/types/production';
-import { BACKEND_ROLE_LABEL, BACKEND_ROLES } from '../roles';
+import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_TONE } from '../roles';
+import { Select } from '@/components/ui/Select';
 import { AccountFormModal, DeleteAccountModal } from './AccountFormModal';
+
+const ROLE_FILTER_OPTIONS = [
+  { value: '', label: 'Mọi vai trò' },
+  ...BACKEND_ROLES.map((r) => ({
+    value: r,
+    label: BACKEND_ROLE_LABEL[r],
+    tone: ROLE_TONE[r],
+  })),
+];
+
+const ROLE_OPTIONS = BACKEND_ROLES.map((r) => ({
+  value: r,
+  label: BACKEND_ROLE_LABEL[r],
+  tone: ROLE_TONE[r],
+}));
 
 const dateFormat = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
@@ -90,22 +106,17 @@ export function AccountsPanel() {
               className={`${fieldInputClass} pl-8 py-1.5 w-52 text-xs`}
             />
           </label>
-          <select
+          <Select
             aria-label="Lọc theo vai trò"
             value={role}
-            onChange={(e) => {
-              setRole(e.target.value as UserRole | '');
+            onChange={(val) => {
+              setRole(val as UserRole | '');
               setPage(1);
             }}
-            className={`${fieldInputClass} py-1.5 w-40 text-xs cursor-pointer bg-white dark:bg-[#0E1118]`}
-          >
-            <option value="">Mọi vai trò</option>
-            {BACKEND_ROLES.map((r) => (
-              <option key={r} value={r}>
-                {BACKEND_ROLE_LABEL[r]}
-              </option>
-            ))}
-          </select>
+            options={ROLE_FILTER_OPTIONS}
+            size="sm"
+            className="w-44"
+          />
         </div>
       </div>
 
@@ -137,21 +148,21 @@ export function AccountsPanel() {
                     <p className="text-slate-500 dark:text-slate-400">{account.email}</p>
                   </td>
                   <td className="py-3 px-4">
-                    <select
+                    <Select
                       aria-label={`Vai trò của ${account.fullName}`}
                       value={account.role}
                       disabled={locked}
-                      onChange={(e) =>
-                        void update(account, { role: e.target.value as UserRole }, `Đã đổi vai trò thành ${BACKEND_ROLE_LABEL[e.target.value as UserRole]}`)
+                      onChange={(newRole) =>
+                        void update(
+                          account,
+                          { role: newRole as UserRole },
+                          `Đã đổi vai trò thành ${BACKEND_ROLE_LABEL[newRole as UserRole]}`
+                        )
                       }
-                      className={`${fieldInputClass} py-1 w-40 text-xs cursor-pointer bg-white dark:bg-[#0E1118] disabled:cursor-not-allowed disabled:opacity-70`}
-                    >
-                      {BACKEND_ROLES.map((r) => (
-                        <option key={r} value={r}>
-                          {BACKEND_ROLE_LABEL[r]}
-                        </option>
-                      ))}
-                    </select>
+                      options={ROLE_OPTIONS}
+                      size="sm"
+                      className="w-44"
+                    />
                   </td>
                   <td className="py-3 px-4">
                     <span
