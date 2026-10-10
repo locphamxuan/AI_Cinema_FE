@@ -26,13 +26,17 @@ export const API_ROUTES = {
   GENRES: {
     LIST: '/genres',
   },
-  // Wallet & Coin
+  // Wallet & Coin (MF-2)
   WALLET: {
-    BALANCE: '/wallet/balance',
-    CHECK_IN: '/wallet/check-in',
-    STREAK: '/wallet/check-in-streak',
-    UNLOCK_EPISODE: '/wallet/unlock-episode',
-    TRANSACTIONS: '/wallet/transactions',
+    BALANCE: '/wallet',
+    CHECK_IN: '/daily-rewards/check-in',
+    STREAK: '/daily-rewards/status',
+    AFFORDABILITY: '/wallet/affordability',
+    TOP_UPS: '/wallet/top-ups',
+    STATEMENTS: '/wallet/statements',
+    TRANSACTIONS: '/wallet/statements',
+    UNLOCK_EPISODE: (episodeId: string) => `/episodes/${episodeId}/purchase`,
+    ACCESS: (episodeId: string) => `/episodes/${episodeId}/access`,
   },
   // Subscriptions
   SUBSCRIPTIONS: {
