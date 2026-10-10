@@ -138,12 +138,33 @@ class ApiClient {
         let errorMessage = `HTTP error! status: ${response.status}`;
         try {
           const errBody = await response.json();
-          if (errBody?.message) {
-            errorMessage = Array.isArray(errBody.message) ? errBody.message.join(', ') : errBody.message;
+          const rawMsg = errBody?.error?.message ?? errBody?.message ?? (typeof errBody?.error === 'string' ? errBody.error : undefined);
+          if (rawMsg) {
+            errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : String(rawMsg);
+          } else {
+            // Friendly Vietnamese messages for common HTTP/Auth errors when server gives no message
+            if (response.status === 401) {
+              errorMessage = 'Email hoặc mật khẩu không chính xác.';
+            } else if (response.status === 403) {
+              errorMessage = 'Bạn không có quyền thực hiện thao tác này.';
+            } else if (response.status === 404) {
+              errorMessage = 'Không tìm thấy dữ liệu yêu cầu.';
+            } else if (response.status >= 500) {
+              errorMessage = 'Lỗi kết nối máy chủ, vui lòng thử lại sau.';
+            }
           }
         } catch {
-          // non-JSON error body
+          if (response.status === 401) {
+            errorMessage = 'Email hoặc mật khẩu không chính xác.';
+          } else if (response.status === 403) {
+            errorMessage = 'Bạn không có quyền thực hiện thao tác này.';
+          } else if (response.status === 404) {
+            errorMessage = 'Không tìm thấy dữ liệu yêu cầu.';
+          } else if (response.status >= 500) {
+            errorMessage = 'Lỗi kết nối máy chủ, vui lòng thử lại sau.';
+          }
         }
+
         return {
           success: false,
           data: null as unknown as T,

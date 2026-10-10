@@ -44,7 +44,11 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
   login: async (email, password) => {
     const res = await authService.login({ email, password });
     if (!res.success || !res.data) {
-      return { success: false, error: res.message ?? 'Email hoặc mật khẩu không chính xác.' };
+      let errorMsg = res.message ?? 'Email hoặc mật khẩu không chính xác.';
+      if (errorMsg === 'Incorrect email or password' || errorMsg.startsWith('HTTP error!')) {
+        errorMsg = 'Email hoặc mật khẩu không chính xác.';
+      }
+      return { success: false, error: errorMsg };
     }
 
     set(sessionStateFor(res.data));
