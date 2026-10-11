@@ -2,7 +2,8 @@
 
 import { useEffect, useState, use, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { coinTopUpService, TopUpOrderResponse } from '@/services/coinTopUpService';
+import { coinTopUpService } from '@/services/coinTopUpService';
+import type { CoinTopUp } from '@/types/episodeAccess';
 import { walletService } from '@/services/walletService';
 import { useAppStore } from '@/store/useAppStore';
 import Link from 'next/link';
@@ -19,7 +20,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
   const router = useRouter();
   const { setWalletBalance } = useAppStore();
 
-  const [order, setOrder] = useState<TopUpOrderResponse | null>(null);
+  const [order, setOrder] = useState<CoinTopUp | null>(null);
   const [loading, setLoading] = useState(true);
   const [pollCount, setPollCount] = useState(0);
 
@@ -58,7 +59,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
       }
     };
 
-    fetchOrder();
+    fetchOrder().catch(() => setLoading(false));
 
     return () => {
       if (timer) clearTimeout(timer);
@@ -67,7 +68,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
 
   const status = order?.status || queryStatus || 'PENDING';
   const isSuccess = status === 'PAID';
-  const isFailed = status === 'FAILED' || status === 'CANCELLED';
+  const isFailed = status === 'FAILED' || status === 'CANCELLED' || status === 'EXPIRED';
 
   return (
     <div className="relative w-full max-w-lg bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl overflow-hidden text-center">
@@ -127,7 +128,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
 
         <div className="flex justify-between items-center pb-2 border-b border-slate-800/80">
           <span className="text-slate-400">Cổng thanh toán:</span>
-          <span className="font-bold text-indigo-400">{provider}</span>
+          <span className="font-bold text-indigo-400">{order?.provider ?? provider}</span>
         </div>
 
         {order && (
@@ -173,6 +174,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
           Về Trang Chủ & Xem Phim
         </Link>
         <button
+          type="button"
           onClick={() => router.back()}
           className="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition-colors cursor-pointer"
         >

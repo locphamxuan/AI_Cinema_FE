@@ -1,0 +1,49 @@
+# CI of the web app: every push and pull request must lint, typecheck, pass the unit tests and
+# build before Vercel deploys it. SonarCloud analyses the repository on its own (automatic analysis).
+name: CI
+
+on:
+  push:
+    branches: [main, dev, 'feat/**', 'fix/**', 'ci/**', 'refactor/**']
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, typecheck, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npx eslint .
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        run: npm run build
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: No high or critical vulnerability in production dependencies
+        run: npm audit --omit=dev --audit-level=high

@@ -6,11 +6,11 @@ import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import WalletHeaderBadge from '@/components/wallet/WalletHeaderBadge';
 import DailyCheckInModal from '@/components/wallet/DailyCheckInModal';
+import RewardSpinModal from '@/components/wallet/RewardSpinModal';
 import DepositModal from '@/components/wallet/DepositModal';
 import UnlockEpisodeModal from '@/components/watch/UnlockEpisodeModal';
 import SupportChatWidget from '@/components/chat/SupportChatWidget';
 import AuthModal from '@/components/auth/AuthModal';
-import DemoControlPanel from '@/components/home/DemoControlPanel';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import RightSidebar from '@/components/layout/RightSidebar';
 import { ToastContainer } from '@/components/ui/Toast';
@@ -18,7 +18,6 @@ import CatalogFilterNav from './header/CatalogFilterNav';
 import HeaderSearch from './header/HeaderSearch';
 import NotificationBell from './header/NotificationBell';
 import UserMenu from './header/UserMenu';
-import VipPassToggle from './header/VipPassToggle';
 
 // Work areas without the consumer header, sidebar and widgets; /studio/ is the outside studio's portal.
 const DASHBOARD_PATHS = ['/creator', '/reviewer', '/staff', '/admin', '/studio/'];
@@ -49,7 +48,6 @@ function MemberActions() {
   return (
     <>
       <NotificationBell />
-      <VipPassToggle />
       <div className="flex items-center gap-1.5">
         <WalletHeaderBadge />
         <button
@@ -96,7 +94,7 @@ function ConsumerHeader({ signedIn }: { signedIn: boolean }) {
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { user, isAuthenticated, restoreSession, loadCatalog } = useAppStore();
+  const { user, isAuthenticated, restoreSession, loadCatalog, syncAccount } = useAppStore();
 
   // Bring back the session saved by a previous login so a page reload stays authenticated.
   useEffect(() => {
@@ -112,8 +110,14 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const isDashboard = DASHBOARD_PATHS.some((path) => pathname.startsWith(path));
   // The viewer's discovery and browse pages carry their own navbar.
   const isHome = pathname === '/' || pathname === '/phim';
-  // The chat assistant and the VIP/coin panel serve members; staff-side accounts never see them.
+  // The chat assistant and the wallet serve members; staff-side accounts never see them.
   const isMemberSide = !user || user.role === 'user' || user.role === 'vip';
+  const userId = user?.id;
+
+  // A member's wallet and plan live on the BE; reload them for each signed-in member.
+  useEffect(() => {
+    if (userId && isMemberSide) syncAccount().catch(() => undefined);
+  }, [userId, isMemberSide, syncAccount]);
 
   return (
     <>
@@ -136,12 +140,12 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
 
       <AuthModal />
       <DailyCheckInModal />
+      <RewardSpinModal />
       <DepositModal />
       <UnlockEpisodeModal />
 
       {isMemberSide && !isDashboard && (
         <>
-          <DemoControlPanel />
           <SupportChatWidget />
         </>
       )}

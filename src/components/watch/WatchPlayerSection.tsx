@@ -19,9 +19,7 @@ interface WatchPlayerSectionProps {
 }
 
 export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProps) {
-  const { currentMovie, isVIPMode, subscription, openUnlockModal, selectEpisode, isCatalogLoading } = useAppStore();
-  // An active membership opens every episode, like VIP (MF-2).
-  const hasPass = isVIPMode || subscription?.status === 'active';
+  const { currentMovie, openUnlockModal, selectEpisode, isCatalogLoading } = useAppStore();
   const videoRef = useRef<HTMLVideoElement>(null);
   // The episode picked in the list (for the route it was picked on) and the version picked for it.
   const [picked, setPicked] = useState<{ route?: string; episodeId: string } | null>(null);
@@ -41,10 +39,9 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   const activeVersion =
     pickedVersion && pickedVersion.episodeId === currentEpisode?.id ? pickedVersion.version : defaultVersion(currentEpisode);
 
-  // Can the user play this episode?
-  const canPlay = currentEpisode
-    ? hasPass || currentEpisode.isFree || currentEpisode.isUnlocked
-    : false;
+  // Free starters play at once; anything else plays once the BE access decision granted it (MF-2),
+  // which the unlock modal records as isUnlocked — a running plan included.
+  const canPlay = currentEpisode ? currentEpisode.isFree || currentEpisode.isUnlocked : false;
 
   // Stream URL: use active version's HLS URL if available, else episode default
   const streamUrl = activeVersion ? activeVersion.hlsUrl : currentEpisode?.hlsUrl;
@@ -73,7 +70,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   }, [canPlay, currentEpisode, openUnlockModal]);
 
   const handleEpisodeClick = (ep: Episode) => {
-    const canPlayEp = hasPass || ep.isFree || ep.isUnlocked;
+    const canPlayEp = ep.isFree || ep.isUnlocked;
     if (canPlayEp) {
       setPicked({ route: episodeId, episodeId: ep.id });
       setPickedVersion(null);
@@ -139,7 +136,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                   <h3 className="text-xl font-bold text-white mb-2">Tập Phim Đang Bị Khóa</h3>
                   <p className="text-muted-light mb-5 text-xs sm:text-sm leading-relaxed">
                     {currentEpisode.isPreview
-                      ? 'Bạn chỉ được xem thử 30 giây đầu. Mở khóa bằng Coin hoặc nâng cấp Hội viên VIP để xem trọn bộ.'
+                      ? 'Bạn chỉ được xem thử 30 giây đầu. Mở khóa bằng Coin hoặc đăng ký gói Tháng để xem trọn bộ.'
                       : 'Mở khóa tập phim bằng Coin để thưởng thức nội dung AI đỉnh cao.'}
                   </p>
                   <button
@@ -181,11 +178,6 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
               <span className="px-3 py-1 rounded-md bg-ruby/20 border border-ruby/30 text-ruby text-xs font-bold">
                 Tập {currentEpisode.episodeNumber}
               </span>
-              {isVIPMode && (
-                <span className="px-3 py-1 rounded-md bg-coin/20 border border-coin/30 text-coin text-xs font-bold">
-                  👑 VIP Member
-                </span>
-              )}
               {currentEpisode.qualities.length > 0 && (
                 <span className="quality-badge">{currentEpisode.qualities.at(-1)}</span>
               )}
@@ -277,7 +269,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
         movie={currentMovie}
         currentEpisodeId={currentEpisode.id}
         isPlaying={isPlaying}
-        canPlay={(ep) => hasPass || ep.isFree || ep.isUnlocked}
+        canPlay={(ep) => ep.isFree || ep.isUnlocked}
         onSelect={handleEpisodeClick}
       />
     </div>

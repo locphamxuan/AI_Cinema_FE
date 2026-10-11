@@ -1,84 +1,60 @@
 import { apiClient, ApiResponse } from './apiClient';
-import type { AccessDecision, PurchaseResult, MembershipPlan } from '@/types/episodeAccess';
+import { randomId } from '@/lib/random';
+import type {
+  AccessDecision,
+  AutoRenewState,
+  MembershipPlan,
+  MySubscription,
+  PurchaseResult,
+  SubscriptionActivation,
+  SubscriptionIntent,
+} from '@/types/episodeAccess';
 
-function generateIdempotencyKey(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return 'idemp-' + Date.now() + '-' + Math.random().toString(36).substring(2, 9);
-}
+/** Sending the same key twice charges once; one key per user action. */
+const idempotent = (key: string) => ({ headers: { 'Idempotency-Key': key } });
 
 export const episodeAccessService = {
-  /**
-   * Evaluates caller's access to an episode (Guest or Member).
-   * Maps to GET /api/episodes/:episodeId/access
-   */
-  async checkAccess(episodeId: string): Promise<ApiResponse<AccessDecision>> {
+  /** GET /episodes/:episodeId/access — may this caller (Guest or Member) watch it, and if not, how. */
+  checkAccess(episodeId: string): Promise<ApiResponse<AccessDecision>> {
     return apiClient.get<AccessDecision>(`/episodes/${episodeId}/access`);
   },
 
-  /**
-   * Unlocks a single episode using Coins (main coin deducted first, then bonus coin).
-   * Maps to POST /api/episodes/:episodeId/purchase
-   */
-  async purchaseEpisode(
-    episodeId: string,
-    idempotencyKey: string = generateIdempotencyKey()
-  ): Promise<ApiResponse<PurchaseResult>> {
-    return apiClient.post<PurchaseResult>(
-      `/episodes/${episodeId}/purchase`,
-      {},
-      {
-        headers: {
-          'Idempotency-Key': idempotencyKey,
-        },
-      }
-    );
+  /** POST /episodes/:episodeId/purchase — unlock one episode with Coins, main before bonus. */
+  purchaseEpisode(episodeId: string, key = randomId('ep-')): Promise<ApiResponse<PurchaseResult>> {
+    return apiClient.post<PurchaseResult>(`/episodes/${episodeId}/purchase`, {}, idempotent(key));
   },
 
-  /**
-   * Purchases an entire series/season at a bundle discount.
-   * Maps to POST /api/movies/:movieId/purchase
-   */
-  async purchaseSeries(
-    movieId: string,
-    idempotencyKey: string = generateIdempotencyKey()
-  ): Promise<ApiResponse<any>> {
-    return apiClient.post(
-      `/movies/${movieId}/purchase`,
-      {},
-      {
-        headers: {
-          'Idempotency-Key': idempotencyKey,
-        },
-      }
-    );
-  },
-
-  /**
-   * Fetches active Membership Plans (Monthly Plan, etc.).
-   * Maps to GET /api/membership-plans
-   */
-  async getPlans(): Promise<ApiResponse<MembershipPlan[]>> {
+  /** GET /membership-plans — the plans on sale, free tier included. */
+  getPlans(): Promise<ApiResponse<MembershipPlan[]>> {
     return apiClient.get<MembershipPlan[]>('/membership-plans');
   },
 
   /**
-   * Quotes and activates a subscription plan using Coins.
-   * Maps to POST /api/subscriptions
+   * Joining a plan is two calls on the BE: POST /subscriptions only quotes a PENDING intent,
+   * POST /subscriptions/:id/activate takes the Coins and starts the period. A wallet short of
+   * Coins answers 422 on the second call and the intent stays PENDING.
    */
-  async subscribePlan(
-    planId: string,
-    idempotencyKey: string = generateIdempotencyKey()
-  ): Promise<ApiResponse<any>> {
-    return apiClient.post(
-      '/subscriptions',
-      { planId },
-      {
-        headers: {
-          'Idempotency-Key': idempotencyKey,
-        },
-      }
+  async joinPlan(planId: string, key = randomId('plan-')): Promise<ApiResponse<SubscriptionActivation>> {
+    const intent = await apiClient.post<SubscriptionIntent>('/subscriptions', { planId }, idempotent(`${key}:quote`));
+    if (!intent.success) return { ...intent, data: null as unknown as SubscriptionActivation };
+    return apiClient.post<SubscriptionActivation>(
+      `/subscriptions/${intent.data.id}/activate`,
+      {},
+      idempotent(`${key}:pay`),
     );
+  },
+
+  /** GET /subscriptions/me — null when the member has no open plan. */
+  getMySubscription(): Promise<ApiResponse<MySubscription | null>> {
+    return apiClient.get<MySubscription | null>('/subscriptions/me');
+  },
+
+  /** Stop auto-renew; the BE refuses it inside the last 24 h before renewal (BR-30). */
+  cancelAutoRenew(subscriptionId: string): Promise<ApiResponse<AutoRenewState>> {
+    return apiClient.post<AutoRenewState>(`/subscriptions/${subscriptionId}/cancel-auto-renew`);
+  },
+
+  resumeAutoRenew(subscriptionId: string): Promise<ApiResponse<AutoRenewState>> {
+    return apiClient.post<AutoRenewState>(`/subscriptions/${subscriptionId}/resume-auto-renew`);
   },
 };

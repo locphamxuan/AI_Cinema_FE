@@ -42,7 +42,7 @@ export default function RightSidebar() {
       icon: Crown,
       iconColor: 'text-amber-400 group-hover:text-amber-300',
       iconBg: 'bg-amber-400/10 border-amber-400/20 group-hover:bg-amber-400/20',
-      badge: isVIPMode ? 'VIP Active' : 'Nâng cấp',
+      badge: isVIPMode ? 'Đang dùng' : 'Nâng cấp',
       badgeColor: isVIPMode
         ? 'bg-amber-400/15 text-amber-300 border-amber-400/30'
         : 'bg-ruby/20 text-ruby-300 border-ruby/40 hover:bg-ruby hover:text-white',
@@ -115,7 +115,9 @@ export default function RightSidebar() {
 
       {/* 2. Dimmed Blurred Backdrop Overlay */}
       {isRightSidebarOpen && (
-        <div
+        <button
+          type="button"
+          aria-label="Đóng menu"
           onClick={closeRightSidebar}
           className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 animate-fade-in cursor-pointer"
         />

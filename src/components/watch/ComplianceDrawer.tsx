@@ -12,14 +12,13 @@ export default function ComplianceDrawer({ isOpen, onClose, compliance }: Compli
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50" onClick={onClose}>
+    <div className="fixed inset-0 z-50">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60" />
+      <button type="button" aria-label="Đóng" className="absolute inset-0 bg-black/60 cursor-default" onClick={onClose} />
 
       {/* Drawer */}
       <div
         className="absolute bottom-0 left-0 right-0 glass-card rounded-t-2xl p-6 animate-slide-up max-h-[70vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Handle bar */}
         <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-5" />

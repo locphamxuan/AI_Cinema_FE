@@ -68,6 +68,7 @@ export function EpisodeRowsEditor({
             aria-label={`Tên tập ${firstNumber + i}`}
             maxLength={255}
             className={`${fieldInputClass} py-1.5 min-w-0 flex-1`}
+            style={{ width: 'auto', flex: '1 1 12rem', minWidth: '8rem' }}
           />
           <input
             type="number"
@@ -77,6 +78,7 @@ export function EpisodeRowsEditor({
             onChange={(e) => update(i, { minutes: Number(e.target.value) })}
             aria-label={`Thời lượng mục tiêu tập ${firstNumber + i} (phút)`}
             className={`${fieldInputClass} py-1.5 w-20 text-center`}
+            style={{ width: '5rem', flex: '0 0 5rem' }}
           />
           <span className="text-[11px] text-slate-500 shrink-0">phút</span>
           <input
@@ -87,6 +89,7 @@ export function EpisodeRowsEditor({
             aria-label={`Thời hạn tập ${firstNumber + i}`}
             title="Thời hạn — studio phải giao tập này trước ngày này"
             className={`${fieldInputClass} py-1.5 w-40 ${ep.milestone && !milestoneValid(ep.milestone) ? 'border-rose-500' : ''}`}
+            style={{ width: '10rem', flex: '0 0 10rem' }}
           />
           <Button
             type="button"

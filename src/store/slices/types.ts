@@ -1,18 +1,7 @@
 import type { WebRole } from '@/lib/permissions';
 import { WalletState, CheckInStreak } from '@/types/wallet';
 import { Movie } from '@/types/movie';
-import { UserSubscription, SubscriptionPlan } from '@/types/subscription';
-import { Transaction } from '@/types/transaction';
 import { ChatMessage, ChatPhase, SupportTicket } from '@/types/chat';
-
-export const emptySubscription: UserSubscription = {
-  plan: null,
-  status: 'none',
-  startDate: null,
-  endDate: null,
-  autoRenew: false,
-  paymentMethod: '',
-};
 
 export interface UserProfile {
   id: string;
@@ -50,21 +39,23 @@ export interface ThemeSlice {
   toggleTheme: () => void;
 }
 
-export interface VipModeSlice {
+export interface AccountSlice {
+  /** The member's monthly plan is running (from GET /subscriptions/me): every episode is open. */
   isVIPMode: boolean;
-  toggleVIPMode: () => void;
+  /** Reloads the wallet and the plan from the BE. */
+  syncAccount: () => Promise<void>;
 }
 
 export interface WalletSlice {
   wallet: WalletState;
   checkInStreak: CheckInStreak;
-  claimDailyCheckIn: () => boolean;
+  /** Records a check-in the API already credited: flags today, never touches the wallet. */
+  markCheckedInToday: (streakDay: number) => void;
   syncCheckInStreak: () => void;
   setWalletBalance: (main: number, bonus: number) => void;
   isDepositModalOpen: boolean;
   openDepositModal: () => void;
   closeDepositModal: () => void;
-  depositCoins: (amountVND: number, mainCoin: number, bonusCoin: number, method: string) => void;
 }
 
 export interface CatalogGenre {
@@ -82,25 +73,12 @@ export interface MovieSlice {
   /** Movie that contains the episode being watched, or null until the catalog has it. */
   currentMovie: Movie | null;
   selectEpisode: (episodeId: string) => Promise<void>;
-  unlockEpisode: (episodeId: string) => { success: boolean; error?: string };
+  /** Flags an episode the API already granted (bought, plan, free); the wallet is left alone. */
+  markEpisodeUnlocked: (episodeId: string) => void;
   isUnlockModalOpen: boolean;
   selectedEpisodeId: string | null;
   openUnlockModal: (episodeId: string) => void;
   closeUnlockModal: () => void;
-}
-
-export interface SubscriptionSlice {
-  subscription: UserSubscription;
-  toggleAutoRenew: () => void;
-  cancelSubscription: () => { success: boolean; message: string; cancelledBefore24h: boolean };
-  activateSubscription: (plan: SubscriptionPlan, paymentMethod?: string) => { success: boolean; message?: string };
-  simulateExpiryTime: (hoursRemaining: number) => void;
-  renewSubscription: () => { success: boolean; message: string };
-}
-
-export interface TransactionSlice {
-  transactions: Transaction[];
-  addTransaction: (tx: Omit<Transaction, 'id' | 'createdAt'>) => void;
 }
 
 export interface ChatSlice {
@@ -122,6 +100,9 @@ export interface UiModalsSlice {
   toggleRightSidebar: () => void;
   isCheckInModalOpen: boolean;
   setCheckInModalOpen: (open: boolean) => void;
+  isRewardSpinModalOpen: boolean;
+  openRewardSpinModal: () => void;
+  closeRewardSpinModal: () => void;
 }
 
 export interface SearchFilterSlice {
@@ -137,11 +118,9 @@ export interface SearchFilterSlice {
 
 export type AppState = AuthSlice &
   ThemeSlice &
-  VipModeSlice &
+  AccountSlice &
   WalletSlice &
   MovieSlice &
-  SubscriptionSlice &
-  TransactionSlice &
   ChatSlice &
   UiModalsSlice &
   SearchFilterSlice;
