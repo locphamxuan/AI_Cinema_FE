@@ -192,6 +192,12 @@ export interface PlatformSettings {
   episodeCoinPriceMax: number;
   bonusCoinExpiryDays: number;
   playbackHeartbeatTimeoutSeconds: number;
+  subscriptionCancelWindowHours: number;
+  planRenewalGraceHours: number;
+  newMemberBonusCoins: number;
+  coinTopUpMinVnd: number;
+  coinTopUpMaxVnd: number;
+  refundOnRemoval: boolean;
   updatedAt?: string;
 }
 
