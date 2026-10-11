@@ -48,6 +48,16 @@ export const createMovieSlice: StateCreator<AppState, [], [], MovieSlice> = (set
     set({ currentMovie: findMovieByEpisode(get().movies, episodeId) });
   },
 
+  markEpisodeUnlocked: (episodeId) =>
+    set((s) => {
+      if (!s.currentMovie) return {};
+      const unlocked: Movie = {
+        ...s.currentMovie,
+        episodes: s.currentMovie.episodes.map((ep) => (ep.id === episodeId ? { ...ep, isUnlocked: true } : ep)),
+      };
+      return { currentMovie: unlocked, movies: s.movies.map((m) => (m.id === unlocked.id ? unlocked : m)) };
+    }),
+
   unlockEpisode: (episodeId) => {
     const state = get();
     const movie = state.currentMovie;
