@@ -1,6 +1,6 @@
 /**
- * AI Cinema - Main Flow 2: Episode Access, Monetization & Payment Types
- * Aligns 1-to-1 with Backend src/modules/episode-access
+ * Main Flow 2 — Episode Access & Monetization. Mirrors the BE responses of
+ * src/modules/episode-access one-to-one; field names are the BE ones.
  */
 
 export type AccessSourceName =
@@ -42,9 +42,10 @@ export interface AccessRequired {
   enoughForPlan?: boolean;
 }
 
+/** GET /episodes/:episodeId/access */
 export interface AccessDecision {
   episodeId: string;
-  movieId?: string;
+  movieId: string;
   accessGranted: boolean;
   source: AccessSourceName;
   actorType: ActorType;
@@ -54,54 +55,129 @@ export interface AccessDecision {
   nextAction: NextAction;
 }
 
+export interface CoinSplit {
+  mainCoins: number;
+  bonusCoins: number;
+}
+
+/** POST /episodes/:episodeId/purchase and POST /movies/:movieId/series-purchase */
 export interface PurchaseResult {
   episodeId?: string;
   movieId?: string;
   paidCoins: number;
-  charged: { mainCoins: number; bonusCoins: number };
+  charged: CoinSplit;
   mainBalance: number;
   bonusBalance: number;
-  access?: { source: AccessSourceName; grantedAt: string | Date };
+  access?: { source: AccessSourceName; grantedAt: string };
   accessGranted: boolean;
   unlockedEpisodes?: number;
   idempotent?: boolean;
-  message?: string;
 }
 
+/** GET /membership-plans — `features` is free-form JSON the Admin sets. */
 export interface MembershipPlan {
   id: string;
   code: string;
   name: string;
-  description?: string;
-  priceCoins: number;
+  description: string | null;
+  period: 'WEEKLY' | 'MONTHLY' | 'YEARLY';
   durationDays: number;
-  badge?: string;
-  features?: string[];
-  isPopular?: boolean;
+  isFree: boolean;
+  isActive: boolean;
+  isFeatured: boolean;
+  sortOrder: number;
+  features: unknown;
+  priceCoins: number | null;
 }
 
-export interface CoinTopUpOrder {
+/** POST /subscriptions — a quote; no Coin has moved yet. */
+export interface SubscriptionIntent {
   id: string;
-  orderCode: string;
-  provider: 'vnpay' | 'momo';
+  planId: string;
+  planCode: string;
+  status: string;
+  priceCoins: number;
+  mainBalance: number;
+  bonusBalance: number;
+  enoughCoins: boolean;
+  missingCoins: number;
+  currentPeriodEnd: string;
+}
+
+/** POST /subscriptions/:id/activate — the first cycle is paid. */
+export interface SubscriptionActivation {
+  id: string;
+  status: string;
+  priceCoins: number;
+  charged: CoinSplit;
+  mainBalance: number;
+  bonusBalance: number;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  nextRenewalAt: string | null;
+  cycleNumber: number;
+  episodeAccessGranted: boolean;
+}
+
+export type TopUpStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'EXPIRED';
+export type PaymentProvider = 'VNPAY' | 'MOMO';
+
+/** POST /wallet/top-ups, GET /wallet/top-ups/:topUpId */
+export interface CoinTopUp {
+  topUpId: string;
+  provider: PaymentProvider | null;
+  providerTxnId: string | null;
   amountVnd: number;
-  coinsExpected: number;
-  bonusCoinsExpected: number;
-  status: 'PENDING' | 'SUCCESS' | 'EXPIRED' | 'FAILED';
-  paymentUrl?: string;
-  createdAt: string;
+  coinsGranted: number;
+  rateVnd: number;
+  status: TopUpStatus;
+  redirectUrl: string | null;
+  failureReason: string | null;
+  paidAt: string | null;
+  expiresAt: string | null;
+}
+
+/** GET /wallet/top-ups/options */
+export interface TopUpOptions {
+  rateVnd: number;
+  minVnd: number;
+  maxVnd: number;
+}
+
+export interface ExpiringBonus {
+  lotId: string;
+  amount: number;
   expiresAt: string;
 }
 
+/** GET /daily-rewards/status */
 export interface DailyRewardStatus {
-  hasCheckedInToday: boolean;
-  currentStreak: number;
-  maxStreak: number;
-  todayRewardCoins: number;
-  ladder: {
-    dayIndex: number;
-    coins: number;
-    isToday: boolean;
-    isClaimed: boolean;
-  }[];
+  checkInDate: string;
+  checkedInToday: boolean;
+  streakDay: number;
+  streakContinued: boolean;
+  reward: { coins: number; bonusCoins: number };
+  ladder: { streakDay: number; coins: number; bonusCoins: number }[];
+  mainBalance: number;
+  bonusBalance: number;
+  expiringBonus: ExpiringBonus[];
+}
+
+/** POST /daily-rewards/check-in */
+export interface CheckInResult {
+  checkInDate: string;
+  streakDay: number;
+  streakContinued: boolean;
+  coinsGranted: number;
+  bonusGranted: number;
+  mainBalance: number;
+  bonusBalance: number;
+}
+
+/** GET /wallet */
+export interface WalletBalance {
+  mainBalance: number;
+  bonusBalance: number;
+  version: number;
+  expiringBonus: ExpiringBonus[];
 }
