@@ -94,7 +94,10 @@ export function SpinWheel({ prizes, rotation, spinning }: { prizes: RewardPrize[
                   dominantBaseline="middle"
                   transform={`rotate(${(mid * 180) / Math.PI + 90}, ${tx}, ${ty})`}
                 >
-                  {prizeLabel(p)}
+                  <>
+                    <tspan x={tx} dy="-0.25em">{prizeLabel(p)}</tspan>
+                    <tspan x={tx} dy="1.2em" fontSize="9">{p.chancePercent ?? 0}%</tspan>
+                  </>
                 </text>
               </g>
             );

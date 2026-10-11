@@ -58,28 +58,15 @@ describe('rewardSpinService', () => {
     expect(headerOf(init, 'Idempotency-Key')).toBe('custom-key-123');
   });
 
-  it('supports admin reward prize endpoints', async () => {
-    const fetchMock = mockFetch(
-      { body: [{ id: 'p1', name: '50 Coin', weight: 80 }] },
-      { body: { id: 'p2', name: '3 ngày gói', weight: 20 }, status: 201 },
-      { body: { id: 'p1', weight: 90 }, status: 200 },
-    );
+  it('supports listing fixed reward prizes and editing a Coin amount', async () => {
+    const fetchMock = mockFetch({ body: [{ id: 'p1', name: '50 Coin', weight: 11 }] }, { body: { id: 'p1', bonusCoins: 60 } });
 
     const listRes = await rewardSpinService.getAdminPrizes();
     expect(listRes.data[0].id).toBe('p1');
 
-    const createRes = await rewardSpinService.createPrize({
-      code: 'plan_3d',
-      name: '3 ngày gói',
-      type: 'PLAN_DAYS',
-      planDays: 3,
-      weight: 20,
-    });
-    expect(createRes.data.id).toBe('p2');
+    const updateRes = await rewardSpinService.updatePrize('p1', { bonusCoins: 60 });
+    expect(updateRes.data.bonusCoins).toBe(60);
 
-    const updateRes = await rewardSpinService.updatePrize('p1', { weight: 90 });
-    expect(updateRes.data.weight).toBe(90);
-
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

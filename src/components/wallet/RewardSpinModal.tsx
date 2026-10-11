@@ -141,7 +141,7 @@ function SpinDialog() {
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
             <div>
               <h2 className="text-xl font-black text-white">🎯 Vòng Quay May Mắn</h2>
-              <p className="text-xs text-muted-light mt-0.5">Mỗi lượt quay trúng Coin thưởng hoặc thêm ngày gói Tháng</p>
+              <p className="text-xs text-muted-light mt-0.5">9 ô Coin và 1 ô gói Tháng 30 ngày (cơ hội trúng 2%)</p>
             </div>
             <button
               type="button"
@@ -192,7 +192,7 @@ function SpinDialog() {
               <p className="text-xs text-verified/90 mt-1">
                 {lastWon.bonusCoins
                   ? `+${lastWon.bonusCoins} Coin thưởng đã được cộng vào ví của bạn.`
-                  : `+${lastWon.planDays} ngày gói Tháng${planUntil(lastWon.planActiveUntil)}.`}
+                  : `Chúc mừng! Gói Tháng 30 ngày đã được kích hoạt${planUntil(lastWon.planActiveUntil)}.`}
               </p>
             </div>
           )}

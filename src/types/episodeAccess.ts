@@ -204,6 +204,7 @@ export interface RewardPrize {
   bonusCoins: number | null;
   planDays: number | null;
   weight?: number;
+  chancePercent?: number;
   isActive?: boolean;
   createdAt?: string;
 }

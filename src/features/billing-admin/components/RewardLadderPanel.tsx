@@ -23,7 +23,7 @@ export function RewardLadderPanel() {
   return (
     <Panel
       title="Điểm danh hằng ngày"
-      description="Điểm danh chỉ trả Coin thưởng (có hạn dùng). Bỏ một ngày thì chuỗi quay về ngày 1; ngày mốc tặng thêm một lượt quay."
+      description="Bỏ lỡ một ngày thì chuỗi bắt đầu lại từ ngày 1. Điểm danh đủ 7 ngày liên tục sẽ tự động tặng một lượt quay."
       actions={
         <Button size="sm" onClick={() => setEditing('new')} disabled={takenDays.size >= LADDER_LENGTH}>
           <Plus className="w-3.5 h-3.5" /> Thêm ngày
@@ -51,7 +51,7 @@ export function RewardLadderPanel() {
                 <td className="py-2 font-semibold">Ngày {rule.streakDay}</td>
                 <td className="py-2">{rule.name}</td>
                 <td className="py-2 text-right font-mono">+{rule.bonusCoins}</td>
-                <td className="py-2">{rule.grantsSpin ? '🎯 Có' : '—'}</td>
+                <td className="py-2">{rule.streakDay === LADDER_LENGTH ? '🎯 Có' : '—'}</td>
                 <td className="py-2">
                   <StatusPill label={rule.isActive ? 'Đang dùng' : 'Đã tắt'} tone={rule.isActive ? 'emerald' : 'neutral'} />
                 </td>
@@ -89,7 +89,6 @@ function RuleModal({
     name: rule?.name ?? '',
     streakDay: String(rule?.streakDay ?? firstFree),
     bonusCoins: String(rule?.bonusCoins ?? ''),
-    grantsSpin: rule?.grantsSpin ?? false,
     isActive: rule?.isActive ?? true,
   });
   const { busy, run } = useAction();
@@ -102,7 +101,7 @@ function RuleModal({
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const input = { name: form.name.trim(), streakDay: day, bonusCoins: coins, grantsSpin: form.grantsSpin };
+    const input = { name: form.name.trim(), streakDay: day, bonusCoins: coins, grantsSpin: day === LADDER_LENGTH };
     const done = rule
       ? await run(() => billingAdminService.updateRewardRule(rule.id, { ...input, isActive: form.isActive }), 'Đã lưu ngày điểm danh')
       : await run(() => billingAdminService.createRewardRule({ ...input, code: form.code.trim() }), 'Đã thêm ngày điểm danh');
@@ -125,7 +124,7 @@ function RuleModal({
         </FormField>
         <div className="grid grid-cols-2 gap-3">
           <FormField label="Ngày trong chuỗi">
-            <select value={form.streakDay} onChange={(e) => set({ streakDay: e.target.value })} className={fieldInputClass}>
+            <select value={form.streakDay} onChange={(e) => set({ streakDay: e.target.value })} disabled={Boolean(rule?.isActive)} className={fieldInputClass}>
               {Array.from({ length: LADDER_LENGTH }, (_, i) => i + 1).map((d) => (
                 <option key={d} value={d}>
                   Ngày {d}
@@ -138,14 +137,11 @@ function RuleModal({
           </FormField>
         </div>
         {dayTaken && <p className="text-xs text-rose-600">Ngày {day} đã có cấu hình đang dùng; hãy sửa hoặc tắt nó trước.</p>}
-        <label className="flex items-center gap-2 text-xs">
-          <input type="checkbox" checked={form.grantsSpin} onChange={(e) => set({ grantsSpin: e.target.checked })} className="accent-purple-600" />
-          Ngày mốc: tặng thêm 1 lượt quay thưởng
-        </label>
-        {rule && (
+        <p className="text-xs text-purple-700 dark:text-purple-300">{day === LADDER_LENGTH ? 'Ngày 7 sẽ tự động tặng 1 lượt quay.' : 'Lượt quay chỉ được tặng sau 7 ngày điểm danh liên tục.'}</p>
+        {rule && !rule.isActive && (
           <label className="flex items-center gap-2 text-xs">
             <input type="checkbox" checked={form.isActive} onChange={(e) => set({ isActive: e.target.checked })} className="accent-purple-600" />
-            Đang dùng
+            Kích hoạt lại ngày này
           </label>
         )}
         <div className="flex justify-end gap-2">
