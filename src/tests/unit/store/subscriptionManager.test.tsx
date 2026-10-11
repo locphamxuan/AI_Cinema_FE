@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import SubscriptionManager from '@/components/subscription/SubscriptionManager';
 import { useAppStore } from '@/store/useAppStore';
+import { mockApi } from '@/tests/support/mockApi';
 
 const monthly = {
   id: 'plan-m',
@@ -18,23 +19,6 @@ const monthly = {
   priceCoins: 900,
 };
 const free = { ...monthly, id: 'plan-f', code: 'FREE', name: 'Gói Thường', isFree: true, priceCoins: 0 };
-
-/** Routes each fetch by method and path to a canned BE answer. */
-function mockApi(routes: Record<string, unknown>) {
-  const fetchMock = vi.fn((url: string, init?: RequestInit) => {
-    const key = `${init?.method ?? 'GET'} ${new URL(url, 'http://x').pathname.replace(/^\/api/, '')}`;
-    const body = routes[key];
-    const empty = body === null;
-    return Promise.resolve({
-      ok: key in routes,
-      status: key in routes ? 200 : 404,
-      json: async () => body,
-      headers: new Headers(empty ? { 'content-length': '0' } : {}),
-    });
-  });
-  vi.stubGlobal('fetch', fetchMock);
-  return fetchMock;
-}
 
 describe('SubscriptionManager (MF-2 membership)', () => {
   beforeEach(() => {
