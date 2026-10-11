@@ -41,6 +41,16 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
     });
   },
 
+  markCheckedInToday: (streakDay) =>
+    set((s) => ({
+      checkInStreak: {
+        ...s.checkInStreak,
+        todayClaimed: true,
+        currentStreak: streakDay,
+        lastCheckInDate: getTodayDateString(),
+      },
+    })),
+
   claimDailyCheckIn: () => {
     const state = get();
     const todayIdx = getTodayDayIndex();

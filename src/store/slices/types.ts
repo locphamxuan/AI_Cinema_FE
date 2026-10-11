@@ -59,6 +59,8 @@ export interface WalletSlice {
   wallet: WalletState;
   checkInStreak: CheckInStreak;
   claimDailyCheckIn: () => boolean;
+  /** Records a check-in the API already credited: flags today, never touches the wallet. */
+  markCheckedInToday: (streakDay: number) => void;
   syncCheckInStreak: () => void;
   setWalletBalance: (main: number, bonus: number) => void;
   isDepositModalOpen: boolean;
@@ -83,6 +85,8 @@ export interface MovieSlice {
   currentMovie: Movie | null;
   selectEpisode: (episodeId: string) => Promise<void>;
   unlockEpisode: (episodeId: string) => { success: boolean; error?: string };
+  /** Flags an episode the API already granted (bought, plan, free); the wallet is left alone. */
+  markEpisodeUnlocked: (episodeId: string) => void;
   isUnlockModalOpen: boolean;
   selectedEpisodeId: string | null;
   openUnlockModal: (episodeId: string) => void;
