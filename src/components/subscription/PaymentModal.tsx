@@ -2,6 +2,7 @@
 
 import { CreditCard, ShieldCheck, Zap } from 'lucide-react';
 import type { SubscriptionPlan } from '@/types/subscription';
+import { Backdrop } from '@/components/ui/Backdrop';
 
 interface PaymentModalProps {
   plan: SubscriptionPlan;
@@ -14,14 +15,12 @@ interface PaymentModalProps {
 /** Step 2 of MF-2: confirm the chosen plan and payment method. */
 export default function PaymentModal({ plan, method, onMethodChange, onClose, onConfirm }: PaymentModalProps) {
   return (
-    <div
+    <Backdrop
+      label="Xác nhận thanh toán"
+      onClose={onClose}
       className="fixed inset-0 bg-slate-900/60 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in"
-      onClick={onClose}
     >
-      <div
-        className="bg-white dark:bg-[#161922] w-full max-w-lg p-6 sm:p-7 rounded-3xl border border-slate-200 dark:border-white/15 shadow-2xl relative animate-scale-in"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="bg-white dark:bg-[#161922] w-full max-w-lg p-6 sm:p-7 rounded-3xl border border-slate-200 dark:border-white/15 shadow-2xl relative animate-scale-in">
         <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-white/10 mb-5">
           <div>
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Xác Nhận Thanh Toán & Kích Hoạt</h3>
@@ -157,6 +156,6 @@ export default function PaymentModal({ plan, method, onMethodChange, onClose, on
           </button>
         </div>
       </div>
-    </div>
+    </Backdrop>
   );
 }

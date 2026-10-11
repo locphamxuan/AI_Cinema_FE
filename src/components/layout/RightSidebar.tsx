@@ -115,7 +115,9 @@ export default function RightSidebar() {
 
       {/* 2. Dimmed Blurred Backdrop Overlay */}
       {isRightSidebarOpen && (
-        <div
+        <button
+          type="button"
+          aria-label="Đóng menu"
           onClick={closeRightSidebar}
           className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 animate-fade-in cursor-pointer"
         />

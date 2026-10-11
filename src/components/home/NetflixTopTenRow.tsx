@@ -3,6 +3,7 @@
 import { useRef } from 'react';
 import { ChevronLeft, ChevronRight, Play,  ShieldCheck } from 'lucide-react';
 import type { Movie } from '@/types/movie';
+import { onActivateKey } from '@/lib/a11y';
 
 interface NetflixTopTenRowProps {
   movies: Movie[];
@@ -62,7 +63,10 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
               <div
                 key={movie.id}
                 className="group/card relative flex items-center flex-shrink-0 cursor-pointer select-none transition-transform duration-300 hover:scale-105 hover:z-30"
+                role="button"
+                tabIndex={0}
                 onClick={() => onOpenDetail(movie)}
+                onKeyDown={onActivateKey(() => onOpenDetail(movie))}
               >
                 {/* Giant Stylized Rank Number (Netflix Metallic Typography) */}
                 <div className="relative z-0 select-none pointer-events-none -mr-4 sm:-mr-8">
