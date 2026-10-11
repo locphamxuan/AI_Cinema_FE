@@ -11,7 +11,7 @@ import { formatBytes, saveBlob } from '../../lib/format';
 import { Empty, Panel } from '../shared/ui';
 import { useProject } from './ProjectContext';
 
-const IDEA_ACCEPT = '.pdf,.docx,.png,.jpg,.jpeg,.webp';
+const IDEA_ACCEPT = '.pdf,.docx,.txt,.png,.jpg,.jpeg,.webp,text/plain';
 
 /** Idea files that travel with the studio brief; the Reviewer uploads and removes them while the project is open. */
 export function IdeaFilesPanel({ canManage }: { canManage: boolean }) {
@@ -42,7 +42,7 @@ export function IdeaFilesPanel({ canManage }: { canManage: boolean }) {
   return (
     <Panel
       title="File ý tưởng"
-      description="Đi kèm brief gửi studio. PDF, DOCX hoặc ảnh, tối đa 20 MB; tải lại cùng tên sẽ tạo phiên bản mới."
+      description="Đi kèm brief gửi studio. PDF, DOCX, TXT mã hóa UTF-8 hoặc ảnh, tối đa 20 MB; tải lại cùng tên sẽ tạo phiên bản mới."
       actions={
         canManage && (
           <>

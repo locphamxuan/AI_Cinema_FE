@@ -5,7 +5,7 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
 import { useAction } from '@/features/production/hooks/useAction';
-import { formatDateTime } from '@/features/production/lib/format';
+import { formatDateTime, formatNumber } from '@/features/production/lib/format';
 import { Panel } from '@/features/production/components/shared/ui';
 import { studioPortalService } from '@/services/studioPortalService';
 import type { StudioPortalOverview } from '@/types/studio-portal';
@@ -63,7 +63,10 @@ export function RespondPanel({
   };
 
   return (
-    <Panel title="Xác nhận nhận dự án" description="Đọc brief và hạn giao bên dưới trước khi trả lời. Chỉ trả lời được một lần.">
+    <Panel
+      title="Xác nhận nhận dự án"
+      description={`Ngân sách sản xuất: ${formatNumber(overview.project.productionFeeTokens)} Token. Đọc brief và hạn giao trước khi trả lời; chỉ trả lời được một lần.`}
+    >
       {declining ? (
         <div className="space-y-3">
           <FormField label="Lý do từ chối (người phụ trách sẽ chọn studio khác)">

@@ -91,6 +91,7 @@ describe('StudioPortalPage', () => {
     mockFetch(overview());
     render(<StudioPortalPage />);
 
+    expect(await screen.findByText(/Ngân sách sản xuất: 20\.000 Token/)).toBeInTheDocument();
     const accept = await screen.findByRole('button', { name: /Nhận dự án/ });
     expect(accept).toBeDisabled();
     await userEvent.click(screen.getByRole('checkbox', { name: /đồng ý các điều khoản/ }));
