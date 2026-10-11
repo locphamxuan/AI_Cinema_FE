@@ -5,6 +5,7 @@ import { Clapperboard, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
+import { toast } from '@/components/ui/Toast';
 import { productionService } from '@/services/productionService';
 import { useAction } from '../../hooks/useAction';
 import {
@@ -36,11 +37,15 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
 
   // Episodes are numbered across the whole movie (BR-03).
   const firstNumbers = seasons.map((_, i) => 1 + seasons.slice(0, i).reduce((n, s) => n + s.episodes.length, 0));
-  const valid =
-    title.trim() &&
-    idea.trim().length >= MIN_IDEA_LENGTH &&
-    genreIds.length > 0 &&
-    seasons.every((s) => episodesValid(s.episodes));
+  const validationIssues = [
+    !title.trim() ? 'nhập tên phim' : null,
+    idea.trim().length < MIN_IDEA_LENGTH ? `mô tả ý tưởng có ít nhất ${MIN_IDEA_LENGTH} ký tự` : null,
+    genreIds.length === 0 ? 'chọn ít nhất một thể loại' : null,
+    seasons.some((s) => !episodesValid(s.episodes))
+      ? 'điền tiêu đề, thời lượng từ 1 đến 720 phút và hạn giao không ở quá khứ cho mọi tập'
+      : null,
+  ].filter((issue): issue is string => issue !== null);
+  const valid = validationIssues.length === 0;
 
   // Milestones follow the episode order across seasons.
   const fillMilestones = (first: string, gapDays: number) => {
@@ -52,18 +57,22 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!valid) return;
-    const created = await run(
-      () =>
-        productionService.createProject({
-          title: title.trim(),
-          ideaDescription: idea.trim(),
-          genreIds,
-          defaultLanguage: language,
-          seasons: seasons.map((s) => ({ title: s.title.trim() || undefined, episodes: s.episodes.map(toEpisodeInput) })),
-        }),
-      'Đã tạo dự án',
-    );
-    if (created) onCreated(created.id);
+    try {
+      const created = await run(
+        () =>
+          productionService.createProject({
+            title: title.trim(),
+            ideaDescription: idea.trim(),
+            genreIds,
+            defaultLanguage: language,
+            seasons: seasons.map((s) => ({ title: s.title.trim() || undefined, episodes: s.episodes.map(toEpisodeInput) })),
+          }),
+        'Đã tạo dự án',
+      );
+      if (created) onCreated(created.id);
+    } catch {
+      toast.error('Không tạo được dự án', 'Không kết nối được tới máy chủ. Vui lòng kiểm tra kết nối rồi thử lại.');
+    }
   };
 
   return (
@@ -128,13 +137,20 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
           </Button>
         </fieldset>
 
-        <div className="flex justify-end gap-2 pt-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Huỷ
-          </Button>
-          <Button type="submit" disabled={!valid || busy}>
-            Tạo dự án
-          </Button>
+        <div className="space-y-2 pt-2">
+          {validationIssues.length > 0 && (
+            <p role="status" className="text-xs text-amber-600 dark:text-amber-400">
+              Cần hoàn tất: {validationIssues.join('; ')}.
+            </p>
+          )}
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="secondary" onClick={onClose}>
+              Huỷ
+            </Button>
+            <Button type="submit" disabled={!valid || busy}>
+              Tạo dự án
+            </Button>
+          </div>
         </div>
       </form>
     </Modal>
