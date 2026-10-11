@@ -64,7 +64,6 @@ export interface PurchaseResult {
   bonusBalance: number;
   access?: { source: AccessSourceName; grantedAt: string };
   accessGranted: boolean;
-  unlockedEpisodes?: number;
   idempotent?: boolean;
 }
 
