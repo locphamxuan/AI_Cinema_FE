@@ -1,7 +1,6 @@
 import type { WebRole } from '@/lib/permissions';
 import { WalletState, CheckInStreak } from '@/types/wallet';
 import { Movie } from '@/types/movie';
-import { Transaction } from '@/types/transaction';
 import { ChatMessage, ChatPhase, SupportTicket } from '@/types/chat';
 
 export interface UserProfile {
@@ -82,11 +81,6 @@ export interface MovieSlice {
   closeUnlockModal: () => void;
 }
 
-export interface TransactionSlice {
-  transactions: Transaction[];
-  addTransaction: (tx: Omit<Transaction, 'id' | 'createdAt'>) => void;
-}
-
 export interface ChatSlice {
   chatMessages: ChatMessage[];
   chatPhase: ChatPhase;
@@ -127,7 +121,6 @@ export type AppState = AuthSlice &
   AccountSlice &
   WalletSlice &
   MovieSlice &
-  TransactionSlice &
   ChatSlice &
   UiModalsSlice &
   SearchFilterSlice;

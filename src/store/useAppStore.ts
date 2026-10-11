@@ -7,7 +7,6 @@ import { createThemeSlice } from './slices/themeSlice';
 import { createAccountSlice } from './slices/accountSlice';
 import { createWalletSlice } from './slices/walletSlice';
 import { createMovieSlice } from './slices/movieSlice';
-import { createTransactionSlice } from './slices/transactionSlice';
 import { createChatSlice } from './slices/chatSlice';
 import { createUiModalsSlice } from './slices/uiModalsSlice';
 import { createSearchFilterSlice } from './slices/searchFilterSlice';
@@ -21,7 +20,6 @@ export const useAppStore = create<AppState>()(
       ...createAccountSlice(set, get, api),
       ...createWalletSlice(set, get, api),
       ...createMovieSlice(set, get, api),
-      ...createTransactionSlice(set, get, api),
       ...createChatSlice(set, get, api),
       ...createUiModalsSlice(set, get, api),
       ...createSearchFilterSlice(set, get, api),
@@ -49,7 +47,6 @@ export const useAppStore = create<AppState>()(
         theme: state.theme,
         wallet: state.wallet,
         checkInStreak: state.checkInStreak,
-        transactions: state.transactions,
       }),
     }
   )
