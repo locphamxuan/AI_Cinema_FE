@@ -157,7 +157,6 @@ export interface RevenueReport {
   to: string;
   totals: { paidCycles: number; coins: number; mainCoins: number; bonusCoins: number };
   byPlan: { plan: { id: string; code: string; name: string }; cycles: number; coins: number; mainCoins: number; bonusCoins: number }[];
-  byDay?: { date: string; cycles: number; mainCoins: number; bonusCoins: number }[];
 }
 
 /** GET /admin/reports/churn */
