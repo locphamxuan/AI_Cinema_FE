@@ -19,6 +19,8 @@ export interface UpdateRewardPrizeDto {
   planDays?: number;
 }
 
+export const newSpinIdempotencyKey = () => randomId('spin-');
+
 export const rewardSpinService = {
   /** GET /rewards/spins — available spins, wheel prizes, and recent spin history */
   getWheelStatus(): Promise<ApiResponse<RewardWheelStatus>> {
@@ -26,7 +28,7 @@ export const rewardSpinService = {
   },
 
   /** POST /rewards/spins — use oldest available spin with CSPRNG draw */
-  spin(key = randomId('spin-')): Promise<ApiResponse<SpinResult>> {
+  spin(key = newSpinIdempotencyKey()): Promise<ApiResponse<SpinResult>> {
     return apiClient.post<SpinResult>('/rewards/spins', {}, { headers: { 'Idempotency-Key': key } });
   },
 

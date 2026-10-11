@@ -73,7 +73,7 @@ describe('RewardSpinModal (BR-09)', () => {
 
     render(<RewardSpinModal />);
 
-    expect(await screen.findByText('Vòng quay chưa có giải thưởng nào.')).toBeInTheDocument();
+    expect(await screen.findByText('Chưa có giải thưởng phù hợp cho tài khoản này.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Quay ngay (2)' })).toBeDisabled();
   });
 });
