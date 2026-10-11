@@ -104,8 +104,8 @@ function PlanModal({ plan, onClose, onDone }: ModalProps & { plan: AdminPlan | n
     code: '',
     name: plan?.name ?? '',
     description: plan?.description ?? '',
-    period: plan?.period ?? ('MONTHLY' as PlanPeriod),
-    durationDays: String(plan?.durationDays ?? 30),
+    period: 'MONTHLY' as PlanPeriod,
+    durationDays: String(plan?.period === 'MONTHLY' ? plan.durationDays : 30),
     sortOrder: String(plan?.sortOrder ?? 0),
     isActive: plan?.isActive ?? true,
     isFeatured: plan?.isFeatured ?? false,
@@ -158,11 +158,7 @@ function PlanModal({ plan, onClose, onDone }: ModalProps & { plan: AdminPlan | n
               }}
               className={fieldInputClass}
             >
-              {(Object.keys(PERIOD_LABEL) as PlanPeriod[]).map((p) => (
-                <option key={p} value={p}>
-                  {PERIOD_LABEL[p]}
-                </option>
-              ))}
+              <option value="MONTHLY">Tháng</option>
             </select>
           </FormField>
           <FormField label="Số ngày / kỳ">
