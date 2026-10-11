@@ -9,7 +9,6 @@ export type AccessSourceName =
   | 'FREE'
   | 'PLAN'
   | 'EPISODE_PURCHASE'
-  | 'SERIES_PURCHASE'
   | 'ADMIN_GRANT';
 
 export type ActorType = 'GUEST' | 'MEMBER';
@@ -18,22 +17,18 @@ export type AccessMethod =
   | 'REGISTER_OR_LOGIN'
   | 'MONTHLY_PLAN'
   | 'UNLOCK_EPISODE'
-  | 'UNLOCK_SERIES'
   | 'OBTAIN_COIN';
 
 export type NextAction =
   | 'REGISTER_OR_LOGIN'
   | 'OBTAIN_COIN'
   | 'UNLOCK_EPISODE'
-  | 'UNLOCK_SERIES'
   | 'MONTHLY_PLAN'
   | 'HANDOFF_TO_PLAYBACK';
 
 export interface AccessRequired {
   coinPrice: number;
   isFreeStarter?: boolean;
-  seriesCoinPrice?: number | null;
-  seriesOwned?: boolean;
   monthlyPlanCoinPrice?: number | null;
   mainBalance?: number;
   bonusBalance?: number;
@@ -60,10 +55,9 @@ export interface CoinSplit {
   bonusCoins: number;
 }
 
-/** POST /episodes/:episodeId/purchase and POST /movies/:movieId/series-purchase */
+/** POST /episodes/:episodeId/purchase */
 export interface PurchaseResult {
   episodeId?: string;
-  movieId?: string;
   paidCoins: number;
   charged: CoinSplit;
   mainBalance: number;
@@ -170,14 +164,21 @@ export interface ExpiringBonus {
   expiresAt: string;
 }
 
+export interface RewardLadderStep {
+  streakDay: number;
+  bonusCoins: number;
+  grantsSpin: boolean;
+}
+
 /** GET /daily-rewards/status */
 export interface DailyRewardStatus {
   checkInDate: string;
   checkedInToday: boolean;
   streakDay: number;
   streakContinued: boolean;
-  reward: { coins: number; bonusCoins: number };
-  ladder: { streakDay: number; coins: number; bonusCoins: number }[];
+  reward: { bonusCoins: number; grantsSpin: boolean };
+  ladder: RewardLadderStep[];
+  availableSpins: number;
   mainBalance: number;
   bonusBalance: number;
   expiringBonus: ExpiringBonus[];
@@ -188,10 +189,56 @@ export interface CheckInResult {
   checkInDate: string;
   streakDay: number;
   streakContinued: boolean;
-  coinsGranted: number;
   bonusGranted: number;
+  spinGranted: boolean;
   mainBalance: number;
   bonusBalance: number;
+}
+
+export type RewardPrizeType = 'BONUS_COIN' | 'PLAN_DAYS';
+
+export interface RewardPrize {
+  id: string;
+  code: string;
+  name: string;
+  type: RewardPrizeType;
+  bonusCoins: number | null;
+  planDays: number | null;
+  weight?: number;
+  isActive?: boolean;
+  createdAt?: string;
+}
+
+export interface RewardSpinHistoryItem {
+  id: string;
+  status: 'AVAILABLE' | 'USED' | 'EXPIRED';
+  grantedAt: string;
+  spunAt: string | null;
+  prize: RewardPrize | null;
+  bonusCoins: number | null;
+  planDays: number | null;
+}
+
+/** GET /rewards/spins */
+export interface RewardWheelStatus {
+  availableSpins: number;
+  prizes: RewardPrize[];
+  history: RewardSpinHistoryItem[];
+}
+
+/** POST /rewards/spins */
+export interface SpinResult {
+  id: string;
+  status: string;
+  grantedAt: string;
+  spunAt: string;
+  prize: RewardPrize;
+  bonusCoins: number | null;
+  planDays: number | null;
+  planActiveUntil: string | null;
+  mainBalance: number;
+  bonusBalance: number;
+  availableSpins: number;
 }
 
 /** GET /wallet */

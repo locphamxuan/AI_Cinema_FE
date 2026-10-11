@@ -62,15 +62,13 @@ describe('MF-2 services', () => {
   });
 
   it('unlocks with an idempotency key on the BE purchase routes', async () => {
-    const fetchMock = mockFetch({ body: { paidCoins: 25 }, status: 201 }, { body: { paidCoins: 200 }, status: 201 });
+    const fetchMock = mockFetch({ body: { paidCoins: 25 }, status: 201 });
 
     await episodeAccessService.purchaseEpisode('ep-1', 'k-ep');
-    await episodeAccessService.purchaseSeries('movie-1', 'k-series');
 
-    const [[episodeUrl, episodeInit], [seriesUrl]] = fetchMock.mock.calls as [string, RequestInit][];
+    const [[episodeUrl, episodeInit]] = fetchMock.mock.calls as [string, RequestInit][];
     expect(episodeUrl).toMatch(/\/episodes\/ep-1\/purchase$/);
     expect(headerOf(episodeInit, 'Idempotency-Key')).toBe('k-ep');
-    expect(seriesUrl).toMatch(/\/movies\/movie-1\/series-purchase$/);
   });
 
   it('reads the gateway redirect from the flat top-up order', async () => {

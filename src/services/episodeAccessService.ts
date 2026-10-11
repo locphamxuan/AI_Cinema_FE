@@ -24,11 +24,6 @@ export const episodeAccessService = {
     return apiClient.post<PurchaseResult>(`/episodes/${episodeId}/purchase`, {}, idempotent(key));
   },
 
-  /** POST /movies/:movieId/series-purchase — unlock every episode of a movie at its series price. */
-  purchaseSeries(movieId: string, key = randomId('series-')): Promise<ApiResponse<PurchaseResult>> {
-    return apiClient.post<PurchaseResult>(`/movies/${movieId}/series-purchase`, {}, idempotent(key));
-  },
-
   /** GET /membership-plans — the plans on sale, free tier included. */
   getPlans(): Promise<ApiResponse<MembershipPlan[]>> {
     return apiClient.get<MembershipPlan[]>('/membership-plans');
