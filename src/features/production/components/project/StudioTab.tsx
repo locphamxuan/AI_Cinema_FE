@@ -75,9 +75,19 @@ export function StudioTab() {
               <p className="text-xs text-rose-600">Studio đã từ chối dự án — hãy đổi sang studio khác.</p>
             )}
             {caps.handoff && delivering && current && current.studioResponse !== 'DECLINED' && (
-              <Button size="sm" variant="secondary" className="w-full" disabled={busy} onClick={resendLink}>
-                <LinkIcon className="w-3.5 h-3.5" aria-hidden="true" /> Gửi lại link cổng studio
-              </Button>
+              <div className="space-y-1.5">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="w-full"
+                  disabled={busy}
+                  onClick={resendLink}
+                  title="Tạo link mới, vô hiệu link cũ và gửi email mới tới studio hiện tại."
+                >
+                  <LinkIcon className="w-3.5 h-3.5" aria-hidden="true" /> Gửi link cổng studio mới
+                </Button>
+                <p className="text-[11px] text-slate-500">Dùng khi studio mất email hoặc link cũ không còn hiệu lực. Link cũ sẽ bị thay thế.</p>
+              </div>
             )}
             {caps.handoff && delivering && (
               <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>

@@ -40,7 +40,7 @@ export function HandoffCard({ handoff: h, current, onDownload }: { handoff: Stud
       </div>
       <p className="text-slate-500 dark:text-slate-400">
         {h.studioEmail}
-        {h.studioContact && ` · ${h.studioContact}`} · Phí in trong brief: {formatNumber(h.productionFeeTokens)} Token
+        {h.studioContact && ` · ${h.studioContact}`} · Ngân sách sản xuất trong brief: {formatNumber(h.productionFeeTokens)} Token
       </p>
       {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi: {h.changeReason}</p>}
       {h.studioResponse === 'DECLINED' && (
