@@ -15,6 +15,22 @@ export const PERMISSION = {
   EPISODE_PUBLISH: 'episode:publish',
   PRICE_ALERT_MANAGE: 'price-alert:manage',
   GENRE_MANAGE: 'genre:manage',
+  // MF-2 — episode access, Coin, monthly plan, rewards
+  ACCESS_EPISODE_READ: 'access.episode.read',
+  WALLET_READ: 'wallet.read',
+  WALLET_TOPUP: 'wallet.topup',
+  REWARD_CHECKIN: 'reward.checkin',
+  SUBSCRIPTION_SELF_MANAGE: 'subscription.self.manage',
+  BILLING_PLAN_MANAGE: 'billing.plan.manage',
+  BILLING_PRICE_MANAGE: 'billing.price.manage',
+  BILLING_SUBSCRIPTION_READ: 'billing.subscription.read',
+  BILLING_SUBSCRIPTION_CANCEL: 'billing.subscription.cancel',
+  COIN_WALLET_READ: 'coin.wallet.read',
+  COIN_ADJUST: 'coin.adjust',
+  COIN_TRANSACTION_READ: 'coin.transaction.read',
+  REWARD_RULE_MANAGE: 'reward.rule.manage',
+  ANALYTICS_REVENUE_READ: 'analytics.revenue.read',
+  ANALYTICS_CHURN_READ: 'analytics.churn.read',
   // Administration
   MEMBER_OPS_READ: 'member:ops.read',
   USER_READ: 'user:read',
@@ -22,7 +38,6 @@ export const PERMISSION = {
   ROLE_MANAGE: 'role:manage',
   PLATFORM_SETTINGS_MANAGE: 'platform:settings.manage',
   TOKEN_BUDGET_MANAGE: 'token-budget:manage',
-  REWARD_RULE_MANAGE: 'reward-rule:manage',
 } as const;
 
 export type PermissionKey = (typeof PERMISSION)[keyof typeof PERMISSION];
