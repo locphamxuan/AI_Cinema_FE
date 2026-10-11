@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { episodeAccessService } from '@/services/episodeAccessService';
 import type { MembershipPlan, MySubscription } from '@/types/episodeAccess';
-import DeviceManager from './DeviceManager';
 import { CurrentPlan, PlanList } from './MembershipCards';
 
 interface Notice {
@@ -17,7 +16,7 @@ interface Notice {
  * with Coins (quote, then activate) and the auto-renew switch with its 24-hour deadline (BR-30).
  */
 export default function SubscriptionManager() {
-  const { isAuthenticated, setWalletBalance, openAuthModal, openDepositModal } = useAppStore();
+  const { isAuthenticated, setWalletBalance, openAuthModal, openDepositModal, syncAccount } = useAppStore();
   const [subscription, setSubscription] = useState<MySubscription | null>(null);
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
@@ -50,7 +49,7 @@ export default function SubscriptionManager() {
     }
     setWalletBalance(res.data.mainBalance, res.data.bonusBalance);
     setNotice({ ok: true, text: `Đã kích hoạt ${plan.name}, hiệu lực đến ${new Date(res.data.currentPeriodEnd).toLocaleDateString('vi-VN')}.` });
-    await reload();
+    await Promise.all([reload(), syncAccount()]);
   };
 
   const toggleRenew = async (resume: boolean) => {
@@ -122,7 +121,6 @@ export default function SubscriptionManager() {
         </section>
       )}
 
-      <DeviceManager />
     </div>
   );
 }

@@ -3,16 +3,8 @@ export interface WalletState {
   bonusCoin: number;
 }
 
-export interface CheckInDay {
-  dayIndex: number; // 0-6 (Mon-Sun)
-  dayLabel: string; // 'T2', 'T3', ... 'CN'
-  reward: number;
-  claimed: boolean;
-  isToday: boolean;
-}
-
+/** What the header knows of the check-in: the BE ladder itself is read by the check-in modal. */
 export interface CheckInStreak {
-  days: CheckInDay[];
   currentStreak: number;
   lastCheckInDate: string | null; // ISO date string
   todayClaimed: boolean;

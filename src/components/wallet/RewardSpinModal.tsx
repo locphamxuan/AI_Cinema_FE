@@ -23,7 +23,7 @@ export default function RewardSpinModal() {
 }
 
 function SpinDialog() {
-  const { closeRewardSpinModal, setWalletBalance } = useAppStore();
+  const { closeRewardSpinModal, setWalletBalance, syncAccount } = useAppStore();
   const [wheel, setWheel] = useState<Wheel | null>(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
@@ -56,6 +56,8 @@ function SpinDialog() {
     setIsSpinning(false);
     setLastWon(won);
     setWalletBalance(won.mainBalance, won.bonusBalance);
+    // Plan days may have started a plan: the BE says whether every episode is open now.
+    if (won.planDays) syncAccount().catch(() => undefined);
     setShowConfetti(true);
     timers.current.push(setTimeout(() => setShowConfetti(false), 3000));
     setWheel((w) =>
