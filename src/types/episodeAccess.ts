@@ -119,6 +119,26 @@ export interface SubscriptionActivation {
   episodeAccessGranted: boolean;
 }
 
+/** GET /subscriptions/me — the open plan (PENDING = quoted, not paid), or null. */
+export interface MySubscription {
+  id: string;
+  status: 'PENDING' | 'ACTIVE' | 'PAST_DUE';
+  autoRenew: boolean;
+  priceCoins: number;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  nextRenewalAt: string | null;
+  cancelDeadline: string | null;
+  plan: { id: string; code: string; name: string; durationDays: number };
+}
+
+/** POST /subscriptions/:id/cancel-auto-renew | resume-auto-renew */
+export interface AutoRenewState {
+  id: string;
+  autoRenew: boolean;
+  nextRenewalAt: string | null;
+}
+
 export type TopUpStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'EXPIRED';
 export type PaymentProvider = 'VNPAY' | 'MOMO';
 

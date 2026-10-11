@@ -2,7 +2,9 @@ import { apiClient, ApiResponse } from './apiClient';
 import { randomId } from '@/lib/random';
 import type {
   AccessDecision,
+  AutoRenewState,
   MembershipPlan,
+  MySubscription,
   PurchaseResult,
   SubscriptionActivation,
   SubscriptionIntent,
@@ -45,5 +47,19 @@ export const episodeAccessService = {
       {},
       idempotent(`${key}:pay`),
     );
+  },
+
+  /** GET /subscriptions/me — null when the member has no open plan. */
+  getMySubscription(): Promise<ApiResponse<MySubscription | null>> {
+    return apiClient.get<MySubscription | null>('/subscriptions/me');
+  },
+
+  /** Stop auto-renew; the BE refuses it inside the last 24 h before renewal (BR-30). */
+  cancelAutoRenew(subscriptionId: string): Promise<ApiResponse<AutoRenewState>> {
+    return apiClient.post<AutoRenewState>(`/subscriptions/${subscriptionId}/cancel-auto-renew`);
+  },
+
+  resumeAutoRenew(subscriptionId: string): Promise<ApiResponse<AutoRenewState>> {
+    return apiClient.post<AutoRenewState>(`/subscriptions/${subscriptionId}/resume-auto-renew`);
   },
 };
