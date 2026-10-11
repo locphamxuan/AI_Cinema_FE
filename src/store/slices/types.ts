@@ -126,6 +126,9 @@ export interface UiModalsSlice {
   toggleRightSidebar: () => void;
   isCheckInModalOpen: boolean;
   setCheckInModalOpen: (open: boolean) => void;
+  isRewardSpinModalOpen: boolean;
+  openRewardSpinModal: () => void;
+  closeRewardSpinModal: () => void;
 }
 
 export interface SearchFilterSlice {

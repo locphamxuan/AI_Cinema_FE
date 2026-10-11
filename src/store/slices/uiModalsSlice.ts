@@ -14,4 +14,8 @@ export const createUiModalsSlice: StateCreator<AppState, [], [], UiModalsSlice> 
     }
     set({ isCheckInModalOpen: open });
   },
+
+  isRewardSpinModalOpen: false,
+  openRewardSpinModal: () => set({ isRewardSpinModalOpen: true }),
+  closeRewardSpinModal: () => set({ isRewardSpinModalOpen: false }),
 });

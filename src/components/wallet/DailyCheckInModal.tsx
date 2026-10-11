@@ -59,7 +59,8 @@ const DAY_ICON: Record<DayState, string> = { claimed: '✅', next: '🎁', locke
  * streak day come from the Admin's ladder on the BE. The wallet shows what the BE credited.
  */
 export default function DailyCheckInModal() {
-  const { isCheckInModalOpen, setCheckInModalOpen, setWalletBalance, markCheckedInToday } = useAppStore();
+  const { isCheckInModalOpen, setCheckInModalOpen, setWalletBalance, markCheckedInToday, openRewardSpinModal } =
+    useAppStore();
 
   const [status, setStatus] = useState<DailyRewardStatus | null>(null);
   const [claimed, setClaimed] = useState<CheckInResult | null>(null);
@@ -106,17 +107,22 @@ export default function DailyCheckInModal() {
   const checkedInToday = Boolean(claimed) || Boolean(status?.checkedInToday);
   const streakDay = claimed?.streakDay ?? status?.streakDay ?? 0;
   const nextDay = checkedInToday ? null : (streakDay % LADDER_LENGTH) + 1;
-  const todayReward = status ? status.reward.coins + status.reward.bonusCoins : 0;
+  const todayReward = status ? status.reward.bonusCoins : 0;
   const ladder = Array.from({ length: LADDER_LENGTH }, (_, i) => {
     const day = i + 1;
     const rule = status?.ladder.find((r) => r.streakDay === day);
     let state: DayState = 'locked';
     if (day === nextDay) state = 'next';
     else if (day <= streakDay) state = 'claimed';
-    return { day, reward: (rule?.coins ?? 0) + (rule?.bonusCoins ?? 0), state };
+    return {
+      day,
+      reward: rule?.bonusCoins ?? 0,
+      grantsSpin: rule?.grantsSpin ?? false,
+      state,
+    };
   });
 
-  let claimLabel = `🎁 Nhận ${todayReward} Coin`;
+  let claimLabel = `🎁 Nhận ${todayReward} Coin Thưởng`;
   if (isClaiming) claimLabel = 'Đang nhận thưởng...';
   else if (checkedInToday) claimLabel = '✓ Đã nhận hôm nay';
   else if (todayReward <= 0) claimLabel = 'Hôm nay chưa có phần thưởng';
@@ -131,7 +137,7 @@ export default function DailyCheckInModal() {
         className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       >
         <div className="glass-card w-full max-w-md p-6 animate-scale-in">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold text-foreground">🎁 Điểm Danh Hàng Ngày</h2>
               <p className="text-sm text-muted-light mt-1">
@@ -148,21 +154,54 @@ export default function DailyCheckInModal() {
             </button>
           </div>
 
-          {errorMsg && (
-            <div className="mb-4 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs">{errorMsg}</div>
+          {status && status.availableSpins > 0 && !claimed && (
+            <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🎯</span>
+                <div>
+                  <p className="text-xs font-bold text-white">Bạn có {status.availableSpins} lượt quay may mắn</p>
+                  <p className="text-[11px] text-purple-200">Quay để trúng Coin hoặc ngày gói VIP</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  handleClose();
+                  openRewardSpinModal();
+                }}
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+              >
+                Quay ngay
+              </button>
+            </div>
           )}
 
-          <div className="grid grid-cols-7 gap-2 mb-6">
-            {ladder.map(({ day, reward, state }) => (
+          {errorMsg && (
+            <div className="mb-4 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs">
+              {errorMsg}
+            </div>
+          )}
+
+          <div className="grid grid-cols-7 gap-1.5 mb-6">
+            {ladder.map(({ day, reward, grantsSpin, state }) => (
               <div
                 key={day}
-                className={`relative flex flex-col items-center py-3 rounded-xl transition-all duration-300 ${dayClass(state)}`}
+                className={`relative flex flex-col items-center py-2.5 px-1 rounded-xl transition-all duration-300 ${dayClass(
+                  state,
+                )}`}
               >
                 <span className={`text-[10px] font-bold mb-1 ${state === 'next' ? 'text-neon' : 'text-muted-light'}`}>
-                  Ngày {day}
+                  N{day}
                 </span>
-                <span className="text-lg mb-1">{DAY_ICON[state]}</span>
-                <span className={`text-[10px] font-bold ${state === 'claimed' ? 'text-verified' : 'text-coin'}`}>+{reward}</span>
+                <span className="text-base mb-1">{grantsSpin ? '🎯' : DAY_ICON[state]}</span>
+                <span className={`text-[10px] font-bold ${state === 'claimed' ? 'text-verified' : 'text-coin'}`}>
+                  +{reward}
+                </span>
+                {grantsSpin && (
+                  <span className="text-[8px] font-black uppercase text-amber-300 tracking-tighter mt-0.5">
+                    +Spin
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -170,10 +209,22 @@ export default function DailyCheckInModal() {
           {claimed && (
             <div className="mb-4 p-3 rounded-xl bg-verified/20 border border-verified/30 text-center animate-bounce-in">
               <p className="text-verified font-bold text-lg">🎉 Nhận thành công!</p>
-              <p className="text-verified/80 text-sm">
-                +{claimed.bonusGranted} Coin thưởng
-                {claimed.coinsGranted > 0 && ` và +${claimed.coinsGranted} Coin chính`} đã được cộng vào ví
-              </p>
+              <p className="text-verified/80 text-sm">+{claimed.bonusGranted} Coin thưởng đã được cộng vào ví</p>
+              {claimed.spinGranted && (
+                <div className="mt-2.5 pt-2 border-t border-verified/30 text-center">
+                  <p className="text-amber-300 font-bold text-xs">🎯 Mốc ngày 7: Nhận thêm 1 lượt quay may mắn!</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleClose();
+                      openRewardSpinModal();
+                    }}
+                    className="mt-2 px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-neutral-950 font-black text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                  >
+                    Quay thưởng ngay
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -186,7 +237,9 @@ export default function DailyCheckInModal() {
             {claimLabel}
           </button>
 
-          <p className="text-center text-xs text-muted mt-3">Điểm danh liên tục để nhận thưởng theo chuỗi; bỏ một ngày chuỗi bắt đầu lại.</p>
+          <p className="text-center text-xs text-muted mt-3">
+            Điểm danh mỗi ngày để tích lũy Coin thưởng. Chuỗi 7 ngày tặng lượt quay may mắn.
+          </p>
         </div>
       </Backdrop>
     </>
