@@ -113,7 +113,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <span className="text-2xl">👑</span>
               <div>
-                <p className="text-sm font-bold text-slate-900 dark:text-white">Quản lý Gói hội viên VIP</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">Quản lý gói Tháng</p>
                 <p className="text-xs text-slate-500 dark:text-muted-light">Xem chi tiết quyền lợi & gia hạn</p>
               </div>
             </div>

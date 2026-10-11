@@ -136,7 +136,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                   <h3 className="text-xl font-bold text-white mb-2">Tập Phim Đang Bị Khóa</h3>
                   <p className="text-muted-light mb-5 text-xs sm:text-sm leading-relaxed">
                     {currentEpisode.isPreview
-                      ? 'Bạn chỉ được xem thử 30 giây đầu. Mở khóa bằng Coin hoặc nâng cấp Hội viên VIP để xem trọn bộ.'
+                      ? 'Bạn chỉ được xem thử 30 giây đầu. Mở khóa bằng Coin hoặc đăng ký gói Tháng để xem trọn bộ.'
                       : 'Mở khóa tập phim bằng Coin để thưởng thức nội dung AI đỉnh cao.'}
                   </p>
                   <button
