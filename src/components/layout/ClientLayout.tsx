@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import WalletHeaderBadge from '@/components/wallet/WalletHeaderBadge';
 import DailyCheckInModal from '@/components/wallet/DailyCheckInModal';
+import RewardSpinModal from '@/components/wallet/RewardSpinModal';
 import DepositModal from '@/components/wallet/DepositModal';
 import UnlockEpisodeModal from '@/components/watch/UnlockEpisodeModal';
 import SupportChatWidget from '@/components/chat/SupportChatWidget';
@@ -136,6 +137,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
 
       <AuthModal />
       <DailyCheckInModal />
+      <RewardSpinModal />
       <DepositModal />
       <UnlockEpisodeModal />
 

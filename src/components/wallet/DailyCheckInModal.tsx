@@ -160,7 +160,7 @@ export default function DailyCheckInModal() {
                 <span className="text-xl">🎯</span>
                 <div>
                   <p className="text-xs font-bold text-white">Bạn có {status.availableSpins} lượt quay may mắn</p>
-                  <p className="text-[11px] text-purple-200">Quay để trúng Coin hoặc ngày gói VIP</p>
+                  <p className="text-[11px] text-purple-200">Quay để trúng Coin thưởng hoặc ngày gói Tháng</p>
                 </div>
               </div>
               <button
@@ -199,7 +199,7 @@ export default function DailyCheckInModal() {
                 </span>
                 {grantsSpin && (
                   <span className="text-[8px] font-black uppercase text-amber-300 tracking-tighter mt-0.5">
-                    +Spin
+                    +Lượt quay
                   </span>
                 )}
               </div>
@@ -212,7 +212,7 @@ export default function DailyCheckInModal() {
               <p className="text-verified/80 text-sm">+{claimed.bonusGranted} Coin thưởng đã được cộng vào ví</p>
               {claimed.spinGranted && (
                 <div className="mt-2.5 pt-2 border-t border-verified/30 text-center">
-                  <p className="text-amber-300 font-bold text-xs">🎯 Mốc ngày 7: Nhận thêm 1 lượt quay may mắn!</p>
+                  <p className="text-amber-300 font-bold text-xs">🎯 Ngày mốc: bạn nhận thêm 1 lượt quay may mắn!</p>
                   <button
                     type="button"
                     onClick={() => {
@@ -238,7 +238,7 @@ export default function DailyCheckInModal() {
           </button>
 
           <p className="text-center text-xs text-muted mt-3">
-            Điểm danh mỗi ngày để tích lũy Coin thưởng. Chuỗi 7 ngày tặng lượt quay may mắn.
+            Điểm danh mỗi ngày để tích lũy Coin thưởng. Ngày mốc của chuỗi tặng thêm lượt quay may mắn.
           </p>
         </div>
       </Backdrop>
