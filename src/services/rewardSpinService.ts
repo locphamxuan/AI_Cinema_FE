@@ -2,22 +2,12 @@ import { apiClient, ApiResponse } from './apiClient';
 import { randomId } from '@/lib/random';
 import type { RewardPrize, RewardWheelStatus, SpinResult } from '@/types/episodeAccess';
 
-export interface CreateRewardPrizeDto {
-  code: string;
-  name: string;
-  type: 'BONUS_COIN' | 'PLAN_DAYS';
-  bonusCoins?: number;
-  planDays?: number;
-  weight: number;
-}
-
 export interface UpdateRewardPrizeDto {
   name?: string;
-  weight?: number;
-  isActive?: boolean;
   bonusCoins?: number;
-  planDays?: number;
 }
+
+export const newSpinIdempotencyKey = () => randomId('spin-');
 
 export const rewardSpinService = {
   /** GET /rewards/spins — available spins, wheel prizes, and recent spin history */
@@ -26,7 +16,7 @@ export const rewardSpinService = {
   },
 
   /** POST /rewards/spins — use oldest available spin with CSPRNG draw */
-  spin(key = randomId('spin-')): Promise<ApiResponse<SpinResult>> {
+  spin(key = newSpinIdempotencyKey()): Promise<ApiResponse<SpinResult>> {
     return apiClient.post<SpinResult>('/rewards/spins', {}, { headers: { 'Idempotency-Key': key } });
   },
 
@@ -35,12 +25,7 @@ export const rewardSpinService = {
     return apiClient.get<RewardPrize[]>('/admin/reward-prizes');
   },
 
-  /** POST /admin/reward-prizes — put a new prize on the wheel */
-  createPrize(dto: CreateRewardPrizeDto): Promise<ApiResponse<RewardPrize>> {
-    return apiClient.post<RewardPrize>('/admin/reward-prizes', dto);
-  },
-
-  /** PATCH /admin/reward-prizes/:id — update prize name, weight, or active status */
+  /** PATCH /admin/reward-prizes/:id — update a display name or Coin amount */
   updatePrize(id: string, dto: UpdateRewardPrizeDto): Promise<ApiResponse<RewardPrize>> {
     return apiClient.patch<RewardPrize>(`/admin/reward-prizes/${id}`, dto);
   },

@@ -65,34 +65,73 @@ export default function DailyCheckInModal() {
   const [status, setStatus] = useState<DailyRewardStatus | null>(null);
   const [claimed, setClaimed] = useState<CheckInResult | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  const loadStatus = useCallback(async () => {
+    setIsRefreshing(true);
+    setStatus(null);
+    setErrorMsg(null);
+    try {
+      const res = await dailyRewardService.getStatus();
+      if (res.success && res.data) setStatus(res.data);
+      else setErrorMsg(res.message || 'Không tải được thông tin điểm danh.');
+    } catch {
+      setErrorMsg('Không tải được thông tin điểm danh.');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!isCheckInModalOpen) return;
+    let cancelled = false;
     dailyRewardService
       .getStatus()
       .then((res) => {
+        if (cancelled) return;
         if (res.success && res.data) setStatus(res.data);
         else setErrorMsg(res.message || 'Không tải được thông tin điểm danh.');
       })
-      .catch(() => setErrorMsg('Không tải được thông tin điểm danh.'));
+      .catch(() => {
+        if (!cancelled) setErrorMsg('Không tải được thông tin điểm danh.');
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [isCheckInModalOpen]);
 
   const handleClaim = useCallback(async () => {
     setIsClaiming(true);
     setErrorMsg(null);
-    const res = await dailyRewardService.checkIn();
-    setIsClaiming(false);
-    if (!res.success || !res.data) {
-      setErrorMsg(res.message || 'Có lỗi xảy ra khi điểm danh.');
-      return;
+    try {
+      const res = await dailyRewardService.checkIn();
+      if (!res.success || !res.data) {
+        setErrorMsg(res.message || 'Có lỗi xảy ra khi điểm danh.');
+        return;
+      }
+      setClaimed(res.data);
+      setWalletBalance(res.data.mainBalance, res.data.bonusBalance);
+      markCheckedInToday(res.data.streakDay);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 2500);
+    } catch {
+      setErrorMsg('Không nhận được phản hồi điểm danh. Đang kiểm tra lại trạng thái...');
+      try {
+        const refreshed = await dailyRewardService.getStatus();
+        if (refreshed.success && refreshed.data) {
+          setStatus(refreshed.data);
+          setWalletBalance(refreshed.data.mainBalance, refreshed.data.bonusBalance);
+          if (refreshed.data.checkedInToday) markCheckedInToday(refreshed.data.streakDay);
+          setErrorMsg(null);
+        }
+      } catch {
+        // Keep the original error visible; the user can retry loading the current status.
+      }
+    } finally {
+      setIsClaiming(false);
     }
-    setClaimed(res.data);
-    setWalletBalance(res.data.mainBalance, res.data.bonusBalance);
-    markCheckedInToday(res.data.streakDay);
-    setShowConfetti(true);
-    setTimeout(() => setShowConfetti(false), 2500);
   }, [setWalletBalance, markCheckedInToday]);
 
   const handleClose = useCallback(() => {
@@ -105,6 +144,7 @@ export default function DailyCheckInModal() {
   if (!isCheckInModalOpen) return null;
 
   const checkedInToday = Boolean(claimed) || Boolean(status?.checkedInToday);
+  const isLoading = isRefreshing || (!status && !errorMsg);
   const streakDay = claimed?.streakDay ?? status?.streakDay ?? 0;
   const nextDay = checkedInToday ? null : (streakDay % LADDER_LENGTH) + 1;
   const todayReward = status ? status.reward.bonusCoins : 0;
@@ -123,9 +163,10 @@ export default function DailyCheckInModal() {
   });
 
   let claimLabel = `🎁 Nhận ${todayReward} Coin Thưởng`;
-  if (isClaiming) claimLabel = 'Đang nhận thưởng...';
+  if (isLoading) claimLabel = 'Đang tải thông tin...';
+  else if (isClaiming) claimLabel = 'Đang nhận thưởng...';
   else if (checkedInToday) claimLabel = '✓ Đã nhận hôm nay';
-  else if (todayReward <= 0) claimLabel = 'Hôm nay chưa có phần thưởng';
+  else if (status && todayReward <= 0) claimLabel = 'Hôm nay chưa có phần thưởng';
 
   return (
     <>
@@ -177,10 +218,13 @@ export default function DailyCheckInModal() {
           )}
 
           {errorMsg && (
-            <div className="mb-4 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs">
-              {errorMsg}
+            <div role="alert" className="mb-4 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-3">
+              <span>{errorMsg}</span>
+              {!isLoading && <button type="button" onClick={() => void loadStatus()} className="shrink-0 underline">Thử tải lại</button>}
             </div>
           )}
+
+          {isLoading && <p role="status" className="text-center text-sm text-muted-light py-4">Đang tải thông tin điểm danh...</p>}
 
           <div className="grid grid-cols-7 gap-1.5 mb-6">
             {ladder.map(({ day, reward, grantsSpin, state }) => (
@@ -231,7 +275,7 @@ export default function DailyCheckInModal() {
           <button
             type="button"
             onClick={() => void handleClaim()}
-            disabled={!status || checkedInToday || isClaiming || todayReward <= 0}
+            disabled={isLoading || !status || checkedInToday || isClaiming || todayReward <= 0}
             className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 cursor-pointer bg-gradient-to-r from-neon to-neon-dark text-white hover:shadow-lg hover:shadow-neon/30 active:scale-95 disabled:bg-none disabled:bg-white/10 disabled:text-muted disabled:cursor-not-allowed disabled:shadow-none"
           >
             {claimLabel}
