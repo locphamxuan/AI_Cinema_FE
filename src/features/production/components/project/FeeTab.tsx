@@ -64,14 +64,28 @@ export function FeeTab() {
         {ledger.loading && !ledger.data && <Loading />}
         {ledger.data && (
           <>
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
               <div className="rounded-xl bg-purple-50 dark:bg-purple-500/10 p-3">
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Tổng phí</p>
-                <p className="text-lg font-bold text-purple-700 dark:text-purple-300">{formatNumber(ledger.data.totalTokens)} Token</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Tổng ngân sách</p>
+                <p className="text-base sm:text-lg font-bold text-purple-700 dark:text-purple-300">{formatNumber(ledger.data.totalTokens)} Token</p>
               </div>
               <div className="rounded-xl bg-slate-50 dark:bg-white/5 p-3">
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">Quy đổi theo tỷ giá từng lần ghi</p>
-                <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{formatNumber(ledger.data.totalVnd)} ₫</p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Quy đổi VND</p>
+                <p className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100">{formatNumber(ledger.data.totalVnd)} ₫</p>
+              </div>
+              <div className="rounded-xl bg-slate-50 dark:bg-white/5 p-3">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Trung bình / Mùa</p>
+                <p className="text-base sm:text-lg font-bold text-slate-800 dark:text-slate-100">
+                  {project.seasons.length > 0 ? formatNumber(Math.round(ledger.data.totalTokens / project.seasons.length)) : 0} Token
+                </p>
+              </div>
+              <div className="rounded-xl bg-slate-50 dark:bg-white/5 p-3">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">Đơn giá dự kiến / Tập</p>
+                <p className="text-base sm:text-lg font-bold text-purple-600 dark:text-purple-400">
+                  {project.seasons.flatMap((s) => s.episodes).length > 0
+                    ? formatNumber(Math.round(ledger.data.totalTokens / project.seasons.flatMap((s) => s.episodes).length))
+                    : 0} Token
+                </p>
               </div>
             </div>
             {ledger.data.entries.length === 0 ? (

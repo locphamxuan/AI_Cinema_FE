@@ -122,7 +122,7 @@ export function ProjectListPage() {
                   <th className="px-4 py-2.5 font-medium hidden md:table-cell">Studio</th>
                   <th className="px-4 py-2.5 font-medium hidden md:table-cell">{isCreator ? 'Reviewer' : 'Creator'}</th>
                   <th className="px-4 py-2.5 font-medium hidden sm:table-cell text-right">Số tập</th>
-                  <th className="px-4 py-2.5 font-medium hidden lg:table-cell">Cập nhật</th>
+                  <th className="px-4 py-2.5 font-medium hidden lg:table-cell">Cập nhật gần nhất</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">

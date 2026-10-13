@@ -39,7 +39,10 @@ export function StudioTab() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <div className="lg:col-span-2 space-y-5">
-        <Panel title="Lịch sử bàn giao" description="Mỗi lần bàn giao hoặc đổi studio, hệ thống tạo brief PDF và gửi email cho studio.">
+        <Panel
+          title="Bàn giao Studio & Theo dõi mốc sản xuất"
+          description="Bàn giao dự án cho studio bên ngoài sản xuất: Creator gửi hồ sơ brief (kịch bản, yêu cầu kỹ thuật, thời hạn từng tập và chi phí sản xuất). Khi studio chấp nhận, studio sẽ tiến hành sản xuất và nộp bản dựng (Submission) qua cổng Studio Portal."
+        >
           {history.error && <ErrorNote message={history.error} onRetry={history.reload} />}
           {history.loading && !history.data && <Loading />}
           {history.data?.length === 0 && <Empty>Chưa bàn giao cho studio nào.</Empty>}
