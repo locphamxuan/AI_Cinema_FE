@@ -31,8 +31,8 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]['key'];
 
-/** Admin proposals are between the Admin and the Reviewer (BR-55); the Creator does not see them. */
-const tabsFor = (base: string) => (base === '/creator' ? TABS.filter((t) => t.key !== 'changes') : TABS);
+/** All production roles (Reviewer, Creator, Admin) have access to the tabs. */
+const tabsFor = (_base: string) => TABS;
 
 /** One movie project, for its Reviewer, its Creator and the Admin; actions follow role, ownership and status. */
 export function ProjectDetailPage() {
