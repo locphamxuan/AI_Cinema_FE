@@ -74,12 +74,12 @@ export function ChangeRequestsTab() {
         </ul>
       </Panel>
 
-      {caps.suggest && project.status !== 'CANCELLED' && <ProposeForm onDone={refresh} />}
+      {(caps.suggest || caps.manage || caps.creator) && project.status !== 'CANCELLED' && <ProposeForm onDone={refresh} />}
 
       <TextPromptModal
         open={!!rejecting}
         title="Từ chối đề xuất"
-        label="Lý do (Admin sẽ nhận được)"
+        label="Lý do phản hồi"
         confirmLabel="Từ chối"
         minLength={1}
         danger
@@ -94,25 +94,38 @@ export function ChangeRequestsTab() {
 function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
   const { project } = useProject();
   const [content, setContent] = useState('');
+  const [reason, setReason] = useState('');
+  const [fileName, setFileName] = useState('');
   const [episodeId, setEpisodeId] = useState('');
   const { busy, run } = useAction();
   const episodes = project.seasons.flatMap((s) => s.episodes);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (await run(() => productionService.proposeChange(project.id, content.trim(), episodeId || undefined), 'Đã gửi đề xuất cho Reviewer')) {
+    const fullProposal = [
+      content.trim(),
+      reason.trim() ? `\n\n📌 Lý do: ${reason.trim()}` : '',
+      fileName.trim() ? `\n📎 Giấy tờ/minh họa đính kèm: ${fileName.trim()}` : '',
+    ].join('');
+
+    if (await run(() => productionService.proposeChange(project.id, fullProposal, episodeId || undefined), 'Đã gửi đề xuất')) {
       setContent('');
+      setReason('');
+      setFileName('');
       setEpisodeId('');
       await onDone();
     }
   };
 
   return (
-    <Panel title="Đề xuất mới">
-      <form onSubmit={submit} className="space-y-3">
-        <FormField label="Về tập (tuỳ chọn)">
+    <Panel
+      title="Tạo đề xuất gửi Admin"
+      description="Đề xuất xin cấp thêm kinh phí Token, gia hạn thời gian phát hành hoặc chỉnh sửa cấu hình dự án."
+    >
+      <form onSubmit={submit} className="space-y-3.5">
+        <FormField label="Áp dụng cho tập (tuỳ chọn)">
           <select value={episodeId} onChange={(e) => setEpisodeId(e.target.value)} className={fieldInputClass}>
-            <option value="">Cả dự án</option>
+            <option value="">Toàn bộ dự án</option>
             {episodes.map((ep) => (
               <option key={ep.id} value={ep.id}>
                 Tập {ep.episodeNumber}: {ep.title}
@@ -120,11 +133,39 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
             ))}
           </select>
         </FormField>
-        <FormField label="Nội dung đề xuất">
-          <textarea rows={5} value={content} onChange={(e) => setContent(e.target.value)} maxLength={5000} required className={fieldTextareaClass} />
+        <FormField label="Nội dung đề xuất (chỉnh sửa dự án, xin thêm kinh phí…)">
+          <textarea
+            rows={3}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Ví dụ: Xin cấp bổ sung 200.000 Token để thuê thêm studio hỗ trợ kỹ xảo 3D cho các tập cuối..."
+            maxLength={3000}
+            required
+            className={fieldTextareaClass}
+          />
+        </FormField>
+        <FormField label="Lý do đề xuất">
+          <textarea
+            rows={2}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Giải trình nguyên nhân phát sinh hoặc căn cứ thực tế..."
+            maxLength={2000}
+            className={fieldTextareaClass}
+          />
+        </FormField>
+        <FormField label="Giấy tờ / Hồ sơ minh họa lý do (tuỳ chọn)">
+          <input
+            type="text"
+            value={fileName}
+            onChange={(e) => setFileName(e.target.value)}
+            placeholder="Tên tài liệu, biên bản báo giá hoặc link lưu trữ minh chứng..."
+            maxLength={255}
+            className={fieldInputClass}
+          />
         </FormField>
         <Button type="submit" className="w-full" disabled={busy || content.trim().length < 5}>
-          <MessageSquarePlus className="w-4 h-4" aria-hidden="true" /> Gửi đề xuất
+          <MessageSquarePlus className="w-4 h-4" aria-hidden="true" /> Gửi đề xuất cho Admin
         </Button>
       </form>
     </Panel>
