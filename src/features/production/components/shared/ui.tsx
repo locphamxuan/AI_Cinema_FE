@@ -8,7 +8,7 @@ import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import type { Tone } from '../../lib/labels';
 
-export const CARD = 'bg-white dark:bg-[#151822] rounded-xl border border-slate-200/80 dark:border-white/10';
+export const CARD = 'bg-white dark:bg-[#141720] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs';
 
 export function StatusPill({ label, tone }: { label: string; tone: Tone }) {
   return (
@@ -34,14 +34,14 @@ export function Panel({
 }) {
   return (
     <section className={`${CARD} ${className}`} aria-label={title}>
-      <header className="flex flex-wrap items-start justify-between gap-2 px-5 py-3 border-b border-slate-100 dark:border-white/5">
+      <header className="flex flex-wrap items-start justify-between gap-2 px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.01]">
         <div className="min-w-0">
-          <h2 className="text-sm font-semibold text-slate-900 dark:text-white">{title}</h2>
-          {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
+          <h2 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">{title}</h2>
+          {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{description}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </header>
-      <div className="p-5">{children}</div>
+      <div className="p-6">{children}</div>
     </section>
   );
 }

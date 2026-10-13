@@ -73,34 +73,58 @@ export function ProjectDetailPage() {
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
       <main className="w-full px-6 lg:px-8 py-6 space-y-6">
-        <div className="space-y-2">
-          <Link href={productionPaths.list(base)} className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-purple-600">
-            <ArrowLeft className="w-3 h-3" aria-hidden="true" /> Dự án phim
-          </Link>
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-xl font-bold text-slate-900 dark:text-white">{data.title}</h1>
-            <StatusPill {...MOVIE_STATUS[data.status]} />
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900/20 via-purple-600/10 to-slate-900/10 border border-slate-200/80 dark:border-white/10 p-6 shadow-sm">
+          <div className="relative z-10 space-y-4">
+            <Link href={productionPaths.list(base)} className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Quay lại danh sách dự án
+            </Link>
+
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{data.title}</h1>
+                  <StatusPill {...MOVIE_STATUS[data.status]} />
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 max-w-3xl leading-relaxed">
+                  {data.synopsis || data.ideaDescription}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <div className="px-3 py-1.5 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 backdrop-blur-xs">
+                  <span className="text-slate-400 block text-[10px]">Reviewer</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{data.reviewer.fullName}</span>
+                </div>
+                <div className="px-3 py-1.5 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 backdrop-blur-xs">
+                  <span className="text-slate-400 block text-[10px]">Creator</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{data.creator?.fullName ?? 'Chưa giao'}</span>
+                </div>
+                <div className="px-3 py-1.5 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 backdrop-blur-xs">
+                  <span className="text-slate-400 block text-[10px]">Quy mô</span>
+                  <span className="font-semibold text-purple-600 dark:text-purple-400 font-mono">{data.seasons.length} mùa · {totalEpisodes} tập</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Reviewer: {data.reviewer.fullName} · Creator: {data.creator?.fullName ?? 'chưa giao'} · Studio: {data.studioName ?? 'chưa bàn giao'} ·{' '}
-            {data.seasons.length} mùa, {totalEpisodes} tập
-          </p>
         </div>
 
         {data.status === 'CANCELLED' && (
-          <p className="flex items-start gap-2 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-300">
-            <Ban className="w-4 h-4 shrink-0" aria-hidden="true" /> Dự án đã huỷ: {data.cancelReason}
+          <p className="flex items-start gap-2 rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-4 text-xs text-rose-700 dark:text-rose-300">
+            <Ban className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" /> 
+            <span><b>Dự án đã huỷ:</b> {data.cancelReason}</span>
           </p>
         )}
         {data.revision.episodeCount > 0 && (
-          <p className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300">
-            <AlertTriangle className="w-4 h-4 shrink-0" aria-hidden="true" />
-            Đang sửa {data.revision.episodeCount} tập —{' '}
-            {data.revision.bySeason.map((s) => `mùa ${s.seasonNumber}: tập ${s.episodeNumbers.join(', ')}`).join('; ')}
+          <p className="flex items-start gap-2 rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4 text-xs text-amber-800 dark:text-amber-300">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+            <span>
+              <b>Đang sửa {data.revision.episodeCount} tập:</b>{' '}
+              {data.revision.bySeason.map((s) => `mùa ${s.seasonNumber}: tập ${s.episodeNumbers.join(', ')}`).join('; ')}
+            </span>
           </p>
         )}
 
-        <div role="tablist" aria-label="Mục của dự án" className="flex gap-1 border-b border-slate-200 dark:border-white/10 overflow-x-auto">
+        <div role="tablist" aria-label="Mục của dự án" className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/5 overflow-x-auto">
           {tabs.map(({ key, label }) => (
             <button
               key={key}
@@ -108,15 +132,15 @@ export function ProjectDetailPage() {
               role="tab"
               aria-selected={tab === key}
               onClick={() => selectTab(key)}
-              className={`shrink-0 px-3 py-2 -mb-px border-b-2 text-xs font-semibold transition cursor-pointer ${
+              className={`shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                 tab === key
-                  ? 'border-purple-600 text-purple-700 dark:text-purple-300'
-                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white'
+                  ? 'bg-white dark:bg-purple-600 text-purple-700 dark:text-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/5'
               }`}
             >
               {label}
               {key === 'changes' && data.openChangeRequests > 0 && (
-                <span className="ml-1.5 px-1.5 rounded-full bg-amber-500 text-white text-[10px]">{data.openChangeRequests}</span>
+                <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px]">{data.openChangeRequests}</span>
               )}
             </button>
           ))}
@@ -127,7 +151,7 @@ export function ProjectDetailPage() {
           {tab === 'episodes' && <EpisodesTab />}
           {tab === 'studio' && <StudioTab />}
           {tab === 'fee' && <FeeTab />}
-          {tab === 'changes' && base !== '/creator' && <ChangeRequestsTab />}
+          {tab === 'changes' && <ChangeRequestsTab />}
           {tab === 'activity' && <ActivityTab />}
         </div>
       </main>
