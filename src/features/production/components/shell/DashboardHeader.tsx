@@ -48,7 +48,18 @@ export function DashboardHeader() {
           )}
         </Link>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2.5 shrink-0">
+          {user && (
+            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs">
+              <span className={`w-2 h-2 rounded-full ${
+                user.role === 'admin' ? 'bg-purple-500' :
+                user.role === 'reviewer' ? 'bg-emerald-500' :
+                user.role === 'creator' ? 'bg-blue-500' :
+                user.role === 'staff' ? 'bg-amber-500' : 'bg-slate-400'
+              }`} />
+              <span className="font-medium text-slate-700 dark:text-slate-200">{ROLE_LABEL[user.role ?? 'user']}</span>
+            </div>
+          )}
           {user && <NotificationMenu />}
           <ThemeToggle />
           <AccountMenu name={user?.name ?? 'Tài khoản'} roleLabel={ROLE_LABEL[user?.role ?? 'user']} onLogout={handleLogout} links={links} />

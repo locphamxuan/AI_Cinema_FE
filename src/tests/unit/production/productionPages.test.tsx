@@ -178,7 +178,7 @@ describe('ProjectDetailPage', () => {
     expect(screen.queryByRole('button', { name: /Huỷ dự án/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Đổi Creator/ })).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('tab', { name: /Đề xuất của Admin/ }));
+    await userEvent.click(screen.getByRole('tab', { name: /Đề xuất cho Admin/ }));
     expect(await screen.findByRole('button', { name: /Gửi đề xuất/ })).toBeInTheDocument();
   });
 

@@ -35,7 +35,11 @@ export function ChangeRequestsTab() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <Panel className="lg:col-span-2" title="Đề xuất sửa dự án" description="Admin không sửa trực tiếp; Reviewer phụ trách quyết định.">
+      <Panel
+        className="lg:col-span-2"
+        title="Danh sách đề xuất cho Admin"
+        description="Đề xuất điều chỉnh dự án, xin cấp thêm kinh phí Token hoặc thay đổi lịch trình. Admin sẽ xem xét và phản hồi."
+      >
         {requests.error && <ErrorNote message={requests.error} onRetry={requests.reload} />}
         {requests.loading && !requests.data && <Loading />}
         {requests.data?.length === 0 && <Empty>Chưa có đề xuất nào.</Empty>}

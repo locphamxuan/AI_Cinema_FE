@@ -78,23 +78,23 @@ export function AccountsPanel() {
   const totalPages = result?.meta.totalPages ?? 1;
 
   return (
-    <section className="bg-white dark:bg-[#151822] rounded-xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
-      <div className="p-5 flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-100 dark:border-white/5">
+    <section className="bg-white dark:bg-[#141720] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm overflow-hidden">
+      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.01]">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white">Tài khoản</h2>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white">Quản lý Tài khoản</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {result ? `${result.meta.totalItems} tài khoản` : 'Đang tải…'}. Đổi vai trò hoặc khoá tài khoản có hiệu lực ngay.
+            {result ? `${result.meta.totalItems} tài khoản trong hệ thống` : 'Đang tải…'} · Đổi vai trò hoặc trạng thái có hiệu lực tức thì.
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {canManage && (
-            <Button size="sm" onClick={() => setEditing('new')}>
+            <Button size="sm" onClick={() => setEditing('new')} className="shadow-xs">
               <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> Tạo tài khoản
             </Button>
           )}
           <label className="relative">
             <span className="sr-only">Tìm theo tên hoặc email</span>
-            <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
             <input
               type="search"
               value={search}
@@ -102,8 +102,8 @@ export function AccountsPanel() {
                 setSearch(e.target.value);
                 setPage(1);
               }}
-              placeholder="Tên hoặc email…"
-              className={`${fieldInputClass} pl-8 py-1.5 w-52 text-xs`}
+              placeholder="Tìm tên hoặc email…"
+              className={`${fieldInputClass} pl-9 py-1.5 w-56 text-xs rounded-xl`}
             />
           </label>
           <Select
@@ -124,15 +124,13 @@ export function AccountsPanel() {
 
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
-          <thead className="text-left text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-white/[0.03]">
+          <thead className="text-left text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50/80 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
             <tr>
-              <th scope="col" className="py-2.5 px-5 font-semibold">Tài khoản</th>
-              <th scope="col" className="py-2.5 px-4 font-semibold">Vai trò</th>
-              <th scope="col" className="py-2.5 px-4 font-semibold">Trạng thái</th>
-              <th scope="col" className="py-2.5 px-4 font-semibold">Ngày tạo</th>
-              <th scope="col" className="py-2.5 px-5">
-                <span className="sr-only">Thao tác</span>
-              </th>
+              <th scope="col" className="py-3 px-5 font-semibold">Tài khoản</th>
+              <th scope="col" className="py-3 px-4 font-semibold">Vai trò</th>
+              <th scope="col" className="py-3 px-4 font-semibold">Trạng thái</th>
+              <th scope="col" className="py-3 px-4 font-semibold">Ngày tạo</th>
+              <th scope="col" className="py-3 px-5 text-right font-semibold">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -140,12 +138,12 @@ export function AccountsPanel() {
               const isMe = account.id === myId;
               const locked = !canManage || isMe || savingId === account.id;
               return (
-                <tr key={account.id} className={account.isActive ? '' : 'opacity-60'}>
-                  <td className="py-3 px-5">
+                <tr key={account.id} className={`hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors ${account.isActive ? '' : 'opacity-60'}`}>
+                  <td className="py-3.5 px-5">
                     <p className="font-semibold text-slate-900 dark:text-white">
-                      {account.fullName} {isMe && <span className="text-slate-400 font-normal">(bạn)</span>}
+                      {account.fullName} {isMe && <span className="text-purple-600 dark:text-purple-400 font-medium text-[11px] ml-1">(bạn)</span>}
                     </p>
-                    <p className="text-slate-500 dark:text-slate-400">{account.email}</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">{account.email}</p>
                   </td>
                   <td className="py-3 px-4">
                     <Select

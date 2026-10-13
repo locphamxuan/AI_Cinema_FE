@@ -23,9 +23,9 @@ import { ActivityTab } from './ActivityTab';
 const TABS = [
   { key: 'overview', label: 'Tổng quan' },
   { key: 'episodes', label: 'Tập phim' },
-  { key: 'studio', label: 'Studio' },
+  { key: 'studio', label: 'Bàn giao Studio' },
   { key: 'fee', label: 'Phí sản xuất' },
-  { key: 'changes', label: 'Đề xuất của Admin' },
+  { key: 'changes', label: 'Đề xuất cho Admin' },
   { key: 'activity', label: 'Lịch sử' },
 ] as const;
 

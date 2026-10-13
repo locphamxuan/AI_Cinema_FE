@@ -72,21 +72,21 @@ export function RolePermissionsPanel() {
   if (!draft) return <p className="text-xs text-slate-500 dark:text-slate-400">Đang tải bảng phân quyền…</p>;
 
   return (
-    <section className="bg-white dark:bg-[#151822] rounded-xl border border-slate-200/80 dark:border-white/10 overflow-hidden">
-      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5">
+    <section className="bg-white dark:bg-[#141720] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm overflow-hidden">
+      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.01]">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Phân quyền theo vai trò</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Bỏ chọn một ô là vai trò đó mất quyền ngay sau khi lưu. Ô có khoá là quyền Admin luôn giữ.
+            Bỏ chọn một ô là vai trò đó mất quyền ngay sau khi lưu · Biểu tượng khoá là quyền Admin luôn giữ.
           </p>
         </div>
         <div className="flex items-center gap-2">
           {changedRoles.length > 0 && (
-            <Button type="button" variant="secondary" onClick={() => setDraft(toMatrix(roles))} className="px-3 py-2 rounded-xl text-xs">
+            <Button type="button" variant="secondary" onClick={() => setDraft(toMatrix(roles))} className="px-3.5 py-2 rounded-xl text-xs">
               Hoàn tác
             </Button>
           )}
-          <Button type="button" disabled={changedRoles.length === 0 || isSaving} onClick={save} className="px-4 py-2 rounded-xl text-xs">
+          <Button type="button" disabled={changedRoles.length === 0 || isSaving} onClick={save} className="px-4 py-2 rounded-xl text-xs shadow-xs">
             {isSaving ? 'Đang lưu…' : changedRoles.length > 0 ? `Lưu ${changedRoles.length} vai trò` : 'Chưa có thay đổi'}
           </Button>
         </div>

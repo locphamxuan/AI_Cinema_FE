@@ -197,7 +197,7 @@ function EpisodeForm(props: {
             className={fieldInputClass}
           />
         </FormField>
-        <FormField label="Thời hạn">
+        <FormField label="Ngày dự kiến phát hành">
           <input
             type="date"
             min={today}

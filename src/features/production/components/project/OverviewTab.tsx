@@ -52,7 +52,6 @@ export function OverviewTab() {
               ['Độ tuổi', project.ageRating ?? '—'],
               ['Năm phát hành', project.releaseYear ?? '—'],
               ['Tạo lúc', formatDateTime(project.createdAt)],
-              ['Giao Creator', formatDateTime(project.assignedAt)],
               ['Bàn giao studio', formatDateTime(project.handedOffAt)],
               ['Hoàn tất', formatDateTime(project.completedAt)],
             ]}
