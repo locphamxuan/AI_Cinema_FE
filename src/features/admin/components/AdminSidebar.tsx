@@ -54,7 +54,7 @@ export function AdminSidebar() {
 /** One Admin page; most panels carry their own heading, so the title is optional. */
 export function AdminPageFrame({ title, description, children }: { title?: string; description?: string; children: React.ReactNode }) {
   return (
-    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+    <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       {title && (
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h1>

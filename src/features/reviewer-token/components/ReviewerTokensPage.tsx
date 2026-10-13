@@ -11,7 +11,7 @@ export function ReviewerTokensPage() {
   const wallet = useResource('reviewer-tokens:me', reviewerTokenService.mine);
 
   return (
-    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 dark:border-white/5 pb-4">
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">Ví Token Reviewer</h1>

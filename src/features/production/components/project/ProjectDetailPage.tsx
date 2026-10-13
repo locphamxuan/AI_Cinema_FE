@@ -72,7 +72,7 @@ export function ProjectDetailPage() {
 
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
-      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+      <main className="w-full px-6 lg:px-8 py-6 space-y-6">
         <div className="space-y-2">
           <Link href={productionPaths.list(base)} className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-purple-600">
             <ArrowLeft className="w-3 h-3" aria-hidden="true" /> Dự án phim
