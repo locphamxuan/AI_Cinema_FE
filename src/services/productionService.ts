@@ -1,12 +1,11 @@
 /**
- * MF-1 API: movie projects, studio handoff, media delivery, review, labels, compliance and publishing.
+ * MF-1 API: movie projects, media delivery, review, labels, compliance and publishing.
  * Every call answers with ApiResponse; the backend checks permissions and project ownership.
  */
 import { apiClient, type ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type {
   AppNotification,
-  ChangeRequest,
   ComplianceInput,
   CreateProjectInput,
   Episode,
@@ -17,6 +16,8 @@ import type {
   MovieStatus,
   NewEpisodeInput,
   NewSeasonInput,
+  UpdateEpisodeInput,
+  UpdateSeasonInput,
   Page,
   PlatformSettings,
   Person,
@@ -28,8 +29,6 @@ import type {
   Publication,
   ReviewDecision,
   ReviewSheet,
-  StudioHandoff,
-  StudioInput,
   TokenEntryType,
   UnpublishMode,
   UnpublishReason,
@@ -77,7 +76,18 @@ export const productionService = {
 
   addSeason: (movieId: string, input: NewSeasonInput) => apiClient.post<unknown>(R.SEASONS(movieId), input),
   addEpisode: (seasonId: string, input: NewEpisodeInput) => apiClient.post<Episode>(R.SEASON_EPISODES(seasonId), input),
-  updateEpisode: (episodeId: string, input: Partial<NewEpisodeInput>) => apiClient.patch<Episode>(R.EPISODE(episodeId), input),
+  updateSeason: (seasonId: string, input: UpdateSeasonInput) => apiClient.patch<unknown>(R.SEASON(seasonId), input),
+  updateEpisode: (episodeId: string, input: UpdateEpisodeInput) => apiClient.patch<Episode>(R.EPISODE(episodeId), input),
+  uploadPoster(movieId: string, file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    return apiClient.postForm<{ posterUrl: string }>(R.POSTER(movieId), form);
+  },
+  uploadThumbnail(episodeId: string, file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    return apiClient.postForm<{ thumbnailUrl: string }>(R.EPISODE_THUMBNAIL(episodeId), form);
+  },
 
   listIdeaFiles: (movieId: string) => apiClient.get<IdeaFile[]>(R.IDEA_FILES(movieId)),
   uploadIdeaFile(movieId: string, file: File) {
@@ -90,25 +100,12 @@ export const productionService = {
 
   // ---- Production fee (Token, BR-45/46/50) ----
   getFee: (movieId: string) => apiClient.get<FeeLedger>(R.FEE(movieId)),
-  addFeeEntry: (movieId: string, entry: { entryType: TokenEntryType; amountTokens: number; reason?: string }) =>
+  /** INITIAL names the season (its amount is price × episodes); a top-up or correction may too. */
+  addFeeEntry: (
+    movieId: string,
+    entry: { entryType: TokenEntryType; seasonId?: string; amountTokens?: number; reason?: string },
+  ) =>
     apiClient.post<FeeLedger>(R.FEE_ENTRIES(movieId), entry),
-
-  // ---- Admin proposals (BR-55) ----
-  listChangeRequests: (movieId: string) => apiClient.get<ChangeRequest[]>(R.CHANGE_REQUESTS(movieId)),
-  proposeChange: (movieId: string, content: string, episodeId?: string) =>
-    apiClient.post<ChangeRequest>(R.CHANGE_REQUESTS(movieId), { content, ...(episodeId ? { episodeId } : {}) }),
-  acceptChange: (id: string, response?: string) =>
-    apiClient.post<ChangeRequest>(R.CHANGE_REQUEST_ACCEPT(id), response ? { response } : {}),
-  rejectChange: (id: string, response: string) => apiClient.post<ChangeRequest>(R.CHANGE_REQUEST_REJECT(id), { response }),
-
-  // ---- Studio handoff (steps 3–4) ----
-  handOff: (movieId: string, studio: StudioInput) =>
-    apiClient.post<unknown>(R.HANDOFF(movieId), studio),
-  changeStudio: (movieId: string, studio: StudioInput, reason: string) =>
-    apiClient.post<unknown>(R.STUDIO_CHANGE(movieId), { ...studio, reason }),
-  listHandoffs: (movieId: string) => apiClient.get<StudioHandoff[]>(R.HANDOFFS(movieId)),
-  downloadBrief: (movieId: string, handoffId: string) => apiClient.getBlob(R.BRIEF(movieId, handoffId)),
-  resendPortalLink: (movieId: string) => apiClient.post<StudioHandoff[]>(R.PORTAL_LINK(movieId)),
 
   // ---- Media delivery (steps 5–7) ----
   listMedia: (episodeId: string) => apiClient.get<MediaAsset[]>(R.EPISODE_MEDIA(episodeId)),

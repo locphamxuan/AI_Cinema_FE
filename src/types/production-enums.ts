@@ -4,6 +4,9 @@ export type UserRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAF
 
 export type MovieStatus = 'DRAFT' | 'ASSIGNED' | 'IN_PRODUCTION' | 'COMPLETED' | 'UNDER_REVISION' | 'CANCELLED';
 
+/** Middle tier Episode → Season → Movie; rolled up by the backend from the episodes. */
+export type SeasonStatus = 'DRAFT' | 'IN_PRODUCTION' | 'COMPLETED' | 'UNDER_REVISION';
+
 export type EpisodeStatus =
   | 'DRAFT'
   | 'AWAITING_MEDIA'
@@ -26,7 +29,17 @@ export type ReviewDecision = 'APPROVED' | 'CHANGES_REQUESTED';
 export type ComplianceCheckType = 'AI_LABEL_PRESENCE' | 'DECREE_142_NOTICE' | 'CONTENT_SAFETY' | 'REAL_PERSON_LIKENESS';
 export type ComplianceResult = 'PENDING' | 'PASS' | 'FAIL';
 export type TokenEntryType = 'INITIAL' | 'TOP_UP' | 'CORRECTION';
-export type ChangeRequestStatus = 'OPEN' | 'ACCEPTED' | 'REJECTED';
+/** Requests go from a Reviewer or Creator to the Admin (BR-55). */
+export type ChangeRequestStatus = 'OPEN' | 'APPROVED' | 'REJECTED';
+export type ChangeRequestType = 'PROJECT_UPDATE' | 'BUDGET_SUPPLEMENT' | 'DEADLINE_EXTENSION' | 'OTHER';
+export type StudioMilestoneStatus =
+  | 'BRIEF_SENT'
+  | 'STUDIO_ACCEPTED'
+  | 'IN_PROGRESS'
+  | 'DELIVERED'
+  | 'STUDIO_DECLINED'
+  | 'SUPERSEDED';
+export type HandoffMaterialKind = 'BRIEF' | 'SCRIPT' | 'REFERENCE' | 'OTHER';
 export type UnpublishMode = 'REVISION' | 'REMOVAL';
 export type UnpublishReason = 'MANUAL' | 'COMPLIANCE_ISSUE' | 'BROKEN_SOURCE';
 export type PriceAlertStatus = 'OPEN' | 'CHANGE_REQUESTED' | 'RESOLVED';

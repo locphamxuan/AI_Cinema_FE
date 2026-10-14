@@ -9,7 +9,9 @@ export const PERMISSION = {
   PROJECT_FEE_ALLOCATE: 'project:fee.allocate',
   PROJECT_READ_ALL: 'project:read.all',
   PROJECT_SUGGEST: 'project:suggest',
+  PROJECT_CHANGE_REVIEW: 'project:change.review',
   STUDIO_HANDOFF: 'studio:handoff',
+  STUDIO_MANAGE: 'studio:manage',
   MEDIA_INGEST: 'media:ingest',
   CONTENT_REVIEW: 'content:review',
   EPISODE_PUBLISH: 'episode:publish',
@@ -50,7 +52,7 @@ export type Area = 'creator' | 'reviewer' | 'staff' | 'admin';
 
 export const AREAS: Record<Area, { label: string; path: string; roles: WebRole[] }> = {
   creator: { label: 'Sản xuất nội dung', path: '/creator/projects', roles: ['creator'] },
-  // The Admin oversees every project and proposes changes (BR-55); actions follow permissions.
+  // The Admin oversees every project and decides the change requests sent to them (BR-55); actions follow permissions.
   reviewer: { label: 'Kiểm duyệt nội dung', path: '/reviewer', roles: ['reviewer', 'admin'] },
   staff: { label: 'Vận hành', path: '/staff', roles: ['staff', 'admin'] },
   admin: { label: 'Quản trị', path: '/admin', roles: ['admin'] },
