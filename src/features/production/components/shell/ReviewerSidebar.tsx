@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Clapperboard, Coins } from 'lucide-react';
+import { Building2, Clapperboard, Coins } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { reviewerTokenService, TOKENS_CHANGED_EVENT } from '@/services/reviewerTokenService';
@@ -35,6 +35,16 @@ export function ReviewerSidebar() {
       icon: Clapperboard,
       active: pathname === '/reviewer' || pathname.startsWith('/reviewer/projects'),
     },
+    ...(can(PERMISSION.STUDIO_MANAGE)
+      ? [
+          {
+            href: '/reviewer/studios',
+            label: 'Studio',
+            icon: Building2,
+            active: pathname.startsWith('/reviewer/studios'),
+          },
+        ]
+      : []),
     ...(hasBudget
       ? [
           {
