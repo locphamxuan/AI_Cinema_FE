@@ -20,7 +20,7 @@ export function DashboardHeader() {
   const can = useCan();
 
   const area = AREA_ORDER.find((a) => pathname.startsWith(`/${a}`)) ?? 'reviewer';
-  // The Admin oversees production: it reads every project and proposes changes, never edits them (BR-55).
+  // The Admin oversees production: it reads every project and decides the change requests, never edits a project (BR-55).
   const oversight = area === 'reviewer' && !can(PERMISSION.PROJECT_MANAGE) && can(PERMISSION.PROJECT_READ_ALL);
   const links = AREA_ORDER.filter((a) => a !== area && canEnter(a, user?.role)).map((a) => ({
     href: AREAS[a].path,
@@ -49,6 +49,14 @@ export function DashboardHeader() {
         </Link>
 
         <div className="flex items-center gap-2 shrink-0">
+          {user && (
+            <span
+              aria-label="Vai trò của tài khoản"
+              className="hidden sm:inline-flex text-[11px] font-semibold px-2.5 py-1 rounded-full bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300"
+            >
+              {ROLE_LABEL[user.role ?? 'user']}
+            </span>
+          )}
           {user && <NotificationMenu />}
           <ThemeToggle />
           <AccountMenu name={user?.name ?? 'Tài khoản'} roleLabel={ROLE_LABEL[user?.role ?? 'user']} onLogout={handleLogout} links={links} />
