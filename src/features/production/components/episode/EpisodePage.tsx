@@ -126,16 +126,18 @@ export function EpisodePage() {
               stacked
               items={[
                 ['Thời lượng mục tiêu', formatDuration(episode.targetDurationSeconds)],
-                ['Thời hạn', formatDay(episode.milestoneDate)],
+                ['Hạn giao Studio', formatDay(episode.deliveryDeadline)],
+                ['Ngày dự kiến phát hành', formatDay(episode.expectedReleaseDate)],
+                ['Creator phụ trách', episode.assignedCreator?.fullName ?? 'Cả nhóm'],
                 ['Giá Coin', formatNumber(episode.coinPrice)],
-                ['Studio', project.data.studioName ?? '—'],
+                ['Studio', project.data.studio?.name ?? '—'],
               ]}
             />
             {episode.synopsis && <p className="mt-3 text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">{episode.synopsis}</p>}
           </Panel>
 
           {canDeliver && (
-            <DeliverMediaPanel title="Giao thay studio" deliver={deliverAsCreator(episode.id)} onDelivered={refreshAll} />
+            <DeliverMediaPanel title="Upload Submission Studio giao" deliver={deliverAsCreator(episode.id)} onDelivered={refreshAll} />
           )}
 
           <Panel title="Các bản studio đã giao" description={processing ? 'Đang xử lý video…' : undefined}>
