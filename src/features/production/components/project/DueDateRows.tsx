@@ -5,13 +5,14 @@ import type { Episode } from '@/types/production';
 import { formatDay, toDateInput } from '../../lib/format';
 
 /** The Reviewer's deadline of an episode can be handed to a studio: set, and not already past. */
-export function deadlineUsable(episode: Pick<Episode, 'milestoneDate'>): boolean {
-  const deadline = toDateInput(episode.milestoneDate);
+export function deadlineUsable(episode: Pick<Episode, 'deliveryDeadline'>): boolean {
+  const deadline = toDateInput(episode.deliveryDeadline);
   return !!deadline && deadline >= getTodayDateString();
 }
 
 /** Read-only: the studio is due on the deadline the Reviewer set for each episode (BR-38). */
 export function DeadlineList({ episodes }: { episodes: Episode[] }) {
+  if (episodes.length === 0) return <p className="text-xs text-slate-500">Mọi tập của phạm vi này đã được bàn giao.</p>;
   return (
     <ul className="space-y-1.5 max-h-72 overflow-y-auto pr-1 text-xs">
       {episodes.map((ep) => {
@@ -22,8 +23,8 @@ export function DeadlineList({ episodes }: { episodes: Episode[] }) {
               #{ep.episodeNumber} {ep.title}
             </span>
             <span className={`shrink-0 font-semibold ${usable ? 'text-slate-800 dark:text-slate-100' : 'text-rose-600'}`}>
-              {ep.milestoneDate ? formatDay(ep.milestoneDate) : 'Chưa đặt'}
-              {ep.milestoneDate && !usable && ' (đã qua)'}
+              {ep.deliveryDeadline ? formatDay(ep.deliveryDeadline) : 'Chưa đặt'}
+              {ep.deliveryDeadline && !usable && ' (đã qua)'}
             </span>
           </li>
         );

@@ -1,204 +1,109 @@
 'use client';
 
 import { useState } from 'react';
-import { LinkIcon, Repeat, Send } from 'lucide-react';
+import { Repeat, Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
-import { Modal } from '@/components/ui/Modal';
-import { productionService } from '@/services/productionService';
-import type { Episode, StudioInput } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { studioService } from '@/services/studioService';
+import type { HandoffMaterial, StudioHandoff } from '@/types/production';
 import { useResource } from '../../hooks/useResource';
 import { DELIVERY_PROJECT, isIn } from '../../lib/capabilities';
 import { saveBlob } from '../../lib/format';
 import { Empty, ErrorNote, Facts, Loading, Panel } from '../shared/ui';
-import { DeadlineList, deadlineUsable } from './DueDateRows';
 import { HandoffCard } from './HandoffCard';
+import { ChangeStudioModal, HandOffModal } from './HandoffModals';
+import { MilestoneModal } from './MilestoneModal';
 import { useProject } from './ProjectContext';
 
-/** Steps 3–4: the Creator sends the brief to an outside studio, due on the Reviewer's deadlines (BR-13, BR-38). */
+/** The studio timeline of steps 3–4: what went to which Studio and when, every milestone and Submission (BR-58, BR-59). */
 export function StudioTab() {
-  const { project, caps } = useProject();
+  const { project, caps, base } = useProject();
   const [mode, setMode] = useState<'handoff' | 'change' | null>(null);
-  const history = useResource(`handoffs:${project.id}:${project.updatedAt}`, () => productionService.listHandoffs(project.id));
-  const episodes = project.seasons.flatMap((s) => s.episodes);
+  const [moving, setMoving] = useState<StudioHandoff | null>(null);
+  const history = useResource(`handoffs:${project.id}:${project.updatedAt}`, () => studioService.listHandoffs(project.id));
   const delivering = isIn(project.status, DELIVERY_PROJECT);
+  const canHandOff = caps.handoff && (project.status === 'ASSIGNED' || delivering);
 
-  const current = history.data?.[0];
-  const { busy, run } = useAction();
-  // A new link replaces the old one, e.g. when the studio lost the email.
-  const resendLink = async () => {
-    if (await run(() => productionService.resendPortalLink(project.id), 'Đã gửi link mới; link cũ hết hiệu lực')) await history.reload();
-  };
-
-  const download = async (handoffId: string) => {
-    const blob = await productionService.downloadBrief(project.id, handoffId);
+  const downloadBrief = async (handoff: StudioHandoff) => {
+    const blob = await studioService.downloadBrief(project.id, handoff.id);
     if (blob) saveBlob(blob, `brief-${project.title}.pdf`);
+  };
+  const downloadMaterial = async (handoff: StudioHandoff, material: HandoffMaterial) => {
+    const blob = await studioService.downloadMaterial(project.id, handoff.id, material.id);
+    if (blob) saveBlob(blob, material.fileName);
+  };
+  const refresh = async () => {
+    await history.reload();
   };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <div className="lg:col-span-2 space-y-5">
-        <Panel title="Lịch sử bàn giao" description="Mỗi lần bàn giao hoặc đổi studio, hệ thống tạo brief PDF và gửi email cho studio.">
+        <Panel
+          title="Dòng thời gian Studio"
+          description="Gửi brief PDF và file material cho Studio đối tác bên thứ 3 qua email, ghi nhận Studio, mùa được giao và ngày giao; sau đó Creator cập nhật từng mốc tiến độ của Studio và upload Submission Studio giao."
+        >
           {history.error && <ErrorNote message={history.error} onRetry={history.reload} />}
           {history.loading && !history.data && <Loading />}
-          {history.data?.length === 0 && <Empty>Chưa bàn giao cho studio nào.</Empty>}
+          {history.data?.length === 0 && <Empty>Chưa bàn giao cho Studio nào.</Empty>}
           <ol className="space-y-3">
-            {history.data?.map((h, i) => (
-              <HandoffCard key={h.id} handoff={h} current={i === 0} onDownload={() => download(h.id)} />
+            {history.data?.map((handoff) => (
+              <HandoffCard
+                key={handoff.id}
+                handoff={handoff}
+                movieId={project.id}
+                base={base}
+                onBrief={() => downloadBrief(handoff)}
+                onMaterial={(material) => downloadMaterial(handoff, material)}
+                onMilestone={caps.handoff && delivering ? () => setMoving(handoff) : undefined}
+              />
             ))}
           </ol>
         </Panel>
       </div>
 
       <div className="space-y-5">
-        <Panel title="Studio hiện tại">
-          {project.studioName ? (
+        <Panel title="Studio của dự án">
+          {project.studio ? (
             <Facts
               stacked
               items={[
-                ['Studio', project.studioName],
-                ['Email', project.studioEmail ?? '—'],
-                ['Liên hệ', project.studioContact ?? '—'],
+                ['Studio', project.studio.name],
+                ['Email', project.studio.email],
+                ['Liên hệ', project.studio.contactName ?? '—'],
+                ['Điện thoại', project.studio.phone ?? '—'],
               ]}
             />
           ) : (
-            <Empty>Chưa bàn giao.</Empty>
+            <Empty>Chưa chọn Studio.</Empty>
           )}
           <div className="mt-4 space-y-2">
-            {caps.handoff && project.status === 'ASSIGNED' && (
+            {canHandOff && (
               <Button size="sm" className="w-full" onClick={() => setMode('handoff')}>
-                <Send className="w-3.5 h-3.5" aria-hidden="true" /> Bàn giao cho studio
+                <Send className="w-3.5 h-3.5" aria-hidden="true" /> Bàn giao cho Studio
               </Button>
             )}
-            {caps.handoff && delivering && current?.studioResponse === 'DECLINED' && (
-              <p className="text-xs text-rose-600">Studio đã từ chối dự án — hãy đổi sang studio khác.</p>
-            )}
-            {caps.handoff && delivering && current && current.studioResponse !== 'DECLINED' && (
-              <div className="space-y-1.5">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="w-full"
-                  disabled={busy}
-                  onClick={resendLink}
-                  title="Tạo link mới, vô hiệu link cũ và gửi email mới tới studio hiện tại."
-                >
-                  <LinkIcon className="w-3.5 h-3.5" aria-hidden="true" /> Gửi link cổng studio mới
-                </Button>
-                <p className="text-[11px] text-slate-500">Dùng khi studio mất email hoặc link cũ không còn hiệu lực. Link cũ sẽ bị thay thế.</p>
-              </div>
-            )}
-            {caps.handoff && delivering && (
+            {caps.handoff && delivering && (history.data?.length ?? 0) > 0 && (
               <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
-                <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi studio
+                <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi Studio
               </Button>
             )}
             {caps.creator && project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Reviewer hoàn tất kế hoạch.</p>}
-            {project.status === 'ASSIGNED' && !caps.handoff && (
-              <p className="text-xs text-slate-500">Chờ Content Creator bàn giao cho studio.</p>
-            )}
+            {project.status === 'ASSIGNED' && !caps.handoff && <p className="text-xs text-slate-500">Chờ Content Creator bàn giao cho Studio.</p>}
           </div>
         </Panel>
       </div>
 
-      {mode === 'handoff' && <HandOffModal episodes={episodes} onClose={() => setMode(null)} onDone={history.reload} />}
-      {mode === 'change' && <ChangeStudioModal onClose={() => setMode(null)} onDone={history.reload} />}
+      {mode === 'handoff' && <HandOffModal onClose={() => setMode(null)} />}
+      {mode === 'change' && <ChangeStudioModal onClose={() => setMode(null)} />}
+      {moving && (
+        <MilestoneModal
+          handoff={moving}
+          onClose={() => {
+            setMoving(null);
+            void refresh();
+          }}
+        />
+      )}
     </div>
-  );
-}
-
-function StudioFields({ value, onChange }: { value: StudioInput; onChange: (v: StudioInput) => void }) {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <FormField label="Tên studio">
-        <input value={value.studioName} onChange={(e) => onChange({ ...value, studioName: e.target.value })} minLength={2} maxLength={255} required className={fieldInputClass} />
-      </FormField>
-      <FormField label="Email nhận brief">
-        <input type="email" value={value.studioEmail} onChange={(e) => onChange({ ...value, studioEmail: e.target.value })} maxLength={255} required className={fieldInputClass} />
-      </FormField>
-      <FormField label="Người liên hệ / SĐT (tuỳ chọn)" className="sm:col-span-2">
-        <input value={value.studioContact ?? ''} onChange={(e) => onChange({ ...value, studioContact: e.target.value })} maxLength={255} className={fieldInputClass} />
-      </FormField>
-    </div>
-  );
-}
-
-function cleanStudio(s: StudioInput): StudioInput {
-  return { studioName: s.studioName.trim(), studioEmail: s.studioEmail.trim(), ...(s.studioContact?.trim() ? { studioContact: s.studioContact.trim() } : {}) };
-}
-
-const studioValid = (s: StudioInput) => s.studioName.trim().length >= 2 && /\S+@\S+\.\S+/.test(s.studioEmail);
-
-function HandOffModal({ episodes, onClose, onDone }: { episodes: Episode[]; onClose: () => void; onDone: () => Promise<void> }) {
-  const { project, reload } = useProject();
-  const [studio, setStudio] = useState<StudioInput>({ studioName: '', studioEmail: '', studioContact: '' });
-  const { busy, run } = useAction();
-  const deadlinesReady = episodes.every(deadlineUsable);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (await run(() => productionService.handOff(project.id, cleanStudio(studio)), 'Đã gửi brief cho studio')) {
-      await Promise.all([reload(), onDone()]);
-      onClose();
-    }
-  };
-
-  return (
-    <Modal open onClose={onClose} title="Bàn giao cho studio" subtitle="Brief PDF (ý tưởng, cấu trúc tập, thời hạn, phí) và link cổng studio được email cho studio." icon={<Send className="w-4 h-4" />} maxWidth="max-w-2xl">
-      <form onSubmit={submit} className="space-y-4">
-        <StudioFields value={studio} onChange={setStudio} />
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Thời hạn từng tập</p>
-          <p className="text-[11px] text-slate-500">Studio phải giao đúng thời hạn Reviewer đã đặt; muốn đổi thời hạn hãy báo Reviewer.</p>
-          <DeadlineList episodes={episodes} />
-          {!deadlinesReady && (
-            <p className="text-[11px] text-rose-600">Có tập chưa có thời hạn hoặc thời hạn đã qua — Reviewer cần cập nhật trước khi bàn giao.</p>
-          )}
-        </div>
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Huỷ
-          </Button>
-          <Button type="submit" disabled={busy || !studioValid(studio) || !deadlinesReady}>
-            {busy ? 'Đang gửi…' : 'Gửi brief'}
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
-
-function ChangeStudioModal({ onClose, onDone }: { onClose: () => void; onDone: () => Promise<void> }) {
-  const { project, reload } = useProject();
-  const [studio, setStudio] = useState<StudioInput>({ studioName: '', studioEmail: '', studioContact: '' });
-  const [reason, setReason] = useState('');
-  const { busy, run } = useAction();
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (await run(() => productionService.changeStudio(project.id, cleanStudio(studio), reason.trim()), 'Đã đổi studio và gửi brief mới')) {
-      await Promise.all([reload(), onDone()]);
-      onClose();
-    }
-  };
-
-  return (
-    <Modal open onClose={onClose} title="Đổi studio" subtitle="Studio mới nhận brief mới với thời hạn Reviewer đã đặt." icon={<Repeat className="w-4 h-4" />}>
-      <form onSubmit={submit} className="space-y-4">
-        <StudioFields value={studio} onChange={setStudio} />
-        <FormField label="Lý do đổi studio">
-          <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} minLength={5} maxLength={2000} required className={fieldTextareaClass} />
-        </FormField>
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Huỷ
-          </Button>
-          <Button type="submit" disabled={busy || !studioValid(studio) || reason.trim().length < 5}>
-            Đổi studio
-          </Button>
-        </div>
-      </form>
-    </Modal>
   );
 }
