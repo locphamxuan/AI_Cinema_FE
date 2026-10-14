@@ -51,8 +51,13 @@ next-env.d.ts
 .claude-tools/
 .claude-mem/
 CLAUDE.md
+.agents/
+.agent/
+GEMINI.md
 TESTING.md
 .codegraph/
 
 # Local context file
 PROJECT_OVERVIEW.md
+PROJECT_CONTEXT.md
+PROGRESS.md
