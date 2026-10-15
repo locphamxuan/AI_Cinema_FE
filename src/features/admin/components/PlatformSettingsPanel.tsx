@@ -60,8 +60,8 @@ export function PlatformSettingsPanel() {
   };
 
   return (
-    <section className="bg-white dark:bg-[#151822] rounded-xl border border-slate-200/80 dark:border-white/10 p-5 space-y-4 max-w-2xl">
-      <div>
+    <section className="bg-white dark:bg-[#141720] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm p-6 space-y-5 max-w-2xl">
+      <div className="border-b border-slate-100 dark:border-white/5 pb-4">
         <h2 className="text-base font-bold text-slate-900 dark:text-white">Cài đặt nền tảng</h2>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Cập nhật lần cuối: {formatDateTime(current.updatedAt)}</p>
       </div>

@@ -98,7 +98,7 @@ export function SeasonSection({
 
   return (
     <section className={`${CARD} overflow-hidden`} aria-label={`Mùa ${season.seasonNumber}`}>
-      <header className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-b border-slate-100 dark:border-white/5">
+      <header className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
         <div className="min-w-0 space-y-1">
           <h2 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
             Mùa {season.seasonNumber}
@@ -130,7 +130,7 @@ export function SeasonSection({
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="text-slate-500 dark:text-slate-400 text-left">
+            <thead className="text-slate-500 dark:text-slate-400 text-left bg-slate-50 dark:bg-white/5">
               <tr>
                 <th className="px-3 py-2 font-medium w-10">#</th>
                 <th className="px-3 py-2 font-medium">Tập</th>

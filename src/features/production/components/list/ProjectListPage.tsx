@@ -44,7 +44,7 @@ export function ProjectListPage() {
   const isCreator = base === '/creator';
 
   return (
-    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+    <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">Dự án phim</h1>

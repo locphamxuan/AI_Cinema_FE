@@ -77,22 +77,35 @@ export function AdminMoviesPanel() {
           <li key={m.id}>
             <Link
               href={productionPaths.project('/admin', m.id, 'episodes')}
-              className="flex gap-3 rounded-2xl border border-slate-200 dark:border-white/10 p-3 hover:border-purple-400 transition"
+              className="group flex gap-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 p-3.5 bg-white dark:bg-[#141720] hover:border-purple-500/40 hover:shadow-md hover:shadow-purple-500/5 transition-all duration-200"
             >
-              <div className="w-20 h-28 shrink-0 rounded-lg bg-slate-100 dark:bg-white/5 overflow-hidden flex items-center justify-center">
+              <div className="w-20 h-28 shrink-0 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden flex items-center justify-center border border-slate-200/50 dark:border-white/5 shadow-xs">
                 {m.posterUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element -- posters come from outside hosts (Commons, R2)
-                  <img src={m.posterUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  <img src={m.posterUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
                 ) : (
-                  <Film className="w-6 h-6 text-slate-400" aria-hidden="true" />
+                  <Film className="w-6 h-6 text-slate-400 group-hover:text-purple-500 transition-colors" aria-hidden="true" />
                 )}
               </div>
-              <div className="min-w-0 text-xs space-y-1">
-                <p className="font-semibold text-sm text-slate-900 dark:text-white line-clamp-2">{m.title}</p>
-                <p className="text-slate-500 dark:text-slate-400">
-                  {[m.releaseYear, m.ageRating, m.genres.map((g) => g.name).join(', ')].filter(Boolean).join(' · ')}
-                </p>
-                {m.synopsis && <p className="text-slate-600 dark:text-slate-300 line-clamp-3">{m.synopsis}</p>}
+              <div className="min-w-0 text-xs space-y-1.5 flex flex-col justify-between">
+                <div>
+                  <p className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    {m.title}
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                    {[m.releaseYear, m.ageRating].filter(Boolean).join(' · ')}
+                  </p>
+                </div>
+                {m.genres.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {m.genres.slice(0, 2).map((g) => (
+                      <span key={g.id} className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">
+                        {g.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {m.synopsis && <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{m.synopsis}</p>}
               </div>
             </Link>
           </li>

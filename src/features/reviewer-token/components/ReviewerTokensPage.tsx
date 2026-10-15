@@ -11,12 +11,14 @@ export function ReviewerTokensPage() {
   const wallet = useResource('reviewer-tokens:me', reviewerTokenService.mine);
 
   return (
-    <main className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-      <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Token</h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-          Admin cấp Token cho bạn; mỗi lần bạn cấp phí sản xuất cho một dự án, số Token đó được trừ khỏi số dư. Cần thêm hãy liên hệ Admin.
-        </p>
+    <main className="w-full px-6 lg:px-8 py-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 dark:border-white/5 pb-4">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">Ví Token Reviewer</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Ngân sách do Admin phân bổ phục vụ cấp kinh phí sản xuất các dự án phim · Biến động cập nhật theo thời gian thực.
+          </p>
+        </div>
       </div>
       {wallet.error && <ErrorNote message={wallet.error} onRetry={wallet.reload} />}
       {wallet.loading && !wallet.data && <Loading />}
