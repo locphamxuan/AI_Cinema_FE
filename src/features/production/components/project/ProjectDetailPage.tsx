@@ -149,7 +149,7 @@ export function ProjectDetailPage() {
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/5'
               }`}
             >
-              {label}
+              {key === 'changes' && caps.creator ? 'Đề xuất cho Reviewer & Admin' : label}
               {key === 'changes' && data.openChangeRequests > 0 && (
                 <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px]">{data.openChangeRequests}</span>
               )}

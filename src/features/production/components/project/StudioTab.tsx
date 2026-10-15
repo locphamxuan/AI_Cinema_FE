@@ -3,61 +3,102 @@
 import { useState } from 'react';
 import { Repeat, Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { TokenRequestForm } from '@/features/token-request/TokenRequestForm';
+import { TokenRequestList } from '@/features/token-request/TokenRequestList';
 import { studioService } from '@/services/studioService';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
 import { useResource } from '../../hooks/useResource';
-import { DELIVERY_PROJECT, isIn } from '../../lib/capabilities';
-import { saveBlob } from '../../lib/format';
+import { DELIVERY_PROJECT, OPEN_PROJECT, isIn } from '../../lib/capabilities';
+import { downloadFile } from '../../lib/download';
+import { Pager, pageOf } from '../shared/Pager';
 import { Empty, ErrorNote, Facts, Loading, Panel } from '../shared/ui';
 import { HandoffCard } from './HandoffCard';
 import { ChangeStudioModal, HandOffModal } from './HandoffModals';
 import { MilestoneModal } from './MilestoneModal';
 import { useProject } from './ProjectContext';
 
+const PAGE_SIZE = 5;
+
+/** Sub-tabs of the Studio timeline: each hand-off sits under its milestone, a failed brief email under "Lỗi". */
+const FILTERS: { key: string; label: string; match: (h: StudioHandoff) => boolean }[] = [
+  { key: 'all', label: 'Tất cả', match: () => true },
+  { key: 'sent', label: 'Đã gửi brief', match: (h) => h.milestoneStatus === 'BRIEF_SENT' },
+  { key: 'accepted', label: 'Studio đã nhận', match: (h) => h.milestoneStatus === 'STUDIO_ACCEPTED' },
+  { key: 'progress', label: 'Studio đang làm', match: (h) => h.milestoneStatus === 'IN_PROGRESS' },
+  { key: 'delivered', label: 'Studio đã giao', match: (h) => h.milestoneStatus === 'DELIVERED' },
+  { key: 'declined', label: 'Studio từ chối', match: (h) => h.milestoneStatus === 'STUDIO_DECLINED' },
+  { key: 'failed', label: 'Lỗi gửi email', match: (h) => h.emailMessage?.status === 'FAILED' },
+  { key: 'superseded', label: 'Đã đổi Studio', match: (h) => h.milestoneStatus === 'SUPERSEDED' },
+];
+
 /** The studio timeline of steps 3–4: what went to which Studio and when, every milestone and Submission (BR-58, BR-59). */
 export function StudioTab() {
   const { project, caps, base } = useProject();
   const [mode, setMode] = useState<'handoff' | 'change' | null>(null);
   const [moving, setMoving] = useState<StudioHandoff | null>(null);
+  const [filter, setFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [requestsVersion, setRequestsVersion] = useState(0);
   const history = useResource(`handoffs:${project.id}:${project.updatedAt}`, () => studioService.listHandoffs(project.id));
   const delivering = isIn(project.status, DELIVERY_PROJECT);
   const canHandOff = caps.handoff && (project.status === 'ASSIGNED' || delivering);
+  const canAskTokens = caps.creator && caps.suggest && isIn(project.status, [...OPEN_PROJECT, 'UNDER_REVISION']);
+  const all = history.data ?? [];
+  const declined = all.some((h) => h.milestoneStatus === 'STUDIO_DECLINED');
+  const matching = all.filter(FILTERS.find((f) => f.key === filter)!.match);
+  const { rows, totalPages } = pageOf(matching, page, PAGE_SIZE);
 
-  const downloadBrief = async (handoff: StudioHandoff) => {
-    const blob = await studioService.downloadBrief(project.id, handoff.id);
-    if (blob) saveBlob(blob, `brief-${project.title}.pdf`);
-  };
-  const downloadMaterial = async (handoff: StudioHandoff, material: HandoffMaterial) => {
-    const blob = await studioService.downloadMaterial(project.id, handoff.id, material.id);
-    if (blob) saveBlob(blob, material.fileName);
-  };
-  const refresh = async () => {
-    await history.reload();
-  };
+  const downloadBrief = (handoff: StudioHandoff) =>
+    downloadFile(() => studioService.downloadBrief(project.id, handoff.id), `brief-${project.title}.pdf`);
+  const downloadMaterial = (handoff: StudioHandoff, material: HandoffMaterial) =>
+    downloadFile(() => studioService.downloadMaterial(project.id, handoff.id, material.id), material.fileName);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <div className="lg:col-span-2 space-y-5">
         <Panel
           title="Dòng thời gian Studio"
-          description="Gửi brief PDF và file material cho Studio đối tác bên thứ 3 qua email, ghi nhận Studio, mùa được giao và ngày giao; sau đó Creator cập nhật từng mốc tiến độ của Studio và upload Submission Studio giao."
+          description="Gửi brief PDF và file material cho Studio đối tác bên thứ 3 qua email; sau đó Creator cập nhật từng mốc tiến độ của Studio và upload Submission Studio giao."
         >
+          <div role="group" aria-label="Lọc theo trạng thái" className="flex flex-wrap gap-1.5 mb-4">
+            {FILTERS.map((f) => {
+              const count = all.filter(f.match).length;
+              return (
+                <button
+                  key={f.key}
+                  type="button"
+                  aria-pressed={filter === f.key}
+                  onClick={() => { setFilter(f.key); setPage(1); }}
+                  className={`px-2.5 py-1 rounded-full text-xs border cursor-pointer ${
+                    filter === f.key ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
+                  }`}
+                >
+                  {f.label} <span className="opacity-70">({count})</span>
+                </button>
+              );
+            })}
+          </div>
           {history.error && <ErrorNote message={history.error} onRetry={history.reload} />}
           {history.loading && !history.data && <Loading />}
-          {history.data?.length === 0 && <Empty>Chưa bàn giao cho Studio nào.</Empty>}
+          {history.data && matching.length === 0 && <Empty>{all.length ? 'Không có bàn giao nào ở mục này.' : 'Chưa bàn giao cho Studio nào.'}</Empty>}
           <ol className="space-y-3">
-            {history.data?.map((handoff) => (
+            {rows.map((handoff) => (
               <HandoffCard
                 key={handoff.id}
                 handoff={handoff}
                 movieId={project.id}
                 base={base}
-                onBrief={() => downloadBrief(handoff)}
-                onMaterial={(material) => downloadMaterial(handoff, material)}
+                onBrief={() => void downloadBrief(handoff)}
+                onMaterial={(material) => void downloadMaterial(handoff, material)}
                 onMilestone={caps.handoff && delivering ? () => setMoving(handoff) : undefined}
               />
             ))}
           </ol>
+          <Pager page={Math.min(page, totalPages)} totalPages={totalPages} onChange={setPage} />
+        </Panel>
+
+        <Panel title="Yêu cầu thêm Token" description="Creator gửi Reviewer khi Studio không chấp nhận mức Token; Admin theo dõi.">
+          <TokenRequestList movieId={project.id} canAnswer={caps.feeAllocate} refreshKey={requestsVersion} />
         </Panel>
       </div>
 
@@ -82,7 +123,7 @@ export function StudioTab() {
                 <Send className="w-3.5 h-3.5" aria-hidden="true" /> Bàn giao cho Studio
               </Button>
             )}
-            {caps.handoff && delivering && (history.data?.length ?? 0) > 0 && (
+            {caps.handoff && delivering && all.length > 0 && (
               <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
                 <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi Studio
               </Button>
@@ -91,6 +132,16 @@ export function StudioTab() {
             {project.status === 'ASSIGNED' && !caps.handoff && <p className="text-xs text-slate-500">Chờ Content Creator bàn giao cho Studio.</p>}
           </div>
         </Panel>
+        {canAskTokens && (
+          <>
+            {declined && (
+              <p className="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300">
+                Studio đã từ chối. Nếu lý do là mức Token, hãy xin thêm Token từ Reviewer bên dưới.
+              </p>
+            )}
+            <TokenRequestForm project={project} onSent={() => setRequestsVersion((v) => v + 1)} />
+          </>
+        )}
       </div>
 
       {mode === 'handoff' && <HandOffModal onClose={() => setMode(null)} />}
@@ -100,7 +151,7 @@ export function StudioTab() {
           handoff={moving}
           onClose={() => {
             setMoving(null);
-            void refresh();
+            void history.reload();
           }}
         />
       )}

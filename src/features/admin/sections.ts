@@ -1,5 +1,7 @@
 import {
   BadgeAlert,
+  Bell,
+  HandCoins,
   BarChart3,
   Clapperboard,
   Coins,
@@ -30,6 +32,8 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { href: '/admin/permissions', label: 'Phân quyền', icon: KeyRound, permission: PERMISSION.ROLE_MANAGE },
   { href: '/admin/projects', label: 'Dự án phim', icon: Clapperboard, permission: PERMISSION.PROJECT_READ_ALL },
   { href: '/admin/change-requests', label: 'Đề xuất chờ duyệt', icon: MessageSquareWarning, permission: PERMISSION.PROJECT_CHANGE_REVIEW },
+  { href: '/admin/token-requests', label: 'Creator xin thêm Token', icon: HandCoins, permission: PERMISSION.PROJECT_CHANGE_REVIEW },
+  { href: '/admin/notifications', label: 'Thông báo', icon: Bell, permission: PERMISSION.PROJECT_READ_ALL },
   { href: '/admin/movies', label: 'Phim đã phát hành', icon: Film, permission: PERMISSION.PROJECT_READ_ALL },
   { href: '/admin/reviewer-tokens', label: 'Token Reviewer', icon: Coins, permission: PERMISSION.TOKEN_BUDGET_MANAGE },
   { href: '/admin/price-alerts', label: 'Cảnh báo giá', icon: BadgeAlert, permission: PERMISSION.PRICE_ALERT_MANAGE },

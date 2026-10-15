@@ -27,8 +27,12 @@ export function ChangeRequestsTab() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <Panel
         className="lg:col-span-2"
-        title="Đề xuất cho Admin"
-        description="Đề xuất chỉnh sửa dự án, xin thêm kinh phí hoặc gia hạn, kèm lý do và giấy tờ minh hoạ. Chỉ Admin duyệt hoặc từ chối."
+        title={caps.creator ? 'Đề xuất cho Reviewer & Admin' : 'Đề xuất cho Admin'}
+        description={
+          caps.creator
+            ? 'Đề xuất chỉnh sửa dự án hoặc gia hạn gửi Admin (Reviewer được báo). Xin thêm Token khi Studio không chấp nhận: gửi Reviewer ở tab Studio.'
+            : 'Đề xuất chỉnh sửa dự án, xin thêm kinh phí hoặc gia hạn, kèm lý do và giấy tờ minh hoạ. Chỉ Admin duyệt hoặc từ chối.'
+        }
       >
         {requests.error && <ErrorNote message={requests.error} onRetry={requests.reload} />}
         {requests.loading && !requests.data && <Loading />}
