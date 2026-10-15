@@ -71,8 +71,17 @@ function kindLabel(e: TokenHistoryEntry): string {
 }
 
 /** Grants, take-backs and production fees, newest first; `projectHref` links fee lines to their project. */
-export function TokenHistoryTable({ wallet, projectHref }: { wallet: ReviewerWallet; projectHref?: (movieId: string) => string }) {
-  if (wallet.history.length === 0) return <Empty>Chưa có giao dịch Token nào.</Empty>;
+export function TokenHistoryTable({
+  wallet,
+  entries = wallet.history,
+  projectHref,
+}: {
+  wallet: ReviewerWallet;
+  /** A filtered part of the history; the whole history by default. */
+  entries?: TokenHistoryEntry[];
+  projectHref?: (movieId: string) => string;
+}) {
+  if (entries.length === 0) return <Empty>Chưa có giao dịch Token nào ở mục này.</Empty>;
   return (
     <div className="overflow-x-auto -mx-5 -my-5 p-5">
       <table className="w-full text-xs">
@@ -86,7 +95,7 @@ export function TokenHistoryTable({ wallet, projectHref }: { wallet: ReviewerWal
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-          {wallet.history.map((e) => (
+          {entries.map((e) => (
             <tr key={`${e.kind}:${e.id}`} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
               <td className="py-3 px-4 text-slate-500 whitespace-nowrap text-[11px]">{formatDateTime(e.createdAt)}</td>
               <td className="py-3 px-4">
@@ -105,6 +114,7 @@ export function TokenHistoryTable({ wallet, projectHref }: { wallet: ReviewerWal
                 ) : (
                   <span className="text-slate-400">—</span>
                 )}
+                {e.season && <span className="block text-[10px] text-slate-400 mt-0.5">Mùa {e.season.seasonNumber}{e.season.title ? ` — ${e.season.title}` : ''}</span>}
               </td>
               <td className={`py-3 px-4 text-right font-mono font-bold ${e.amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 {e.amountTokens > 0 ? '+' : ''}
