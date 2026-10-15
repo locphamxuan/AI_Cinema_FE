@@ -1,129 +1,165 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Film, Search } from 'lucide-react';
-import { fieldInputClass } from '@/components/ui/FormField';
-import { API_ROUTES } from '@/constants/apiRoutes';
-import { useResource } from '@/features/production/hooks/useResource';
-import { productionPaths } from '@/features/production/lib/routes';
+import { ChevronDown, ChevronRight, Coins, Eye, Film, Heart, ShoppingCart } from 'lucide-react';
 import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
-import { apiClient } from '@/services/apiClient';
-import type { Genre } from '@/types/production';
+import { useResource } from '@/features/production/hooks/useResource';
+import { formatNumber } from '@/features/production/lib/format';
+import { productionPaths } from '@/features/production/lib/routes';
+import { filmReportService } from '@/services/filmReportService';
+import type { FilmFigures } from '@/types/film-report';
 
-/** A movie as the public catalog lists it: at least one episode out, never cancelled. */
-interface CatalogMovie {
-  id: string;
-  title: string;
-  synopsis: string | null;
-  ageRating: string | null;
-  releaseYear: number | null;
-  posterUrl: string | null;
-  genres: Genre[];
-}
-
-interface CatalogPage {
-  data: CatalogMovie[];
-  meta: { totalItems: number; currentPage: number; totalPages: number };
-}
-
-function catalogUrl(page: number, search: string): string {
-  const params = new URLSearchParams({ page: String(page), limit: '12', sortBy: 'createdAt:DESC' });
-  if (search.trim()) params.set('search', search.trim());
-  return `${API_ROUTES.MOVIES.LIST}?${params.toString()}`;
-}
+const STAT = 'inline-flex items-center gap-1 font-mono';
 
 /**
- * Movies viewers can watch now (the public catalog). Each one is a movie project, so the Admin opens it to
- * see episodes, prices and publications, and proposes changes to its Reviewer from there (BR-55).
+ * Film management: one tab per genre (a movie of several genres shows in each of them), and for every movie its
+ * hearts, plays, purchases and the Coin Members paid, then the same figures episode by episode.
  */
 export function AdminMoviesPanel() {
-  const [searchDraft, setSearchDraft] = useState('');
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
-  const movies = useResource(`admin:movies:${search}:${page}`, () => apiClient.get<CatalogPage>(catalogUrl(page, search)));
-  const totalPages = movies.data?.meta.totalPages ?? 1;
+  const genres = useResource('admin:films:genres', filmReportService.genres);
+  const [chosen, setChosen] = useState<string | null>(null);
+  const genreId = chosen ?? genres.data?.[0]?.id ?? null;
+  const films = useResource(genreId ? `admin:films:${genreId}` : null, () => filmReportService.movies(genreId!));
+  const [open, setOpen] = useState<string | null>(null);
+  const rows = films.data ?? [];
+  const total = (key: 'likeCount' | 'viewCount' | 'purchases' | 'coinsEarned') => rows.reduce((n, f) => n + f[key], 0);
 
   return (
-    <Panel
-      title="Phim đã phát hành"
-      description={`${movies.data ? `${movies.data.meta.totalItems} phim` : 'Đang tải…'} đang có trên trang người xem. Mở phim để xem tập, giá và lịch phát hành.`}
-      actions={
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSearch(searchDraft);
-            setPage(1);
-          }}
-          className="relative"
-        >
-          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-          <input
-            type="search"
-            aria-label="Tìm phim theo tên"
-            value={searchDraft}
-            onChange={(e) => setSearchDraft(e.target.value)}
-            placeholder="Tên phim…"
-            className={`${fieldInputClass} pl-8 py-1.5 w-52 text-xs`}
-          />
-        </form>
-      }
-    >
-      {movies.error && <ErrorNote message={movies.error} onRetry={movies.reload} />}
-      {movies.loading && !movies.data && <Loading />}
-      {movies.data?.data.length === 0 && <Empty>Chưa có phim nào được phát hành.</Empty>}
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {movies.data?.data.map((m) => (
-          <li key={m.id}>
-            <Link
-              href={productionPaths.project('/admin', m.id, 'episodes')}
-              className="group flex gap-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 p-3.5 bg-white dark:bg-[#141720] hover:border-purple-500/40 hover:shadow-md hover:shadow-purple-500/5 transition-all duration-200"
+    <div className="space-y-5">
+      <div>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Quản lý phim</h1>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          Phim đang có trên nền tảng theo từng thể loại: số tim, lượt xem, lượt mua và Coin Member đã trả, chi tiết tới từng tập.
+        </p>
+      </div>
+      {genres.error && <ErrorNote message={genres.error} onRetry={genres.reload} />}
+      {genres.loading && !genres.data && <Loading />}
+      {genres.data && (
+        <div role="tablist" aria-label="Thể loại" className="flex gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-white/5 overflow-x-auto">
+          {genres.data.map((g) => (
+            <button
+              key={g.id}
+              type="button"
+              role="tab"
+              aria-selected={g.id === genreId}
+              onClick={() => { setChosen(g.id); setOpen(null); }}
+              className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold cursor-pointer ${
+                g.id === genreId ? 'bg-white dark:bg-purple-600 text-purple-700 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
+              }`}
             >
-              <div className="w-20 h-28 shrink-0 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden flex items-center justify-center border border-slate-200/50 dark:border-white/5 shadow-xs">
-                {m.posterUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- posters come from outside hosts (Commons, R2)
-                  <img src={m.posterUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                ) : (
-                  <Film className="w-6 h-6 text-slate-400 group-hover:text-purple-500 transition-colors" aria-hidden="true" />
-                )}
-              </div>
-              <div className="min-w-0 text-xs space-y-1.5 flex flex-col justify-between">
-                <div>
-                  <p className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    {m.title}
-                  </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                    {[m.releaseYear, m.ageRating].filter(Boolean).join(' · ')}
-                  </p>
-                </div>
-                {m.genres.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {m.genres.slice(0, 2).map((g) => (
-                      <span key={g.id} className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">
-                        {g.name}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {m.synopsis && <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{m.synopsis}</p>}
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-end gap-2 text-xs">
-          <button type="button" aria-label="Trang trước" disabled={page <= 1} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer">
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <span className="text-slate-500 dark:text-slate-400">
-            Trang {page}/{totalPages}
-          </span>
-          <button type="button" aria-label="Trang sau" disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer">
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
+              {g.name} <span className="opacity-60">({g.movieCount})</span>
+            </button>
+          ))}
         </div>
       )}
-    </Panel>
+      {genres.data?.length === 0 && <Empty>Chưa có phim nào trên nền tảng.</Empty>}
+      {genreId && (
+        <Panel
+          title={genres.data?.find((g) => g.id === genreId)?.name ?? 'Thể loại'}
+          description={`${rows.length} phim · ${formatNumber(total('likeCount'))} tim · ${formatNumber(total('viewCount'))} lượt xem · ${formatNumber(total('purchases'))} lượt mua · ${formatNumber(total('coinsEarned'))} Coin`}
+        >
+          {films.error && <ErrorNote message={films.error} onRetry={films.reload} />}
+          {films.loading && !films.data && <Loading />}
+          {films.data && rows.length === 0 && <Empty>Thể loại này chưa có phim.</Empty>}
+          {rows.length > 0 && (
+            <div className="overflow-x-auto -mx-6 -my-6">
+              <table className="w-full text-xs">
+                <thead className="text-[11px] text-slate-500 text-left bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                  <tr>
+                    <th className="py-2.5 px-4 font-semibold">Phim</th>
+                    <th className="py-2.5 px-3 font-semibold text-right">Tim</th>
+                    <th className="py-2.5 px-3 font-semibold text-right">Lượt xem</th>
+                    <th className="py-2.5 px-3 font-semibold text-right">Lượt mua</th>
+                    <th className="py-2.5 px-4 font-semibold text-right">Coin nhận được</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                  {rows.map((film) => (
+                    <FilmRow key={film.id} film={film} expanded={open === film.id} onToggle={() => setOpen(open === film.id ? null : film.id)} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Panel>
+      )}
+    </div>
+  );
+}
+
+function FilmRow({ film, expanded, onToggle }: { film: FilmFigures; expanded: boolean; onToggle: () => void }) {
+  const many = film.episodes.length > 1;
+  return (
+    <Fragment>
+      <tr className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02]">
+        <td className="py-3 px-4">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-expanded={expanded}
+              aria-label={`${expanded ? 'Ẩn' : 'Xem'} từng tập của ${film.title}`}
+              className="text-slate-400 hover:text-purple-600 cursor-pointer"
+            >
+              {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </button>
+            {film.posterUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={film.posterUrl} alt="" className="w-9 h-12 rounded-md object-cover bg-slate-200 dark:bg-white/10" />
+            ) : (
+              <span className="w-9 h-12 rounded-md bg-slate-200 dark:bg-white/10 flex items-center justify-center"><Film className="w-4 h-4 text-slate-400" /></span>
+            )}
+            <div className="min-w-0">
+              <Link href={productionPaths.project('/admin', film.id, 'episodes')} className="font-semibold text-slate-900 dark:text-white hover:text-purple-600">
+                {film.title}
+              </Link>
+              <p className="text-[11px] text-slate-500">
+                {film.episodes.length} tập{film.releaseYear ? ` · ${film.releaseYear}` : ''}{film.ageRating ? ` · ${film.ageRating}` : ''} · {film.genres.map((g) => g.name).join(', ')}
+              </p>
+            </div>
+          </div>
+        </td>
+        <td className="py-3 px-3 text-right"><span className={`${STAT} text-rose-600`}><Heart className="w-3 h-3" />{formatNumber(film.likeCount)}</span></td>
+        <td className="py-3 px-3 text-right"><span className={STAT}><Eye className="w-3 h-3" />{formatNumber(film.viewCount)}</span></td>
+        <td className="py-3 px-3 text-right"><span className={STAT}><ShoppingCart className="w-3 h-3" />{formatNumber(film.purchases)}</span></td>
+        <td className="py-3 px-4 text-right">
+          <span className={`${STAT} text-amber-600 font-bold`}><Coins className="w-3 h-3" />{formatNumber(film.coinsEarned)}</span>
+          {film.refundedCoins > 0 && <span className="block text-[10px] text-rose-500">đã hoàn {formatNumber(film.refundedCoins)}</span>}
+        </td>
+      </tr>
+      {expanded && (
+        <tr className="bg-slate-50/60 dark:bg-white/[0.02]">
+          <td colSpan={5} className="px-4 py-3">
+            {!many && <p className="text-[11px] text-slate-500 mb-2">Phim một tập — số liệu của tập chính là của phim.</p>}
+            <table className="w-full text-[11px]">
+              <thead className="text-slate-500 text-left">
+                <tr>
+                  <th className="py-1.5 pl-10">Tập</th>
+                  <th className="py-1.5 text-right">Giá</th>
+                  <th className="py-1.5 text-right">Lượt xem</th>
+                  <th className="py-1.5 text-right">Lượt mua</th>
+                  <th className="py-1.5 pr-0 text-right">Coin nhận được</th>
+                </tr>
+              </thead>
+              <tbody>
+                {film.episodes.map((e) => (
+                  <tr key={e.id} className="border-t border-slate-200/60 dark:border-white/5">
+                    <td className="py-1.5 pl-10">Tập {e.episodeNumber}{e.title && e.title !== `Tập ${e.episodeNumber}` ? ` — ${e.title}` : ''}</td>
+                    <td className="py-1.5 text-right font-mono">{e.coinPrice ? `${e.coinPrice} Coin` : 'Miễn phí'}</td>
+                    <td className="py-1.5 text-right font-mono">{formatNumber(e.views)}</td>
+                    <td className="py-1.5 text-right font-mono">{formatNumber(e.purchases)}</td>
+                    <td className="py-1.5 text-right font-mono text-amber-600">
+                      {formatNumber(e.coinsEarned)}
+                      {e.refundedCoins > 0 && <span className="text-rose-500"> (hoàn {formatNumber(e.refundedCoins)})</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      )}
+    </Fragment>
   );
 }
