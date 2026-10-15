@@ -70,6 +70,11 @@ export interface StudioInput {
 
 /** A hand-off: the studio (default: the project's), the season (default: everything left) and the files. */
 export interface HandOffInput {
+  /** Studio typed by hand: a known email reuses that studio, a new one needs `studioName`. */
+  studioName?: string;
+  studioEmail?: string;
+  studioPhone?: string;
+  /** Falls back to the project's current studio (first hand-off only). */
   studioId?: string;
   seasonId?: string;
   scripts?: File[];
@@ -77,7 +82,6 @@ export interface HandOffInput {
 }
 
 export interface ChangeStudioInput extends HandOffInput {
-  studioId: string;
   reason: string;
 }
 

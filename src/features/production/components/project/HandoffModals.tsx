@@ -7,7 +7,6 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { studioService } from '@/services/studioService';
 import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
 import { FilePicker } from '../shared/FilePicker';
 import { DeadlineList, deadlineUsable } from './DueDateRows';
 import { useProject } from './ProjectContext';
@@ -15,38 +14,49 @@ import { useProject } from './ProjectContext';
 const MATERIAL_ACCEPT = '.pdf,.docx,.txt,.png,.jpg,.jpeg,.webp';
 const MATERIAL_HINT = 'PDF, DOCX, TXT UTF-8 hoặc ảnh; tối đa 10 tệp, mỗi tệp 50 MB.';
 
-/** Studio, season and files of a hand-off, shared by the first hand-off and a studio change. */
-function HandoffFields(props: {
-  studioId: string;
+interface HandoffForm {
+  studioName: string;
+  studioEmail: string;
+  studioPhone: string;
   seasonId: string;
   scripts: File[];
   references: File[];
-  /** Season ids that can still be chosen; empty for the studio change, which asks for its own scope. */
-  onChange: (patch: Partial<{ studioId: string; seasonId: string; scripts: File[]; references: File[] }>) => void;
+}
+
+/** Studio, season and files of a hand-off, shared by the first hand-off and a studio change. */
+function HandoffFields(props: {
+  studioName: string;
+  studioEmail: string;
+  studioPhone: string;
+  seasonId: string;
+  scripts: File[];
+  references: File[];
+  onChange: (patch: Partial<HandoffForm>) => void;
+  /** The first hand-off may reuse the project's studio, so typing one is optional there. */
   studioRequired: boolean;
 }) {
   const { project } = useProject();
-  const studios = useResource('studios:active', () => studioService.list(true));
   return (
     <>
-      <FormField label="Studio nhận brief">
-        <select
-          value={props.studioId}
-          onChange={(e) => props.onChange({ studioId: e.target.value })}
-          required={props.studioRequired}
-          className={fieldInputClass}
-          aria-label="Studio nhận brief"
-        >
-          <option value="" disabled={props.studioRequired}>
-            {studios.loading ? 'Đang tải…' : props.studioRequired ? 'Chọn Studio' : `Studio của dự án (${project.studio?.name ?? 'chưa chọn'})`}
-          </option>
-          {studios.data?.map((studio) => (
-            <option key={studio.id} value={studio.id}>
-              {studio.name} — {studio.email}
-            </option>
-          ))}
-        </select>
-      </FormField>
+      <fieldset className="space-y-3">
+        <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Studio nhận brief (nhập tay)</legend>
+        {!props.studioRequired && project.studio && (
+          <p className="text-[11px] text-slate-500">
+            Để trống để gửi cho Studio của dự án: {project.studio.name}. Email đã có trong hệ thống sẽ dùng lại Studio đó.
+          </p>
+        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <FormField label="Tên Studio">
+            <input value={props.studioName} onChange={(e) => props.onChange({ studioName: e.target.value })} minLength={2} maxLength={255} className={fieldInputClass} aria-label="Tên Studio" />
+          </FormField>
+          <FormField label="Email nhận brief">
+            <input type="email" value={props.studioEmail} onChange={(e) => props.onChange({ studioEmail: e.target.value })} maxLength={255} className={fieldInputClass} aria-label="Email Studio" />
+          </FormField>
+        </div>
+        <FormField label="Số điện thoại (không bắt buộc)">
+          <input value={props.studioPhone} onChange={(e) => props.onChange({ studioPhone: e.target.value })} maxLength={30} className={fieldInputClass} aria-label="Số điện thoại Studio" />
+        </FormField>
+      </fieldset>
       <FormField label="Phạm vi bàn giao">
         <select value={props.seasonId} onChange={(e) => props.onChange({ seasonId: e.target.value })} className={fieldInputClass} aria-label="Phạm vi bàn giao">
           <option value="">Cả dự án (mọi tập chưa giao)</option>
@@ -64,11 +74,19 @@ function HandoffFields(props: {
   );
 }
 
-const EMPTY = { studioId: '', seasonId: '', scripts: [] as File[], references: [] as File[] };
+const EMPTY: HandoffForm = { studioName: '', studioEmail: '', studioPhone: '', seasonId: '', scripts: [], references: [] };
+
+/** The typed studio as the API takes it; nothing when the fields are left empty. */
+function typedStudio(form: HandoffForm) {
+  const email = form.studioEmail.trim();
+  return email ? { studioEmail: email, studioName: form.studioName.trim(), studioPhone: form.studioPhone.trim() } : {};
+}
+
+const studioTyped = (form: HandoffForm) => form.studioEmail.trim() !== '' && form.studioName.trim().length >= 2;
 
 export function HandOffModal({ onClose }: { onClose: () => void }) {
   const { project, reload } = useProject();
-  const [form, setForm] = useState({ ...EMPTY, studioId: project.studio?.id ?? '' });
+  const [form, setForm] = useState(EMPTY);
   const { busy, run } = useAction();
   const episodes = project.seasons
     .filter((s) => !form.seasonId || s.id === form.seasonId)
@@ -81,7 +99,7 @@ export function HandOffModal({ onClose }: { onClose: () => void }) {
     const done = await run(
       () =>
         studioService.handOff(project.id, {
-          ...(form.studioId ? { studioId: form.studioId } : {}),
+          ...typedStudio(form),
           ...(form.seasonId ? { seasonId: form.seasonId } : {}),
           scripts: form.scripts,
           references: form.references,
@@ -115,7 +133,7 @@ export function HandOffModal({ onClose }: { onClose: () => void }) {
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !ready || (!form.studioId && !project.studio)}>
+          <Button type="submit" disabled={busy || !ready || (project.studio ? form.studioEmail.trim() !== '' && !studioTyped(form) : !studioTyped(form))}>
             {busy ? 'Đang gửi…' : 'Gửi brief'}
           </Button>
         </div>
@@ -135,7 +153,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
     const done = await run(
       () =>
         studioService.changeStudio(project.id, {
-          studioId: form.studioId,
+          ...typedStudio(form),
           ...(form.seasonId ? { seasonId: form.seasonId } : {}),
           reason: reason.trim(),
           scripts: form.scripts,
@@ -160,7 +178,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !form.studioId || reason.trim().length < 5}>
+          <Button type="submit" disabled={busy || !studioTyped(form) || reason.trim().length < 5}>
             Đổi Studio
           </Button>
         </div>

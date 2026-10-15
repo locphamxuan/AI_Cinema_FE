@@ -175,7 +175,7 @@ describe('ProjectListPage', () => {
 });
 
 describe('ProjectDetailPage', () => {
-  it('offers the assigned Creator the studio hand-off, to a studio of the catalog', async () => {
+  it('offers the assigned Creator the studio hand-off, with the studio typed by hand', async () => {
     nav.pathname = '/creator/projects/m1';
     nav.params = { projectId: 'm1' };
     nav.search = 'tab=studio';
@@ -192,7 +192,10 @@ describe('ProjectDetailPage', () => {
     expect(within(dialog).queryByLabelText(/Hạn giao tập/)).not.toBeInTheDocument();
     const send = screen.getByRole('button', { name: 'Gửi brief' });
     expect(send).toBeDisabled();
-    await userEvent.selectOptions(await within(dialog).findByLabelText('Studio nhận brief'), 'st1');
+    expect(within(dialog).queryByRole('combobox', { name: /Studio nhận brief/ })).not.toBeInTheDocument();
+    await userEvent.type(await within(dialog).findByLabelText('Tên Studio'), 'Studio Ánh Trăng');
+    expect(send).toBeDisabled();
+    await userEvent.type(within(dialog).getByLabelText('Email Studio'), 'contact@anhtrang.studio');
     expect(send).toBeEnabled();
   });
 

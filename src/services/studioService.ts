@@ -20,6 +20,9 @@ const R = API_ROUTES.PRODUCTION;
 export function handoffForm(input: HandOffInput & { reason?: string }): FormData {
   const form = new FormData();
   if (input.studioId) form.append('studioId', input.studioId);
+  if (input.studioEmail) form.append('studioEmail', input.studioEmail);
+  if (input.studioName) form.append('studioName', input.studioName);
+  if (input.studioPhone) form.append('studioPhone', input.studioPhone);
   if (input.seasonId) form.append('seasonId', input.seasonId);
   if (input.reason) form.append('reason', input.reason);
   for (const file of input.scripts ?? []) form.append('scripts', file);

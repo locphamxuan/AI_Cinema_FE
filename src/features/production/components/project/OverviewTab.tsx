@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
-import { studioService } from '@/services/studioService';
 import { teamService } from '@/services/teamService';
 import type { AgeRating, Person } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
@@ -139,8 +138,6 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
   const [genreIds, setGenreIds] = useState(project.genres.map((g) => g.id));
   const [ageRating, setAgeRating] = useState<AgeRating | ''>(project.ageRating ?? '');
   const [releaseYear, setReleaseYear] = useState(project.releaseYear ? String(project.releaseYear) : '');
-  const [studioId, setStudioId] = useState(project.studio?.id ?? '');
-  const studios = useResource(project.handedOffAt ? null : 'studios:active', () => studioService.list(true));
   const { busy, run } = useAction();
 
   const submit = async (e: React.FormEvent) => {
@@ -154,7 +151,6 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
           ...(synopsis.trim() ? { synopsis: synopsis.trim() } : {}),
           ...(ageRating ? { ageRating } : {}),
           ...(releaseYear ? { releaseYear: Number(releaseYear) } : {}),
-          ...(studioId && studioId !== project.studio?.id ? { studioId } : {}),
         }),
       'Đã lưu thông tin phim',
     );
@@ -180,18 +176,6 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
           <span className="block text-slate-600 dark:text-slate-300 mb-1 text-xs font-medium">Thể loại</span>
           <GenrePicker value={genreIds} onChange={setGenreIds} />
         </div>
-        {!project.handedOffAt && (
-          <FormField label="Studio đối tác (đổi được tới khi bàn giao)">
-            <select value={studioId} onChange={(e) => setStudioId(e.target.value)} className={fieldInputClass} aria-label="Studio đối tác">
-              <option value="">{studios.loading ? 'Đang tải…' : 'Chưa chọn'}</option>
-              {studios.data?.map((studio) => (
-                <option key={studio.id} value={studio.id}>
-                  {studio.name}
-                </option>
-              ))}
-            </select>
-          </FormField>
-        )}
         <div className="grid grid-cols-2 gap-3">
           <FormField label="Độ tuổi (BR-54)">
             <select value={ageRating} onChange={(e) => setAgeRating(e.target.value as AgeRating | '')} className={fieldInputClass}>

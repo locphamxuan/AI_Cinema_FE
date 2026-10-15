@@ -7,9 +7,7 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
 import { productionService } from '@/services/productionService';
-import { studioService } from '@/services/studioService';
 import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
 import { emptyEpisode } from '../shared/EpisodeRowsEditor';
 import { GenrePicker } from '../shared/GenrePicker';
 import { emptySeason, seasonValid, toSeasonInput, SeasonDraftEditor, type SeasonDraft } from '../shared/SeasonDraftEditor';
@@ -22,9 +20,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
   const [idea, setIdea] = useState('');
   const [genreIds, setGenreIds] = useState<string[]>([]);
   const [language, setLanguage] = useState('vi');
-  const [studioId, setStudioId] = useState('');
   const [seasons, setSeasons] = useState<SeasonDraft[]>([{ ...emptySeason(1), episodes: [emptyEpisode(1), emptyEpisode(2)] }]);
-  const studios = useResource('studios:active', () => studioService.list(true));
   const { busy, run } = useAction();
 
   // Episodes are numbered across the whole movie (BR-03).
@@ -50,7 +46,6 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
             ideaDescription: idea.trim(),
             genreIds,
             defaultLanguage: language,
-            ...(studioId ? { studioId } : {}),
             seasons: seasons.map(toSeasonInput),
           }),
         'Đã tạo dự án',
@@ -62,7 +57,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
   };
 
   return (
-    <Modal open onClose={onClose} title="Tạo dự án phim" subtitle="Bước 1 — ý tưởng, Studio và cấu trúc mùa/tập" icon={<Clapperboard className="w-4 h-4" />} maxWidth="max-w-3xl">
+    <Modal open onClose={onClose} title="Tạo dự án phim" subtitle="Bước 1 — ý tưởng, thể loại và cấu trúc mùa/tập (Studio nhập khi bàn giao)" icon={<Clapperboard className="w-4 h-4" />} maxWidth="max-w-3xl">
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Tên phim">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} required className={fieldInputClass} />
@@ -79,16 +74,6 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
             <select value={language} onChange={(e) => setLanguage(e.target.value)} className={fieldInputClass}>
               <option value="vi">Tiếng Việt</option>
               <option value="en">English</option>
-            </select>
-          </FormField>
-          <FormField label="Studio đối tác (đặt hàng sản xuất)">
-            <select value={studioId} onChange={(e) => setStudioId(e.target.value)} className={fieldInputClass} aria-label="Studio đối tác">
-              <option value="">{studios.loading ? 'Đang tải…' : 'Chọn sau'}</option>
-              {studios.data?.map((studio) => (
-                <option key={studio.id} value={studio.id}>
-                  {studio.name}
-                </option>
-              ))}
             </select>
           </FormField>
         </div>
