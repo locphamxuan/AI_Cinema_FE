@@ -1,17 +1,23 @@
 'use client';
 
+import { useState } from 'react';
 import { productionService } from '@/services/productionService';
 import type { ProjectEvent } from '@/types/production';
 import { useResource } from '../../hooks/useResource';
 import { EVENT_LABEL } from '../../lib/labels';
 import { formatDateTime } from '../../lib/format';
+import { Pager, pageOf } from '../shared/Pager';
 import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
 import { useProject } from './ProjectContext';
 
-/** What happened in the project, newest first (audit log, §4.1.6). */
+const PAGE_SIZE = 15;
+
+/** What happened in the project, newest first (audit log, §4.1.6), a page at a time. */
 export function ActivityTab() {
   const { project } = useProject();
   const events = useResource(`events:${project.id}:${project.updatedAt}`, () => productionService.listEvents(project.id));
+  const [page, setPage] = useState(1);
+  const { rows, totalPages } = pageOf(events.data ?? [], page, PAGE_SIZE);
 
   return (
     <Panel title="Lịch sử dự án">
@@ -19,7 +25,7 @@ export function ActivityTab() {
       {events.loading && !events.data && <Loading />}
       {events.data?.length === 0 && <Empty>Chưa có sự kiện nào.</Empty>}
       <ol className="relative border-l border-slate-200 dark:border-white/10 ml-2 space-y-4">
-        {events.data?.map((ev) => (
+        {rows.map((ev) => (
           <li key={ev.id} className="ml-4 text-xs">
             <span className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white dark:border-[#151822]" />
             <p className="font-semibold text-slate-800 dark:text-slate-100">{EVENT_LABEL[ev.action] ?? ev.action}</p>
@@ -31,6 +37,7 @@ export function ActivityTab() {
           </li>
         ))}
       </ol>
+      <Pager page={Math.min(page, totalPages)} totalPages={totalPages} onChange={setPage} />
     </Panel>
   );
 }
