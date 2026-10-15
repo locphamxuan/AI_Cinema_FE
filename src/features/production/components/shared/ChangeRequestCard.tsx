@@ -8,7 +8,8 @@ import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequest } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { CHANGE_REQUEST_STATUS, CHANGE_REQUEST_TYPE } from '../../lib/labels';
-import { formatDateTime, formatNumber, saveBlob } from '../../lib/format';
+import { downloadFile } from '../../lib/download';
+import { formatDateTime, formatNumber } from '../../lib/format';
 import { StatusPill, TextPromptModal } from './ui';
 
 /** One request to the Admin: what was asked and why, the proof, and the Admin's decision (BR-55). */
@@ -38,8 +39,7 @@ export function ChangeRequestCard({
     }
   };
   const proof = async () => {
-    const blob = await changeRequestService.downloadProof(cr.id);
-    if (blob) saveBlob(blob, cr.attachmentName ?? 'giay-to');
+    await downloadFile(() => changeRequestService.downloadProof(cr.id), cr.attachmentName ?? 'giay-to');
   };
 
   return (
