@@ -1,14 +1,18 @@
 import type {
   ChangeRequestStatus,
+  ChangeRequestType,
   ComplianceCheckType,
   ComplianceResult,
   EpisodeStatus,
+  HandoffMaterialKind,
   LabelLocation,
   LabelType,
   MediaIngestStatus,
   MediaSourceMethod,
   MovieStatus,
   PriceAlertStatus,
+  SeasonStatus,
+  StudioMilestoneStatus,
   TokenEntryType,
   UnpublishMode,
   UnpublishReason,
@@ -28,6 +32,13 @@ export const MOVIE_STATUS: Record<MovieStatus, Label> = {
   COMPLETED: { label: 'Hoàn tất', tone: 'emerald' },
   UNDER_REVISION: { label: 'Đang sửa tập', tone: 'amber' },
   CANCELLED: { label: 'Đã huỷ', tone: 'rose' },
+};
+
+export const SEASON_STATUS: Record<SeasonStatus, Label> = {
+  DRAFT: { label: 'Nháp', tone: 'neutral' },
+  IN_PRODUCTION: { label: 'Đang sản xuất', tone: 'purple' },
+  COMPLETED: { label: 'Hoàn tất', tone: 'emerald' },
+  UNDER_REVISION: { label: 'Đang sửa tập', tone: 'amber' },
 };
 
 export const EPISODE_STATUS: Record<EpisodeStatus, Label> = {
@@ -95,15 +106,39 @@ export const COMPLIANCE_RESULT: Record<ComplianceResult, Label> = {
 };
 
 export const FEE_ENTRY: Record<TokenEntryType, string> = {
-  INITIAL: 'Cấp lần đầu',
-  TOP_UP: 'Cấp thêm',
+  INITIAL: 'Cấp theo đơn giá mùa',
+  TOP_UP: 'Token thêm',
   CORRECTION: 'Điều chỉnh',
 };
 
 export const CHANGE_REQUEST_STATUS: Record<ChangeRequestStatus, Label> = {
-  OPEN: { label: 'Chờ trả lời', tone: 'amber' },
-  ACCEPTED: { label: 'Đã chấp nhận', tone: 'emerald' },
-  REJECTED: { label: 'Đã từ chối', tone: 'rose' },
+  OPEN: { label: 'Chờ Admin duyệt', tone: 'amber' },
+  APPROVED: { label: 'Admin đã duyệt', tone: 'emerald' },
+  REJECTED: { label: 'Admin từ chối', tone: 'rose' },
+};
+
+export const CHANGE_REQUEST_TYPE: Record<ChangeRequestType, string> = {
+  PROJECT_UPDATE: 'Chỉnh sửa dự án',
+  BUDGET_SUPPLEMENT: 'Xin thêm kinh phí',
+  DEADLINE_EXTENSION: 'Gia hạn thời gian',
+  OTHER: 'Khác',
+};
+
+/** Where a hand-off stands with the studio (BR-58). */
+export const MILESTONE_STATUS: Record<StudioMilestoneStatus, Label> = {
+  BRIEF_SENT: { label: 'Đã gửi brief', tone: 'blue' },
+  STUDIO_ACCEPTED: { label: 'Studio đã nhận', tone: 'purple' },
+  IN_PROGRESS: { label: 'Studio đang làm', tone: 'amber' },
+  DELIVERED: { label: 'Studio đã giao', tone: 'emerald' },
+  STUDIO_DECLINED: { label: 'Studio từ chối', tone: 'rose' },
+  SUPERSEDED: { label: 'Đã đổi Studio', tone: 'neutral' },
+};
+
+export const MATERIAL_KIND: Record<HandoffMaterialKind, string> = {
+  BRIEF: 'Brief',
+  SCRIPT: 'Kịch bản',
+  REFERENCE: 'Tài liệu tham khảo',
+  OTHER: 'Khác',
 };
 
 export const PRICE_ALERT_STATUS: Record<PriceAlertStatus, Label> = {
@@ -151,9 +186,14 @@ export const EVENT_LABEL: Record<string, string> = {
   PROJECT_ASSIGNED: 'Giao Content Creator',
   STUDIO_HANDOFF_SENT: 'Gửi brief cho studio',
   STUDIO_CHANGED: 'Đổi studio',
-  STUDIO_LINK_RESENT: 'Gửi lại link cổng studio',
-  STUDIO_ACCEPTED: 'Studio nhận dự án',
-  STUDIO_DECLINED: 'Studio từ chối dự án',
+  STUDIO_MILESTONE_UPDATED: 'Cập nhật mốc Studio',
+  STUDIO_CREATED: 'Thêm Studio vào danh mục',
+  STUDIO_UPDATED: 'Sửa Studio',
+  STUDIO_DELETED: 'Xoá Studio',
+  CREATOR_ADDED: 'Thêm Creator vào dự án',
+  CREATOR_REMOVED: 'Gỡ Creator khỏi dự án',
+  EPISODE_ASSIGNED: 'Giao tập cho Creator',
+  EPISODE_DELEGATED: 'Creator uỷ quyền tập',
   PROJECT_CANCELLED: 'Huỷ dự án',
   PROJECT_COMPLETED: 'Hoàn tất dự án',
   PROJECT_UNDER_REVISION: 'Dự án có tập đang sửa',
@@ -167,9 +207,10 @@ export const EVENT_LABEL: Record<string, string> = {
   COMPLIANCE_FAILED: 'Không đạt kiểm tra tuân thủ',
   EPISODE_PRICED: 'Đặt giá Coin',
   PRICE_OUT_OF_RANGE: 'Giá Coin ngoài khoảng',
-  PROJECT_CHANGE_REQUESTED: 'Admin đề xuất sửa',
-  PROJECT_CHANGE_ACCEPTED: 'Chấp nhận đề xuất',
-  PROJECT_CHANGE_REJECTED: 'Từ chối đề xuất',
+  PROJECT_CHANGE_REQUESTED: 'Gửi đề xuất cho Admin',
+  PROJECT_CHANGE_APPROVED: 'Admin duyệt đề xuất',
+  PROJECT_CHANGE_ACCEPTED: 'Admin duyệt đề xuất',
+  PROJECT_CHANGE_REJECTED: 'Admin từ chối đề xuất',
   EPISODE_SCHEDULED: 'Lên lịch phát hành',
   EPISODE_PUBLISHED: 'Phát hành tập',
   EPISODE_UNPUBLISHED: 'Gỡ tập',

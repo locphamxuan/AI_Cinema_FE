@@ -48,7 +48,7 @@ describe('AdminSidebar', () => {
     signInAs('admin');
     render(<AdminSidebar />);
     const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
-    for (const label of ['Tài khoản', 'Phân quyền', 'Dự án phim', 'Phim đã phát hành', 'Token Reviewer', 'Cảnh báo giá', 'Cài đặt nền tảng']) {
+    for (const label of ['Tài khoản', 'Phân quyền', 'Dự án phim', 'Quản lý phim', 'Token Reviewer', 'Cảnh báo giá', 'Cài đặt nền tảng']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }
     expect(within(nav).getByRole('link', { name: 'Tài khoản' })).toHaveAttribute('aria-current', 'page');
@@ -94,15 +94,32 @@ describe('AccountsPanel', () => {
 });
 
 describe('AdminMoviesPanel', () => {
-  it('lists released movies and opens their project', async () => {
+  it('shows one genre per tab with hearts, plays and Coin per movie, then per episode', async () => {
     signInAs('admin');
     routeFetch({
-      'GET /movies': {
-        body: page([{ id: 'm1', title: 'EXECUTE', synopsis: 'Sci-fi', ageRating: 'T16', releaseYear: 2023, posterUrl: null, genres: [{ id: 'g', name: 'Khoa học viễn tưởng' }] }]),
+      'GET /admin/films/genres': { body: [{ id: 'g1', name: 'Kinh dị', movieCount: 1 }, { id: 'g2', name: 'Cổ trang', movieCount: 2 }] },
+      'GET /admin/films': {
+        body: [
+          {
+            id: 'm1', title: 'Vùng dịch 704', posterUrl: null, status: 'COMPLETED', releaseYear: 2026, ageRating: 'T16',
+            genres: [{ id: 'g1', name: 'Kinh dị' }], likeCount: 12, viewCount: 340, purchases: 9, coinsEarned: 27, refundedCoins: 0,
+            episodes: [
+              { id: 'e1', episodeNumber: 1, title: 'Tập 1', coinPrice: 0, status: 'PUBLISHED', views: 200, purchases: 0, coinsEarned: 0, refundedCoins: 0 },
+              { id: 'e2', episodeNumber: 2, title: 'Tập 2', coinPrice: 3, status: 'PUBLISHED', views: 140, purchases: 9, coinsEarned: 27, refundedCoins: 0 },
+            ],
+          },
+        ],
       },
     });
     render(<AdminMoviesPanel />);
-    const link = await screen.findByRole('link', { name: /EXECUTE/ });
+    expect(await screen.findByRole('tab', { name: /Kinh dị/ })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /Cổ trang/ })).toBeInTheDocument();
+    const link = await screen.findByRole('link', { name: 'Vùng dịch 704' });
     expect(link).toHaveAttribute('href', '/admin/projects/m1?tab=episodes');
+    expect(screen.getByText('340')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: /Xem từng tập của Vùng dịch 704/ }));
+    expect(screen.getByText('Tập 2')).toBeInTheDocument();
+    expect(screen.getByText('3 Coin')).toBeInTheDocument();
   });
 });

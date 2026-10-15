@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Search, Bell,  ChevronDown, User, LogOut, Wallet, Film, ShieldCheck, Settings } from 'lucide-react';
+import { Search, ChevronDown, User, LogOut, Wallet, Film, ShieldCheck, Settings } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import NotificationBell from '@/components/layout/header/NotificationBell';

@@ -9,7 +9,7 @@ import { useCan } from '@/hooks/useCan';
 import { productionService } from '@/services/productionService';
 import { useResource } from '../../hooks/useResource';
 import { projectCapabilities } from '../../lib/capabilities';
-import { MOVIE_STATUS } from '../../lib/labels';
+import { MOVIE_STATUS, SEASON_STATUS } from '../../lib/labels';
 import { baseFromPath, productionPaths } from '../../lib/routes';
 import { ErrorNote, Loading, StatusPill } from '../shared/ui';
 import { ProjectProvider } from './ProjectContext';
@@ -17,22 +17,21 @@ import { OverviewTab } from './OverviewTab';
 import { EpisodesTab } from './EpisodesTab';
 import { StudioTab } from './StudioTab';
 import { FeeTab } from './FeeTab';
+import { TeamTab } from './TeamTab';
 import { ChangeRequestsTab } from './ChangeRequestsTab';
 import { ActivityTab } from './ActivityTab';
 
 const TABS = [
   { key: 'overview', label: 'Tổng quan' },
-  { key: 'episodes', label: 'Tập phim' },
-  { key: 'studio', label: 'Bàn giao Studio' },
+  { key: 'episodes', label: 'Mùa & tập phim' },
+  { key: 'team', label: 'Creator' },
+  { key: 'studio', label: 'Studio' },
   { key: 'fee', label: 'Phí sản xuất' },
   { key: 'changes', label: 'Đề xuất cho Admin' },
   { key: 'activity', label: 'Lịch sử' },
 ] as const;
 
 type TabKey = (typeof TABS)[number]['key'];
-
-/** All production roles (Reviewer, Creator, Admin) have access to the tabs. */
-const tabsFor = (_base: string) => TABS;
 
 /** One movie project, for its Reviewer, its Creator and the Admin; actions follow role, ownership and status. */
 export function ProjectDetailPage() {
@@ -44,7 +43,7 @@ export function ProjectDetailPage() {
   const userId = useAppStore((s) => s.user?.id);
   const can = useCan();
 
-  const tabs = tabsFor(base);
+  const tabs = TABS;
   const requested = searchParams.get('tab');
   const [tab, setTab] = useState<TabKey>(tabs.some((t) => t.key === requested) ? (requested as TabKey) : 'overview');
   const project = useResource(`project:${projectId}`, () => productionService.getProject(projectId));
@@ -106,6 +105,18 @@ export function ProjectDetailPage() {
               </div>
             </div>
           </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Reviewer: {data.reviewer.fullName} · Creator: {data.creator?.fullName ?? 'chưa giao'} · Studio: {data.studio?.name ?? 'chưa chọn'} ·{' '}
+            {data.seasons.length} mùa, {totalEpisodes} tập
+          </p>
+          <p className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400" aria-label="Trạng thái dự án, mùa và tập">
+            Dự án <StatusPill {...MOVIE_STATUS[data.status]} />
+            {data.seasons.map((season) => (
+              <span key={season.id} className="inline-flex items-center gap-1">
+                → Mùa {season.seasonNumber} <StatusPill {...SEASON_STATUS[season.status]} />
+              </span>
+            ))}
+          </p>
         </div>
 
         {data.status === 'CANCELLED' && (
@@ -138,7 +149,7 @@ export function ProjectDetailPage() {
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/5'
               }`}
             >
-              {label}
+              {key === 'changes' && caps.creator ? 'Đề xuất cho Reviewer & Admin' : label}
               {key === 'changes' && data.openChangeRequests > 0 && (
                 <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px]">{data.openChangeRequests}</span>
               )}
@@ -149,6 +160,7 @@ export function ProjectDetailPage() {
         <div role="tabpanel">
           {tab === 'overview' && <OverviewTab />}
           {tab === 'episodes' && <EpisodesTab />}
+          {tab === 'team' && <TeamTab />}
           {tab === 'studio' && <StudioTab />}
           {tab === 'fee' && <FeeTab />}
           {tab === 'changes' && <ChangeRequestsTab />}

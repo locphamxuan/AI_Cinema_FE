@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
+import { teamService } from '@/services/teamService';
 import type { AgeRating, Person } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
@@ -14,6 +15,7 @@ import { formatDateTime } from '../../lib/format';
 import { GenrePicker } from '../shared/GenrePicker';
 import { Facts, Panel, TextPromptModal } from '../shared/ui';
 import { IdeaFilesPanel } from './IdeaFilesPanel';
+import { PosterPanel } from './PosterPanel';
 import { useProject } from './ProjectContext';
 
 export function OverviewTab() {
@@ -52,7 +54,8 @@ export function OverviewTab() {
               ['Độ tuổi', project.ageRating ?? '—'],
               ['Năm phát hành', project.releaseYear ?? '—'],
               ['Tạo lúc', formatDateTime(project.createdAt)],
-              ['Bàn giao studio', formatDateTime(project.handedOffAt)],
+              ['Studio', project.studio?.name ?? '—'],
+              ['Bàn giao Studio', formatDateTime(project.handedOffAt)],
               ['Hoàn tất', formatDateTime(project.completedAt)],
             ]}
           />
@@ -70,10 +73,12 @@ export function OverviewTab() {
           </div>
         </Panel>
 
-        <IdeaFilesPanel canManage={caps.manage && open} />
+        <IdeaFilesPanel canManage={caps.manage && open} purpose="IDEA" />
+        <IdeaFilesPanel canManage={caps.manage && open} purpose="SYNOPSIS" />
       </div>
 
       <div className="space-y-5">
+        <PosterPanel canManage={caps.manage && canEdit} />
         <Panel title="Phân công">
           <Facts
             stacked
@@ -94,7 +99,7 @@ export function OverviewTab() {
                 <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> {project.creator ? 'Đổi Creator' : 'Giao Content Creator'}
               </Button>
               {project.productionFeeTokens <= 0 && (
-                <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400">Cấp phí sản xuất (tab Phí sản xuất) trước khi giao Creator.</p>
+                <p className="mt-2 text-[11px] text-amber-600 dark:text-amber-400">Cấp phí cho từng mùa (tab Phí sản xuất) trước khi giao Creator.</p>
               )}
             </>
           )}
@@ -173,7 +178,7 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
           <GenrePicker value={genreIds} onChange={setGenreIds} />
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="Độ tuổi (BR-54)">
+          <FormField label="Độ tuổi">
             <select value={ageRating} onChange={(e) => setAgeRating(e.target.value as AgeRating | '')} className={fieldInputClass}>
               <option value="">Chưa đặt</option>
               <option value="T16">T16</option>
@@ -199,7 +204,7 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
 
 function AssignCreatorModal({ current, onClose }: { current: Person | null; onClose: () => void }) {
   const { project, reload } = useProject();
-  const creators = useResource('creators', () => productionService.listCreators());
+  const creators = useResource('creator-directory', () => teamService.directory());
   const [creatorId, setCreatorId] = useState(current?.id ?? '');
   const { busy, run } = useAction();
 

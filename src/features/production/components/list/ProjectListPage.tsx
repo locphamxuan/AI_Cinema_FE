@@ -50,9 +50,9 @@ export function ProjectListPage() {
           <h1 className="text-xl font-bold text-slate-900 dark:text-white">Dự án phim</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             {isCreator
-              ? 'Các dự án được giao cho bạn: bàn giao studio, giao tập và theo dõi kiểm duyệt.'
+              ? 'Các dự án bạn tham gia: bàn giao Studio, cập nhật mốc Studio, upload Submission và theo dõi kiểm duyệt.'
               : base === '/admin'
-                ? 'Mọi dự án phim trên nền tảng. Admin xem và gửi đề xuất sửa cho Reviewer, không sửa trực tiếp (BR-55).'
+                ? 'Mọi dự án phim trên nền tảng. Admin xem mọi dự án và duyệt đề xuất của Reviewer/Creator, không sửa trực tiếp (BR-55).'
                 : 'Đặt hàng studio sản xuất, duyệt tập, gắn nhãn AI và phát hành.'}
           </p>
         </div>
@@ -122,7 +122,9 @@ export function ProjectListPage() {
                   <th className="px-4 py-2.5 font-medium hidden md:table-cell">Studio</th>
                   <th className="px-4 py-2.5 font-medium hidden md:table-cell">{isCreator ? 'Reviewer' : 'Creator'}</th>
                   <th className="px-4 py-2.5 font-medium hidden sm:table-cell text-right">Số tập</th>
-                  <th className="px-4 py-2.5 font-medium hidden lg:table-cell">Cập nhật gần nhất</th>
+                  <th className="px-4 py-2.5 font-medium hidden lg:table-cell" title="Thời điểm thay đổi gần nhất của dự án: sửa thông tin, mùa/tập, bàn giao Studio, duyệt, phát hành…">
+                    Cập nhật lần cuối
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -142,12 +144,12 @@ export function ProjectListPage() {
                       <td className="px-4 py-3">
                         <StatusPill {...MOVIE_STATUS[p.status]} />
                       </td>
-                      <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">{p.studioName ?? '—'}</td>
+                      <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">{p.studio?.name ?? '—'}</td>
                       <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">
                         {(isCreator ? p.reviewer?.fullName : p.creator?.fullName) ?? 'Chưa giao'}
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{p._count?.episodes ?? '—'}</td>
-                      <td className="px-4 py-3 hidden lg:table-cell text-slate-500 dark:text-slate-400">{formatDateTime(p.updatedAt)}</td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-slate-500 dark:text-slate-400">{formatDateTime(p.lastActivityAt)}</td>
                     </tr>
                   );
                 })}

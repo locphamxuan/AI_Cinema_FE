@@ -20,7 +20,7 @@ export function DashboardHeader() {
   const can = useCan();
 
   const area = AREA_ORDER.find((a) => pathname.startsWith(`/${a}`)) ?? 'reviewer';
-  // The Admin oversees production: it reads every project and proposes changes, never edits them (BR-55).
+  // The Admin oversees production: it reads every project and decides the change requests, never edits a project (BR-55).
   const oversight = area === 'reviewer' && !can(PERMISSION.PROJECT_MANAGE) && can(PERMISSION.PROJECT_READ_ALL);
   const links = AREA_ORDER.filter((a) => a !== area && canEnter(a, user?.role)).map((a) => ({
     href: AREAS[a].path,
@@ -48,17 +48,14 @@ export function DashboardHeader() {
           )}
         </Link>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           {user && (
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs">
-              <span className={`w-2 h-2 rounded-full ${
-                user.role === 'admin' ? 'bg-purple-500' :
-                user.role === 'reviewer' ? 'bg-emerald-500' :
-                user.role === 'creator' ? 'bg-blue-500' :
-                user.role === 'staff' ? 'bg-amber-500' : 'bg-slate-400'
-              }`} />
-              <span className="font-medium text-slate-700 dark:text-slate-200">{ROLE_LABEL[user.role ?? 'user']}</span>
-            </div>
+            <span
+              aria-label="Vai trò của tài khoản"
+              className="hidden sm:inline-flex text-[11px] font-semibold px-2.5 py-1 rounded-full bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300"
+            >
+              {ROLE_LABEL[user.role ?? 'user']}
+            </span>
           )}
           {user && <NotificationMenu />}
           <ThemeToggle />

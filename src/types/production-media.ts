@@ -52,9 +52,10 @@ export interface MediaAsset {
   submissionNote: string | null;
   lastCheckedAt: string | null;
   createdAt: string;
-  /** The Creator delivering on the studio's behalf; null when the studio delivered through its portal. */
-  submittedBy: Person | null;
-  studioHandoff: { id: string; studioName: string } | null;
+  /** The Creator who uploaded what the studio delivered. */
+  submittedBy: Person;
+  /** The hand-off that covered the episode when the Submission was uploaded. */
+  studioHandoff: { id: string; studio: { id: string; name: string } } | null;
   ingestJobs: IngestJob[];
 }
 

@@ -1,16 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertTriangle, Check, ShieldCheck, Tag, Undo2 } from 'lucide-react';
+import { AlertTriangle, Check, ShieldCheck, Undo2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
-import type { ComplianceInput, LabelLocation, LabelType, ReviewSheet } from '@/types/production';
+import type { ComplianceInput, ReviewSheet } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { REVIEWED_EPISODE, isIn } from '../../lib/capabilities';
-import { AI_PARTS, COMPLIANCE_CHECK, COMPLIANCE_RESULT, LABEL_DEFAULT_TEXT, LABEL_LOCATION, LABEL_TYPE } from '../../lib/labels';
+import { AI_PARTS, COMPLIANCE_CHECK, COMPLIANCE_RESULT, LABEL_TYPE } from '../../lib/labels';
 import { formatDateTime, formatDuration } from '../../lib/format';
 import { Facts, Panel, StatusPill, TextPromptModal } from '../shared/ui';
+import { LabelPanel } from './LabelPanel';
 
 /**
  * Steps 8–11 on one delivered version: the review sheet, approve or send back to the studio (BR-16, BR-18),
@@ -87,9 +88,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
         )}
       </Panel>
 
-      {(sheet.aiContentLabel || (canAct && sheet.isApprovedVersion && status === 'APPROVED')) && (
-        <LabelPanel sheet={sheet} canAct={canAct && sheet.isApprovedVersion && status === 'APPROVED'} onChanged={onChanged} />
-      )}
+      {(sheet.aiContentLabel || (canAct && reviewed)) && <LabelPanel sheet={sheet} canAct={canAct && reviewed} onChanged={onChanged} />}
       {(sheet.complianceChecks.length > 0 || (canAct && sheet.isApprovedVersion && status === 'LABELED')) && (
         <CompliancePanel sheet={sheet} canAct={canAct && sheet.isApprovedVersion && status === 'LABELED'} onChanged={onChanged} />
       )}
@@ -106,77 +105,6 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
         onConfirm={requestChanges}
       />
     </div>
-  );
-}
-
-function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; canAct: boolean; onChanged: () => Promise<void> }) {
-  const [labelType, setLabelType] = useState<LabelType>(sheet.proposedLabelType);
-  const [text, setText] = useState(LABEL_DEFAULT_TEXT[sheet.proposedLabelType]);
-  const [location, setLocation] = useState<LabelLocation>('TOP_RIGHT');
-  const { busy, run } = useAction();
-  const label = sheet.aiContentLabel;
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const done = await run(
-      () => productionService.applyLabel(sheet.id, { labelType, labelText: text.trim(), displayLocation: location }),
-      'Đã gắn nhãn AI',
-    );
-    if (done) await onChanged();
-  };
-
-  return (
-    <Panel title="Nhãn nội dung AI (BR-40)" description={label ? `Theo chính sách: ${label.policy.name}` : 'Bước 10 — người xem thấy nhãn này khi phát.'}>
-      {label ? (
-        <Facts
-          items={[
-            ['Loại nhãn', LABEL_TYPE[label.labelType]],
-            ['Nội dung', label.labelText],
-            ['Vị trí', label.displayLocation ? LABEL_LOCATION[label.displayLocation] : '—'],
-            ['Gắn lúc', formatDateTime(label.appliedAt)],
-          ]}
-        />
-      ) : (
-        canAct && (
-          <form onSubmit={submit} className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <FormField label="Loại nhãn">
-                <select
-                  value={labelType}
-                  onChange={(e) => {
-                    const t = e.target.value as LabelType;
-                    setLabelType(t);
-                    setText(LABEL_DEFAULT_TEXT[t]);
-                  }}
-                  className={fieldInputClass}
-                >
-                  {(Object.keys(LABEL_TYPE) as LabelType[]).map((t) => (
-                    <option key={t} value={t}>
-                      {LABEL_TYPE[t]}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-              <FormField label="Vị trí hiển thị">
-                <select value={location} onChange={(e) => setLocation(e.target.value as LabelLocation)} className={fieldInputClass}>
-                  {(Object.keys(LABEL_LOCATION) as LabelLocation[]).map((l) => (
-                    <option key={l} value={l}>
-                      {LABEL_LOCATION[l]}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-            </div>
-            <FormField label="Nội dung nhãn">
-              <input value={text} onChange={(e) => setText(e.target.value)} minLength={5} maxLength={500} className={fieldInputClass} />
-            </FormField>
-            <Button type="submit" disabled={busy || text.trim().length < 5}>
-              <Tag className="w-3.5 h-3.5" aria-hidden="true" /> Gắn nhãn
-            </Button>
-          </form>
-        )
-      )}
-    </Panel>
   );
 }
 

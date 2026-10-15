@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Clapperboard } from 'lucide-react';
+import { Bell, Clapperboard, Coins, UserRound } from 'lucide-react';
 
 /**
  * Left navigation of the Content Creator area: keeps visual consistency with Admin & Reviewer consoles.
@@ -17,6 +17,9 @@ export function CreatorSidebar() {
       icon: Clapperboard,
       active: pathname === '/creator' || pathname.startsWith('/creator/projects'),
     },
+    { href: '/creator/token-requests', label: 'Yêu cầu thêm Token', icon: Coins, active: pathname.startsWith('/creator/token-requests') },
+    { href: '/creator/notifications', label: 'Thông báo', icon: Bell, active: pathname.startsWith('/creator/notifications') },
+    { href: '/creator/profile', label: 'Hồ sơ tài khoản', icon: UserRound, active: pathname.startsWith('/creator/profile') },
   ];
 
   return (

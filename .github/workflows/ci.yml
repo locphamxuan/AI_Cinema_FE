@@ -1,5 +1,7 @@
 # CI of the web app: every push and pull request must lint, typecheck, pass the unit tests and
-# build before Vercel deploys it. SonarCloud analyses the repository on its own (automatic analysis).
+# build before Vercel deploys it. SonarCloud then analyses it with the unit-test coverage and its
+# quality gate must pass. Repository secret it reads: SONAR_TOKEN (vars.SONAR_HOST_URL only for a
+# self-hosted SonarQube). Turn off SonarCloud's "Automatic Analysis" for this project, or the scan fails.
 name: CI
 
 on:
@@ -31,10 +33,48 @@ jobs:
         run: npx eslint .
       - name: Typecheck
         run: npx tsc --noEmit
-      - name: Unit tests
-        run: npm test
+      - name: Unit tests with coverage
+        run: npm run test:cov
       - name: Build
         run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          retention-days: 7
+
+  sonar:
+    name: SonarCloud analysis
+    needs: quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - name: Require the quality-gate token
+        if: env.SONAR_TOKEN == ''
+        run: |
+          echo "::error::SONAR_TOKEN is required; SonarCloud quality gate cannot be skipped."
+          exit 1
+      - uses: actions/checkout@v4
+        if: env.SONAR_TOKEN != ''
+        with:
+          # Full history: Sonar needs it to tell new code from old code.
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        if: env.SONAR_TOKEN != ''
+        with:
+          name: coverage
+          path: coverage
+      - name: Scan and wait for the quality gate
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL || 'https://sonarcloud.io' }}
+        with:
+          args: >
+            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.timeout=300
 
   audit:
     name: Dependency audit

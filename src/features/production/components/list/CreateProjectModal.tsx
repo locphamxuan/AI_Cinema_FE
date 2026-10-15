@@ -1,38 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { Clapperboard, Plus, Trash2 } from 'lucide-react';
+import { Clapperboard, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
 import { productionService } from '@/services/productionService';
 import { useAction } from '../../hooks/useAction';
-import {
-  EpisodeRowsEditor,
-  MilestoneQuickFill,
-  emptyEpisode,
-  episodesValid,
-  spreadMilestones,
-  toEpisodeInput,
-  type EpisodeDraft,
-} from '../shared/EpisodeRowsEditor';
+import { emptyEpisode } from '../shared/EpisodeRowsEditor';
 import { GenrePicker } from '../shared/GenrePicker';
+import { emptyProjectInfo, ProjectInfoFields, releaseYearValid, type ProjectInfoDraft } from '../shared/ProjectInfoFields';
+import { tooLarge } from '../../lib/attachments';
+import { emptySeason, seasonValid, toSeasonInput, SeasonDraftEditor, type SeasonDraft } from '../shared/SeasonDraftEditor';
 
 const MIN_IDEA_LENGTH = 20;
 
-interface SeasonDraft {
-  title: string;
-  episodes: EpisodeDraft[];
-}
-
-/** Step 1: the Reviewer opens a project with its idea, genres and season/episode structure (BR-12, BR-37). */
+/** Step 1: the Reviewer opens a project with its idea, genres, studio and season/episode structure (BR-12, BR-37, BR-59). */
 export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void; onCreated: (movieId: string) => void }) {
   const [title, setTitle] = useState('');
   const [idea, setIdea] = useState('');
   const [genreIds, setGenreIds] = useState<string[]>([]);
   const [language, setLanguage] = useState('vi');
-  const [seasons, setSeasons] = useState<SeasonDraft[]>([{ title: 'Mùa 1', episodes: [emptyEpisode(1), emptyEpisode(2)] }]);
+  const [info, setInfo] = useState<ProjectInfoDraft>(emptyProjectInfo);
+  const [seasons, setSeasons] = useState<SeasonDraft[]>([{ ...emptySeason(1), episodes: [emptyEpisode(1), emptyEpisode(2)] }]);
   const { busy, run } = useAction();
 
   // Episodes are numbered across the whole movie (BR-03).
@@ -41,18 +32,13 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
     !title.trim() ? 'nhập tên phim' : null,
     idea.trim().length < MIN_IDEA_LENGTH ? `mô tả ý tưởng có ít nhất ${MIN_IDEA_LENGTH} ký tự` : null,
     genreIds.length === 0 ? 'chọn ít nhất một thể loại' : null,
-    seasons.some((s) => !episodesValid(s.episodes))
-      ? 'điền tiêu đề, thời lượng từ 1 đến 720 phút và hạn giao không ở quá khứ cho mọi tập'
+    !releaseYearValid(info.releaseYear) ? 'năm phát hành từ 2000 đến 2100' : null,
+    tooLarge([...info.ideaFiles, ...info.synopsisFiles]).length ? 'mỗi tệp tối đa 100 MB' : null,
+    seasons.some((s) => !seasonValid(s))
+      ? 'mỗi mùa cần đơn giá tập (Token), khoảng phát hành hợp lệ và mọi tập có tiêu đề, thời lượng 1–720 phút, hạn giao không ở quá khứ'
       : null,
   ].filter((issue): issue is string => issue !== null);
   const valid = validationIssues.length === 0;
-
-  // Milestones follow the episode order across seasons.
-  const fillMilestones = (first: string, gapDays: number) => {
-    const total = seasons.reduce((n, s) => n + s.episodes.length, 0);
-    const days = spreadMilestones(first, gapDays, total);
-    setSeasons(seasons.map((s, i) => ({ ...s, episodes: s.episodes.map((ep, j) => ({ ...ep, milestone: days[firstNumbers[i] - 1 + j] })) })));
-  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,18 +51,23 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
             ideaDescription: idea.trim(),
             genreIds,
             defaultLanguage: language,
-            seasons: seasons.map((s) => ({ title: s.title.trim() || undefined, episodes: s.episodes.map(toEpisodeInput) })),
+            ...(info.synopsis.trim() ? { synopsis: info.synopsis.trim() } : {}),
+            ...(info.ageRating ? { ageRating: info.ageRating } : {}),
+            ...(info.releaseYear ? { releaseYear: Number(info.releaseYear) } : {}),
+            seasons: seasons.map(toSeasonInput),
           }),
         'Đã tạo dự án',
       );
-      if (created) onCreated(created.id);
+      if (!created) return;
+      await uploadAttachments(created.id, info);
+      onCreated(created.id);
     } catch {
       toast.error('Không tạo được dự án', 'Không kết nối được tới máy chủ. Vui lòng kiểm tra kết nối rồi thử lại.');
     }
   };
 
   return (
-    <Modal open onClose={onClose} title="Tạo dự án phim" subtitle="Bước 1 — ý tưởng và cấu trúc mùa/tập" icon={<Clapperboard className="w-4 h-4" />} maxWidth="max-w-2xl">
+    <Modal open onClose={onClose} title="Tạo dự án phim" subtitle="Bước 1 — ý tưởng, thông tin phim cho người xem và cấu trúc mùa/tập (Studio nhập khi bàn giao)" icon={<Clapperboard className="w-4 h-4" />} maxWidth="max-w-3xl">
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Tên phim">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} required className={fieldInputClass} />
@@ -88,51 +79,32 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
           <span className="block text-slate-600 dark:text-slate-300 mb-1 text-xs font-medium">Thể loại (1–5)</span>
           <GenrePicker value={genreIds} onChange={setGenreIds} />
         </div>
-        <FormField label="Ngôn ngữ chính" className="max-w-40">
-          <select value={language} onChange={(e) => setLanguage(e.target.value)} className={fieldInputClass}>
-            <option value="vi">Tiếng Việt</option>
-            <option value="en">English</option>
-          </select>
-        </FormField>
+        <ProjectInfoFields value={info} onChange={setInfo} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <FormField label="Ngôn ngữ chính">
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} className={fieldInputClass}>
+              <option value="vi">Tiếng Việt</option>
+              <option value="en">English</option>
+            </select>
+          </FormField>
+        </div>
 
         <fieldset className="space-y-3">
-          <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Mùa và tập — thời lượng (không giới hạn) và thời hạn từng tập</legend>
-          <p className="text-[11px] text-slate-500">Thời hạn là ngày studio phải giao tập; Creator bàn giao theo đúng thời hạn này.</p>
-          <MilestoneQuickFill onApply={fillMilestones} />
+          <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Mùa và tập — đơn giá, khoảng phát hành, thời lượng, hạn giao và ngày dự kiến phát hành</legend>
+          <p className="text-[11px] text-slate-500">
+            Hạn giao là ngày Studio phải giao tập; ngày dự kiến phát hành nằm trong khoảng phát hành của mùa và không trước hạn giao.
+          </p>
           {seasons.map((season, i) => (
-            <div key={i} className="rounded-xl border border-slate-200 dark:border-white/10 p-3 space-y-2">
-              <div className="flex items-center gap-2">
-                <input
-                  value={season.title}
-                  onChange={(e) => setSeasons(seasons.map((s, j) => (j === i ? { ...s, title: e.target.value } : s)))}
-                  aria-label={`Tên mùa ${i + 1}`}
-                  placeholder={`Mùa ${i + 1}`}
-                  className={`${fieldInputClass} py-1.5 font-semibold`}
-                />
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  disabled={seasons.length <= 1}
-                  onClick={() => setSeasons(seasons.filter((_, j) => j !== i))}
-                  aria-label={`Bỏ mùa ${i + 1}`}
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-              <EpisodeRowsEditor
-                episodes={season.episodes}
-                firstNumber={firstNumbers[i]}
-                onChange={(episodes) => setSeasons(seasons.map((s, j) => (j === i ? { ...s, episodes } : s)))}
-              />
-            </div>
+            <SeasonDraftEditor
+              key={i}
+              season={season}
+              number={i + 1}
+              firstNumber={firstNumbers[i]}
+              onChange={(next) => setSeasons(seasons.map((s, j) => (j === i ? next : s)))}
+              onRemove={seasons.length > 1 ? () => setSeasons(seasons.filter((_, j) => j !== i)) : undefined}
+            />
           ))}
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            onClick={() => setSeasons([...seasons, { title: `Mùa ${seasons.length + 1}`, episodes: [emptyEpisode(1)] }])}
-          >
+          <Button type="button" size="sm" variant="secondary" onClick={() => setSeasons([...seasons, emptySeason(seasons.length + 1, firstNumbers[seasons.length - 1] + seasons[seasons.length - 1].episodes.length)])}>
             <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm mùa
           </Button>
         </fieldset>
@@ -155,4 +127,18 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
       </form>
     </Modal>
   );
+}
+
+/** Idea files go with the studio brief, synopsis files back the summary; a failed one is reported, the project stays. */
+async function uploadAttachments(movieId: string, info: ProjectInfoDraft) {
+  const jobs = [
+    ...info.ideaFiles.map((file) => ({ file, purpose: 'IDEA' as const })),
+    ...info.synopsisFiles.map((file) => ({ file, purpose: 'SYNOPSIS' as const })),
+  ];
+  const failed: string[] = [];
+  for (const { file, purpose } of jobs) {
+    const res = await productionService.uploadIdeaFile(movieId, file, purpose);
+    if (!res.success) failed.push(file.name);
+  }
+  if (failed.length) toast.error('Một số tệp chưa tải lên được', `${failed.join(', ')} — tải lại ở tab Tổng quan.`);
 }

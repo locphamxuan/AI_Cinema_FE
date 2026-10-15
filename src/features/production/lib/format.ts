@@ -57,12 +57,19 @@ export function localDateTimeToIso(value: string): string {
   return new Date(value).toISOString();
 }
 
-/** Triggers a browser download of a fetched file. */
+/**
+ * Triggers a browser download of a fetched file. The link must be in the page for Firefox, and the object URL
+ * must outlive the click or Safari/Firefox cancel the download.
+ */
 export function saveBlob(blob: Blob, fileName: string): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
   link.download = fileName;
+  link.rel = 'noopener';
+  link.style.display = 'none';
+  document.body.appendChild(link);
   link.click();
-  URL.revokeObjectURL(url);
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }
