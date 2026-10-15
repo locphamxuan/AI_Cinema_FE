@@ -31,15 +31,19 @@ export function FeeTab() {
   const rate = settings.data?.tokenRateVnd;
 
   const [entryType, setEntryType] = useState<AdjustType>('TOP_UP');
-  const [seasonId, setSeasonId] = useState('');
+  const [pickedSeasonId, setSeasonId] = useState('');
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
   const { busy, run } = useAction();
+  // Every extra fee belongs to a season: default to the one that is short, else the first.
+  const seasonFees = ledger.data?.seasons ?? project.seasonFees;
+  const seasonId =
+    pickedSeasonId || seasonFees.find((s) => s.missingTokens > 0)?.seasonId || project.seasons[0]?.id || '';
   const value = Number(amount);
   const amountValid = Number.isInteger(value) && value !== 0 && (entryType === 'CORRECTION' ? total + value > 0 : value > 0);
   // A fee is paid from the Reviewer's budget; lowering it gives Token back.
   const affordable = balance === undefined || value <= balance;
-  const valid = amountValid && affordable && total > 0 && reason.trim().length > 0;
+  const valid = amountValid && affordable && total > 0 && seasonId !== '' && reason.trim().length > 0;
 
   const refresh = async () => {
     announceTokensChanged();
@@ -60,7 +64,7 @@ export function FeeTab() {
           entryType,
           amountTokens: value,
           reason: reason.trim(),
-          ...(seasonId ? { seasonId } : {}),
+          seasonId,
         }),
       'Đã ghi phí sản xuất',
     );
@@ -82,7 +86,7 @@ export function FeeTab() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <div className="lg:col-span-2 space-y-5">
         <Panel title="Phí theo mùa" description="Định mức = đơn giá 1 tập × số tập. Thêm tập hoặc tăng đơn giá thì cấp thêm một khoản “+… Token thêm” gắn với mùa.">
-          <SeasonFeeTable seasons={ledger.data?.seasons ?? project.seasonFees} canAllocate={canWrite} busy={busy} onAllocate={allocate} onTopUp={topUp} />
+          <SeasonFeeTable seasons={seasonFees} canAllocate={canWrite} busy={busy} onAllocate={allocate} onTopUp={topUp} />
         </Panel>
 
         <Panel title="Lịch sử biến động" description="Mỗi lần cấp hoặc điều chỉnh là một dòng mới; không sửa, không xoá dòng cũ.">
@@ -141,7 +145,7 @@ export function FeeTab() {
         </Panel>
       </div>
 
-      {canWrite && (
+      {canWrite && total > 0 && (
         <Panel title="Cấp thêm / điều chỉnh" description={rate ? `1 Token = ${formatNumber(rate)} ₫` : undefined}>
           <form onSubmit={submit} className="space-y-3">
             <div role="radiogroup" aria-label="Loại ghi" className="flex gap-3 text-xs">
@@ -154,7 +158,6 @@ export function FeeTab() {
             </div>
             <FormField label="Mùa">
               <select value={seasonId} onChange={(e) => setSeasonId(e.target.value)} className={fieldInputClass} aria-label="Mùa">
-                <option value="">Cả dự án</option>
                 {project.seasons.map((s) => (
                   <option key={s.id} value={s.id}>
                     Mùa {s.seasonNumber}
