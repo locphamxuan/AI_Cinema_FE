@@ -73,7 +73,8 @@ export function OverviewTab() {
           </div>
         </Panel>
 
-        <IdeaFilesPanel canManage={caps.manage && open} />
+        <IdeaFilesPanel canManage={caps.manage && open} purpose="IDEA" />
+        <IdeaFilesPanel canManage={caps.manage && open} purpose="SYNOPSIS" />
       </div>
 
       <div className="space-y-5">
@@ -177,7 +178,7 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
           <GenrePicker value={genreIds} onChange={setGenreIds} />
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="Độ tuổi (BR-54)">
+          <FormField label="Độ tuổi">
             <select value={ageRating} onChange={(e) => setAgeRating(e.target.value as AgeRating | '')} className={fieldInputClass}>
               <option value="">Chưa đặt</option>
               <option value="T16">T16</option>

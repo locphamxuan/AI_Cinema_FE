@@ -10,6 +10,8 @@ import { productionService } from '@/services/productionService';
 import { useAction } from '../../hooks/useAction';
 import { emptyEpisode } from '../shared/EpisodeRowsEditor';
 import { GenrePicker } from '../shared/GenrePicker';
+import { emptyProjectInfo, ProjectInfoFields, releaseYearValid, type ProjectInfoDraft } from '../shared/ProjectInfoFields';
+import { tooLarge } from '../../lib/attachments';
 import { emptySeason, seasonValid, toSeasonInput, SeasonDraftEditor, type SeasonDraft } from '../shared/SeasonDraftEditor';
 
 const MIN_IDEA_LENGTH = 20;
@@ -20,6 +22,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
   const [idea, setIdea] = useState('');
   const [genreIds, setGenreIds] = useState<string[]>([]);
   const [language, setLanguage] = useState('vi');
+  const [info, setInfo] = useState<ProjectInfoDraft>(emptyProjectInfo);
   const [seasons, setSeasons] = useState<SeasonDraft[]>([{ ...emptySeason(1), episodes: [emptyEpisode(1), emptyEpisode(2)] }]);
   const { busy, run } = useAction();
 
@@ -29,6 +32,8 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
     !title.trim() ? 'nhập tên phim' : null,
     idea.trim().length < MIN_IDEA_LENGTH ? `mô tả ý tưởng có ít nhất ${MIN_IDEA_LENGTH} ký tự` : null,
     genreIds.length === 0 ? 'chọn ít nhất một thể loại' : null,
+    !releaseYearValid(info.releaseYear) ? 'năm phát hành từ 2000 đến 2100' : null,
+    tooLarge([...info.ideaFiles, ...info.synopsisFiles]).length ? 'mỗi tệp tối đa 100 MB' : null,
     seasons.some((s) => !seasonValid(s))
       ? 'mỗi mùa cần đơn giá tập (Token), khoảng phát hành hợp lệ và mọi tập có tiêu đề, thời lượng 1–720 phút, hạn giao không ở quá khứ'
       : null,
@@ -46,18 +51,23 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
             ideaDescription: idea.trim(),
             genreIds,
             defaultLanguage: language,
+            ...(info.synopsis.trim() ? { synopsis: info.synopsis.trim() } : {}),
+            ...(info.ageRating ? { ageRating: info.ageRating } : {}),
+            ...(info.releaseYear ? { releaseYear: Number(info.releaseYear) } : {}),
             seasons: seasons.map(toSeasonInput),
           }),
         'Đã tạo dự án',
       );
-      if (created) onCreated(created.id);
+      if (!created) return;
+      await uploadAttachments(created.id, info);
+      onCreated(created.id);
     } catch {
       toast.error('Không tạo được dự án', 'Không kết nối được tới máy chủ. Vui lòng kiểm tra kết nối rồi thử lại.');
     }
   };
 
   return (
-    <Modal open onClose={onClose} title="Tạo dự án phim" subtitle="Bước 1 — ý tưởng, thể loại và cấu trúc mùa/tập (Studio nhập khi bàn giao)" icon={<Clapperboard className="w-4 h-4" />} maxWidth="max-w-3xl">
+    <Modal open onClose={onClose} title="Tạo dự án phim" subtitle="Bước 1 — ý tưởng, thông tin phim cho người xem và cấu trúc mùa/tập (Studio nhập khi bàn giao)" icon={<Clapperboard className="w-4 h-4" />} maxWidth="max-w-3xl">
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Tên phim">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} required className={fieldInputClass} />
@@ -69,6 +79,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
           <span className="block text-slate-600 dark:text-slate-300 mb-1 text-xs font-medium">Thể loại (1–5)</span>
           <GenrePicker value={genreIds} onChange={setGenreIds} />
         </div>
+        <ProjectInfoFields value={info} onChange={setInfo} />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField label="Ngôn ngữ chính">
             <select value={language} onChange={(e) => setLanguage(e.target.value)} className={fieldInputClass}>
@@ -116,4 +127,18 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
       </form>
     </Modal>
   );
+}
+
+/** Idea files go with the studio brief, synopsis files back the summary; a failed one is reported, the project stays. */
+async function uploadAttachments(movieId: string, info: ProjectInfoDraft) {
+  const jobs = [
+    ...info.ideaFiles.map((file) => ({ file, purpose: 'IDEA' as const })),
+    ...info.synopsisFiles.map((file) => ({ file, purpose: 'SYNOPSIS' as const })),
+  ];
+  const failed: string[] = [];
+  for (const { file, purpose } of jobs) {
+    const res = await productionService.uploadIdeaFile(movieId, file, purpose);
+    if (!res.success) failed.push(file.name);
+  }
+  if (failed.length) toast.error('Một số tệp chưa tải lên được', `${failed.join(', ')} — tải lại ở tab Tổng quan.`);
 }
