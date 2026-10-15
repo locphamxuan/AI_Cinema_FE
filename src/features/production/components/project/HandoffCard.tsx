@@ -63,6 +63,12 @@ export function HandoffCard({
 
       {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi Studio: {h.changeReason}</p>}
       {h.emailMessage?.errorMessage && <p className="text-rose-600">{h.emailMessage.errorMessage}</p>}
+      {h.filmSentAt && (
+        <p className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-3 py-2">
+          {h.filmSentNote ?? 'Studio đã gửi phim qua email.'} · {formatDateTime(h.filmSentAt)}
+          {h.milestoneStatus !== 'DELIVERED' && ' · Chờ Creator upload Submission.'}
+        </p>
+      )}
 
       <div>
         <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Đã giao những gì</p>

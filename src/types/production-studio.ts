@@ -60,6 +60,9 @@ export interface StudioHandoff {
   statusNote: string | null;
   respondedAt: string | null;
   declineReason: string | null;
+  /** When the studio last mailed a film back to the Creator, and what it said. */
+  filmSentAt: string | null;
+  filmSentNote: string | null;
   createdAt: string;
   createdBy: Person;
   emailMessage: { status: 'QUEUED' | 'SENT' | 'FAILED'; sentAt: string | null; errorMessage: string | null } | null;
