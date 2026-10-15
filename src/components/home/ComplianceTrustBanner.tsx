@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShieldCheck, Cpu, Coins, Sparkles, ArrowRight, CheckCircle2, FileCheck, Layers, Award, ArrowUpRight } from 'lucide-react';
+import { ShieldCheck, Cpu, Coins, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function ComplianceTrustBanner() {
   const steps = [
@@ -87,7 +87,7 @@ export default function ComplianceTrustBanner() {
 
           {/* 3 Step Interactive Pipeline Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {steps.map((step, idx) => {
+            {steps.map((step) => {
               const Icon = step.icon;
               return (
                 <div
