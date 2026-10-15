@@ -8,9 +8,9 @@ import { useAction } from '../../hooks/useAction';
 import { Panel } from '../shared/ui';
 import { useProject } from './ProjectContext';
 
-const IMAGE_ACCEPT = '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp';
+const IMAGE_ACCEPT = 'image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif';
 
-/** The poster of the project (PNG, JPEG or WebP, ≤ 5 MB) the catalog shows; the Reviewer uploads and replaces it. */
+/** The poster of the project (PNG, JPEG, WebP, GIF, BMP or AVIF, ≤ 20 MB) the catalog shows; the Reviewer uploads and replaces it. */
 export function PosterPanel({ canManage }: { canManage: boolean }) {
   const { project, reload } = useProject();
   const input = useRef<HTMLInputElement>(null);
@@ -25,7 +25,7 @@ export function PosterPanel({ canManage }: { canManage: boolean }) {
   return (
     <Panel
       title="Ảnh bìa / thumbnail"
-      description="PNG, JPEG hoặc WebP, tối đa 5 MB."
+      description="PNG, JPEG, WebP, GIF, BMP hoặc AVIF, tối đa 20 MB."
       actions={
         canManage && (
           <>
