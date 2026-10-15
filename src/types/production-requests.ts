@@ -42,6 +42,12 @@ export interface CreateProjectInput {
   title: string;
   ideaDescription: string;
   genreIds: string[];
+  /** Genres the list does not have yet; the backend adds them. */
+  genreNames?: string[];
+  /** Viewer-facing summary, also needed before the first release. */
+  synopsis?: string;
+  ageRating?: AgeRating;
+  releaseYear?: number;
   defaultLanguage?: string;
   /** Active studio of the catalog (BR-59). */
   studioId?: string;
@@ -52,6 +58,7 @@ export interface UpdateProjectInput {
   title?: string;
   ideaDescription?: string;
   genreIds?: string[];
+  genreNames?: string[];
   defaultLanguage?: string;
   synopsis?: string;
   ageRating?: AgeRating;

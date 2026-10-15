@@ -22,6 +22,7 @@ const wallet: ReviewerWallet = {
   balanceTokens: 380000,
   tokenRateVnd: 1000,
   history: [],
+  coinActivity: { movies: [], entries: [] },
 };
 
 const row: ReviewerBudgetRow = { id: 'r1', fullName: 'Reviewer Một', email: 'r1@x.vn', isActive: true, grantedTokens: 500000, allocatedTokens: 120000, balanceTokens: 380000 };

@@ -22,6 +22,14 @@ export const notificationService = {
     return apiClient.get<NotificationPage>(`${API_ROUTES.NOTIFICATIONS.LIST}?page=${page}&limit=${limit}`);
   },
 
+  /** One page of the notifications of the given types (all when empty), optionally only the unread ones. */
+  async listByTypes(types: string[], page = 1, limit = 15, unreadOnly = false): Promise<ApiResponse<NotificationPage>> {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+    if (types.length) params.set('filter.type', `$$in:${types.join(',')}`);
+    if (unreadOnly) params.set('filter.readAt', '$null');
+    return apiClient.get<NotificationPage>(`${API_ROUTES.NOTIFICATIONS.LIST}?${params.toString()}`);
+  },
+
   /**
    * Fetches unread notification count for the authenticated account.
    * Maps to GET /api/notifications/unread-count

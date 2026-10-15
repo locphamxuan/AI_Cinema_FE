@@ -16,6 +16,7 @@ export const API_ROUTES = {
     REGISTER: '/auth/register',
     REFRESH_TOKEN: '/auth/refresh',
     PROFILE: '/auth/me',
+    CHANGE_PASSWORD: '/auth/me/password',
   },
   // Movies & Video
   MOVIES: {
@@ -99,6 +100,10 @@ export const API_ROUTES = {
     CHANGE_REQUEST_PROOF: (id: string) => `/change-requests/${id}/proof`,
     CHANGE_REQUEST_APPROVE: (id: string) => `/change-requests/${id}/approve`,
     CHANGE_REQUEST_REJECT: (id: string) => `/change-requests/${id}/reject`,
+    TOKEN_REQUESTS: (movieId: string) => `/projects/${movieId}/token-requests`,
+    TOKEN_REQUEST_INBOX: '/token-requests',
+    TOKEN_REQUEST_APPROVE: (id: string) => `/token-requests/${id}/approve`,
+    TOKEN_REQUEST_REJECT: (id: string) => `/token-requests/${id}/reject`,
     HANDOFF: (movieId: string) => `/projects/${movieId}/handoff`,
     STUDIO_CHANGE: (movieId: string) => `/projects/${movieId}/studio-change`,
     HANDOFFS: (movieId: string) => `/projects/${movieId}/handoffs`,

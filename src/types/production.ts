@@ -88,9 +88,13 @@ export interface Season {
   episodes: Episode[];
 }
 
+/** IDEA travels with the studio brief; SYNOPSIS backs the summary viewers read. */
+export type IdeaFilePurpose = 'IDEA' | 'SYNOPSIS';
+
 export interface IdeaFile {
   id: string;
   fileName: string;
+  purpose: IdeaFilePurpose;
   version: number;
   mimeType: string;
   sizeBytes: number;

@@ -36,6 +36,7 @@ import type {
   LabelType,
   LabelLocation,
   IdeaFile,
+  IdeaFilePurpose,
 } from '@/types/production';
 
 const R = API_ROUTES.PRODUCTION;
@@ -90,10 +91,11 @@ export const productionService = {
   },
 
   listIdeaFiles: (movieId: string) => apiClient.get<IdeaFile[]>(R.IDEA_FILES(movieId)),
-  uploadIdeaFile(movieId: string, file: File) {
+  /** IDEA travels with the studio brief; SYNOPSIS backs the summary for viewers. */
+  uploadIdeaFile(movieId: string, file: File, purpose: IdeaFilePurpose = 'IDEA') {
     const form = new FormData();
     form.append('file', file);
-    return apiClient.postForm<IdeaFile>(R.IDEA_FILES(movieId), form);
+    return apiClient.postForm<IdeaFile>(`${R.IDEA_FILES(movieId)}?purpose=${purpose}`, form);
   },
   deleteIdeaFile: (movieId: string, fileId: string) => apiClient.delete<null>(R.IDEA_FILE(movieId, fileId)),
   downloadIdeaFile: (movieId: string, fileId: string) => apiClient.getBlob(R.IDEA_FILE_CONTENT(movieId, fileId)),
