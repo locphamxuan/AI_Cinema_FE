@@ -8,6 +8,7 @@ import EpisodeVersionDrawer from './EpisodeVersionDrawer';
 import { QualitySelect } from './QualitySelect';
 import EpisodePlaylist from './EpisodePlaylist';
 import { useHlsPlayer } from './useHlsPlayer';
+import { useEpisodeStream } from './useEpisodeStream';
 
 function defaultVersion(episode: Episode | null): EpisodeVersion | null {
   if (!episode?.versions?.length) return null;
@@ -40,11 +41,12 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
     pickedVersion && pickedVersion.episodeId === currentEpisode?.id ? pickedVersion.version : defaultVersion(currentEpisode);
 
   // Free starters play at once; anything else plays once the BE access decision granted it (MF-2),
-  // which the unlock modal records as isUnlocked — a running plan included.
-  const canPlay = currentEpisode ? currentEpisode.isFree || currentEpisode.isUnlocked : false;
+  // which the unlock modal records as isUnlocked - a running plan included.
+  const stream = useEpisodeStream(currentEpisode?.id, !!currentEpisode?.isUnlocked);
+  const canPlay = currentEpisode ? currentEpisode.isFree || currentEpisode.isUnlocked || stream.accessGranted : false;
 
-  // Stream URL: use active version's HLS URL if available, else episode default
-  const streamUrl = activeVersion ? activeVersion.hlsUrl : currentEpisode?.hlsUrl;
+  // The picked version's stream if it has one, else the one the access decision handed out.
+  const streamUrl = activeVersion?.hlsUrl || stream.streamUrl || currentEpisode?.hlsUrl;
 
   const { levels, level, selectLevel: handleSelectLevel } = useHlsPlayer(videoRef, {
     enabled: !!currentEpisode,
@@ -121,7 +123,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                   src={track.src}
                   srcLang={track.language}
                   label={track.label}
-                  default={index === 0}
+                  default={track.isDefault ?? index === 0}
                 />
               ))}
             </video>
@@ -176,7 +178,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
             {/* Episode number & Quality pills */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-md bg-ruby/20 border border-ruby/30 text-ruby text-xs font-bold">
-                Tập {currentEpisode.episodeNumber}
+                {currentEpisode.displayLabel ?? `Tập ${currentEpisode.episodeNumber}`}
               </span>
               {currentEpisode.qualities.length > 0 && (
                 <span className="quality-badge">{currentEpisode.qualities.at(-1)}</span>

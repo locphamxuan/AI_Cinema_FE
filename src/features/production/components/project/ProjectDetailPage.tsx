@@ -6,6 +6,7 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import { AlertTriangle, ArrowLeft, Ban } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
+import { seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { useResource } from '../../hooks/useResource';
 import { projectCapabilities } from '../../lib/capabilities';
@@ -95,9 +96,15 @@ export function ProjectDetailPage() {
                   <span className="font-semibold text-slate-800 dark:text-slate-200">{data.reviewer.fullName}</span>
                 </div>
                 <div className="px-3 py-1.5 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 backdrop-blur-xs">
-                  <span className="text-slate-400 block text-[10px]">Creator</span>
+                  <span className="text-slate-400 block text-[10px]">Creator chính</span>
                   <span className="font-semibold text-slate-800 dark:text-slate-200">{data.creator?.fullName ?? 'Chưa giao'}</span>
                 </div>
+                {caps.creator && (
+                  <div className="px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30">
+                    <span className="text-slate-400 block text-[10px]">Vai trò của bạn</span>
+                    <span className="font-semibold text-purple-700 dark:text-purple-300">{caps.lead ? 'Creator chính' : 'Creator phụ'}</span>
+                  </div>
+                )}
                 <div className="px-3 py-1.5 rounded-xl bg-white/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/10 backdrop-blur-xs">
                   <span className="text-slate-400 block text-[10px]">Quy mô</span>
                   <span className="font-semibold text-purple-600 dark:text-purple-400 font-mono">{data.seasons.length} mùa · {totalEpisodes} tập</span>
@@ -106,14 +113,14 @@ export function ProjectDetailPage() {
             </div>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Reviewer: {data.reviewer.fullName} · Creator: {data.creator?.fullName ?? 'chưa giao'} · Studio: {data.studio?.name ?? 'chưa chọn'} ·{' '}
+            Reviewer: {data.reviewer.fullName} · Creator chính: {data.creator?.fullName ?? 'chưa giao'} · Studio: {data.studio?.name ?? 'chưa chọn'} ·{' '}
             {data.seasons.length} mùa, {totalEpisodes} tập
           </p>
           <p className="flex flex-wrap items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400" aria-label="Trạng thái dự án, mùa và tập">
             Dự án <StatusPill {...MOVIE_STATUS[data.status]} />
             {data.seasons.map((season) => (
               <span key={season.id} className="inline-flex items-center gap-1">
-                → Mùa {season.seasonNumber} <StatusPill {...SEASON_STATUS[season.status]} />
+                → {seasonName(season.seasonNumber, season.episodes.length)} <StatusPill {...SEASON_STATUS[season.status]} />
               </span>
             ))}
           </p>

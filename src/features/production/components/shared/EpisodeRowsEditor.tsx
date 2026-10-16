@@ -129,7 +129,7 @@ export function EpisodeRowsEditor({
             value={ep.deadline}
             onChange={(e) => update(i, { deadline: e.target.value })}
             aria-label={`Hạn giao tập ${firstNumber + i}`}
-            title="Hạn giao — studio phải giao tập này trước ngày này"
+            title="Hạn giao - studio phải giao tập này trước ngày này"
             className={`${fieldInputClass} py-1.5 ${ep.deadline && !deadlineValid(ep.deadline) ? 'border-rose-500' : ''}`}
             style={{ width: '9.5rem', flex: '0 0 9.5rem' }}
           />
@@ -139,7 +139,7 @@ export function EpisodeRowsEditor({
             value={ep.releaseDate}
             onChange={(e) => update(i, { releaseDate: e.target.value })}
             aria-label={`Ngày dự kiến phát hành tập ${firstNumber + i}`}
-            title="Ngày dự kiến phát hành — trong khoảng phát hành của mùa, không trước hạn giao"
+            title="Ngày dự kiến phát hành - trong khoảng phát hành của mùa, không trước hạn giao"
             className={`${fieldInputClass} py-1.5 ${releaseDateValid(ep.releaseDate, ep.deadline, window) ? '' : 'border-rose-500'}`}
             style={{ width: '9.5rem', flex: '0 0 9.5rem' }}
           />

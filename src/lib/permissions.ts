@@ -4,7 +4,7 @@
  * the backend returns for the signed-in account.
  */
 export const PERMISSION = {
-  // MF-1 — movie projects
+  // MF-1 - movie projects
   PROJECT_MANAGE: 'project:manage',
   PROJECT_FEE_ALLOCATE: 'project:fee.allocate',
   PROJECT_READ_ALL: 'project:read.all',
@@ -17,7 +17,7 @@ export const PERMISSION = {
   EPISODE_PUBLISH: 'episode:publish',
   PRICE_ALERT_MANAGE: 'price-alert:manage',
   GENRE_MANAGE: 'genre:manage',
-  // MF-2 — episode access, Coin, monthly plan, rewards
+  // MF-2 - episode access, Coin, monthly plan, rewards
   ACCESS_EPISODE_READ: 'access.episode.read',
   WALLET_READ: 'wallet.read',
   WALLET_TOPUP: 'wallet.topup',
@@ -81,6 +81,11 @@ export function homeAreaOf(role: WebRole | undefined): Area | null {
     default:
       return null;
   }
+}
+
+/** The viewer site (home, catalog, wallet, check-in, reward wheel) is for members only; staff-side roles work in their area. */
+export function isMemberRole(role: WebRole | undefined): boolean {
+  return role === 'user' || role === 'vip';
 }
 
 export function canEnter(area: Area, role: WebRole | undefined): boolean {

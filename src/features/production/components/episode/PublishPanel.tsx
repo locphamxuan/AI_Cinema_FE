@@ -48,7 +48,7 @@ export function PublishPanel({
     e.preventDefault();
     const done = await run(
       () => productionService.setCoinPrice(episode.id, priceValue),
-      outOfRange ? 'Đã lưu giá — giá ngoài khoảng nên Admin được báo' : 'Đã lưu giá Coin',
+      outOfRange ? 'Đã lưu giá - giá ngoài khoảng nên Admin được báo' : 'Đã lưu giá Coin',
     );
     if (done) await onChanged();
   };
@@ -121,7 +121,7 @@ export function PublishPanel({
                   <p className="text-rose-600">
                     {p.publishedAt ? (p.unpublishMode ? UNPUBLISH_MODE[p.unpublishMode].label : 'Gỡ') : 'Huỷ lịch'} {formatDateTime(p.unpublishedAt)}
                     {p.unpublishReason && ` · ${UNPUBLISH_REASON[p.unpublishReason]}`}
-                    {p.unpublishNote && ` — ${p.unpublishNote}`}
+                    {p.unpublishNote && ` - ${p.unpublishNote}`}
                   </p>
                 )}
                 {canAct && p === active && isIn(episode.status, ['PUBLISHED', 'SCHEDULED']) && (

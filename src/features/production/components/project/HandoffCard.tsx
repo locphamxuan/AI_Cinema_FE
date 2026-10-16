@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Download, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { seasonLabel } from '@/lib/seasonLabel';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
 import { MATERIAL_KIND, MILESTONE_STATUS } from '../../lib/labels';
 import { formatBytes, formatDateTime, formatNumber } from '../../lib/format';
@@ -17,13 +18,14 @@ const EMAIL_STATUS = {
   FAILED: { label: 'Gửi email lỗi', tone: 'rose' },
 } as const;
 
-export const scopeLabel = (h: Pick<StudioHandoff, 'season'>) =>
-  h.season ? `Mùa ${h.season.seasonNumber}${h.season.title ? ` — ${h.season.title}` : ''}` : 'Cả dự án';
+export const scopeLabel = (h: Pick<StudioHandoff, 'season'>, episodeCount?: number) =>
+  h.season ? seasonLabel(h.season.seasonNumber, episodeCount, h.season.title) : 'Cả dự án';
 
 /** One hand-off (or studio change) on the Studio timeline: who it went to, what was sent, every milestone and Submission. */
 export function HandoffCard({
   handoff: h,
   movieId,
+  episodeCount,
   base,
   onBrief,
   onMaterial,
@@ -31,6 +33,8 @@ export function HandoffCard({
 }: {
   handoff: StudioHandoff;
   movieId: string;
+  /** Episodes of the handed-off season: one episode reads as a whole film. */
+  episodeCount?: number;
   base: ProductionBase;
   onBrief: () => void;
   onMaterial: (material: HandoffMaterial) => void;
@@ -43,7 +47,7 @@ export function HandoffCard({
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="font-semibold text-slate-900 dark:text-white">
-            {h.studio.name} <Badge tone="blue">{scopeLabel(h)}</Badge>
+            {h.studio.name} <Badge tone="blue">{scopeLabel(h, episodeCount)}</Badge>
           </p>
           <p className="text-slate-500 dark:text-slate-400">
             Giao ngày {formatDateTime(h.createdAt)} bởi {h.createdBy.fullName} · {h.studio.email} · ngân sách trong brief:{' '}
@@ -62,6 +66,11 @@ export function HandoffCard({
       </div>
 
       {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi Studio: {h.changeReason}</p>}
+      {Number(h.lostTokens) > 0 && (
+        <p className="text-rose-600">
+          Đã đổi sang Studio khác: {formatNumber(Number(h.lostTokens))} Token đã gửi cho Studio này bị mất, không hoàn.
+        </p>
+      )}
       {h.emailMessage?.errorMessage && <p className="text-rose-600">{h.emailMessage.errorMessage}</p>}
       {h.filmSentAt && (
         <p className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-3 py-2">

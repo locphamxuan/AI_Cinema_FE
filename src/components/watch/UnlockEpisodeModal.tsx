@@ -11,7 +11,7 @@ type Tab = 'episode' | 'plan';
 
 /**
  * MF-2 Choose Access Method: unlock the episode with Coins or join the monthly plan, both paid in
- * Coins (BR-01). Everything shown — prices, balances, what is missing — is the BE access decision;
+ * Coins (BR-01). Everything shown - prices, balances, what is missing - is the BE access decision;
  * the wallet and the unlocked flag are updated from what the BE answered, never computed here.
  */
 export default function UnlockEpisodeModal() {
@@ -94,7 +94,7 @@ export default function UnlockEpisodeModal() {
     finish(
       {
         title: 'Mở Khóa Tập Phim Thành Công!',
-        description: `Tập ${episode.episodeNumber}: ${episode.title}`,
+        description: `${episode.displayLabel ?? `Tập ${episode.episodeNumber}`}: ${episode.title}`,
         paidCoins: res.data.paidCoins,
         chargedMain: res.data.charged.mainCoins,
         chargedBonus: res.data.charged.bonusCoins,
@@ -167,7 +167,7 @@ export default function UnlockEpisodeModal() {
           ) : (
             <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-800/40 border border-slate-800">
               <div className="min-w-0">
-                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-bold uppercase">Tập {episode.episodeNumber}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-bold uppercase">{episode.displayLabel ?? `Tập ${episode.episodeNumber}`}</span>
                 <h4 className="text-xs font-bold text-white truncate mt-1">{episode.title}</h4>
               </div>
               <span className="text-base font-black text-amber-400">{episodePrice} Coin</span>
@@ -213,7 +213,7 @@ export default function UnlockEpisodeModal() {
               <div>
                 <h3 className="text-lg font-black tracking-wide text-white">🔒 Mở Khóa Tập Phim</h3>
                 <p className="text-xs text-slate-400">
-                  {currentMovie?.title} • Tập {episode.episodeNumber}
+                  {currentMovie?.title} • {episode.displayLabel ?? `Tập ${episode.episodeNumber}`}
                 </p>
               </div>
               <button

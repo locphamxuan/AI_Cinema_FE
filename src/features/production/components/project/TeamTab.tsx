@@ -83,9 +83,9 @@ export function TeamTab() {
                     {seat.assignedBy.fullName}
                     <p className="text-slate-400">{formatDateTime(seat.assignedAt)}</p>
                   </td>
-                  <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300">{seat.delegatedFrom?.fullName ?? '—'}</td>
+                  <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300">{seat.delegatedFrom?.fullName ?? '-'}</td>
                   <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300">
-                    {seat.episodes.length ? seat.episodes.map((e) => `Tập ${e.episodeNumber}`).join(', ') : seat.isActive ? 'Cả nhóm (chưa giao riêng)' : '—'}
+                    {seat.episodes.length ? seat.episodes.map((e) => `Tập ${e.episodeNumber}`).join(', ') : seat.isActive ? 'Cả nhóm (chưa giao riêng)' : '-'}
                   </td>
                   <td className="px-3 py-2.5 text-right">
                     {caps.manage && editable && seat.isActive && !seat.isLead && (

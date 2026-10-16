@@ -16,5 +16,5 @@ export const COIN_ENTRY_LABEL: Record<CoinEntryType, string> = {
 
 export const COIN_ENTRY_TYPES = Object.keys(COIN_ENTRY_LABEL) as CoinEntryType[];
 
-/** `+12` / `-5` / `—` for an amount on one counter. */
-export const signed = (amount: number) => (amount === 0 ? '—' : `${amount > 0 ? '+' : ''}${amount.toLocaleString('vi-VN')}`);
+/** `+12` / `-5` / `-` for an amount on one counter. */
+export const signed = (amount: number) => (amount === 0 ? '-' : `${amount > 0 ? '+' : ''}${amount.toLocaleString('vi-VN')}`);

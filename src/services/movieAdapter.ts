@@ -1,6 +1,8 @@
+import { API_BASE_URL } from '@/constants/apiRoutes';
+import { episodeLabel } from '@/lib/seasonLabel';
 import type { AIComplianceInfo, Episode, Movie } from '@/types/movie';
 
-/** A movie of the public catalog (GET /movies, GET /movies/:id) — never the studio, fee or people in charge. */
+/** A movie of the public catalog (GET /movies, GET /movies/:id) - never the studio, fee or people in charge. */
 export interface ApiCatalogMovie {
   id: string;
   title: string;
@@ -33,6 +35,8 @@ export interface ApiCatalogEpisode {
   durationSeconds: number | null;
   qualities: string[];
   aiLabel: { labelType: string; labelText: string; displayLocation: string | null } | null;
+  /** WebVTT tracks, served by GET /subtitles/:id. */
+  subtitles?: { id: string; language: string; label: string; isDefault: boolean }[];
   publishedAt: string | null;
 }
 
@@ -62,16 +66,22 @@ function bestQuality(qualities: string[]): string | undefined {
   return [...qualities].sort((a, b) => parseInt(b, 10) - parseInt(a, 10))[0];
 }
 
-function adaptEpisode(ep: ApiCatalogEpisode, fallbackImage: string): Episode {
+function adaptEpisode(ep: ApiCatalogEpisode, fallbackImage: string, all: ApiCatalogEpisode[]): Episode {
   return {
     id: ep.id,
     episodeNumber: ep.episodeNumber,
+    displayLabel: episodeLabel(ep, all),
     title: ep.title,
     duration: formatDuration(ep.durationSeconds),
-    // Playback (unlock and stream) is not served by the catalog yet.
+    // The stream comes from the access decision once access is granted (MF-2), never the catalog.
     hlsUrl: '',
     qualities: ep.qualities,
-    subtitles: [],
+    subtitles: (ep.subtitles ?? []).map((s) => ({
+      language: s.language,
+      label: s.label,
+      src: `${API_BASE_URL}/subtitles/${s.id}`,
+      isDefault: s.isDefault,
+    })),
     thumbnailUrl: ep.thumbnailUrl ?? fallbackImage,
     price: ep.coinPrice ?? 0,
     isFree: ep.isFreeStarter,
@@ -108,7 +118,7 @@ export function adaptApiMovie(api: ApiCatalogMovie, episodes: ApiCatalogEpisode[
     year: api.releaseYear ?? new Date().getFullYear(),
     totalEpisodes: episodes.length,
     ageRating: api.ageRating ?? 'Mọi lứa tuổi',
-    episodes: episodes.map((ep) => adaptEpisode(ep, posterUrl)),
+    episodes: episodes.map((ep) => adaptEpisode(ep, posterUrl, episodes)),
     quality: bestQuality(episodes.flatMap((ep) => ep.qualities)) ?? 'HD',
     aiCompliance: aiCompliance(api, episodes),
     isSeries,

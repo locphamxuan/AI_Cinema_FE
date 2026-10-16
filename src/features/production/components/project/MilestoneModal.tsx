@@ -60,7 +60,7 @@ export function MilestoneModal({ handoff, onClose }: { handoff: StudioHandoff; o
               </option>
               {submissions.map(({ episode, media }) => (
                 <option key={media.id} value={media.id}>
-                  Tập {episode.episodeNumber} — {episode.title} · v{media.version}
+                  Tập {episode.episodeNumber} - {episode.title} · v{media.version}
                 </option>
               ))}
             </select>

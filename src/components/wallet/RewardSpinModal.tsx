@@ -23,7 +23,7 @@ export default function RewardSpinModal() {
 }
 
 function SpinDialog() {
-  const { closeRewardSpinModal, setWalletBalance, syncAccount } = useAppStore();
+  const { closeRewardSpinModal, setWalletBalance, setAvailableSpins, syncAccount } = useAppStore();
   const [wheel, setWheel] = useState<Wheel | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSpinning, setIsSpinning] = useState(false);
@@ -73,6 +73,11 @@ function SpinDialog() {
 
   const availableSpins = wheel?.availableSpins ?? 0;
   const prizes = wheel?.prizes ?? [];
+
+  // The header badge shows the same count the wheel just read from the BE.
+  useEffect(() => {
+    if (wheel) setAvailableSpins(wheel.availableSpins);
+  }, [wheel, setAvailableSpins]);
 
   const handleClose = () => {
     if (!isSpinning) closeRewardSpinModal();
@@ -171,7 +176,7 @@ function SpinDialog() {
           <div className="flex flex-col items-center my-4">
             {isLoading && <p role="status" className="text-xs text-muted-light py-10">Đang tải danh sách giải thưởng...</p>}
             {wheel && !isLoading && prizes.length === 0 && <p className="text-xs text-muted-light py-10">Chưa có giải thưởng phù hợp cho tài khoản này.</p>}
-            {prizes.length > 0 && <SpinWheel prizes={prizes} rotation={rotation} spinning={isSpinning} />}
+            {prizes.length > 0 && <SpinWheel prizes={prizes} rotation={rotation} spinning={isSpinning} spinsLeft={availableSpins} />}
             <button
               type="button"
               onClick={() => void handleSpin()}

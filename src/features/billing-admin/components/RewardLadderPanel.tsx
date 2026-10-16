@@ -32,7 +32,7 @@ export function RewardLadderPanel() {
     >
       {rules.error && <ErrorNote message={rules.error} onRetry={rules.reload} />}
       {rules.loading && !rules.data && <Loading />}
-      {rules.data?.length === 0 && <Empty>Chưa cấu hình ngày nào — Member điểm danh sẽ không nhận gì.</Empty>}
+      {rules.data?.length === 0 && <Empty>Chưa cấu hình ngày nào - Member điểm danh sẽ không nhận gì.</Empty>}
       {rules.data && rules.data.length > 0 && (
         <table className="w-full text-xs">
           <thead className="text-slate-500 dark:text-slate-400 text-left">
@@ -51,7 +51,7 @@ export function RewardLadderPanel() {
                 <td className="py-2 font-semibold">Ngày {rule.streakDay}</td>
                 <td className="py-2">{rule.name}</td>
                 <td className="py-2 text-right font-mono">+{rule.bonusCoins}</td>
-                <td className="py-2">{rule.streakDay === LADDER_LENGTH ? '🎯 Có' : '—'}</td>
+                <td className="py-2">{rule.streakDay === LADDER_LENGTH ? '🎯 Có' : '-'}</td>
                 <td className="py-2">
                   <StatusPill label={rule.isActive ? 'Đang dùng' : 'Đã tắt'} tone={rule.isActive ? 'emerald' : 'neutral'} />
                 </td>

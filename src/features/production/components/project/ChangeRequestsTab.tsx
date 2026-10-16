@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
+import { seasonName } from '@/lib/seasonLabel';
 import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequestType } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
@@ -114,7 +115,7 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
               <option value="">Cả dự án</option>
               {project.seasons.map((s) => (
                 <option key={s.id} value={s.id}>
-                  Mùa {s.seasonNumber}
+                  {seasonName(s.seasonNumber, s.episodes.length)}
                 </option>
               ))}
             </select>
@@ -147,7 +148,7 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
           files={proof}
           onChange={setProof}
           multiple={false}
-          hint="PDF, DOCX, TXT hoặc ảnh, tối đa 10 MB — ví dụ báo giá của Studio."
+          hint="PDF, DOCX, TXT hoặc ảnh, tối đa 10 MB - ví dụ báo giá của Studio."
         />
         <Button type="submit" className="w-full" disabled={busy || !valid}>
           <MessageSquarePlus className="w-4 h-4" aria-hidden="true" /> Gửi đề xuất

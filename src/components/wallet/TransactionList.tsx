@@ -59,7 +59,7 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
                       {COIN_ENTRY_LABEL[line.entryType]}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-foreground">{line.description ?? '—'}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-foreground">{line.description ?? '-'}</td>
                   <td className={`px-4 py-3 text-right text-sm font-bold ${amountClass(line.mainAmount, 'text-verified')}`}>
                     {signed(line.mainAmount)}
                   </td>

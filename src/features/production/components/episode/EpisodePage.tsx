@@ -10,7 +10,7 @@ import { productionService } from '@/services/productionService';
 import type { MediaAsset } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
-import { DELIVERY_PROJECT, SUBMITTABLE_EPISODE, isIn, projectCapabilities } from '../../lib/capabilities';
+import { DELIVERY_PROJECT, SUBMITTABLE_EPISODE, holdsEpisode, isIn, projectCapabilities } from '../../lib/capabilities';
 import { EPISODE_STATUS } from '../../lib/labels';
 import { formatDay, formatDuration, formatNumber } from '../../lib/format';
 import { baseFromPath, productionPaths } from '../../lib/routes';
@@ -71,7 +71,8 @@ export function EpisodePage() {
 
   const caps = projectCapabilities(project.data, userId, can);
   const delivering = isIn(project.data.status, DELIVERY_PROJECT);
-  const canDeliver = caps.ingest && delivering && isIn(episode.status, SUBMITTABLE_EPISODE);
+  const mine = caps.ingest && holdsEpisode(caps, episode, userId);
+  const canDeliver = mine && delivering && isIn(episode.status, SUBMITTABLE_EPISODE);
   const refreshAll = async () => {
     await Promise.all([project.reload(), media.reload(), sheet.reload()]);
   };
@@ -130,14 +131,18 @@ export function EpisodePage() {
                 ['Ngày dự kiến phát hành', formatDay(episode.expectedReleaseDate)],
                 ['Creator phụ trách', episode.assignedCreator?.fullName ?? 'Cả nhóm'],
                 ['Giá Coin', formatNumber(episode.coinPrice)],
-                ['Studio', project.data.studio?.name ?? '—'],
+                ['Studio', project.data.studio?.name ?? '-'],
               ]}
             />
             {episode.synopsis && <p className="mt-3 text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">{episode.synopsis}</p>}
           </Panel>
 
           {canDeliver && (
-            <DeliverMediaPanel title="Upload Submission Studio giao" deliver={deliverAsCreator(episode.id)} onDelivered={refreshAll} />
+            <DeliverMediaPanel
+              title={caps.lead ? 'Upload Submission Studio giao' : 'Gửi tập lên Creator chính (upload Submission)'}
+              deliver={deliverAsCreator(episode.id)}
+              onDelivered={refreshAll}
+            />
           )}
 
           <Panel title="Các bản studio đã giao" description={processing ? 'Đang xử lý video…' : undefined}>
@@ -146,7 +151,7 @@ export function EpisodePage() {
               selectedId={selectedId}
               approvedId={episode.approvedMediaAssetId}
               onSelect={setPicked}
-              onRetry={caps.ingest && delivering ? retry : undefined}
+              onRetry={mine && delivering ? retry : undefined}
               busy={busy}
             />
           </Panel>

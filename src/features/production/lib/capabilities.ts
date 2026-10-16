@@ -22,7 +22,10 @@ export interface ProjectCapabilities {
   /** The lead Creator, who also gives episodes to the others. */
   lead: boolean;
   feeAllocate: boolean;
+  /** Speak to the studio: hand off, change studio, move milestones. Only the lead (BE `lead` role). */
   handoff: boolean;
+  /** Ask the Reviewer for more Token: only the lead. */
+  askTokens: boolean;
   ingest: boolean;
   review: boolean;
   publish: boolean;
@@ -51,7 +54,8 @@ export function projectCapabilities(
     creator,
     lead,
     feeAllocate: owner && can(PERMISSION.PROJECT_FEE_ALLOCATE),
-    handoff: creator && can(PERMISSION.STUDIO_HANDOFF),
+    handoff: lead && can(PERMISSION.STUDIO_HANDOFF),
+    askTokens: lead && can(PERMISSION.PROJECT_SUGGEST),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),
     review: owner && can(PERMISSION.CONTENT_REVIEW),
     publish: owner && can(PERMISSION.EPISODE_PUBLISH),
@@ -59,6 +63,11 @@ export function projectCapabilities(
     delegate: creator && can(PERMISSION.MEDIA_INGEST),
     status: project.status,
   };
+}
+
+/** An episode is worked on by the Creator it was given to or the lead; one given to nobody is the lead's. */
+export function holdsEpisode(caps: ProjectCapabilities, episode: { assignedCreatorId: string | null }, userId: string | undefined): boolean {
+  return caps.lead || (caps.creator && !!userId && episode.assignedCreatorId === userId);
 }
 
 export function isIn<T>(value: T, list: readonly T[]): boolean {

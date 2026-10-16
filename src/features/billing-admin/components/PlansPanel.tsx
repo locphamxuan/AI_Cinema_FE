@@ -127,7 +127,7 @@ function PlanModal({ plan, onClose, onDone }: ModalProps & { plan: AdminPlan | n
     };
     const done = plan
       ? await run(() => billingAdminService.updatePlan(plan.id, { ...input, isActive: form.isActive }), 'Đã lưu gói')
-      : await run(() => billingAdminService.createPlan({ ...input, code: form.code.trim() }), 'Đã tạo gói — hãy đặt giá để mở bán');
+      : await run(() => billingAdminService.createPlan({ ...input, code: form.code.trim() }), 'Đã tạo gói - hãy đặt giá để mở bán');
     if (done) {
       await onDone();
       onClose();

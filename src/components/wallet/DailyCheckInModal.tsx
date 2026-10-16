@@ -4,45 +4,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { dailyRewardService } from '@/services/dailyRewardService';
 import { Backdrop } from '@/components/ui/Backdrop';
-import { randomInt, randomUnit } from '@/lib/random';
 import type { CheckInResult, DailyRewardStatus } from '@/types/episodeAccess';
+import { ConfettiEffect } from './spin/SpinWheel';
 
-const CONFETTI_COLORS = ['#E50914', '#8B5CF6', '#F59E0B', '#10B981', '#3B82F6', '#EC4899'];
 /** The BE ladder wraps after 7 days (daily-reward.service LADDER_LENGTH). */
 const LADDER_LENGTH = 7;
-
-function drawParticles() {
-  return Array.from({ length: 40 }, (_, i) => ({
-    id: i,
-    x: randomUnit() * 100,
-    color: CONFETTI_COLORS[randomInt(0, CONFETTI_COLORS.length - 1)],
-    delay: randomUnit() * 0.5,
-    width: 6 + randomUnit() * 8,
-    height: 6 + randomUnit() * 8,
-  }));
-}
-
-function ConfettiEffect() {
-  const [particles] = useState(drawParticles);
-
-  return (
-    <div className="confetti-container">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="confetti-particle"
-          style={{
-            left: `${p.x}%`,
-            backgroundColor: p.color,
-            animationDelay: `${p.delay}s`,
-            width: `${p.width}px`,
-            height: `${p.height}px`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
 
 type DayState = 'claimed' | 'next' | 'locked';
 
@@ -59,8 +25,15 @@ const DAY_ICON: Record<DayState, string> = { claimed: '✅', next: '🎁', locke
  * streak day come from the Admin's ladder on the BE. The wallet shows what the BE credited.
  */
 export default function DailyCheckInModal() {
-  const { isCheckInModalOpen, setCheckInModalOpen, setWalletBalance, markCheckedInToday, openRewardSpinModal } =
-    useAppStore();
+  const {
+    isCheckInModalOpen,
+    setCheckInModalOpen,
+    setWalletBalance,
+    markCheckedInToday,
+    openRewardSpinModal,
+    setAvailableSpins,
+    syncRewards,
+  } = useAppStore();
 
   const [status, setStatus] = useState<DailyRewardStatus | null>(null);
   const [claimed, setClaimed] = useState<CheckInResult | null>(null);
@@ -91,8 +64,12 @@ export default function DailyCheckInModal() {
       .getStatus()
       .then((res) => {
         if (cancelled) return;
-        if (res.success && res.data) setStatus(res.data);
-        else setErrorMsg(res.message || 'Không tải được thông tin điểm danh.');
+        if (res.success && res.data) {
+          setStatus(res.data);
+          // The header flag and spin count follow what the BE just said.
+          if (res.data.checkedInToday) markCheckedInToday(res.data.streakDay);
+          setAvailableSpins(res.data.availableSpins);
+        } else setErrorMsg(res.message || 'Không tải được thông tin điểm danh.');
       })
       .catch(() => {
         if (!cancelled) setErrorMsg('Không tải được thông tin điểm danh.');
@@ -100,7 +77,7 @@ export default function DailyCheckInModal() {
     return () => {
       cancelled = true;
     };
-  }, [isCheckInModalOpen]);
+  }, [isCheckInModalOpen, markCheckedInToday, setAvailableSpins]);
 
   const handleClaim = useCallback(async () => {
     setIsClaiming(true);
@@ -114,6 +91,8 @@ export default function DailyCheckInModal() {
       setClaimed(res.data);
       setWalletBalance(res.data.mainBalance, res.data.bonusBalance);
       markCheckedInToday(res.data.streakDay);
+      // A milestone day adds a spin: the BE says how many are left.
+      if (res.data.spinGranted) syncRewards().catch(() => undefined);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 2500);
     } catch {
@@ -132,7 +111,7 @@ export default function DailyCheckInModal() {
     } finally {
       setIsClaiming(false);
     }
-  }, [setWalletBalance, markCheckedInToday]);
+  }, [setWalletBalance, markCheckedInToday, syncRewards]);
 
   const handleClose = useCallback(() => {
     setCheckInModalOpen(false);
@@ -146,14 +125,16 @@ export default function DailyCheckInModal() {
   const checkedInToday = Boolean(claimed) || Boolean(status?.checkedInToday);
   const isLoading = isRefreshing || (!status && !errorMsg);
   const streakDay = claimed?.streakDay ?? status?.streakDay ?? 0;
-  const nextDay = checkedInToday ? null : (streakDay % LADDER_LENGTH) + 1;
+  // The ladder starts over after day 7: until today's claim, no day of the new round is done yet.
+  const doneDays = checkedInToday ? streakDay : streakDay % LADDER_LENGTH;
+  const nextDay = checkedInToday ? null : doneDays + 1;
   const todayReward = status ? status.reward.bonusCoins : 0;
   const ladder = Array.from({ length: LADDER_LENGTH }, (_, i) => {
     const day = i + 1;
     const rule = status?.ladder.find((r) => r.streakDay === day);
     let state: DayState = 'locked';
     if (day === nextDay) state = 'next';
-    else if (day <= streakDay) state = 'claimed';
+    else if (day <= doneDays) state = 'claimed';
     return {
       day,
       reward: rule?.bonusCoins ?? 0,

@@ -7,6 +7,6 @@ export const ATTACHMENT_ACCEPT = [
 
 export const ATTACHMENT_MAX_BYTES = 100 * 1024 * 1024;
 
-export const ATTACHMENT_HINT = 'Word, PDF, TXT, Excel, PowerPoint, ảnh hoặc video — tối đa 100 MB mỗi tệp.';
+export const ATTACHMENT_HINT = 'Word, PDF, TXT, Excel, PowerPoint, ảnh hoặc video - tối đa 100 MB mỗi tệp.';
 
 export const tooLarge = (files: File[]) => files.filter((f) => f.size > ATTACHMENT_MAX_BYTES).map((f) => f.name);

@@ -54,6 +54,8 @@ export interface StudioHandoff {
   season: { id: string; seasonNumber: number; title: string | null } | null;
   seasonId: string | null;
   productionFeeTokens: number | string;
+  /** Token this hand-off cost when its studio was replaced (BR-59); 0 otherwise. */
+  lostTokens: number | string;
   changeReason: string | null;
   briefFileKey: string | null;
   milestoneStatus: StudioMilestoneStatus;
@@ -99,6 +101,10 @@ export interface SeasonFee {
   correctionTokens: number;
   totalTokens: number;
   missingTokens: number;
+  /** Spent on studios that were replaced: gone, never refunded (BR-59). */
+  lostTokens: number;
+  /** What a new brief of the season may still promise. */
+  availableTokens: number;
   hasInitial: boolean;
 }
 

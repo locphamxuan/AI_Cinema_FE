@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/Button';
+import { seasonLabel } from '@/lib/seasonLabel';
 import type { SeasonFee } from '@/types/production';
 import { formatNumber } from '../../lib/format';
 import { Empty } from '../shared/ui';
@@ -33,6 +34,12 @@ export function SeasonFeeTable({
             <th className="py-2 font-medium text-right">Đã cấp</th>
             <th className="py-2 font-medium text-right">+ Token thêm</th>
             <th className="py-2 font-medium text-right">Còn thiếu</th>
+            <th className="py-2 font-medium text-right" title="Token đã gửi cho Studio cũ, mất khi đổi Studio (không hoàn)">
+              Mất do đổi Studio
+            </th>
+            <th className="py-2 font-medium text-right" title="Số Token brief mới của mùa còn ghi được">
+              Còn dùng được
+            </th>
             <th className="py-2 w-28" />
           </tr>
         </thead>
@@ -40,22 +47,27 @@ export function SeasonFeeTable({
           {seasons.map((season) => (
             <tr key={season.seasonId}>
               <td className="py-2 text-slate-800 dark:text-slate-100">
-                Mùa {season.seasonNumber}
-                {season.title && season.title !== `Mùa ${season.seasonNumber}` && <span className="text-slate-400"> — {season.title}</span>}
+                {seasonLabel(season.seasonNumber, season.episodeCount, season.title)}
               </td>
               <td className="py-2 text-right">{formatNumber(season.episodeProductionCost)}</td>
               <td className="py-2 text-right">{season.episodeCount}</td>
               <td className="py-2 text-right">{formatNumber(season.baselineTokens)}</td>
               <td className="py-2 text-right font-mono text-emerald-600">{formatNumber(season.allocatedTokens)}</td>
-              <td className="py-2 text-right font-mono text-emerald-600">{season.supplementTokens ? `+${formatNumber(season.supplementTokens)}` : '—'}</td>
+              <td className="py-2 text-right font-mono text-emerald-600">{season.supplementTokens ? `+${formatNumber(season.supplementTokens)}` : '-'}</td>
               <td className={`py-2 text-right font-mono ${season.missingTokens ? 'text-amber-600' : 'text-slate-400'}`}>{formatNumber(season.missingTokens)}</td>
+              <td className={`py-2 text-right font-mono ${season.lostTokens ? 'text-rose-600' : 'text-slate-400'}`}>
+                {season.lostTokens ? `-${formatNumber(season.lostTokens)}` : '-'}
+              </td>
+              <td className={`py-2 text-right font-mono ${season.availableTokens ? 'text-slate-800 dark:text-slate-100' : 'text-rose-600'}`}>
+                {formatNumber(season.availableTokens)}
+              </td>
               <td className="py-2 text-right">
                 {canAllocate && !season.hasInitial && season.episodeProductionCost > 0 && season.episodeCount > 0 && (
                   <Button size="sm" variant="secondary" disabled={busy} onClick={() => onAllocate(season)}>
                     Cấp phí mùa
                   </Button>
                 )}
-                {canAllocate && season.hasInitial && season.missingTokens > 0 && (
+                {canAllocate && season.hasInitial && (season.missingTokens > 0 || season.availableTokens === 0) && (
                   <Button size="sm" variant="secondary" onClick={() => onTopUp(season)}>
                     Cấp thêm
                   </Button>

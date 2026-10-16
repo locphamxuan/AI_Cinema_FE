@@ -131,7 +131,7 @@ function FilmRow({ film, expanded, onToggle }: { film: FilmFigures; expanded: bo
       {expanded && (
         <tr className="bg-slate-50/60 dark:bg-white/[0.02]">
           <td colSpan={5} className="px-4 py-3">
-            {!many && <p className="text-[11px] text-slate-500 mb-2">Phim một tập — số liệu của tập chính là của phim.</p>}
+            {!many && <p className="text-[11px] text-slate-500 mb-2">Phim một tập - số liệu của tập chính là của phim.</p>}
             <table className="w-full text-[11px]">
               <thead className="text-slate-500 text-left">
                 <tr>
@@ -145,7 +145,7 @@ function FilmRow({ film, expanded, onToggle }: { film: FilmFigures; expanded: bo
               <tbody>
                 {film.episodes.map((e) => (
                   <tr key={e.id} className="border-t border-slate-200/60 dark:border-white/5">
-                    <td className="py-1.5 pl-10">Tập {e.episodeNumber}{e.title && e.title !== `Tập ${e.episodeNumber}` ? ` — ${e.title}` : ''}</td>
+                    <td className="py-1.5 pl-10">Tập {e.episodeNumber}{e.title && e.title !== `Tập ${e.episodeNumber}` ? ` - ${e.title}` : ''}</td>
                     <td className="py-1.5 text-right font-mono">{e.coinPrice ? `${e.coinPrice} Coin` : 'Miễn phí'}</td>
                     <td className="py-1.5 text-right font-mono">{formatNumber(e.views)}</td>
                     <td className="py-1.5 text-right font-mono">{formatNumber(e.purchases)}</td>

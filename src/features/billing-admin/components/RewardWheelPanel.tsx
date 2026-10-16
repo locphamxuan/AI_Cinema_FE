@@ -33,7 +33,7 @@ export function RewardWheelPanel() {
     >
       {prizes.error && <ErrorNote message={prizes.error} onRetry={prizes.reload} />}
       {prizes.loading && !prizes.data && <Loading />}
-      {prizes.data?.length === 0 && <Empty>Vòng quay chưa có giải nào — Member có lượt cũng không quay được.</Empty>}
+      {prizes.data?.length === 0 && <Empty>Vòng quay chưa có giải nào - Member có lượt cũng không quay được.</Empty>}
       {list.length > 0 && (
         <table className="w-full text-xs">
           <thead className="text-slate-500 dark:text-slate-400 text-left">

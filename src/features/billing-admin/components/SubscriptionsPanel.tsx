@@ -165,10 +165,10 @@ function SubscriptionFacts({ sub }: { sub: AdminSubscription }) {
   const facts: [string, string][] = [
     ['Member', `${sub.user.fullName} · ${sub.user.email}`],
     ['Gói', `${sub.plan.name}${sub.source === 'REWARD' ? ' (tặng từ vòng quay)' : ''}`],
-    ['Trạng thái', SUBSCRIPTION_STATUS[sub.status].label + (sub.endReason ? ` — ${END_REASON[sub.endReason]}` : '')],
+    ['Trạng thái', SUBSCRIPTION_STATUS[sub.status].label + (sub.endReason ? ` - ${END_REASON[sub.endReason]}` : '')],
     ['Bắt đầu', formatDateTime(sub.startedAt)],
     ['Hết kỳ hiện tại', formatDateTime(sub.currentPeriodEnd)],
-    ['Tự gia hạn', sub.autoRenew ? `Bật — lần tới ${formatDateTime(sub.nextRenewalAt)}` : 'Tắt'],
+    ['Tự gia hạn', sub.autoRenew ? `Bật - lần tới ${formatDateTime(sub.nextRenewalAt)}` : 'Tắt'],
     ['Đã gia hạn', `${sub.renewalsCompleted} lần`],
   ];
   return (

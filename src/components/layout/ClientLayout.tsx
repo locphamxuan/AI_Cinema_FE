@@ -2,8 +2,10 @@
 
 import { ReactNode, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
+import { AREAS, homeAreaOf, isMemberRole } from '@/lib/permissions';
+import RewardShortcuts from '@/components/wallet/RewardShortcuts';
 import WalletHeaderBadge from '@/components/wallet/WalletHeaderBadge';
 import DailyCheckInModal from '@/components/wallet/DailyCheckInModal';
 import RewardSpinModal from '@/components/wallet/RewardSpinModal';
@@ -48,6 +50,7 @@ function MemberActions() {
   return (
     <>
       <NotificationBell />
+      <RewardShortcuts />
       <div className="flex items-center gap-1.5">
         <WalletHeaderBadge />
         <button
@@ -94,7 +97,8 @@ function ConsumerHeader({ signedIn }: { signedIn: boolean }) {
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { user, isAuthenticated, restoreSession, loadCatalog, syncAccount } = useAppStore();
+  const router = useRouter();
+  const { user, isAuthenticated, restoreSession, loadCatalog, syncAccount, syncRewards } = useAppStore();
 
   // Bring back the session saved by a previous login so a page reload stays authenticated.
   useEffect(() => {
@@ -111,13 +115,21 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   // The viewer's discovery and browse pages carry their own navbar.
   const isHome = pathname === '/' || pathname === '/phim';
   // The chat assistant and the wallet serve members; staff-side accounts never see them.
-  const isMemberSide = !user || user.role === 'user' || user.role === 'vip';
+  const isMemberSide = !user || isMemberRole(user.role);
   const userId = user?.id;
 
-  // A member's wallet and plan live on the BE; reload them for each signed-in member.
+  // A member's wallet, plan, check-in and spins live on the BE; reload them for each signed-in member.
   useEffect(() => {
-    if (userId && isMemberSide) syncAccount().catch(() => undefined);
-  }, [userId, isMemberSide, syncAccount]);
+    if (!userId || !isMemberSide) return;
+    syncAccount().catch(() => undefined);
+    syncRewards().catch(() => undefined);
+  }, [userId, isMemberSide, syncAccount, syncRewards]);
+
+  // The viewer site is the members'; a Creator, Reviewer, Staff or Admin goes to their own area.
+  const staffArea = signedIn ? homeAreaOf(user?.role) : null;
+  useEffect(() => {
+    if (staffArea && !isDashboard) router.replace(AREAS[staffArea].path);
+  }, [staffArea, isDashboard, router]);
 
   return (
     <>

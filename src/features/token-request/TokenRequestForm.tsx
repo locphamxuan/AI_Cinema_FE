@@ -7,6 +7,7 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Panel } from '@/features/production/components/shared/ui';
 import { useAction } from '@/features/production/hooks/useAction';
 import { formatNumber } from '@/features/production/lib/format';
+import { seasonLabel } from '@/lib/seasonLabel';
 import { tokenRequestService } from '@/services/tokenRequestService';
 import type { ProjectDetail } from '@/types/production';
 
@@ -38,19 +39,25 @@ export function TokenRequestForm({ project, onSent }: { project: ProjectDetail; 
   };
 
   return (
-    <Panel title="Xin thêm Token" description="Khi Studio không chấp nhận mức Token, gửi Reviewer số Token cần thêm cho mùa đó. Reviewer và Admin nhận thông báo.">
+    <div id="xin-them-token">
+    <Panel title="Xin thêm Token" description="Khi Studio không chấp nhận mức Token, hoặc sau khi đổi Studio đã hết Token, gửi Reviewer số Token cần thêm cho mùa đó. Reviewer và Admin nhận thông báo.">
       <form onSubmit={submit} className="space-y-3">
         <FormField label="Mùa">
           <select value={seasonId} onChange={(e) => setSeasonId(e.target.value)} className={fieldInputClass}>
             {project.seasons.map((s) => (
               <option key={s.id} value={s.id}>
-                Mùa {s.seasonNumber}
-                {s.title ? ` — ${s.title}` : ''}
+                {seasonLabel(s.seasonNumber, s.episodes.length, s.title)}
               </option>
             ))}
           </select>
         </FormField>
-        {fee && <p className="text-[11px] text-slate-500">Đã cấp cho mùa này: {formatNumber(fee.totalTokens)} Token.</p>}
+        {fee && (
+          <p className="text-[11px] text-slate-500">
+            Đã cấp: {formatNumber(fee.totalTokens)} Token
+            {fee.lostTokens > 0 && <> · mất do đổi Studio: {formatNumber(fee.lostTokens)}</>} · còn dùng được:{' '}
+            {formatNumber(fee.availableTokens)} Token.
+          </p>
+        )}
         <FormField label="Số Token cần thêm">
           <input type="number" min={1} max={MAX_TOKENS} value={tokens} onChange={(e) => setTokens(e.target.value)} className={fieldInputClass} />
         </FormField>
@@ -63,5 +70,6 @@ export function TokenRequestForm({ project, onSent }: { project: ProjectDetail; 
         </Button>
       </form>
     </Panel>
+    </div>
   );
 }

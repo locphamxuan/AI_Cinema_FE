@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { AreaGuard } from '@/components/auth/AreaGuard';
 import { useAppStore } from '@/store/useAppStore';
-import { canEnter, homeAreaOf } from '@/lib/permissions';
+import { canEnter, homeAreaOf, isMemberRole } from '@/lib/permissions';
 import { toUserProfile } from '@/services/authService';
 import { signInAs } from '@/tests/support/signIn';
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }));
+vi.mock('next/navigation', () => ({ useRouter: () => router }));
 
 describe('Areas of the web portal', () => {
   it.each([
@@ -20,6 +21,17 @@ describe('Areas of the web portal', () => {
       expect(canEnter(area, role)).toBe((allowed as readonly string[]).includes(area));
     }
     expect(homeAreaOf(role)).toBe(home);
+  });
+
+  it('keeps the viewer site for members: every other role has an area of its own', () => {
+    for (const role of ['user', 'vip'] as const) {
+      expect(isMemberRole(role)).toBe(true);
+      expect(homeAreaOf(role)).toBeNull();
+    }
+    for (const role of ['creator', 'reviewer', 'staff', 'admin'] as const) {
+      expect(isMemberRole(role)).toBe(false);
+      expect(homeAreaOf(role)).not.toBeNull();
+    }
   });
 
   it('keeps STAFF apart from ADMIN and carries the permissions the backend sent', () => {
@@ -49,8 +61,17 @@ describe('AreaGuard', () => {
     expect(screen.getByRole('button', { name: /Đến trang Sản xuất nội dung/ })).toBeInTheDocument();
   });
 
-  it('asks a visitor to sign in', () => {
+  it('sends a visitor straight to the sign-in screen', () => {
     render(<AreaGuard area="staff">Vận hành</AreaGuard>);
-    expect(screen.getByRole('heading', { name: 'Bạn cần đăng nhập' })).toBeInTheDocument();
+    expect(screen.queryByText('Vận hành')).not.toBeInTheDocument();
+    expect(router.replace).toHaveBeenCalledWith('/login');
+  });
+
+  it('signs a turned-away account out and opens the sign-in screen for another one', () => {
+    signInAs('creator');
+    render(<AreaGuard area="admin">Bí mật</AreaGuard>);
+    fireEvent.click(screen.getByRole('button', { name: /Đăng nhập bằng tài khoản khác/ }));
+    expect(router.push).toHaveBeenCalledWith('/login');
+    expect(useAppStore.getState().user).toBeNull();
   });
 });

@@ -10,6 +10,7 @@ const CONFETTI_COLORS = ['#F59E0B', '#8B5CF6', '#10B981', '#E50914', '#3B82F6', 
 const SECTOR_COLORS = ['#4F46E5', '#D97706', '#059669', '#DC2626', '#7C3AED', '#0284C7', '#DB2777', '#CA8A04'];
 const RADIUS = 130;
 const CENTER = 150;
+const HUB_RADIUS = 40;
 
 export const prizeLabel = (p: Pick<RewardPrize, 'type' | 'bonusCoins' | 'planDays'>) =>
   p.type === 'BONUS_COIN' ? `+${p.bonusCoins} Coin` : `+${p.planDays} ngày gói`;
@@ -56,7 +57,17 @@ export function ConfettiEffect() {
 }
 
 /** The prizes as equal slices; the chances stay with the Admin, so slices do not show weights. */
-export function SpinWheel({ prizes, rotation, spinning }: { prizes: RewardPrize[]; rotation: number; spinning: boolean }) {
+export function SpinWheel({
+  prizes,
+  rotation,
+  spinning,
+  spinsLeft,
+}: {
+  prizes: RewardPrize[];
+  rotation: number;
+  spinning: boolean;
+  spinsLeft: number;
+}) {
   const slice = (2 * Math.PI) / prizes.length;
   return (
     <div className="relative flex justify-center">
@@ -102,9 +113,17 @@ export function SpinWheel({ prizes, rotation, spinning }: { prizes: RewardPrize[
               </g>
             );
           })}
-          <circle cx={CENTER} cy={CENTER} r={28} fill="#1E1B4B" stroke="#F59E0B" strokeWidth="3" />
-          <circle cx={CENTER} cy={CENTER} r={12} fill="#F59E0B" />
+          <circle cx={CENTER} cy={CENTER} r={HUB_RADIUS} fill="#1E1B4B" stroke="#F59E0B" strokeWidth="3" />
         </svg>
+      </div>
+      {/* The hub does not turn with the wheel: it tells how many spins are left. */}
+      <div
+        aria-label={`Bạn còn ${spinsLeft} lượt quay`}
+        className="absolute inset-0 m-auto w-[28%] h-[28%] rounded-full flex flex-col items-center justify-center text-center leading-none select-none pointer-events-none"
+      >
+        <span className="text-[9px] sm:text-[10px] font-semibold text-purple-200">Bạn còn</span>
+        <span className="text-xl sm:text-2xl font-black text-amber-400 my-0.5">{spinsLeft}</span>
+        <span className="text-[9px] sm:text-[10px] font-semibold text-purple-200">lượt</span>
       </div>
     </div>
   );

@@ -81,6 +81,36 @@ describe('Zustand App Store (src/store/useAppStore.ts)', () => {
     });
   });
 
+  describe('Rewards sync (check-in + spins from the BE)', () => {
+    const daily = (checkedInToday: boolean, streakDay: number) => ({
+      checkedInToday,
+      streakDay,
+      availableSpins: 2,
+      reward: { streakDay: streakDay + 1, bonusCoins: 5, grantsSpin: false },
+      ladder: [],
+    });
+
+    it('takes today and the spins left from the BE, not from the cached flag', async () => {
+      useAppStore.setState({ checkInStreak: { currentStreak: 9, lastCheckInDate: '2000-01-01', todayClaimed: true } });
+      mockApi({
+        'GET /daily-rewards/status': daily(false, 3),
+        'GET /rewards/spins': { availableSpins: 2, prizes: [], history: [] },
+      });
+      await useAppStore.getState().syncRewards();
+      expect(useAppStore.getState().checkInStreak).toEqual({ currentStreak: 3, lastCheckInDate: null, todayClaimed: false });
+      expect(useAppStore.getState().availableSpins).toBe(2);
+    });
+
+    it('keeps what it knew when the BE does not answer, and forgets it on logout', async () => {
+      useAppStore.setState({ availableSpins: 4 });
+      mockApi({});
+      await useAppStore.getState().syncRewards();
+      expect(useAppStore.getState().availableSpins).toBe(4);
+      useAppStore.getState().logout();
+      expect(useAppStore.getState().availableSpins).toBe(0);
+    });
+  });
+
   describe('Account sync (wallet + monthly plan from the BE)', () => {
     const plan = (status: string, currentPeriodEnd: string) => ({
       id: 'sub-1',

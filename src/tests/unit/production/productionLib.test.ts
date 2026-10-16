@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { notificationHref, productionBaseFor, productionPaths } from '@/features/production/lib/routes';
-import { projectCapabilities } from '@/features/production/lib/capabilities';
+import { holdsEpisode, projectCapabilities } from '@/features/production/lib/capabilities';
 import { addDays, formatDay, formatDuration } from '@/features/production/lib/format';
 import {
   deadlineValid,
@@ -50,12 +50,24 @@ describe('projectCapabilities', () => {
     expect(projectCapabilities(project, 'other', reviewerKeys)).toMatchObject({ manage: false, review: false, publish: false });
   });
 
-  it('lets the lead Creator and the Creators of the team hand off and deliver', () => {
+  it('lets only the lead Creator speak to the studio; the other Creators deliver their own episodes', () => {
     const creatorKeys = grant(PERMISSION.STUDIO_HANDOFF, PERMISSION.MEDIA_INGEST, PERMISSION.PROJECT_SUGGEST);
     const team = { ...project, creatorAssignments: [{ creatorId: 'cre' }, { creatorId: 'second' }] };
-    expect(projectCapabilities(team, 'cre', creatorKeys)).toMatchObject({ creator: true, lead: true, handoff: true, ingest: true, manage: false });
-    expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, handoff: true, delegate: true });
+    expect(projectCapabilities(team, 'cre', creatorKeys)).toMatchObject({ creator: true, lead: true, handoff: true, askTokens: true, ingest: true, manage: false });
+    expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, handoff: false, askTokens: false, ingest: true, delegate: true });
     expect(projectCapabilities(team, 'someone', creatorKeys)).toMatchObject({ creator: false, handoff: false, ingest: false, suggest: false });
+  });
+
+  it("keeps an episode for the Creator it was given to, and one given to nobody for the lead", () => {
+    const creatorKeys = grant(PERMISSION.MEDIA_INGEST);
+    const team = { ...project, creatorAssignments: [{ creatorId: 'second' }] };
+    const lead = projectCapabilities(team, 'cre', creatorKeys);
+    const second = projectCapabilities(team, 'second', creatorKeys);
+    expect(holdsEpisode(lead, { assignedCreatorId: null }, 'cre')).toBe(true);
+    expect(holdsEpisode(lead, { assignedCreatorId: 'second' }, 'cre')).toBe(true);
+    expect(holdsEpisode(second, { assignedCreatorId: 'second' }, 'second')).toBe(true);
+    expect(holdsEpisode(second, { assignedCreatorId: null }, 'second')).toBe(false);
+    expect(holdsEpisode(second, { assignedCreatorId: 'cre' }, 'second')).toBe(false);
   });
 
   it('lets the Reviewer in charge and the Creators of the team ask the Admin (BR-55)', () => {
@@ -76,7 +88,7 @@ describe('formatting', () => {
     expect(formatDuration(750)).toBe('12:30');
     expect(formatDuration(3909)).toBe('1:05:09');
     expect(formatDuration(-90)).toBe('-1:30');
-    expect(formatDuration(null)).toBe('—');
+    expect(formatDuration(null)).toBe('-');
   });
 
   it('reads a due date as a calendar day whatever the time zone', () => {
