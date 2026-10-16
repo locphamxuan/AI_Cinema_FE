@@ -69,6 +69,8 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
       user: null,
       isVIPMode: false,
       wallet: { mainCoin: 0, bonusCoin: 0 },
+      checkInStreak: { currentStreak: 0, lastCheckInDate: null, todayClaimed: false },
+      availableSpins: 0,
     });
   },
 });

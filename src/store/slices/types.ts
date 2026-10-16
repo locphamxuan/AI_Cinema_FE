@@ -52,6 +52,11 @@ export interface WalletSlice {
   /** Records a check-in the API already credited: flags today, never touches the wallet. */
   markCheckedInToday: (streakDay: number) => void;
   syncCheckInStreak: () => void;
+  /** Reward-wheel spins the member still has (from the BE); 0 until loaded. */
+  availableSpins: number;
+  setAvailableSpins: (spins: number) => void;
+  /** Reads today's check-in and the spins left from the BE, which decide both. */
+  syncRewards: () => Promise<void>;
   setWalletBalance: (main: number, bonus: number) => void;
   isDepositModalOpen: boolean;
   openDepositModal: () => void;
