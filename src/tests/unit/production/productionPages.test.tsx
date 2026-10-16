@@ -38,6 +38,7 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
     defaultLanguage: 'vi',
     ageRating: null,
     releaseYear: null,
+    freeEpisodeCount: null,
     status: 'ASSIGNED',
     posterUrl: null,
     reviewerId: 'reviewer-id',
@@ -210,7 +211,8 @@ describe('ProjectDetailPage', () => {
     expect(await screen.findByText(/Gửi brief PDF và file material cho Studio đối tác bên thứ 3 qua email/)).toBeInTheDocument();
     const tiers = screen.getByLabelText('Trạng thái dự án, mùa và tập');
     expect(tiers).toHaveTextContent('Dự án');
-    expect(tiers).toHaveTextContent('Mùa 1');
+    // The sample season has a single episode: it reads as a whole film.
+    expect(tiers).toHaveTextContent('Phần 1 (trọn bộ)');
   });
 
   it('shows the season window, price and, per episode, Creator, prices and expected release date', async () => {
@@ -222,7 +224,7 @@ describe('ProjectDetailPage', () => {
     routeFetch({ '/projects/m1': project(), '/projects/m1/creators': [] });
     render(<ProjectDetailPage />);
 
-    const season = await screen.findByRole('region', { name: 'Mùa 1' });
+    const season = await screen.findByRole('region', { name: 'Phần 1 (trọn bộ)' });
     expect(season).toHaveTextContent('01/01/2027 → 31/03/2027');
     expect(season).toHaveTextContent('đơn giá 500 Token/tập');
     expect(within(season).getByRole('columnheader', { name: 'Creator phụ trách' })).toBeInTheDocument();
