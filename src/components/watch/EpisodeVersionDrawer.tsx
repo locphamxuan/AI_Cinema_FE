@@ -40,7 +40,7 @@ export default function EpisodeVersionDrawer({
               </h2>
             </div>
             <p className="text-xs text-muted-light">
-              Tập {episode.episodeNumber}: <strong className="text-foreground">{episode.title}</strong> • Tổng cộng {versions.length} phiên bản
+              {episode.displayLabel ?? `Tập ${episode.episodeNumber}`}: <strong className="text-foreground">{episode.title}</strong> • Tổng cộng {versions.length} phiên bản
             </p>
           </div>
           <button

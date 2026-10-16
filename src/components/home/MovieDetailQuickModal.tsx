@@ -189,7 +189,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
                     {/* Episode Title & Synopsis */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-[#E50914]">Tập {ep.episodeNumber}</span>
+                        <span className="text-xs font-black text-[#E50914]">{ep.displayLabel ?? `Tập ${ep.episodeNumber}`}</span>
                         <h4 className="text-sm font-bold text-white group-hover/ep:text-[#E50914] transition-colors truncate">
                           {ep.title}
                         </h4>

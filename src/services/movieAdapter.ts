@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '@/constants/apiRoutes';
+import { episodeLabel } from '@/lib/seasonLabel';
 import type { AIComplianceInfo, Episode, Movie } from '@/types/movie';
 
 /** A movie of the public catalog (GET /movies, GET /movies/:id) - never the studio, fee or people in charge. */
@@ -65,10 +66,11 @@ function bestQuality(qualities: string[]): string | undefined {
   return [...qualities].sort((a, b) => parseInt(b, 10) - parseInt(a, 10))[0];
 }
 
-function adaptEpisode(ep: ApiCatalogEpisode, fallbackImage: string): Episode {
+function adaptEpisode(ep: ApiCatalogEpisode, fallbackImage: string, all: ApiCatalogEpisode[]): Episode {
   return {
     id: ep.id,
     episodeNumber: ep.episodeNumber,
+    displayLabel: episodeLabel(ep, all),
     title: ep.title,
     duration: formatDuration(ep.durationSeconds),
     // The stream comes from the access decision once access is granted (MF-2), never the catalog.
@@ -116,7 +118,7 @@ export function adaptApiMovie(api: ApiCatalogMovie, episodes: ApiCatalogEpisode[
     year: api.releaseYear ?? new Date().getFullYear(),
     totalEpisodes: episodes.length,
     ageRating: api.ageRating ?? 'Mọi lứa tuổi',
-    episodes: episodes.map((ep) => adaptEpisode(ep, posterUrl)),
+    episodes: episodes.map((ep) => adaptEpisode(ep, posterUrl, episodes)),
     quality: bestQuality(episodes.flatMap((ep) => ep.qualities)) ?? 'HD',
     aiCompliance: aiCompliance(api, episodes),
     isSeries,

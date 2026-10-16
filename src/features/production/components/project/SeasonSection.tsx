@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { AlertTriangle, ChevronDown, ChevronRight, Pencil, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { getTodayDateString } from '@/lib/dateUtils';
+import { seasonLabel, seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { teamService } from '@/services/teamService';
 import type { CreatorSeat, Episode, Season, SeasonFee } from '@/types/production';
@@ -97,12 +98,11 @@ export function SeasonSection({
   const cost = Number(season.episodeProductionCost);
 
   return (
-    <section className={`${CARD} overflow-hidden`} aria-label={`Mùa ${season.seasonNumber}`}>
+    <section className={`${CARD} overflow-hidden`} aria-label={seasonName(season.seasonNumber, season.episodes.length)}>
       <header className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
         <div className="min-w-0 space-y-1">
           <h2 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-            Mùa {season.seasonNumber}
-            {season.title && season.title !== `Mùa ${season.seasonNumber}` && <span className="font-normal text-slate-500">- {season.title}</span>}
+            {seasonLabel(season.seasonNumber, season.episodes.length, season.title)}
             <StatusPill {...SEASON_STATUS[season.status]} />
           </h2>
           <p className="text-[11px] text-slate-500 dark:text-slate-400">

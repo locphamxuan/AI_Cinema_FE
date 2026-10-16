@@ -6,6 +6,7 @@ import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigat
 import { AlertTriangle, ArrowLeft, Ban } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
+import { seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { useResource } from '../../hooks/useResource';
 import { projectCapabilities } from '../../lib/capabilities';
@@ -113,7 +114,7 @@ export function ProjectDetailPage() {
             Dự án <StatusPill {...MOVIE_STATUS[data.status]} />
             {data.seasons.map((season) => (
               <span key={season.id} className="inline-flex items-center gap-1">
-                → Mùa {season.seasonNumber} <StatusPill {...SEASON_STATUS[season.status]} />
+                → {seasonName(season.seasonNumber, season.episodes.length)} <StatusPill {...SEASON_STATUS[season.status]} />
               </span>
             ))}
           </p>

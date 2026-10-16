@@ -178,7 +178,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
             {/* Episode number & Quality pills */}
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-md bg-ruby/20 border border-ruby/30 text-ruby text-xs font-bold">
-                Tập {currentEpisode.episodeNumber}
+                {currentEpisode.displayLabel ?? `Tập ${currentEpisode.episodeNumber}`}
               </span>
               {currentEpisode.qualities.length > 0 && (
                 <span className="quality-badge">{currentEpisode.qualities.at(-1)}</span>
