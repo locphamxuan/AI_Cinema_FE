@@ -44,7 +44,7 @@ export function StudioTab() {
   const history = useResource(`handoffs:${project.id}:${project.updatedAt}`, () => studioService.listHandoffs(project.id));
   const delivering = isIn(project.status, DELIVERY_PROJECT);
   const canHandOff = caps.handoff && (project.status === 'ASSIGNED' || delivering);
-  const canAskTokens = caps.creator && caps.suggest && isIn(project.status, [...OPEN_PROJECT, 'UNDER_REVISION']);
+  const canAskTokens = caps.askTokens && isIn(project.status, [...OPEN_PROJECT, 'UNDER_REVISION']);
   const all = history.data ?? [];
   const declined = all.some((h) => h.milestoneStatus === 'STUDIO_DECLINED');
   const matching = all.filter(FILTERS.find((f) => f.key === filter)!.match);
@@ -132,7 +132,13 @@ export function StudioTab() {
               </Button>
             )}
             {caps.creator && project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Reviewer hoàn tất kế hoạch.</p>}
-            {project.status === 'ASSIGNED' && !caps.handoff && <p className="text-xs text-slate-500">Chờ Content Creator bàn giao cho Studio.</p>}
+            {project.status === 'ASSIGNED' && !caps.handoff && <p className="text-xs text-slate-500">Chờ Creator chính bàn giao cho Studio.</p>}
+            {caps.creator && !caps.lead && (
+              <p className="rounded-xl border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 p-3 text-xs text-sky-800 dark:text-sky-300">
+                Bạn là Creator phụ: Creator chính {project.creator?.fullName ?? ''} bàn giao, đổi Studio, cập nhật mốc và xin thêm Token. Studio CC bạn
+                khi gửi phim; tải tập của bạn rồi upload Submission ở trang tập để gửi lên Creator chính.
+              </p>
+            )}
           </div>
         </Panel>
         {canAskTokens && (
