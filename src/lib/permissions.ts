@@ -83,6 +83,11 @@ export function homeAreaOf(role: WebRole | undefined): Area | null {
   }
 }
 
+/** The viewer site (home, catalog, wallet, check-in, reward wheel) is for members only; staff-side roles work in their area. */
+export function isMemberRole(role: WebRole | undefined): boolean {
+  return role === 'user' || role === 'vip';
+}
+
 export function canEnter(area: Area, role: WebRole | undefined): boolean {
   return role !== undefined && AREAS[area].roles.includes(role);
 }

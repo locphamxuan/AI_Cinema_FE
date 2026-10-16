@@ -16,7 +16,7 @@ const AREA_ORDER: Area[] = ['creator', 'reviewer', 'staff', 'admin'];
 export function DashboardHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout, openAuthModal } = useAppStore();
+  const { user, logout } = useAppStore();
   const can = useCan();
 
   const area = AREA_ORDER.find((a) => pathname.startsWith(`/${a}`)) ?? 'reviewer';
@@ -29,8 +29,7 @@ export function DashboardHeader() {
 
   const handleLogout = () => {
     logout();
-    router.push('/');
-    openAuthModal('login');
+    router.push('/login');
   };
 
   return (
