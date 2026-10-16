@@ -91,6 +91,27 @@ describe('movieService', () => {
     expect(paid).toMatchObject({ price: 3, isFree: false, isUnlocked: false });
   });
 
+  it('keeps the subtitle tracks, loaded through the API', async () => {
+    routeFetch({
+      '/movies/m1': apiMovie,
+      '/movies/m1/episodes': [
+        episode(1, {
+          subtitles: [
+            { id: 's-vi', language: 'vi', label: 'Tiếng Việt', isDefault: true },
+            { id: 's-en', language: 'en', label: 'English', isDefault: false },
+          ],
+        }),
+      ],
+    });
+
+    const res = await movieService.getMovieById('m1');
+
+    expect(res.data.episodes[0].subtitles).toEqual([
+      { language: 'vi', label: 'Tiếng Việt', src: '/api/subtitles/s-vi', isDefault: true },
+      { language: 'en', label: 'English', src: '/api/subtitles/s-en', isDefault: false },
+    ]);
+  });
+
   it('returns genres from the paginated genre endpoint', async () => {
     routeFetch({ '/genres': { data: [{ id: 'g1', name: 'Lãng mạn', description: null }], meta: {} } });
     const res = await movieService.getGenres();
