@@ -13,7 +13,7 @@ export interface ModalProps {
   maxWidth?: string;
 }
 
-/** Shared modal shell — centers a dialog card over a dim backdrop, with a title bar and close button, so every page stops hand-rolling this. */
+/** Shared modal shell - centers a dialog card over a dim backdrop, with a title bar and close button, so every page stops hand-rolling this. */
 export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth = 'max-w-lg' }: ModalProps) {
   if (!open) return null;
 

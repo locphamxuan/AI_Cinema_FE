@@ -14,7 +14,7 @@ export type CoinEntryType =
 
 export type StatementKind = 'ALL' | 'MAIN' | 'BONUS';
 
-/** GET /wallet/statements — one ledger line with the balances right after it. */
+/** GET /wallet/statements - one ledger line with the balances right after it. */
 export interface StatementLine {
   id: string;
   entryType: CoinEntryType;
@@ -29,7 +29,7 @@ export interface StatementLine {
   bonusBalanceAfter: number;
 }
 
-/** GET /admin/coin-transactions — a line of any wallet. */
+/** GET /admin/coin-transactions - a line of any wallet. */
 export interface LedgerLine extends StatementLine {
   walletId: string;
   userId: string;
@@ -180,7 +180,7 @@ export interface ReportRange {
   to?: string;
 }
 
-/** GET /admin/reward-rules — one rung of the check-in streak ladder (BR-05). */
+/** GET /admin/reward-rules - one rung of the check-in streak ladder (BR-05). */
 export interface RewardRule {
   id: string;
   code: string;

@@ -41,13 +41,13 @@ export function SeasonFeeTable({
             <tr key={season.seasonId}>
               <td className="py-2 text-slate-800 dark:text-slate-100">
                 Mùa {season.seasonNumber}
-                {season.title && season.title !== `Mùa ${season.seasonNumber}` && <span className="text-slate-400"> — {season.title}</span>}
+                {season.title && season.title !== `Mùa ${season.seasonNumber}` && <span className="text-slate-400"> - {season.title}</span>}
               </td>
               <td className="py-2 text-right">{formatNumber(season.episodeProductionCost)}</td>
               <td className="py-2 text-right">{season.episodeCount}</td>
               <td className="py-2 text-right">{formatNumber(season.baselineTokens)}</td>
               <td className="py-2 text-right font-mono text-emerald-600">{formatNumber(season.allocatedTokens)}</td>
-              <td className="py-2 text-right font-mono text-emerald-600">{season.supplementTokens ? `+${formatNumber(season.supplementTokens)}` : '—'}</td>
+              <td className="py-2 text-right font-mono text-emerald-600">{season.supplementTokens ? `+${formatNumber(season.supplementTokens)}` : '-'}</td>
               <td className={`py-2 text-right font-mono ${season.missingTokens ? 'text-amber-600' : 'text-slate-400'}`}>{formatNumber(season.missingTokens)}</td>
               <td className="py-2 text-right">
                 {canAllocate && !season.hasInitial && season.episodeProductionCost > 0 && season.episodeCount > 0 && (

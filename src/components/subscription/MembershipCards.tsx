@@ -3,7 +3,7 @@
 import { useNow } from '@/hooks/useNow';
 import type { MembershipPlan, MySubscription } from '@/types/episodeAccess';
 
-const day = (iso: string | null) => (iso ? new Date(iso).toLocaleString('vi-VN') : '—');
+const day = (iso: string | null) => (iso ? new Date(iso).toLocaleString('vi-VN') : '-');
 
 interface CurrentPlanProps {
   subscription: MySubscription | null;
@@ -53,12 +53,12 @@ export function CurrentPlan({ subscription, busy, onCancelRenew, onResumeRenew }
         <div>
           <dt className="text-slate-500">Tự gia hạn</dt>
           <dd className="font-bold text-slate-900 dark:text-white">
-            {subscription.autoRenew ? `Bật — ${day(subscription.nextRenewalAt)}` : 'Tắt — gói dừng khi hết hạn'}
+            {subscription.autoRenew ? `Bật - ${day(subscription.nextRenewalAt)}` : 'Tắt - gói dừng khi hết hạn'}
           </dd>
         </div>
         <div>
           <dt className="text-slate-500">Hạn chót tắt gia hạn</dt>
-          <dd className="font-bold text-slate-900 dark:text-white">{subscription.autoRenew ? day(subscription.cancelDeadline) : '—'}</dd>
+          <dd className="font-bold text-slate-900 dark:text-white">{subscription.autoRenew ? day(subscription.cancelDeadline) : '-'}</dd>
         </div>
       </dl>
 

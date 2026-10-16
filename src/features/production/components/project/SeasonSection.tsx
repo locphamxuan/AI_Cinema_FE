@@ -102,7 +102,7 @@ export function SeasonSection({
         <div className="min-w-0 space-y-1">
           <h2 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
             Mùa {season.seasonNumber}
-            {season.title && season.title !== `Mùa ${season.seasonNumber}` && <span className="font-normal text-slate-500">— {season.title}</span>}
+            {season.title && season.title !== `Mùa ${season.seasonNumber}` && <span className="font-normal text-slate-500">- {season.title}</span>}
             <StatusPill {...SEASON_STATUS[season.status]} />
           </h2>
           <p className="text-[11px] text-slate-500 dark:text-slate-400">

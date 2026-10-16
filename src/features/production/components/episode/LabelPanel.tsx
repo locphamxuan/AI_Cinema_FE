@@ -61,7 +61,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
   return (
     <Panel
       title="Nhãn nội dung AI (BR-40)"
-      description={label ? `Theo chính sách: ${label.policy.name}` : 'Bước 10 — người xem thấy nhãn này trên mọi màn hình phát video.'}
+      description={label ? `Theo chính sách: ${label.policy.name}` : 'Bước 10 - người xem thấy nhãn này trên mọi màn hình phát video.'}
       actions={
         canAct &&
         label &&
@@ -79,7 +79,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
               ['Creator đề xuất', LABEL_TYPE[sheet.proposedLabelType]],
               ['Loại nhãn đã gắn', LABEL_TYPE[label.labelType]],
               ['Nội dung', label.labelText],
-              ['Vị trí', label.displayLocation ? LABEL_LOCATION[label.displayLocation] : '—'],
+              ['Vị trí', label.displayLocation ? LABEL_LOCATION[label.displayLocation] : '-'],
               ['Gắn lúc', formatDateTime(label.appliedAt)],
             ]}
           />

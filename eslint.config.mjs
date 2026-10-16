@@ -17,14 +17,14 @@ const eslintConfig = defineConfig([
   ]),
   {
     // Keep files small and single-purpose. Split a file before it grows past
-    // this — large files are a signal to extract a component/hook/slice.
+    // this - large files are a signal to extract a component/hook/slice.
     files: ["src/**/*.{ts,tsx}"],
     rules: {
       "max-lines": ["error", { max: 300, skipBlankLines: false, skipComments: false }],
     },
   },
   {
-    // Seed/fixture data is not logic — line count there tracks the dataset,
+    // Seed/fixture data is not logic - line count there tracks the dataset,
     // not code complexity.
     files: ["src/mocks/**/*.{ts,tsx}", "src/**/mocks/**/*.{ts,tsx}"],
     rules: {

@@ -130,7 +130,7 @@ export function EpisodePage() {
                 ['Ngày dự kiến phát hành', formatDay(episode.expectedReleaseDate)],
                 ['Creator phụ trách', episode.assignedCreator?.fullName ?? 'Cả nhóm'],
                 ['Giá Coin', formatNumber(episode.coinPrice)],
-                ['Studio', project.data.studio?.name ?? '—'],
+                ['Studio', project.data.studio?.name ?? '-'],
               ]}
             />
             {episode.synopsis && <p className="mt-3 text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">{episode.synopsis}</p>}

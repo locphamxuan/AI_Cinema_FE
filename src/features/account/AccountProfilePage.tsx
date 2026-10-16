@@ -53,11 +53,11 @@ export function AccountProfilePage() {
               stacked
               items={[
                 ['Email', account.data.email],
-                ['Số điện thoại', account.data.phoneNumber ?? '—'],
-                ['Ngày sinh', account.data.dateOfBirth ? account.data.dateOfBirth.slice(0, 10) : '—'],
+                ['Số điện thoại', account.data.phoneNumber ?? '-'],
+                ['Ngày sinh', account.data.dateOfBirth ? account.data.dateOfBirth.slice(0, 10) : '-'],
                 ['Trạng thái', account.data.isActive ? 'Đang hoạt động' : 'Đã khoá'],
                 ['Tham gia', formatDateTime(account.data.createdAt)],
-                ['Dự án phim', projects.data ? String(projects.data.meta.totalItems) : '—'],
+                ['Dự án phim', projects.data ? String(projects.data.meta.totalItems) : '-'],
               ]}
             />
           </Panel>

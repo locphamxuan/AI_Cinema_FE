@@ -112,15 +112,15 @@ export function TokenHistoryTable({
                     e.movie.title
                   )
                 ) : (
-                  <span className="text-slate-400">—</span>
+                  <span className="text-slate-400">-</span>
                 )}
-                {e.season && <span className="block text-[10px] text-slate-400 mt-0.5">Mùa {e.season.seasonNumber}{e.season.title ? ` — ${e.season.title}` : ''}</span>}
+                {e.season && <span className="block text-[10px] text-slate-400 mt-0.5">Mùa {e.season.seasonNumber}{e.season.title ? ` - ${e.season.title}` : ''}</span>}
               </td>
               <td className={`py-3 px-4 text-right font-mono font-bold ${e.amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 {e.amountTokens > 0 ? '+' : ''}
                 {formatNumber(e.amountTokens)} <span className="text-[10px] font-normal">Token</span>
               </td>
-              <td className="py-3 px-5 text-slate-600 dark:text-slate-400 text-[11px] max-w-xs">{e.reason ?? '—'}</td>
+              <td className="py-3 px-5 text-slate-600 dark:text-slate-400 text-[11px] max-w-xs">{e.reason ?? '-'}</td>
             </tr>
           ))}
         </tbody>

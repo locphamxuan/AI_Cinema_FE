@@ -41,7 +41,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
     pickedVersion && pickedVersion.episodeId === currentEpisode?.id ? pickedVersion.version : defaultVersion(currentEpisode);
 
   // Free starters play at once; anything else plays once the BE access decision granted it (MF-2),
-  // which the unlock modal records as isUnlocked — a running plan included.
+  // which the unlock modal records as isUnlocked - a running plan included.
   const stream = useEpisodeStream(currentEpisode?.id, !!currentEpisode?.isUnlocked);
   const canPlay = currentEpisode ? currentEpisode.isFree || currentEpisode.isUnlocked || stream.accessGranted : false;
 

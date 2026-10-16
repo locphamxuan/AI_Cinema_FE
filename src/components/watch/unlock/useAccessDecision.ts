@@ -14,7 +14,7 @@ export interface AccessState {
 
 const IDLE: AccessState = { decision: null, monthlyPlan: null, loading: false, error: null };
 
-/** Cheapest paid monthly plan on sale — the same plan the BE quotes in the access decision. */
+/** Cheapest paid monthly plan on sale - the same plan the BE quotes in the access decision. */
 function pickMonthlyPlan(plans: MembershipPlan[]): MembershipPlan | null {
   const paid = plans.filter((p) => !p.isFree && p.isActive && p.period === 'MONTHLY' && p.priceCoins !== null);
   return paid.sort((a, b) => (a.priceCoins ?? 0) - (b.priceCoins ?? 0))[0] ?? null;

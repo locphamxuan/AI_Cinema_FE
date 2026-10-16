@@ -11,7 +11,7 @@ type Tab = 'episode' | 'plan';
 
 /**
  * MF-2 Choose Access Method: unlock the episode with Coins or join the monthly plan, both paid in
- * Coins (BR-01). Everything shown — prices, balances, what is missing — is the BE access decision;
+ * Coins (BR-01). Everything shown - prices, balances, what is missing - is the BE access decision;
  * the wallet and the unlocked flag are updated from what the BE answered, never computed here.
  */
 export default function UnlockEpisodeModal() {

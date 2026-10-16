@@ -60,8 +60,8 @@ export function ProjectInfoFields({ value, onChange }: { value: ProjectInfoDraft
         <FormField label="Độ tuổi">
           <select value={value.ageRating} onChange={(e) => patch({ ageRating: e.target.value as AgeRating | '' })} className={fieldInputClass}>
             <option value="">Chưa đặt</option>
-            <option value="T16">T16 — từ 16 tuổi</option>
-            <option value="T18">T18 — từ 18 tuổi</option>
+            <option value="T16">T16 - từ 16 tuổi</option>
+            <option value="T18">T18 - từ 18 tuổi</option>
           </select>
         </FormField>
         <FormField label="Năm phát hành">

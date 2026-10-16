@@ -110,8 +110,8 @@ export function StudioTab() {
               items={[
                 ['Studio', project.studio.name],
                 ['Email', project.studio.email],
-                ['Liên hệ', project.studio.contactName ?? '—'],
-                ['Điện thoại', project.studio.phone ?? '—'],
+                ['Liên hệ', project.studio.contactName ?? '-'],
+                ['Điện thoại', project.studio.phone ?? '-'],
               ]}
             />
           ) : (

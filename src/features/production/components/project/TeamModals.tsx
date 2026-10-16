@@ -113,7 +113,7 @@ export function DelegateModal({
                 <li key={episode.id}>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" checked={picked.includes(episode.id)} onChange={() => toggle(episode.id)} />
-                    Tập {episode.episodeNumber} — {episode.title}
+                    Tập {episode.episodeNumber} - {episode.title}
                   </label>
                 </li>
               ))}

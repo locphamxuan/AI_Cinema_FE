@@ -39,7 +39,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
   return (
     <div className="space-y-5">
       <Panel
-        title={`Phiếu duyệt — bản ${sheet.version}`}
+        title={`Phiếu duyệt - bản ${sheet.version}`}
         actions={
           canAct &&
           (underReview || reviewed) && (
@@ -139,14 +139,14 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
     };
     const done = await run(
       () => productionService.runCompliance(sheet.id, input),
-      fails ? 'Không đạt — tập được trả về để studio sửa' : 'Tập đạt kiểm tra tuân thủ',
+      fails ? 'Không đạt - tập được trả về để studio sửa' : 'Tập đạt kiểm tra tuân thủ',
     );
     if (done) await onChanged();
   };
 
   return (
     <Panel
-      title="Bước 11 — Kiểm tra pháp lý và an toàn nội dung"
+      title="Bước 11 - Kiểm tra pháp lý và an toàn nội dung"
       description="Rà soát nhãn AI, thông báo theo Nghị định 142, an toàn nội dung và nguy cơ gây nhầm lẫn với người hoặc sự kiện có thật. Nếu có mục không đạt, tập sẽ được gửi lại để studio sửa."
     >
       {sheet.complianceChecks.length > 0 && (

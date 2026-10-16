@@ -18,7 +18,7 @@ const EMAIL_STATUS = {
 } as const;
 
 export const scopeLabel = (h: Pick<StudioHandoff, 'season'>) =>
-  h.season ? `Mùa ${h.season.seasonNumber}${h.season.title ? ` — ${h.season.title}` : ''}` : 'Cả dự án';
+  h.season ? `Mùa ${h.season.seasonNumber}${h.season.title ? ` - ${h.season.title}` : ''}` : 'Cả dự án';
 
 /** One hand-off (or studio change) on the Studio timeline: who it went to, what was sent, every milestone and Submission. */
 export function HandoffCard({

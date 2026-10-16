@@ -1,5 +1,5 @@
 /**
- * Main Flow 2 — Episode Access & Monetization. Mirrors the BE responses of
+ * Main Flow 2 - Episode Access & Monetization. Mirrors the BE responses of
  * src/modules/episode-access one-to-one; field names are the BE ones.
  */
 
@@ -69,7 +69,7 @@ export interface PurchaseResult {
   idempotent?: boolean;
 }
 
-/** GET /membership-plans — `features` is free-form JSON the Admin sets. */
+/** GET /membership-plans - `features` is free-form JSON the Admin sets. */
 export interface MembershipPlan {
   id: string;
   code: string;
@@ -85,7 +85,7 @@ export interface MembershipPlan {
   priceCoins: number | null;
 }
 
-/** POST /subscriptions — a quote; no Coin has moved yet. */
+/** POST /subscriptions - a quote; no Coin has moved yet. */
 export interface SubscriptionIntent {
   id: string;
   planId: string;
@@ -99,7 +99,7 @@ export interface SubscriptionIntent {
   currentPeriodEnd: string;
 }
 
-/** POST /subscriptions/:id/activate — the first cycle is paid. */
+/** POST /subscriptions/:id/activate - the first cycle is paid. */
 export interface SubscriptionActivation {
   id: string;
   status: string;
@@ -114,7 +114,7 @@ export interface SubscriptionActivation {
   episodeAccessGranted: boolean;
 }
 
-/** GET /subscriptions/me — the open plan (PENDING = quoted, not paid), or null. */
+/** GET /subscriptions/me - the open plan (PENDING = quoted, not paid), or null. */
 export interface MySubscription {
   id: string;
   status: 'PENDING' | 'ACTIVE' | 'PAST_DUE';

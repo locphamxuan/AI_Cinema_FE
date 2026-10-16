@@ -67,7 +67,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
   };
 
   return (
-    <Modal open onClose={onClose} title="Tạo dự án phim" subtitle="Bước 1 — ý tưởng, thông tin phim cho người xem và cấu trúc mùa/tập (Studio nhập khi bàn giao)" icon={<Clapperboard className="w-4 h-4" />} maxWidth="max-w-3xl">
+    <Modal open onClose={onClose} title="Tạo dự án phim" subtitle="Bước 1 - ý tưởng, thông tin phim cho người xem và cấu trúc mùa/tập (Studio nhập khi bàn giao)" icon={<Clapperboard className="w-4 h-4" />} maxWidth="max-w-3xl">
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Tên phim">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} required className={fieldInputClass} />
@@ -90,7 +90,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
         </div>
 
         <fieldset className="space-y-3">
-          <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Mùa và tập — đơn giá, khoảng phát hành, thời lượng, hạn giao và ngày dự kiến phát hành</legend>
+          <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Mùa và tập - đơn giá, khoảng phát hành, thời lượng, hạn giao và ngày dự kiến phát hành</legend>
           <p className="text-[11px] text-slate-500">
             Hạn giao là ngày Studio phải giao tập; ngày dự kiến phát hành nằm trong khoảng phát hành của mùa và không trước hạn giao.
           </p>
@@ -140,5 +140,5 @@ async function uploadAttachments(movieId: string, info: ProjectInfoDraft) {
     const res = await productionService.uploadIdeaFile(movieId, file, purpose);
     if (!res.success) failed.push(file.name);
   }
-  if (failed.length) toast.error('Một số tệp chưa tải lên được', `${failed.join(', ')} — tải lại ở tab Tổng quan.`);
+  if (failed.length) toast.error('Một số tệp chưa tải lên được', `${failed.join(', ')} - tải lại ở tab Tổng quan.`);
 }

@@ -45,7 +45,7 @@ export function TokenRequestForm({ project, onSent }: { project: ProjectDetail; 
             {project.seasons.map((s) => (
               <option key={s.id} value={s.id}>
                 Mùa {s.seasonNumber}
-                {s.title ? ` — ${s.title}` : ''}
+                {s.title ? ` - ${s.title}` : ''}
               </option>
             ))}
           </select>

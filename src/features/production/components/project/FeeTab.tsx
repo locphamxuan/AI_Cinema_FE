@@ -128,7 +128,7 @@ export function FeeTab() {
                             {amountTokens > 0 ? '+' : ''}
                             {formatNumber(amountTokens)}
                           </td>
-                          <td className="py-2 pl-4 text-slate-600 dark:text-slate-300">{e.reason ?? '—'}</td>
+                          <td className="py-2 pl-4 text-slate-600 dark:text-slate-300">{e.reason ?? '-'}</td>
                           <td className="py-2 hidden md:table-cell text-slate-500">
                             {e.createdBy.fullName}
                             <br />
@@ -171,7 +171,7 @@ export function FeeTab() {
             {rate && amountValid && <p className="text-[11px] text-slate-500">≈ {formatNumber(value * rate)} ₫</p>}
             {balance !== undefined && (
               <p className={`text-[11px] ${affordable ? 'text-slate-500' : 'text-rose-600'}`}>
-                Bạn còn {formatNumber(balance)} Token{!affordable && ' — không đủ, hãy gửi đề xuất xin thêm kinh phí lên Admin'}.
+                Bạn còn {formatNumber(balance)} Token{!affordable && ' - không đủ, hãy gửi đề xuất xin thêm kinh phí lên Admin'}.
               </p>
             )}
             {total === 0 && <p className="text-[11px] text-amber-600">Cấp phí theo đơn giá cho ít nhất một mùa trước.</p>}

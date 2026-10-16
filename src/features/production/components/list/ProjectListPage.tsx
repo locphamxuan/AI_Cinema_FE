@@ -144,11 +144,11 @@ export function ProjectListPage() {
                       <td className="px-4 py-3">
                         <StatusPill {...MOVIE_STATUS[p.status]} />
                       </td>
-                      <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">{p.studio?.name ?? '—'}</td>
+                      <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">{p.studio?.name ?? '-'}</td>
                       <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">
                         {(isCreator ? p.reviewer?.fullName : p.creator?.fullName) ?? 'Chưa giao'}
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{p._count?.episodes ?? '—'}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{p._count?.episodes ?? '-'}</td>
                       <td className="px-4 py-3 hidden lg:table-cell text-slate-500 dark:text-slate-400">{formatDateTime(p.lastActivityAt)}</td>
                     </tr>
                   );

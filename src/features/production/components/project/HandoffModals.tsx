@@ -63,7 +63,7 @@ function HandoffFields(props: {
           {project.seasons.map((season) => (
             <option key={season.id} value={season.id}>
               Mùa {season.seasonNumber}
-              {season.title && season.title !== `Mùa ${season.seasonNumber}` ? ` — ${season.title}` : ''}
+              {season.title && season.title !== `Mùa ${season.seasonNumber}` ? ` - ${season.title}` : ''}
             </option>
           ))}
         </select>
@@ -127,7 +127,7 @@ export function HandOffModal({ onClose }: { onClose: () => void }) {
           <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Hạn giao của các tập sẽ bàn giao</p>
           <p className="text-[11px] text-slate-500">Studio phải giao đúng hạn Reviewer đã đặt; muốn đổi hạn hãy báo Reviewer.</p>
           <DeadlineList episodes={episodes} />
-          {!ready && <p className="text-[11px] text-rose-600">Không có tập nào để bàn giao, hoặc có tập chưa có hạn giao / hạn đã qua — Reviewer cần cập nhật trước.</p>}
+          {!ready && <p className="text-[11px] text-rose-600">Không có tập nào để bàn giao, hoặc có tập chưa có hạn giao / hạn đã qua - Reviewer cần cập nhật trước.</p>}
         </div>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>

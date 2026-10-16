@@ -49,12 +49,12 @@ export function OverviewTab() {
         >
           <Facts
             items={[
-              ['Thể loại', project.genres.map((g) => g.name).join(', ') || '—'],
+              ['Thể loại', project.genres.map((g) => g.name).join(', ') || '-'],
               ['Ngôn ngữ', project.defaultLanguage],
-              ['Độ tuổi', project.ageRating ?? '—'],
-              ['Năm phát hành', project.releaseYear ?? '—'],
+              ['Độ tuổi', project.ageRating ?? '-'],
+              ['Năm phát hành', project.releaseYear ?? '-'],
               ['Tạo lúc', formatDateTime(project.createdAt)],
-              ['Studio', project.studio?.name ?? '—'],
+              ['Studio', project.studio?.name ?? '-'],
               ['Bàn giao Studio', formatDateTime(project.handedOffAt)],
               ['Hoàn tất', formatDateTime(project.completedAt)],
             ]}

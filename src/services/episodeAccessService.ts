@@ -14,17 +14,17 @@ import type {
 const idempotent = (key: string) => ({ headers: { 'Idempotency-Key': key } });
 
 export const episodeAccessService = {
-  /** GET /episodes/:episodeId/access — may this caller (Guest or Member) watch it, and if not, how. */
+  /** GET /episodes/:episodeId/access - may this caller (Guest or Member) watch it, and if not, how. */
   checkAccess(episodeId: string): Promise<ApiResponse<AccessDecision>> {
     return apiClient.get<AccessDecision>(`/episodes/${episodeId}/access`);
   },
 
-  /** POST /episodes/:episodeId/purchase — unlock one episode with Coins, main before bonus. */
+  /** POST /episodes/:episodeId/purchase - unlock one episode with Coins, main before bonus. */
   purchaseEpisode(episodeId: string, key = randomId('ep-')): Promise<ApiResponse<PurchaseResult>> {
     return apiClient.post<PurchaseResult>(`/episodes/${episodeId}/purchase`, {}, idempotent(key));
   },
 
-  /** GET /membership-plans — the plans on sale, free tier included. */
+  /** GET /membership-plans - the plans on sale, free tier included. */
   getPlans(): Promise<ApiResponse<MembershipPlan[]>> {
     return apiClient.get<MembershipPlan[]>('/membership-plans');
   },
@@ -44,7 +44,7 @@ export const episodeAccessService = {
     );
   },
 
-  /** GET /subscriptions/me — null when the member has no open plan. */
+  /** GET /subscriptions/me - null when the member has no open plan. */
   getMySubscription(): Promise<ApiResponse<MySubscription | null>> {
     return apiClient.get<MySubscription | null>('/subscriptions/me');
   },

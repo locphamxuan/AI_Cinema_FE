@@ -77,7 +77,7 @@ export function StudiosPage() {
                         {studio.note && <p className="text-slate-400">{studio.note}</p>}
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">
-                        {studio.contactName ?? '—'}
+                        {studio.contactName ?? '-'}
                         {studio.phone && <p className="text-slate-400">{studio.phone}</p>}
                       </td>
                       <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{studio._count?.movies ?? 0}</td>

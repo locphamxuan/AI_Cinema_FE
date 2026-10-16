@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '@/constants/apiRoutes';
 import type { AIComplianceInfo, Episode, Movie } from '@/types/movie';
 
-/** A movie of the public catalog (GET /movies, GET /movies/:id) — never the studio, fee or people in charge. */
+/** A movie of the public catalog (GET /movies, GET /movies/:id) - never the studio, fee or people in charge. */
 export interface ApiCatalogMovie {
   id: string;
   title: string;
