@@ -53,6 +53,7 @@ export function OverviewTab() {
               ['Ngôn ngữ', project.defaultLanguage],
               ['Độ tuổi', project.ageRating ?? '-'],
               ['Năm phát hành', project.releaseYear ?? '-'],
+              ['Tập xem miễn phí', project.freeEpisodeCount ?? 'Theo mặc định nền tảng'],
               ['Tạo lúc', formatDateTime(project.createdAt)],
               ['Studio', project.studio?.name ?? '-'],
               ['Bàn giao Studio', formatDateTime(project.handedOffAt)],
@@ -139,6 +140,9 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
   const [genreIds, setGenreIds] = useState(project.genres.map((g) => g.id));
   const [ageRating, setAgeRating] = useState<AgeRating | ''>(project.ageRating ?? '');
   const [releaseYear, setReleaseYear] = useState(project.releaseYear ? String(project.releaseYear) : '');
+  // '' = the platform's default count; a number overrides it for this movie (BR-03).
+  const [freeEpisodes, setFreeEpisodes] = useState(project.freeEpisodeCount == null ? '' : String(project.freeEpisodeCount));
+  const freeValid = freeEpisodes === '' || (Number.isInteger(Number(freeEpisodes)) && Number(freeEpisodes) >= 0);
   const { busy, run } = useAction();
 
   const submit = async (e: React.FormEvent) => {
@@ -152,6 +156,7 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
           ...(synopsis.trim() ? { synopsis: synopsis.trim() } : {}),
           ...(ageRating ? { ageRating } : {}),
           ...(releaseYear ? { releaseYear: Number(releaseYear) } : {}),
+          freeEpisodeCount: freeEpisodes === '' ? null : Number(freeEpisodes),
         }),
       'Đã lưu thông tin phim',
     );
@@ -189,11 +194,26 @@ function EditProjectModal({ onClose }: { onClose: () => void }) {
             <input type="number" min={2000} max={2100} value={releaseYear} onChange={(e) => setReleaseYear(e.target.value)} className={fieldInputClass} />
           </FormField>
         </div>
+        <FormField label="Số tập xem miễn phí">
+          <input
+            type="number"
+            min={0}
+            max={1000}
+            value={freeEpisodes}
+            onChange={(e) => setFreeEpisodes(e.target.value)}
+            placeholder="Để trống = theo mặc định nền tảng"
+            aria-label="Số tập xem miễn phí"
+            className={fieldInputClass}
+          />
+          <span className="block mt-1 text-[11px] text-slate-500">
+            Tính theo số thứ tự tập trong cả phim. Phim 1 tập trọn bộ: nhập 0 để thu Coin, 1 để cho xem miễn phí.
+          </span>
+        </FormField>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !title.trim() || idea.trim().length < 20 || genreIds.length === 0}>
+          <Button type="submit" disabled={busy || !freeValid || !title.trim() || idea.trim().length < 20 || genreIds.length === 0}>
             Lưu
           </Button>
         </div>
