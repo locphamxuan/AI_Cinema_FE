@@ -35,6 +35,7 @@ export interface SubtitleTrack {
   language: string;
   label: string;
   src: string;
+  isDefault?: boolean;
 }
 
 export interface Episode {

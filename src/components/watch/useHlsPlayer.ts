@@ -10,7 +10,12 @@ interface HlsOptions {
   isPreview: boolean;
 }
 
-/** Attaches an HLS stream to the video and exposes the renditions of its master playlist. */
+/** HLS playlists go through hls.js; anything else (an MP4) the video element plays itself. */
+export function isHlsUrl(url: string): boolean {
+  return /\.m3u8(\?|#|$)/i.test(url);
+}
+
+/** Attaches the stream (HLS or MP4) to the video and exposes the renditions of an HLS master playlist. */
 export function useHlsPlayer(videoRef: RefObject<HTMLVideoElement | null>, options: HlsOptions) {
   const { enabled, streamUrl, canPlay, isPreview } = options;
   const hlsRef = useRef<Hls | null>(null);
@@ -29,6 +34,15 @@ export function useHlsPlayer(videoRef: RefObject<HTMLVideoElement | null>, optio
     destroy();
     setLevels([]);
     setLevel(-1);
+
+    if (!isHlsUrl(streamUrl)) {
+      if (!canPlay && !isPreview) return destroy;
+      video.src = streamUrl;
+      return () => {
+        video.removeAttribute('src');
+        video.load();
+      };
+    }
 
     if (canPlay) {
       if (Hls.isSupported()) {

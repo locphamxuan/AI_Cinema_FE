@@ -47,6 +47,8 @@ export interface AccessDecision {
   planCode?: string;
   accessMethods: AccessMethod[];
   required: AccessRequired;
+  /** What the player loads (HLS or MP4); only present when access is granted. */
+  streamUrl?: string;
   nextAction: NextAction;
 }
 
