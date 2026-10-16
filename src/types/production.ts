@@ -114,6 +114,8 @@ export interface ProjectDetail {
   defaultLanguage: string;
   ageRating: AgeRating | null;
   releaseYear: number | null;
+  /** Free episodes of this movie set by the Reviewer; null = the platform's default (BR-03). */
+  freeEpisodeCount: number | null;
   status: MovieStatus;
   posterUrl: string | null;
   reviewerId: string;
