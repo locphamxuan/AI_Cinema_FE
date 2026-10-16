@@ -76,7 +76,7 @@ describe('formatting', () => {
     expect(formatDuration(750)).toBe('12:30');
     expect(formatDuration(3909)).toBe('1:05:09');
     expect(formatDuration(-90)).toBe('-1:30');
-    expect(formatDuration(null)).toBe('—');
+    expect(formatDuration(null)).toBe('-');
   });
 
   it('reads a due date as a calendar day whatever the time zone', () => {
