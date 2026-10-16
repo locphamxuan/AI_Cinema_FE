@@ -4,10 +4,13 @@
 
 // Same-origin by default so the Next.js rewrite or route handlers proxy to the backend
 // and the browser never makes a cross-origin call or fails if port 3001 is offline.
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_API_URL.includes('3001')
-    ? process.env.NEXT_PUBLIC_API_URL
-    : '/api';
+// A relative value ("api") is rooted, or pages like /watch/:id would call /watch/api/...
+export function resolveApiBaseUrl(configured: string | undefined): string {
+  if (!configured || configured.includes('3001')) return '/api';
+  return /^https?:\/\//.test(configured) || configured.startsWith('/') ? configured : `/${configured}`;
+}
+
+export const API_BASE_URL = resolveApiBaseUrl(process.env.NEXT_PUBLIC_API_URL);
 
 export const API_ROUTES = {
   // Auth
