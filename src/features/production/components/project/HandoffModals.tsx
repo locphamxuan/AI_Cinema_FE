@@ -5,7 +5,10 @@ import { Repeat, Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
+import { seasonLabel } from '@/lib/seasonLabel';
 import { studioService } from '@/services/studioService';
+import { formatNumber } from '../../lib/format';
+import { swapPreview } from '../../lib/studioSwap';
 import { useAction } from '../../hooks/useAction';
 import { FilePicker } from '../shared/FilePicker';
 import { DeadlineList, deadlineUsable } from './DueDateRows';
@@ -62,8 +65,7 @@ function HandoffFields(props: {
           <option value="">Cả dự án (mọi tập chưa giao)</option>
           {project.seasons.map((season) => (
             <option key={season.id} value={season.id}>
-              Mùa {season.seasonNumber}
-              {season.title && season.title !== `Mùa ${season.seasonNumber}` ? ` - ${season.title}` : ''}
+              {seasonLabel(season.seasonNumber, season.episodes.length, season.title)}
             </option>
           ))}
         </select>
@@ -142,11 +144,13 @@ export function HandOffModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
+export function ChangeStudioModal({ onClose, onAskTokens }: { onClose: () => void; onAskTokens?: () => void }) {
   const { project, reload } = useProject();
   const [form, setForm] = useState(EMPTY);
   const [reason, setReason] = useState('');
   const { busy, run } = useAction();
+  const preview = swapPreview(project, form.seasonId || null);
+  const funded = preview.availableTokens > 0;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,18 +175,43 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
     <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief mới." icon={<Repeat className="w-4 h-4" />} maxWidth="max-w-2xl">
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} studioRequired onChange={(patch) => setForm({ ...form, ...patch })} />
-        <FormField label="Lý do đổi Studio">
+        <SwapCost lostTokens={preview.lostTokens} availableTokens={preview.availableTokens} onAskTokens={onAskTokens} />
+        <FormField label="Lý do đổi Studio (Reviewer sẽ nhận được)">
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} minLength={5} maxLength={2000} required className={fieldTextareaClass} />
         </FormField>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !studioTyped(form) || reason.trim().length < 5}>
+          <Button type="submit" disabled={busy || !funded || !studioTyped(form) || reason.trim().length < 5}>
             Đổi Studio
           </Button>
         </div>
       </form>
     </Modal>
+  );
+}
+
+/** BR-59: the old studio keeps what it was promised; the new one needs Token the season still has. */
+function SwapCost({ lostTokens, availableTokens, onAskTokens }: { lostTokens: number; availableTokens: number; onAskTokens?: () => void }) {
+  return (
+    <div className={`rounded-lg border px-3 py-2 text-xs space-y-1 ${availableTokens > 0 ? 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200' : 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200'}`}>
+      <p>
+        Token đã gửi cho Studio cũ sẽ mất, không hoàn: <strong className="font-mono">{formatNumber(lostTokens)}</strong> Token.
+      </p>
+      <p>
+        Brief cho Studio mới sẽ ghi: <strong className="font-mono">{formatNumber(availableTokens)}</strong> Token.
+      </p>
+      {availableTokens === 0 && (
+        <p>
+          Phạm vi này đã hết Token. Hãy xin Reviewer cấp thêm trước khi đổi Studio.{' '}
+          {onAskTokens && (
+            <button type="button" onClick={onAskTokens} className="underline font-semibold cursor-pointer">
+              Xin thêm Token
+            </button>
+          )}
+        </p>
+      )}
+    </div>
   );
 }

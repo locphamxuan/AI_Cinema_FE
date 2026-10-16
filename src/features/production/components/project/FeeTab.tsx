@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Coins } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { episodeCountsBySeason, seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { announceTokensChanged, reviewerTokenService } from '@/services/reviewerTokenService';
 import type { SeasonFee } from '@/types/production';
@@ -29,6 +30,7 @@ export function FeeTab() {
   const open = isIn(project.status, [...OPEN_PROJECT, 'UNDER_REVISION']);
   const canWrite = caps.feeAllocate && open;
   const rate = settings.data?.tokenRateVnd;
+  const episodeCounts = episodeCountsBySeason(project.seasons);
 
   const [entryType, setEntryType] = useState<AdjustType>('TOP_UP');
   const [pickedSeasonId, setSeasonId] = useState('');
@@ -78,8 +80,10 @@ export function FeeTab() {
   const topUp = (season: SeasonFee) => {
     setEntryType('TOP_UP');
     setSeasonId(season.seasonId);
-    setAmount(String(season.missingTokens));
-    setReason(`Bổ sung theo định mức mùa ${season.seasonNumber}`);
+    const name = seasonName(season.seasonNumber, season.episodeCount).toLowerCase();
+    // After a studio change the season may be fully priced yet have nothing left for the new studio (BR-59).
+    setAmount(season.missingTokens > 0 ? String(season.missingTokens) : '');
+    setReason(season.missingTokens > 0 ? `Bổ sung theo định mức ${name}` : `Ngân sách cho Studio mới của ${name}`);
   };
 
   return (
@@ -123,7 +127,9 @@ export function FeeTab() {
                       return (
                         <tr key={e.id}>
                           <td className="py-2 text-slate-700 dark:text-slate-200">{FEE_ENTRY[e.entryType]}</td>
-                          <td className="py-2 text-slate-500">{e.season ? `Mùa ${e.season.seasonNumber}` : 'Cả dự án'}</td>
+                          <td className="py-2 text-slate-500">
+                            {e.season ? seasonName(e.season.seasonNumber, episodeCounts.get(e.season.id)) : 'Cả dự án'}
+                          </td>
                           <td className={`py-2 text-right font-mono ${amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                             {amountTokens > 0 ? '+' : ''}
                             {formatNumber(amountTokens)}
@@ -160,7 +166,7 @@ export function FeeTab() {
               <select value={seasonId} onChange={(e) => setSeasonId(e.target.value)} className={fieldInputClass} aria-label="Mùa">
                 {project.seasons.map((s) => (
                   <option key={s.id} value={s.id}>
-                    Mùa {s.seasonNumber}
+                    {seasonName(s.seasonNumber, s.episodes.length)}
                   </option>
                 ))}
               </select>

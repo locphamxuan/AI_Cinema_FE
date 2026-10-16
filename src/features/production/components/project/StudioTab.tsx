@@ -16,6 +16,7 @@ import { HandoffCard } from './HandoffCard';
 import { ChangeStudioModal, HandOffModal } from './HandoffModals';
 import { MilestoneModal } from './MilestoneModal';
 import { useProject } from './ProjectContext';
+import { episodeCountsBySeason } from '@/lib/seasonLabel';
 
 const PAGE_SIZE = 5;
 
@@ -34,6 +35,7 @@ const FILTERS: { key: string; label: string; match: (h: StudioHandoff) => boolea
 /** The studio timeline of steps 3–4: what went to which Studio and when, every milestone and Submission (BR-58, BR-59). */
 export function StudioTab() {
   const { project, caps, base } = useProject();
+  const episodeCounts = episodeCountsBySeason(project.seasons);
   const [mode, setMode] = useState<'handoff' | 'change' | null>(null);
   const [moving, setMoving] = useState<StudioHandoff | null>(null);
   const [filter, setFilter] = useState('all');
@@ -87,6 +89,7 @@ export function StudioTab() {
                 key={handoff.id}
                 handoff={handoff}
                 movieId={project.id}
+                episodeCount={handoff.seasonId ? episodeCounts.get(handoff.seasonId) : undefined}
                 base={base}
                 onBrief={() => void downloadBrief(handoff)}
                 onMaterial={(material) => void downloadMaterial(handoff, material)}
@@ -145,7 +148,15 @@ export function StudioTab() {
       </div>
 
       {mode === 'handoff' && <HandOffModal onClose={() => setMode(null)} />}
-      {mode === 'change' && <ChangeStudioModal onClose={() => setMode(null)} />}
+      {mode === 'change' && (
+        <ChangeStudioModal
+          onClose={() => setMode(null)}
+          onAskTokens={() => {
+            setMode(null);
+            document.getElementById('xin-them-token')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }}
+        />
+      )}
       {moving && (
         <MilestoneModal
           handoff={moving}
