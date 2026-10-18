@@ -67,7 +67,7 @@ export function MilestoneModal({ handoff, onClose }: { handoff: StudioHandoff; o
           </FormField>
         )}
         {needsSubmission && submissions.length === 0 && (
-          <p className="text-[11px] text-amber-600 dark:text-amber-400">Tải bản Studio giao lên ở trang từng tập (mục “Giao bản dựng”) trước khi chuyển sang “Studio đã giao”.</p>
+          <p className="text-[11px] text-amber-600 dark:text-amber-400">Tải bản Studio giao lên ở trang từng tập (mục “Giao bản dựng”): mốc tự chuyển sang “Studio đã giao” khi bản giao xử lý xong.</p>
         )}
         <FormField label={needsNote ? 'Lý do Studio từ chối' : 'Ghi chú (không bắt buộc)'}>
           <textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} maxLength={2000} required={needsNote} className={fieldTextareaClass} />
