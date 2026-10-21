@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, Film, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Film, Search, Star, Calendar } from 'lucide-react';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import { useResource } from '@/features/production/hooks/useResource';
 import { productionPaths } from '@/features/production/lib/routes';
-import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
+import { Empty, ErrorNote, Loading } from '@/features/production/components/shared/ui';
 import { apiClient } from '@/services/apiClient';
 import type { Genre } from '@/types/production';
 
@@ -45,85 +45,135 @@ export function AdminMoviesPanel() {
   const totalPages = movies.data?.meta.totalPages ?? 1;
 
   return (
-    <Panel
-      title="Phim đã phát hành"
-      description={`${movies.data ? `${movies.data.meta.totalItems} phim` : 'Đang tải…'} đang có trên trang người xem. Mở phim để xem tập, giá và lịch phát hành.`}
-      actions={
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSearch(searchDraft);
-            setPage(1);
+    <section className="space-y-0">
+      {/* Hero header */}
+      <div className="relative bg-gradient-to-br from-purple-700 via-violet-600 to-purple-800 overflow-hidden rounded-2xl mx-6 lg:mx-8 mt-6">
+        <div className="absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 60px, white 60px, white 62px)`,
           }}
-          className="relative"
-        >
-          <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
-          <input
-            type="search"
-            aria-label="Tìm phim theo tên"
-            value={searchDraft}
-            onChange={(e) => setSearchDraft(e.target.value)}
-            placeholder="Tên phim…"
-            className={`${fieldInputClass} pl-8 py-1.5 w-52 text-xs`}
-          />
-        </form>
-      }
-    >
-      {movies.error && <ErrorNote message={movies.error} onRetry={movies.reload} />}
-      {movies.loading && !movies.data && <Loading />}
-      {movies.data?.data.length === 0 && <Empty>Chưa có phim nào được phát hành.</Empty>}
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {movies.data?.data.map((m) => (
-          <li key={m.id}>
-            <Link
-              href={productionPaths.project('/admin', m.id, 'episodes')}
-              className="group flex gap-3.5 rounded-2xl border border-slate-200/80 dark:border-white/10 p-3.5 bg-white dark:bg-[#141720] hover:border-purple-500/40 hover:shadow-md hover:shadow-purple-500/5 transition-all duration-200"
-            >
-              <div className="w-20 h-28 shrink-0 rounded-xl bg-slate-100 dark:bg-white/5 overflow-hidden flex items-center justify-center border border-slate-200/50 dark:border-white/5 shadow-xs">
-                {m.posterUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- posters come from outside hosts (Commons, R2)
-                  <img src={m.posterUrl} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                ) : (
-                  <Film className="w-6 h-6 text-slate-400 group-hover:text-purple-500 transition-colors" aria-hidden="true" />
-                )}
+        />
+        <div className="absolute -top-16 -right-16 w-56 h-56 bg-white/10 rounded-full blur-3xl" />
+        <div className="relative z-10 px-6 py-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+                <Star className="w-3.5 h-3.5 text-white" />
               </div>
-              <div className="min-w-0 text-xs space-y-1.5 flex flex-col justify-between">
-                <div>
-                  <p className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+              <span className="text-white/60 text-[11px] font-semibold uppercase tracking-widest">Catalog</span>
+            </div>
+            <h2 className="text-xl font-bold text-white">Phim đã phát hành</h2>
+            <p className="text-white/60 text-sm mt-0.5">
+              {movies.data ? `${movies.data.meta.totalItems} phim` : 'Đang tải…'} · Mở phim để xem tập, giá và lịch phát hành.
+            </p>
+          </div>
+          <form
+            onSubmit={(e) => { e.preventDefault(); setSearch(searchDraft); setPage(1); }}
+            className="relative w-full sm:w-64"
+          >
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-white/50" aria-hidden="true" />
+            <input
+              type="search"
+              aria-label="Tìm phim theo tên"
+              value={searchDraft}
+              onChange={(e) => setSearchDraft(e.target.value)}
+              placeholder="Tìm tên phim…"
+              className="w-full bg-white/15 backdrop-blur-sm border border-white/25 text-white placeholder:text-white/40 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
+            />
+          </form>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="px-6 lg:px-8 py-6 space-y-4">
+        {movies.error && <ErrorNote message={movies.error} onRetry={movies.reload} />}
+        {movies.loading && !movies.data && <Loading />}
+        {movies.data?.data.length === 0 && <Empty>Chưa có phim nào được phát hành.</Empty>}
+
+        <ul className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {movies.data?.data.map((m) => (
+            <li key={m.id}>
+              <Link
+                href={productionPaths.project('/admin', m.id, 'episodes')}
+                className="group flex flex-col rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] hover:border-purple-400/60 hover:shadow-2xl hover:shadow-purple-500/15 transition-all duration-300 overflow-hidden"
+              >
+                {/* Poster */}
+                <div className="relative w-full aspect-[2/3] bg-slate-100 dark:bg-white/[0.04] overflow-hidden">
+                  {m.posterUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- posters come from outside hosts (Commons, R2)
+                    <img
+                      src={m.posterUrl}
+                      alt={m.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-700 to-violet-800 flex items-center justify-center">
+                      <Film className="w-10 h-10 text-white/30 group-hover:scale-110 transition-transform duration-300" aria-hidden="true" />
+                    </div>
+                  )}
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  {/* Age rating */}
+                  {m.ageRating && (
+                    <div className="absolute top-2 right-2 bg-black/50 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                      {m.ageRating}
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="p-3 space-y-1.5">
+                  <p className="font-bold text-sm text-slate-900 dark:text-white line-clamp-2 leading-snug group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                     {m.title}
                   </p>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                    {[m.releaseYear, m.ageRating].filter(Boolean).join(' · ')}
-                  </p>
+                  {m.releaseYear && (
+                    <p className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400">
+                      <Calendar className="w-3 h-3" aria-hidden="true" />
+                      {m.releaseYear}
+                    </p>
+                  )}
+                  {m.genres.length > 0 && (
+                    <div className="flex flex-wrap gap-1 pt-0.5">
+                      {m.genres.slice(0, 2).map((g) => (
+                        <span key={g.id} className="text-[10px] px-1.5 py-0.5 rounded-md bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 font-medium">
+                          {g.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                {m.genres.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {m.genres.slice(0, 2).map((g) => (
-                      <span key={g.id} className="text-[10px] px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300">
-                        {g.name}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {m.synopsis && <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{m.synopsis}</p>}
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
-      {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-end gap-2 text-xs">
-          <button type="button" aria-label="Trang trước" disabled={page <= 1} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer">
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <span className="text-slate-500 dark:text-slate-400">
-            Trang {page}/{totalPages}
-          </span>
-          <button type="button" aria-label="Trang sau" disabled={page >= totalPages} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer">
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
-    </Panel>
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 pt-4 text-xs">
+            <button
+              type="button"
+              aria-label="Trang trước"
+              disabled={page <= 1}
+              onClick={() => setPage(page - 1)}
+              className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-slate-500 dark:text-slate-400 font-medium">
+              Trang {page} / {totalPages}
+            </span>
+            <button
+              type="button"
+              aria-label="Trang sau"
+              disabled={page >= totalPages}
+              onClick={() => setPage(page + 1)}
+              className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }

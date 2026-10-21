@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { LinkIcon, Repeat, Send } from 'lucide-react';
+import { Building2, LinkIcon, Mail, Phone, Repeat, Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -11,7 +11,7 @@ import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
 import { DELIVERY_PROJECT, isIn } from '../../lib/capabilities';
 import { saveBlob } from '../../lib/format';
-import { Empty, ErrorNote, Facts, Loading, Panel } from '../shared/ui';
+import { Empty, ErrorNote, Loading } from '../shared/ui';
 import { DeadlineList, deadlineUsable } from './DueDateRows';
 import { HandoffCard } from './HandoffCard';
 import { useProject } from './ProjectContext';
@@ -26,7 +26,6 @@ export function StudioTab() {
 
   const current = history.data?.[0];
   const { busy, run } = useAction();
-  // A new link replaces the old one, e.g. when the studio lost the email.
   const resendLink = async () => {
     if (await run(() => productionService.resendPortalLink(project.id), 'Đã gửi link mới; link cũ hết hiệu lực')) await history.reload();
   };
@@ -38,61 +37,98 @@ export function StudioTab() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-      <div className="lg:col-span-2 space-y-5">
-        <Panel
-          title="Bàn giao Studio & Theo dõi mốc sản xuất"
-          description="Bàn giao dự án cho studio bên ngoài sản xuất: Creator gửi hồ sơ brief (kịch bản, yêu cầu kỹ thuật, thời hạn từng tập và chi phí sản xuất). Khi studio chấp nhận, studio sẽ tiến hành sản xuất và nộp bản dựng (Submission) qua cổng Studio Portal."
-        >
-          {history.error && <ErrorNote message={history.error} onRetry={history.reload} />}
-          {history.loading && !history.data && <Loading />}
-          {history.data?.length === 0 && <Empty>Chưa bàn giao cho studio nào.</Empty>}
-          <ol className="space-y-3">
-            {history.data?.map((h, i) => (
-              <HandoffCard key={h.id} handoff={h} current={i === 0} onDownload={() => download(h.id)} />
-            ))}
-          </ol>
-        </Panel>
-      </div>
-
-      <div className="space-y-5">
-        <Panel title="Studio hiện tại">
-          {project.studioName ? (
-            <Facts
-              stacked
-              items={[
-                ['Studio', project.studioName],
-                ['Email', project.studioEmail ?? '—'],
-                ['Liên hệ', project.studioContact ?? '—'],
-              ]}
-            />
-          ) : (
-            <Empty>Chưa bàn giao.</Empty>
-          )}
-          <div className="mt-4 space-y-2">
-            {caps.handoff && project.status === 'ASSIGNED' && (
-              <Button size="sm" className="w-full" onClick={() => setMode('handoff')}>
-                <Send className="w-3.5 h-3.5" aria-hidden="true" /> Bàn giao cho studio
-              </Button>
-            )}
-            {caps.handoff && delivering && current?.studioResponse === 'DECLINED' && (
-              <p className="text-xs text-rose-600">Studio đã từ chối dự án — hãy đổi sang studio khác.</p>
-            )}
-            {caps.handoff && delivering && current && current.studioResponse !== 'DECLINED' && (
-              <Button size="sm" variant="secondary" className="w-full" disabled={busy} onClick={resendLink}>
-                <LinkIcon className="w-3.5 h-3.5" aria-hidden="true" /> Gửi lại link cổng studio
-              </Button>
-            )}
-            {caps.handoff && delivering && (
-              <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
-                <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi studio
-              </Button>
-            )}
-            {caps.creator && project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Reviewer hoàn tất kế hoạch.</p>}
-            {project.status === 'ASSIGNED' && !caps.handoff && (
-              <p className="text-xs text-slate-500">Chờ Content Creator bàn giao cho studio.</p>
+      {/* Main: handoff history */}
+      <div className="lg:col-span-2 space-y-4">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] overflow-hidden shadow-sm">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+              <Send className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Bàn giao Studio & Theo dõi mốc</h2>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                Brief PDF (kịch bản, yêu cầu kỹ thuật, thời hạn, chi phí) gửi email cho studio.
+              </p>
+            </div>
+          </div>
+          <div className="p-5">
+            {history.error && <ErrorNote message={history.error} onRetry={history.reload} />}
+            {history.loading && !history.data && <Loading />}
+            {history.data?.length === 0 && <Empty>Chưa bàn giao cho studio nào.</Empty>}
+            {history.data && history.data.length > 0 && (
+              <ol className="space-y-3">
+                {history.data.map((h, i) => (
+                  <HandoffCard key={h.id} handoff={h} current={i === 0} onDownload={() => download(h.id)} />
+                ))}
+              </ol>
             )}
           </div>
-        </Panel>
+        </div>
+      </div>
+
+      {/* Sidebar: studio info + actions */}
+      <div className="space-y-4">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] overflow-hidden shadow-sm">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+              <Building2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Studio hiện tại</h2>
+          </div>
+          <div className="p-5">
+            {project.studioName ? (
+              <div className="space-y-3">
+                <div className="rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-500/[0.07] dark:to-orange-500/[0.05] border border-amber-100 dark:border-amber-500/15 p-3.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-500 mb-0.5">Studio</p>
+                  <p className="font-bold text-slate-900 dark:text-white text-sm">{project.studioName}</p>
+                </div>
+                {project.studioEmail && (
+                  <div className="flex items-center gap-2.5 text-xs text-slate-600 dark:text-slate-300">
+                    <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span className="truncate">{project.studioEmail}</span>
+                  </div>
+                )}
+                {project.studioContact && (
+                  <div className="flex items-center gap-2.5 text-xs text-slate-600 dark:text-slate-300">
+                    <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>{project.studioContact}</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Empty>Chưa bàn giao.</Empty>
+            )}
+
+            <div className="mt-4 space-y-2">
+              {caps.handoff && project.status === 'ASSIGNED' && (
+                <Button size="sm" className="w-full" onClick={() => setMode('handoff')}>
+                  <Send className="w-3.5 h-3.5" aria-hidden="true" /> Bàn giao cho studio
+                </Button>
+              )}
+              {caps.handoff && delivering && current?.studioResponse === 'DECLINED' && (
+                <div className="rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 p-3 text-xs text-rose-600 dark:text-rose-400">
+                  Studio đã từ chối dự án — hãy đổi sang studio khác.
+                </div>
+              )}
+              {caps.handoff && delivering && current && current.studioResponse !== 'DECLINED' && (
+                <Button size="sm" variant="secondary" className="w-full" disabled={busy} onClick={resendLink}>
+                  <LinkIcon className="w-3.5 h-3.5" aria-hidden="true" /> Gửi lại link cổng studio
+                </Button>
+              )}
+              {caps.handoff && delivering && (
+                <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
+                  <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi studio
+                </Button>
+              )}
+              {caps.creator && project.status === 'DRAFT' && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 text-center">Chờ Reviewer hoàn tất kế hoạch.</p>
+              )}
+              {project.status === 'ASSIGNED' && !caps.handoff && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 text-center">Chờ Content Creator bàn giao cho studio.</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {mode === 'handoff' && <HandOffModal episodes={episodes} onClose={() => setMode(null)} onDone={history.reload} />}
@@ -150,9 +186,7 @@ function HandOffModal({ episodes, onClose, onDone }: { episodes: Episode[]; onCl
           )}
         </div>
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Huỷ
-          </Button>
+          <Button type="button" variant="secondary" onClick={onClose}>Huỷ</Button>
           <Button type="submit" disabled={busy || !studioValid(studio) || !deadlinesReady}>
             {busy ? 'Đang gửi…' : 'Gửi brief'}
           </Button>
@@ -184,12 +218,8 @@ function ChangeStudioModal({ onClose, onDone }: { onClose: () => void; onDone: (
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} minLength={5} maxLength={2000} required className={fieldTextareaClass} />
         </FormField>
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Huỷ
-          </Button>
-          <Button type="submit" disabled={busy || !studioValid(studio) || reason.trim().length < 5}>
-            Đổi studio
-          </Button>
+          <Button type="button" variant="secondary" onClick={onClose}>Huỷ</Button>
+          <Button type="submit" disabled={busy || !studioValid(studio) || reason.trim().length < 5}>Đổi studio</Button>
         </div>
       </form>
     </Modal>

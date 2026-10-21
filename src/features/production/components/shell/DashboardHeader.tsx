@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Film } from 'lucide-react';
+import { Clapperboard, ShieldCheck, Users, Sparkles } from 'lucide-react';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
@@ -11,6 +11,20 @@ import { AccountMenu } from './AccountMenu';
 import { NotificationMenu } from './NotificationMenu';
 
 const AREA_ORDER: Area[] = ['creator', 'reviewer', 'staff', 'admin'];
+
+const AREA_ICON: Record<Area, React.ElementType> = {
+  creator: Clapperboard,
+  reviewer: ShieldCheck,
+  staff: Users,
+  admin: Sparkles,
+};
+
+const AREA_GRADIENT: Record<Area, string> = {
+  creator: 'from-blue-600 to-purple-600',
+  reviewer: 'from-emerald-600 to-teal-500',
+  staff: 'from-amber-500 to-orange-500',
+  admin: 'from-purple-600 to-violet-500',
+};
 
 /** Slim top bar of every internal area: where you are, notifications, theme and the account menu. */
 export function DashboardHeader() {
@@ -33,31 +47,36 @@ export function DashboardHeader() {
     openAuthModal('login');
   };
 
+  const AreaIcon = AREA_ICON[area] ?? Sparkles;
+  const gradient = AREA_GRADIENT[area] ?? 'from-purple-600 to-violet-500';
+
   return (
-    <header className="bg-white dark:bg-[#12141A] border-b border-slate-200 dark:border-white/10 sticky top-0 z-30 w-full transition-colors">
+    <header className="bg-white/95 dark:bg-[#12141A]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-white/[0.08] sticky top-0 z-30 w-full transition-colors shadow-sm">
       <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-        <Link href={AREAS[area].path} className="flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-purple-600/10 border border-purple-600/20 flex items-center justify-center shrink-0">
-            <Film className="w-4 h-4 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+        {/* Logo + Area */}
+        <Link href={AREAS[area].path} className="flex items-center gap-3 min-w-0 group">
+          <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200`}>
+            <AreaIcon className="w-4.5 h-4.5 text-white" aria-hidden="true" />
           </div>
-          <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight truncate">{AREAS[area].label}</span>
+          <div className="min-w-0">
+            <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight leading-none block">
+              AI Cinema
+            </span>
+            <span className="text-[11px] text-slate-400 dark:text-slate-500 leading-none">{AREAS[area].label}</span>
+          </div>
           {oversight && (
-            <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300">
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
               Giám sát
             </span>
           )}
         </Link>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        {/* Right controls */}
+        <div className="flex items-center gap-2 shrink-0">
           {user && (
-            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-xs">
-              <span className={`w-2 h-2 rounded-full ${
-                user.role === 'admin' ? 'bg-purple-500' :
-                user.role === 'reviewer' ? 'bg-emerald-500' :
-                user.role === 'creator' ? 'bg-blue-500' :
-                user.role === 'staff' ? 'bg-amber-500' : 'bg-slate-400'
-              }`} />
-              <span className="font-medium text-slate-700 dark:text-slate-200">{ROLE_LABEL[user.role ?? 'user']}</span>
+            <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r ${gradient} text-xs shadow-sm`}>
+              <div className="w-1.5 h-1.5 rounded-full bg-white/70" />
+              <span className="font-semibold text-white">{ROLE_LABEL[user.role ?? 'user']}</span>
             </div>
           )}
           {user && <NotificationMenu />}

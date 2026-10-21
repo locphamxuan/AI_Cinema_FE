@@ -52,16 +52,36 @@ export function AdminSidebar() {
 }
 
 /** One Admin page; most panels carry their own heading, so the title is optional. */
-export function AdminPageFrame({ title, description, children }: { title?: string; description?: string; children: React.ReactNode }) {
+export function AdminPageFrame({
+  title,
+  description,
+  gradient,
+  children,
+}: {
+  title?: string;
+  description?: string;
+  gradient?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <main className="w-full px-6 lg:px-8 py-6 space-y-6">
+    <main className="w-full">
       {title && (
-        <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h1>
-          {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
+        <div className={`relative overflow-hidden ${gradient ?? 'bg-gradient-to-br from-purple-700 via-violet-600 to-purple-800'}`}>
+          <div className="absolute inset-0 opacity-[0.07]"
+            style={{
+              backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 60px, white 60px, white 62px)`,
+            }}
+          />
+          <div className="absolute -top-16 -right-16 w-56 h-56 bg-white/10 rounded-full blur-3xl" />
+          <div className="relative z-10 px-6 lg:px-8 py-7">
+            <h1 className="text-xl font-bold text-white">{title}</h1>
+            {description && <p className="text-white/60 text-sm mt-1">{description}</p>}
+          </div>
         </div>
       )}
-      {children}
+      <div className="px-6 lg:px-8 py-6 space-y-6">
+        {children}
+      </div>
     </main>
   );
 }
