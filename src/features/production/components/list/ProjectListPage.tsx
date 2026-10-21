@@ -163,7 +163,7 @@ export function ProjectListPage() {
             {canCreate && (
               <Button
                 onClick={() => setCreating(true)}
-                className="bg-white text-slate-900 hover:bg-white/90 shadow-lg font-bold border-0"
+                className="!bg-white !text-slate-900 hover:!bg-white/90 shadow-lg font-bold border-0"
               >
                 <Plus className="w-4 h-4 text-purple-600" aria-hidden="true" /> Tạo dự án mới
               </Button>
