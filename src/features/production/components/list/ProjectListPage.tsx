@@ -17,8 +17,6 @@ import {
   LayoutGrid,
   List,
   Building2,
-  Calendar,
-  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
@@ -30,7 +28,7 @@ import { useResource } from '../../hooks/useResource';
 import { MOVIE_STATUS } from '../../lib/labels';
 import { formatDateTime } from '../../lib/format';
 import { baseFromPath, productionPaths } from '../../lib/routes';
-import { CARD, Empty, ErrorNote, Loading, StatusPill } from '../shared/ui';
+import { CARD, ErrorNote, Loading, StatusPill } from '../shared/ui';
 import { CreateProjectModal } from './CreateProjectModal';
 
 const FILTERS: { key: string; label: string; status?: MovieStatus[]; icon: React.ElementType }[] = [
@@ -49,6 +47,46 @@ const STATUS_GRADIENTS: Partial<Record<MovieStatus, string>> = {
   COMPLETED: 'from-emerald-600 via-teal-600 to-slate-900',
   CANCELLED: 'from-rose-700 via-red-800 to-slate-950',
 };
+
+/** Poster thumbnail with fallback when URL is broken or missing. */
+function ProjectPoster({
+  title,
+  posterUrl,
+  gradient,
+}: {
+  title: string;
+  posterUrl?: string | null;
+  gradient: string;
+}) {
+  const [loadError, setLoadError] = useState(false);
+
+  if (posterUrl && !loadError) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={posterUrl}
+        alt={title}
+        onError={() => setLoadError(true)}
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
+      />
+    );
+  }
+
+  return (
+    <div className={`absolute inset-0 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
+      <div
+        className="absolute inset-0 opacity-15"
+        style={{
+          backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 16px, white 16px, white 18px)`,
+        }}
+      />
+      <div className="relative w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-white/20 transition-all duration-300 shadow-lg">
+        <Film className="w-7 h-7 text-white/80" />
+      </div>
+    </div>
+  );
+}
 
 /** Projects the account may see (own projects of a Reviewer, assigned ones of a Creator, all for the Admin). */
 export function ProjectListPage() {
@@ -252,28 +290,7 @@ export function ProjectListPage() {
                     >
                       {/* ── Poster Thumbnail ── */}
                       <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-900">
-                        {posterUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={posterUrl}
-                            alt={p.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className={`absolute inset-0 bg-gradient-to-br ${gradient} flex items-center justify-center`}>
-                            {/* Film pattern background */}
-                            <div
-                              className="absolute inset-0 opacity-15"
-                              style={{
-                                backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 16px, white 16px, white 18px)`,
-                              }}
-                            />
-                            <div className="relative w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-white/20 transition-all duration-300 shadow-lg">
-                              <Film className="w-7 h-7 text-white/80" />
-                            </div>
-                          </div>
-                        )}
+                        <ProjectPoster title={p.title} posterUrl={posterUrl} gradient={gradient} />
 
                         {/* Top Overlay Badge: Status */}
                         <div className="absolute top-3 left-3 z-10 drop-shadow-md">
@@ -335,7 +352,7 @@ export function ProjectListPage() {
                       <th className="px-4 py-3 font-semibold">Trạng thái</th>
                       <th className="px-4 py-3 font-semibold hidden md:table-cell">Studio</th>
                       <th className="px-4 py-3 font-semibold hidden md:table-cell">{isCreator ? 'Reviewer' : 'Creator'}</th>
-                      <th className="px-4 py-3 font-semibold hidden sm:table-cell text-right">Số tập</th>
+                      <th className="px-4 py-2.5 font-medium hidden sm:table-cell text-right">Số tập</th>
                       <th className="px-4 py-3 font-semibold hidden lg:table-cell">Cập nhật lần cuối</th>
                     </tr>
                   </thead>
