@@ -1,10 +1,23 @@
 'use client';
 
-import { useAppStore } from '@/store/useAppStore';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useAppStore } from '@/store/useAppStore';
+import { episodeAccessService } from '@/services/episodeAccessService';
+import type { MySubscription } from '@/types/episodeAccess';
 
 export default function ProfilePage() {
-  const { user, isVIPMode, wallet, subscription, toggleVIPMode, openDepositModal } = useAppStore();
+  const { user, wallet, openDepositModal } = useAppStore();
+  const [plan, setPlan] = useState<MySubscription | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    episodeAccessService
+      .getMySubscription()
+      .then((res) => setPlan(res.success && res.data?.status !== 'PENDING' ? res.data : null))
+      .catch(() => setPlan(null));
+  }, [user]);
+  const isMember = plan !== null;
 
   if (!user) {
     return (
@@ -35,26 +48,27 @@ export default function ProfilePage() {
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{user.name}</h1>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
-                  isVIPMode
+                  isMember
                     ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/30'
                     : 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-muted-light'
                 }`}
               >
-                {isVIPMode ? '👑 Hội Viên VIP' : 'FREE TIER'}
+                {isMember ? `👑 ${plan.plan.name}` : 'Gói Thường'}
               </span>
             </div>
 
             <p className="text-sm text-slate-500 dark:text-muted-light font-mono">{user.email}</p>
 
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
-              <button
-                onClick={toggleVIPMode}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs font-bold transition-all cursor-pointer border border-slate-300 dark:border-white/20"
+              <Link
+                href="/profile/subscription"
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs font-bold transition-all border border-slate-300 dark:border-white/20"
               >
-                {isVIPMode ? '⚡ Chuyển sang Tài khoản thường (Demo)' : '👑 Nâng cấp lên VIP Pass'}
-              </button>
+                {isMember ? '👑 Quản lý gói Tháng' : '👑 Đăng ký gói Tháng'}
+              </Link>
 
               <button
+                type="button"
                 onClick={openDepositModal}
                 className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black transition-all shadow-md cursor-pointer"
               >
@@ -70,7 +84,7 @@ export default function ProfilePage() {
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-md">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-muted-light">Số Dư Main Coin</p>
           <p className="text-3xl font-black text-amber-500 font-mono mt-1">{wallet.mainCoin}</p>
-          <p className="text-xs text-slate-500 dark:text-muted-light mt-1">Dùng mở khóa phim 4K</p>
+          <p className="text-xs text-slate-500 dark:text-muted-light mt-1">Từ nạp tiền, trừ trước khi mở khóa</p>
         </div>
 
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-md">
@@ -81,8 +95,10 @@ export default function ProfilePage() {
 
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-md">
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-muted-light">Trạng Thái Gói</p>
-          <p className="text-xl font-black text-ruby mt-1">{isVIPMode ? 'VIP 4K Unlimited' : 'Tài Khoản Thường'}</p>
-          <p className="text-xs text-slate-500 dark:text-muted-light mt-1">Hạn dùng: {subscription.endDate ? new Date(subscription.endDate).toLocaleDateString('vi-VN') : 'Không giới hạn'}</p>
+          <p className="text-xl font-black text-ruby mt-1">{isMember ? plan.plan.name : 'Gói Thường'}</p>
+          <p className="text-xs text-slate-500 dark:text-muted-light mt-1">
+            {isMember ? `Hiệu lực đến ${new Date(plan.currentPeriodEnd).toLocaleDateString('vi-VN')}` : 'Xem tập miễn phí, mở khóa tập bằng Coin'}
+          </p>
         </div>
       </div>
 
@@ -97,7 +113,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
               <span className="text-2xl">👑</span>
               <div>
-                <p className="text-sm font-bold text-slate-900 dark:text-white">Quản lý Gói hội viên VIP</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">Quản lý gói Tháng</p>
                 <p className="text-xs text-slate-500 dark:text-muted-light">Xem chi tiết quyền lợi & gia hạn</p>
               </div>
             </div>

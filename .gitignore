@@ -46,13 +46,18 @@ next-env.d.ts
 
 next-env.d.ts
 
-# Local-only, machine-specific — not shared
+# Local-only, machine-specific - not shared
 .claude/
 .claude-tools/
 .claude-mem/
 CLAUDE.md
+.agents/
+.agent/
+GEMINI.md
 TESTING.md
 .codegraph/
 
 # Local context file
 PROJECT_OVERVIEW.md
+PROJECT_CONTEXT.md
+PROGRESS.md

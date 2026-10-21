@@ -1,10 +1,16 @@
 'use client';
 
-import { Download } from 'lucide-react';
+import Link from 'next/link';
+import { Download, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import type { StudioHandoff } from '@/types/production';
-import { formatDateTime, formatNumber } from '../../lib/format';
+import { seasonLabel } from '@/lib/seasonLabel';
+import type { HandoffMaterial, StudioHandoff } from '@/types/production';
+import { MATERIAL_KIND, MILESTONE_STATUS } from '../../lib/labels';
+import { formatBytes, formatDateTime, formatNumber } from '../../lib/format';
+import { canMove } from '../../lib/milestones';
+import { productionPaths, type ProductionBase } from '../../lib/routes';
+import { StatusPill } from '../shared/ui';
 
 const EMAIL_STATUS = {
   QUEUED: { label: 'Đang gửi', tone: 'amber' },
@@ -12,47 +18,117 @@ const EMAIL_STATUS = {
   FAILED: { label: 'Gửi email lỗi', tone: 'rose' },
 } as const;
 
-/** The studio's answer through its portal link, or why there is none. */
-function ResponseBadge({ handoff, current }: { handoff: StudioHandoff; current: boolean }) {
-  if (handoff.studioResponse === 'ACCEPTED') return <Badge tone="emerald">Studio đã nhận</Badge>;
-  if (handoff.studioResponse === 'DECLINED') return <Badge tone="rose">Studio từ chối</Badge>;
-  if (!current) return null;
-  return handoff.portalActive ? <Badge tone="amber">Chờ studio trả lời</Badge> : <Badge tone="neutral">Chưa có link cổng studio</Badge>;
-}
+export const scopeLabel = (h: Pick<StudioHandoff, 'season'>, episodeCount?: number) =>
+  h.season ? seasonLabel(h.season.seasonNumber, episodeCount, h.season.title) : 'Cả dự án';
 
-/** One hand-off (or studio change) in the history: studio, email, brief and the studio's answer. */
-export function HandoffCard({ handoff: h, current, onDownload }: { handoff: StudioHandoff; current: boolean; onDownload: () => void }) {
+/** One hand-off (or studio change) on the Studio timeline: who it went to, what was sent, every milestone and Submission. */
+export function HandoffCard({
+  handoff: h,
+  movieId,
+  episodeCount,
+  base,
+  onBrief,
+  onMaterial,
+  onMilestone,
+}: {
+  handoff: StudioHandoff;
+  movieId: string;
+  /** Episodes of the handed-off season: one episode reads as a whole film. */
+  episodeCount?: number;
+  base: ProductionBase;
+  onBrief: () => void;
+  onMaterial: (material: HandoffMaterial) => void;
+  /** Present when the viewer may move the milestone. */
+  onMilestone?: () => void;
+}) {
+  const status = MILESTONE_STATUS[h.milestoneStatus];
   return (
-    <li className="rounded-xl border border-slate-200 dark:border-white/10 p-3 text-xs space-y-1.5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-semibold text-slate-900 dark:text-white">
-          {h.studioName} {current && <Badge tone="purple">Hiện tại</Badge>}
-        </p>
+    <li className="rounded-xl border border-slate-200 dark:border-white/10 p-4 text-xs space-y-3">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <p className="font-semibold text-slate-900 dark:text-white">
+            {h.studio.name} <Badge tone="blue">{scopeLabel(h, episodeCount)}</Badge>
+          </p>
+          <p className="text-slate-500 dark:text-slate-400">
+            Giao ngày {formatDateTime(h.createdAt)} bởi {h.createdBy.fullName} · {h.studio.email} · ngân sách trong brief:{' '}
+            {formatNumber(Number(h.productionFeeTokens))} Token
+          </p>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ResponseBadge handoff={h} current={current} />
+          <StatusPill {...status} />
           {h.emailMessage && <Badge tone={EMAIL_STATUS[h.emailMessage.status].tone}>{EMAIL_STATUS[h.emailMessage.status].label}</Badge>}
-          {h.briefFileKey && (
-            <Button size="sm" variant="ghost" onClick={onDownload}>
-              <Download className="w-3.5 h-3.5" aria-hidden="true" /> Brief
+          {onMilestone && canMove(h) && (
+            <Button size="sm" variant="secondary" onClick={onMilestone}>
+              Cập nhật mốc
             </Button>
           )}
         </div>
       </div>
-      <p className="text-slate-500 dark:text-slate-400">
-        {h.studioEmail}
-        {h.studioContact && ` · ${h.studioContact}`} · Phí in trong brief: {formatNumber(h.productionFeeTokens)} Token
-      </p>
-      {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi: {h.changeReason}</p>}
-      {h.studioResponse === 'DECLINED' && (
+
+      {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi Studio: {h.changeReason}</p>}
+      {Number(h.lostTokens) > 0 && (
         <p className="text-rose-600">
-          Lý do studio từ chối ({formatDateTime(h.respondedAt)}): {h.declineReason}
+          Đã đổi sang Studio khác: {formatNumber(Number(h.lostTokens))} Token đã gửi cho Studio này bị mất, không hoàn.
         </p>
       )}
-      {h.studioResponse === 'ACCEPTED' && <p className="text-emerald-600">Studio nhận dự án lúc {formatDateTime(h.respondedAt)}</p>}
       {h.emailMessage?.errorMessage && <p className="text-rose-600">{h.emailMessage.errorMessage}</p>}
-      <p className="text-slate-400">
-        {h.createdBy.fullName} · {formatDateTime(h.createdAt)}
-      </p>
+      {h.filmSentAt && (
+        <p className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-3 py-2">
+          {h.filmSentNote ?? 'Studio đã gửi phim qua email.'} · {formatDateTime(h.filmSentAt)}
+          {h.milestoneStatus !== 'DELIVERED' && ' · Chờ Creator upload Submission.'}
+        </p>
+      )}
+
+      <div>
+        <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Đã giao những gì</p>
+        <ul className="space-y-1">
+          {h.briefFileKey && (
+            <li className="flex items-center gap-2">
+              <FileText className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
+              <span className="flex-1">Brief PDF</span>
+              <Button size="sm" variant="ghost" onClick={onBrief} aria-label="Tải brief">
+                <Download className="w-3.5 h-3.5" />
+              </Button>
+            </li>
+          )}
+          {h.materials.map((m) => (
+            <li key={m.id} className="flex items-center gap-2">
+              <FileText className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
+              <span className="flex-1 min-w-0 truncate">
+                {m.fileName} <span className="text-slate-400">· {MATERIAL_KIND[m.kind]} · {formatBytes(Number(m.sizeBytes))}</span>
+              </span>
+              <Button size="sm" variant="ghost" onClick={() => onMaterial(m)} aria-label={`Tải ${m.fileName}`}>
+                <Download className="w-3.5 h-3.5" />
+              </Button>
+            </li>
+          ))}
+          {!h.briefFileKey && h.materials.length === 0 && <li className="text-slate-400">Không có tệp.</li>}
+        </ul>
+      </div>
+
+      <div>
+        <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Các mốc</p>
+        <ol className="space-y-1 border-l border-slate-200 dark:border-white/10 pl-3">
+          {h.milestoneEvents.map((event) => (
+            <li key={event.id}>
+              <span className="font-medium text-slate-800 dark:text-slate-100">{MILESTONE_STATUS[event.toStatus].label}</span>
+              <span className="text-slate-400">
+                {' '}
+                · {formatDateTime(event.createdAt)} · {event.changedBy.fullName}
+              </span>
+              {event.note && <p className="text-slate-600 dark:text-slate-300">{event.note}</p>}
+              {event.mediaAsset && (
+                <Link
+                  href={productionPaths.episode(base, movieId, event.mediaAsset.episodeId)}
+                  className="text-purple-600 dark:text-purple-300 hover:underline"
+                >
+                  Submission v{event.mediaAsset.version}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ol>
+      </div>
     </li>
   );
 }

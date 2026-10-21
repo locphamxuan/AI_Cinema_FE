@@ -3,23 +3,23 @@ const DATE = new Intl.DateTimeFormat('vi-VN', { day: '2-digit', month: '2-digit'
 const NUMBER = new Intl.NumberFormat('vi-VN');
 
 export function formatDateTime(iso: string | null | undefined): string {
-  return iso ? DATE_TIME.format(new Date(iso)) : '—';
+  return iso ? DATE_TIME.format(new Date(iso)) : '-';
 }
 
 /** A due date: the API stores a calendar day (`@db.Date`), so read it without shifting time zones. */
 export function formatDay(iso: string | null | undefined): string {
-  if (!iso) return '—';
+  if (!iso) return '-';
   const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
   return DATE.format(new Date(y, m - 1, d));
 }
 
 export function formatNumber(n: number | null | undefined): string {
-  return n === null || n === undefined ? '—' : NUMBER.format(n);
+  return n === null || n === undefined ? '-' : NUMBER.format(n);
 }
 
 /** 1:05:09 / 12:30 */
 export function formatDuration(seconds: number | null | undefined): string {
-  if (seconds === null || seconds === undefined) return '—';
+  if (seconds === null || seconds === undefined) return '-';
   const s = Math.abs(Math.round(seconds));
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
@@ -29,7 +29,7 @@ export function formatDuration(seconds: number | null | undefined): string {
 }
 
 export function formatBytes(bytes: number | null | undefined): string {
-  if (!bytes) return '—';
+  if (!bytes) return '-';
   const units = ['B', 'KB', 'MB', 'GB'];
   let value = bytes;
   let unit = 0;
@@ -57,12 +57,19 @@ export function localDateTimeToIso(value: string): string {
   return new Date(value).toISOString();
 }
 
-/** Triggers a browser download of a fetched file. */
+/**
+ * Triggers a browser download of a fetched file. The link must be in the page for Firefox, and the object URL
+ * must outlive the click or Safari/Firefox cancel the download.
+ */
 export function saveBlob(blob: Blob, fileName: string): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
   link.download = fileName;
+  link.rel = 'noopener';
+  link.style.display = 'none';
+  document.body.appendChild(link);
   link.click();
-  URL.revokeObjectURL(url);
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 30_000);
 }

@@ -1,16 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertTriangle, Check, ShieldCheck, Tag, Undo2 } from 'lucide-react';
+import { AlertTriangle, Check, ShieldCheck, Undo2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
-import type { ComplianceInput, LabelLocation, LabelType, ReviewSheet } from '@/types/production';
+import type { ComplianceInput, ReviewSheet } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { REVIEWED_EPISODE, isIn } from '../../lib/capabilities';
-import { AI_PARTS, COMPLIANCE_CHECK, COMPLIANCE_RESULT, LABEL_DEFAULT_TEXT, LABEL_LOCATION, LABEL_TYPE } from '../../lib/labels';
+import { AI_PARTS, COMPLIANCE_CHECK, COMPLIANCE_RESULT, LABEL_TYPE } from '../../lib/labels';
 import { formatDateTime, formatDuration } from '../../lib/format';
 import { Facts, Panel, StatusPill, TextPromptModal } from '../shared/ui';
+import { LabelPanel } from './LabelPanel';
 
 /**
  * Steps 8–11 on one delivered version: the review sheet, approve or send back to the studio (BR-16, BR-18),
@@ -38,7 +39,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
   return (
     <div className="space-y-5">
       <Panel
-        title={`Phiếu duyệt — bản ${sheet.version}`}
+        title={`Phiếu duyệt - bản ${sheet.version}`}
         actions={
           canAct &&
           (underReview || reviewed) && (
@@ -87,9 +88,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
         )}
       </Panel>
 
-      {(sheet.aiContentLabel || (canAct && sheet.isApprovedVersion && status === 'APPROVED')) && (
-        <LabelPanel sheet={sheet} canAct={canAct && sheet.isApprovedVersion && status === 'APPROVED'} onChanged={onChanged} />
-      )}
+      {(sheet.aiContentLabel || (canAct && reviewed)) && <LabelPanel sheet={sheet} canAct={canAct && reviewed} onChanged={onChanged} />}
       {(sheet.complianceChecks.length > 0 || (canAct && sheet.isApprovedVersion && status === 'LABELED')) && (
         <CompliancePanel sheet={sheet} canAct={canAct && sheet.isApprovedVersion && status === 'LABELED'} onChanged={onChanged} />
       )}
@@ -109,92 +108,28 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
   );
 }
 
-function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; canAct: boolean; onChanged: () => Promise<void> }) {
-  const [labelType, setLabelType] = useState<LabelType>(sheet.proposedLabelType);
-  const [text, setText] = useState(LABEL_DEFAULT_TEXT[sheet.proposedLabelType]);
-  const [location, setLocation] = useState<LabelLocation>('TOP_RIGHT');
-  const { busy, run } = useAction();
-  const label = sheet.aiContentLabel;
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const done = await run(
-      () => productionService.applyLabel(sheet.id, { labelType, labelText: text.trim(), displayLocation: location }),
-      'Đã gắn nhãn AI',
-    );
-    if (done) await onChanged();
-  };
-
-  return (
-    <Panel title="Nhãn nội dung AI (BR-40)" description={label ? `Theo chính sách: ${label.policy.name}` : 'Bước 10 — người xem thấy nhãn này khi phát.'}>
-      {label ? (
-        <Facts
-          items={[
-            ['Loại nhãn', LABEL_TYPE[label.labelType]],
-            ['Nội dung', label.labelText],
-            ['Vị trí', label.displayLocation ? LABEL_LOCATION[label.displayLocation] : '—'],
-            ['Gắn lúc', formatDateTime(label.appliedAt)],
-          ]}
-        />
-      ) : (
-        canAct && (
-          <form onSubmit={submit} className="space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <FormField label="Loại nhãn">
-                <select
-                  value={labelType}
-                  onChange={(e) => {
-                    const t = e.target.value as LabelType;
-                    setLabelType(t);
-                    setText(LABEL_DEFAULT_TEXT[t]);
-                  }}
-                  className={fieldInputClass}
-                >
-                  {(Object.keys(LABEL_TYPE) as LabelType[]).map((t) => (
-                    <option key={t} value={t}>
-                      {LABEL_TYPE[t]}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-              <FormField label="Vị trí hiển thị">
-                <select value={location} onChange={(e) => setLocation(e.target.value as LabelLocation)} className={fieldInputClass}>
-                  {(Object.keys(LABEL_LOCATION) as LabelLocation[]).map((l) => (
-                    <option key={l} value={l}>
-                      {LABEL_LOCATION[l]}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-            </div>
-            <FormField label="Nội dung nhãn">
-              <input value={text} onChange={(e) => setText(e.target.value)} minLength={5} maxLength={500} className={fieldInputClass} />
-            </FormField>
-            <Button type="submit" disabled={busy || text.trim().length < 5}>
-              <Tag className="w-3.5 h-3.5" aria-hidden="true" /> Gắn nhãn
-            </Button>
-          </form>
-        )
-      )}
-    </Panel>
-  );
-}
-
-type Verdict = { result: 'PASS' | 'FAIL'; failureReason: string };
+type Verdict = { result: 'PASS' | 'FAIL' | null; failureReason: string };
 
 function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; canAct: boolean; onChanged: () => Promise<void> }) {
-  const [decree, setDecree] = useState<Verdict>({ result: 'PASS', failureReason: '' });
-  const [safety, setSafety] = useState<Verdict>({ result: 'PASS', failureReason: '' });
-  const [realPerson, setRealPerson] = useState(false);
-  const [realPersonNote, setRealPersonNote] = useState('');
+  const savedCheck = (type: keyof typeof COMPLIANCE_CHECK) => sheet.complianceChecks.find((check) => check.checkType === type);
+  const savedDecree = savedCheck('DECREE_142_NOTICE');
+  const savedSafety = savedCheck('CONTENT_SAFETY');
+  const savedRealPerson = savedCheck('REAL_PERSON_LIKENESS');
+  const [decree, setDecree] = useState<Verdict>({ result: savedDecree?.result === 'PENDING' ? null : (savedDecree?.result ?? null), failureReason: savedDecree?.failureReason ?? '' });
+  const [safety, setSafety] = useState<Verdict>({ result: savedSafety?.result === 'PENDING' ? null : (savedSafety?.result ?? null), failureReason: savedSafety?.failureReason ?? '' });
+  const [realPerson, setRealPerson] = useState<boolean | null>(
+    !sheet.aiDisclosure.noRealPersonLikeness ? null : savedRealPerson ? savedRealPerson.result === 'FAIL' : null,
+  );
+  const [realPersonNote, setRealPersonNote] = useState(savedRealPerson?.failureReason ?? '');
   const { busy, run } = useAction();
 
-  const reasonOk = (v: Verdict) => v.result === 'PASS' || v.failureReason.trim().length >= 5;
-  const valid = reasonOk(decree) && reasonOk(safety) && (!realPerson || realPersonNote.trim().length >= 5);
-  const fails = decree.result === 'FAIL' || safety.result === 'FAIL' || realPerson;
+  const reasonOk = (v: Verdict) => v.result !== null && (v.result === 'PASS' || v.failureReason.trim().length >= 5);
+  const valid = reasonOk(decree) && reasonOk(safety) && realPerson !== null && (realPerson === false || realPersonNote.trim().length >= 5);
+  const fails = decree.result === 'FAIL' || safety.result === 'FAIL' || realPerson === true;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!valid || realPerson === null) return;
     const item = (v: Verdict) => (v.result === 'PASS' ? { result: 'PASS' as const } : { result: 'FAIL' as const, failureReason: v.failureReason.trim() });
     const input: ComplianceInput = {
       decree142Notice: item(decree),
@@ -204,13 +139,16 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
     };
     const done = await run(
       () => productionService.runCompliance(sheet.id, input),
-      fails ? 'Không đạt — tập được trả về để studio sửa' : 'Tập đạt kiểm tra tuân thủ',
+      fails ? 'Không đạt - tập được trả về để studio sửa' : 'Tập đạt kiểm tra tuân thủ',
     );
     if (done) await onChanged();
   };
 
   return (
-    <Panel title="Kiểm tra tuân thủ (BR-42)" description="Bước 11 — một mục không đạt sẽ trả tập về để studio sửa.">
+    <Panel
+      title="Bước 11 - Kiểm tra pháp lý và an toàn nội dung"
+      description="Rà soát nhãn AI, thông báo theo Nghị định 142, an toàn nội dung và nguy cơ gây nhầm lẫn với người hoặc sự kiện có thật. Nếu có mục không đạt, tập sẽ được gửi lại để studio sửa."
+    >
       {sheet.complianceChecks.length > 0 && (
         <ul className="space-y-1.5 text-xs mb-4">
           {sheet.complianceChecks.map((c) => (
@@ -228,11 +166,21 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
         <form onSubmit={submit} className="space-y-3 text-xs">
           <VerdictRow label={COMPLIANCE_CHECK.DECREE_142_NOTICE} value={decree} onChange={setDecree} />
           <VerdictRow label={COMPLIANCE_CHECK.CONTENT_SAFETY} value={safety} onChange={setSafety} />
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <input type="checkbox" checked={realPerson} onChange={(e) => setRealPerson(e.target.checked)} />
-            Tập có mô tả người hoặc sự kiện có thật gây hiểu nhầm
-          </label>
-          {realPerson && (
+          <fieldset className="space-y-2">
+            <legend className="font-medium text-slate-700 dark:text-slate-200">Tập có mô tả người hoặc sự kiện có thật theo cách dễ gây hiểu nhầm không?</legend>
+            <div className="flex gap-4">
+              {([false, true] as const).map((value) => (
+                <label key={String(value)} className="flex items-center gap-1.5 cursor-pointer">
+                  <input type="radio" name="real-person-or-event" checked={realPerson === value} onChange={() => setRealPerson(value)} />
+                  {value ? 'Có' : 'Không'}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          {!sheet.aiDisclosure.noRealPersonLikeness && (
+            <p className="text-amber-600">Studio chưa cam kết không dùng hình ảnh giống người thật. Mục này chưa thể đạt cho tới khi studio bổ sung cam kết trong bản giao.</p>
+          )}
+          {realPerson === true && (
             <textarea
               rows={2}
               value={realPersonNote}
@@ -242,9 +190,9 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
               className={fieldTextareaClass}
             />
           )}
-          <p className="text-slate-500">Mục “Có nhãn AI” được hệ thống tự đánh giá từ nhãn đã gắn.</p>
+          <p className="text-slate-500">Hệ thống tự kiểm tra mục “Có nhãn AI” dựa trên nhãn đã gắn ở bước trước. Chọn kết quả cho từng mục; nếu không đạt, hãy ghi lý do.</p>
           <Button type="submit" variant={fails ? 'danger' : 'success'} disabled={busy || !valid}>
-            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" /> {fails ? 'Ghi nhận không đạt' : 'Xác nhận đạt'}
+            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" /> {!valid ? 'Hoàn tất các mục kiểm tra' : fails ? 'Ghi nhận không đạt' : 'Xác nhận đã kiểm tra và đạt'}
           </Button>
         </form>
       )}

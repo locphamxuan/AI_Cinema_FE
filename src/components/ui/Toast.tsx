@@ -2,6 +2,7 @@
 
 import { create } from 'zustand';
 import { CheckCircle2, AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { randomId } from '@/lib/random';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -22,7 +23,7 @@ interface ToastStore {
 export const useToastStore = create<ToastStore>((set) => ({
   toasts: [],
   addToast: (toast) => {
-    const id = `toast-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const id = randomId('toast-');
     const duration = toast.duration ?? 4500;
 
     set((state) => ({

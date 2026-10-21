@@ -9,7 +9,7 @@ import { useAction } from '@/features/production/hooks/useAction';
 import { useResource } from '@/features/production/hooks/useResource';
 import { formatDateTime } from '@/features/production/lib/format';
 
-type Key = Exclude<keyof PlatformSettings, 'updatedAt'>;
+type Key = { [K in keyof PlatformSettings]-?: PlatformSettings[K] extends number ? K : never }[keyof PlatformSettings];
 
 const FIELDS: { key: Key; label: string; unit: string; hint: string; min: number }[] = [
   { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Các tập đầu Guest và Member Free xem được (BR-03).', min: 0 },
@@ -19,12 +19,18 @@ const FIELDS: { key: Key; label: string; unit: string; hint: string; min: number
   { key: 'episodeCoinPriceMax', label: 'Giá tập cao nhất', unit: 'Coin', hint: '', min: 0 },
   { key: 'bonusCoinExpiryDays', label: 'Hạn Coin thưởng', unit: 'ngày', hint: 'BR-28, BR-52.', min: 1 },
   { key: 'playbackHeartbeatTimeoutSeconds', label: 'Hết phiên phát', unit: 'giây', hint: 'Không nhận heartbeat quá thời gian này thì đóng luồng (BR-36).', min: 10 },
+  { key: 'subscriptionCancelWindowHours', label: 'Hạn tắt gia hạn', unit: 'giờ', hint: 'Member tắt tự gia hạn trước ngày gia hạn ít nhất ngần này giờ (BR-30).', min: 0 },
+  { key: 'planRenewalGraceHours', label: 'Thời gian chờ gia hạn lỗi', unit: 'giờ', hint: 'Gia hạn thiếu Coin được thử lại trong ngần này giờ, không có quyền xem; 0 = gói hết hạn ngay.', min: 0 },
+  { key: 'newMemberBonusCoins', label: 'Coin thưởng tài khoản mới', unit: 'Coin', hint: '0 = không tặng.', min: 0 },
+  { key: 'coinTopUpMinVnd', label: 'Nạp tối thiểu mỗi lần', unit: '₫', hint: '', min: 1000 },
+  { key: 'coinTopUpMaxVnd', label: 'Nạp tối đa mỗi lần', unit: '₫', hint: '', min: 1000 },
 ];
 
 /** Platform policies the Admin sets: free episodes, rates, the valid Coin price range, timeouts. */
 export function PlatformSettingsPanel() {
   const settings = useResource('settings', productionService.getPlatformSettings);
   const [draft, setDraft] = useState<Partial<Record<Key, string>>>({});
+  const [refund, setRefund] = useState<boolean | null>(null);
   const { busy, run } = useAction();
 
   if (settings.loading && !settings.data) return <p className="text-xs text-slate-500">Đang tải cài đặt…</p>;
@@ -33,17 +39,22 @@ export function PlatformSettingsPanel() {
 
   const value = (k: Key) => draft[k] ?? String(current[k]);
   const changed = FIELDS.filter((f) => draft[f.key] !== undefined && Number(draft[f.key]) !== current[f.key]);
+  const refundChanged = refund !== null && refund !== current.refundOnRemoval;
   const invalid = FIELDS.some((f) => {
     const n = Number(value(f.key));
     return !Number.isInteger(n) || n < f.min;
   });
   const rangeInvalid = Number(value('episodeCoinPriceMin')) > Number(value('episodeCoinPriceMax'));
+  const topUpInvalid = Number(value('coinTopUpMinVnd')) > Number(value('coinTopUpMaxVnd'));
+  const changes = changed.length + (refundChanged ? 1 : 0);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     const patch = Object.fromEntries(changed.map((f) => [f.key, Number(value(f.key))])) as Partial<PlatformSettings>;
+    if (refundChanged) patch.refundOnRemoval = refund ?? current.refundOnRemoval;
     if (await run(() => productionService.updatePlatformSettings(patch), 'Đã lưu cài đặt')) {
       setDraft({});
+      setRefund(null);
       await settings.reload();
     }
   };
@@ -74,10 +85,23 @@ export function PlatformSettingsPanel() {
             </span>
           </label>
         ))}
+        <label className="flex items-start gap-2">
+          <input
+            type="checkbox"
+            checked={refund ?? current.refundOnRemoval}
+            onChange={(e) => setRefund(e.target.checked)}
+            className="mt-0.5 accent-purple-600"
+          />
+          <span>
+            <span className="block font-semibold text-slate-800 dark:text-slate-200">Hoàn Coin khi gỡ hẳn tập</span>
+            <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả (BR-52).</span>
+          </span>
+        </label>
         {rangeInvalid && <p className="text-rose-600">Giá thấp nhất không được lớn hơn giá cao nhất.</p>}
+        {topUpInvalid && <p className="text-rose-600">Mức nạp tối thiểu không được lớn hơn mức tối đa.</p>}
         <div className="flex justify-end">
-          <Button type="submit" disabled={busy || changed.length === 0 || invalid || rangeInvalid}>
-            Lưu {changed.length > 0 && `(${changed.length})`}
+          <Button type="submit" disabled={busy || changes === 0 || invalid || rangeInvalid || topUpInvalid}>
+            Lưu {changes > 0 && `(${changes})`}
           </Button>
         </div>
       </form>

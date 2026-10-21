@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 
 export type SelectTone = 'neutral' | 'amber' | 'emerald' | 'blue' | 'purple' | 'rose';
@@ -63,6 +63,7 @@ export function Select<T extends string = string>({
   'aria-label': ariaLabel,
 }: SelectProps<T>) {
   const [open, setOpen] = useState(false);
+  const listboxId = useId();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((o) => o.value === value);
@@ -117,6 +118,7 @@ export function Select<T extends string = string>({
         type="button"
         role="combobox"
         aria-expanded={open}
+        aria-controls={listboxId}
         aria-haspopup="listbox"
         aria-label={ariaLabel ?? selectedOption?.label}
         disabled={disabled}
@@ -150,6 +152,7 @@ export function Select<T extends string = string>({
       {/* Floating Menu Popover */}
       {open && (
         <div
+          id={listboxId}
           role="listbox"
           tabIndex={-1}
           className={`absolute left-0 top-full mt-1.5 w-full min-w-[170px] z-50 rounded-xl border border-slate-200 dark:border-white/15 bg-white/95 dark:bg-[#121623]/95 backdrop-blur-md shadow-xl shadow-black/20 dark:shadow-purple-950/40 py-1.5 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150 ${menuClassName}`}

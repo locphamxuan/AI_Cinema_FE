@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Clapperboard, ShieldCheck, Users, Sparkles } from 'lucide-react';
+import { Clapperboard, ShieldCheck, Users, Sparkles, Film } from 'lucide-react';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
@@ -30,11 +30,11 @@ const AREA_GRADIENT: Record<Area, string> = {
 export function DashboardHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout, openAuthModal } = useAppStore();
+  const { user, logout } = useAppStore();
   const can = useCan();
 
   const area = AREA_ORDER.find((a) => pathname.startsWith(`/${a}`)) ?? 'reviewer';
-  // The Admin oversees production: it reads every project and proposes changes, never edits them (BR-55).
+  // The Admin oversees production: it reads every project and decides the change requests, never edits a project (BR-55).
   const oversight = area === 'reviewer' && !can(PERMISSION.PROJECT_MANAGE) && can(PERMISSION.PROJECT_READ_ALL);
   const links = AREA_ORDER.filter((a) => a !== area && canEnter(a, user?.role)).map((a) => ({
     href: AREAS[a].path,
@@ -43,11 +43,10 @@ export function DashboardHeader() {
 
   const handleLogout = () => {
     logout();
-    router.push('/');
-    openAuthModal('login');
+    router.push('/login');
   };
 
-  const AreaIcon = AREA_ICON[area] ?? Sparkles;
+  const AreaIcon = AREA_ICON[area] ?? Film;
   const gradient = AREA_GRADIENT[area] ?? 'from-purple-600 to-violet-500';
 
   return (

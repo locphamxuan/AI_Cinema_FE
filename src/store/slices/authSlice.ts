@@ -1,19 +1,10 @@
 import type { StateCreator } from 'zustand';
-import { mockSubscriptionVIP } from '@/mocks/mockData';
 import { authService, redirectUrlFor } from '@/services/authService';
-import { emptySubscription, type AppState, type AuthSlice, type UserProfile } from './types';
+import type { AppState, AuthSlice, UserProfile } from './types';
 
-// Wallet and subscription still come from mocks: the backend has no wallet/subscription
-// API yet (MF-2/MF-3). Only identity is real.
+// The wallet and the plan are read from the BE right after (syncAccount), never assumed here.
 function sessionStateFor(user: UserProfile) {
-  const isStaffSide = user.role !== undefined && user.role !== 'user' && user.role !== 'vip';
-  return {
-    isAuthenticated: true,
-    user,
-    isVIPMode: isStaffSide,
-    isAuthModalOpen: false,
-    subscription: isStaffSide ? mockSubscriptionVIP : emptySubscription,
-  };
+  return { isAuthenticated: true, user, isVIPMode: false, isAuthModalOpen: false };
 }
 
 export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) => ({
@@ -77,7 +68,9 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
       isAuthenticated: false,
       user: null,
       isVIPMode: false,
-      subscription: emptySubscription,
+      wallet: { mainCoin: 0, bonusCoin: 0 },
+      checkInStreak: { currentStreak: 0, lastCheckInDate: null, todayClaimed: false },
+      availableSpins: 0,
     });
   },
 });

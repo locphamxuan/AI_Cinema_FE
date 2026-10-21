@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { X, Play, Lock, CheckCircle, ShieldCheck,  Calendar,  Info } from 'lucide-react';
 import type { Movie, Episode } from '@/types/movie';
 import { useAppStore } from '@/store/useAppStore';
+import { onActivateKey } from '@/lib/a11y';
 
 interface MovieDetailQuickModalProps {
   movie: Movie | null;
@@ -49,8 +50,10 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-fade-in">
       {/* Dark Blurred Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/85 backdrop-blur-xl transition-opacity"
+      <button
+        type="button"
+        aria-label="Đóng"
+        className="fixed inset-0 bg-black/85 backdrop-blur-xl transition-opacity cursor-default"
         onClick={onClose}
       />
 
@@ -154,7 +157,10 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
                 return (
                   <div
                     key={ep.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => handleEpisodeClick(ep)}
+                    onKeyDown={onActivateKey(() => handleEpisodeClick(ep))}
                     className="group/ep flex items-center gap-4 p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all cursor-pointer"
                   >
                     {/* Episode Thumbnail */}
@@ -183,7 +189,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
                     {/* Episode Title & Synopsis */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-[#E50914]">Tập {ep.episodeNumber}</span>
+                        <span className="text-xs font-black text-[#E50914]">{ep.displayLabel ?? `Tập ${ep.episodeNumber}`}</span>
                         <h4 className="text-sm font-bold text-white group-hover/ep:text-[#E50914] transition-colors truncate">
                           {ep.title}
                         </h4>

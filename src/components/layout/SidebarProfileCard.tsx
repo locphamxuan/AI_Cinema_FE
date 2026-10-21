@@ -35,7 +35,7 @@ export default function SidebarProfileCard({ user, isVIPMode }: { user: UserProf
               {isVIPMode ? (
                 <>
                   <Crown className="w-3 h-3 text-amber-400" />
-                  <span>VIP PASS</span>
+                  <span>GÓI THÁNG</span>
                 </>
               ) : (
                 <>

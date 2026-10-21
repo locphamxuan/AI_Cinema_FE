@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useSyncExternalStore } from 'react';
+import { ReactNode, useEffect, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, ArrowRight, LogIn } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
@@ -22,11 +22,20 @@ const subscribeNoop = () => () => {};
  */
 export function AreaGuard({ area, children }: AreaGuardProps) {
   const router = useRouter();
-  const { user, logout, openAuthModal } = useAppStore();
+  const { user, logout } = useAppStore();
   // Avoid hydration mismatch between server-render (no session in SSR) and client-render (session in localStorage).
   const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
 
-  if (!mounted) {
+  // Right after a reload the store has not restored the session yet; the stored profile decides meanwhile.
+  const account = user ?? authService.getStoredUser();
+  const signedOut = mounted && !account;
+
+  // Without a session the internal areas have one way in: the sign-in screen.
+  useEffect(() => {
+    if (signedOut) router.replace('/login');
+  }, [signedOut, router]);
+
+  if (!mounted || signedOut) {
     return (
       <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-6">
         <div className="w-8 h-8 rounded-full border-2 border-purple-600 border-t-transparent animate-spin" />
@@ -34,16 +43,12 @@ export function AreaGuard({ area, children }: AreaGuardProps) {
     );
   }
 
-  // Right after a reload the store has not restored the session yet; the stored profile decides meanwhile.
-  const account = user ?? authService.getStoredUser();
-
   if (account && canEnter(area, account.role)) return <>{children}</>;
 
   const home = homeAreaOf(account?.role);
   const signIn = () => {
-    if (account) logout();
-    router.push('/');
-    openAuthModal('login');
+    logout();
+    router.push('/login');
   };
 
   return (

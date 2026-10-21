@@ -66,7 +66,7 @@ export default function EpisodePlaylist({ movie, currentEpisodeId, isPlaying, ca
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className={`text-xs font-bold ${isActive ? 'text-ruby' : 'text-slate-500 dark:text-muted-light'}`}>
-                    Tập {ep.episodeNumber}
+                    {ep.displayLabel ?? `Tập ${ep.episodeNumber}`}
                   </span>
                   {ep.isFree && (
                     <span className="text-[9px] px-1.5 py-0.2 rounded bg-verified/20 border border-verified/30 text-verified font-bold">

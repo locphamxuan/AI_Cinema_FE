@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Search, Bell,  ChevronDown, User, LogOut, Wallet, Film, ShieldCheck, Settings } from 'lucide-react';
+import { Search, ChevronDown, User, LogOut, Wallet } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
+import RewardShortcuts from '@/components/wallet/RewardShortcuts';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import NotificationBell from '@/components/layout/header/NotificationBell';
 
@@ -170,6 +171,9 @@ export default function NetflixNavbar() {
           {/* Notification Bell Dropdown */}
           <NotificationBell isScrolled={isScrolled} />
 
+          {/* Rewards: daily check-in and the wheel, always reachable for a signed-in member */}
+          {isAuthenticated && user && <RewardShortcuts withCheckIn light={isScrolled} />}
+
           {/* Coin Wallet Badge */}
           <button
             onClick={openDepositModal}
@@ -201,7 +205,7 @@ export default function NetflixNavbar() {
                 <div className="absolute right-0 top-full mt-2 w-56 p-1.5 rounded-2xl bg-white dark:bg-[#12151E] border border-slate-200 dark:border-white/10 shadow-2xl z-50 animate-fade-in text-xs text-slate-800 dark:text-white">
                   <div className="px-3 py-2 border-b border-slate-100 dark:border-white/5">
                     <p className="font-bold truncate">{user.name}</p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">{user.role || 'Hội viên'}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">Hội viên</p>
                   </div>
 
                   <div className="py-1">
@@ -219,36 +223,6 @@ export default function NetflixNavbar() {
                     >
                       <Wallet className="w-3.5 h-3.5 text-amber-500" /> Lịch sử ví Coin
                     </Link>
-                  </div>
-
-                  {/* Operational Portals Quick Access */}
-                  <div className="py-1 border-t border-slate-100 dark:border-white/5">
-                    <p className="px-3 py-1 text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">
-                      Cổng điều hành
-                    </p>
-                    <Link
-                      href="/creator"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition"
-                    >
-                      <Film className="w-3.5 h-3.5" /> Maker Hub (Studio)
-                    </Link>
-                    <Link
-                      href="/reviewer"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5" /> Checker Audit Hub
-                    </Link>
-                    {(user.role === 'admin' || user.role === 'staff') && (
-                      <Link
-                        href="/admin"
-                        onClick={() => setIsUserMenuOpen(false)}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition"
-                      >
-                        <Settings className="w-3.5 h-3.5" /> Quản Trị Hệ Thống
-                      </Link>
-                    )}
                   </div>
 
                   <div className="pt-1 border-t border-slate-100 dark:border-white/5">

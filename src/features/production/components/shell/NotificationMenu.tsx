@@ -90,6 +90,16 @@ export function NotificationMenu() {
         <div className="absolute right-0 top-full mt-2 w-80 max-h-[70vh] overflow-y-auto rounded-xl bg-white dark:bg-[#161922] border border-slate-200 dark:border-white/10 shadow-lg z-40">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 dark:border-white/5">
             <p className="text-xs font-semibold text-slate-900 dark:text-white">Thông báo</p>
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                router.push(`/${role === 'creator' ? 'creator' : role === 'admin' ? 'admin' : 'reviewer'}/notifications`);
+              }}
+              className="text-[11px] font-medium text-slate-500 hover:text-purple-600 hover:underline cursor-pointer"
+            >
+              Xem tất cả theo mục
+            </button>
             {unread > 0 && (
               <button type="button" onClick={readAll} className="text-[11px] font-medium text-purple-600 dark:text-purple-400 hover:underline cursor-pointer">
                 Đánh dấu đã đọc hết

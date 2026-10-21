@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Clapperboard, Coins, ShieldCheck } from 'lucide-react';
+import { Bell, Building2, Clapperboard, Coins, ShieldCheck, UserRound } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { reviewerTokenService, TOKENS_CHANGED_EVENT } from '@/services/reviewerTokenService';
@@ -35,6 +35,16 @@ export function ReviewerSidebar() {
       icon: Clapperboard,
       active: pathname === '/reviewer' || pathname.startsWith('/reviewer/projects'),
     },
+    ...(can(PERMISSION.STUDIO_MANAGE)
+      ? [
+          {
+            href: '/reviewer/studios',
+            label: 'Studio',
+            icon: Building2,
+            active: pathname.startsWith('/reviewer/studios'),
+          },
+        ]
+      : []),
     ...(hasBudget
       ? [
           {
@@ -46,6 +56,8 @@ export function ReviewerSidebar() {
           },
         ]
       : []),
+    { href: '/reviewer/notifications', label: 'Thông báo', icon: Bell, active: pathname.startsWith('/reviewer/notifications') },
+    { href: '/reviewer/profile', label: 'Hồ sơ tài khoản', icon: UserRound, active: pathname.startsWith('/reviewer/profile') },
   ];
 
   return (

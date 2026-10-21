@@ -4,17 +4,35 @@
  * the backend returns for the signed-in account.
  */
 export const PERMISSION = {
-  // MF-1 — movie projects
+  // MF-1 - movie projects
   PROJECT_MANAGE: 'project:manage',
   PROJECT_FEE_ALLOCATE: 'project:fee.allocate',
   PROJECT_READ_ALL: 'project:read.all',
   PROJECT_SUGGEST: 'project:suggest',
+  PROJECT_CHANGE_REVIEW: 'project:change.review',
   STUDIO_HANDOFF: 'studio:handoff',
+  STUDIO_MANAGE: 'studio:manage',
   MEDIA_INGEST: 'media:ingest',
   CONTENT_REVIEW: 'content:review',
   EPISODE_PUBLISH: 'episode:publish',
   PRICE_ALERT_MANAGE: 'price-alert:manage',
   GENRE_MANAGE: 'genre:manage',
+  // MF-2 - episode access, Coin, monthly plan, rewards
+  ACCESS_EPISODE_READ: 'access.episode.read',
+  WALLET_READ: 'wallet.read',
+  WALLET_TOPUP: 'wallet.topup',
+  REWARD_CHECKIN: 'reward.checkin',
+  SUBSCRIPTION_SELF_MANAGE: 'subscription.self.manage',
+  BILLING_PLAN_MANAGE: 'billing.plan.manage',
+  BILLING_PRICE_MANAGE: 'billing.price.manage',
+  BILLING_SUBSCRIPTION_READ: 'billing.subscription.read',
+  BILLING_SUBSCRIPTION_CANCEL: 'billing.subscription.cancel',
+  COIN_WALLET_READ: 'coin.wallet.read',
+  COIN_ADJUST: 'coin.adjust',
+  COIN_TRANSACTION_READ: 'coin.transaction.read',
+  REWARD_RULE_MANAGE: 'reward.rule.manage',
+  ANALYTICS_REVENUE_READ: 'analytics.revenue.read',
+  ANALYTICS_CHURN_READ: 'analytics.churn.read',
   // Administration
   MEMBER_OPS_READ: 'member:ops.read',
   USER_READ: 'user:read',
@@ -34,7 +52,7 @@ export type Area = 'creator' | 'reviewer' | 'staff' | 'admin';
 
 export const AREAS: Record<Area, { label: string; path: string; roles: WebRole[] }> = {
   creator: { label: 'Sản xuất nội dung', path: '/creator/projects', roles: ['creator'] },
-  // The Admin oversees every project and proposes changes (BR-55); actions follow permissions.
+  // The Admin oversees every project and decides the change requests sent to them (BR-55); actions follow permissions.
   reviewer: { label: 'Kiểm duyệt nội dung', path: '/reviewer', roles: ['reviewer', 'admin'] },
   staff: { label: 'Vận hành', path: '/staff', roles: ['staff', 'admin'] },
   admin: { label: 'Quản trị', path: '/admin', roles: ['admin'] },
@@ -63,6 +81,11 @@ export function homeAreaOf(role: WebRole | undefined): Area | null {
     default:
       return null;
   }
+}
+
+/** The viewer site (home, catalog, wallet, check-in, reward wheel) is for members only; staff-side roles work in their area. */
+export function isMemberRole(role: WebRole | undefined): boolean {
+  return role === 'user' || role === 'vip';
 }
 
 export function canEnter(area: Area, role: WebRole | undefined): boolean {

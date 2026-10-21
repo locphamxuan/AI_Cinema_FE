@@ -1,192 +1,113 @@
 'use client';
 
-import type { Transaction, TransactionType } from '@/types/transaction';
+import { COIN_ENTRY_LABEL, signed } from '@/lib/coinEntry';
+import type { CoinEntryType, StatementLine } from '@/types/billing';
 
-const typeColors: Record<TransactionType, string> = {
-  deposit: 'bg-verified/20 text-verified',
-  checkin: 'bg-neon/20 text-neon',
-  episode_purchase: 'bg-ruby/20 text-ruby',
-  subscription: 'bg-coin/20 text-coin',
-  refund: 'bg-info/20 text-info',
+const TYPE_COLOR: Partial<Record<CoinEntryType, string>> = {
+  TOP_UP: 'bg-verified/20 text-verified',
+  DAILY_REWARD: 'bg-neon/20 text-neon',
+  REWARD_SPIN: 'bg-neon/20 text-neon',
+  SIGNUP_BONUS: 'bg-neon/20 text-neon',
+  EPISODE_PURCHASE: 'bg-ruby/20 text-ruby',
+  PLAN_PAYMENT: 'bg-coin/20 text-coin',
+  PLAN_RENEWAL: 'bg-coin/20 text-coin',
+  REFUND: 'bg-info/20 text-info',
+};
+const typeClass = (type: CoinEntryType) => TYPE_COLOR[type] ?? 'bg-slate-500/15 text-slate-500';
+
+const amountClass = (amount: number, gain: string) => {
+  if (amount === 0) return 'text-slate-400 dark:text-muted';
+  return amount > 0 ? gain : 'text-ruby';
 };
 
-const statusColors: Record<string, string> = {
-  success: 'bg-verified/20 text-verified',
-  pending: 'bg-warning/20 text-warning',
-  failed: 'bg-danger/20 text-danger',
-  review: 'bg-warning/20 text-warning',
+const when = (iso: string) => {
+  const date = new Date(iso);
+  return {
+    day: date.toLocaleDateString('vi-VN'),
+    time: date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+  };
 };
 
-/** Wallet transactions: a table on desktop, cards on mobile. */
-export default function TransactionList({ transactions }: { transactions: Transaction[] }) {
+const HEAD = 'px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold';
+
+/** The member's Coin ledger: a table on desktop, cards on mobile, balances as the BE recorded them. */
+export default function TransactionList({ lines }: Readonly<{ lines: StatementLine[] }>) {
   return (
     <div className="glass-card overflow-hidden border border-slate-200 dark:border-white/10 shadow-sm">
-      {/* Desktop Table */}
       <div className="hidden sm:block overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-slate-200 dark:border-white/10 bg-slate-100/60 dark:bg-white/[0.02]">
-              <th className="text-left px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold">
-                Mã GD
-              </th>
-              <th className="text-left px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold">
-                Loại
-              </th>
-              <th className="text-left px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold">
-                Mô tả
-              </th>
-              <th className="text-right px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold">
-                Coin chính
-              </th>
-              <th className="text-right px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold">
-                Coin thưởng
-              </th>
-              <th className="text-center px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold">
-                Trạng thái
-              </th>
-              <th className="text-right px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold">
-                Thời gian
-              </th>
+              <th className={`text-left ${HEAD}`}>Loại</th>
+              <th className={`text-left ${HEAD}`}>Mô tả</th>
+              <th className={`text-right ${HEAD}`}>Coin chính</th>
+              <th className={`text-right ${HEAD}`}>Coin thưởng</th>
+              <th className={`text-right ${HEAD}`}>Số dư sau</th>
+              <th className={`text-right ${HEAD}`}>Thời gian</th>
             </tr>
           </thead>
           <tbody>
-            {transactions.map((tx, i) => (
-              <tr
-                key={tx.id}
-                className={`border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors ${
-                  i % 2 === 0 ? '' : 'bg-slate-50/50 dark:bg-white/[0.02]'
-                }`}
-              >
-                <td className="px-4 py-3">
-                  <span className="text-xs text-slate-600 dark:text-muted-light font-mono font-semibold">{tx.id}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${typeColors[tx.type]}`}
-                  >
-                    {tx.typeLabel}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <p className="text-sm font-medium text-slate-900 dark:text-foreground">{tx.description}</p>
-                  {tx.episodeInfo && (
-                    <p className="text-[10px] text-slate-500 dark:text-muted mt-0.5">🎬 {tx.episodeInfo}</p>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {tx.mainCoinDelta !== 0 && (
-                    <span
-                      className={`text-sm font-bold ${
-                        tx.mainCoinDelta > 0 ? 'text-verified' : 'text-ruby'
-                      }`}
-                    >
-                      {tx.mainCoinDelta > 0 ? '+' : ''}
-                      {tx.mainCoinDelta}
+            {lines.map((line) => {
+              const { day, time } = when(line.createdAt);
+              return (
+                <tr
+                  key={line.id}
+                  className="border-b border-slate-100 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                >
+                  <td className="px-4 py-3">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap ${typeClass(line.entryType)}`}>
+                      {COIN_ENTRY_LABEL[line.entryType]}
                     </span>
-                  )}
-                  {tx.mainCoinDelta === 0 && <span className="text-xs text-slate-400 dark:text-muted">—</span>}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {tx.bonusCoinDelta !== 0 && (
-                    <span
-                      className={`text-sm font-bold ${
-                        tx.bonusCoinDelta > 0 ? 'text-neon' : 'text-ruby'
-                      }`}
-                    >
-                      {tx.bonusCoinDelta > 0 ? '+' : ''}
-                      {tx.bonusCoinDelta}
-                    </span>
-                  )}
-                  {tx.bonusCoinDelta === 0 && <span className="text-xs text-slate-400 dark:text-muted">—</span>}
-                </td>
-                <td className="px-4 py-3 text-center">
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${statusColors[tx.status]}`}
-                  >
-                    {tx.status === 'success'
-                      ? '✅ Thành công'
-                      : tx.status === 'review'
-                        ? '⚠️ Cần kiểm tra'
-                        : tx.status === 'pending'
-                          ? '⏳ Đang xử lý'
-                          : '❌ Thất bại'}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <span className="text-xs text-slate-600 dark:text-muted-light font-medium">
-                    {new Date(tx.createdAt).toLocaleDateString('vi-VN')}
-                  </span>
-                  <br />
-                  <span className="text-[10px] text-slate-400 dark:text-muted">
-                    {new Date(tx.createdAt).toLocaleTimeString('vi-VN', {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </span>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-foreground">{line.description ?? '-'}</td>
+                  <td className={`px-4 py-3 text-right text-sm font-bold ${amountClass(line.mainAmount, 'text-verified')}`}>
+                    {signed(line.mainAmount)}
+                  </td>
+                  <td className={`px-4 py-3 text-right text-sm font-bold ${amountClass(line.bonusAmount, 'text-neon')}`}>
+                    {signed(line.bonusAmount)}
+                  </td>
+                  <td className="px-4 py-3 text-right text-xs font-mono text-slate-600 dark:text-muted-light whitespace-nowrap">
+                    {line.mainBalanceAfter} 🟡 · {line.bonusBalanceAfter} 🎁
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <span className="text-xs text-slate-600 dark:text-muted-light font-medium">{day}</span>
+                    <br />
+                    <span className="text-[10px] text-slate-400 dark:text-muted">{time}</span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
-      {/* Mobile Card List */}
-      <div className="sm:hidden divide-y divide-slate-200 dark:divide-white/5">
-        {transactions.map((tx) => (
-          <div key={tx.id} className="p-4 space-y-2">
+      <ul className="sm:hidden divide-y divide-slate-200 dark:divide-white/5">
+        {lines.map((line) => (
+          <li key={line.id} className="p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <span
-                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${typeColors[tx.type]}`}
-              >
-                {tx.typeLabel}
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${typeClass(line.entryType)}`}>
+                {COIN_ENTRY_LABEL[line.entryType]}
               </span>
-              <span
-                className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${statusColors[tx.status]}`}
-              >
-                {tx.statusLabel}
-              </span>
+              <span className="text-[10px] text-muted">{when(line.createdAt).day}</span>
             </div>
-            <p className="text-sm text-foreground">{tx.description}</p>
-            <div className="flex items-center justify-between">
-              <div className="flex gap-3">
-                {tx.mainCoinDelta !== 0 && (
-                  <span
-                    className={`text-xs font-bold ${
-                      tx.mainCoinDelta > 0 ? 'text-verified' : 'text-ruby'
-                    }`}
-                  >
-                    🟡 {tx.mainCoinDelta > 0 ? '+' : ''}
-                    {tx.mainCoinDelta}
-                  </span>
-                )}
-                {tx.bonusCoinDelta !== 0 && (
-                  <span
-                    className={`text-xs font-bold ${
-                      tx.bonusCoinDelta > 0 ? 'text-neon' : 'text-ruby'
-                    }`}
-                  >
-                    🎁 {tx.bonusCoinDelta > 0 ? '+' : ''}
-                    {tx.bonusCoinDelta}
-                  </span>
-                )}
-              </div>
-              <span className="text-[10px] text-muted">
-                {new Date(tx.createdAt).toLocaleDateString('vi-VN')}
-              </span>
+            {line.description && <p className="text-sm text-foreground">{line.description}</p>}
+            <div className="flex gap-3 text-xs font-bold">
+              {line.mainAmount !== 0 && (
+                <span className={amountClass(line.mainAmount, 'text-verified')}>🟡 {signed(line.mainAmount)}</span>
+              )}
+              {line.bonusAmount !== 0 && (
+                <span className={amountClass(line.bonusAmount, 'text-neon')}>🎁 {signed(line.bonusAmount)}</span>
+              )}
             </div>
-            <p className="text-[10px] text-muted font-mono">{tx.id}</p>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
 
-      {/* Empty State */}
-      {transactions.length === 0 && (
+      {lines.length === 0 && (
         <div className="p-12 text-center">
           <div className="text-4xl mb-3">📭</div>
-          <p className="text-foreground font-medium">Không tìm thấy giao dịch</p>
-          <p className="text-muted-light text-sm mt-1">
-            Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm
-          </p>
+          <p className="text-foreground font-medium">Chưa có giao dịch nào</p>
+          <p className="text-muted-light text-sm mt-1">Thử đổi bộ lọc, hoặc nạp Coin để bắt đầu.</p>
         </div>
       )}
     </div>

@@ -13,13 +13,15 @@ import {
   History,
   CalendarClock,
   Layers,
+  Users,
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
+import { seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { useResource } from '../../hooks/useResource';
 import { projectCapabilities } from '../../lib/capabilities';
-import { MOVIE_STATUS } from '../../lib/labels';
+import { MOVIE_STATUS, SEASON_STATUS } from '../../lib/labels';
 import { baseFromPath, productionPaths } from '../../lib/routes';
 import { ErrorNote, Loading, StatusPill } from '../shared/ui';
 import { ProjectProvider } from './ProjectContext';
@@ -27,22 +29,21 @@ import { OverviewTab } from './OverviewTab';
 import { EpisodesTab } from './EpisodesTab';
 import { StudioTab } from './StudioTab';
 import { FeeTab } from './FeeTab';
+import { TeamTab } from './TeamTab';
 import { ChangeRequestsTab } from './ChangeRequestsTab';
 import { ActivityTab } from './ActivityTab';
 
 const TABS = [
   { key: 'overview', label: 'Tổng quan', icon: Film },
-  { key: 'episodes', label: 'Tập phim', icon: Clapperboard },
-  { key: 'studio', label: 'Bàn giao Studio', icon: Layers },
+  { key: 'episodes', label: 'Mùa & tập phim', icon: Clapperboard },
+  { key: 'team', label: 'Creator', icon: Users },
+  { key: 'studio', label: 'Studio', icon: Layers },
   { key: 'fee', label: 'Phí sản xuất', icon: CalendarClock },
   { key: 'changes', label: 'Đề xuất cho Admin', icon: ShieldCheck },
   { key: 'activity', label: 'Lịch sử', icon: History },
 ] as const;
 
 type TabKey = (typeof TABS)[number]['key'];
-
-/** All production roles (Reviewer, Creator, Admin) have access to the tabs. */
-const tabsFor = (_base: string) => TABS;
 
 const BASE_GRADIENT: Record<string, string> = {
   '/creator': 'from-blue-800 via-blue-700 to-purple-800',
@@ -60,7 +61,7 @@ export function ProjectDetailPage() {
   const userId = useAppStore((s) => s.user?.id);
   const can = useCan();
 
-  const tabs = tabsFor(base);
+  const tabs = TABS;
   const requested = searchParams.get('tab');
   const [tab, setTab] = useState<TabKey>(tabs.some((t) => t.key === requested) ? (requested as TabKey) : 'overview');
   const project = useResource(`project:${projectId}`, () => productionService.getProject(projectId));
@@ -90,10 +91,8 @@ export function ProjectDetailPage() {
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
       <main className="w-full">
-
         {/* ── Cinematic Hero Header ── */}
         <div className={`relative bg-gradient-to-br ${heroGradient} overflow-hidden`}>
-          {/* Film frame grid overlay */}
           <div
             className="absolute inset-0 opacity-[0.05]"
             style={{
@@ -101,12 +100,10 @@ export function ProjectDetailPage() {
                 repeating-linear-gradient(0deg, transparent, transparent 58px, white 58px, white 60px)`,
             }}
           />
-          {/* Glow blobs */}
           <div className="absolute -top-20 right-1/3 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 -left-16 w-64 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none" />
 
           <div className="relative z-10 px-6 lg:px-8 pt-5 pb-6 space-y-4">
-            {/* Back link */}
             <Link
               href={productionPaths.list(base)}
               className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/50 hover:text-white/90 transition-colors"
@@ -114,18 +111,21 @@ export function ProjectDetailPage() {
               <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Quay lại danh sách dự án
             </Link>
 
-            {/* Project meta */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-3">
-                  {/* Film icon badge */}
                   <div className="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-lg">
                     <Film className="w-5.5 h-5.5 text-white" aria-hidden="true" />
                   </div>
                   <div>
                     <h1 className="text-2xl font-black text-white tracking-tight leading-none">{data.title}</h1>
-                    <div className="mt-1.5">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       <StatusPill {...MOVIE_STATUS[data.status]} />
+                      {data.seasons.map((season) => (
+                        <span key={season.id} className="inline-flex items-center gap-1 text-[11px] text-white/70">
+                          → {seasonName(season.seasonNumber, season.episodes.length)} <StatusPill {...SEASON_STATUS[season.status]} />
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -143,9 +143,15 @@ export function ProjectDetailPage() {
                   <span className="font-bold text-white text-sm leading-tight">{data.reviewer.fullName}</span>
                 </div>
                 <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
-                  <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">Creator</span>
+                  <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">Creator chính</span>
                   <span className="font-bold text-white text-sm leading-tight">{data.creator?.fullName ?? 'Chưa giao'}</span>
                 </div>
+                {caps.creator && (
+                  <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
+                    <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">Vai trò của bạn</span>
+                    <span className="font-bold text-white text-sm leading-tight">{caps.lead ? 'Creator chính' : 'Creator phụ'}</span>
+                  </div>
+                )}
                 <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
                   <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">Quy mô</span>
                   <span className="font-black text-white text-sm font-mono">{data.seasons.length} mùa · {totalEpisodes} tập</span>
@@ -154,7 +160,7 @@ export function ProjectDetailPage() {
             </div>
           </div>
 
-          {/* ── Tab bar attached to bottom of hero ── */}
+          {/* ── Tab bar ── */}
           <div className="relative z-10 px-6 lg:px-8 border-t border-white/10">
             <div
               role="tablist"
@@ -175,13 +181,12 @@ export function ProjectDetailPage() {
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                  {label}
+                  {key === 'changes' && caps.creator ? 'Đề xuất cho Reviewer & Admin' : label}
                   {key === 'changes' && data.openChangeRequests > 0 && (
                     <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-bold">
                       {data.openChangeRequests}
                     </span>
                   )}
-                  {/* Active indicator line */}
                   {tab === key && (
                     <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-t-full" />
                   )}
@@ -214,6 +219,7 @@ export function ProjectDetailPage() {
         <div role="tabpanel" className="px-6 lg:px-8 py-6">
           {tab === 'overview' && <OverviewTab />}
           {tab === 'episodes' && <EpisodesTab />}
+          {tab === 'team' && <TeamTab />}
           {tab === 'studio' && <StudioTab />}
           {tab === 'fee' && <FeeTab />}
           {tab === 'changes' && <ChangeRequestsTab />}

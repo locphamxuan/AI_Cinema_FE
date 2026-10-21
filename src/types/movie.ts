@@ -35,11 +35,14 @@ export interface SubtitleTrack {
   language: string;
   label: string;
   src: string;
+  isDefault?: boolean;
 }
 
 export interface Episode {
   id: string;
   episodeNumber: number;
+  /** "Tập N", or "Phần N (trọn bộ)" when the episode is the only one of its season. */
+  displayLabel?: string;
   title: string;
   duration: string;
   hlsUrl: string;

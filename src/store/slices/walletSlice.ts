@@ -1,92 +1,51 @@
 import type { StateCreator } from 'zustand';
-import { getTodayDayIndex, getTodayDateString, VN_DAY_LABELS } from '@/lib/dateUtils';
+import { getTodayDateString } from '@/lib/dateUtils';
+import { dailyRewardService } from '@/services/dailyRewardService';
+import { rewardSpinService } from '@/services/rewardSpinService';
 import type { AppState, WalletSlice } from './types';
 
-const createEmptyCheckInStreak = () => ({
-  days: VN_DAY_LABELS.map((label, idx) => ({
-    dayIndex: idx,
-    dayLabel: label,
-    reward: 10,
-    claimed: false,
-    isToday: idx === getTodayDayIndex(),
-  })),
-  currentStreak: 0,
-  lastCheckInDate: null,
-  todayClaimed: false,
-});
+const emptyCheckInStreak = () => ({ currentStreak: 0, lastCheckInDate: null, todayClaimed: false });
 
-export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (set, get) => ({
+export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (set) => ({
   wallet: { mainCoin: 0, bonusCoin: 0 },
-  checkInStreak: createEmptyCheckInStreak(),
+  checkInStreak: emptyCheckInStreak(),
+  availableSpins: 0,
 
-  syncCheckInStreak: () => {
-    const todayIdx = getTodayDayIndex();
-    const todayStr = getTodayDateString();
-    set((s) => {
-      const current = s.checkInStreak && s.checkInStreak.days.length > 0 ? s.checkInStreak : createEmptyCheckInStreak();
-      const isTodayClaimed = current.lastCheckInDate === todayStr;
-      const updatedDays = current.days.map((d, idx) => ({
-        ...d,
-        isToday: idx === todayIdx,
-        claimed: idx < todayIdx ? true : idx === todayIdx ? isTodayClaimed : false,
-      }));
-      return {
-        checkInStreak: {
-          ...current,
-          todayClaimed: isTodayClaimed,
-          currentStreak: isTodayClaimed ? Math.max(current.currentStreak, todayIdx + 1) : Math.max(current.currentStreak, todayIdx),
-          days: updatedDays,
-        },
-      };
-    });
+  setAvailableSpins: (spins) => set({ availableSpins: spins }),
+
+  /** The BE is the only judge of today's check-in and of the spins left; a cached flag may be a day or an account old. */
+  syncRewards: async () => {
+    const [daily, wheel] = await Promise.all([dailyRewardService.getStatus(), rewardSpinService.getWheelStatus()]);
+    set((s) => ({
+      ...(daily.success && daily.data
+        ? {
+            checkInStreak: {
+              currentStreak: daily.data.streakDay,
+              lastCheckInDate: daily.data.checkedInToday ? getTodayDateString() : null,
+              todayClaimed: daily.data.checkedInToday,
+            },
+          }
+        : {}),
+      availableSpins: wheel.success && wheel.data ? wheel.data.availableSpins : s.availableSpins,
+    }));
   },
 
-  claimDailyCheckIn: () => {
-    const state = get();
-    const todayIdx = getTodayDayIndex();
-    const todayStr = getTodayDateString();
+  /** A check-in recorded on an earlier day no longer counts as today's. */
+  syncCheckInStreak: () =>
+    set((s) => {
+      const current = s.checkInStreak ?? emptyCheckInStreak();
+      return { checkInStreak: { ...current, todayClaimed: current.lastCheckInDate === getTodayDateString() } };
+    }),
 
-    if (state.checkInStreak.lastCheckInDate === todayStr || state.checkInStreak.todayClaimed) {
-      return false;
-    }
-
-    const todayDay =
-      state.checkInStreak.days[todayIdx] ||
-      state.checkInStreak.days.find((d) => d.isToday);
-    if (!todayDay) return false;
-
-    const reward = todayDay.reward;
-
+  markCheckedInToday: (streakDay) =>
     set((s) => ({
-      wallet: {
-        ...s.wallet,
-        bonusCoin: s.wallet.bonusCoin + reward,
-      },
       checkInStreak: {
         ...s.checkInStreak,
         todayClaimed: true,
-        currentStreak: Math.max(s.checkInStreak.currentStreak, todayIdx + 1),
-        lastCheckInDate: todayStr,
-        days: s.checkInStreak.days.map((d, idx) =>
-          idx === todayIdx || d.isToday ? { ...d, claimed: true, isToday: true } : d
-        ),
+        currentStreak: streakDay,
+        lastCheckInDate: getTodayDateString(),
       },
-    }));
-
-    // Also add a transaction
-    get().addTransaction({
-      type: 'checkin',
-      typeLabel: 'Điểm danh',
-      description: `Điểm danh nhận thưởng +${reward} Coin`,
-      mainCoinDelta: 0,
-      bonusCoinDelta: reward,
-      totalAmount: reward,
-      status: 'success',
-      statusLabel: 'Thành công',
-    });
-
-    return true;
-  },
+    })),
 
   setWalletBalance: (main, bonus) =>
     set((s) => ({ wallet: { ...s.wallet, mainCoin: main, bonusCoin: bonus } })),
@@ -94,25 +53,4 @@ export const createWalletSlice: StateCreator<AppState, [], [], WalletSlice> = (s
   isDepositModalOpen: false,
   openDepositModal: () => set({ isDepositModalOpen: true }),
   closeDepositModal: () => set({ isDepositModalOpen: false }),
-
-  depositCoins: (amountVND, mainCoin, bonusCoin, method) => {
-    set((s) => ({
-      wallet: {
-        mainCoin: s.wallet.mainCoin + mainCoin,
-        bonusCoin: s.wallet.bonusCoin + bonusCoin,
-      },
-      isDepositModalOpen: false,
-    }));
-
-    get().addTransaction({
-      type: 'deposit',
-      typeLabel: 'Nạp Coin',
-      description: `Nạp ${mainCoin + bonusCoin} Coin qua ${method} (${amountVND.toLocaleString('vi-VN')} đ)`,
-      mainCoinDelta: mainCoin,
-      bonusCoinDelta: bonusCoin,
-      totalAmount: mainCoin + bonusCoin,
-      status: 'success',
-      statusLabel: 'Thành công',
-    });
-  },
 });

@@ -25,7 +25,7 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   dot?: boolean;
 }
 
-/** Shared status pill — used for workflow status, review decisions, compliance state, etc. */
+/** Shared status pill - used for workflow status, review decisions, compliance state, etc. */
 export function Badge({ tone = 'neutral', dot = false, className = '', children, ...props }: BadgeProps) {
   return (
     <span

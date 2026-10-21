@@ -48,52 +48,15 @@ export const createMovieSlice: StateCreator<AppState, [], [], MovieSlice> = (set
     set({ currentMovie: findMovieByEpisode(get().movies, episodeId) });
   },
 
-  unlockEpisode: (episodeId) => {
-    const state = get();
-    const movie = state.currentMovie;
-    const episode = movie?.episodes.find((ep) => ep.id === episodeId);
-    if (!movie || !episode) return { success: false, error: 'Tập phim không tồn tại' };
-    if (episode.isUnlocked || episode.isFree) return { success: true };
-
-    const price = episode.price;
-    const { mainCoin, bonusCoin } = state.wallet;
-    const total = mainCoin + bonusCoin;
-
-    if (total < price) {
-      return { success: false, error: `Số dư không đủ. Cần ${price} Coin, hiện có ${total} Coin.` };
-    }
-
-    // Deduct main coin first, then bonus
-    const mainDeduct = Math.min(mainCoin, price);
-    const bonusDeduct = price - mainDeduct;
-
-    const unlocked: Movie = {
-      ...movie,
-      episodes: movie.episodes.map((ep) => (ep.id === episodeId ? { ...ep, isUnlocked: true } : ep)),
-    };
-    set((s) => ({
-      wallet: {
-        mainCoin: s.wallet.mainCoin - mainDeduct,
-        bonusCoin: s.wallet.bonusCoin - bonusDeduct,
-      },
-      currentMovie: unlocked,
-      movies: s.movies.map((m) => (m.id === unlocked.id ? unlocked : m)),
-    }));
-
-    get().addTransaction({
-      type: 'episode_purchase',
-      typeLabel: 'Mua tập phim',
-      description: `Mở khóa "${movie.title}" - Tập ${episode.episodeNumber}: ${episode.title}`,
-      mainCoinDelta: -mainDeduct,
-      bonusCoinDelta: -bonusDeduct,
-      totalAmount: -price,
-      status: 'success',
-      statusLabel: 'Thành công',
-      episodeInfo: `${movie.title} - Tập ${episode.episodeNumber}`,
-    });
-
-    return { success: true };
-  },
+  markEpisodeUnlocked: (episodeId) =>
+    set((s) => {
+      if (!s.currentMovie) return {};
+      const unlocked: Movie = {
+        ...s.currentMovie,
+        episodes: s.currentMovie.episodes.map((ep) => (ep.id === episodeId ? { ...ep, isUnlocked: true } : ep)),
+      };
+      return { currentMovie: unlocked, movies: s.movies.map((m) => (m.id === unlocked.id ? unlocked : m)) };
+    }),
 
   isUnlockModalOpen: false,
   selectedEpisodeId: null,

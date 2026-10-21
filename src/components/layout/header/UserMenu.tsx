@@ -49,7 +49,7 @@ export default function UserMenu() {
                   : 'bg-slate-100 text-slate-600 dark:bg-white/10 dark:text-muted-light'
               }`}
             >
-              {isVIPMode ? 'Hội viên VIP' : 'Tài khoản thường'}
+              {isVIPMode ? 'Gói Tháng' : 'Gói Thường'}
             </span>
           </div>
 

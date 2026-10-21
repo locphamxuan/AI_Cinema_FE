@@ -22,14 +22,13 @@ export default function EpisodeVersionDrawer({
   const versions = episode.versions || [];
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex justify-end animate-fade-in">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <button type="button" aria-label="Đóng" className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-default" onClick={onClose} />
 
       {/* Drawer Panel */}
       <div
         className="relative w-full max-w-xl h-full bg-[#111319] border-l border-white/10 p-6 overflow-y-auto flex flex-col z-10 animate-slide-left shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-start justify-between pb-4 border-b border-white/10">
@@ -41,7 +40,7 @@ export default function EpisodeVersionDrawer({
               </h2>
             </div>
             <p className="text-xs text-muted-light">
-              Tập {episode.episodeNumber}: <strong className="text-foreground">{episode.title}</strong> • Tổng cộng {versions.length} phiên bản
+              {episode.displayLabel ?? `Tập ${episode.episodeNumber}`}: <strong className="text-foreground">{episode.title}</strong> • Tổng cộng {versions.length} phiên bản
             </p>
           </div>
           <button

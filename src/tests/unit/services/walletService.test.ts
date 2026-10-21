@@ -1,64 +1,81 @@
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { walletService } from '@/services/walletService';
+import { episodeAccessService } from '@/services/episodeAccessService';
+import { coinTopUpService } from '@/services/coinTopUpService';
 import { getTodayDayIndex, VN_DAY_LABELS } from '@/lib/dateUtils';
 
-describe('Wallet Service (src/services/walletService.ts)', () => {
+/** Answers each fetch with the next queued response. */
+function mockFetch(...responses: { body: unknown; status?: number }[]) {
+  const fetchMock = vi.fn();
+  for (const { body, status = 200 } of responses) {
+    fetchMock.mockResolvedValueOnce({ ok: status < 400, status, json: async () => body, headers: new Headers() });
+  }
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
+
+const headerOf = (init: RequestInit, name: string) => (init.headers as Record<string, string>)[name];
+
+describe('MF-2 services', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
   it('calculates day index properly for Vietnam weekdays', () => {
-    // Wednesday 2026-09-23 -> index 2 (T4)
     const wed = new Date('2026-09-23T10:00:00');
-    expect(wed.getDay()).toBe(3);
     expect(getTodayDayIndex(wed)).toBe(2);
     expect(VN_DAY_LABELS[getTodayDayIndex(wed)]).toBe('T4');
-
-    // Sunday 2026-09-27 -> index 6 (CN)
-    const sun = new Date('2026-09-27T10:00:00');
-    expect(getTodayDayIndex(sun)).toBe(6);
-    expect(VN_DAY_LABELS[getTodayDayIndex(sun)]).toBe('CN');
+    expect(VN_DAY_LABELS[getTodayDayIndex(new Date('2026-09-27T10:00:00'))]).toBe('CN');
   });
 
-  it('fetches wallet balance successfully', async () => {
+  it('maps the BE wallet balance to the store shape', async () => {
+    const fetchMock = mockFetch({ body: { mainBalance: 40, bonusBalance: 15, version: 3, expiringBonus: [] } });
+
     const res = await walletService.getBalance();
-    expect(res.success).toBe(true);
-    expect(res.data.mainCoin).toBeDefined();
-    expect(res.data.bonusCoin).toBeDefined();
+
+    expect(fetchMock.mock.calls[0][0]).toMatch(/\/wallet$/);
+    expect(res).toMatchObject({ success: true, data: { mainCoin: 40, bonusCoin: 15 } });
   });
 
-  it('fetches check-in streak calendar with dynamic today', async () => {
-    const res = await walletService.getCheckInStreak();
-    expect(res.success).toBe(true);
-    expect(res.data.days).toHaveLength(7);
-    const today = res.data.days.find((d) => d.isToday);
-    expect(today).toBeDefined();
-    expect(today?.dayLabel).toBe(VN_DAY_LABELS[getTodayDayIndex()]);
+  it('joins a plan in two calls: quote the intent, then pay it', async () => {
+    const fetchMock = mockFetch(
+      { body: { id: 'sub-1', status: 'PENDING' }, status: 201 },
+      { body: { id: 'sub-1', status: 'ACTIVE', charged: { mainCoins: 900, bonusCoins: 0 } }, status: 201 },
+    );
+
+    const res = await episodeAccessService.joinPlan('plan-1', 'k1');
+
+    expect(res).toMatchObject({ success: true, data: { status: 'ACTIVE' } });
+    const [[quoteUrl, quote], [payUrl, pay]] = fetchMock.mock.calls as [string, RequestInit][];
+    expect(quoteUrl).toMatch(/\/subscriptions$/);
+    expect(JSON.parse(quote.body as string)).toEqual({ planId: 'plan-1' });
+    expect(payUrl).toMatch(/\/subscriptions\/sub-1\/activate$/);
+    expect(headerOf(pay, 'Idempotency-Key')).toBe('k1:pay');
   });
 
-  it('calculates coin deduction prioritizing main coin', async () => {
-    const wallet = { mainCoin: 50, bonusCoin: 30 };
-    const res = await walletService.unlockEpisode('m-1', 'ep-1', 20, wallet);
+  it('stops at the quote when the BE refuses it', async () => {
+    const fetchMock = mockFetch({ body: { error: { message: 'The member already has a running plan' } }, status: 409 });
 
-    expect(res.success).toBe(true);
-    expect(res.data.deductedFrom).toBe('main');
-    expect(res.data.mainDeducted).toBe(20);
-    expect(res.data.bonusDeducted).toBe(0);
-    expect(res.data.newBalance.mainCoin).toBe(30);
-  });
-
-  it('splits deduction when main coin is less than price', async () => {
-    const wallet = { mainCoin: 10, bonusCoin: 30 };
-    const res = await walletService.unlockEpisode('m-1', 'ep-1', 20, wallet);
-
-    expect(res.success).toBe(true);
-    expect(res.data.deductedFrom).toBe('split');
-    expect(res.data.mainDeducted).toBe(10);
-    expect(res.data.bonusDeducted).toBe(10);
-    expect(res.data.newBalance.mainCoin).toBe(0);
-    expect(res.data.newBalance.bonusCoin).toBe(20);
-  });
-
-  it('handles insufficient funds error', async () => {
-    const wallet = { mainCoin: 5, bonusCoin: 5 };
-    const res = await walletService.unlockEpisode('m-1', 'ep-1', 20, wallet);
+    const res = await episodeAccessService.joinPlan('plan-1');
 
     expect(res.success).toBe(false);
+    expect(res.statusCode).toBe(409);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('unlocks with an idempotency key on the BE purchase routes', async () => {
+    const fetchMock = mockFetch({ body: { paidCoins: 25 }, status: 201 });
+
+    await episodeAccessService.purchaseEpisode('ep-1', 'k-ep');
+
+    const [[episodeUrl, episodeInit]] = fetchMock.mock.calls as [string, RequestInit][];
+    expect(episodeUrl).toMatch(/\/episodes\/ep-1\/purchase$/);
+    expect(headerOf(episodeInit, 'Idempotency-Key')).toBe('k-ep');
+  });
+
+  it('reads the gateway redirect from the flat top-up order', async () => {
+    mockFetch({ body: { topUpId: 't1', status: 'PENDING', redirectUrl: 'https://pay.example/t1' }, status: 201 });
+
+    const res = await coinTopUpService.createTopUp('VNPAY', 50_000);
+
+    expect(res.data.redirectUrl).toBe('https://pay.example/t1');
   });
 });

@@ -1,23 +1,18 @@
 /** MF-1 (movie project management & publishing) as the NestJS API returns it; dates are ISO strings. */
 import type {
   AgeRating,
-  ChangeRequestStatus,
   EpisodeStatus,
   MediaIngestStatus,
   MovieStatus,
-  TokenEntryType,
+  SeasonStatus,
   UserRole,
 } from './production-enums';
+import type { CreatorSeat, Person, SeasonFee, Studio, StudioHandoff } from './production-studio';
 
 export * from './production-enums';
 export * from './production-media';
 export * from './production-requests';
-
-export interface Person {
-  id: string;
-  fullName: string;
-  email?: string;
-}
+export * from './production-studio';
 
 export interface Genre {
   id: string;
@@ -35,12 +30,14 @@ export interface ProjectSummary {
   id: string;
   title: string;
   status: MovieStatus;
-  studioName: string | null;
+  studio: Studio | null;
   reviewerId: string;
   creatorId: string | null;
   reviewer: Person;
   creator: Person | null;
   updatedAt: string;
+  /** Newest change of the project: its latest content event, else its own update time. */
+  lastActivityAt: string;
   createdAt: string;
   _count: { episodes: number };
 }
@@ -56,14 +53,20 @@ export interface Episode {
   id: string;
   movieId: string;
   seasonId: string;
+  assignedCreatorId: string | null;
+  assignedCreator: Person | null;
   episodeNumber: number;
   title: string;
   synopsis: string | null;
+  thumbnailUrl: string | null;
   status: EpisodeStatus;
   targetDurationSeconds: number;
-  /** Reviewer milestone; null only on episodes created before milestones existed. */
-  milestoneDate: string | null;
+  /** The day the Reviewer wants the studio to deliver; null only on very old episodes. */
+  deliveryDeadline: string | null;
+  /** The studio's due date, set when the episode is handed off (BR-38). */
   dueDate: string | null;
+  /** Expected release day, inside the season window (BR-60). */
+  expectedReleaseDate: string | null;
   approvedMediaAssetId: string | null;
   coinPrice: number | null;
   revisionStartedAt: string | null;
@@ -77,35 +80,25 @@ export interface Season {
   id: string;
   seasonNumber: number;
   title: string | null;
+  status: SeasonStatus;
+  /** Token paid for one episode of this season (BR-37). */
+  episodeProductionCost: number | string;
+  releaseStartDate: string | null;
+  releaseEndDate: string | null;
   episodes: Episode[];
 }
+
+/** IDEA travels with the studio brief; SYNOPSIS backs the summary viewers read. */
+export type IdeaFilePurpose = 'IDEA' | 'SYNOPSIS';
 
 export interface IdeaFile {
   id: string;
   fileName: string;
+  purpose: IdeaFilePurpose;
   version: number;
   mimeType: string;
   sizeBytes: number;
   createdAt: string;
-}
-
-export interface StudioHandoff {
-  id: string;
-  studioName: string;
-  studioEmail: string;
-  studioContact: string | null;
-  productionFeeTokens: number;
-  changeReason: string | null;
-  briefFileKey: string | null;
-  createdAt: string;
-  createdBy: Person;
-  emailMessage?: { status: 'QUEUED' | 'SENT' | 'FAILED'; sentAt: string | null; errorMessage: string | null } | null;
-  /** The studio's answer through its portal link. */
-  studioResponse: 'ACCEPTED' | 'DECLINED' | null;
-  respondedAt: string | null;
-  declineReason: string | null;
-  /** Whether the emailed portal link still works (revoked on a studio change or a new link). */
-  portalActive: boolean;
 }
 
 export interface RevisionSummary {
@@ -121,17 +114,16 @@ export interface ProjectDetail {
   defaultLanguage: string;
   ageRating: AgeRating | null;
   releaseYear: number | null;
+  /** Free episodes of this movie set by the Reviewer; null = the platform's default (BR-03). */
+  freeEpisodeCount: number | null;
   status: MovieStatus;
   posterUrl: string | null;
   reviewerId: string;
   creatorId: string | null;
   reviewer: Person;
   creator: Person | null;
-  studioName: string | null;
-  studioEmail: string | null;
-  studioContact: string | null;
+  studio: Studio | null;
   cancelReason: string | null;
-  assignedAt: string | null;
   handedOffAt: string | null;
   completedAt: string | null;
   cancelledAt: string | null;
@@ -141,37 +133,11 @@ export interface ProjectDetail {
   seasons: Season[];
   ideaFiles: IdeaFile[];
   studioHandoffs: StudioHandoff[];
+  creatorAssignments: CreatorSeat[];
   productionFeeTokens: number;
+  seasonFees: SeasonFee[];
   openChangeRequests: number;
   revision: RevisionSummary;
-}
-
-export interface FeeEntry {
-  id: string;
-  entryType: TokenEntryType;
-  amountTokens: number;
-  rateVnd: number;
-  reason: string | null;
-  createdAt: string;
-  createdBy: Person;
-}
-
-export interface FeeLedger {
-  totalTokens: number;
-  totalVnd: number;
-  entries: FeeEntry[];
-}
-
-export interface ChangeRequest {
-  id: string;
-  content: string;
-  status: ChangeRequestStatus;
-  reviewerResponse: string | null;
-  createdAt: string;
-  resolvedAt: string | null;
-  requestedBy: Person;
-  resolvedBy: Person | null;
-  episode: { id: string; episodeNumber: number; title: string } | null;
 }
 
 export interface ProjectEvent {
@@ -192,6 +158,12 @@ export interface PlatformSettings {
   episodeCoinPriceMax: number;
   bonusCoinExpiryDays: number;
   playbackHeartbeatTimeoutSeconds: number;
+  subscriptionCancelWindowHours: number;
+  planRenewalGraceHours: number;
+  newMemberBonusCoins: number;
+  coinTopUpMinVnd: number;
+  coinTopUpMaxVnd: number;
+  refundOnRemoval: boolean;
   updatedAt?: string;
 }
 

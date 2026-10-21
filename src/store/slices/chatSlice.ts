@@ -1,6 +1,7 @@
 import type { StateCreator } from 'zustand';
 import { ChatMessage, ChatPhase, SupportTicket } from '@/types/chat';
 import type { AppState, ChatSlice } from './types';
+import { randomInt } from '@/lib/random';
 
 const defaultSupportReply = 'Xin chào! Tôi đang chờ dữ liệu từ backend để trả lời chính xác cho bạn.';
 
@@ -85,7 +86,7 @@ export const createChatSlice: StateCreator<AppState, [], [], ChatSlice> = (set, 
       chatPhase: 'waiting',
       chatTicket: ticket,
       chatMessages: [...state.chatMessages, systemMsg],
-      estimatedWaitMinutes: Math.floor(Math.random() * 5) + 3,
+      estimatedWaitMinutes: randomInt(3, 7),
     });
   },
 });

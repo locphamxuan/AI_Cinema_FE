@@ -75,11 +75,11 @@ export function PriceAlertsPanel() {
                   href={productionPaths.episode('/reviewer', a.episode.movie.id, a.episode.id)}
                   className="font-semibold text-slate-900 dark:text-white hover:underline"
                 >
-                  {a.episode.movie.title} — tập {a.episode.episodeNumber}: {a.episode.title}
+                  {a.episode.movie.title} - tập {a.episode.episodeNumber}: {a.episode.title}
                 </Link>
                 <p className="text-slate-600 dark:text-slate-300">
                   Giá đặt <b>{a.coinPrice}</b> Coin, khoảng hợp lệ {a.rangeMin}–{a.rangeMax}
-                  {a.episode.coinPrice !== a.coinPrice && ` · giá hiện tại ${a.episode.coinPrice ?? '—'}`}
+                  {a.episode.coinPrice !== a.coinPrice && ` · giá hiện tại ${a.episode.coinPrice ?? '-'}`}
                 </p>
                 <p className="text-slate-400">
                   {a.setBy.fullName} · {formatDateTime(a.createdAt)}

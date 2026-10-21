@@ -53,7 +53,7 @@ export default function NetflixMovieRow({
           </h2>
           {subtitle && (
             <span className="text-xs text-slate-500 dark:text-slate-400 font-medium hidden md:inline">
-              — {subtitle}
+              - {subtitle}
             </span>
           )}
         </div>

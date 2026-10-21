@@ -6,7 +6,7 @@ export interface FormFieldProps {
   className?: string;
 }
 
-/** Shared label+control wrapper for form fields — the "block text-slate-300 mb-1 font-semibold label + input" pattern repeated across every modal and editor form. */
+/** Shared label+control wrapper for form fields - the "block text-slate-300 mb-1 font-semibold label + input" pattern repeated across every modal and editor form. */
 export function FormField({ label, children, className = '' }: FormFieldProps) {
   return (
     <label className={`block ${className}`}>

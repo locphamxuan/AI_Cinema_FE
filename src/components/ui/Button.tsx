@@ -25,7 +25,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
 }
 
-/** Shared button primitive — keeps action styling consistent across the MF1 dashboards instead of every page hand-rolling its own Tailwind classes. */
+/** Shared button primitive - keeps action styling consistent across the MF1 dashboards instead of every page hand-rolling its own Tailwind classes. */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', className = '', disabled, ...props }, ref) => (
     <button

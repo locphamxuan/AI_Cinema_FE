@@ -1,153 +1,174 @@
 'use client';
 
+import { useCallback, useEffect, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { useState, useCallback, useEffect } from 'react';
 import { dailyRewardService } from '@/services/dailyRewardService';
-import { walletService } from '@/services/walletService';
+import { Backdrop } from '@/components/ui/Backdrop';
+import type { CheckInResult, DailyRewardStatus } from '@/types/episodeAccess';
+import { ConfettiEffect } from './spin/SpinWheel';
 
-const CONFETTI_COLORS = ['#E50914', '#8B5CF6', '#F59E0B', '#10B981', '#3B82F6', '#EC4899'];
+/** The BE ladder wraps after 7 days (daily-reward.service LADDER_LENGTH). */
+const LADDER_LENGTH = 7;
 
-function drawParticles() {
-  return Array.from({ length: 40 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
-    delay: Math.random() * 0.5,
-    width: 6 + Math.random() * 8,
-    height: 6 + Math.random() * 8,
-  }));
+type DayState = 'claimed' | 'next' | 'locked';
+
+function dayClass(state: DayState): string {
+  if (state === 'next') return 'bg-neon/20 border-2 border-neon glow-neon';
+  if (state === 'claimed') return 'bg-verified/20 border border-verified/30';
+  return 'bg-white/5 border border-white/10';
 }
 
-function ConfettiEffect() {
-  const [particles] = useState(drawParticles);
+const DAY_ICON: Record<DayState, string> = { claimed: '✅', next: '🎁', locked: '🔒' };
 
-  return (
-    <div className="confetti-container">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="confetti-particle"
-          style={{
-            left: `${p.x}%`,
-            backgroundColor: p.color,
-            animationDelay: `${p.delay}s`,
-            width: `${p.width}px`,
-            height: `${p.height}px`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
+/**
+ * SF-C Daily Check-in: one check-in per Vietnam business day; the streak and the reward of each
+ * streak day come from the Admin's ladder on the BE. The wallet shows what the BE credited.
+ */
 export default function DailyCheckInModal() {
   const {
     isCheckInModalOpen,
     setCheckInModalOpen,
-    checkInStreak,
-    claimDailyCheckIn,
-    syncCheckInStreak,
     setWalletBalance,
-    wallet,
+    markCheckedInToday,
+    openRewardSpinModal,
+    setAvailableSpins,
+    syncRewards,
   } = useAppStore();
 
+  const [status, setStatus] = useState<DailyRewardStatus | null>(null);
+  const [claimed, setClaimed] = useState<CheckInResult | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [claimSuccess, setClaimSuccess] = useState(false);
-  const [rewardAmount, setRewardAmount] = useState(10);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (isCheckInModalOpen) {
-      syncCheckInStreak();
-      // Fetch fresh server status
-      dailyRewardService.getStatus().then((res) => {
-        if (res.success && res.data) {
-          if (res.data.checkedInToday) {
-            setClaimSuccess(true);
-          }
-          if (res.data.reward?.bonusCoins) {
-            setRewardAmount(res.data.reward.bonusCoins);
-          }
-        }
-      }).catch(() => {});
+  const loadStatus = useCallback(async () => {
+    setIsRefreshing(true);
+    setStatus(null);
+    setErrorMsg(null);
+    try {
+      const res = await dailyRewardService.getStatus();
+      if (res.success && res.data) setStatus(res.data);
+      else setErrorMsg(res.message || 'Không tải được thông tin điểm danh.');
+    } catch {
+      setErrorMsg('Không tải được thông tin điểm danh.');
+    } finally {
+      setIsRefreshing(false);
     }
-  }, [isCheckInModalOpen, syncCheckInStreak]);
+  }, []);
+
+  useEffect(() => {
+    if (!isCheckInModalOpen) return;
+    let cancelled = false;
+    dailyRewardService
+      .getStatus()
+      .then((res) => {
+        if (cancelled) return;
+        if (res.success && res.data) {
+          setStatus(res.data);
+          // The header flag and spin count follow what the BE just said.
+          if (res.data.checkedInToday) markCheckedInToday(res.data.streakDay);
+          setAvailableSpins(res.data.availableSpins);
+        } else setErrorMsg(res.message || 'Không tải được thông tin điểm danh.');
+      })
+      .catch(() => {
+        if (!cancelled) setErrorMsg('Không tải được thông tin điểm danh.');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isCheckInModalOpen, markCheckedInToday, setAvailableSpins]);
 
   const handleClaim = useCallback(async () => {
     setIsClaiming(true);
     setErrorMsg(null);
-
     try {
       const res = await dailyRewardService.checkIn();
-      if (res.success && res.data) {
-        const reward = res.data.reward?.bonusCoins ?? res.data.rewardCoins ?? 10;
-        setRewardAmount(reward);
-        setClaimSuccess(true);
-        setShowConfetti(true);
-
-        // Update wallet in Zustand
-        if (res.data.mainBalance !== undefined && res.data.bonusBalance !== undefined) {
-          setWalletBalance(res.data.mainBalance, res.data.bonusBalance);
-        } else {
-          setWalletBalance(wallet.mainCoin, wallet.bonusCoin + reward);
-        }
-
-        claimDailyCheckIn();
-        setTimeout(() => setShowConfetti(false), 2500);
-      } else {
-        // Fallback to local
-        claimDailyCheckIn();
-        setClaimSuccess(true);
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 2500);
+      if (!res.success || !res.data) {
+        setErrorMsg(res.message || 'Có lỗi xảy ra khi điểm danh.');
+        return;
       }
-    } catch (err: any) {
-      if (err?.message?.includes('ALREADY_CHECKED_IN_TODAY')) {
-        setClaimSuccess(true);
-        setErrorMsg('Bạn đã điểm danh ngày hôm nay rồi.');
-      } else {
-        setErrorMsg(err?.message || 'Có lỗi xảy ra khi điểm danh.');
+      setClaimed(res.data);
+      setWalletBalance(res.data.mainBalance, res.data.bonusBalance);
+      markCheckedInToday(res.data.streakDay);
+      // A milestone day adds a spin: the BE says how many are left.
+      if (res.data.spinGranted) syncRewards().catch(() => undefined);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 2500);
+    } catch {
+      setErrorMsg('Không nhận được phản hồi điểm danh. Đang kiểm tra lại trạng thái...');
+      try {
+        const refreshed = await dailyRewardService.getStatus();
+        if (refreshed.success && refreshed.data) {
+          setStatus(refreshed.data);
+          setWalletBalance(refreshed.data.mainBalance, refreshed.data.bonusBalance);
+          if (refreshed.data.checkedInToday) markCheckedInToday(refreshed.data.streakDay);
+          setErrorMsg(null);
+        }
+      } catch {
+        // Keep the original error visible; the user can retry loading the current status.
       }
     } finally {
       setIsClaiming(false);
     }
-  }, [claimDailyCheckIn, setWalletBalance, wallet]);
+  }, [setWalletBalance, markCheckedInToday, syncRewards]);
 
   const handleClose = useCallback(() => {
     setCheckInModalOpen(false);
-    setClaimSuccess(false);
+    setClaimed(null);
+    setStatus(null);
     setErrorMsg(null);
   }, [setCheckInModalOpen]);
 
   if (!isCheckInModalOpen) return null;
 
-  const todayDay = checkInStreak.days.find((d) => d.isToday);
-  const todayClaimed = checkInStreak.todayClaimed || claimSuccess;
+  const checkedInToday = Boolean(claimed) || Boolean(status?.checkedInToday);
+  const isLoading = isRefreshing || (!status && !errorMsg);
+  const streakDay = claimed?.streakDay ?? status?.streakDay ?? 0;
+  // The ladder starts over after day 7: until today's claim, no day of the new round is done yet.
+  const doneDays = checkedInToday ? streakDay : streakDay % LADDER_LENGTH;
+  const nextDay = checkedInToday ? null : doneDays + 1;
+  const todayReward = status ? status.reward.bonusCoins : 0;
+  const ladder = Array.from({ length: LADDER_LENGTH }, (_, i) => {
+    const day = i + 1;
+    const rule = status?.ladder.find((r) => r.streakDay === day);
+    let state: DayState = 'locked';
+    if (day === nextDay) state = 'next';
+    else if (day <= doneDays) state = 'claimed';
+    return {
+      day,
+      reward: rule?.bonusCoins ?? 0,
+      grantsSpin: rule?.grantsSpin ?? false,
+      state,
+    };
+  });
+
+  let claimLabel = `🎁 Nhận ${todayReward} Coin Thưởng`;
+  if (isLoading) claimLabel = 'Đang tải thông tin...';
+  else if (isClaiming) claimLabel = 'Đang nhận thưởng...';
+  else if (checkedInToday) claimLabel = '✓ Đã nhận hôm nay';
+  else if (status && todayReward <= 0) claimLabel = 'Hôm nay chưa có phần thưởng';
 
   return (
     <>
       {showConfetti && <ConfettiEffect />}
 
-      {/* Backdrop */}
-      <div
+      <Backdrop
+        label="Điểm danh hàng ngày"
+        onClose={handleClose}
         className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-        onClick={handleClose}
       >
-        {/* Modal */}
-        <div
-          className="glass-card w-full max-w-md p-6 animate-scale-in"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+        <div className="glass-card w-full max-w-md p-6 animate-scale-in">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold text-foreground">🎁 Điểm Danh Hàng Ngày</h2>
               <p className="text-sm text-muted-light mt-1">
-                Streak hiện tại: <span className="text-coin font-bold">{checkInStreak.currentStreak + (claimSuccess && !checkInStreak.todayClaimed ? 1 : 0)} ngày</span>
+                Chuỗi hiện tại: <span className="text-coin font-bold">{streakDay} ngày</span>
               </p>
             </div>
             <button
+              type="button"
+              aria-label="Đóng"
               onClick={handleClose}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-muted-light hover:text-foreground cursor-pointer"
             >
@@ -155,101 +176,97 @@ export default function DailyCheckInModal() {
             </button>
           </div>
 
-          {errorMsg && (
-            <div className="mb-4 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs">
-              {errorMsg}
+          {status && status.availableSpins > 0 && !claimed && (
+            <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">🎯</span>
+                <div>
+                  <p className="text-xs font-bold text-white">Bạn có {status.availableSpins} lượt quay may mắn</p>
+                  <p className="text-[11px] text-purple-200">Quay để trúng Coin thưởng hoặc ngày gói Tháng</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  handleClose();
+                  openRewardSpinModal();
+                }}
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+              >
+                Quay ngay
+              </button>
             </div>
           )}
 
-          {/* Streak Progress Bar */}
-          <div className="mb-6">
-            <div className="flex justify-between text-xs text-muted-light mb-2">
-              <span>Tiến trình tuần</span>
-              <span>{checkInStreak.days.filter((d) => d.claimed || (d.isToday && claimSuccess)).length}/7 ngày</span>
+          {errorMsg && (
+            <div role="alert" className="mb-4 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs flex items-center justify-between gap-3">
+              <span>{errorMsg}</span>
+              {!isLoading && <button type="button" onClick={() => void loadStatus()} className="shrink-0 underline">Thử tải lại</button>}
             </div>
-            <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+          )}
+
+          {isLoading && <p role="status" className="text-center text-sm text-muted-light py-4">Đang tải thông tin điểm danh...</p>}
+
+          <div className="grid grid-cols-7 gap-1.5 mb-6">
+            {ladder.map(({ day, reward, grantsSpin, state }) => (
               <div
-                className="h-full bg-gradient-to-r from-neon to-coin rounded-full transition-all duration-700"
-                style={{
-                  width: `${(checkInStreak.days.filter((d) => d.claimed || (d.isToday && claimSuccess)).length / 7) * 100}%`,
-                }}
-              />
-            </div>
+                key={day}
+                className={`relative flex flex-col items-center py-2.5 px-1 rounded-xl transition-all duration-300 ${dayClass(
+                  state,
+                )}`}
+              >
+                <span className={`text-[10px] font-bold mb-1 ${state === 'next' ? 'text-neon' : 'text-muted-light'}`}>
+                  N{day}
+                </span>
+                <span className="text-base mb-1">{grantsSpin ? '🎯' : DAY_ICON[state]}</span>
+                <span className={`text-[10px] font-bold ${state === 'claimed' ? 'text-verified' : 'text-coin'}`}>
+                  +{reward}
+                </span>
+                {grantsSpin && (
+                  <span className="text-[8px] font-black uppercase text-amber-300 tracking-tighter mt-0.5">
+                    +Lượt quay
+                  </span>
+                )}
+              </div>
+            ))}
           </div>
 
-          {/* 7-Day Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2 mb-6">
-            {checkInStreak.days.map((day) => {
-              const isClaimed = day.claimed || (day.isToday && claimSuccess);
-              const isToday = day.isToday;
-              const isPast = day.dayIndex < (checkInStreak.days.find((d) => d.isToday)?.dayIndex ?? 7);
-              const isMissed = isPast && !day.claimed;
-
-              return (
-                <div
-                  key={day.dayIndex}
-                  className={`relative flex flex-col items-center py-3 rounded-xl transition-all duration-300 ${
-                    isToday && !isClaimed
-                      ? 'bg-neon/20 border-2 border-neon glow-neon'
-                      : isClaimed
-                        ? 'bg-verified/20 border border-verified/30'
-                        : isMissed
-                          ? 'bg-white/5 border border-white/5 opacity-50'
-                          : 'bg-white/5 border border-white/10'
-                  }`}
-                >
-                  <span className={`text-[10px] font-bold mb-1 ${isToday ? 'text-neon' : 'text-muted-light'}`}>{day.dayLabel}</span>
-                  <span className="text-lg mb-1">
-                    {isClaimed ? '✅' : isToday ? '🎁' : isMissed ? '❌' : '🔒'}
-                  </span>
-                  <span className={`text-[10px] font-bold ${
-                    isClaimed ? 'text-verified' : isToday ? 'text-coin' : 'text-muted'
-                  }`}>
-                    +{day.reward}
-                  </span>
-                  {isToday && (
-                    <span className="mt-1 px-1.5 py-0.5 rounded-full text-[8px] font-extrabold bg-neon text-black leading-none shadow-xs">
-                      Hôm nay
-                    </span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Success Message */}
-          {claimSuccess && (
+          {claimed && (
             <div className="mb-4 p-3 rounded-xl bg-verified/20 border border-verified/30 text-center animate-bounce-in">
               <p className="text-verified font-bold text-lg">🎉 Nhận thành công!</p>
-              <p className="text-verified/80 text-sm">+{rewardAmount} Coin Thưởng đã được cộng vào ví</p>
+              <p className="text-verified/80 text-sm">+{claimed.bonusGranted} Coin thưởng đã được cộng vào ví</p>
+              {claimed.spinGranted && (
+                <div className="mt-2.5 pt-2 border-t border-verified/30 text-center">
+                  <p className="text-amber-300 font-bold text-xs">🎯 Ngày mốc: bạn nhận thêm 1 lượt quay may mắn!</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleClose();
+                      openRewardSpinModal();
+                    }}
+                    className="mt-2 px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-neutral-950 font-black text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                  >
+                    Quay thưởng ngay
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
-          {/* Claim Button */}
           <button
-            onClick={handleClaim}
-            disabled={todayClaimed || isClaiming}
-            className={`w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 cursor-pointer ${
-              todayClaimed
-                ? 'bg-white/10 text-muted cursor-not-allowed'
-                : 'bg-gradient-to-r from-neon to-neon-dark text-white hover:shadow-lg hover:shadow-neon/30 active:scale-95'
-            }`}
+            type="button"
+            onClick={() => void handleClaim()}
+            disabled={isLoading || !status || checkedInToday || isClaiming || todayReward <= 0}
+            className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 cursor-pointer bg-gradient-to-r from-neon to-neon-dark text-white hover:shadow-lg hover:shadow-neon/30 active:scale-95 disabled:bg-none disabled:bg-white/10 disabled:text-muted disabled:cursor-not-allowed disabled:shadow-none"
           >
-            {isClaiming ? (
-              <span>Đang nhận thưởng...</span>
-            ) : todayClaimed ? (
-              <span>✓ Đã nhận hôm nay</span>
-            ) : (
-              <span>🎁 Nhận {todayDay?.reward || rewardAmount} Coin Thưởng</span>
-            )}
+            {claimLabel}
           </button>
 
-          {/* Info */}
           <p className="text-center text-xs text-muted mt-3">
-            Điểm danh liên tục 7 ngày để nhận thưởng tối đa!
+            Điểm danh mỗi ngày để tích lũy Coin thưởng. Ngày mốc của chuỗi tặng thêm lượt quay may mắn.
           </p>
         </div>
-      </div>
+      </Backdrop>
     </>
   );
 }
