@@ -3,6 +3,7 @@
  */
 
 import { API_BASE_URL } from '@/constants/apiRoutes';
+import { localizeApiError } from '@/lib/applicationMessages';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 
 export interface ApiResponse<T> {
@@ -135,35 +136,16 @@ class ApiClient {
             };
           }
         }
-        let errorMessage = `HTTP error! status: ${response.status}`;
+        let rawMessage: unknown;
+        let rawDetails: unknown;
         try {
           const errBody = await response.json();
-          const rawMsg = errBody?.error?.message ?? errBody?.message ?? (typeof errBody?.error === 'string' ? errBody.error : undefined);
-          if (rawMsg) {
-            errorMessage = Array.isArray(rawMsg) ? rawMsg.join(', ') : String(rawMsg);
-          } else {
-            // Friendly Vietnamese messages for common HTTP/Auth errors when server gives no message
-            if (response.status === 401) {
-              errorMessage = 'Email hoặc mật khẩu không chính xác.';
-            } else if (response.status === 403) {
-              errorMessage = 'Bạn không có quyền thực hiện thao tác này.';
-            } else if (response.status === 404) {
-              errorMessage = 'Không tìm thấy dữ liệu yêu cầu.';
-            } else if (response.status >= 500) {
-              errorMessage = 'Lỗi kết nối máy chủ, vui lòng thử lại sau.';
-            }
-          }
+          rawMessage = errBody?.error?.message ?? errBody?.message ?? (typeof errBody?.error === 'string' ? errBody.error : undefined);
+          rawDetails = errBody?.error?.details ?? errBody?.details;
         } catch {
-          if (response.status === 401) {
-            errorMessage = 'Email hoặc mật khẩu không chính xác.';
-          } else if (response.status === 403) {
-            errorMessage = 'Bạn không có quyền thực hiện thao tác này.';
-          } else if (response.status === 404) {
-            errorMessage = 'Không tìm thấy dữ liệu yêu cầu.';
-          } else if (response.status >= 500) {
-            errorMessage = 'Lỗi kết nối máy chủ, vui lòng thử lại sau.';
-          }
+          // Use the HTTP status fallback when the server returned an empty or non-JSON error body.
         }
+        const errorMessage = localizeApiError(rawMessage, response.status, rawDetails, endpoint);
 
         return {
           success: false,

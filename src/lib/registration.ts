@@ -1,3 +1,5 @@
+import { APPLICATION_MESSAGES } from './applicationMessages';
+
 /** Sign-up rules the backend enforces (RegisterRequestDto), checked first so the form answers at once. */
 export const MIN_PASSWORD_LENGTH = 8;
 export const MAX_PASSWORD_LENGTH = 72;
@@ -28,7 +30,7 @@ export function registrationError(password: string, dateOfBirth: string, today: 
   if (!PASSWORD_RULE.test(password)) return 'Mật khẩu cần có ít nhất một chữ cái và một chữ số.';
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) return 'Vui lòng nhập ngày sinh.';
   if (dateOfBirth > latestAdultBirthDate(today)) {
-    return `AI Cinema dành cho người từ ${MIN_MEMBER_AGE} tuổi trở lên.`;
+    return APPLICATION_MESSAGES.MSG07.message;
   }
   return null;
 }

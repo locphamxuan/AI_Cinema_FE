@@ -1,5 +1,6 @@
 import type { StateCreator } from 'zustand';
 import { authService, redirectUrlFor } from '@/services/authService';
+import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
 import type { AppState, AuthSlice, UserProfile } from './types';
 
 // The wallet and the plan are read from the BE right after (syncAccount), never assumed here.
@@ -49,7 +50,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
 
   register: async (name, email, password, dateOfBirth) => {
     if (!name.trim() || !email.trim() || !password || !dateOfBirth) {
-      return { success: false, error: 'Vui lòng điền đầy đủ thông tin đăng ký!' };
+      return { success: false, error: APPLICATION_MESSAGES.MSG02.message };
     }
 
     const res = await authService.register({ name, email, password, dateOfBirth });

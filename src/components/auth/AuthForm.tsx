@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
+import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
 import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
 
@@ -94,6 +96,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
       setError(res.error || (mode === 'login' ? 'Đăng nhập thất bại' : 'Đăng ký thất bại'));
       return;
     }
+    if (mode === 'register') toast.success(APPLICATION_MESSAGES.MSG04.message);
     rememberEmail(email, rememberMe);
     const target = ('redirectUrl' in res && typeof res.redirectUrl === 'string' ? res.redirectUrl : undefined) || fallbackUrl;
     if (target) router.push(target);

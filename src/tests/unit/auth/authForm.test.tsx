@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AuthForm from '@/components/auth/AuthForm';
+import { useToastStore } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 
 vi.mock('next/navigation', () => ({
@@ -14,6 +15,7 @@ describe('AuthForm sign-up', () => {
   beforeEach(() => {
     register.mockReset().mockResolvedValue({ success: true });
     localStorage.clear();
+    useToastStore.setState({ toasts: [] });
     useAppStore.setState({ register });
   });
 
@@ -28,6 +30,7 @@ describe('AuthForm sign-up', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Tạo Tài Khoản' }));
 
     expect(register).toHaveBeenCalledWith('Nguyễn Minh Anh', 'anh@example.com', 'matkhau123', '2000-05-14');
+    expect(useToastStore.getState().toasts[0]?.title).toBe('Tài khoản của bạn đã được tạo thành công.');
   });
 
   it('stops when the two passwords differ', async () => {
