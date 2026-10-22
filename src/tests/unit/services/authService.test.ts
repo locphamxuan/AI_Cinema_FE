@@ -62,7 +62,7 @@ describe('authService', () => {
     const res = await authService.login({ email: 'reviewer@aicinema.com', password: 'wrong' });
 
     expect(res.success).toBe(false);
-    expect(res.message).toBe('Incorrect email or password');
+    expect(res.message).toBe('Email hoặc mật khẩu không chính xác. Vui lòng thử lại.');
     expect(authService.hasSession()).toBe(false);
   });
 
