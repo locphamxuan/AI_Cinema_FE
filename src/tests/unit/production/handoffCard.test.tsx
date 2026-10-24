@@ -16,6 +16,7 @@ const handoff = (over: Partial<StudioHandoff> = {}) =>
     milestoneStatus: 'IN_PROGRESS',
     emailMessage: null,
     materials: [],
+    filmLinks: [],
     milestoneEvents: [],
     briefFileKey: null,
     changeReason: null,
@@ -42,5 +43,28 @@ describe('HandoffCard film sent by the studio', () => {
   it('stops waiting once the milestone is DELIVERED', () => {
     renderCard(handoff({ milestoneStatus: 'DELIVERED', filmSentAt: '2026-10-15T03:00:00.000Z', filmSentNote: 'Đã gửi.' }));
     expect(screen.queryByText(/Chờ Creator upload Submission/)).toBeNull();
+  });
+
+  it('lists the link of every episode the studio mailed, to its episode page and to the film', () => {
+    renderCard(
+      handoff({
+        filmSentAt: '2026-10-15T03:00:00.000Z',
+        filmSentNote: 'Đã gửi.',
+        filmLinks: [
+          {
+            id: 'l1',
+            episodeId: 'e1',
+            version: 'v1',
+            fileName: 'tap-1.mp4',
+            url: 'http://studio.test/films/a/tap-1.mp4',
+            sentAt: '2026-10-15T03:00:00.000Z',
+            episode: { episodeNumber: 1 },
+          },
+        ],
+      }),
+    );
+    expect(screen.getByText('Tập 1').getAttribute('href')).toBe('/creator/projects/m1/episodes/e1');
+    expect(screen.getByLabelText('Xem phim tập 1').getAttribute('href')).toBe('http://studio.test/films/a/tap-1.mp4');
+    expect(screen.getByText(/tap-1\.mp4/)).toBeTruthy();
   });
 });

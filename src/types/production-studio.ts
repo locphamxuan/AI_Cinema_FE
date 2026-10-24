@@ -47,6 +47,17 @@ export interface MilestoneEvent {
   mediaAsset: { id: string; version: number; episodeId: string; ingestStatus: MediaIngestStatus } | null;
 }
 
+/** The link the studio last mailed for one episode of a hand-off: downloaded, or imported as the Submission. */
+export interface StudioFilmLink {
+  id: string;
+  episodeId: string;
+  version: string;
+  fileName: string;
+  url: string;
+  sentAt: string;
+  episode: { episodeNumber: number };
+}
+
 /** One hand-off: which studio, which season (null = the whole project), when and with what (BR-58, BR-59). */
 export interface StudioHandoff {
   id: string;
@@ -69,6 +80,7 @@ export interface StudioHandoff {
   createdBy: Person;
   emailMessage: { status: 'QUEUED' | 'SENT' | 'FAILED'; sentAt: string | null; errorMessage: string | null } | null;
   materials: HandoffMaterial[];
+  filmLinks: StudioFilmLink[];
   milestoneEvents: MilestoneEvent[];
 }
 

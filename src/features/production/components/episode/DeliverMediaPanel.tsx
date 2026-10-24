@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { UploadCloud } from 'lucide-react';
+import { ExternalLink, UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import type { ApiResponse } from '@/services/apiClient';
 import { productionService } from '@/services/productionService';
-import type { AiDisclosure, LabelType, MediaMetadataInput } from '@/types/production';
+import type { AiDisclosure, LabelType, MediaMetadataInput, StudioFilmLink } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { AI_PARTS, LABEL_TYPE } from '../../lib/labels';
 import { Panel } from '../shared/ui';
@@ -41,11 +41,14 @@ export function DeliverMediaPanel({
   onDelivered,
   declarant = 'creator',
   title = 'Giao bản dựng của studio',
+  studioFilm,
 }: {
   deliver: (delivery: Delivery) => Promise<ApiResponse<unknown>>;
   onDelivered: () => Promise<void>;
   declarant?: 'studio' | 'creator';
   title?: string;
+  /** The episode as the studio last mailed it, offered as the link to import. */
+  studioFilm?: StudioFilmLink;
 }) {
   const [method, setMethod] = useState<Method>('UPLOAD');
   const [file, setFile] = useState<File | null>(null);
@@ -91,6 +94,29 @@ export function DeliverMediaPanel({
   return (
     <Panel title={title} description="Mỗi lần giao tạo một phiên bản mới; bản cũ được giữ lại.">
       <form onSubmit={submit} className="space-y-4 text-xs">
+        {studioFilm && (
+          <div className="rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10 p-3 space-y-2">
+            <p className="text-emerald-800 dark:text-emerald-300">
+              Studio đã gửi <b>{studioFilm.fileName}</b> ({studioFilm.version}) qua email.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <a href={studioFilm.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold text-emerald-700 dark:text-emerald-300 hover:underline">
+                <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" /> Xem phim
+              </a>
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  setMethod('REMOTE_FILE');
+                  setUrl(studioFilm.url);
+                }}
+              >
+                Dùng link này
+              </Button>
+            </div>
+          </div>
+        )}
         <div role="radiogroup" aria-label="Cách giao" className="grid grid-cols-3 gap-2">
           {METHODS.map((m) => (
             <button
