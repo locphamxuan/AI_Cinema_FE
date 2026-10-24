@@ -136,22 +136,17 @@ export function localizeApiError(
   ) {
     return APPLICATION_MESSAGES.MSG03.message;
   }
-  if (
-    normalized.includes('not found') ||
-    normalized.includes('does not exist') ||
-    normalized.includes('could not be found')
-  ) {
-    return APPLICATION_MESSAGES.MSG10.message;
-  }
-  if (normalized === 'an unexpected error occurred') return APPLICATION_MESSAGES.MSG18.message;
-
+  // Session, rate limit and server faults read the same whatever the server said, and never leak internals.
   if (status === 429) return APPLICATION_MESSAGES.MSG19.message;
   if (status === 401 && endpoint.includes('/auth/login')) return APPLICATION_MESSAGES.MSG05.message;
   if (status === 401) return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+  if (status >= 500) return APPLICATION_MESSAGES.MSG18.message;
+
+  // Any other business rule the backend explains (a refused hand-off, a Submission in the wrong state, …)
+  // reaches the user as is; the generic wording only stands in when the backend gave no reason.
+  if (message) return message;
   if (status === 403) return APPLICATION_MESSAGES.MSG09.message;
   if (status === 404) return APPLICATION_MESSAGES.MSG10.message;
   if (status === 400 || status === 422) return APPLICATION_MESSAGES.MSG03.message;
-  if (status >= 500) return APPLICATION_MESSAGES.MSG18.message;
-
-  return message || `HTTP error! status: ${status}`;
+  return `HTTP error! status: ${status}`;
 }

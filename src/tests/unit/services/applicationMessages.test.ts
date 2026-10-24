@@ -32,6 +32,29 @@ describe('application messages', () => {
     ).toBe(APPLICATION_MESSAGES.MSG03.message);
   });
 
+  it('keeps the reason of any other business rule the backend refuses', () => {
+    const handoff = 'Episodes 2 have no delivery deadline or one already past; the Reviewer must set it first';
+    expect(localizeApiError(handoff, 409, undefined, '/projects/m1/handoff')).toBe(handoff);
+    expect(localizeApiError('Only a failed delivery can be processed again', 400, undefined, '/media/a1/retry')).toBe(
+      'Only a failed delivery can be processed again',
+    );
+    expect(localizeApiError('Season not found in this project', 404, undefined, '/projects/m1/handoff')).toBe(
+      'Season not found in this project',
+    );
+  });
+
+  it('never shows what the server said about a session, rate limit or server fault', () => {
+    expect(localizeApiError('Invalid refresh token', 401, undefined, '/auth/refresh')).toBe(
+      'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+    );
+    expect(localizeApiError('ThrottlerException: Too Many Requests', 429, undefined, '/movies')).toBe(
+      APPLICATION_MESSAGES.MSG19.message,
+    );
+    expect(localizeApiError('relation "users" does not exist', 500, undefined, '/movies')).toBe(
+      APPLICATION_MESSAGES.MSG18.message,
+    );
+  });
+
   it('uses Vietnamese fallbacks for common HTTP statuses', () => {
     expect(localizeApiError(undefined, 403, undefined, '/projects')).toBe(APPLICATION_MESSAGES.MSG09.message);
     expect(localizeApiError(undefined, 404, undefined, '/movies/missing')).toBe(APPLICATION_MESSAGES.MSG10.message);
