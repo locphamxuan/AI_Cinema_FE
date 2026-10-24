@@ -298,14 +298,14 @@ export function ProjectListPage() {
                         </div>
 
                         {/* Bottom Overlay Badges */}
-                        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-center justify-between z-10">
-                          <span className="text-white text-[11px] font-bold px-2 py-0.5 rounded-lg bg-white/20 backdrop-blur-md border border-white/20">
+                        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/95 via-black/60 to-transparent flex items-center justify-between z-10">
+                          <span className="text-white text-[11px] font-bold px-2 py-0.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/15 shadow-sm">
                             {episodeCount} tập
                           </span>
                           {p.lastActivityAt && (
-                            <span className="text-white/70 text-[10px] font-medium flex items-center gap-1">
-                              <Clock className="w-3 h-3 text-white/60" />
-                              {formatDateTime(p.lastActivityAt)}
+                            <span className="text-white text-[11px] font-semibold px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 shadow-md flex items-center gap-1.5">
+                              <Clock className="w-3.5 h-3.5 text-purple-300 shrink-0" />
+                              <span>{formatDateTime(p.lastActivityAt)}</span>
                             </span>
                           )}
                         </div>
