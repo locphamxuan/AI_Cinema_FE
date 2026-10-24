@@ -7,7 +7,8 @@ import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { productionService } from '@/services/productionService';
-import type { MediaAsset } from '@/types/production';
+import { studioService } from '@/services/studioService';
+import type { MediaAsset, StudioHandoff } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
 import { DELIVERY_PROJECT, SUBMITTABLE_EPISODE, holdsEpisode, isIn, projectCapabilities } from '../../lib/capabilities';
@@ -26,6 +27,13 @@ const IN_PROGRESS = ['PENDING', 'DOWNLOADING', 'TRANSCODING', 'VALIDATING'];
 
 const inProgress = (versions: MediaAsset[] | null) => !!versions?.some((v) => IN_PROGRESS.includes(v.ingestStatus));
 
+/** The newest link the studio mailed for the episode, across every hand-off of the project. */
+const latestFilmLink = (handoffs: StudioHandoff[] | null, episodeId: string) =>
+  handoffs
+    ?.flatMap((h) => h.filmLinks)
+    .filter((link) => link.episodeId === episodeId)
+    .sort((a, b) => b.sentAt.localeCompare(a.sentAt))[0];
+
 /** One episode end to end: deliveries, review sheet, label, compliance and release. */
 export function EpisodePage() {
   const { projectId, episodeId } = useParams<{ projectId: string; episodeId: string }>();
@@ -35,6 +43,7 @@ export function EpisodePage() {
 
   const project = useResource(`project:${projectId}`, () => productionService.getProject(projectId));
   const media = useResource(`media:${episodeId}`, () => productionService.listMedia(episodeId));
+  const handoffs = useResource(`handoffs:${projectId}`, () => studioService.listHandoffs(projectId));
   const [picked, setPicked] = useState<string | null>(null);
   const { busy, run } = useAction();
 
@@ -142,6 +151,7 @@ export function EpisodePage() {
               title={caps.lead ? 'Upload Submission Studio giao' : 'Gửi tập lên Creator chính (upload Submission)'}
               deliver={deliverAsCreator(episode.id)}
               onDelivered={refreshAll}
+              studioFilm={latestFilmLink(handoffs.data, episode.id)}
             />
           )}
 

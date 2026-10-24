@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, FileText } from 'lucide-react';
+import { Download, ExternalLink, FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { seasonLabel } from '@/lib/seasonLabel';
@@ -77,6 +77,35 @@ export function HandoffCard({
           {h.filmSentNote ?? 'Studio đã gửi phim qua email.'} · {formatDateTime(h.filmSentAt)}
           {h.milestoneStatus !== 'DELIVERED' && ' · Chờ Creator upload Submission.'}
         </p>
+      )}
+      {h.filmLinks.length > 0 && (
+        <div>
+          <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Phim Studio đã gửi</p>
+          <ul className="space-y-1">
+            {h.filmLinks.map((link) => (
+              <li key={link.id} className="flex items-center gap-2">
+                <Link
+                  href={productionPaths.episode(base, movieId, link.episodeId)}
+                  className="shrink-0 font-medium text-purple-600 dark:text-purple-300 hover:underline"
+                >
+                  Tập {link.episode.episodeNumber}
+                </Link>
+                <span className="flex-1 min-w-0 truncate">
+                  {link.fileName} <span className="text-slate-400">· {link.version} · {formatDateTime(link.sentAt)}</span>
+                </span>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Xem phim tập ${link.episode.episodeNumber}`}
+                  className="text-slate-500 hover:text-purple-600"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <div>
