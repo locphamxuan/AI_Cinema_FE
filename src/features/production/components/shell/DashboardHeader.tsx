@@ -73,10 +73,13 @@ export function DashboardHeader() {
         {/* Right controls */}
         <div className="flex items-center gap-2 shrink-0">
           {user && (
-            <div className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r ${gradient} text-xs shadow-sm`}>
-              <div className="w-1.5 h-1.5 rounded-full bg-white/70" />
-              <span className="font-semibold text-white">{ROLE_LABEL[user.role ?? 'user']}</span>
-            </div>
+            <span
+              aria-label="Vai trò của tài khoản"
+              className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r ${gradient} text-xs font-semibold text-white shadow-sm`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-white/70" aria-hidden="true" />
+              {ROLE_LABEL[user.role ?? 'user']}
+            </span>
           )}
           {user && <NotificationMenu />}
           <ThemeToggle />

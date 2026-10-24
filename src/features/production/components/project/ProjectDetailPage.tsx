@@ -51,6 +51,15 @@ const BASE_GRADIENT: Record<string, string> = {
   '/admin': 'from-violet-800 via-purple-700 to-violet-900',
 };
 
+function MetaChip({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
+      <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">{label}</span>
+      <span className="font-bold text-white text-sm leading-tight">{value}</span>
+    </div>
+  );
+}
+
 /** One movie project, for its Reviewer, its Creator and the Admin; actions follow role, ownership and status. */
 export function ProjectDetailPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -119,7 +128,8 @@ export function ProjectDetailPage() {
                   </div>
                   <div>
                     <h1 className="text-2xl font-black text-white tracking-tight leading-none">{data.title}</h1>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                    <div aria-label="Trạng thái dự án, mùa và tập" className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                      <span className="text-[11px] text-white/70">Dự án</span>
                       <StatusPill {...MOVIE_STATUS[data.status]} />
                       {data.seasons.map((season) => (
                         <span key={season.id} className="inline-flex items-center gap-1 text-[11px] text-white/70">
@@ -136,26 +146,12 @@ export function ProjectDetailPage() {
                 )}
               </div>
 
-              {/* Meta chips */}
               <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
-                  <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">Reviewer</span>
-                  <span className="font-bold text-white text-sm leading-tight">{data.reviewer.fullName}</span>
-                </div>
-                <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
-                  <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">Creator chính</span>
-                  <span className="font-bold text-white text-sm leading-tight">{data.creator?.fullName ?? 'Chưa giao'}</span>
-                </div>
-                {caps.creator && (
-                  <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
-                    <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">Vai trò của bạn</span>
-                    <span className="font-bold text-white text-sm leading-tight">{caps.lead ? 'Creator chính' : 'Creator phụ'}</span>
-                  </div>
-                )}
-                <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
-                  <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">Quy mô</span>
-                  <span className="font-black text-white text-sm font-mono">{data.seasons.length} mùa · {totalEpisodes} tập</span>
-                </div>
+                <MetaChip label="Reviewer" value={data.reviewer.fullName} />
+                <MetaChip label="Creator chính" value={data.creator?.fullName ?? 'Chưa giao'} />
+                {caps.creator && <MetaChip label="Vai trò của bạn" value={caps.lead ? 'Creator chính' : 'Creator phụ'} />}
+                <MetaChip label="Studio" value={data.studio?.name ?? 'Chưa chọn'} />
+                <MetaChip label="Quy mô" value={`${data.seasons.length} mùa · ${totalEpisodes} tập`} />
               </div>
             </div>
           </div>

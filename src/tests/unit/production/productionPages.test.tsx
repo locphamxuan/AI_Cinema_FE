@@ -144,9 +144,9 @@ describe('ProjectListPage', () => {
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
 
-    const row = (await screen.findByText('Mưa Sài Gòn')).closest('tr')!;
-    expect(within(row).getByText('Studio đang sản xuất')).toBeInTheDocument();
-    expect(within(row).getByText('Studio Sao Mai')).toBeInTheDocument();
+    const card = (await screen.findByText('Mưa Sài Gòn')).closest('li')!;
+    expect(within(card).getByText('Studio đang sản xuất')).toBeInTheDocument();
+    expect(within(card).getByText('Studio Sao Mai')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Tạo dự án/ })).toBeInTheDocument();
   });
 
@@ -157,6 +157,7 @@ describe('ProjectListPage', () => {
     render(<ProjectListPage />);
 
     await screen.findByText('Mưa Sài Gòn');
+    await userEvent.click(screen.getByRole('button', { name: 'Xem dạng bảng' }));
     const header = screen.getByRole('columnheader', { name: 'Cập nhật lần cuối' });
     expect(header).toHaveAttribute('title', expect.stringContaining('thay đổi gần nhất'));
     // The newest content event (14/10), not the project's own update time (01/10).

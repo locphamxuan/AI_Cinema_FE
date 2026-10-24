@@ -30,6 +30,7 @@ export interface ProjectSummary {
   id: string;
   title: string;
   status: MovieStatus;
+  posterUrl: string | null;
   studio: Studio | null;
   reviewerId: string;
   creatorId: string | null;
