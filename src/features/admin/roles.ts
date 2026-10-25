@@ -29,5 +29,6 @@ export const PERMISSION_AREA_LABEL: Record<string, string> = {
   review: 'Kiểm duyệt nội dung',
   publishing: 'Phát hành',
   catalog: 'Danh mục',
+  advertising: 'Quảng cáo (MF-3)',
   administration: 'Quản trị',
 };

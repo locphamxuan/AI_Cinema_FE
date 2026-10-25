@@ -47,7 +47,7 @@ export interface AccessDecision {
   planCode?: string;
   accessMethods: AccessMethod[];
   required: AccessRequired;
-  /** What the player loads (HLS or MP4); only present when access is granted. */
+  /** @deprecated Bypasses Main Flow 3 (ads, stream limit, progress); players open a playback session instead. */
   streamUrl?: string;
   nextAction: NextAction;
 }
