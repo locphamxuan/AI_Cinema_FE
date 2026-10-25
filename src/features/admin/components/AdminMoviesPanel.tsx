@@ -2,13 +2,16 @@
 
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, Coins, Eye, Film, Heart, ShoppingCart } from 'lucide-react';
+import { ChevronDown, ChevronRight, Coins, Eye, Film, Heart, Megaphone, ShoppingCart } from 'lucide-react';
 import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
 import { useResource } from '@/features/production/hooks/useResource';
 import { formatNumber } from '@/features/production/lib/format';
 import { productionPaths } from '@/features/production/lib/routes';
 import { filmReportService } from '@/services/filmReportService';
+import { useCan } from '@/hooks/useCan';
+import { PERMISSION } from '@/lib/permissions';
 import type { FilmFigures } from '@/types/film-report';
+import { EpisodeAdSlotsModal } from './EpisodeAdSlotsModal';
 
 const STAT = 'inline-flex items-center gap-1 font-mono';
 
@@ -22,6 +25,8 @@ export function AdminMoviesPanel() {
   const genreId = chosen ?? genres.data?.[0]?.id ?? null;
   const films = useResource(genreId ? `admin:films:${genreId}` : null, () => filmReportService.movies(genreId!));
   const [open, setOpen] = useState<string | null>(null);
+  const [adsOf, setAdsOf] = useState<{ id: string; label: string } | null>(null);
+  const can = useCan();
   const rows = films.data ?? [];
   const total = (key: 'likeCount' | 'viewCount' | 'purchases' | 'coinsEarned') => rows.reduce((n, f) => n + f[key], 0);
 
@@ -76,7 +81,13 @@ export function AdminMoviesPanel() {
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                   {rows.map((film) => (
-                    <FilmRow key={film.id} film={film} expanded={open === film.id} onToggle={() => setOpen(open === film.id ? null : film.id)} />
+                    <FilmRow
+                      key={film.id}
+                      film={film}
+                      expanded={open === film.id}
+                      onToggle={() => setOpen(open === film.id ? null : film.id)}
+                      onAds={can(PERMISSION.AD_MANAGE) ? setAdsOf : undefined}
+                    />
                   ))}
                 </tbody>
               </table>
@@ -84,11 +95,20 @@ export function AdminMoviesPanel() {
           )}
         </Panel>
       )}
+      {adsOf && <EpisodeAdSlotsModal episode={adsOf} onClose={() => setAdsOf(null)} />}
     </div>
   );
 }
 
-function FilmRow({ film, expanded, onToggle }: { film: FilmFigures; expanded: boolean; onToggle: () => void }) {
+interface FilmRowProps {
+  film: FilmFigures;
+  expanded: boolean;
+  onToggle: () => void;
+  /** Present for an account allowed to place the episode's ads (BR-32). */
+  onAds?: (episode: { id: string; label: string }) => void;
+}
+
+function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
   const many = film.episodes.length > 1;
   return (
     <Fragment>
@@ -140,6 +160,7 @@ function FilmRow({ film, expanded, onToggle }: { film: FilmFigures; expanded: bo
                   <th className="py-1.5 text-right">Lượt xem</th>
                   <th className="py-1.5 text-right">Lượt mua</th>
                   <th className="py-1.5 pr-0 text-right">Coin nhận được</th>
+                  {onAds && <th className="py-1.5 pl-3 text-right">Quảng cáo</th>}
                 </tr>
               </thead>
               <tbody>
@@ -153,6 +174,17 @@ function FilmRow({ film, expanded, onToggle }: { film: FilmFigures; expanded: bo
                       {formatNumber(e.coinsEarned)}
                       {e.refundedCoins > 0 && <span className="text-rose-500"> (hoàn {formatNumber(e.refundedCoins)})</span>}
                     </td>
+                    {onAds && (
+                      <td className="py-1.5 pl-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => onAds({ id: e.id, label: `${film.title} - Tập ${e.episodeNumber}` })}
+                          className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 font-semibold cursor-pointer"
+                        >
+                          <Megaphone className="w-3 h-3" /> Đặt vị trí
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
