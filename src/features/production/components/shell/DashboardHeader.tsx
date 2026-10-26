@@ -19,14 +19,10 @@ const AREA_ICON: Record<Area, React.ElementType> = {
   admin: Sparkles,
 };
 
-const AREA_GRADIENT: Record<Area, string> = {
-  creator: 'from-blue-600 to-purple-600',
-  reviewer: 'from-emerald-600 to-teal-500',
-  staff: 'from-amber-500 to-orange-500',
-  admin: 'from-purple-600 to-violet-500',
-};
-
-/** Slim top bar of every internal area: where you are, notifications, theme and the account menu. */
+/**
+ * Slim top bar of every internal area: where you are, notifications, theme and the account menu.
+ * Every role shares the brand colours; the role shows only in its badge.
+ */
 export function DashboardHeader() {
   const pathname = usePathname();
   const router = useRouter();
@@ -47,25 +43,22 @@ export function DashboardHeader() {
   };
 
   const AreaIcon = AREA_ICON[area] ?? Film;
-  const gradient = AREA_GRADIENT[area] ?? 'from-purple-600 to-violet-500';
 
   return (
-    <header className="bg-white/95 dark:bg-[#12141A]/95 backdrop-blur-md border-b border-slate-200/60 dark:border-white/[0.08] sticky top-0 z-30 w-full transition-colors shadow-sm">
+    <header className="bg-white/95 dark:bg-[#0F1C27]/95 backdrop-blur-md border-b border-sky-100 dark:border-white/[0.08] sticky top-0 z-30 w-full transition-colors">
       <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
         {/* Logo + Area */}
         <Link href={AREAS[area].path} className="flex items-center gap-3 min-w-0 group">
-          <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-200`}>
-            <AreaIcon className="w-4.5 h-4.5 text-white" aria-hidden="true" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center shrink-0">
+            <AreaIcon className="w-4 h-4 text-white" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <span className="text-sm font-bold text-slate-900 dark:text-white tracking-tight leading-none block">
-              AI Cinema
-            </span>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 leading-none">{AREAS[area].label}</span>
+            <span className="text-sm font-semibold text-slate-900 dark:text-white leading-tight block">AI Cinema</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">{AREAS[area].label}</span>
           </div>
           {oversight && (
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
-              Giám sát
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-500/10 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-500/20">
+              Chế độ giám sát
             </span>
           )}
         </Link>
@@ -75,9 +68,9 @@ export function DashboardHeader() {
           {user && (
             <span
               aria-label="Vai trò của tài khoản"
-              className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gradient-to-r ${gradient} text-xs font-semibold text-white shadow-sm`}
+              className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 text-xs font-semibold text-sky-800 dark:text-sky-200"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-white/70" aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full bg-coral-500" aria-hidden="true" />
               {ROLE_LABEL[user.role ?? 'user']}
             </span>
           )}
