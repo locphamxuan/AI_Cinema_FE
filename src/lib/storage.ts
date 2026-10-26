@@ -11,6 +11,8 @@ export const STORAGE_KEYS = {
   SUBSCRIPTION_DATA: 'ai_cinema_subscription_data',
   /** UUID v4 that owns a guest's playback session (X-Guest-Key). */
   GUEST_KEY: 'ai_cinema_guest_key',
+  /** UUID v4 of this browser, sent as X-Device-Id when a member plays (MF-4). */
+  DEVICE_ID: 'ai_cinema_device_id',
 } as const;
 
 export const storage = {

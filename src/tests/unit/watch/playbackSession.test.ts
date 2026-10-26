@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { guestKey, playbackService, uuidV4 } from '@/services/playbackService';
+import { browserName, deviceKey, guestKey, playbackService, uuidV4 } from '@/services/playbackService';
 import { adAdminService, adSlotProblem } from '@/services/adAdminService';
 import { cuesReached } from '@/components/watch/useAdBreaks';
 import { resumePointOf } from '@/components/watch/usePlaybackSession';
@@ -36,7 +36,7 @@ describe('MF-3 playback session', () => {
     expect(guestKey()).toBe(key);
   });
 
-  it('opens a guest session with X-Guest-Key and a member one without it', async () => {
+  it('opens a guest session with X-Guest-Key and a member one from this browser as a device', async () => {
     const fetchMock = mockFetch({ body: { sessionId: 's1' }, status: 201 }, { body: { sessionId: 's2' }, status: 201 });
 
     await playbackService.openSession('ep-1', 'k1');
@@ -51,6 +51,20 @@ describe('MF-3 playback session', () => {
     const memberInit = fetchMock.mock.calls[1][1];
     expect(headerOf(memberInit, 'X-Guest-Key')).toBeUndefined();
     expect(headerOf(memberInit, 'Authorization')).toBe('Bearer token');
+    // MF-4: a member plays from a registered device; a guest never sends one.
+    expect(headerOf(guestInit, 'X-Device-Id')).toBeUndefined();
+    expect(headerOf(memberInit, 'X-Device-Id')).toBe(deviceKey());
+    expect(JSON.parse(memberInit.body)).toEqual({ episodeId: 'ep-1', deviceName: expect.any(String), devicePlatform: 'WEB' });
+  });
+
+  it('keeps one device id per browser and names the browser for the device list', () => {
+    expect(deviceKey()).toMatch(UUID_V4);
+    expect(deviceKey()).toBe(deviceKey());
+    const chrome = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
+    expect(browserName(chrome)).toBe('Chrome trên Windows');
+    expect(browserName(`${chrome} Edg/130.0`)).toBe('Edge trên Windows');
+    expect(browserName('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Version/17.0 Mobile/15E148 Safari/604.1')).toBe('Safari trên iOS');
+    expect(browserName('curl/8.0')).toBe('Trình duyệt');
   });
 
   it('reports the playhead on heartbeat, ad start and stop', async () => {
