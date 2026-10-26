@@ -27,7 +27,7 @@ export function LabelPreview({ text, location }: { text: string; location: Label
       aria-label={`Xem trước nhãn AI: ${text}`}
       className="relative aspect-video w-full max-w-xs rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 overflow-hidden"
     >
-      <span className={`absolute ${POSITION[location]} max-w-[80%] rounded bg-black/70 px-2 py-1 text-[10px] font-semibold text-white`}>{text}</span>
+      <span className={`absolute ${POSITION[location]} max-w-[80%] rounded bg-black/70 px-2 py-1 text-xs font-semibold text-white`}>{text}</span>
     </div>
   );
 }
@@ -60,7 +60,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
 
   return (
     <Panel
-      title="Nhãn nội dung AI (BR-40)"
+      title="Nhãn nội dung AI"
       description={label ? `Theo chính sách: ${label.policy.name}` : 'Bước 10 - người xem thấy nhãn này trên mọi màn hình phát video.'}
       actions={
         canAct &&

@@ -65,7 +65,7 @@ export function AdsPanel() {
                 <p className="text-slate-500">
                   {ad.durationSeconds} giây · trọng số {ad.weight} · {ad.validFrom || ad.validTo ? `${formatDay(ad.validFrom)} → ${formatDay(ad.validTo)}` : 'không giới hạn ngày'}
                 </p>
-                <a href={ad.mediaUrl} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline break-all">
+                <a href={ad.mediaUrl} target="_blank" rel="noopener noreferrer" className="text-sky-700 hover:underline break-all">
                   {ad.mediaUrl}
                 </a>
               </div>

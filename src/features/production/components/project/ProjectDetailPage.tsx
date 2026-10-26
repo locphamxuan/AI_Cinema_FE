@@ -45,17 +45,12 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]['key'];
 
-const BASE_GRADIENT: Record<string, string> = {
-  '/creator': 'from-blue-800 via-blue-700 to-purple-800',
-  '/reviewer': 'from-emerald-800 via-teal-700 to-emerald-900',
-  '/admin': 'from-violet-800 via-purple-700 to-violet-900',
-};
-
-function MetaChip({ label, value }: { label: string; value: string }) {
+/** Who and what the project involves, read at a glance under its title. */
+function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="px-4 py-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/15 text-center min-w-[90px]">
-      <span className="text-white/50 block text-[10px] font-semibold uppercase tracking-wider">{label}</span>
-      <span className="font-bold text-white text-sm leading-tight">{value}</span>
+    <div className="min-w-0">
+      <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+      <dd className="text-sm font-semibold text-slate-900 dark:text-white truncate">{value}</dd>
     </div>
   );
 }
@@ -85,7 +80,7 @@ export function ProjectDetailPage() {
     return (
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-4">
         <ErrorNote message={project.error ?? 'Không tìm thấy dự án.'} onRetry={project.reload} />
-        <Link href={productionPaths.list(base)} className="text-xs text-purple-600 hover:underline">
+        <Link href={productionPaths.list(base)} className="text-xs text-sky-700 hover:underline">
           ← Về danh sách dự án
         </Link>
       </main>
@@ -95,100 +90,70 @@ export function ProjectDetailPage() {
   const data = project.data;
   const caps = projectCapabilities(data, userId, can);
   const totalEpisodes = data.seasons.reduce((n, s) => n + s.episodes.length, 0);
-  const heroGradient = BASE_GRADIENT[base] ?? 'from-purple-800 via-violet-700 to-purple-900';
 
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
       <main className="w-full">
-        {/* ── Cinematic Hero Header ── */}
-        <div className={`relative bg-gradient-to-br ${heroGradient} overflow-hidden`}>
-          <div
-            className="absolute inset-0 opacity-[0.05]"
-            style={{
-              backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 58px, white 58px, white 60px),
-                repeating-linear-gradient(0deg, transparent, transparent 58px, white 58px, white 60px)`,
-            }}
-          />
-          <div className="absolute -top-20 right-1/3 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 -left-16 w-64 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-
-          <div className="relative z-10 px-6 lg:px-8 pt-5 pb-6 space-y-4">
+        <div className="bg-white dark:bg-[#0F1C27] border-b border-sky-100 dark:border-white/10">
+          <div className="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-coral-400" aria-hidden="true" />
+          <div className="px-6 lg:px-8 pt-4 pb-5 space-y-4">
             <Link
               href={productionPaths.list(base)}
-              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/50 hover:text-white/90 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-700 dark:text-sky-300 hover:underline"
             >
-              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Quay lại danh sách dự án
+              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Danh sách dự án
             </Link>
 
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-lg">
-                    <Film className="w-5.5 h-5.5 text-white" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-black text-white tracking-tight leading-none">{data.title}</h1>
-                    <div aria-label="Trạng thái dự án, mùa và tập" className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                      <span className="text-[11px] text-white/70">Dự án</span>
-                      <StatusPill {...MOVIE_STATUS[data.status]} />
-                      {data.seasons.map((season) => (
-                        <span key={season.id} className="inline-flex items-center gap-1 text-[11px] text-white/70">
-                          → {seasonName(season.seasonNumber, season.episodes.length)} <StatusPill {...SEASON_STATUS[season.status]} />
-                        </span>
-                      ))}
-                    </div>
-                  </div>
+            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5">
+              <div className="space-y-2 min-w-0">
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">{data.title}</h1>
+                <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
+                  <span className="inline-flex items-center gap-1.5">
+                    Dự án <StatusPill {...MOVIE_STATUS[data.status]} />
+                  </span>
+                  {data.seasons.map((season) => (
+                    <span key={season.id} className="inline-flex items-center gap-1.5">
+                      {seasonName(season.seasonNumber, season.episodes.length)} <StatusPill {...SEASON_STATUS[season.status]} />
+                    </span>
+                  ))}
                 </div>
                 {(data.synopsis || data.ideaDescription) && (
-                  <p className="text-white/55 text-sm line-clamp-2 max-w-2xl leading-relaxed pl-14">
-                    {data.synopsis || data.ideaDescription}
-                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 max-w-3xl leading-relaxed">{data.synopsis || data.ideaDescription}</p>
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                <MetaChip label="Reviewer" value={data.reviewer.fullName} />
-                <MetaChip label="Creator chính" value={data.creator?.fullName ?? 'Chưa giao'} />
-                {caps.creator && <MetaChip label="Vai trò của bạn" value={caps.lead ? 'Creator chính' : 'Creator phụ'} />}
-                <MetaChip label="Studio" value={data.studio?.name ?? 'Chưa chọn'} />
-                <MetaChip label="Quy mô" value={`${data.seasons.length} mùa · ${totalEpisodes} tập`} />
-              </div>
+              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3 shrink-0 rounded-xl bg-sky-50/70 dark:bg-white/[0.04] px-5 py-3">
+                <Fact label="Reviewer" value={data.reviewer.fullName} />
+                <Fact label={caps.creator ? (caps.lead ? 'Creator chính (bạn)' : 'Creator chính') : 'Creator chính'} value={data.creator?.fullName ?? 'Chưa giao'} />
+                <Fact label="Studio" value={data.studio?.name ?? 'Chưa chọn'} />
+                <Fact label="Quy mô" value={`${data.seasons.length} mùa, ${totalEpisodes} tập`} />
+              </dl>
             </div>
           </div>
 
-          {/* ── Tab bar ── */}
-          <div className="relative z-10 px-6 lg:px-8 border-t border-white/10">
-            <div
-              role="tablist"
-              aria-label="Mục của dự án"
-              className="flex items-center gap-0.5 overflow-x-auto scrollbar-none"
-            >
-              {tabs.map(({ key, label, icon: Icon }) => (
-                <button
-                  key={key}
-                  type="button"
-                  role="tab"
-                  aria-selected={tab === key}
-                  onClick={() => selectTab(key)}
-                  className={`relative shrink-0 flex items-center gap-2 px-4 py-3 text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                    tab === key
-                      ? 'text-white'
-                      : 'text-white/40 hover:text-white/80'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" aria-hidden="true" />
-                  {key === 'changes' && caps.creator ? 'Đề xuất cho Reviewer & Admin' : label}
-                  {key === 'changes' && data.openChangeRequests > 0 && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[9px] font-bold">
-                      {data.openChangeRequests}
-                    </span>
-                  )}
-                  {tab === key && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-white rounded-t-full" />
-                  )}
-                </button>
-              ))}
-            </div>
+          <div role="tablist" aria-label="Mục của dự án" className="px-6 lg:px-8 flex items-center gap-1 overflow-x-auto scrollbar-none">
+            {tabs.map(({ key, label, icon: Icon }) => (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={tab === key}
+                onClick={() => selectTab(key)}
+                className={`shrink-0 flex items-center gap-2 px-4 py-3 text-sm border-b-2 whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:bg-sky-50 ${
+                  tab === key
+                    ? 'border-sky-500 text-sky-800 dark:text-sky-200 font-semibold'
+                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                <Icon className="w-4 h-4" aria-hidden="true" />
+                {key === 'changes' && caps.creator ? 'Đề xuất cho Reviewer và Admin' : label}
+                {key === 'changes' && data.openChangeRequests > 0 && (
+                  <span className="px-1.5 rounded-full bg-coral-500 text-white text-xs font-semibold tabular-nums" title="Đề xuất đang chờ">
+                    {data.openChangeRequests}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
         </div>
 

@@ -13,7 +13,7 @@ import { useProject } from './ProjectContext';
 function CreatorSelect({ value, onChange, exclude }: { value: string; onChange: (id: string) => void; exclude: string[] }) {
   const directory = useResource('creator-directory', () => teamService.directory());
   return (
-    <select value={value} onChange={(e) => onChange(e.target.value)} required className={fieldInputClass} aria-label="Content Creator">
+    <select value={value} onChange={(e) => onChange(e.target.value)} required className={fieldInputClass} aria-label="Creator">
       <option value="" disabled>
         {directory.loading ? 'Đang tải…' : 'Chọn Creator'}
       </option>
@@ -45,9 +45,9 @@ export function AddCreatorModal({ seats, onClose, onDone }: { seats: CreatorSeat
   };
 
   return (
-    <Modal open onClose={onClose} title="Thêm Content Creator" subtitle="Creator mới cùng làm dự án; giao tập riêng cho họ ở bảng Tập phim.">
+    <Modal open onClose={onClose} title="Thêm Creator" subtitle="Creator mới cùng làm dự án; giao tập riêng cho họ ở bảng Tập phim.">
       <form onSubmit={submit} className="space-y-4">
-        <FormField label="Content Creator">
+        <FormField label="Creator">
           <CreatorSelect value={creatorId} onChange={setCreatorId} exclude={taken} />
         </FormField>
         <FormField label="Ghi chú (không bắt buộc)">

@@ -36,7 +36,7 @@ export function TeamTab() {
 
   return (
     <Panel
-      title="Phân công Content Creator"
+      title="Phân công Creator"
       description="Một dự án có thể có nhiều Creator. Reviewer thêm Creator và giao từng tập; Creator có thể uỷ quyền các tập của mình cho Creator khác."
       actions={
         <>
@@ -55,7 +55,7 @@ export function TeamTab() {
     >
       {team.error && <ErrorNote message={team.error} onRetry={team.reload} />}
       {team.loading && !team.data && <Loading />}
-      {!team.loading && seats.length === 0 && <Empty>Chưa giao Content Creator cho dự án.</Empty>}
+      {!team.loading && seats.length === 0 && <Empty>Dự án chưa có Creator nào.</Empty>}
       {seats.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">

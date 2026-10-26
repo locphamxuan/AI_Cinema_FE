@@ -93,7 +93,7 @@ export function EpisodeRowsEditor({
 
   return (
     <div className="space-y-2">
-      <div aria-hidden="true" className="hidden sm:flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+      <div aria-hidden="true" className="hidden sm:flex items-center gap-2 text-xs font-medium text-slate-500">
         <span className="w-8 shrink-0 text-right">#</span>
         <span style={{ flex: '1 1 10rem', minWidth: '7rem' }}>Tên tập</span>
         <span style={{ flex: '0 0 6.5rem' }}>Thời lượng</span>
@@ -155,7 +155,7 @@ export function EpisodeRowsEditor({
           </Button>
         </div>
       ))}
-      <p className="text-[11px] text-slate-500 pl-10">Hạn giao Studio: ngày Studio phải giao tập (bắt buộc). Dự kiến phát hành: ngày tập dự kiến lên sóng, nằm trong khoảng phát hành của mùa, không trước hạn giao (không bắt buộc, BR-60).</p>
+      <p className="text-[11px] text-slate-500 pl-10">Hạn giao Studio: ngày Studio phải giao tập (bắt buộc). Dự kiến phát hành: ngày tập dự kiến lên sóng, nằm trong khoảng phát hành của mùa, không trước hạn giao (không bắt buộc).</p>
       <Button type="button" size="sm" variant="secondary" onClick={addEpisode}>
         <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm tập
       </Button>

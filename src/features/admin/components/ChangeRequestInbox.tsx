@@ -35,7 +35,7 @@ export function ChangeRequestInbox() {
             onClick={() => setFilter(key)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
               filter === key
-                ? 'bg-purple-600 text-white'
+                ? 'bg-sky-600 text-white'
                 : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10'
             }`}
           >

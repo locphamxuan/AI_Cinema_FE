@@ -23,12 +23,12 @@ export const ROLE_TONE: Record<UserRole, 'purple' | 'emerald' | 'blue' | 'amber'
 
 /** Groups of the permission catalog (AI_Cinema_BE PERMISSION_CATALOG `area`). */
 export const PERMISSION_AREA_LABEL: Record<string, string> = {
-  'movie-project': 'Dự án phim (MF-1)',
+  'movie-project': 'Dự án phim',
   studio: 'Studio sản xuất',
   media: 'Giao tập phim',
   review: 'Kiểm duyệt nội dung',
   publishing: 'Phát hành',
   catalog: 'Danh mục',
-  advertising: 'Quảng cáo (MF-3)',
+  advertising: 'Quảng cáo',
   administration: 'Quản trị',
 };

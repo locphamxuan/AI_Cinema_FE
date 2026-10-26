@@ -99,9 +99,9 @@ export function FeeTab() {
           {ledger.data && (
             <>
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="rounded-xl bg-purple-50 dark:bg-purple-500/10 p-3">
+                <div className="rounded-xl bg-sky-50 dark:bg-sky-500/10 p-3">
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">Tổng phí</p>
-                  <p className="text-lg font-bold text-purple-700 dark:text-purple-300">{formatNumber(ledger.data.totalTokens)} Token</p>
+                  <p className="text-lg font-bold text-sky-800 dark:text-sky-300">{formatNumber(ledger.data.totalTokens)} Token</p>
                 </div>
                 <div className="rounded-xl bg-slate-50 dark:bg-white/5 p-3">
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">Quy đổi theo tỷ giá từng lần ghi</p>
@@ -109,7 +109,7 @@ export function FeeTab() {
                 </div>
               </div>
               {ledger.data.entries.length === 0 ? (
-                <Empty>Chưa cấp phí. Cần cấp phí cho mọi mùa trước khi giao Content Creator (BR-12).</Empty>
+                <Empty>Chưa cấp phí. Cấp phí cho mọi mùa trước khi giao dự án cho Creator.</Empty>
               ) : (
                 <table className="w-full text-xs">
                   <thead className="text-slate-500 dark:text-slate-400 text-left">
@@ -138,7 +138,7 @@ export function FeeTab() {
                           <td className="py-2 hidden md:table-cell text-slate-500">
                             {e.createdBy.fullName}
                             <br />
-                            <span className="text-[10px]">{formatDateTime(e.createdAt)}</span>
+                            <span className="text-xs">{formatDateTime(e.createdAt)}</span>
                           </td>
                         </tr>
                       );
@@ -181,7 +181,7 @@ export function FeeTab() {
               </p>
             )}
             {total === 0 && <p className="text-[11px] text-amber-600">Cấp phí theo đơn giá cho ít nhất một mùa trước.</p>}
-            <FormField label="Lý do (bắt buộc, BR-46)">
+            <FormField label="Lý do (bắt buộc)">
               <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} className={fieldTextareaClass} />
             </FormField>
             <Button type="submit" className="w-full" disabled={!valid || busy}>

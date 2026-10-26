@@ -12,14 +12,14 @@ import { formatDateTime } from '@/features/production/lib/format';
 type Key = { [K in keyof PlatformSettings]-?: PlatformSettings[K] extends number ? K : never }[keyof PlatformSettings];
 
 const FIELDS: { key: Key; label: string; unit: string; hint: string; min: number }[] = [
-  { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Các tập đầu Guest và Member Free xem được (BR-03).', min: 0 },
-  { key: 'tokenRateVnd', label: 'Tỷ giá Token', unit: '₫ / Token', hint: 'Giá trị 1 Token phí sản xuất; áp cho các lần ghi phí từ nay (BR-45).', min: 1 },
-  { key: 'coinRateVnd', label: 'Tỷ giá Coin', unit: '₫ / Coin', hint: 'Giá trị 1 Coin chính (BR-45).', min: 1 },
-  { key: 'episodeCoinPriceMin', label: 'Giá tập thấp nhất', unit: 'Coin', hint: 'Giá ngoài khoảng vẫn lưu được nhưng báo Admin (BR-47).', min: 0 },
+  { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Các tập đầu Guest và Member Free xem được.', min: 0 },
+  { key: 'tokenRateVnd', label: 'Tỷ giá Token', unit: '₫ / Token', hint: 'Giá trị 1 Token phí sản xuất; áp cho các lần ghi phí từ nay.', min: 1 },
+  { key: 'coinRateVnd', label: 'Tỷ giá Coin', unit: '₫ / Coin', hint: 'Giá trị 1 Coin chính.', min: 1 },
+  { key: 'episodeCoinPriceMin', label: 'Giá tập thấp nhất', unit: 'Coin', hint: 'Giá ngoài khoảng vẫn lưu được nhưng báo Admin.', min: 0 },
   { key: 'episodeCoinPriceMax', label: 'Giá tập cao nhất', unit: 'Coin', hint: '', min: 0 },
-  { key: 'bonusCoinExpiryDays', label: 'Hạn Coin thưởng', unit: 'ngày', hint: 'BR-28, BR-52.', min: 1 },
-  { key: 'playbackHeartbeatTimeoutSeconds', label: 'Hết phiên phát', unit: 'giây', hint: 'Không nhận heartbeat quá thời gian này thì đóng luồng (BR-36).', min: 10 },
-  { key: 'subscriptionCancelWindowHours', label: 'Hạn tắt gia hạn', unit: 'giờ', hint: 'Member tắt tự gia hạn trước ngày gia hạn ít nhất ngần này giờ (BR-30).', min: 0 },
+  { key: 'bonusCoinExpiryDays', label: 'Hạn Coin thưởng', unit: 'ngày', hint: 'Coin thưởng hết hạn sau số ngày này kể từ khi nhận.', min: 1 },
+  { key: 'playbackHeartbeatTimeoutSeconds', label: 'Hết phiên phát', unit: 'giây', hint: 'Trình phát không báo tín hiệu quá số giây này thì phiên xem bị đóng.', min: 10 },
+  { key: 'subscriptionCancelWindowHours', label: 'Hạn tắt gia hạn', unit: 'giờ', hint: 'Member tắt tự gia hạn trước ngày gia hạn ít nhất ngần này giờ.', min: 0 },
   { key: 'planRenewalGraceHours', label: 'Thời gian chờ gia hạn lỗi', unit: 'giờ', hint: 'Gia hạn thiếu Coin được thử lại trong ngần này giờ, không có quyền xem; 0 = gói hết hạn ngay.', min: 0 },
   { key: 'newMemberBonusCoins', label: 'Coin thưởng tài khoản mới', unit: 'Coin', hint: '0 = không tặng.', min: 0 },
   { key: 'coinTopUpMinVnd', label: 'Nạp tối thiểu mỗi lần', unit: '₫', hint: '', min: 1000 },
@@ -60,7 +60,7 @@ export function PlatformSettingsPanel() {
   };
 
   return (
-    <section className="bg-white dark:bg-[#141720] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm p-6 space-y-5 max-w-2xl">
+    <section className="bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10 p-6 space-y-5 max-w-2xl">
       <div className="border-b border-slate-100 dark:border-white/5 pb-4">
         <h2 className="text-base font-bold text-slate-900 dark:text-white">Cài đặt nền tảng</h2>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Cập nhật lần cuối: {formatDateTime(current.updatedAt)}</p>
@@ -90,11 +90,11 @@ export function PlatformSettingsPanel() {
             type="checkbox"
             checked={refund ?? current.refundOnRemoval}
             onChange={(e) => setRefund(e.target.checked)}
-            className="mt-0.5 accent-purple-600"
+            className="mt-0.5 accent-sky-600"
           />
           <span>
             <span className="block font-semibold text-slate-800 dark:text-slate-200">Hoàn Coin khi gỡ hẳn tập</span>
-            <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả (BR-52).</span>
+            <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả.</span>
           </span>
         </label>
         {rangeInvalid && <p className="text-rose-600">Giá thấp nhất không được lớn hơn giá cao nhất.</p>}

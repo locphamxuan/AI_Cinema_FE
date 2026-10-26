@@ -92,7 +92,7 @@ export function EpisodePage() {
   return (
     <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       <div className="space-y-2">
-        <Link href={productionPaths.project(base, projectId, 'episodes')} className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-purple-600">
+        <Link href={productionPaths.project(base, projectId, 'episodes')} className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-sky-700">
           <ArrowLeft className="w-3 h-3" aria-hidden="true" /> {project.data.title}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
@@ -148,7 +148,7 @@ export function EpisodePage() {
 
           {canDeliver && (
             <DeliverMediaPanel
-              title={caps.lead ? 'Upload Submission Studio giao' : 'Gửi tập lên Creator chính (upload Submission)'}
+              title={caps.lead ? 'Nộp bản phim Studio giao' : 'Gửi bản phim cho Creator chính'}
               deliver={deliverAsCreator(episode.id)}
               onDelivered={refreshAll}
               studioFilm={latestFilmLink(handoffs.data, episode.id)}

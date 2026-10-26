@@ -38,7 +38,7 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
                 <td className="px-4 py-3">
                   <Link
                     href={href}
-                    className="font-semibold text-slate-900 dark:text-white hover:underline hover:text-purple-600"
+                    className="font-semibold text-slate-900 dark:text-white hover:underline hover:text-sky-700"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {p.title}

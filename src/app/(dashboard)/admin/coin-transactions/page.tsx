@@ -1,4 +1,4 @@
-import { AdminPageFrame } from '@/features/admin/components/AdminSidebar';
+import { AdminPageFrame } from '@/features/admin/components/AdminPageFrame';
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 
 export default function Page() {

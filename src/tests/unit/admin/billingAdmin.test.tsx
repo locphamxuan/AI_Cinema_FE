@@ -69,7 +69,7 @@ describe('Admin MF-2 sections', () => {
     signInAs('admin');
     render(<AdminSidebar />);
     const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
-    for (const label of ['Gói thành viên', 'Đăng ký gói', 'Giao dịch Coin', 'Điểm danh & vòng quay', 'Báo cáo gói']) {
+    for (const label of ['Gói thành viên', 'Giao dịch Coin', 'Điểm danh & vòng quay', 'Báo cáo doanh thu gói']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }
   });

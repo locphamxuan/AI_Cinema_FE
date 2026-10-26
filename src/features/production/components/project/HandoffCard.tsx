@@ -43,7 +43,7 @@ export function HandoffCard({
 }) {
   const status = MILESTONE_STATUS[h.milestoneStatus];
   return (
-    <li className="rounded-xl border border-slate-200 dark:border-white/10 p-4 text-xs space-y-3">
+    <li className="rounded-xl border border-sky-100 dark:border-white/10 p-4 text-xs space-y-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="font-semibold text-slate-900 dark:text-white">
@@ -75,7 +75,7 @@ export function HandoffCard({
       {h.filmSentAt && (
         <p className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-3 py-2">
           {h.filmSentNote ?? 'Studio đã gửi phim qua email.'} · {formatDateTime(h.filmSentAt)}
-          {h.milestoneStatus !== 'DELIVERED' && ' · Chờ Creator upload Submission.'}
+          {h.milestoneStatus !== 'DELIVERED' && ' · Chờ Creator nộp bản phim.'}
         </p>
       )}
       {h.filmLinks.length > 0 && (
@@ -86,7 +86,7 @@ export function HandoffCard({
               <li key={link.id} className="flex items-center gap-2">
                 <Link
                   href={productionPaths.episode(base, movieId, link.episodeId)}
-                  className="shrink-0 font-medium text-purple-600 dark:text-purple-300 hover:underline"
+                  className="shrink-0 font-medium text-sky-700 dark:text-sky-300 hover:underline"
                 >
                   Tập {link.episode.episodeNumber}
                 </Link>
@@ -98,7 +98,7 @@ export function HandoffCard({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Xem phim tập ${link.episode.episodeNumber}`}
-                  className="text-slate-500 hover:text-purple-600"
+                  className="text-slate-500 hover:text-sky-700"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
@@ -149,7 +149,7 @@ export function HandoffCard({
               {event.mediaAsset && (
                 <Link
                   href={productionPaths.episode(base, movieId, event.mediaAsset.episodeId)}
-                  className="text-purple-600 dark:text-purple-300 hover:underline"
+                  className="text-sky-700 dark:text-sky-300 hover:underline"
                 >
                   Submission v{event.mediaAsset.version}
                 </Link>

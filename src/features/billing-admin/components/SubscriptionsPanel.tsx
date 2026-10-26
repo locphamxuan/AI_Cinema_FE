@@ -90,7 +90,7 @@ export function SubscriptionsPanel() {
                   </td>
                   <td className="py-2">
                     {row.plan.name}
-                    {row.source === 'REWARD' && <span className="ml-1 text-[10px] text-purple-600">(vòng quay)</span>}
+                    {row.source === 'REWARD' && <span className="ml-1 text-xs text-sky-700">(vòng quay)</span>}
                   </td>
                   <td className="py-2">
                     <StatusPill {...SUBSCRIPTION_STATUS[row.status]} />

@@ -72,8 +72,8 @@ export function RolePermissionsPanel() {
   if (!draft) return <p className="text-xs text-slate-500 dark:text-slate-400">Đang tải bảng phân quyền…</p>;
 
   return (
-    <section className="bg-white dark:bg-[#141720] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm overflow-hidden">
-      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.01]">
+    <section className="bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
+      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Phân quyền theo vai trò</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
@@ -108,7 +108,7 @@ export function RolePermissionsPanel() {
           {areas.map((area) => (
             <tbody key={area} className="divide-y divide-slate-100 dark:divide-white/5">
               <tr>
-                <th colSpan={BACKEND_ROLES.length + 1} scope="colgroup" className="px-5 pt-4 pb-1.5 text-left text-[11px] font-bold text-purple-600 dark:text-purple-400">
+                <th colSpan={BACKEND_ROLES.length + 1} scope="colgroup" className="px-5 pt-4 pb-1.5 text-left text-[11px] font-bold text-sky-700 dark:text-sky-500">
                   {PERMISSION_AREA_LABEL[area] ?? area}
                 </th>
               </tr>
@@ -118,7 +118,7 @@ export function RolePermissionsPanel() {
                   <tr key={permission.key}>
                     <th scope="row" className="py-2 px-5 text-left font-normal">
                       <p className="text-slate-800 dark:text-slate-200">{permission.description}</p>
-                      <p className="text-[10px] font-mono text-slate-400">{permission.key}</p>
+                      <p className="text-xs font-mono text-slate-400">{permission.key}</p>
                     </th>
                     {BACKEND_ROLES.map((role) => {
                       const isLocked = locked.get(role)?.has(permission.key) ?? false;
@@ -132,7 +132,7 @@ export function RolePermissionsPanel() {
                               checked={draft[role].has(permission.key)}
                               onChange={() => toggle(role, permission.key)}
                               aria-label={`${BACKEND_ROLE_LABEL[role]}: ${permission.description}`}
-                              className="w-4 h-4 accent-purple-600 cursor-pointer"
+                              className="w-4 h-4 accent-sky-600 cursor-pointer"
                             />
                           )}
                         </td>

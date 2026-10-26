@@ -8,7 +8,7 @@ import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import type { Tone } from '../../lib/labels';
 
-export const CARD = 'bg-white dark:bg-[#141720] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-xs';
+export const CARD = 'bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10';
 
 export function StatusPill({ label, tone }: { label: string; tone: Tone }) {
   return (
@@ -34,21 +34,21 @@ export function Panel({
 }) {
   return (
     <section className={`${CARD} ${className}`} aria-label={title}>
-      <header className="flex flex-wrap items-start justify-between gap-2 px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.01]">
-        <div className="min-w-0">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">{title}</h2>
-          {description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{description}</p>}
+      <header className="flex flex-wrap items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-slate-100 dark:border-white/5">
+        <div className="min-w-0 max-w-prose">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-white">{title}</h2>
+          {description && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{description}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </header>
-      <div className="p-6">{children}</div>
+      <div className="px-6 py-5">{children}</div>
     </section>
   );
 }
 
 export function Loading({ label = 'Đang tải…' }: { label?: string }) {
   return (
-    <p className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 py-6 justify-center" role="status">
+    <p className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 py-8 justify-center" role="status">
       <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> {label}
     </p>
   );
@@ -56,7 +56,7 @@ export function Loading({ label = 'Đang tải…' }: { label?: string }) {
 
 export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-4 text-xs text-rose-700 dark:text-rose-300 flex items-center justify-between gap-3">
+    <div role="alert" className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-4 text-sm text-rose-700 dark:text-rose-300 flex items-center justify-between gap-3">
       <span>{message}</span>
       {onRetry && (
         <Button size="sm" variant="secondary" onClick={onRetry}>
@@ -68,18 +68,17 @@ export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () 
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <p className="text-xs text-slate-500 dark:text-slate-400 py-4 text-center">{children}</p>;
+  return <p className="text-sm text-slate-500 dark:text-slate-400 py-8 text-center max-w-prose mx-auto">{children}</p>;
 }
 
-/** Label/value pairs in two columns. */
-/** Label/value pairs; `stacked` keeps one pair per row for narrow side panels. */
+/** Label/value pairs in two columns; `stacked` keeps one pair per row for narrow side panels. */
 export function Facts({ items, stacked = false }: { items: [string, ReactNode][]; stacked?: boolean }) {
   return (
-    <dl className={`grid grid-cols-1 ${stacked ? '' : 'sm:grid-cols-2'} gap-x-6 gap-y-2 text-xs`}>
+    <dl className={`grid grid-cols-1 ${stacked ? '' : 'sm:grid-cols-2'} gap-x-8 gap-y-2.5 text-sm`}>
       {items.map(([label, value]) => (
         <div key={label} className="flex gap-2 min-w-0">
-          <dt className="text-slate-500 dark:text-slate-400 shrink-0 w-32">{label}</dt>
-          <dd className="text-slate-800 dark:text-slate-200 min-w-0 break-words">{value}</dd>
+          <dt className="text-slate-500 dark:text-slate-400 shrink-0 w-36">{label}</dt>
+          <dd className="text-slate-900 dark:text-slate-100 font-medium min-w-0 break-words">{value}</dd>
         </div>
       ))}
     </dl>
@@ -142,7 +141,7 @@ export function TextPromptModal({
           />
         </FormField>
         {required && text.trim().length > 0 && blocked && (
-          <p className="text-[11px] text-amber-600 dark:text-amber-400">Cần ít nhất {minLength} ký tự.</p>
+          <p className="text-xs text-amber-700 dark:text-amber-400">Viết ít nhất {minLength} ký tự.</p>
         )}
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>

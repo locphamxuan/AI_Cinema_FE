@@ -209,7 +209,7 @@ describe('ProjectDetailPage', () => {
     routeFetch({ '/projects/m1': project(), '/projects/m1/handoffs': [] });
     render(<ProjectDetailPage />);
 
-    expect(await screen.findByText(/Gửi brief PDF và file material cho Studio đối tác bên thứ 3 qua email/)).toBeInTheDocument();
+    expect(await screen.findByText(/Gửi brief PDF và tài liệu cho Studio đối tác qua email/)).toBeInTheDocument();
     const tiers = screen.getByLabelText('Trạng thái dự án, mùa và tập');
     expect(tiers).toHaveTextContent('Dự án');
     // The sample season has a single episode: it reads as a whole film.

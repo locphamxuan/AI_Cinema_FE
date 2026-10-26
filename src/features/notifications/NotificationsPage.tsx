@@ -94,11 +94,11 @@ export function NotificationsPage() {
             aria-selected={t.key === tabKey}
             onClick={() => choose(t.key)}
             className={`shrink-0 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer ${
-              t.key === tabKey ? 'bg-white dark:bg-purple-600 text-purple-700 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
+              t.key === tabKey ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             {t.label}
-            {(counts[t.key] ?? 0) > 0 && <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[10px]">{counts[t.key]}</span>}
+            {(counts[t.key] ?? 0) > 0 && <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-xs">{counts[t.key]}</span>}
           </button>
         ))}
       </div>
@@ -121,7 +121,7 @@ export function NotificationsPage() {
                 aria-pressed={sectionKey === s.key}
                 onClick={() => choose(tab.key, s.key)}
                 className={`px-2.5 py-1 rounded-full text-xs border cursor-pointer ${
-                  sectionKey === s.key ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
+                  sectionKey === s.key ? 'bg-sky-600 border-sky-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
                 }`}
               >
                 {s.label}
@@ -137,11 +137,11 @@ export function NotificationsPage() {
             <li key={item.id}>
               <button type="button" onClick={() => open(item)} className="w-full text-left py-3 px-1 hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer">
                 <p className={`text-xs ${item.readAt ? 'text-slate-600 dark:text-slate-400' : 'font-semibold text-slate-900 dark:text-white'}`}>
-                  {!item.readAt && <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-500 mr-1.5 align-middle" />}
+                  {!item.readAt && <span className="inline-block w-1.5 h-1.5 rounded-full bg-sky-500 mr-1.5 align-middle" />}
                   {item.title}
                 </p>
                 {item.body && <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{item.body}</p>}
-                <p className="text-[10px] text-slate-400 mt-1">{formatDateTime(item.createdAt)}</p>
+                <p className="text-xs text-slate-400 mt-1">{formatDateTime(item.createdAt)}</p>
               </button>
             </li>
           ))}

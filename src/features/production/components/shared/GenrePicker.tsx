@@ -47,8 +47,8 @@ export function GenrePicker({ value, onChange }: { value: string[]; onChange: (i
               disabled={!on && value.length >= MAX_GENRES}
               className={`px-2.5 py-1 rounded-full text-xs border transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                 on
-                  ? 'bg-purple-600 border-purple-600 text-white'
-                  : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-purple-400'
+                  ? 'bg-sky-600 border-sky-600 text-white'
+                  : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-sky-400'
               }`}
             >
               {g.name}

@@ -80,14 +80,14 @@ export function NotificationMenu() {
       >
         <Bell className="w-4 h-4" aria-hidden="true" />
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-rose-600 text-white text-xs font-bold flex items-center justify-center">
             {unread > 99 ? '99+' : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 max-h-[70vh] overflow-y-auto rounded-xl bg-white dark:bg-[#161922] border border-slate-200 dark:border-white/10 shadow-lg z-40">
+        <div className="absolute right-0 top-full mt-2 w-80 max-h-[70vh] overflow-y-auto rounded-xl bg-white dark:bg-[#0F1C27] border border-slate-200 dark:border-white/10 shadow-lg z-40">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 dark:border-white/5">
             <p className="text-xs font-semibold text-slate-900 dark:text-white">Thông báo</p>
             <button
@@ -96,12 +96,12 @@ export function NotificationMenu() {
                 setOpen(false);
                 router.push(`/${role === 'creator' ? 'creator' : role === 'admin' ? 'admin' : 'reviewer'}/notifications`);
               }}
-              className="text-[11px] font-medium text-slate-500 hover:text-purple-600 hover:underline cursor-pointer"
+              className="text-[11px] font-medium text-slate-500 hover:text-sky-700 hover:underline cursor-pointer"
             >
               Xem tất cả theo mục
             </button>
             {unread > 0 && (
-              <button type="button" onClick={readAll} className="text-[11px] font-medium text-purple-600 dark:text-purple-400 hover:underline cursor-pointer">
+              <button type="button" onClick={readAll} className="text-[11px] font-medium text-sky-700 dark:text-sky-500 hover:underline cursor-pointer">
                 Đánh dấu đã đọc hết
               </button>
             )}
@@ -117,11 +117,11 @@ export function NotificationMenu() {
                   className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer"
                 >
                   <p className={`text-xs ${item.readAt ? 'text-slate-600 dark:text-slate-400' : 'font-semibold text-slate-900 dark:text-white'}`}>
-                    {!item.readAt && <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-500 mr-1.5 align-middle" />}
+                    {!item.readAt && <span className="inline-block w-1.5 h-1.5 rounded-full bg-sky-500 mr-1.5 align-middle" />}
                     {item.title}
                   </p>
                   {item.body && <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{item.body}</p>}
-                  <p className="text-[10px] text-slate-400 mt-1">{formatDateTime(item.createdAt)}</p>
+                  <p className="text-xs text-slate-400 mt-1">{formatDateTime(item.createdAt)}</p>
                 </button>
               </li>
             ))}

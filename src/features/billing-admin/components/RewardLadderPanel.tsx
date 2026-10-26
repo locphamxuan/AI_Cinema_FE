@@ -137,10 +137,10 @@ function RuleModal({
           </FormField>
         </div>
         {dayTaken && <p className="text-xs text-rose-600">Ngày {day} đã có cấu hình đang dùng; hãy sửa hoặc tắt nó trước.</p>}
-        <p className="text-xs text-purple-700 dark:text-purple-300">{day === LADDER_LENGTH ? 'Ngày 7 sẽ tự động tặng 1 lượt quay.' : 'Lượt quay chỉ được tặng sau 7 ngày điểm danh liên tục.'}</p>
+        <p className="text-xs text-sky-800 dark:text-sky-300">{day === LADDER_LENGTH ? 'Ngày 7 sẽ tự động tặng 1 lượt quay.' : 'Lượt quay chỉ được tặng sau 7 ngày điểm danh liên tục.'}</p>
         {rule && !rule.isActive && (
           <label className="flex items-center gap-2 text-xs">
-            <input type="checkbox" checked={form.isActive} onChange={(e) => set({ isActive: e.target.checked })} className="accent-purple-600" />
+            <input type="checkbox" checked={form.isActive} onChange={(e) => set({ isActive: e.target.checked })} className="accent-sky-600" />
             Kích hoạt lại ngày này
           </label>
         )}

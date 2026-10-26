@@ -27,7 +27,7 @@ export function ActivityTab() {
       <ol className="relative border-l border-slate-200 dark:border-white/10 ml-2 space-y-4">
         {rows.map((ev) => (
           <li key={ev.id} className="ml-4 text-xs">
-            <span className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-purple-500 border-2 border-white dark:border-[#151822]" />
+            <span className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-sky-500 border-2 border-white dark:border-[#151822]" />
             <p className="font-semibold text-slate-800 dark:text-slate-100">{EVENT_LABEL[ev.action] ?? ev.action}</p>
             <p className="text-slate-500 dark:text-slate-400">
               {actorName(ev)} · {formatDateTime(ev.createdAt)}

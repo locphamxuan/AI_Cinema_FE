@@ -50,7 +50,7 @@ export function AdminMoviesPanel() {
               aria-selected={g.id === genreId}
               onClick={() => { setChosen(g.id); setOpen(null); }}
               className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold cursor-pointer ${
-                g.id === genreId ? 'bg-white dark:bg-purple-600 text-purple-700 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
+                g.id === genreId ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
               }`}
             >
               {g.name} <span className="opacity-60">({g.movieCount})</span>
@@ -120,7 +120,7 @@ function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
               onClick={onToggle}
               aria-expanded={expanded}
               aria-label={`${expanded ? 'Ẩn' : 'Xem'} từng tập của ${film.title}`}
-              className="text-slate-400 hover:text-purple-600 cursor-pointer"
+              className="text-slate-400 hover:text-sky-700 cursor-pointer"
             >
               {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
@@ -131,7 +131,7 @@ function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
               <span className="w-9 h-12 rounded-md bg-slate-200 dark:bg-white/10 flex items-center justify-center"><Film className="w-4 h-4 text-slate-400" /></span>
             )}
             <div className="min-w-0">
-              <Link href={productionPaths.project('/admin', film.id, 'episodes')} className="font-semibold text-slate-900 dark:text-white hover:text-purple-600">
+              <Link href={productionPaths.project('/admin', film.id, 'episodes')} className="font-semibold text-slate-900 dark:text-white hover:text-sky-700">
                 {film.title}
               </Link>
               <p className="text-[11px] text-slate-500">
@@ -145,7 +145,7 @@ function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
         <td className="py-3 px-3 text-right"><span className={STAT}><ShoppingCart className="w-3 h-3" />{formatNumber(film.purchases)}</span></td>
         <td className="py-3 px-4 text-right">
           <span className={`${STAT} text-amber-600 font-bold`}><Coins className="w-3 h-3" />{formatNumber(film.coinsEarned)}</span>
-          {film.refundedCoins > 0 && <span className="block text-[10px] text-rose-500">đã hoàn {formatNumber(film.refundedCoins)}</span>}
+          {film.refundedCoins > 0 && <span className="block text-xs text-rose-500">đã hoàn {formatNumber(film.refundedCoins)}</span>}
         </td>
       </tr>
       {expanded && (
@@ -179,7 +179,7 @@ function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
                         <button
                           type="button"
                           onClick={() => onAds({ id: e.id, label: `${film.title} - Tập ${e.episodeNumber}` })}
-                          className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-800 font-semibold cursor-pointer"
+                          className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-800 font-semibold cursor-pointer"
                         >
                           <Megaphone className="w-3 h-3" /> Đặt vị trí
                         </button>

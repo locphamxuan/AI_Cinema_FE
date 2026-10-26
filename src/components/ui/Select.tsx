@@ -129,8 +129,8 @@ export function Select<T extends string = string>({
           disabled
             ? 'opacity-60 cursor-not-allowed bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400'
             : open
-            ? 'bg-white dark:bg-[#131722] border-purple-500 shadow-md shadow-purple-500/10 ring-2 ring-purple-500/20 text-slate-900 dark:text-white'
-            : 'bg-white dark:bg-[#0E1118] hover:bg-slate-50 dark:hover:bg-[#141824] border-slate-200 dark:border-white/10 hover:border-purple-500/40 text-slate-800 dark:text-slate-100'
+            ? 'bg-white dark:bg-[#131722] border-action shadow-md ring-2 ring-action/20 text-slate-900 dark:text-white'
+            : 'bg-white dark:bg-[#0E1118] hover:bg-slate-50 dark:hover:bg-[#141824] border-slate-200 dark:border-white/10 hover:border-action/40 text-slate-800 dark:text-slate-100'
         }`}
       >
         <span className="flex items-center gap-2 truncate">
@@ -143,7 +143,7 @@ export function Select<T extends string = string>({
 
         <ChevronDown
           className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ${
-            open ? 'rotate-180 text-purple-500' : ''
+            open ? 'rotate-180 text-action' : ''
           }`}
           aria-hidden="true"
         />
@@ -155,7 +155,7 @@ export function Select<T extends string = string>({
           id={listboxId}
           role="listbox"
           tabIndex={-1}
-          className={`absolute left-0 top-full mt-1.5 w-full min-w-[170px] z-50 rounded-xl border border-slate-200 dark:border-white/15 bg-white/95 dark:bg-[#121623]/95 backdrop-blur-md shadow-xl shadow-black/20 dark:shadow-purple-950/40 py-1.5 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150 ${menuClassName}`}
+          className={`absolute left-0 top-full mt-1.5 w-full min-w-[170px] z-50 rounded-xl border border-slate-200 dark:border-white/15 bg-white/95 dark:bg-[#121623]/95 backdrop-blur-md shadow-xl shadow-black/20 dark:shadow-black/40 py-1.5 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150 ${menuClassName}`}
         >
           <div className="max-h-60 overflow-y-auto space-y-0.5 px-1 scrollbar-thin">
             {options.map((opt) => {
@@ -172,7 +172,7 @@ export function Select<T extends string = string>({
                     opt.disabled
                       ? 'opacity-40 cursor-not-allowed text-slate-400'
                       : isSelected
-                      ? 'bg-purple-500/15 text-purple-700 dark:text-purple-300 font-semibold'
+                      ? 'bg-action/10 text-action-strong dark:text-white font-semibold'
                       : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -185,7 +185,7 @@ export function Select<T extends string = string>({
                   </span>
 
                   {isSelected && (
-                    <Check className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+                    <Check className="w-3.5 h-3.5 text-action shrink-0" />
                   )}
                 </button>
               );

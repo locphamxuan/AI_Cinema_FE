@@ -46,13 +46,13 @@ export function ReviewerTokensPanel() {
                 <tr key={r.id}>
                   <td className="py-2">
                     <p className="font-medium text-slate-900 dark:text-white">
-                      {r.fullName} {!r.isActive && <span className="text-[10px] text-rose-600">(đã khoá)</span>}
+                      {r.fullName} {!r.isActive && <span className="text-xs text-rose-600">(đã khoá)</span>}
                     </p>
                     <p className="text-[11px] text-slate-500">{r.email}</p>
                   </td>
                   <td className="py-2 text-right font-mono">{formatNumber(r.grantedTokens)}</td>
                   <td className="py-2 text-right font-mono hidden sm:table-cell">{formatNumber(r.allocatedTokens)}</td>
-                  <td className="py-2 text-right font-mono font-semibold text-purple-700 dark:text-purple-300">{formatNumber(r.balanceTokens)}</td>
+                  <td className="py-2 text-right font-mono font-semibold text-sky-800 dark:text-sky-300">{formatNumber(r.balanceTokens)}</td>
                   <td className="py-2 text-right whitespace-nowrap">
                     <Button size="sm" variant="ghost" aria-label={`Cấp Token cho ${r.fullName}`} onClick={() => setDialog({ reviewer: r, mode: 'GRANT' })}>
                       <PlusCircle className="w-3.5 h-3.5 text-emerald-600" />
