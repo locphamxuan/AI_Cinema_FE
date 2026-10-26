@@ -29,7 +29,7 @@ describe('production routes', () => {
     ['/projects/m1/change-requests', 'reviewer', '/reviewer/projects/m1?tab=changes'],
     ['/projects/m1/studio', 'creator', '/creator/projects/m1?tab=studio'],
     ['/projects/m1', 'admin', '/admin/projects/m1'],
-    ['/admin/price-alerts', 'admin', '/admin/price-alerts'],
+    ['/admin/price-alerts', 'admin', '/admin/settings?tab=price-alerts'],
   ] as const)('opens the notification link %s for a %s at %s', (link, role, href) => {
     expect(notificationHref(link, role)).toBe(href);
   });

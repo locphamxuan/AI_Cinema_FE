@@ -44,12 +44,15 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('AdminSidebar', () => {
-  it('lists the Admin sections, projects and released movies included', () => {
+  it('lists the Admin sections, the requests and settings merged into one each', () => {
     signInAs('admin');
     render(<AdminSidebar />);
     const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
-    for (const label of ['Tài khoản', 'Phân quyền', 'Dự án phim', 'Quản lý phim', 'Token Reviewer', 'Cảnh báo giá', 'Cài đặt nền tảng']) {
+    for (const label of ['Tài khoản', 'Phân quyền', 'Dự án phim', 'Duyệt yêu cầu', 'Quản lý phim', 'Cài đặt nền tảng']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
+    }
+    for (const merged of ['Token Reviewer', 'Cảnh báo giá', 'Đề xuất chờ duyệt', 'Yêu cầu cấp thêm Token']) {
+      expect(within(nav).queryByRole('link', { name: merged })).toBeNull();
     }
     expect(within(nav).getByRole('link', { name: 'Tài khoản' })).toHaveAttribute('aria-current', 'page');
   });

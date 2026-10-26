@@ -34,15 +34,15 @@ describe('HandoffCard film sent by the studio', () => {
     expect(screen.queryByText(/Studio đã gửi phim/)).toBeNull();
   });
 
-  it('shows the film the studio mailed and waits for the Submission', () => {
+  it('shows the film the studio mailed and waits for the delivered film', () => {
     renderCard(handoff({ filmSentAt: '2026-10-15T03:00:00.000Z', filmSentNote: 'Studio đã gửi phim qua email: v2 (3 tập).' }));
     expect(screen.getByText(/Studio đã gửi phim qua email: v2 \(3 tập\)/)).toBeTruthy();
-    expect(screen.getByText(/Chờ Creator upload Submission/)).toBeTruthy();
+    expect(screen.getByText(/Chờ Creator nộp bản phim/)).toBeTruthy();
   });
 
   it('stops waiting once the milestone is DELIVERED', () => {
     renderCard(handoff({ milestoneStatus: 'DELIVERED', filmSentAt: '2026-10-15T03:00:00.000Z', filmSentNote: 'Đã gửi.' }));
-    expect(screen.queryByText(/Chờ Creator upload Submission/)).toBeNull();
+    expect(screen.queryByText(/Chờ Creator nộp bản phim/)).toBeNull();
   });
 
   it('lists the link of every episode the studio mailed, to its episode page and to the film', () => {
