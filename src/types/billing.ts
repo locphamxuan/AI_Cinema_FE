@@ -104,6 +104,15 @@ export interface PlanInput {
   isActive?: boolean;
   isFeatured?: boolean;
   sortOrder?: number;
+  features?: PlanFeatures;
+}
+
+/** What a plan allows (BR-34): device and stream limits, no ads, the highest quality. */
+export interface PlanFeatures {
+  maxRegisteredDevices?: number;
+  maxConcurrentStreams?: number;
+  adFree?: boolean;
+  maxQuality?: string;
 }
 
 export type SubscriptionStatus = 'PENDING' | 'ACTIVE' | 'PAST_DUE' | 'CANCELLED' | 'EXPIRED';

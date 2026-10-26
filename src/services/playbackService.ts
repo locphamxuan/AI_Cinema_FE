@@ -21,10 +21,43 @@ export function guestKey(): string {
   return key;
 }
 
-/** A session belongs to a member (bearer token) or a guest (X-Guest-Key), never both. */
+/** This browser as a registered device of the member (X-Device-Id, MF-4); kept across sign-outs. */
+export function deviceKey(): string {
+  const saved = storage.getString(STORAGE_KEYS.DEVICE_ID);
+  if (saved) return saved;
+  const key = uuidV4();
+  storage.set(STORAGE_KEYS.DEVICE_ID, key);
+  return key;
+}
+
+const BROWSERS: [RegExp, string][] = [
+  [/Edg\//, 'Edge'],
+  [/OPR\//, 'Opera'],
+  [/Firefox\//, 'Firefox'],
+  [/Chrome\//, 'Chrome'],
+  [/Safari\//, 'Safari'],
+];
+const SYSTEMS: [RegExp, string][] = [
+  [/Windows/, 'Windows'],
+  [/Android/, 'Android'],
+  [/iPhone|iPad/, 'iOS'],
+  [/Mac OS/, 'macOS'],
+  [/Linux/, 'Linux'],
+];
+
+/** "Chrome trên Windows": how the member's device list names this browser. */
+export function browserName(userAgent: string): string {
+  const browser = BROWSERS.find(([pattern]) => pattern.test(userAgent))?.[1] ?? 'Trình duyệt';
+  const system = SYSTEMS.find(([pattern]) => pattern.test(userAgent))?.[1];
+  return system ? `${browser} trên ${system}` : browser;
+}
+
+const isMember = () => !!storage.getString(STORAGE_KEYS.AUTH_TOKEN);
+
+/** A session belongs to a member (bearer token, from a registered device) or a guest (X-Guest-Key), never both. */
 function owner(extra: RequestOptions = {}): RequestOptions {
-  const member = !!storage.getString(STORAGE_KEYS.AUTH_TOKEN);
-  return { ...extra, headers: { ...(member ? {} : { 'X-Guest-Key': guestKey() }), ...extra.headers } };
+  const identity: Record<string, string> = isMember() ? { 'X-Device-Id': deviceKey() } : { 'X-Guest-Key': guestKey() };
+  return { ...extra, headers: { ...identity, ...extra.headers } };
 }
 
 const session = (id: string) => `/playback/sessions/${id}`;
@@ -32,7 +65,10 @@ const session = (id: string) => `/playback/sessions/${id}`;
 export const playbackService = {
   /** POST /playback/sessions - re-verifies access and hands back the stream, ads and resume point. */
   openSession(episodeId: string, key = randomId('play-')): Promise<ApiResponse<StreamingSession>> {
-    return apiClient.post<StreamingSession>('/playback/sessions', { episodeId }, owner({ headers: { 'Idempotency-Key': key } }));
+    const body = isMember()
+      ? { episodeId, deviceName: browserName(navigator.userAgent), devicePlatform: 'WEB' }
+      : { episodeId };
+    return apiClient.post<StreamingSession>('/playback/sessions', body, owner({ headers: { 'Idempotency-Key': key } }));
   },
 
   /** `watchedSeconds` is what actually played since the last beat: 0 keeps a paused session alive without credit. */
