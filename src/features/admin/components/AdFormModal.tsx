@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { UploadCloud } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { MAX_AD_DURATION_SECONDS, MAX_AD_WEIGHT, adInputProblem } from '@/services/adAdminService';
+import { toast } from '@/components/ui/Toast';
+import { MAX_AD_DURATION_SECONDS, MAX_AD_VIDEO_BYTES, MAX_AD_WEIGHT, adAdminService, adInputProblem } from '@/services/adAdminService';
 import type { AdInput, AdminAd } from '@/types/playback';
 
 /** `yyyy-mm-dd` of a stored instant, for a date input. */
@@ -29,6 +31,29 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
   const [weight, setWeight] = useState(ad?.weight ?? 1);
   const [from, setFrom] = useState(dayOf(ad?.validFrom ?? null));
   const [to, setTo] = useState(dayOf(ad?.validTo ?? null));
+  const [uploading, setUploading] = useState(false);
+  // The length follows the video while creating, or once a new file replaces the video of an ad.
+  const [followLength, setFollowLength] = useState(!ad);
+
+  const upload = async (file: File | undefined) => {
+    if (!file) return;
+    if (file.size > MAX_AD_VIDEO_BYTES) {
+      toast.error('File quá lớn', 'Video quảng cáo tối đa 100 MB.');
+      return;
+    }
+    setUploading(true);
+    try {
+      const res = await adAdminService.uploadVideo(file);
+      if (!res.success || !res.data) {
+        toast.error('Không tải được video', res.message ?? 'Chỉ nhận file MP4.');
+        return;
+      }
+      setMediaUrl(res.data.mediaUrl);
+      setFollowLength(true);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const input: AdInput = {
     title: title.trim(),
@@ -54,8 +79,25 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
         <FormField label="Tên quảng cáo">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} className={fieldInputClass} required />
         </FormField>
-        <FormField label="Link video (MP4)">
-          <input type="url" value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} maxLength={1000} className={fieldInputClass} required />
+        <FormField label="Video (MP4): dán link hoặc tải file từ máy">
+          <div className="flex gap-2">
+            <input type="url" value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} maxLength={1000} placeholder="https://…" className={fieldInputClass} required />
+            <label className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/10 px-3 text-sm font-medium ${uploading ? 'opacity-60' : 'cursor-pointer hover:border-purple-500'}`}>
+              <UploadCloud className="w-4 h-4" aria-hidden="true" />
+              {uploading ? 'Đang tải lên…' : 'Tải từ máy'}
+              <input
+                type="file"
+                accept="video/mp4,.mp4,.m4v"
+                className="sr-only"
+                disabled={uploading}
+                aria-label="Tải video quảng cáo từ máy"
+                onChange={(e) => {
+                  void upload(e.target.files?.[0]);
+                  e.target.value = '';
+                }}
+              />
+            </label>
+          </div>
         </FormField>
         {/^https?:\/\//i.test(mediaUrl) && (
           <video
@@ -63,7 +105,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
             controls
             muted
             className="w-full max-h-48 rounded-xl bg-black"
-            onLoadedMetadata={(e) => !ad && setDuration(Math.max(1, Math.round(e.currentTarget.duration)))}
+            onLoadedMetadata={(e) => followLength && setDuration(Math.max(1, Math.round(e.currentTarget.duration)))}
           />
         )}
         <FormField label="Link khi người xem bấm (không bắt buộc)">
@@ -88,7 +130,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !!problem}>
+          <Button type="submit" disabled={busy || uploading || !!problem}>
             {ad ? 'Lưu' : 'Tạo quảng cáo'}
           </Button>
         </div>
