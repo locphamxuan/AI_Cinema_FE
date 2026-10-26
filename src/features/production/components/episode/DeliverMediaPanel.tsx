@@ -54,29 +54,21 @@ export function DeliverMediaPanel({
   const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState('');
   const [labelType, setLabelType] = useState<LabelType>('AI_GENERATED');
-  const [tools, setTools] = useState('');
   const [parts, setParts] = useState<string[]>(['video']);
-  const [humanEdited, setHumanEdited] = useState(false);
   const [noLikeness, setNoLikeness] = useState(false);
   const [noCopyright, setNoCopyright] = useState(false);
   const [note, setNote] = useState('');
   const { busy, run } = useAction();
 
-  const aiTools = tools
-    .split(',')
-    .map((t) => t.trim())
-    .filter(Boolean);
   const who = declarant === 'studio' ? 'Chúng tôi' : 'Studio';
   const sourceReady = method === 'UPLOAD' ? !!file : /^https?:\/\/\S+$/.test(url.trim());
-  const valid = sourceReady && aiTools.length > 0 && parts.length > 0 && noLikeness && noCopyright;
+  const valid = sourceReady && parts.length > 0 && noLikeness && noCopyright;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!valid) return;
     const aiDisclosure: AiDisclosure = {
-      aiTools,
       aiGeneratedParts: parts,
-      humanEdited,
       noRealPersonLikeness: noLikeness,
       noCopyrightedMaterial: noCopyright,
     };
@@ -149,9 +141,6 @@ export function DeliverMediaPanel({
           <legend className="px-1 font-semibold text-slate-800 dark:text-slate-200">
             {declarant === 'studio' ? 'Khai báo và cam kết sử dụng AI của studio' : 'Khai báo AI của studio (Creator nhập thay)'}
           </legend>
-          <FormField label="Công cụ AI đã dùng (cách nhau bằng dấu phẩy)">
-            <input value={tools} onChange={(e) => setTools(e.target.value)} placeholder="Kling, ElevenLabs, Suno" className={fieldInputClass} />
-          </FormField>
           <div>
             <span className="block text-slate-600 dark:text-slate-300 mb-1 font-medium">Phần do AI tạo</span>
             <div className="flex flex-wrap gap-3">
@@ -167,16 +156,13 @@ export function DeliverMediaPanel({
               ))}
             </div>
           </div>
-          <label className="flex items-center gap-1.5 cursor-pointer">
-            <input type="checkbox" checked={humanEdited} onChange={(e) => setHumanEdited(e.target.checked)} /> Có người chỉnh sửa thủ công
-          </label>
           <label className="flex items-start gap-1.5 cursor-pointer">
             <input type="checkbox" className="mt-0.5" checked={noLikeness} onChange={(e) => setNoLikeness(e.target.checked)} />
-            {who} cam kết không giả mạo gây hiểu nhầm người hoặc sự kiện có thật (BR-41)
+            {who} cam kết phim không mô phỏng người thật hoặc sự kiện có thật theo cách gây hiểu nhầm
           </label>
           <label className="flex items-start gap-1.5 cursor-pointer">
             <input type="checkbox" className="mt-0.5" checked={noCopyright} onChange={(e) => setNoCopyright(e.target.checked)} />
-            {who} cam kết không dùng tài liệu có bản quyền của bên thứ ba (BR-41)
+            {who} cam kết không sử dụng tác phẩm có bản quyền của bên thứ ba khi chưa được phép
           </label>
         </fieldset>
 
