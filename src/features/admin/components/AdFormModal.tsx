@@ -82,7 +82,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
         <FormField label="Video (MP4): dán link hoặc tải file từ máy">
           <div className="flex gap-2">
             <input type="url" value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} maxLength={1000} placeholder="https://…" className={fieldInputClass} required />
-            <label className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/10 px-3 text-sm font-medium ${uploading ? 'opacity-60' : 'cursor-pointer hover:border-purple-500'}`}>
+            <label className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-sky-100 dark:border-white/10 px-3 text-sm font-medium ${uploading ? 'opacity-60' : 'cursor-pointer hover:border-sky-500'}`}>
               <UploadCloud className="w-4 h-4" aria-hidden="true" />
               {uploading ? 'Đang tải lên…' : 'Tải từ máy'}
               <input

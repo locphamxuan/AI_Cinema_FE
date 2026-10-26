@@ -56,7 +56,7 @@ export function PlansPanel() {
                 <tr key={plan.id}>
                   <td className="py-2">
                     <p className="font-medium text-slate-900 dark:text-white">
-                      {plan.name} {plan.isFeatured && <span className="text-[10px] text-amber-600">★ nổi bật</span>}
+                      {plan.name} {plan.isFeatured && <span className="text-xs text-amber-600">★ nổi bật</span>}
                     </p>
                     <p className="text-[11px] text-slate-500 font-mono">{plan.code}</p>
                   </td>
@@ -169,12 +169,12 @@ function PlanModal({ plan, onClose, onDone }: ModalProps & { plan: AdminPlan | n
           </FormField>
         </div>
         <label className="flex items-center gap-2 text-xs">
-          <input type="checkbox" checked={form.isFeatured} onChange={(e) => set({ isFeatured: e.target.checked })} className="accent-purple-600" />
+          <input type="checkbox" checked={form.isFeatured} onChange={(e) => set({ isFeatured: e.target.checked })} className="accent-sky-600" />
           Đánh dấu là gói nổi bật
         </label>
         {plan && (
           <label className="flex items-center gap-2 text-xs">
-            <input type="checkbox" checked={form.isActive} onChange={(e) => set({ isActive: e.target.checked })} className="accent-purple-600" />
+            <input type="checkbox" checked={form.isActive} onChange={(e) => set({ isActive: e.target.checked })} className="accent-sky-600" />
             Đang bán (bỏ chọn để ẩn với Member; gói đang chạy vẫn giữ nguyên)
           </label>
         )}

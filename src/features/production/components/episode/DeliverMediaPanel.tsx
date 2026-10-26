@@ -118,7 +118,7 @@ export function DeliverMediaPanel({
               aria-checked={method === m.key}
               onClick={() => setMethod(m.key)}
               className={`rounded-xl border px-3 py-2 font-semibold transition cursor-pointer ${
-                method === m.key ? 'border-purple-500 bg-purple-50 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
+                method === m.key ? 'border-sky-500 bg-sky-50 dark:bg-sky-500/10 text-sky-800 dark:text-sky-300' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
               }`}
             >
               {m.label}
@@ -137,7 +137,7 @@ export function DeliverMediaPanel({
           </FormField>
         )}
 
-        <fieldset className="space-y-3 rounded-xl border border-slate-200 dark:border-white/10 p-3">
+        <fieldset className="space-y-3 rounded-xl border border-sky-100 dark:border-white/10 p-3">
           <legend className="px-1 font-semibold text-slate-800 dark:text-slate-200">
             {declarant === 'studio' ? 'Khai báo và cam kết sử dụng AI của studio' : 'Khai báo AI của studio (Creator nhập thay)'}
           </legend>

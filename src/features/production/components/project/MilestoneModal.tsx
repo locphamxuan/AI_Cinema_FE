@@ -53,8 +53,8 @@ export function MilestoneModal({ handoff, onClose }: { handoff: StudioHandoff; o
           </select>
         </FormField>
         {needsSubmission && (
-          <FormField label="Submission Studio vừa giao">
-            <select value={mediaAssetId} onChange={(e) => setMediaAssetId(e.target.value)} required className={fieldInputClass} aria-label="Submission">
+          <FormField label="Bản phim Studio vừa giao">
+            <select value={mediaAssetId} onChange={(e) => setMediaAssetId(e.target.value)} required className={fieldInputClass} aria-label="Bản phim">
               <option value="" disabled>
                 {submissions.length ? 'Chọn bản đã tải lên' : 'Chưa có bản nào'}
               </option>

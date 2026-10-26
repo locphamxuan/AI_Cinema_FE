@@ -75,14 +75,14 @@ export function PublishPanel({
             <Button type="submit" variant="secondary" disabled={busy || !priceValid || priceValue === episode.coinPrice}>
               <Coins className="w-3.5 h-3.5" aria-hidden="true" /> Lưu giá
             </Button>
-            {outOfRange && <p className="w-full text-amber-600">Giá ngoài khoảng: vẫn lưu được nhưng Admin sẽ nhận cảnh báo (BR-47).</p>}
+            {outOfRange && <p className="w-full text-amber-600">Giá ngoài khoảng: vẫn lưu được nhưng Admin sẽ nhận cảnh báo.</p>}
           </form>
         ) : (
           <p className="text-slate-600 dark:text-slate-300">Giá Coin: {formatNumber(episode.coinPrice)}</p>
         )}
 
         {canRelease && (
-          <div className="space-y-2 rounded-xl border border-slate-200 dark:border-white/10 p-3">
+          <div className="space-y-2 rounded-xl border border-sky-100 dark:border-white/10 p-3">
             {episode.coinPrice === null && <p className="text-amber-600">Đặt giá Coin trước khi phát hành.</p>}
             <div className="flex flex-wrap items-end gap-2">
               <Button disabled={busy || episode.coinPrice === null} onClick={() => publish(false)}>
@@ -173,7 +173,7 @@ function UnpublishModal({ publication, onClose, onDone }: { publication: Publica
             {(Object.keys(UNPUBLISH_MODE) as UnpublishMode[]).map((m) => (
               <label
                 key={m}
-                className={`block rounded-xl border p-3 cursor-pointer ${mode === m ? 'border-purple-500 bg-purple-50/60 dark:bg-purple-500/10' : 'border-slate-200 dark:border-white/10'}`}
+                className={`block rounded-xl border p-3 cursor-pointer ${mode === m ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-500/10' : 'border-slate-200 dark:border-white/10'}`}
               >
                 <span className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
                   <input type="radio" name="unpublish-mode" checked={mode === m} onChange={() => setMode(m)} />

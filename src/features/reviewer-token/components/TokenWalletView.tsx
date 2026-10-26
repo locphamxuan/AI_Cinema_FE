@@ -39,18 +39,18 @@ export function TokenTotalsCards({ totals, rateVnd }: { totals: TokenTotals; rat
           key={c.label}
           className={`relative rounded-2xl p-5 border transition-all duration-200 ${
             c.primary
-              ? 'bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent border-purple-500/25 shadow-xs'
-              : 'bg-white dark:bg-[#141720] border-slate-200/80 dark:border-white/10 shadow-xs'
+              ? 'bg-gradient-to-br from-sky-500/10 via-sky-500/5 to-transparent border-sky-500/25'
+              : 'bg-white dark:bg-[#0F1C27] border-slate-200/80 dark:border-white/10 shadow-xs'
           }`}
         >
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{c.label}</p>
             {c.primary && (
-              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" title="Đang sẵn sàng sử dụng" />
+              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" title="Đang sẵn sàng sử dụng" />
             )}
           </div>
           <div className="mt-2.5">
-            <p className={`text-2xl font-bold font-mono tracking-tight ${c.primary ? 'text-purple-700 dark:text-purple-300' : 'text-slate-900 dark:text-white'}`}>
+            <p className={`text-2xl font-bold font-mono tracking-tight ${c.primary ? 'text-sky-800 dark:text-sky-300' : 'text-slate-900 dark:text-white'}`}>
               {formatNumber(c.value)} <span className="text-sm font-semibold font-sans">Token</span>
             </p>
             <div className="mt-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-white/5">
@@ -100,12 +100,12 @@ export function TokenHistoryTable({
               <td className="py-3 px-4 text-slate-500 whitespace-nowrap text-[11px]">{formatDateTime(e.createdAt)}</td>
               <td className="py-3 px-4">
                 <span className="font-medium text-slate-800 dark:text-slate-200">{kindLabel(e)}</span>
-                {e.by && <span className="block text-[10px] text-slate-400 mt-0.5">{e.by.fullName}</span>}
+                {e.by && <span className="block text-xs text-slate-400 mt-0.5">{e.by.fullName}</span>}
               </td>
               <td className="py-3 px-4 text-slate-700 dark:text-slate-300">
                 {e.movie ? (
                   projectHref ? (
-                    <Link href={projectHref(e.movie.id)} className="font-medium text-purple-600 dark:text-purple-400 hover:underline">
+                    <Link href={projectHref(e.movie.id)} className="font-medium text-sky-700 dark:text-sky-500 hover:underline">
                       {e.movie.title}
                     </Link>
                   ) : (
@@ -114,11 +114,11 @@ export function TokenHistoryTable({
                 ) : (
                   <span className="text-slate-400">-</span>
                 )}
-                {e.season && <span className="block text-[10px] text-slate-400 mt-0.5">Mùa {e.season.seasonNumber}{e.season.title ? ` - ${e.season.title}` : ''}</span>}
+                {e.season && <span className="block text-xs text-slate-400 mt-0.5">Mùa {e.season.seasonNumber}{e.season.title ? ` - ${e.season.title}` : ''}</span>}
               </td>
               <td className={`py-3 px-4 text-right font-mono font-bold ${e.amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 {e.amountTokens > 0 ? '+' : ''}
-                {formatNumber(e.amountTokens)} <span className="text-[10px] font-normal">Token</span>
+                {formatNumber(e.amountTokens)} <span className="text-xs font-normal">Token</span>
               </td>
               <td className="py-3 px-5 text-slate-600 dark:text-slate-400 text-[11px] max-w-xs">{e.reason ?? '-'}</td>
             </tr>

@@ -14,10 +14,10 @@ type TabKey = 'all' | 'admin' | 'project' | 'request' | 'coin';
 
 const TABS: { key: TabKey; label: string; description: string }[] = [
   { key: 'all', label: 'Tất cả', description: 'Mọi biến động Token, mới nhất trước. Không sửa, không xoá dòng cũ; nhầm thì ghi dòng điều chỉnh.' },
-  { key: 'admin', label: 'Admin', description: 'Admin cấp ngân sách, thu hồi phần chưa dùng, và cấp bổ sung khi duyệt đề xuất (MF-1).' },
-  { key: 'project', label: 'Dự án phim', description: 'Phí sản xuất bạn cấp cho từng dự án theo mùa: lần đầu, cấp thêm, điều chỉnh (MF-1).' },
-  { key: 'request', label: 'Creator xin thêm', description: 'Yêu cầu thêm Token của Creator và khoản bạn đã cấp theo yêu cầu (MF-1).' },
-  { key: 'coin', label: 'Coin người xem', description: 'Coin người xem dùng để mở khoá tập trong các phim bạn phụ trách, và phần đã hoàn khi gỡ tập (MF-2).' },
+  { key: 'admin', label: 'Admin', description: 'Admin cấp ngân sách, thu hồi phần chưa dùng, và cấp bổ sung khi duyệt đề xuất.' },
+  { key: 'project', label: 'Dự án phim', description: 'Phí sản xuất bạn cấp cho từng dự án theo mùa: lần đầu, cấp thêm, điều chỉnh.' },
+  { key: 'request', label: 'Creator xin thêm', description: 'Yêu cầu thêm Token của Creator và khoản bạn đã cấp theo yêu cầu.' },
+  { key: 'coin', label: 'Coin người xem', description: 'Coin người xem dùng để mở khoá tập trong các phim bạn phụ trách, và phần đã hoàn khi gỡ tập.' },
 ];
 
 /** Sub-filters of the Admin and project tabs, so each kind of entry can be looked at alone. */
@@ -82,7 +82,7 @@ export function ReviewerTokensPage() {
                 aria-selected={tab === t.key}
                 onClick={() => select(t.key)}
                 className={`shrink-0 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer ${
-                  tab === t.key ? 'bg-white dark:bg-purple-600 text-purple-700 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
+                  tab === t.key ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
                 }`}
               >
                 {t.label}
@@ -103,7 +103,7 @@ export function ReviewerTokensPage() {
                         aria-pressed={sub === f.key}
                         onClick={() => setSub(f.key)}
                         className={`px-2.5 py-1 rounded-full text-xs border cursor-pointer ${
-                          sub === f.key ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
+                          sub === f.key ? 'bg-sky-600 border-sky-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
                         }`}
                       >
                         {f.label}

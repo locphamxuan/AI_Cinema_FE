@@ -39,8 +39,8 @@ export function PriceAlertsPanel() {
   };
 
   return (
-    <section className="bg-white dark:bg-[#141720] rounded-2xl border border-slate-200/80 dark:border-white/10 shadow-sm overflow-hidden">
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.01]">
+    <section className="bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Cảnh báo giá Coin</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Giá tập ngoài khoảng cho phép · Reviewer phụ trách là người đổi giá.</p>
@@ -54,7 +54,7 @@ export function PriceAlertsPanel() {
               onClick={() => setFilter(f.key)}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 filter === f.key
-                  ? 'bg-white dark:bg-purple-600 text-purple-700 dark:text-white font-semibold shadow-xs'
+                  ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white font-semibold shadow-xs'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >

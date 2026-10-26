@@ -41,7 +41,7 @@ export function AccountProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <Panel title="Tài khoản">
             <div className="flex items-center gap-3 mb-4">
-              <span className="w-12 h-12 rounded-full bg-purple-600 text-white text-lg font-bold flex items-center justify-center">
+              <span className="w-12 h-12 rounded-full bg-sky-600 text-white text-lg font-bold flex items-center justify-center">
                 {account.data.fullName.charAt(0).toUpperCase()}
               </span>
               <div>

@@ -73,7 +73,7 @@ export function TokenRequestList({
             aria-pressed={status === f.key}
             onClick={() => { setStatus(f.key); setPage(1); }}
             className={`px-2.5 py-1 rounded-full text-xs border cursor-pointer ${
-              status === f.key ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
+              status === f.key ? 'bg-sky-600 border-sky-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
             }`}
           >
             {f.label}
@@ -85,11 +85,11 @@ export function TokenRequestList({
       {list.data && rows.length === 0 && <Empty>Chưa có yêu cầu thêm Token nào.</Empty>}
       <ul className="space-y-2">
         {rows.map((r) => (
-          <li key={r.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-3 text-xs space-y-1.5">
+          <li key={r.id} className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs space-y-1.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-semibold text-slate-900 dark:text-white">
                 {projectHref ? (
-                  <Link href={projectHref(r.movie.id)} className="text-purple-600 dark:text-purple-400 hover:underline">{r.movie.title}</Link>
+                  <Link href={projectHref(r.movie.id)} className="text-sky-700 dark:text-sky-500 hover:underline">{r.movie.title}</Link>
                 ) : (
                   r.movie.title
                 )}{' '}

@@ -11,8 +11,8 @@ import { StatusPill } from '../shared/ui';
 
 const STATUS_GRADIENTS: Record<MovieStatus, string> = {
   DRAFT: 'from-slate-600 via-slate-700 to-slate-800',
-  ASSIGNED: 'from-blue-600 via-indigo-600 to-slate-900',
-  IN_PRODUCTION: 'from-purple-700 via-violet-600 to-indigo-900',
+  ASSIGNED: 'from-blue-600 via-sky-600 to-slate-900',
+  IN_PRODUCTION: 'from-sky-700 via-cyan-600 to-sky-900',
   UNDER_REVISION: 'from-amber-600 via-orange-600 to-slate-900',
   COMPLETED: 'from-emerald-600 via-teal-600 to-slate-900',
   CANCELLED: 'from-rose-700 via-red-800 to-slate-950',
@@ -58,7 +58,7 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
           <li key={p.id}>
             <Link
               href={productionPaths.project(base, p.id)}
-              className="group flex flex-col h-full rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] hover:border-purple-400/60 dark:hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/10 dark:hover:shadow-purple-900/30 transition-all duration-300 overflow-hidden"
+              className="group flex flex-col h-full rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0F1C27] hover:border-sky-400/60 dark:hover:border-sky-500/50 hover:shadow-2xl hover:shadow-sky-500/10 dark:hover:shadow-sky-900/30 transition-all duration-300 overflow-hidden"
             >
               <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-900">
                 <ProjectPoster title={p.title} posterUrl={p.posterUrl} status={p.status} />
@@ -73,14 +73,14 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
                     title="Cập nhật lần cuối"
                     className="text-white text-[11px] font-semibold px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 shadow-md flex items-center gap-1.5"
                   >
-                    <Clock className="w-3.5 h-3.5 text-purple-300 shrink-0" aria-hidden="true" />
+                    <Clock className="w-3.5 h-3.5 text-sky-300 shrink-0" aria-hidden="true" />
                     {formatDateTime(p.lastActivityAt)}
                   </span>
                 </div>
               </div>
 
               <div className="p-4 flex-1 flex flex-col justify-between gap-3">
-                <h2 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-sky-700 dark:group-hover:text-sky-500 transition-colors">
                   {p.title}
                 </h2>
                 <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300">
@@ -93,7 +93,7 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
                   <p className="flex items-center gap-2">
                     <span
                       aria-hidden="true"
-                      className="w-4 h-4 rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-400 font-bold flex items-center justify-center text-[9px] shrink-0"
+                      className="w-4 h-4 rounded-full bg-sky-500/15 text-sky-700 dark:text-sky-500 font-bold flex items-center justify-center text-xs shrink-0"
                     >
                       {inCharge?.charAt(0) ?? '?'}
                     </span>

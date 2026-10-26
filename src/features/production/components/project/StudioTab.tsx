@@ -60,7 +60,7 @@ export function StudioTab() {
       <div className="lg:col-span-2 space-y-5">
         <Panel
           title="Dòng thời gian Studio"
-          description="Gửi brief PDF và file material cho Studio đối tác bên thứ 3 qua email; sau đó Creator cập nhật từng mốc tiến độ của Studio và upload Submission Studio giao."
+          description="Gửi brief PDF và tài liệu cho Studio đối tác qua email. Sau đó Creator cập nhật tiến độ của Studio và nộp bản phim Studio giao."
         >
           <div role="group" aria-label="Lọc theo trạng thái" className="flex flex-wrap gap-1.5 mb-4">
             {FILTERS.map((f) => {
@@ -72,7 +72,7 @@ export function StudioTab() {
                   aria-pressed={filter === f.key}
                   onClick={() => { setFilter(f.key); setPage(1); }}
                   className={`px-2.5 py-1 rounded-full text-xs border cursor-pointer ${
-                    filter === f.key ? 'bg-purple-600 border-purple-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
+                    filter === f.key ? 'bg-sky-600 border-sky-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
                   }`}
                 >
                   {f.label} <span className="opacity-70">({count})</span>

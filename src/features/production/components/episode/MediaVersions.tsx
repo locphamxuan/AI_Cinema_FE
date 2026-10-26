@@ -48,8 +48,8 @@ export function MediaVersions({
               }}
               className={`rounded-xl border p-3 text-xs space-y-1.5 cursor-pointer transition ${
                 selected
-                  ? 'border-purple-500 bg-purple-50/60 dark:bg-purple-500/10'
-                  : 'border-slate-200 dark:border-white/10 hover:border-purple-300'
+                  ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-500/10'
+                  : 'border-slate-200 dark:border-white/10 hover:border-sky-300'
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-2">

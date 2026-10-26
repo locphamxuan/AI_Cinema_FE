@@ -183,7 +183,7 @@ export function EditEpisodeModal({ episode, season, onClose }: { episode: Episod
   };
 
   return (
-    <Modal open onClose={onClose} title={`Sửa tập ${episode.episodeNumber}`} subtitle="Đổi thời lượng mục tiêu và hạn giao được tới khi tập được duyệt (BR-31).">
+    <Modal open onClose={onClose} title={`Sửa tập ${episode.episodeNumber}`} subtitle="Đổi thời lượng mục tiêu và hạn giao được tới khi tập được duyệt.">
       <EpisodeForm
         values={values}
         window={windowOf(season)}

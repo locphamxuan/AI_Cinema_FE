@@ -183,7 +183,7 @@ export const EVENT_LABEL: Record<string, string> = {
   FEE_ALLOCATED: 'Cấp phí sản xuất',
   FEE_TOPPED_UP: 'Cấp thêm phí sản xuất',
   FEE_CORRECTED: 'Điều chỉnh phí sản xuất',
-  PROJECT_ASSIGNED: 'Giao Content Creator',
+  PROJECT_ASSIGNED: 'Giao cho Creator',
   STUDIO_HANDOFF_SENT: 'Gửi brief cho studio',
   STUDIO_CHANGED: 'Đổi studio',
   STUDIO_MILESTONE_UPDATED: 'Cập nhật mốc Studio',

@@ -19,8 +19,8 @@ export function CoinActivityView({ activity, projectHref }: { activity?: CoinAct
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {activity.movies.map((m) => (
-          <div key={m.movie.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-3 text-xs">
-            <Link href={projectHref(m.movie.id)} className="font-semibold text-purple-600 dark:text-purple-400 hover:underline">
+          <div key={m.movie.id} className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs">
+            <Link href={projectHref(m.movie.id)} className="font-semibold text-sky-700 dark:text-sky-500 hover:underline">
               {m.movie.title}
             </Link>
             <p className="text-slate-500 mt-1">
@@ -46,7 +46,7 @@ export function CoinActivityView({ activity, projectHref }: { activity?: CoinAct
               <td className="py-2 px-2 text-slate-500 whitespace-nowrap">{formatDateTime(e.at)}</td>
               <td className="py-2 px-2">
                 {e.kind === 'REFUND' ? 'Hoàn Coin khi gỡ tập' : 'Mở khoá tập'}
-                {e.note && <span className="block text-[10px] text-slate-400">{e.note}</span>}
+                {e.note && <span className="block text-xs text-slate-400">{e.note}</span>}
               </td>
               <td className="py-2 px-2">{e.movie.title} · tập {e.episodeNumber}</td>
               <td className={`py-2 px-2 text-right font-mono ${e.coins < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>

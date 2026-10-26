@@ -43,7 +43,7 @@ export function ChangeRequestCard({
   };
 
   return (
-    <li className="rounded-xl border border-slate-200 dark:border-white/10 p-3 text-xs space-y-2">
+    <li className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-slate-500 dark:text-slate-400">
           {cr.requestedBy.fullName} · {formatDateTime(cr.createdAt)}
@@ -56,7 +56,7 @@ export function ChangeRequestCard({
         </div>
       </div>
       {cr.movie && projectHref && (
-        <Link href={projectHref} className="font-semibold text-purple-600 dark:text-purple-300 hover:underline">
+        <Link href={projectHref} className="font-semibold text-sky-700 dark:text-sky-300 hover:underline">
           {cr.movie.title}
         </Link>
       )}

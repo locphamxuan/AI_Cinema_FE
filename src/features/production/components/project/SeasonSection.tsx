@@ -21,8 +21,8 @@ import { useProject } from './ProjectContext';
 /** Submissions of one episode: every version of media the Creator uploaded from the studio's deliveries. */
 function Submissions({ episode }: { episode: Episode }) {
   const versions = useResource(`media:${episode.id}`, () => productionService.listMedia(episode.id));
-  if (versions.loading && !versions.data) return <p className="text-slate-500">Đang tải Submission…</p>;
-  if (!versions.data?.length) return <p className="text-slate-500">Chưa có Submission nào.</p>;
+  if (versions.loading && !versions.data) return <p className="text-slate-500">Đang tải bản phim…</p>;
+  if (!versions.data?.length) return <p className="text-slate-500">Chưa có bản phim nào.</p>;
   return (
     <ul className="space-y-1">
       {versions.data.map((media) => (
@@ -155,8 +155,8 @@ export function SeasonSection({
                         <Link href={productionPaths.episode(base, project.id, ep.id)} className="font-medium text-slate-900 dark:text-white hover:underline">
                           {ep.title}
                         </Link>
-                        <span className="ml-2 text-[10px] text-slate-400">{formatDuration(ep.targetDurationSeconds)}</span>
-                        {ep.revisionStartedAt && <span className="ml-2 text-[10px] text-amber-600">đang sửa</span>}
+                        <span className="ml-2 text-xs text-slate-400">{formatDuration(ep.targetDurationSeconds)}</span>
+                        {ep.revisionStartedAt && <span className="ml-2 text-xs text-amber-600">đang sửa</span>}
                       </td>
                       <td className="px-3 py-2.5">
                         <StatusPill {...EPISODE_STATUS[ep.status]} />
@@ -192,7 +192,7 @@ export function SeasonSection({
                       <tr className="bg-slate-50/60 dark:bg-white/5">
                         <td />
                         <td colSpan={8} className="px-3 py-2.5">
-                          <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Submission (các version media)</p>
+                          <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Các bản phim đã nộp</p>
                           <Submissions episode={ep} />
                         </td>
                       </tr>

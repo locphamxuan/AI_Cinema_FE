@@ -111,16 +111,16 @@ export function AssignCreatorModal({ current, onClose }: { current: Person | nul
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (await run(() => productionService.assignCreator(project.id, creatorId), 'Đã giao Content Creator')) {
+    if (await run(() => productionService.assignCreator(project.id, creatorId), 'Đã giao cho Creator')) {
       await reload();
       onClose();
     }
   };
 
   return (
-    <Modal open onClose={onClose} title="Giao Content Creator" subtitle="Creator sẽ bàn giao dự án cho studio và giao các tập.">
+    <Modal open onClose={onClose} title="Giao cho Creator" subtitle="Creator sẽ bàn giao dự án cho studio và giao các tập.">
       <form onSubmit={submit} className="space-y-4">
-        <FormField label="Content Creator">
+        <FormField label="Creator">
           <select value={creatorId} onChange={(e) => setCreatorId(e.target.value)} required className={fieldInputClass}>
             <option value="" disabled>
               {creators.loading ? 'Đang tải…' : 'Chọn Creator'}
