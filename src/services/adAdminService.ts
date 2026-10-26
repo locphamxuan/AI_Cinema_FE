@@ -5,6 +5,8 @@ import { apiClient, ApiResponse } from './apiClient';
 /** Bounds of the BE (ad-limits.ts): longer stops being a mid-roll, heavier wins every draw. */
 export const MAX_AD_DURATION_SECONDS = 300;
 export const MAX_AD_WEIGHT = 1000;
+/** The BE (ad-media.service.ts) takes an MP4 of at most 100 MB. */
+export const MAX_AD_VIDEO_BYTES = 100 * 1024 * 1024;
 
 /** BR-32: the BE refuses more cues than this on one episode. */
 export const MAX_AD_SLOTS_PER_EPISODE = 20;
@@ -13,6 +15,12 @@ export const adAdminService = {
   async ads(): Promise<ApiResponse<AdminAd[]>> {
     const res = await apiClient.get<{ data: AdminAd[] }>('/admin/ads?limit=100');
     return res.success && res.data ? { ...res, data: res.data.data } : { ...res, data: [] };
+  },
+  /** Uploads an ad video from the computer; the answered link is what the ad is created with. */
+  uploadVideo(file: File) {
+    const form = new FormData();
+    form.append('file', file);
+    return apiClient.postForm<{ mediaUrl: string }>('/admin/ads/media', form);
   },
   createAd: (input: AdInput) => apiClient.post<AdminAd>('/admin/ads', input),
   /** Edits an ad; `{ status }` alone pauses or resumes it. */
