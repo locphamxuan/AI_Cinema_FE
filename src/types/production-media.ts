@@ -17,9 +17,7 @@ import type {
 import type { Person } from './production';
 
 export interface AiDisclosure {
-  aiTools: string[];
   aiGeneratedParts: string[];
-  humanEdited: boolean;
   noRealPersonLikeness: boolean;
   noCopyrightedMaterial: boolean;
 }

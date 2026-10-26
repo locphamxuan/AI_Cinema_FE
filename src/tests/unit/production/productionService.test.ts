@@ -9,9 +9,7 @@ function mockFetch(body: unknown, status = 200) {
 }
 
 const disclosure: AiDisclosure = {
-  aiTools: ['Kling'],
   aiGeneratedParts: ['video'],
-  humanEdited: true,
   noRealPersonLikeness: true,
   noCopyrightedMaterial: true,
 };

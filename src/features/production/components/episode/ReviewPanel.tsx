@@ -66,11 +66,10 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
                 {d.deviationSeconds !== null && ` (${d.deviationSeconds > 0 ? '+' : ''}${formatDuration(d.deviationSeconds)})`}
               </span>,
             ],
-            ['Công cụ AI', ai.aiTools.join(', ')],
             ['Phần do AI tạo', ai.aiGeneratedParts.map((p) => AI_PARTS.find((x) => x.value === p)?.label ?? p).join(', ')],
-            ['Người chỉnh sửa', ai.humanEdited ? 'Có' : 'Không'],
-            ['Cam kết BR-41', ai.noRealPersonLikeness && ai.noCopyrightedMaterial ? 'Đủ 2 cam kết' : 'Thiếu'],
             ['Nhãn đề xuất', LABEL_TYPE[sheet.proposedLabelType]],
+            ['Không mô phỏng người/sự kiện thật', <Pledged key="likeness" given={ai.noRealPersonLikeness} />],
+            ['Không dùng tác phẩm có bản quyền', <Pledged key="copyright" given={ai.noCopyrightedMaterial} />],
           ]}
         />
         {sheet.contentReviews.length > 0 && (
@@ -106,6 +105,11 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
       />
     </div>
   );
+}
+
+/** Whether the studio signed one of its BR-41 pledges in the delivery. */
+function Pledged({ given }: { given: boolean }) {
+  return given ? <span>Studio đã cam kết</span> : <span className="text-rose-600 font-semibold">Studio chưa cam kết</span>;
 }
 
 type Verdict = { result: 'PASS' | 'FAIL' | null; failureReason: string };

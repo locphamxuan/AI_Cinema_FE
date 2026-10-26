@@ -33,6 +33,8 @@ export const PERMISSION = {
   REWARD_RULE_MANAGE: 'reward.rule.manage',
   ANALYTICS_REVENUE_READ: 'analytics.revenue.read',
   ANALYTICS_CHURN_READ: 'analytics.churn.read',
+  // MF-3 - playback & ads
+  AD_MANAGE: 'ad.manage',
   // Administration
   MEMBER_OPS_READ: 'member:ops.read',
   USER_READ: 'user:read',

@@ -9,6 +9,9 @@ import { QualitySelect } from './QualitySelect';
 import EpisodePlaylist from './EpisodePlaylist';
 import { useHlsPlayer } from './useHlsPlayer';
 import { useEpisodeStream } from './useEpisodeStream';
+import { usePlaybackSession } from './usePlaybackSession';
+import { useAdBreaks } from './useAdBreaks';
+import { AdBreakOverlay, ResumePrompt } from './PlayerOverlays';
 
 function defaultVersion(episode: Episode | null): EpisodeVersion | null {
   if (!episode?.versions?.length) return null;
@@ -45,8 +48,13 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   const stream = useEpisodeStream(currentEpisode?.id, !!currentEpisode?.isUnlocked);
   const canPlay = currentEpisode ? currentEpisode.isFree || currentEpisode.isUnlocked || stream.accessGranted : false;
 
-  // The picked version's stream if it has one, else the one the access decision handed out.
-  const streamUrl = activeVersion?.hlsUrl || stream.streamUrl || currentEpisode?.hlsUrl;
+  // MF-3: a granted episode plays through a streaming session (ads, stream limit, progress).
+  const playback = usePlaybackSession(videoRef, currentEpisode?.id, canPlay);
+  const { activeAd, finishAd } = useAdBreaks(videoRef, playback.session, playback.dueBreakId);
+
+  // A version picked in the drawer plays its own stream, else the session's; a locked episode only its preview.
+  const pickedStream = pickedVersion && pickedVersion.episodeId === currentEpisode?.id ? pickedVersion.version.hlsUrl : undefined;
+  const streamUrl = pickedStream || (canPlay ? playback.session?.stream.masterUrl : currentEpisode?.hlsUrl);
 
   const { levels, level, selectLevel: handleSelectLevel } = useHlsPlayer(videoRef, {
     enabled: !!currentEpisode,
@@ -128,6 +136,14 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
               ))}
             </video>
 
+            {activeAd && <AdBreakOverlay cue={activeAd} onDone={finishAd} />}
+            {playback.resumeAt !== null && !activeAd && <ResumePrompt at={playback.resumeAt} onAnswer={playback.answerResume} />}
+            {playback.error && (
+              <div role="alert" className="absolute inset-0 z-20 flex items-center justify-center bg-black/70 p-6 text-center text-sm text-white">
+                {playback.error}
+              </div>
+            )}
+
             {/* Locked Overlay */}
             {!canPlay && (
               <div className="absolute inset-0 video-blur-overlay flex flex-col items-center justify-center p-6">
@@ -162,7 +178,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
             {/* Compliance Badge Button (Top left to not obstruct video seek bar / controls) */}
             <button
               onClick={() => setShowComplianceDrawer(true)}
-              className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/75 backdrop-blur-md text-[10px] sm:text-xs text-muted-light hover:text-white hover:bg-black/90 transition-all cursor-pointer border border-white/15 shadow-xl z-20"
+              className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/75 backdrop-blur-md text-[10px] sm:text-xs text-muted-light hover:text-white hover:bg-black/90 transition-all cursor-pointer border border-white/15 shadow-xl z-40"
             >
               <span className="text-sm">🏷️</span>
               <span className="line-clamp-1">
