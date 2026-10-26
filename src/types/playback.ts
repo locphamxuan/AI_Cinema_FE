@@ -63,9 +63,6 @@ export interface AdBreakState {
 export interface AdminAd extends AdCreative {
   weight: number;
   status: 'ACTIVE' | 'PAUSED';
-  /** The ad is drawn only inside this window; null = open on that side. */
-  validFrom: string | null;
-  validTo: string | null;
 }
 
 /** POST /admin/ads, PATCH /admin/ads/:id */
@@ -73,11 +70,8 @@ export interface AdInput {
   title: string;
   mediaUrl: string;
   clickUrl?: string | null;
-  durationSeconds: number;
   weight?: number;
   status?: 'ACTIVE' | 'PAUSED';
-  validFrom?: string | null;
-  validTo?: string | null;
 }
 
 /** GET|PUT /admin/episodes/:id/ad-slots */

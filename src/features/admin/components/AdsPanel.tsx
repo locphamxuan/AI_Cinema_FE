@@ -6,17 +6,14 @@ import { Button } from '@/components/ui/Button';
 import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/features/production/components/shared/ui';
 import { useAction } from '@/features/production/hooks/useAction';
 import { useResource } from '@/features/production/hooks/useResource';
-import { formatDay } from '@/features/production/lib/format';
+import { formatDuration } from '@/features/production/lib/format';
 import { adAdminService } from '@/services/adAdminService';
 import type { AdInput, AdminAd } from '@/types/playback';
 import { AdFormModal } from './AdFormModal';
 
-/** Whether the mid-roll draw can pick the ad right now: active and inside its window. */
-export function adLiveState(ad: AdminAd, now = new Date()): { label: string; tone: 'emerald' | 'amber' | 'neutral' } {
-  if (ad.status === 'PAUSED') return { label: 'Tạm dừng', tone: 'neutral' };
-  if (ad.validFrom && new Date(ad.validFrom) > now) return { label: 'Chưa tới ngày chạy', tone: 'amber' };
-  if (ad.validTo && new Date(ad.validTo) <= now) return { label: 'Hết hạn', tone: 'neutral' };
-  return { label: 'Đang chạy', tone: 'emerald' };
+/** Whether the mid-roll draw can pick the ad: an active ad runs until the Admin pauses it. */
+export function adLiveState(ad: AdminAd): { label: string; tone: 'emerald' | 'neutral' } {
+  return ad.status === 'ACTIVE' ? { label: 'Đang chạy', tone: 'emerald' } : { label: 'Tạm dừng', tone: 'neutral' };
 }
 
 /** MF-3: the ads drawn into mid-roll breaks. The Admin creates them, edits them, pauses and resumes them. */
@@ -63,7 +60,7 @@ export function AdsPanel() {
               <div className="min-w-0 space-y-0.5">
                 <p className="font-semibold text-slate-900 dark:text-white">{ad.title}</p>
                 <p className="text-slate-500">
-                  {ad.durationSeconds} giây · trọng số {ad.weight} · {ad.validFrom || ad.validTo ? `${formatDay(ad.validFrom)} → ${formatDay(ad.validTo)}` : 'không giới hạn ngày'}
+                  Dài {formatDuration(ad.durationSeconds)} · trọng số {ad.weight}
                 </p>
                 <a href={ad.mediaUrl} target="_blank" rel="noopener noreferrer" className="text-sky-700 hover:underline break-all">
                   {ad.mediaUrl}

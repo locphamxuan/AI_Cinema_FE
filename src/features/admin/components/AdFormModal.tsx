@@ -6,13 +6,9 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
+import { formatDuration } from '@/features/production/lib/format';
 import { MAX_AD_DURATION_SECONDS, MAX_AD_VIDEO_BYTES, MAX_AD_WEIGHT, adAdminService, adInputProblem } from '@/services/adAdminService';
 import type { AdInput, AdminAd } from '@/types/playback';
-
-/** `yyyy-mm-dd` of a stored instant, for a date input. */
-export const dayOf = (iso: string | null): string => (iso ? iso.slice(0, 10) : '');
-/** Start of that day in Vietnam (UTC+7), the zone the business days follow. */
-export const instantOf = (day: string): string | null => (day ? new Date(`${day}T00:00:00+07:00`).toISOString() : null);
 
 interface Props {
   /** Null creates a new ad. */
@@ -22,18 +18,17 @@ interface Props {
   onSubmit: (input: AdInput) => void;
 }
 
-/** Create or edit one mid-roll ad: its video, length, pick weight and the window it is drawn in. */
+/**
+ * Create or edit one mid-roll ad: its video and how often the draw picks it. The viewer watches the whole
+ * video, so its length is read from the file (here for the preview, by the BE when saving), never typed.
+ */
 export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
   const [title, setTitle] = useState(ad?.title ?? '');
   const [mediaUrl, setMediaUrl] = useState(ad?.mediaUrl ?? '');
   const [clickUrl, setClickUrl] = useState(ad?.clickUrl ?? '');
-  const [duration, setDuration] = useState(ad?.durationSeconds ?? 15);
   const [weight, setWeight] = useState(ad?.weight ?? 1);
-  const [from, setFrom] = useState(dayOf(ad?.validFrom ?? null));
-  const [to, setTo] = useState(dayOf(ad?.validTo ?? null));
   const [uploading, setUploading] = useState(false);
-  // The length follows the video while creating, or once a new file replaces the video of an ad.
-  const [followLength, setFollowLength] = useState(!ad);
+  const [length, setLength] = useState<{ url: string; seconds: number } | null>(null);
 
   const upload = async (file: File | undefined) => {
     if (!file) return;
@@ -49,7 +44,6 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
         return;
       }
       setMediaUrl(res.data.mediaUrl);
-      setFollowLength(true);
     } finally {
       setUploading(false);
     }
@@ -60,12 +54,11 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
     mediaUrl: mediaUrl.trim(),
     // The BE takes null to clear the link of an existing ad and refuses an empty string.
     clickUrl: clickUrl.trim() || (ad ? null : undefined),
-    durationSeconds: duration,
     weight,
-    validFrom: instantOf(from) ?? (ad ? null : undefined),
-    validTo: instantOf(to) ?? (ad ? null : undefined),
   };
-  const problem = adInputProblem(input);
+  const seconds = length?.url === mediaUrl ? length.seconds : null;
+  const tooLong = seconds !== null && seconds > MAX_AD_DURATION_SECONDS;
+  const problem = adInputProblem(input) ?? (tooLong ? `Video dài ${formatDuration(seconds)}, quảng cáo tối đa ${MAX_AD_DURATION_SECONDS / 60} phút.` : null);
 
   return (
     <Modal open onClose={onClose} title={ad ? 'Sửa quảng cáo' : 'Tạo quảng cáo'} subtitle="Quảng cáo chèn giữa tập cho gói có quảng cáo." maxWidth="max-w-xl">
@@ -100,31 +93,27 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
           </div>
         </FormField>
         {/^https?:\/\//i.test(mediaUrl) && (
-          <video
-            src={mediaUrl}
-            controls
-            muted
-            className="w-full max-h-48 rounded-xl bg-black"
-            onLoadedMetadata={(e) => followLength && setDuration(Math.max(1, Math.round(e.currentTarget.duration)))}
-          />
+          <div className="space-y-1.5">
+            <video
+              src={mediaUrl}
+              controls
+              muted
+              className="w-full max-h-48 rounded-xl bg-black"
+              onLoadedMetadata={(e) => setLength({ url: mediaUrl, seconds: Math.round(e.currentTarget.duration) })}
+            />
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {seconds !== null
+                ? `Dài ${formatDuration(seconds)}. Người xem phải xem hết quảng cáo rồi mới bấm "Bỏ qua quảng cáo" để xem tiếp phim.`
+                : 'Hệ thống tự lấy thời lượng từ video khi lưu.'}
+            </p>
+          </div>
         )}
         <FormField label="Link khi người xem bấm (không bắt buộc)">
           <input type="url" value={clickUrl} onChange={(e) => setClickUrl(e.target.value)} maxLength={1000} className={fieldInputClass} />
         </FormField>
-        <div className="grid grid-cols-2 gap-3">
-          <FormField label={`Thời lượng (giây, tối đa ${MAX_AD_DURATION_SECONDS})`}>
-            <input type="number" min={1} max={MAX_AD_DURATION_SECONDS} value={duration} onChange={(e) => setDuration(Number(e.target.value))} className={fieldInputClass} />
-          </FormField>
-          <FormField label={`Trọng số (1-${MAX_AD_WEIGHT}, cao thì hiện nhiều hơn)`}>
-            <input type="number" min={1} max={MAX_AD_WEIGHT} value={weight} onChange={(e) => setWeight(Number(e.target.value))} className={fieldInputClass} />
-          </FormField>
-          <FormField label="Chạy từ ngày (bỏ trống = ngay)">
-            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className={fieldInputClass} />
-          </FormField>
-          <FormField label="Dừng từ ngày (bỏ trống = không hạn)">
-            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className={fieldInputClass} />
-          </FormField>
-        </div>
+        <FormField label={`Trọng số (1-${MAX_AD_WEIGHT}): số càng lớn, quảng cáo càng hay được chọn`}>
+          <input type="number" min={1} max={MAX_AD_WEIGHT} value={weight} onChange={(e) => setWeight(Number(e.target.value))} className={fieldInputClass} />
+        </FormField>
         {problem && title && mediaUrl && <p role="alert" className="text-xs text-rose-600">{problem}</p>}
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>

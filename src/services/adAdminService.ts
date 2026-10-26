@@ -2,7 +2,7 @@
 import type { AdInput, AdminAd, EpisodeAdSlotInput, EpisodeAdSlots } from '@/types/playback';
 import { apiClient, ApiResponse } from './apiClient';
 
-/** Bounds of the BE (ad-limits.ts): longer stops being a mid-roll, heavier wins every draw. */
+/** Bounds of the BE (ad-limits.ts): a longer video stops being a mid-roll, a heavier weight wins every draw. */
 export const MAX_AD_DURATION_SECONDS = 300;
 export const MAX_AD_WEIGHT = 1000;
 /** The BE (ad-media.service.ts) takes an MP4 of at most 100 MB. */
@@ -48,13 +48,7 @@ export function adInputProblem(input: AdInput): string | null {
   if (!input.title.trim()) return 'Nhập tên quảng cáo.';
   if (!/^https?:\/\/\S+$/i.test(input.mediaUrl)) return 'Link video phải bắt đầu bằng http:// hoặc https://.';
   if (input.clickUrl && !/^https?:\/\/\S+$/i.test(input.clickUrl)) return 'Link khi bấm phải bắt đầu bằng http:// hoặc https://.';
-  if (!Number.isInteger(input.durationSeconds) || input.durationSeconds < 1 || input.durationSeconds > MAX_AD_DURATION_SECONDS) {
-    return `Thời lượng từ 1 đến ${MAX_AD_DURATION_SECONDS} giây.`;
-  }
   const weight = input.weight ?? 1;
   if (!Number.isInteger(weight) || weight < 1 || weight > MAX_AD_WEIGHT) return `Trọng số từ 1 đến ${MAX_AD_WEIGHT}.`;
-  if (input.validFrom && input.validTo && new Date(input.validFrom) >= new Date(input.validTo)) {
-    return 'Ngày bắt đầu phải trước ngày kết thúc.';
-  }
   return null;
 }
