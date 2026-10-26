@@ -1,7 +1,8 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { adAdminService, adInputProblem } from '@/services/adAdminService';
+import { MAX_AD_VIDEO_BYTES, adAdminService, adInputProblem } from '@/services/adAdminService';
 import { adLiveState } from '@/features/admin/components/AdsPanel';
-import { dayOf, instantOf } from '@/features/admin/components/AdFormModal';
+import { AdFormModal, dayOf, instantOf } from '@/features/admin/components/AdFormModal';
 import type { AdminAd, AdInput } from '@/types/playback';
 
 const input = (patch: Partial<AdInput> = {}): AdInput => ({
@@ -64,5 +65,33 @@ describe('Admin ads (MF-3)', () => {
     expect(fetchMock.mock.calls[1][0]).toMatch(/\/admin\/ads\/a1$/);
     expect(fetchMock.mock.calls[1][1].method).toBe('PATCH');
     expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual({ status: 'PAUSED' });
+  });
+
+  it('uploads an ad video from the computer as multipart', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => ({ mediaUrl: 'https://cdn.example/ads/x.mp4' }), headers: new Headers() });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const res = await adAdminService.uploadVideo(new File(['mp4'], 'ad.mp4', { type: 'video/mp4' }));
+
+    expect(fetchMock.mock.calls[0][0]).toMatch(/\/admin\/ads\/media$/);
+    expect(fetchMock.mock.calls[0][1].body).toBeInstanceOf(FormData);
+    expect((fetchMock.mock.calls[0][1].body as FormData).get('file')).toBeInstanceOf(File);
+    expect(res.data?.mediaUrl).toBe('https://cdn.example/ads/x.mp4');
+  });
+
+  it('fills the video link from the file uploaded in the form, and refuses one over 100 MB', async () => {
+    const uploadVideo = vi.spyOn(adAdminService, 'uploadVideo').mockResolvedValue({ success: true, data: { mediaUrl: 'https://cdn.example/ads/x.mp4' } });
+    render(<AdFormModal ad={null} busy={false} onClose={vi.fn()} onSubmit={vi.fn()} />);
+    const picker = screen.getByLabelText('Tải video quảng cáo từ máy');
+
+    const huge = new File(['x'], 'big.mp4', { type: 'video/mp4' });
+    Object.defineProperty(huge, 'size', { value: MAX_AD_VIDEO_BYTES + 1 });
+    fireEvent.change(picker, { target: { files: [huge] } });
+    expect(uploadVideo).not.toHaveBeenCalled();
+
+    fireEvent.change(picker, { target: { files: [new File(['mp4'], 'ad.mp4', { type: 'video/mp4' })] } });
+    await waitFor(() => expect(screen.getByDisplayValue('https://cdn.example/ads/x.mp4')).toBeTruthy());
+    expect(uploadVideo).toHaveBeenCalledTimes(1);
+    uploadVideo.mockRestore();
   });
 });
