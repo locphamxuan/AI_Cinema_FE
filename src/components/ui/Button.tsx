@@ -6,7 +6,7 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 type Size = 'sm' | 'md';
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: 'bg-ruby hover:bg-ruby-dark text-white shadow-sm',
+  primary: 'bg-action hover:bg-action-strong text-white shadow-sm',
   secondary:
     'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 dark:bg-white/10 dark:hover:bg-white/15 dark:text-slate-100 dark:border-white/10',
   ghost:
@@ -31,7 +31,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       disabled={disabled}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-xl font-semibold transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-xl font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action/40 focus-visible:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
       {...props}
     />
   )
