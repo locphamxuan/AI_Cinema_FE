@@ -7,6 +7,7 @@ import {
   Gift,
   Inbox,
   KeyRound,
+  LayoutDashboard,
   Megaphone,
   Receipt,
   Settings,
@@ -23,8 +24,9 @@ export interface AdminSection {
   permissions: PermissionKey[];
 }
 
-/** The Admin console in sidebar order: production first, then money, then people and settings. */
+/** The Admin console in sidebar order: overview, production, money, then people and settings. */
 export const ADMIN_SECTIONS: AdminSection[] = [
+  { href: '/admin', label: 'Tổng quan', icon: LayoutDashboard, permissions: [PERMISSION.PROJECT_READ_ALL] },
   { href: '/admin/projects', label: 'Dự án phim', icon: Clapperboard, permissions: [PERMISSION.PROJECT_READ_ALL] },
   {
     href: '/admin/requests',

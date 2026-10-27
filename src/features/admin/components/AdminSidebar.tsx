@@ -14,7 +14,7 @@ export function AdminSidebar() {
     href,
     label,
     icon,
-    active: pathname.startsWith(href),
+    active: href === '/admin' ? pathname === '/admin' : pathname.startsWith(href),
   }));
   return <DashboardSidebar label="Khu quản trị" title="Quản trị" subtitle="Toàn bộ nền tảng" icon={LayoutDashboard} items={items} />;
 }

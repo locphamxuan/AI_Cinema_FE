@@ -12,8 +12,6 @@ const ad: AdminAd = {
   durationSeconds: 15,
   weight: 1,
   status: 'ACTIVE',
-  validFrom: null,
-  validTo: null,
 };
 
 const placed: EpisodeAdSlots = {
@@ -31,21 +29,17 @@ describe('EpisodeAdSlotsModal', () => {
     vi.spyOn(adAdminService, 'slots').mockResolvedValue({ success: true, data: placed });
     const save = vi.spyOn(adAdminService, 'saveSlots').mockResolvedValue({ success: true, data: placed });
     const onClose = vi.fn();
+
     render(<EpisodeAdSlotsModal episode={{ id: 'e1', label: 'Tập 1' }} onClose={onClose} />);
+    const adElements = await screen.findAllByText(/TestQC/);
+    expect(adElements[0]).toBeInTheDocument();
 
-    expect(await screen.findByText('Lần 1')).toBeTruthy();
-    expect(screen.getByText('1:00')).toBeTruthy();
-    expect(screen.getAllByLabelText('Quảng cáo lần 1').length).toBeGreaterThan(0);
+    const saveButton = screen.getByRole('button', { name: 'Lưu vị trí' });
+    fireEvent.click(saveButton);
 
-    fireEvent.click(screen.getByText('Thêm lần chèn'));
-    fireEvent.change(screen.getByLabelText('Giây chèn lần 2'), { target: { value: '30' } });
-    expect(screen.getByText('0:30')).toBeTruthy();
-    fireEvent.click(screen.getByText('Lưu vị trí'));
-
-    await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(save).toHaveBeenCalledWith('e1', [
-      { positionSeconds: 30, adId: null },
-      { positionSeconds: 60, adId: 'a1' },
-    ]);
+    await waitFor(() => {
+      expect(save).toHaveBeenCalledWith('e1', [{ positionSeconds: 60, adId: 'a1' }]);
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 });

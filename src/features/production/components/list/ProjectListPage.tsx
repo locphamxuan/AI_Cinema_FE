@@ -28,6 +28,7 @@ import { ErrorNote, Loading } from '../shared/ui';
 import { CreateProjectModal } from './CreateProjectModal';
 import { ProjectGrid } from './ProjectGrid';
 import { ProjectTable } from './ProjectTable';
+import { CreatorAnalyticsSection } from './CreatorAnalyticsSection';
 
 const FILTERS: { key: string; label: string; status?: MovieStatus[]; icon: React.ElementType }[] = [
   { key: 'all', label: 'Tất cả', icon: Layers },
@@ -164,6 +165,13 @@ export function ProjectListPage() {
 
         {projects.data && (
           <>
+            {projects.data.data.length > 0 && (
+              <CreatorAnalyticsSection
+                projects={projects.data.data}
+                roleTitle={isCreator ? 'Creator' : base === '/reviewer' ? 'Reviewer' : 'Admin'}
+              />
+            )}
+
             {projects.data.data.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-sky-200 dark:border-white/10 p-12 text-center bg-white dark:bg-white/[0.02]">
                 <Film className="w-10 h-10 mx-auto text-sky-300 dark:text-slate-600 mb-3" aria-hidden="true" />

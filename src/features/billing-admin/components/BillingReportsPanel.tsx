@@ -8,6 +8,7 @@ import { useResource } from '@/features/production/hooks/useResource';
 import { addDays, formatNumber } from '@/features/production/lib/format';
 import { ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
 import { billingAdminService } from '@/services/billingAdminService';
+import { BarChart } from '@/components/charts/BarChart';
 import type { ChurnReport, ReportRange, RevenueReport } from '@/types/billing';
 
 const today = () => new Date().toISOString().slice(0, 10);
@@ -56,34 +57,48 @@ function RevenueSection({ rangeKey, query }: { rangeKey: string; query: ReportRa
       {report.error && <ErrorNote message={report.error} onRetry={report.reload} />}
       {report.loading && !r && <Loading />}
       {r && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Stat label="Kỳ đã thu" value={formatNumber(r.totals.paidCycles)} />
             <Stat label="Tổng giá gói" value={formatNumber(r.totals.coins)} hint="Coin" />
             <Stat label="Thu bằng Coin chính" value={formatNumber(r.totals.mainCoins)} hint="Coin" />
             <Stat label="Thu bằng Coin thưởng" value={formatNumber(r.totals.bonusCoins)} hint="Coin" />
           </div>
+
           {r.byPlan.length > 0 && (
-            <table className="w-full text-xs">
-              <thead className="text-slate-500 text-left">
-                <tr>
-                  <th className="py-1 font-medium">Gói</th>
-                  <th className="py-1 font-medium text-right">Kỳ</th>
-                  <th className="py-1 font-medium text-right">Coin chính</th>
-                  <th className="py-1 font-medium text-right">Coin thưởng</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                {r.byPlan.map((row) => (
-                  <tr key={row.plan.id}>
-                    <td className="py-1">{row.plan.name}</td>
-                    <td className="py-1 text-right font-mono">{row.cycles}</td>
-                    <td className="py-1 text-right font-mono">{formatNumber(row.mainCoins)}</td>
-                    <td className="py-1 text-right font-mono">{formatNumber(row.bonusCoins)}</td>
+            <div className="space-y-4 pt-2">
+              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">Biểu đồ doanh thu từng gói</h4>
+              <BarChart
+                categories={r.byPlan.map((row) => row.plan.name)}
+                series={[
+                  { name: 'Coin chính', color: '#8b5cf6', values: r.byPlan.map((row) => row.mainCoins) },
+                  { name: 'Coin thưởng', color: '#38bdf8', values: r.byPlan.map((row) => row.bonusCoins) },
+                ]}
+                valueUnit="Coin"
+                height={200}
+              />
+
+              <table className="w-full text-xs pt-2">
+                <thead className="text-slate-500 text-left">
+                  <tr>
+                    <th className="py-1 font-medium">Gói</th>
+                    <th className="py-1 font-medium text-right">Kỳ</th>
+                    <th className="py-1 font-medium text-right">Coin chính</th>
+                    <th className="py-1 font-medium text-right">Coin thưởng</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                  {r.byPlan.map((row) => (
+                    <tr key={row.plan.id}>
+                      <td className="py-1 font-medium">{row.plan.name}</td>
+                      <td className="py-1 text-right font-mono">{row.cycles}</td>
+                      <td className="py-1 text-right font-mono">{formatNumber(row.mainCoins)}</td>
+                      <td className="py-1 text-right font-mono">{formatNumber(row.bonusCoins)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
