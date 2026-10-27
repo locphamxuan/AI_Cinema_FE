@@ -77,36 +77,49 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
       {slots.length === 0 && (
         <p className="text-xs text-slate-500 italic">Chưa đặt vị trí nào - tập sẽ được chèn quảng cáo ngẫu nhiên.</p>
       )}
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {slots.map((slot, index) => (
-          <li key={index} className="flex items-center gap-2">
-            <span className="w-14 text-[11px] text-slate-500">Lần {index + 1}</span>
-            <input
-              type="number"
-              min={1}
-              max={duration ? duration - 1 : undefined}
-              value={slot.positionSeconds}
-              onChange={(e) => edit(index, { positionSeconds: Number(e.target.value) })}
-              aria-label={`Giây chèn lần ${index + 1}`}
-              className={`${fieldInputClass} w-24`}
-            />
-            <span className="w-12 text-[11px] font-mono text-slate-500">{formatDuration(slot.positionSeconds || 0)}</span>
-            <Select
-              value={slot.adId ?? RANDOM_AD}
-              onChange={(adId) => edit(index, { adId: adId || null })}
-              options={options}
-              size="sm"
-              className="flex-1 min-w-0"
-              aria-label={`Quảng cáo lần ${index + 1}`}
-            />
-            <button
-              type="button"
-              onClick={() => setSlots((all) => all.filter((_, i) => i !== index))}
-              aria-label={`Bỏ lần chèn ${index + 1}`}
-              className="p-1.5 text-slate-400 hover:text-rose-600 cursor-pointer"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+          <li key={index} className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-white/[0.03] p-3 space-y-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">
+                Lần {index + 1}
+                <span className="ml-2 font-normal text-slate-500 dark:text-slate-400">
+                  phát lúc <span className="font-mono">{formatDuration(slot.positionSeconds || 0)}</span>
+                </span>
+              </p>
+              <button
+                type="button"
+                onClick={() => setSlots((all) => all.filter((_, i) => i !== index))}
+                aria-label={`Bỏ lần chèn ${index + 1}`}
+                className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-[8rem_minmax(0,1fr)] gap-2.5">
+              <div>
+                <span className="block mb-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">Giây chèn</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={duration ? duration - 1 : undefined}
+                  value={slot.positionSeconds}
+                  onChange={(e) => edit(index, { positionSeconds: Number(e.target.value) })}
+                  aria-label={`Giây chèn lần ${index + 1}`}
+                  className={fieldInputClass}
+                />
+              </div>
+              <div className="min-w-0">
+                <span className="block mb-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">Quảng cáo</span>
+                <Select
+                  value={slot.adId ?? RANDOM_AD}
+                  onChange={(adId) => edit(index, { adId: adId || null })}
+                  options={options}
+                  className="w-full"
+                  aria-label={`Quảng cáo lần ${index + 1}`}
+                />
+              </div>
+            </div>
           </li>
         ))}
       </ul>
