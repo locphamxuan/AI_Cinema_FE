@@ -35,3 +35,10 @@ export interface RegisterCredentials {
   /** YYYY-MM-DD; Members must be 18 or older (BR-54). */
   dateOfBirth: string;
 }
+
+/** Body of POST /auth/google; the extras answer the step a first Google sign-in asks for. */
+export interface GoogleSignIn {
+  idToken: string;
+  dateOfBirth?: string;
+  password?: string;
+}

@@ -63,6 +63,17 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
     return { success: true };
   },
 
+  loginWithGoogle: async (idToken, extra = {}) => {
+    const res = await authService.googleLogin({ idToken, ...extra });
+    if (!res.success || !res.data) {
+      return { success: false, error: res.message ?? 'Đăng nhập bằng Google thất bại.', reason: res.reason };
+    }
+
+    set(sessionStateFor(res.data));
+
+    return { success: true, redirectUrl: redirectUrlFor(res.data.role ?? 'user') };
+  },
+
   logout: () => {
     authService.logout();
     set({
