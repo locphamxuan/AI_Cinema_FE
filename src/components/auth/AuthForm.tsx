@@ -6,6 +6,7 @@ import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
 import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
+import GoogleSignInButton from './GoogleSignInButton';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
 
 // Only the email is remembered; a password never goes to localStorage.
@@ -98,7 +99,11 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
     }
     if (mode === 'register') toast.success(APPLICATION_MESSAGES.MSG04.message);
     rememberEmail(email, rememberMe);
-    const target = ('redirectUrl' in res && typeof res.redirectUrl === 'string' ? res.redirectUrl : undefined) || fallbackUrl;
+    goOn('redirectUrl' in res && typeof res.redirectUrl === 'string' ? res.redirectUrl : undefined);
+  };
+
+  const goOn = (redirectUrl?: string) => {
+    const target = redirectUrl || fallbackUrl;
     if (target) router.push(target);
   };
 
@@ -208,6 +213,8 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
           {loading ? 'Đang xử lý...' : mode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'}
         </button>
       </form>
+
+      <GoogleSignInButton onSignedIn={goOn} />
 
       <p className="mt-5 text-center text-xs text-slate-500 dark:text-muted-light">
         {mode === 'login' ? 'Chưa có tài khoản? ' : 'Đã có tài khoản? '}
