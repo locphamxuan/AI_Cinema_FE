@@ -73,14 +73,14 @@ export function RolePermissionsPanel() {
   };
 
   if (error) return <p className="text-xs text-rose-600 dark:text-rose-400">{error}</p>;
-  if (!draft) return <p className="text-xs text-slate-500 dark:text-slate-400">Đang tải ma trận phân quyền…</p>;
+  if (!draft) return <p className="text-xs text-slate-500 dark:text-slate-400">Đang tải bảng phân quyền vai trò…</p>;
 
   return (
     <section className="bg-white dark:bg-[#0F1C27] rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
       <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            Ma trận phân quyền hệ thống
+            Phân quyền theo vai trò
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
             Nhấp trực tiếp vào ô trạng thái để bật / tắt quyền hạn cho vai trò tương ứng. Biểu tượng ổ khóa màu cam là quyền bắt buộc của hệ thống.

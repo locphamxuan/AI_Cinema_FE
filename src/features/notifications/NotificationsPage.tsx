@@ -11,17 +11,13 @@ import {
   AlertTriangle,
   ArrowRight,
   Clock,
-  ExternalLink,
   Film,
-  CheckCircle2,
-  XCircle,
   Inbox,
-  Filter,
-  Sparkles,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Empty, ErrorNote, Loading } from '@/features/production/components/shared/ui';
-import { Pager } from '@/features/production/components/shared/Pager';
 import { useResource } from '@/features/production/hooks/useResource';
 import { formatDateTime } from '@/features/production/lib/format';
 import { notificationHref } from '@/features/production/lib/routes';
@@ -30,7 +26,9 @@ import { useAppStore } from '@/store/useAppStore';
 import type { AppNotification } from '@/types/production';
 import { notificationTabsFor, typesOf, type NotificationTab } from './notificationCatalog';
 
-const PAGE_SIZE = 15;
+// 6 items per page so user has clean paging and doesn't have to scroll/slide through long list
+const PAGE_SIZE = 6;
+
 const ALL: NotificationTab = {
   key: 'all',
   label: 'Tất cả thông báo',
@@ -101,7 +99,7 @@ function getNotificationMeta(item: AppNotification): {
   };
 }
 
-/** Format relative time or clean date string */
+/** Format relative time */
 function formatTimeAgo(isoString: string): string {
   try {
     const diffMs = Date.now() - new Date(isoString).getTime();
@@ -138,7 +136,7 @@ function useUnreadCounts(tabs: NotificationTab[], version: number) {
 
 /**
  * Modern High-Fidelity Notification Center
- * Redesigned into responsive cards with distinct color accents, category tags, action shortcuts, and time-ago badges.
+ * Redesigned into responsive cards with distinct color accents, category tags, action shortcuts, and full numbered pagination.
  */
 export function NotificationsPage() {
   const router = useRouter();
@@ -162,6 +160,7 @@ export function NotificationsPage() {
 
   const rows = list.data?.data ?? [];
   const totalItems = list.data?.meta?.totalItems ?? 0;
+  const totalPages = Math.max(1, list.data?.meta?.totalPages ?? Math.ceil(totalItems / PAGE_SIZE) ?? 1);
   const totalUnreadAll = counts['all'] ?? 0;
 
   const choose = (next: string, nextSection: string | null = null) => {
@@ -184,8 +183,14 @@ export function NotificationsPage() {
     setVersion((v) => v + 1);
   };
 
+  // Generate numbered pages for pagination
+  const pageNumbers: number[] = [];
+  for (let p = 1; p <= totalPages; p++) {
+    pageNumbers.push(p);
+  }
+
   return (
-    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fade-in">
+    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* ── Header Hero Bar ── */}
       <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] p-6 sm:p-8 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
@@ -220,13 +225,13 @@ export function NotificationsPage() {
         </div>
       </div>
 
-      {/* ── Main Filter Bar & Tabs ── */}
+      {/* ── Main Filter Bar & Tabs (Clean wrap without horizontal slide) ── */}
       <div className="space-y-3">
-        {/* Category Tabs */}
+        {/* Category Tabs: flex-wrap to prevent horizontal sliding */}
         <div
           role="tablist"
           aria-label="Nhóm thông báo"
-          className="flex gap-2 p-1.5 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/5 overflow-x-auto"
+          className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/5"
         >
           {tabs.map((t) => {
             const isActive = t.key === tabKey;
@@ -238,7 +243,7 @@ export function NotificationsPage() {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => choose(t.key)}
-                className={`flex items-center gap-2 shrink-0 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
                   isActive
                     ? 'bg-white dark:bg-sky-500 text-slate-900 dark:text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-transparent'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
@@ -348,7 +353,7 @@ export function NotificationsPage() {
           )}
 
           {rows.length > 0 && (
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               {rows.map((item) => {
                 const isUnread = !item.readAt;
                 const meta = getNotificationMeta(item);
@@ -361,7 +366,7 @@ export function NotificationsPage() {
                     onClick={() => open(item)}
                     className={`group relative rounded-2xl p-4 sm:p-5 transition-all duration-200 cursor-pointer border ${
                       isUnread
-                        ? 'bg-sky-50/30 dark:bg-sky-500/[0.04] border-sky-200/80 dark:border-sky-500/20 hover:border-sky-300 dark:hover:border-sky-500/40 shadow-xs'
+                        ? 'bg-sky-50/40 dark:bg-sky-500/[0.05] border-sky-200/90 dark:border-sky-500/25 hover:border-sky-300 dark:hover:border-sky-500/40 shadow-xs'
                         : 'bg-white dark:bg-white/[0.015] border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10 hover:bg-slate-50/70 dark:hover:bg-white/[0.03]'
                     }`}
                   >
@@ -439,14 +444,55 @@ export function NotificationsPage() {
             </div>
           )}
 
-          {/* Pagination */}
-          <div className="pt-6 border-t border-slate-100 dark:border-white/5 mt-6">
-            <Pager
-              page={page}
-              totalPages={list.data?.meta?.totalPages ?? 1}
-              onChange={setPage}
-            />
-          </div>
+          {/* ── Discrete Paging Controls (Always visible when items exist) ── */}
+          {totalItems > 0 && (
+            <div className="pt-6 border-t border-slate-100 dark:border-white/5 mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Hiển thị <span className="font-semibold text-slate-900 dark:text-white">{Math.min(totalItems, (page - 1) * PAGE_SIZE + 1)}</span>–
+                <span className="font-semibold text-slate-900 dark:text-white">{Math.min(totalItems, page * PAGE_SIZE)}</span> trên tổng số{' '}
+                <span className="font-semibold text-slate-900 dark:text-white">{totalItems}</span> thông báo
+              </p>
+
+              <nav aria-label="Phân trang thông báo" className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  <span>Trang trước</span>
+                </button>
+
+                <div className="flex items-center gap-1 px-1">
+                  {pageNumbers.map((p) => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setPage(p)}
+                      className={`w-8 h-8 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                        p === page
+                          ? 'bg-sky-500 text-white shadow-xs'
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Trang sau</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </nav>
+            </div>
+          )}
         </div>
       </div>
     </main>
