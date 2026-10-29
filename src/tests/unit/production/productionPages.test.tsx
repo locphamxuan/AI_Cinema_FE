@@ -144,7 +144,9 @@ describe('ProjectListPage', () => {
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
 
-    const card = (await screen.findByText('Mưa Sài Gòn')).closest('li')!;
+    // The analytics chart names the project too; the card is the one in the list.
+    const titles = await screen.findAllByText('Mưa Sài Gòn');
+    const card = titles.map((title) => title.closest('li')).find(Boolean)!;
     expect(within(card).getByText('Studio đang sản xuất')).toBeInTheDocument();
     expect(within(card).getByText('Studio Sao Mai')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Tạo dự án/ })).toBeInTheDocument();
@@ -156,7 +158,7 @@ describe('ProjectListPage', () => {
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
 
-    await screen.findByText('Mưa Sài Gòn');
+    await screen.findAllByText('Mưa Sài Gòn');
     await userEvent.click(screen.getByRole('button', { name: 'Xem dạng bảng' }));
     const header = screen.getByRole('columnheader', { name: 'Cập nhật lần cuối' });
     expect(header).toHaveAttribute('title', expect.stringContaining('thay đổi gần nhất'));
@@ -171,7 +173,7 @@ describe('ProjectListPage', () => {
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
 
-    await screen.findByText('Mưa Sài Gòn');
+    await screen.findAllByText('Mưa Sài Gòn');
     expect(screen.queryByRole('button', { name: /Tạo dự án/ })).not.toBeInTheDocument();
   });
 });
