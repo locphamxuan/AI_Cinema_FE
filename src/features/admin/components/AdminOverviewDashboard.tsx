@@ -2,19 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import {
-  BarChart3,
-  Clapperboard,
-  CreditCard,
-  Film,
-  Gift,
-  Layers,
-  Receipt,
-  TrendingUp,
-  Users,
-  ArrowRight,
-  ShieldCheck,
-} from 'lucide-react';
+import { BarChart3, Film, TrendingUp, Users, ArrowRight, ShieldCheck } from 'lucide-react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
 import { useResource } from '@/features/production/hooks/useResource';
@@ -24,6 +12,7 @@ import { productionService } from '@/services/productionService';
 import { adminService } from '@/services/adminService';
 import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
 import type { RevenueReport, ReportRange } from '@/types/billing';
+import { AdminOverviewKpis } from './AdminOverviewKpis';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -167,81 +156,12 @@ export function AdminOverviewDashboard() {
         </div>
       </div>
 
-      {/* ── 4 KPI Summary Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Doanh thu gói */}
-        <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
-            <Receipt className="w-6 h-6" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Doanh thu gói
-            </p>
-            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white truncate">
-              {revenue ? `${formatNumber(revenue.totals.coins)}` : '…'}
-              <span className="text-xs font-normal text-slate-400 ml-1">Coin</span>
-            </p>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              Thu từ hội viên đăng ký
-            </p>
-          </div>
-        </div>
-
-        {/* Lượt gia hạn thành công */}
-        <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-            <TrendingUp className="w-6 h-6" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Lượt thu phí kỳ
-            </p>
-            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white">
-              {revenue ? formatNumber(revenue.totals.paidCycles) : '…'}
-            </p>
-            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">
-              Thành viên trả phí
-            </p>
-          </div>
-        </div>
-
-        {/* Tổng dự án phim */}
-        <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
-            <Clapperboard className="w-6 h-6" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Dự án phim
-            </p>
-            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white">
-              {projects.length}
-            </p>
-            <p className="text-[11px] text-purple-600 dark:text-purple-400 mt-0.5 font-medium">
-              {projectStats.production} đang sản xuất
-            </p>
-          </div>
-        </div>
-
-        {/* Tổng số tài khoản */}
-        <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
-            <Users className="w-6 h-6" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Tài khoản toàn sàn
-            </p>
-            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white">
-              {accounts.length}
-            </p>
-            <p className="text-[11px] text-slate-400 mt-0.5">
-              {roleStats.member} khán giả · {roleStats.creator + roleStats.reviewer} ekip
-            </p>
-          </div>
-        </div>
-      </div>
+      <AdminOverviewKpis
+        revenue={revenue}
+        projectCount={projects.length}
+        completedProjects={projectStats.done}
+        accountCount={accountsRes.data?.meta.totalItems ?? accounts.length}
+      />
 
       {/* ── Main Analytics Grid: Revenue breakdown & Coin structure ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

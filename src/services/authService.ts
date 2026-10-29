@@ -4,7 +4,13 @@
 
 import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
-import type { AuthRole as BackendRole, LoginCredentials, RegisterCredentials, UserProfile } from '@/types/auth';
+import type {
+  AuthRole as BackendRole,
+  GoogleSignIn,
+  LoginCredentials,
+  RegisterCredentials,
+  UserProfile,
+} from '@/types/auth';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { AREAS, homeAreaOf } from '@/lib/permissions';
 
@@ -93,6 +99,19 @@ export const authService = {
       return { ...res, data: null as unknown as UserProfile };
     }
 
+    return { ...res, data: persistSession(res.data) };
+  },
+
+  /**
+   * Signs in with a Google ID token. A first sign-in may come back with `reason` asking for a
+   * birthday (new member, BR-54) or the password of the account that already owns the email;
+   * the caller resends the same token with that answer.
+   */
+  async googleLogin(input: GoogleSignIn): Promise<ApiResponse<UserProfile>> {
+    const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.GOOGLE, input);
+    if (!res.success) {
+      return { ...res, data: null as unknown as UserProfile };
+    }
     return { ...res, data: persistSession(res.data) };
   },
 

@@ -11,6 +11,8 @@ export interface ApiResponse<T> {
   data: T;
   message?: string;
   statusCode?: number;
+  /** The backend `details.reason` of a refusal, for screens that react to a specific one. */
+  reason?: string;
 }
 
 export interface RequestOptions extends RequestInit {
@@ -117,6 +119,7 @@ class ApiClient {
           response.status === 401 &&
           !options._isRetry &&
           !endpoint.includes('/auth/login') &&
+          !endpoint.includes('/auth/google') &&
           !endpoint.includes('/auth/refresh')
         ) {
           const refreshed = await this.tryRefreshToken();
@@ -146,12 +149,17 @@ class ApiClient {
           // Use the HTTP status fallback when the server returned an empty or non-JSON error body.
         }
         const errorMessage = localizeApiError(rawMessage, response.status, rawDetails, endpoint);
+        const reason =
+          typeof rawDetails === 'object' && rawDetails !== null && 'reason' in rawDetails
+            ? String(rawDetails.reason)
+            : undefined;
 
         return {
           success: false,
           data: null as unknown as T,
           message: errorMessage,
           statusCode: response.status,
+          reason,
         };
       }
 

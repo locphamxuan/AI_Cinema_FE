@@ -107,6 +107,14 @@ const PLAYBACK_REASONS: Record<string, string> = {
   PLAYBACK_ACCESS_REVOKED: 'Quyền xem tập này đã hết hiệu lực.',
 };
 
+/** Google sign-in refusals, keyed by the BE `details.reason`. */
+const GOOGLE_REASONS: Record<string, string> = {
+  GOOGLE_SIGNUP_NEEDS_BIRTHDAY: 'Nhập ngày sinh để hoàn tất đăng ký (từ 18 tuổi).',
+  GOOGLE_LINK_NEEDS_PASSWORD: 'Email này đã có tài khoản. Nhập mật khẩu của tài khoản đó để liên kết với Google.',
+  GOOGLE_ACCOUNT_MISMATCH: 'Email này đã được liên kết với một tài khoản Google khác.',
+  PROVIDER_NOT_CONFIGURED: 'Đăng nhập bằng Google hiện chưa được bật.',
+};
+
 export function localizeApiError(
   rawMessage: unknown,
   status: number,
@@ -132,8 +140,14 @@ export function localizeApiError(
   ) {
     return APPLICATION_MESSAGES.MSG13.message;
   }
-  const playback = PLAYBACK_REASONS[String(reason)];
+  const playback = PLAYBACK_REASONS[String(reason)] ?? GOOGLE_REASONS[String(reason)];
   if (playback) return playback;
+  if (normalized.includes('google id token') || normalized.includes('google account email is not verified')) {
+    return 'Không xác thực được tài khoản Google. Vui lòng thử lại.';
+  }
+  if (normalized.includes('uses google sign-in') || normalized.includes('has no password')) {
+    return 'Tài khoản này đăng nhập bằng Google, không có mật khẩu. Hãy dùng nút "Đăng nhập với Google".';
+  }
   if (normalized.includes('cannot be released yet')) return APPLICATION_MESSAGES.MSG14.message;
   if (normalized.includes('viewers aged 18 or older')) return APPLICATION_MESSAGES.MSG07.message;
   if (normalized.includes('account with this email already exists')) return APPLICATION_MESSAGES.MSG06.message;
@@ -151,7 +165,7 @@ export function localizeApiError(
   }
   // Session, rate limit and server faults read the same whatever the server said, and never leak internals.
   if (status === 429) return APPLICATION_MESSAGES.MSG19.message;
-  if (status === 401 && endpoint.includes('/auth/login')) return APPLICATION_MESSAGES.MSG05.message;
+  if (status === 401 && (endpoint.includes('/auth/login') || endpoint.includes('/auth/google'))) return APPLICATION_MESSAGES.MSG05.message;
   if (status === 401) return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
   if (status >= 500) return APPLICATION_MESSAGES.MSG18.message;
 

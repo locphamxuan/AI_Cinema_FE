@@ -7,6 +7,7 @@ import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
 import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
+import GoogleSignInButton from './GoogleSignInButton';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
 
 const STORAGE_KEY = 'aicinema_saved_email';
@@ -114,7 +115,11 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
     }
 
     rememberEmail(email, rememberMe);
-    const target = ('redirectUrl' in res && typeof res.redirectUrl === 'string' ? res.redirectUrl : undefined) || fallbackUrl;
+    goOn('redirectUrl' in res && typeof res.redirectUrl === 'string' ? res.redirectUrl : undefined);
+  };
+
+  const goOn = (redirectUrl?: string) => {
+    const target = redirectUrl || fallbackUrl;
     if (target) router.push(target);
   };
 
@@ -250,6 +255,8 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
           {loading ? 'Đang xác thực…' : mode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'}
         </button>
       </form>
+
+      <GoogleSignInButton onSignedIn={goOn} />
 
       {/* Switch mode footer */}
       <div className="mt-6 pt-5 border-t border-slate-100 dark:border-white/10 text-center text-xs text-slate-500 dark:text-muted-light">
