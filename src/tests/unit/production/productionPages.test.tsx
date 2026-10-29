@@ -144,6 +144,9 @@ describe('ProjectListPage', () => {
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
 
+    // The analytics chart names the project too; the card is the one in the list.
+    const titles = await screen.findAllByText('Mưa Sài Gòn');
+    const card = titles.map((title) => title.closest('li')).find(Boolean)!;
     const card = (await screen.findByRole('heading', { name: 'Mưa Sài Gòn' })).closest('li')!;
     expect(within(card).getByText('Studio đang sản xuất')).toBeInTheDocument();
     expect(within(card).getByText('Studio Sao Mai')).toBeInTheDocument();
@@ -156,6 +159,7 @@ describe('ProjectListPage', () => {
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
 
+    await screen.findAllByText('Mưa Sài Gòn');
     await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
     await userEvent.click(screen.getByRole('button', { name: 'Xem dạng bảng' }));
     const header = screen.getByRole('columnheader', { name: 'Cập nhật lần cuối' });
@@ -170,6 +174,8 @@ describe('ProjectListPage', () => {
     signInAs('creator');
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
+
+    await screen.findAllByText('Mưa Sài Gòn');
 
     await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
     expect(screen.queryByRole('button', { name: /Tạo dự án/ })).not.toBeInTheDocument();

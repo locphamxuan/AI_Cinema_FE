@@ -55,9 +55,9 @@ export function ChangeRequestCard({
           <StatusPill {...CHANGE_REQUEST_STATUS[cr.status]} />
         </div>
       </div>
-      {cr.movie && projectHref && (
+      {cr.project && projectHref && (
         <Link href={projectHref} className="font-semibold text-sky-700 dark:text-sky-300 hover:underline">
-          {cr.movie.title}
+          {cr.project.movie.title}
         </Link>
       )}
       <div>
@@ -92,7 +92,7 @@ export function ChangeRequestCard({
       <TextPromptModal
         open={rejecting}
         title="Từ chối đề xuất"
-        subtitle={cr.movie?.title}
+        subtitle={cr.project?.movie.title}
         label="Lý do (người đề xuất sẽ nhận được)"
         confirmLabel="Từ chối"
         minLength={1}

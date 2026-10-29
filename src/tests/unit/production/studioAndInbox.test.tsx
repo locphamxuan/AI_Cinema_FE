@@ -24,7 +24,7 @@ const studio = (patch: object = {}) => ({
   note: null,
   isActive: true,
   createdAt: '2026-10-01T00:00:00.000Z',
-  _count: { movies: 0, handoffs: 0 },
+  _count: { projects: 0, handoffs: 0 },
   ...patch,
 });
 
@@ -37,7 +37,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe('StudiosPage (BR-59)', () => {
   it('lets the Reviewer add a studio and delete only one nobody used', async () => {
     signInAs('reviewer');
-    const calls = routeFetch({ '/studios': [studio(), studio({ id: 'st2', name: 'Studio Đã Dùng', email: 'used@x.vn', _count: { movies: 2, handoffs: 3 } })] });
+    const calls = routeFetch({ '/studios': [studio(), studio({ id: 'st2', name: 'Studio Đã Dùng', email: 'used@x.vn', _count: { projects: 2, handoffs: 3 } })] });
     render(<StudiosPage />);
 
     expect(await screen.findByText('Studio Ánh Trăng')).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe('StudiosPage (BR-59)', () => {
 describe('ChangeRequestInbox (BR-55)', () => {
   const request = {
     id: 'cr1',
-    movieId: 'm1',
+    projectId: 'm1',
     requestType: 'BUDGET_SUPPLEMENT',
     content: 'Studio báo giá lại, cần thêm Token.',
     reason: 'Kịch bản dài hơn dự kiến.',
@@ -82,7 +82,7 @@ describe('ChangeRequestInbox (BR-55)', () => {
     resolvedBy: null,
     season: { id: 's1', seasonNumber: 1, title: null },
     episode: null,
-    movie: { id: 'm1', title: 'Mưa Sài Gòn', reviewerId: 'r1' },
+    project: { id: 'm1', reviewerId: 'r1', creatorId: null, movie: { title: 'Mưa Sài Gòn' } },
   };
 
   it('lists open requests with their reason, proof and tokens for the Admin to decide', async () => {

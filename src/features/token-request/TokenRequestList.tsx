@@ -89,9 +89,9 @@ export function TokenRequestList({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-semibold text-slate-900 dark:text-white">
                 {projectHref ? (
-                  <Link href={projectHref(r.movie.id)} className="text-sky-700 dark:text-sky-500 hover:underline">{r.movie.title}</Link>
+                  <Link href={projectHref(r.project.id)} className="text-sky-700 dark:text-sky-500 hover:underline">{r.project.movie.title}</Link>
                 ) : (
-                  r.movie.title
+                  r.project.movie.title
                 )}{' '}
                 · Mùa {r.season.seasonNumber} · xin <span className="font-mono">{formatNumber(r.requestedTokens)}</span> Token
               </p>
@@ -132,7 +132,7 @@ export function TokenRequestList({
       <TextPromptModal
         open={!!rejecting}
         title="Từ chối yêu cầu thêm Token"
-        subtitle={rejecting ? `${rejecting.movie.title} · Mùa ${rejecting.season.seasonNumber}` : undefined}
+        subtitle={rejecting ? `${rejecting.project.movie.title} · Mùa ${rejecting.season.seasonNumber}` : undefined}
         label="Lý do (Creator sẽ nhận được)"
         confirmLabel="Từ chối"
         danger
@@ -156,7 +156,7 @@ function ApproveModal({ request, onClose, onDone }: { request: TokenRequest; onC
   };
 
   return (
-    <Modal open onClose={onClose} title="Cấp thêm Token" subtitle={`${request.movie.title} · Mùa ${request.season.seasonNumber}`}>
+    <Modal open onClose={onClose} title="Cấp thêm Token" subtitle={`${request.project.movie.title} · Mùa ${request.season.seasonNumber}`}>
       <form onSubmit={submit} className="space-y-4">
         <p className="text-xs text-slate-600 dark:text-slate-300">
           Ghi thành khoản “+ Token thêm” của mùa, trừ vào ví Token của bạn. Không cấp quá số Creator xin ({formatNumber(request.requestedTokens)}).

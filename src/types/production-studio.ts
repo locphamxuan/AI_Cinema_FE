@@ -14,6 +14,14 @@ export interface Person {
   email?: string;
 }
 
+/** The project a production row belongs to, as lists show it: who owns it and the movie title. */
+export interface ProjectRef {
+  id: string;
+  reviewerId: string;
+  creatorId: string | null;
+  movie: { title: string };
+}
+
 /** A partner studio: third party, no account (BR-15, BR-59). */
 export interface Studio {
   id: string;
@@ -24,7 +32,7 @@ export interface Studio {
   note: string | null;
   isActive: boolean;
   createdAt: string;
-  _count?: { movies: number; handoffs: number };
+  _count?: { projects: number; handoffs: number };
 }
 
 export interface HandoffMaterial {
@@ -140,7 +148,7 @@ export interface FeeLedger {
 
 export interface ChangeRequest {
   id: string;
-  movieId: string;
+  projectId: string;
   requestType: ChangeRequestType;
   content: string;
   reason: string;
@@ -155,5 +163,5 @@ export interface ChangeRequest {
   season: { id: string; seasonNumber: number; title: string | null } | null;
   episode: { id: string; episodeNumber: number; title: string } | null;
   /** Only in the Admin's inbox. */
-  movie?: { id: string; title: string; reviewerId: string };
+  project?: ProjectRef;
 }
