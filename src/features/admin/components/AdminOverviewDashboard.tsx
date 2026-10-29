@@ -72,6 +72,27 @@ export function AdminOverviewDashboard() {
     { label: 'Đã huỷ', value: projectStats.cancelled, color: '#ef4444' },
   ];
 
+  // Real-time episode output by project
+  const topProjectsWithEpisodes = [...projects]
+    .filter((p) => (p._count?.episodes ?? 0) > 0 || p.status === 'IN_PRODUCTION')
+    .slice(0, 6);
+
+  const episodeCategories = topProjectsWithEpisodes.map((p, idx) => {
+    const title = p.title?.trim();
+    if (title && title.length > 0) {
+      return title.length > 14 ? `${title.slice(0, 12)}…` : title;
+    }
+    return `Dự án ${idx + 1}`;
+  });
+
+  const episodeBarSeries = [
+    {
+      name: 'Số tập phim',
+      color: '#10b981',
+      values: topProjectsWithEpisodes.map((p) => p._count?.episodes ?? 0),
+    },
+  ];
+
   // Revenue by Plan bar chart
   const planCategories = revenue?.byPlan.map((p) => p.plan.name) ?? [];
   const planBarSeries = [
@@ -158,34 +179,34 @@ export function AdminOverviewDashboard() {
               Doanh thu gói
             </p>
             <p className="text-2xl font-black font-mono text-slate-900 dark:text-white truncate">
-              {formatNumber(revenue?.totals.coins ?? 0)}{' '}
-              <span className="text-xs font-sans font-medium text-slate-400">Coin</span>
+              {revenue ? `${formatNumber(revenue.totals.coins)}` : '…'}
+              <span className="text-xs font-normal text-slate-400 ml-1">Coin</span>
             </p>
-            <p className="text-[11px] text-purple-600 dark:text-purple-400 font-medium truncate">
-              {formatNumber(revenue?.totals.mainCoins ?? 0)} Coin chính
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              ≈ {revenue ? formatNumber(revenue.totals.vndEstimate) : 0} ₫
             </p>
           </div>
         </div>
 
-        {/* Kỳ đã thu */}
+        {/* Lượt gia hạn thành công */}
         <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-            <CreditCard className="w-6 h-6" />
+            <TrendingUp className="w-6 h-6" />
           </div>
           <div className="min-w-0">
             <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Kỳ thanh toán
+              Lượt thu phí kỳ
             </p>
-            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white truncate">
-              {formatNumber(revenue?.totals.paidCycles ?? 0)}
+            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white">
+              {revenue ? formatNumber(revenue.totals.chargesCount) : '…'}
             </p>
-            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium truncate">
-              Giao dịch gói thành công
+            <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">
+              Thành viên trả phí
             </p>
           </div>
         </div>
 
-        {/* Tổng dự án */}
+        {/* Tổng dự án phim */}
         <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-600 dark:text-sky-400 shrink-0">
             <Clapperboard className="w-6 h-6" />
@@ -194,50 +215,50 @@ export function AdminOverviewDashboard() {
             <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Dự án phim
             </p>
-            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white truncate">
+            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white">
               {projects.length}
             </p>
-            <p className="text-[11px] text-sky-600 dark:text-sky-400 font-medium truncate">
-              {projectStats.done} phim đã hoàn tất
+            <p className="text-[11px] text-purple-600 dark:text-purple-400 mt-0.5 font-medium">
+              {projectStats.production} đang sản xuất
             </p>
           </div>
         </div>
 
-        {/* Tổng tài khoản */}
+        {/* Tổng số tài khoản */}
         <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
             <Users className="w-6 h-6" />
           </div>
           <div className="min-w-0">
             <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-              Tài khoản
+              Tài khoản toàn sàn
             </p>
-            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white truncate">
-              {accountsRes.data?.meta.totalItems ?? accounts.length}
+            <p className="text-2xl font-black font-mono text-slate-900 dark:text-white">
+              {accounts.length}
             </p>
-            <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium truncate">
-              Đang hoạt động trên sàn
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              {roleStats.member} khán giả · {roleStats.creator + roleStats.reviewer} ekip
             </p>
           </div>
         </div>
       </div>
 
-      {/* ── Main Charts Grid ── */}
+      {/* ── Main Analytics Grid: Revenue breakdown & Coin structure ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Doanh thu theo Gói (Bar Chart - 2 Cols) */}
+        {/* Doanh thu theo gói (Bar Chart - 2 Cols) */}
         <div className="lg:col-span-2 p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-purple-500" />
-                Doanh thu theo Gói thành viên
+                Doanh thu phân bổ theo gói hội viên
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                So sánh số lượng Coin chính vs Coin thưởng thu được trên từng gói
+                Thống kê số Coin thu được từ từng gói hội viên trong khoảng thời gian đã chọn
               </p>
             </div>
             <Link
-              href="/admin/billing-reports"
+              href="/admin/membership-plans?tab=reports"
               className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
             >
               Chi tiết báo cáo <ArrowRight className="w-3.5 h-3.5" />
@@ -289,6 +310,42 @@ export function AdminOverviewDashboard() {
         </div>
       </div>
 
+      {/* ── Real-time Episode Output Chart ── */}
+      <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Film className="w-4 h-4 text-emerald-500" />
+              Số tập phim theo dự án (Real-time)
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Dữ liệu số lượng tập phim thực tế đang được sản xuất hoặc hoàn tất từ các dự án tiêu biểu
+            </p>
+          </div>
+          <Link
+            href="/admin/projects"
+            className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+          >
+            Quản lý dự án phim <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {episodeCategories.length > 0 ? (
+          <div className="pt-2">
+            <BarChart
+              categories={episodeCategories}
+              series={episodeBarSeries}
+              valueUnit="tập"
+              height={220}
+            />
+          </div>
+        ) : (
+          <div className="py-12 text-center text-xs text-slate-400">
+            Chưa có dữ liệu tập phim từ các dự án hiện tại.
+          </div>
+        )}
+      </div>
+
       {/* ── Secondary Charts Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Phân bổ trạng thái dự án */}
@@ -335,7 +392,7 @@ export function AdminOverviewDashboard() {
               </p>
             </div>
             <Link
-              href="/admin/accounts"
+              href="/admin/permissions?tab=accounts"
               className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
             >
               Quản lý tài khoản <ArrowRight className="w-3.5 h-3.5" />

@@ -29,16 +29,24 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
     { label: 'Đã huỷ', value: statusCounts.cancelled, color: '#ef4444' },
   ];
 
-  // Top 5 active projects with episode counts
+  // Real-time active projects with episode counts (Top 6)
   const recentProjects = [...projects]
-    .filter((p) => (p._count?.episodes ?? 0) > 0)
-    .slice(0, 5);
+    .filter((p) => (p._count?.episodes ?? 0) > 0 || p.status === 'IN_PRODUCTION')
+    .slice(0, 6);
 
-  const barCategories = recentProjects.map((_, idx) => `Dự án ${idx + 1}`);
+  // Use real project titles (shortened if needed) for real-time fidelity
+  const barCategories = recentProjects.map((p, idx) => {
+    const title = p.title?.trim();
+    if (title && title.length > 0) {
+      return title.length > 15 ? `${title.slice(0, 13)}…` : title;
+    }
+    return `Dự án ${idx + 1}`;
+  });
+
   const barSeries = [
     {
-      name: 'Số tập',
-      color: '#a855f7',
+      name: 'Số tập đã quay / dựng',
+      color: '#10b981',
       values: recentProjects.map((p) => p._count?.episodes ?? 0),
     },
   ];
@@ -58,7 +66,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
               Thống kê & Tiến độ sản xuất
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Tổng quan phân bổ dự án và số lượng tập phim của {roleTitle}
+              Tổng quan phân bổ dự án và số lượng tập phim thực tế của {roleTitle}
             </p>
           </div>
         </div>
@@ -82,55 +90,55 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
         </button>
       </div>
 
-      {/* ── Body ── */}
+      {/* ── Collapsible Body ── */}
       {!collapsed && (
-        <div className="p-6 space-y-6">
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-800/30">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-300 shrink-0">
-                <Clapperboard className="w-5 h-5" />
+        <div className="p-6 space-y-6 animate-fade-in">
+          {/* 3 KPI Summary Tiles */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                <Film className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">
-                  Tổng dự án
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Tổng số dự án
                 </p>
-                <p className="text-xl font-bold font-mono text-slate-900 dark:text-white">
+                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
                   {projects.length}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-800/30">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-300 shrink-0">
-                <CheckCircle2 className="w-5 h-5" />
+            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+                <Clapperboard className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                  Đã hoàn tất
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Tổng tập hoàn thành
                 </p>
-                <p className="text-xl font-bold font-mono text-slate-900 dark:text-white">
-                  {statusCounts.done}
+                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
+                  {totalEpisodes}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-800/30">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-300 shrink-0">
-                <Film className="w-5 h-5" />
+            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
-                  Tổng số tập phim
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Dự án đã đóng máy
                 </p>
-                <p className="text-xl font-bold font-mono text-slate-900 dark:text-white">
-                  {totalEpisodes}
+                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
+                  {statusCounts.done}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Charts Row */}
+          {/* Charts Row: 2 Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
             {/* Donut Chart: Project Status Distribution */}
             <div className="p-5 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.02]">
@@ -147,12 +155,17 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
               />
             </div>
 
-            {/* Bar Chart: Episode Output */}
+            {/* Bar Chart: Episode Output (Real-time data) */}
             <div className="p-5 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.02]">
-              <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                Số tập phim theo dự án
-              </h4>
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  Số tập phim theo dự án
+                </h4>
+                <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">
+                  Real-time Data
+                </span>
+              </div>
               {barCategories.length > 0 ? (
                 <BarChart
                   categories={barCategories}
