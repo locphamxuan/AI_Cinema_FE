@@ -35,14 +35,10 @@ export function DashboardSidebar({
       aria-label={label}
       className="md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-sky-100 dark:border-white/5 bg-white dark:bg-[#0F1C27] md:min-h-[calc(100vh-3.5rem)] transition-colors"
     >
-      <div className="hidden md:flex items-center gap-3 px-5 py-4 border-b border-sky-100 dark:border-white/5">
-        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center">
-          <TitleIcon className="w-4 h-4 text-white" aria-hidden="true" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{subtitle}</p>
-        </div>
+      {/* Streamlined section header without repeating the top header's full icon badge */}
+      <div className="hidden md:block px-5 py-3.5 border-b border-sky-100 dark:border-white/5">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{label || title}</p>
+        <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{subtitle}</p>
       </div>
       <ul className="flex md:flex-col gap-0.5 p-2 md:p-3 overflow-x-auto">
         {items.map(({ href, label: text, icon: Icon, active, badge }) => (
