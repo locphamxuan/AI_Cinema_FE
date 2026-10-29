@@ -127,6 +127,17 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
     <>
       <ModeTabs mode={mode} onChange={switchMode} />
 
+      {/* Google Sign-In / Sign-Up Button (Prominently visible for both Login & Register) */}
+      <div className="my-4">
+        <GoogleSignInButton mode={mode} onSignedIn={goOn} />
+
+        <div className="flex items-center gap-3 my-3 text-[11px] text-slate-400 dark:text-muted uppercase tracking-wider">
+          <span className="flex-1 h-px bg-slate-200/80 dark:bg-white/10" />
+          <span>{mode === 'login' ? 'hoặc dùng email' : 'hoặc đăng ký bằng email'}</span>
+          <span className="flex-1 h-px bg-slate-200/80 dark:bg-white/10" />
+        </div>
+      </div>
+
       {/* Saved Account Notice (Similar to Mobile AuthModal) */}
       {hasSavedCredentials && mode === 'login' && email && (
         <div className="mb-5 p-3 rounded-2xl bg-slate-100/80 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-between text-xs">
@@ -256,9 +267,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
         </button>
       </form>
 
-      <GoogleSignInButton onSignedIn={goOn} />
-
-      {/* Switch mode footer */}
+{/* Switch mode footer */}
       <div className="mt-6 pt-5 border-t border-slate-100 dark:border-white/10 text-center text-xs text-slate-500 dark:text-muted-light">
         {mode === 'login' ? 'Chưa có tài khoản? ' : 'Đã có tài khoản? '}
         <button
