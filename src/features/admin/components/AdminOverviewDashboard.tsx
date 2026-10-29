@@ -183,7 +183,7 @@ export function AdminOverviewDashboard() {
               <span className="text-xs font-normal text-slate-400 ml-1">Coin</span>
             </p>
             <p className="text-[11px] text-slate-400 mt-0.5">
-              ≈ {revenue ? formatNumber(revenue.totals.vndEstimate) : 0} ₫
+              Thu từ hội viên đăng ký
             </p>
           </div>
         </div>
@@ -198,7 +198,7 @@ export function AdminOverviewDashboard() {
               Lượt thu phí kỳ
             </p>
             <p className="text-2xl font-black font-mono text-slate-900 dark:text-white">
-              {revenue ? formatNumber(revenue.totals.chargesCount) : '…'}
+              {revenue ? formatNumber(revenue.totals.paidCycles) : '…'}
             </p>
             <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium">
               Thành viên trả phí
