@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Play, Lock, CheckCircle, ShieldCheck,  Calendar,  Info } from 'lucide-react';
+import { X, Play, Lock, CheckCircle, ShieldCheck, Calendar, Info, Bookmark, Heart } from 'lucide-react';
 import type { Movie, Episode } from '@/types/movie';
 import { useAppStore } from '@/store/useAppStore';
 import { onActivateKey } from '@/lib/a11y';
+import { savedMovieService } from '@/services/savedMovieService';
+import { engagementService, type MovieEngagement } from '@/services/engagementService';
+import { toast } from '@/components/ui/Toast';
 
 interface MovieDetailQuickModalProps {
   movie: Movie | null;
@@ -17,6 +20,12 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'episodes' | 'compliance' | 'brief'>('episodes');
 
+  // Engagement & Save states
+  const [isSaved, setIsSaved] = useState(false);
+  const [savingBusy, setSavingBusy] = useState(false);
+  const [engagement, setEngagement] = useState<MovieEngagement | null>(null);
+  const [likingBusy, setLikingBusy] = useState(false);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -24,27 +33,98 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
     if (movie) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
+
+      // Fetch saved status if logged in
+      if (isAuthenticated) {
+        savedMovieService.isSaved(movie.id).then((res) => {
+          if (res.success && res.data) setIsSaved(res.data.saved);
+        }).catch(() => {});
+      }
+
+      // Fetch like / engagement summary
+      engagementService.summary(movie.id).then((res) => {
+        if (res.success && res.data) setEngagement(res.data);
+      }).catch(() => {});
     }
     return () => {
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [movie, onClose]);
+  }, [movie, onClose, isAuthenticated]);
 
   if (!movie) return null;
 
   const handleEpisodeClick = (ep: Episode) => {
     if (ep.isFree || ep.isUnlocked) {
-      // Navigate to watch page
       router.push(`/watch/${ep.id}`);
       return;
     }
-    // Need unlock
     if (!isAuthenticated) {
       openAuthModal('login');
       return;
     }
     openUnlockModal(ep.id);
+  };
+
+  const handlePlayFirstEpisode = () => {
+    const ep = movie.episodes.find((e) => e.isFree || e.isUnlocked) || movie.episodes[0];
+    if (ep) handleEpisodeClick(ep);
+  };
+
+  const handleToggleSave = async () => {
+    if (!isAuthenticated) {
+      openAuthModal('login');
+      return;
+    }
+
+    setSavingBusy(true);
+    const nextSaved = !isSaved;
+    setIsSaved(nextSaved);
+
+    const res = nextSaved ? await savedMovieService.save(movie.id) : await savedMovieService.unsave(movie.id);
+    setSavingBusy(false);
+
+    if (res.success) {
+      toast.success(
+        nextSaved ? 'Đã lưu phim' : 'Đã bỏ lưu',
+        nextSaved ? `"${movie.title}" đã được thêm vào danh sách xem sau.` : `Đã xóa "${movie.title}" khỏi danh sách.`,
+      );
+    } else {
+      setIsSaved(!nextSaved);
+      toast.error('Thao tác thất bại', 'Vui lòng thử lại sau.');
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (!isAuthenticated) {
+      openAuthModal('login');
+      return;
+    }
+
+    setLikingBusy(true);
+    const wasLiked = engagement?.likedByMe ?? false;
+    const currentCount = engagement?.likeCount ?? 0;
+
+    // Optimistic
+    setEngagement((prev) => ({
+      likeCount: wasLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+      viewCount: prev?.viewCount ?? 0,
+      likedByMe: !wasLiked,
+    }));
+
+    const res = wasLiked ? await engagementService.unlike(movie.id) : await engagementService.like(movie.id);
+    setLikingBusy(false);
+
+    if (res.success && res.data) {
+      setEngagement(res.data);
+    } else {
+      // Revert on failure
+      setEngagement((prev) => ({
+        likeCount: currentCount,
+        viewCount: prev?.viewCount ?? 0,
+        likedByMe: wasLiked,
+      }));
+    }
   };
 
   return (
@@ -69,7 +149,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
         </button>
 
         {/* Modal Hero Banner Section */}
-        <div className="relative h-64 sm:h-80 md:h-96 w-full shrink-0 overflow-hidden">
+        <div className="relative h-72 sm:h-84 md:h-96 w-full shrink-0 overflow-hidden">
           <img
             src={movie.bannerUrl || movie.posterUrl}
             alt={movie.title}
@@ -77,27 +157,72 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
           />
 
           {/* Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#12151E] via-[#12151E]/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#12151E] via-[#12151E]/50 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-[#12151E] via-transparent to-transparent w-2/3" />
 
           {/* Hero Meta Info */}
-          <div className="absolute bottom-6 left-6 right-6 z-20">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
+          <div className="absolute bottom-6 left-6 right-6 z-20 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white font-black text-[10px] uppercase tracking-wider">
                 {movie.badge || 'Độc Quyền AI'}
               </span>
               <span className="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white text-xs font-semibold">
                 {movie.quality}
               </span>
+              <span className="px-2 py-0.5 rounded bg-white/10 text-slate-300 text-xs font-semibold">
+                {movie.year}
+              </span>
             </div>
 
-            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight mb-2 drop-shadow-md">
+            <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight drop-shadow-md">
               {movie.title}
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-2xl leading-relaxed">
               {movie.description}
             </p>
+
+            {/* Quick Interactive Actions: Play, Bookmark, Heart */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={handlePlayFirstEpisode}
+                className="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-black font-black text-xs sm:text-sm shadow-xl flex items-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <Play className="w-4 h-4 fill-black" />
+                <span>Xem Ngay Tập 1</span>
+              </button>
+
+              {/* Bookmark Button */}
+              <button
+                type="button"
+                disabled={savingBusy}
+                onClick={handleToggleSave}
+                className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 border transition-all cursor-pointer ${
+                  isSaved
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                    : 'bg-black/60 hover:bg-white/15 text-white border-white/20'
+                }`}
+              >
+                <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current text-amber-400' : ''}`} />
+                <span>{isSaved ? 'Đã Lưu Vào Danh Sách' : '+ Lưu Phim'}</span>
+              </button>
+
+              {/* Heart Like Button */}
+              <button
+                type="button"
+                disabled={likingBusy}
+                onClick={handleToggleLike}
+                className={`px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 border transition-all cursor-pointer ${
+                  engagement?.likedByMe
+                    ? 'bg-ruby/20 text-ruby-light border-ruby/40 hover:bg-ruby/30'
+                    : 'bg-black/60 hover:bg-white/15 text-white border-white/20'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${engagement?.likedByMe ? 'fill-current text-ruby' : ''}`} />
+                <span>{engagement?.likeCount ?? 0} Thích</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -228,7 +353,6 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
           {/* TAB 2: COMPLIANCE DISCLOSURE (ARTICLE 44) */}
           {activeTab === 'compliance' && (
             <div className="space-y-4 animate-fade-in">
-              {/* Compliance Header Banner */}
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3">
                 <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0 mt-0.5" />
                 <div>
@@ -242,7 +366,6 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
                 </div>
               </div>
 
-              {/* What the platform actually knows about the episodes it released */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
                   <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
@@ -261,7 +384,6 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
                 </div>
               </div>
 
-              {/* Official Disclaimer */}
               <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 text-xs text-slate-400 italic leading-relaxed">
                 &ldquo;{movie.aiCompliance.disclaimer}&rdquo;
               </div>
@@ -276,9 +398,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
                   <Info className="w-4 h-4 text-[#8B5CF6]" />
                   <span>Tóm tắt phim</span>
                 </h4>
-                <p>
-                  {movie.contentBrief || 'Chưa có tóm tắt.'}
-                </p>
+                <p>{movie.contentBrief || 'Chưa có tóm tắt.'}</p>
               </div>
 
               <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">

@@ -250,3 +250,23 @@ export interface WalletBalance {
   version: number;
   expiringBonus: ExpiringBonus[];
 }
+
+
+/** GET /accesses - one bought episode / entitlement row */
+export interface PurchasedEpisode {
+  id: string;
+  source: string;
+  paidCoins: number;
+  grantedAt: string;
+  episode: {
+    id: string;
+    movieId: string;
+    episodeNumber: number;
+    title: string;
+    thumbnailUrl: string | null;
+  };
+  movie: {
+    id: string;
+    title: string;
+  };
+}

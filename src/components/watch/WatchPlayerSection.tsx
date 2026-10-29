@@ -12,6 +12,10 @@ import { useEpisodeStream } from './useEpisodeStream';
 import { usePlaybackSession } from './usePlaybackSession';
 import { useAdBreaks } from './useAdBreaks';
 import { AdBreakOverlay, ResumePrompt } from './PlayerOverlays';
+import { Bookmark, Heart } from 'lucide-react';
+import { savedMovieService } from '@/services/savedMovieService';
+import { engagementService, type MovieEngagement } from '@/services/engagementService';
+import { toast } from '@/components/ui/Toast';
 
 function defaultVersion(episode: Episode | null): EpisodeVersion | null {
   if (!episode?.versions?.length) return null;
@@ -23,7 +27,11 @@ interface WatchPlayerSectionProps {
 }
 
 export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProps) {
-  const { currentMovie, openUnlockModal, selectEpisode, isCatalogLoading } = useAppStore();
+  const { currentMovie, openUnlockModal, openAuthModal, isAuthenticated, selectEpisode, isCatalogLoading } = useAppStore();
+  const [isSaved, setIsSaved] = useState(false);
+  const [savingBusy, setSavingBusy] = useState(false);
+  const [engagement, setEngagement] = useState<MovieEngagement | null>(null);
+  const [likingBusy, setLikingBusy] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   // The episode picked in the list (for the route it was picked on) and the version picked for it.
   const [picked, setPicked] = useState<{ route?: string; episodeId: string } | null>(null);
@@ -36,6 +44,18 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
   useEffect(() => {
     if (episodeId) selectEpisode(episodeId);
   }, [episodeId, selectEpisode]);
+
+  useEffect(() => {
+    if (!currentMovie) return;
+    if (isAuthenticated) {
+      savedMovieService.isSaved(currentMovie.id).then((res) => {
+        if (res.success && res.data) setIsSaved(res.data.saved);
+      }).catch(() => {});
+    }
+    engagementService.summary(currentMovie.id).then((res) => {
+      if (res.success && res.data) setEngagement(res.data);
+    }).catch(() => {});
+  }, [currentMovie?.id, isAuthenticated]);
 
   // The route's episode unless one was picked from the list since; its current version unless another was picked.
   const shownId = picked && picked.route === episodeId ? picked.episodeId : episodeId;
@@ -86,6 +106,52 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
       setPickedVersion(null);
     } else {
       openUnlockModal(ep.id);
+    }
+  };
+
+  const handleToggleSave = async () => {
+    if (!currentMovie) return;
+    if (!isAuthenticated) {
+      openAuthModal('login');
+      return;
+    }
+    setSavingBusy(true);
+    const nextSaved = !isSaved;
+    setIsSaved(nextSaved);
+    const res = nextSaved ? await savedMovieService.save(currentMovie.id) : await savedMovieService.unsave(currentMovie.id);
+    setSavingBusy(false);
+    if (res.success) {
+      toast.success(nextSaved ? 'Đã lưu phim' : 'Đã bỏ lưu', nextSaved ? `"${currentMovie.title}" đã được thêm vào danh sách xem sau.` : `Đã xóa "${currentMovie.title}" khỏi danh sách.`);
+    } else {
+      setIsSaved(!nextSaved);
+      toast.error('Thao tác thất bại', 'Vui lòng thử lại sau.');
+    }
+  };
+
+  const handleToggleLike = async () => {
+    if (!currentMovie) return;
+    if (!isAuthenticated) {
+      openAuthModal('login');
+      return;
+    }
+    setLikingBusy(true);
+    const wasLiked = engagement?.likedByMe ?? false;
+    const currentCount = engagement?.likeCount ?? 0;
+    setEngagement((prev) => ({
+      likeCount: wasLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
+      viewCount: prev?.viewCount ?? 0,
+      likedByMe: !wasLiked,
+    }));
+    const res = wasLiked ? await engagementService.unlike(currentMovie.id) : await engagementService.like(currentMovie.id);
+    setLikingBusy(false);
+    if (res.success && res.data) {
+      setEngagement(res.data);
+    } else {
+      setEngagement((prev) => ({
+        likeCount: currentCount,
+        viewCount: prev?.viewCount ?? 0,
+        likedByMe: wasLiked,
+      }));
     }
   };
 
@@ -229,9 +295,41 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            {currentMovie.title} - {currentEpisode.title}
-          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+              {currentMovie.title} - {currentEpisode.title}
+            </h1>
+            <div className="flex items-center gap-2.5 shrink-0">
+              <button
+                type="button"
+                disabled={savingBusy}
+                onClick={handleToggleSave}
+                title={isSaved ? 'Đã lưu trong danh sách xem sau' : 'Lưu vào danh sách xem sau'}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all cursor-pointer ${
+                  isSaved
+                    ? 'bg-amber-500/20 text-amber-500 border-amber-500/30'
+                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10'
+                }`}
+              >
+                <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current text-amber-500' : ''}`} />
+                <span>{isSaved ? 'Đã Lưu' : 'Lưu Phim'}</span>
+              </button>
+              <button
+                type="button"
+                disabled={likingBusy}
+                onClick={handleToggleLike}
+                title="Thả tim yêu thích"
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition-all cursor-pointer ${
+                  engagement?.likedByMe
+                    ? 'bg-ruby/20 text-ruby border-ruby/30'
+                    : 'bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10'
+                }`}
+              >
+                <Heart className={`w-4 h-4 ${engagement?.likedByMe ? 'fill-current text-ruby' : ''}`} />
+                <span>{engagement?.likeCount ?? 0}</span>
+              </button>
+            </div>
+          </div>
 
           {/* Active Version Changelog Snippet */}
           {activeVersion && (

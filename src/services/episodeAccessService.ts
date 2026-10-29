@@ -6,9 +6,11 @@ import type {
   MembershipPlan,
   MySubscription,
   PurchaseResult,
+  PurchasedEpisode,
   SubscriptionActivation,
   SubscriptionIntent,
 } from '@/types/episodeAccess';
+import type { Page } from '@/types/production';
 
 /** Sending the same key twice charges once; one key per user action. */
 const idempotent = (key: string) => ({ headers: { 'Idempotency-Key': key } });
@@ -56,5 +58,10 @@ export const episodeAccessService = {
 
   resumeAutoRenew(subscriptionId: string): Promise<ApiResponse<AutoRenewState>> {
     return apiClient.post<AutoRenewState>(`/subscriptions/${subscriptionId}/resume-auto-renew`);
+  },
+
+  /** GET /accesses - episodes the member bought and unlocked with Coins. */
+  getPurchasedEpisodes(page = 1, limit = 20): Promise<ApiResponse<Page<PurchasedEpisode>>> {
+    return apiClient.get<Page<PurchasedEpisode>>(`/accesses?page=${page}&limit=${limit}`);
   },
 };

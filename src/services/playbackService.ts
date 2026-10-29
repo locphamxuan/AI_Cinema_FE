@@ -1,7 +1,8 @@
 import { apiClient, ApiResponse, RequestOptions } from './apiClient';
 import { randomId } from '@/lib/random';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
-import type { AdBreakState, SessionState, StreamingSession } from '@/types/playback';
+import type { AdBreakState, SessionState, StreamingSession, WatchHistoryItem } from '@/types/playback';
+import type { Page } from '@/types/production';
 
 /** UUID v4 built from 128 random bits: the BE refuses any other guest key shape. */
 export function uuidV4(): string {
@@ -92,5 +93,10 @@ export const playbackService = {
 
   adFinished(sessionId: string, breakId: string): Promise<ApiResponse<AdBreakState>> {
     return apiClient.post<AdBreakState>(`${session(sessionId)}/ad-breaks/${breakId}/completed`, {}, owner());
+  },
+
+  /** GET /playback/history - the member's watch history with resume positions and progress. */
+  getHistory(page = 1, limit = 20): Promise<ApiResponse<Page<WatchHistoryItem>>> {
+    return apiClient.get<Page<WatchHistoryItem>>(`/playback/history?page=${page}&limit=${limit}`, owner());
   },
 };
