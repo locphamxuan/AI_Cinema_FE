@@ -110,6 +110,7 @@ const PLAYBACK_REASONS: Record<string, string> = {
 /** Google sign-in refusals, keyed by the BE `details.reason`. */
 const GOOGLE_REASONS: Record<string, string> = {
   GOOGLE_ACCOUNT_MISMATCH: 'Email này đã được liên kết với một tài khoản Google khác.',
+  GOOGLE_STAFF_ACCOUNT: 'Đăng nhập Google chỉ dành cho thành viên. Tài khoản quản trị / nhân sự hãy đăng nhập bằng mật khẩu.',
   PROVIDER_NOT_CONFIGURED: 'Đăng nhập bằng Google hiện chưa được bật.',
 };
 
