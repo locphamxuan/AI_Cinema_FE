@@ -1,10 +1,5 @@
-import { AdminPageFrame } from '@/features/admin/components/AdminPageFrame';
-import { BillingReportsPanel } from '@/features/billing-admin/components/BillingReportsPanel';
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return (
-    <AdminPageFrame title="Báo cáo gói thành viên" description="Doanh thu gói và tỉ lệ rời gói theo khoảng thời gian.">
-      <BillingReportsPanel />
-    </AdminPageFrame>
-  );
+  redirect('/admin/membership-plans?tab=reports');
 }

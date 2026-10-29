@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   Bell,
   Clapperboard,
   CreditCard,
@@ -11,7 +10,6 @@ import {
   Megaphone,
   Receipt,
   Settings,
-  Users,
   type LucideIcon,
 } from 'lucide-react';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
@@ -38,15 +36,18 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { href: '/admin/ads', label: 'Quảng cáo', icon: Megaphone, permissions: [PERMISSION.AD_MANAGE] },
   {
     href: '/admin/membership-plans',
-    label: 'Gói thành viên',
+    label: 'Gói thành viên & Doanh thu',
     icon: CreditCard,
-    permissions: [PERMISSION.BILLING_PLAN_MANAGE, PERMISSION.BILLING_SUBSCRIPTION_READ],
+    permissions: [PERMISSION.BILLING_PLAN_MANAGE, PERMISSION.BILLING_SUBSCRIPTION_READ, PERMISSION.ANALYTICS_REVENUE_READ],
   },
   { href: '/admin/coin-transactions', label: 'Giao dịch Coin', icon: Receipt, permissions: [PERMISSION.COIN_TRANSACTION_READ] },
   { href: '/admin/rewards', label: 'Điểm danh & vòng quay', icon: Gift, permissions: [PERMISSION.REWARD_RULE_MANAGE] },
-  { href: '/admin/billing-reports', label: 'Báo cáo doanh thu gói', icon: BarChart3, permissions: [PERMISSION.ANALYTICS_REVENUE_READ] },
-  { href: '/admin/accounts', label: 'Tài khoản', icon: Users, permissions: [PERMISSION.USER_READ] },
-  { href: '/admin/permissions', label: 'Phân quyền', icon: KeyRound, permissions: [PERMISSION.ROLE_MANAGE] },
+  {
+    href: '/admin/permissions',
+    label: 'Tài khoản & Phân quyền',
+    icon: KeyRound,
+    permissions: [PERMISSION.USER_READ, PERMISSION.ROLE_MANAGE],
+  },
   { href: '/admin/notifications', label: 'Thông báo', icon: Bell, permissions: [PERMISSION.PROJECT_READ_ALL] },
   {
     href: '/admin/settings',

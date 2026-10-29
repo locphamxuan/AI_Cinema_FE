@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Mail, Lock, User, Calendar, ShieldCheck, Check, Sparkles } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
@@ -9,13 +10,12 @@ import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
 import GoogleSignInButton from './GoogleSignInButton';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
 
-// Only the email is remembered; a password never goes to localStorage.
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
 
 const INPUT =
-  'w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all';
-const LABEL = 'block text-xs font-semibold text-slate-700 dark:text-muted-light mb-1';
+  'w-full bg-slate-50 dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 rounded-2xl px-4 py-3 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-2 focus:ring-ruby/20 transition-all font-medium';
+const LABEL = 'block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5';
 
 function savedEmail(): string | null {
   try {
@@ -40,8 +40,9 @@ interface AuthFormProps {
 }
 
 /**
- * Sign-in, or the sign-up of a viewer account with every field the account keeps (users table):
- * full name, date of birth (18+, BR-54), email and password. Role and status are set by the system.
+ * Mobile-aligned Web Sign-in & Sign-up Form:
+ * Features polished inputs, sleek dark theme surface, remembered account banner,
+ * clear password toggle, and prompt toast on successful authentication.
  */
 export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: AuthFormProps) {
   const router = useRouter();
@@ -54,10 +55,10 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
+  const [hasSavedCredentials, setHasSavedCredentials] = useState(() => Boolean(savedEmail()));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Earlier versions stored the password itself; drop it.
   useEffect(() => {
     try {
       localStorage.removeItem(LEGACY_CREDENTIALS_KEY);
@@ -67,6 +68,14 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
   const switchMode = (next: AuthMode) => {
     setMode(next);
     setError(null);
+  };
+
+  const forgetSaved = () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      setEmail('');
+      setHasSavedCredentials(false);
+    } catch {}
   };
 
   const signUpError = (): string | null => {
@@ -94,10 +103,17 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
     setLoading(false);
 
     if (!res.success) {
-      setError(res.error || (mode === 'login' ? 'Đăng nhập thất bại' : 'Đăng ký thất bại'));
+      setError(res.error || (mode === 'login' ? 'Đăng nhập thất bại. Kiểm tra lại email hoặc mật khẩu.' : 'Đăng ký thất bại. Vui lòng thử lại sau ít phút.'));
       return;
     }
-    if (mode === 'register') toast.success(APPLICATION_MESSAGES.MSG04.message);
+
+    // Success feedback
+    if (mode === 'register') {
+      toast.success(APPLICATION_MESSAGES.MSG04.message);
+    } else {
+      toast.success('Đăng nhập thành công!', 'Chào mừng bạn quay trở lại với AI Cinema.');
+    }
+
     rememberEmail(email, rememberMe);
     goOn('redirectUrl' in res && typeof res.redirectUrl === 'string' ? res.redirectUrl : undefined);
   };
@@ -111,12 +127,29 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
     <>
       <ModeTabs mode={mode} onChange={switchMode} />
 
+      {/* Saved Account Notice (Similar to Mobile AuthModal) */}
+      {hasSavedCredentials && mode === 'login' && email && (
+        <div className="mb-5 p-3 rounded-2xl bg-slate-100/80 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Tài khoản đã lưu: <strong className="font-semibold text-slate-900 dark:text-white">{email}</strong></span>
+          </div>
+          <button
+            type="button"
+            onClick={forgetSaved}
+            className="text-ruby font-bold hover:underline cursor-pointer ml-2 text-[11px]"
+          >
+            Quên
+          </button>
+        </div>
+      )}
+
       {error && (
-        <div role="alert" className="mb-4 p-3 rounded-xl bg-danger/15 border border-danger/30 text-danger text-xs flex items-center gap-2">
+        <div role="alert" className="mb-4 p-3.5 rounded-2xl bg-danger/15 border border-danger/30 text-danger text-xs flex items-center gap-2.5 animate-slide-up">
           <svg className="w-4 h-4 text-danger shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
-          <span>{error}</span>
+          <span className="font-medium">{error}</span>
         </div>
       )}
 
@@ -136,13 +169,13 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
                 maxLength={255}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Nguyễn Minh Anh"
+                placeholder="Nguyễn Văn A"
                 className={INPUT}
               />
             </div>
             <div>
               <label htmlFor="auth-dob" className={LABEL}>
-                Ngày sinh <span className="font-normal text-slate-500">(từ 18 tuổi)</span>
+                Ngày sinh <span className="font-normal text-slate-500 text-[11px]">(từ 18 tuổi · Yêu cầu Điều 44)</span>
               </label>
               <input
                 id="auth-dob"
@@ -154,6 +187,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
                 onChange={(e) => setDateOfBirth(e.target.value)}
                 className={`${INPUT} dark:[color-scheme:dark]`}
               />
+              <p className="text-[11px] text-slate-400 dark:text-muted mt-1">Định dạng theo năm-tháng-ngày.</p>
             </div>
           </>
         )}
@@ -170,8 +204,8 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
             maxLength={255}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="name@example.com"
-            className={`${INPUT} font-medium`}
+            placeholder="ten@email.com"
+            className={INPUT}
           />
         </div>
 
@@ -181,7 +215,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
           value={password}
           onChange={setPassword}
           autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-          placeholder={mode === 'login' ? 'Nhập mật khẩu...' : `${MIN_PASSWORD_LENGTH}–${MAX_PASSWORD_LENGTH} ký tự, có chữ và số`}
+          placeholder={mode === 'login' ? '••••••••' : `Tối thiểu ${MIN_PASSWORD_LENGTH} ký tự, có chữ và số`}
         />
 
         {mode === 'register' && (
@@ -195,37 +229,46 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
           />
         )}
 
-        <label className="flex items-center gap-2 pt-1 text-xs cursor-pointer select-none text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors">
-          <input
-            type="checkbox"
-            checked={rememberMe}
-            onChange={(e) => setRememberMe(e.target.checked)}
-            className="w-4 h-4 rounded border-slate-300 dark:border-white/20 accent-ruby cursor-pointer"
-          />
-          <span>Ghi nhớ email đăng nhập</span>
-        </label>
+        <div className="flex items-center justify-between pt-1">
+          <label className="flex items-center gap-2.5 text-xs cursor-pointer select-none text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="w-4 h-4 rounded-lg border-slate-300 dark:border-white/20 accent-ruby cursor-pointer"
+            />
+            <span>Nhớ đăng nhập trên máy này</span>
+          </label>
+
+          {mode === 'login' && (
+            <span className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer">
+              Quên mật khẩu?
+            </span>
+          )}
+        </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-ruby to-ruby-dark hover:shadow-xl hover:shadow-ruby/40 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed mt-3 shadow-lg shadow-ruby/20 cursor-pointer"
+          className="w-full py-3.5 rounded-2xl font-black text-white bg-gradient-to-r from-ruby to-[#B90910] hover:shadow-xl hover:shadow-ruby/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-lg shadow-ruby/20 cursor-pointer text-sm tracking-wide"
         >
-          {loading ? 'Đang xử lý...' : mode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'}
+          {loading ? 'Đang xác thực…' : mode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'}
         </button>
       </form>
 
       <GoogleSignInButton onSignedIn={goOn} />
 
-      <p className="mt-5 text-center text-xs text-slate-500 dark:text-muted-light">
+      {/* Switch mode footer */}
+      <div className="mt-6 pt-5 border-t border-slate-100 dark:border-white/10 text-center text-xs text-slate-500 dark:text-muted-light">
         {mode === 'login' ? 'Chưa có tài khoản? ' : 'Đã có tài khoản? '}
         <button
           type="button"
           onClick={() => switchMode(mode === 'login' ? 'register' : 'login')}
-          className="text-ruby font-bold hover:underline cursor-pointer"
+          className="text-ruby font-bold hover:underline cursor-pointer ml-1"
         >
-          {mode === 'login' ? 'Đăng ký ngay' : 'Đăng nhập'}
+          {mode === 'login' ? 'Tạo tài khoản mới' : 'Đăng nhập ngay'}
         </button>
-      </p>
+      </div>
     </>
   );
 }

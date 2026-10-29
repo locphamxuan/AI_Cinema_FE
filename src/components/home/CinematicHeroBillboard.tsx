@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Play, Info, Plus, Check, Volume2, VolumeX, ShieldCheck, Sparkles } from 'lucide-react';
+import { Play, Info, Plus, Check, Volume2, VolumeX, ShieldCheck } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 interface CinematicHeroBillboardProps {
@@ -62,7 +62,6 @@ export default function CinematicHeroBillboard({
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-4 animate-slide-up">
           {/* AI Masterpiece Badge */}
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-[#E50914] text-white text-[11px] font-black uppercase tracking-wider shadow-lg shadow-red-600/40">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             AI Masterpiece
           </span>
 

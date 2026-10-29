@@ -61,6 +61,27 @@ export function AdminOverviewDashboard() {
     { label: 'Đã huỷ', value: projectStats.cancelled, color: '#ef4444' },
   ];
 
+  // Real-time episode output by project
+  const topProjectsWithEpisodes = [...projects]
+    .filter((p) => (p._count?.episodes ?? 0) > 0 || p.status === 'IN_PRODUCTION')
+    .slice(0, 6);
+
+  const episodeCategories = topProjectsWithEpisodes.map((p, idx) => {
+    const title = p.title?.trim();
+    if (title && title.length > 0) {
+      return title.length > 14 ? `${title.slice(0, 12)}…` : title;
+    }
+    return `Dự án ${idx + 1}`;
+  });
+
+  const episodeBarSeries = [
+    {
+      name: 'Số tập phim',
+      color: '#10b981',
+      values: topProjectsWithEpisodes.map((p) => p._count?.episodes ?? 0),
+    },
+  ];
+
   // Revenue by Plan bar chart
   const planCategories = revenue?.byPlan.map((p) => p.plan.name) ?? [];
   const planBarSeries = [
@@ -142,22 +163,22 @@ export function AdminOverviewDashboard() {
         accountCount={accountsRes.data?.meta.totalItems ?? accounts.length}
       />
 
-      {/* ── Main Charts Grid ── */}
+      {/* ── Main Analytics Grid: Revenue breakdown & Coin structure ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Doanh thu theo Gói (Bar Chart - 2 Cols) */}
+        {/* Doanh thu theo gói (Bar Chart - 2 Cols) */}
         <div className="lg:col-span-2 p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-purple-500" />
-                Doanh thu theo Gói thành viên
+                Doanh thu phân bổ theo gói hội viên
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                So sánh số lượng Coin chính vs Coin thưởng thu được trên từng gói
+                Thống kê số Coin thu được từ từng gói hội viên trong khoảng thời gian đã chọn
               </p>
             </div>
             <Link
-              href="/admin/billing-reports"
+              href="/admin/membership-plans?tab=reports"
               className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
             >
               Chi tiết báo cáo <ArrowRight className="w-3.5 h-3.5" />
@@ -209,6 +230,42 @@ export function AdminOverviewDashboard() {
         </div>
       </div>
 
+      {/* ── Real-time Episode Output Chart ── */}
+      <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Film className="w-4 h-4 text-emerald-500" />
+              Số tập phim theo dự án (Real-time)
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Dữ liệu số lượng tập phim thực tế đang được sản xuất hoặc hoàn tất từ các dự án tiêu biểu
+            </p>
+          </div>
+          <Link
+            href="/admin/projects"
+            className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+          >
+            Quản lý dự án phim <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {episodeCategories.length > 0 ? (
+          <div className="pt-2">
+            <BarChart
+              categories={episodeCategories}
+              series={episodeBarSeries}
+              valueUnit="tập"
+              height={220}
+            />
+          </div>
+        ) : (
+          <div className="py-12 text-center text-xs text-slate-400">
+            Chưa có dữ liệu tập phim từ các dự án hiện tại.
+          </div>
+        )}
+      </div>
+
       {/* ── Secondary Charts Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Phân bổ trạng thái dự án */}
@@ -255,7 +312,7 @@ export function AdminOverviewDashboard() {
               </p>
             </div>
             <Link
-              href="/admin/accounts"
+              href="/admin/permissions?tab=accounts"
               className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
             >
               Quản lý tài khoản <ArrowRight className="w-3.5 h-3.5" />
