@@ -24,11 +24,8 @@ export interface AuthSlice {
     password: string,
     dateOfBirth: string,
   ) => Promise<{ success: boolean; error?: string }>;
-  /** `reason` names the step a first Google sign-in still needs (birthday or password). */
-  loginWithGoogle: (
-    idToken: string,
-    extra?: { dateOfBirth?: string },
-  ) => Promise<{ success: boolean; error?: string; reason?: string; redirectUrl?: string }>;
+  /** One tap: signs in, links or opens the account behind a Google ID token. */
+  loginWithGoogle: (idToken: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
   logout: () => void;
   restoreSession: () => void;
   isAuthModalOpen: boolean;

@@ -50,31 +50,31 @@ describe('auth flow', () => {
     });
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await useAppStore.getState().loginWithGoogle('google-token', { dateOfBirth: '2000-01-01' });
+    const result = await useAppStore.getState().loginWithGoogle('google-token');
 
     expect(result.success).toBe(true);
     const [url, requestInit] = fetchMock.mock.calls[0];
     expect(url).toEqual(expect.stringContaining('/api/auth/google'));
-    expect(JSON.parse(String(requestInit.body))).toEqual({ idToken: 'google-token', dateOfBirth: '2000-01-01' });
+    expect(JSON.parse(String(requestInit.body))).toEqual({ idToken: 'google-token' });
     expect(useAppStore.getState().user?.email).toBe('bob@gmail.com');
   });
 
-  it('passes the step a first Google sign-in still needs back to the screen', async () => {
+  it('explains a refused Google sign-in and stays signed out', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
         ok: false,
-        status: 422,
+        status: 409,
         json: async () => ({
-          error: { message: 'Enter your date of birth', details: { reason: 'GOOGLE_SIGNUP_NEEDS_BIRTHDAY' } },
+          error: { message: 'This email is linked to another Google account', details: { reason: 'GOOGLE_ACCOUNT_MISMATCH' } },
         }),
       }),
     );
 
     const result = await useAppStore.getState().loginWithGoogle('google-token');
 
-    expect(result).toMatchObject({ success: false, reason: 'GOOGLE_SIGNUP_NEEDS_BIRTHDAY' });
-    expect(result.error).toContain('ngày sinh');
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('tài khoản Google khác');
     expect(useAppStore.getState().isAuthenticated).toBe(false);
   });
 });

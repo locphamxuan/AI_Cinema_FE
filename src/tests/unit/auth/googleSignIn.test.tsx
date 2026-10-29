@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -52,21 +51,19 @@ describe('GoogleSignInButton', () => {
     expect(window.google?.accounts.id.initialize).toHaveBeenCalledWith(
       expect.objectContaining({ client_id: 'web-client-id' }),
     );
-    expect(loginWithGoogle).toHaveBeenCalledWith('id-token', undefined);
+    expect(loginWithGoogle).toHaveBeenCalledWith('id-token');
     expect(onSignedIn).toHaveBeenCalledWith('/admin');
   });
 
-  it('asks a new member for a birthday and resends the same token (BR-54)', async () => {
-    loginWithGoogle
-      .mockResolvedValueOnce({ success: false, reason: 'GOOGLE_SIGNUP_NEEDS_BIRTHDAY' })
-      .mockResolvedValueOnce({ success: true });
+  it('opens a new account in one tap, without asking for anything else', async () => {
+    loginWithGoogle.mockResolvedValue({ success: true, redirectUrl: '/' });
 
     await signInWithGoogle();
-    await userEvent.type(screen.getByLabelText('Ngày sinh'), '2000-05-14');
-    await userEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }));
 
-    expect(loginWithGoogle).toHaveBeenLastCalledWith('id-token', { dateOfBirth: '2000-05-14' });
-    expect(onSignedIn).toHaveBeenCalled();
+    expect(loginWithGoogle).toHaveBeenCalledTimes(1);
+    expect(loginWithGoogle).toHaveBeenCalledWith('id-token');
+    expect(screen.queryByLabelText('Ngày sinh')).not.toBeInTheDocument();
+    expect(onSignedIn).toHaveBeenCalledWith('/');
   });
 
   it('shows a refusal that needs no further step', async () => {
