@@ -36,9 +36,8 @@ export interface RegisterCredentials {
   dateOfBirth: string;
 }
 
-/** Body of POST /auth/google; the extras answer the step a first Google sign-in asks for. */
+/** Body of POST /auth/google; a first sign-in that opens an account adds the birthday it asks for. */
 export interface GoogleSignIn {
   idToken: string;
   dateOfBirth?: string;
-  password?: string;
 }

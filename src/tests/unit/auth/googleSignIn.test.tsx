@@ -69,20 +69,6 @@ describe('GoogleSignInButton', () => {
     expect(onSignedIn).toHaveBeenCalled();
   });
 
-  it('asks for the password before linking an existing account and shows a wrong one', async () => {
-    loginWithGoogle
-      .mockResolvedValueOnce({ success: false, reason: 'GOOGLE_LINK_NEEDS_PASSWORD' })
-      .mockResolvedValueOnce({ success: false, error: 'Email hoặc mật khẩu không chính xác.' });
-
-    await signInWithGoogle();
-    await userEvent.type(screen.getByLabelText('Mật khẩu tài khoản'), 'sai-mat-khau');
-    await userEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }));
-
-    expect(loginWithGoogle).toHaveBeenLastCalledWith('id-token', { password: 'sai-mat-khau' });
-    expect(screen.getByRole('alert')).toHaveTextContent('Email hoặc mật khẩu không chính xác.');
-    expect(onSignedIn).not.toHaveBeenCalled();
-  });
-
   it('shows a refusal that needs no further step', async () => {
     loginWithGoogle.mockResolvedValue({ success: false, error: 'Email này đã được liên kết với một tài khoản Google khác.' });
 

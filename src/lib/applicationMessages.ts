@@ -110,7 +110,6 @@ const PLAYBACK_REASONS: Record<string, string> = {
 /** Google sign-in refusals, keyed by the BE `details.reason`. */
 const GOOGLE_REASONS: Record<string, string> = {
   GOOGLE_SIGNUP_NEEDS_BIRTHDAY: 'Nhập ngày sinh để hoàn tất đăng ký (từ 18 tuổi).',
-  GOOGLE_LINK_NEEDS_PASSWORD: 'Email này đã có tài khoản. Nhập mật khẩu của tài khoản đó để liên kết với Google.',
   GOOGLE_ACCOUNT_MISMATCH: 'Email này đã được liên kết với một tài khoản Google khác.',
   PROVIDER_NOT_CONFIGURED: 'Đăng nhập bằng Google hiện chưa được bật.',
 };

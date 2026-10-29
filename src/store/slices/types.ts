@@ -27,7 +27,7 @@ export interface AuthSlice {
   /** `reason` names the step a first Google sign-in still needs (birthday or password). */
   loginWithGoogle: (
     idToken: string,
-    extra?: { dateOfBirth?: string; password?: string },
+    extra?: { dateOfBirth?: string },
   ) => Promise<{ success: boolean; error?: string; reason?: string; redirectUrl?: string }>;
   logout: () => void;
   restoreSession: () => void;

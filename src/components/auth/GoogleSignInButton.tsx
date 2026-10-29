@@ -3,12 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { latestAdultBirthDate } from '@/lib/registration';
-import { PasswordField } from './AuthFields';
 
 const GIS_SRC = 'https://accounts.google.com/gsi/client';
 const NEEDS_BIRTHDAY = 'GOOGLE_SIGNUP_NEEDS_BIRTHDAY';
-const NEEDS_PASSWORD = 'GOOGLE_LINK_NEEDS_PASSWORD';
-type Step = typeof NEEDS_BIRTHDAY | typeof NEEDS_PASSWORD;
 
 interface GoogleIdentity {
   initialize(options: { client_id: string; callback: (response: { credential: string }) => void }): void;
@@ -46,9 +43,8 @@ const INPUT =
 
 /**
  * "Sign in with Google" / "Sign up with Google".
- * A first sign-in may need one more answer: a birthday to open a member account (18+, BR-54),
- * or the password of the account that already owns the email.
- * The same Google token is sent again with that answer.
+ * An email that already has an account is linked at once (Google verified it). A first sign-in
+ * may need a birthday to open a member account (18+, BR-54); the same token is sent again with it.
  */
 export default function GoogleSignInButton({
   onSignedIn,
@@ -64,13 +60,12 @@ export default function GoogleSignInButton({
   const loginWithGoogle = useAppStore((state) => state.loginWithGoogle);
   const buttonRef = useRef<HTMLDivElement>(null);
   const [idToken, setIdToken] = useState<string | null>(null);
-  const [step, setStep] = useState<Step | null>(null);
+  const [needsBirthday, setNeedsBirthday] = useState(false);
   const [dateOfBirth, setDateOfBirth] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const signIn = async (token: string, extra?: { dateOfBirth?: string; password?: string }) => {
+  const signIn = async (token: string, extra?: { dateOfBirth?: string }) => {
     setLoading(true);
     setError(null);
     const res = await loginWithGoogle(token, extra);
@@ -79,9 +74,9 @@ export default function GoogleSignInButton({
       onSignedIn(res.redirectUrl);
       return;
     }
-    if (res.reason === NEEDS_BIRTHDAY || res.reason === NEEDS_PASSWORD) {
+    if (res.reason === NEEDS_BIRTHDAY) {
       setIdToken(token);
-      setStep(res.reason);
+      setNeedsBirthday(true);
       return;
     }
     setError(res.error ?? 'Đăng nhập bằng Google thất bại.');
@@ -125,50 +120,32 @@ export default function GoogleSignInButton({
   const answer = (e: React.FormEvent) => {
     e.preventDefault();
     if (!idToken) return;
-    if (step === NEEDS_BIRTHDAY) {
-      if (!dateOfBirth) return setError('Vui lòng nhập ngày sinh.');
-      void signIn(idToken, { dateOfBirth });
-    } else if (step === NEEDS_PASSWORD) {
-      if (!password) return setError('Vui lòng nhập mật khẩu.');
-      void signIn(idToken, { password });
-    }
+    if (!dateOfBirth) return setError('Vui lòng nhập ngày sinh.');
+    void signIn(idToken, { dateOfBirth });
   };
 
   return (
     <div className="w-full">
-      {step ? (
+      {needsBirthday ? (
         <form onSubmit={answer} className="space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10" aria-label="Hoàn tất đăng nhập Google">
           <p className="text-xs text-slate-600 dark:text-muted-light">
-            {step === NEEDS_BIRTHDAY
-              ? 'Lần đầu đăng nhập bằng Google: nhập ngày sinh để tạo tài khoản (từ 18 tuổi).'
-              : 'Email này đã có tài khoản AI Cinema. Nhập mật khẩu của tài khoản đó để liên kết với Google.'}
+            Lần đầu đăng nhập bằng Google: nhập ngày sinh để tạo tài khoản (từ 18 tuổi).
           </p>
-          {step === NEEDS_BIRTHDAY ? (
-            <div>
-              <label htmlFor="google-dob" className="block text-xs font-semibold text-slate-700 dark:text-muted-light mb-1">
-                Ngày sinh
-              </label>
-              <input
-                id="google-dob"
-                type="date"
-                required
-                autoComplete="bday"
-                max={latestAdultBirthDate()}
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                className={`${INPUT} dark:[color-scheme:dark]`}
-              />
-            </div>
-          ) : (
-            <PasswordField
-              id="google-password"
-              label="Mật khẩu tài khoản"
-              value={password}
-              onChange={setPassword}
-              autoComplete="current-password"
-              placeholder="Nhập mật khẩu..."
+          <div>
+            <label htmlFor="google-dob" className="block text-xs font-semibold text-slate-700 dark:text-muted-light mb-1">
+              Ngày sinh
+            </label>
+            <input
+              id="google-dob"
+              type="date"
+              required
+              autoComplete="bday"
+              max={latestAdultBirthDate()}
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              className={`${INPUT} dark:[color-scheme:dark]`}
             />
-          )}
+          </div>
           {error && (
             <p role="alert" className="text-xs text-danger">
               {error}
@@ -178,7 +155,7 @@ export default function GoogleSignInButton({
             <button
               type="button"
               onClick={() => {
-                setStep(null);
+                setNeedsBirthday(false);
                 setIdToken(null);
                 setError(null);
               }}

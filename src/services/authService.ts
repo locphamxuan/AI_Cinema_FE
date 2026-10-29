@@ -103,9 +103,9 @@ export const authService = {
   },
 
   /**
-   * Signs in with a Google ID token. A first sign-in may come back with `reason` asking for a
-   * birthday (new member, BR-54) or the password of the account that already owns the email;
-   * the caller resends the same token with that answer.
+   * Signs in with a Google ID token; an existing account with that email is linked at once. A first
+   * sign-in may come back with `reason` asking for a birthday (new member, BR-54); the caller resends
+   * the same token with it.
    */
   async googleLogin(input: GoogleSignIn): Promise<ApiResponse<UserProfile>> {
     const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.GOOGLE, input);
