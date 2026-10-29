@@ -138,23 +138,6 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
         </div>
       </div>
 
-      {/* Saved Account Notice (Similar to Mobile AuthModal) */}
-      {hasSavedCredentials && mode === 'login' && email && (
-        <div className="mb-5 p-3 rounded-2xl bg-slate-100/80 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>Tài khoản đã lưu: <strong className="font-semibold text-slate-900 dark:text-white">{email}</strong></span>
-          </div>
-          <button
-            type="button"
-            onClick={forgetSaved}
-            className="text-ruby font-bold hover:underline cursor-pointer ml-2 text-[11px]"
-          >
-            Quên
-          </button>
-        </div>
-      )}
-
       {error && (
         <div role="alert" className="mb-4 p-3.5 rounded-2xl bg-danger/15 border border-danger/30 text-danger text-xs flex items-center gap-2.5 animate-slide-up">
           <svg className="w-4 h-4 text-danger shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
