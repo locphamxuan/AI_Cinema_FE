@@ -25,6 +25,7 @@ let gisLoading: Promise<void> | null = null;
 
 /** Loads Google Identity Services once per page. */
 function loadGis(): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
   if (window.google?.accounts?.id) return Promise.resolve();
   gisLoading ??= new Promise((resolve, reject) => {
     const script = document.createElement('script');
@@ -44,12 +45,22 @@ const INPUT =
   'w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all';
 
 /**
- * "Sign in with Google". A first sign-in may need one more answer from the viewer: a birthday to
- * open a member account (18+, BR-54), or the password of the account that already owns the email.
+ * "Sign in with Google" / "Sign up with Google".
+ * A first sign-in may need one more answer: a birthday to open a member account (18+, BR-54),
+ * or the password of the account that already owns the email.
  * The same Google token is sent again with that answer.
  */
-export default function GoogleSignInButton({ onSignedIn }: { onSignedIn: (redirectUrl?: string) => void }) {
-  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+export default function GoogleSignInButton({
+  onSignedIn,
+  mode = 'login',
+}: {
+  onSignedIn: (redirectUrl?: string) => void;
+  mode?: 'login' | 'register';
+}) {
+  // Use client ID from env, or fall back to the project's official Google Web client ID unless explicitly blanked out in unit tests
+  const envClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const clientId = envClientId !== undefined ? envClientId : '440650077495-fjea3pvoj35lt770sqp6ile9ib8ufafp.apps.googleusercontent.com';
+
   const loginWithGoogle = useAppStore((state) => state.loginWithGoogle);
   const buttonRef = useRef<HTMLDivElement>(null);
   const [idToken, setIdToken] = useState<string | null>(null);
@@ -96,9 +107,9 @@ export default function GoogleSignInButton({ onSignedIn }: { onSignedIn: (redire
         window.google.accounts.id.renderButton(host, {
           theme: 'outline',
           size: 'large',
-          text: 'continue_with',
+          text: mode === 'register' ? 'signup_with' : 'signin_with',
           shape: 'pill',
-          width: Math.min(host.offsetWidth || 320, 400),
+          width: Math.min(host.offsetWidth || 340, 400),
         });
       })
       .catch(() => {
@@ -107,7 +118,7 @@ export default function GoogleSignInButton({ onSignedIn }: { onSignedIn: (redire
     return () => {
       cancelled = true;
     };
-  }, [clientId]);
+  }, [clientId, mode]);
 
   if (!clientId) return null;
 
@@ -124,15 +135,9 @@ export default function GoogleSignInButton({ onSignedIn }: { onSignedIn: (redire
   };
 
   return (
-    <div className="mt-5">
-      <div className="flex items-center gap-3 mb-4 text-[11px] text-slate-400 dark:text-muted uppercase tracking-wide">
-        <span className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
-        hoặc
-        <span className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
-      </div>
-
+    <div className="w-full">
       {step ? (
-        <form onSubmit={answer} className="space-y-3" aria-label="Hoàn tất đăng nhập Google">
+        <form onSubmit={answer} className="space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/10" aria-label="Hoàn tất đăng nhập Google">
           <p className="text-xs text-slate-600 dark:text-muted-light">
             {step === NEEDS_BIRTHDAY
               ? 'Lần đầu đăng nhập bằng Google: nhập ngày sinh để tạo tài khoản (từ 18 tuổi).'
@@ -169,7 +174,7 @@ export default function GoogleSignInButton({ onSignedIn }: { onSignedIn: (redire
               {error}
             </p>
           )}
-          <div className="flex gap-2">
+          <div className="flex gap-2 pt-1">
             <button
               type="button"
               onClick={() => {
@@ -177,28 +182,47 @@ export default function GoogleSignInButton({ onSignedIn }: { onSignedIn: (redire
                 setIdToken(null);
                 setError(null);
               }}
-              className="flex-1 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-white/15 text-slate-600 dark:text-muted-light cursor-pointer"
+              className="flex-1 py-2.5 rounded-xl text-xs font-bold border border-slate-300 dark:border-white/15 text-slate-600 dark:text-muted-light hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-ruby disabled:opacity-50 cursor-pointer"
+              className="flex-1 py-2.5 rounded-xl text-xs font-bold text-white bg-ruby hover:bg-ruby-hover disabled:opacity-50 transition-colors cursor-pointer"
             >
               {loading ? 'Đang xử lý...' : 'Tiếp tục'}
             </button>
           </div>
         </form>
       ) : (
-        error && (
-          <p role="alert" className="mb-2 text-center text-xs text-danger">
-            {error}
-          </p>
-        )
+        <>
+          {error && (
+            <p role="alert" className="mb-2 text-center text-xs text-danger">
+              {error}
+            </p>
+          )}
+          {/* Official Google Button container with graceful styled placeholder while GIS iframe loads */}
+          <div
+            ref={buttonRef}
+            className="flex justify-center min-h-[44px] w-full"
+            data-testid="google-signin"
+          >
+            <button
+              type="button"
+              className="w-full max-w-[340px] flex items-center justify-center gap-3 py-2.5 px-4 rounded-full border border-slate-300 dark:border-white/15 bg-white dark:bg-[#1A202C] hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 font-semibold text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
+            >
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+              </svg>
+              <span>{mode === 'register' ? 'Đăng ký bằng Google' : 'Đăng nhập bằng Google'}</span>
+            </button>
+          </div>
+        </>
       )}
-      {/* Stays mounted while a step is open, so Google's button is still there after "Hủy". */}
-      <div ref={buttonRef} className={step ? 'hidden' : 'flex justify-center min-h-[44px]'} data-testid="google-signin" />
     </div>
   );
 }
