@@ -16,6 +16,9 @@ import {
   ShieldCheck,
   ChevronRight,
   SlidersHorizontal,
+  Bookmark,
+  Laptop,
+  KeyRound,
 } from 'lucide-react';
 
 export default function RightSidebar() {
@@ -37,6 +40,34 @@ export default function RightSidebar() {
   // Define sidebar navigation items with Lucide icons
   const sidebarNavItems = [
     {
+      href: '/profile/saved',
+      label: 'Phim đã lưu',
+      icon: Bookmark,
+      iconColor: 'text-amber-400 group-hover:text-amber-300',
+      iconBg: 'bg-amber-400/10 border-amber-400/20 group-hover:bg-amber-400/20',
+    },
+    {
+      href: '/profile/history',
+      label: 'Lịch sử xem',
+      icon: Clock,
+      iconColor: 'text-purple-400 group-hover:text-purple-300',
+      iconBg: 'bg-purple-400/10 border-purple-400/20 group-hover:bg-purple-400/20',
+    },
+    {
+      href: '/profile/devices',
+      label: 'Quản lý thiết bị',
+      icon: Laptop,
+      iconColor: 'text-sky-400 group-hover:text-sky-300',
+      iconBg: 'bg-sky-400/10 border-sky-400/20 group-hover:bg-sky-400/20',
+    },
+    {
+      href: '/profile/library',
+      label: 'Kho phim đã mua',
+      icon: KeyRound,
+      iconColor: 'text-fuchsia-400 group-hover:text-fuchsia-300',
+      iconBg: 'bg-fuchsia-400/10 border-fuchsia-400/20 group-hover:bg-fuchsia-400/20',
+    },
+    {
       href: '/profile/subscription',
       label: 'Gói hội viên',
       icon: Crown,
@@ -51,15 +82,8 @@ export default function RightSidebar() {
       href: '/profile/transactions',
       label: 'Lịch sử giao dịch',
       icon: CreditCard,
-      iconColor: 'text-sky-400 group-hover:text-sky-300',
-      iconBg: 'bg-sky-400/10 border-sky-400/20 group-hover:bg-sky-400/20',
-    },
-    {
-      href: '/profile/history',
-      label: 'Lịch sử xem',
-      icon: Clock,
-      iconColor: 'text-purple-400 group-hover:text-purple-300',
-      iconBg: 'bg-purple-400/10 border-purple-400/20 group-hover:bg-purple-400/20',
+      iconColor: 'text-emerald-400 group-hover:text-emerald-300',
+      iconBg: 'bg-emerald-400/10 border-emerald-400/20 group-hover:bg-emerald-400/20',
     },
     {
       href: '/profile',
@@ -72,8 +96,8 @@ export default function RightSidebar() {
       href: '#deposit',
       label: 'Nạp tiền vào ví',
       icon: Coins,
-      iconColor: 'text-emerald-400 group-hover:text-emerald-300',
-      iconBg: 'bg-emerald-400/10 border-emerald-400/20 group-hover:bg-emerald-400/20',
+      iconColor: 'text-amber-400 group-hover:text-amber-300',
+      iconBg: 'bg-amber-400/10 border-amber-400/20 group-hover:bg-amber-400/20',
       onClick: () => {
         closeRightSidebar();
         openDepositModal();
@@ -93,188 +117,192 @@ export default function RightSidebar() {
 
   const reviewerItem = {
     href: '/reviewer',
-    label: 'Thẩm định (Checker)',
+    label: 'Kiểm duyệt (Reviewer)',
     subtitle: 'Kiểm duyệt & Cấp phép AI',
     icon: ShieldCheck,
-    roleBadge: 'Checker',
+    roleBadge: 'Reviewer',
   };
+
+  const adminItem = {
+    href: '/admin',
+    label: 'Quản trị (Admin)',
+    subtitle: 'Quản lý toàn bộ hệ thống',
+    icon: SlidersHorizontal,
+    roleBadge: 'Admin',
+  };
+
+  const userRole = user?.role?.toUpperCase();
+  const showCreator = userRole === 'CREATOR' || userRole === 'ADMIN';
+  const showReviewer = userRole === 'REVIEWER' || userRole === 'ADMIN';
+  const showAdmin = userRole === 'ADMIN';
 
   return (
     <>
-      {/* 1. Floating Right Edge Drawer Trigger Button */}
-      <button
-        onClick={toggleRightSidebar}
-        className="fixed right-0 top-1/2 -translate-y-1/2 z-40 shadow-2xl bg-gradient-to-b from-ruby via-rose-600 to-ruby-dark text-white rounded-l-2xl py-3 px-2 flex flex-col items-center gap-1.5 cursor-pointer transition-all hover:scale-105 active:scale-95 group border-y border-l border-white/20 select-none hover:shadow-ruby/40"
-        title="Mở Bảng Điều Khiển SideBar"
-      >
-        <SlidersHorizontal className="w-4 h-4 group-hover:rotate-45 transition-transform" />
-        <span className="text-[10px] font-black uppercase tracking-wider [writing-mode:vertical-lr] rotate-180">
-          MENU
-        </span>
-      </button>
-
-      {/* 2. Dimmed Blurred Backdrop Overlay */}
+      {/* Backdrop for mobile */}
       {isRightSidebarOpen && (
-        <button
-          type="button"
-          aria-label="Đóng menu"
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 lg:hidden animate-fade-in"
           onClick={closeRightSidebar}
-          className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 animate-fade-in cursor-pointer"
+          aria-hidden="true"
         />
       )}
 
-      {/* 3. Slide-Over Overlay Drawer Panel */}
+      {/* Sidebar Container */}
       <aside
-        className={`fixed right-0 top-0 bottom-0 z-50 w-84 sm:w-92 max-w-[92vw] bg-slate-950/95 dark:bg-slate-950/98 text-slate-100 shadow-[-12px_0_40px_rgba(0,0,0,0.7)] border-l border-white/10 flex flex-col justify-between overflow-y-auto backdrop-blur-3xl transition-transform duration-300 ease-out p-4 sm:p-5 ${
-          isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+        id="right-sidebar"
+        aria-label="Bảng điều khiển cá nhân"
+        className={`fixed top-0 right-0 h-full w-80 bg-white/95 dark:bg-[#080B11]/95 backdrop-blur-xl border-l border-slate-200 dark:border-white/10 z-50 flex flex-col transition-transform duration-300 ease-in-out shadow-2xl lg:translate-x-0 ${
+          isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        {/* Top Header Section */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between pb-3.5 border-b border-white/10">
-            <div className="flex items-center gap-2.5">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-              </span>
-              <div>
-                <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-1.5">
-                  Bảng Điều Khiển Của Bạn
-                </h3>
-              </div>
-            </div>
-
-            <button
-              onClick={closeRightSidebar}
-              className="w-8 h-8 rounded-xl bg-white/[0.06] hover:bg-white/[0.15] text-slate-400 hover:text-white flex items-center justify-center transition-all cursor-pointer border border-white/10 hover:rotate-90"
-              title="Đóng Sidebar"
-            >
-              <X className="w-4 h-4" />
-            </button>
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/10">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-ruby animate-pulse" />
+            <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Khu Vực Thành Viên
+            </span>
           </div>
+          <button
+            onClick={closeRightSidebar}
+            aria-label="Đóng bảng điều khiển"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer lg:hidden"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
+        {/* Content Area */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-white/10">
           {user && <SidebarProfileCard user={user} isVIPMode={isVIPMode} />}
 
           {/* Navigation Items */}
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 mb-2">
-              Quản Lý & Dịch Vụ
-            </p>
-
             {sidebarNavItems.map((item) => {
+              const Icon = item.icon;
               const isActive = pathname === item.href;
-              const IconComponent = item.icon;
 
-              return (
-                <Link
-                  key={item.label}
-                  href={item.onClick ? '#' : item.href}
-                  onClick={(e) => {
-                    if (item.onClick) {
-                      e.preventDefault();
-                      item.onClick();
-                    } else {
-                      closeRightSidebar();
-                    }
-                  }}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer group border ${
-                    isActive
-                      ? 'bg-gradient-to-r from-ruby/25 via-ruby/15 to-transparent text-white border-l-4 border-ruby shadow-md shadow-ruby/10 border-y-transparent border-r-transparent'
-                      : 'text-slate-300 hover:text-white hover:bg-white/[0.06] border-transparent hover:border-white/5'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center border transition-all ${
-                        isActive
-                          ? 'bg-ruby/30 border-ruby/50 text-white'
-                          : `${item.iconBg} ${item.iconColor}`
-                      }`}
-                    >
-                      <IconComponent className="w-4 h-4" />
+              if (item.onClick) {
+                return (
+                  <button
+                    key={item.label}
+                    onClick={item.onClick}
+                    className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group text-left cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${item.iconBg} shrink-0`}>
+                        <Icon className={`w-4 h-4 ${item.iconColor}`} />
+                      </div>
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white truncate">
+                        {item.label}
+                      </span>
                     </div>
-                    <span className="tracking-wide">{item.label}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
                     {item.badge && (
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${
-                          isActive
-                            ? 'bg-white/20 text-white border-white/30'
-                            : item.badgeColor
-                        }`}
-                      >
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${item.badgeColor}`}>
                         {item.badge}
                       </span>
                     )}
-                    <ChevronRight
-                      className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                        isActive
-                          ? 'text-white translate-x-0.5'
-                          : 'text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5'
-                      }`}
-                    />
+                  </button>
+                );
+              }
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={closeRightSidebar}
+                  className={`flex items-center justify-between p-2.5 rounded-xl transition-all group ${
+                    isActive
+                      ? 'bg-ruby/10 border border-ruby/20 text-ruby'
+                      : 'hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${item.iconBg} shrink-0`}>
+                      <Icon className={`w-4 h-4 ${item.iconColor}`} />
+                    </div>
+                    <span className="text-xs font-semibold group-hover:text-slate-900 dark:group-hover:text-white truncate">
+                      {item.label}
+                    </span>
                   </div>
+                  {item.badge && (
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0 ${item.badgeColor}`}>
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
+          </div>
 
-            {/* Role Dashboards (Studio & Thẩm Định) */}
-            <div className="pt-3 mt-3 border-t border-white/10 space-y-1.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 mb-1.5">
-                Studio & Thẩm Định
+          {/* Role Special Portals */}
+          {(showCreator || showReviewer || showAdmin) && (
+            <div className="pt-2 border-t border-slate-200 dark:border-white/10 space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2.5 pb-1">
+                Khu Vực Phân Quyền
               </p>
 
-              <Link
-                href={creatorItem.href}
-                onClick={closeRightSidebar}
-                className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all group border ${
-                  pathname.startsWith('/creator')
-                    ? 'bg-ruby/20 border-ruby/40 text-white shadow-md shadow-ruby/10'
-                    : 'bg-white/[0.03] hover:bg-white/[0.07] border-white/5 text-slate-200 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-ruby/15 border border-ruby/30 text-ruby flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <Clapperboard className="w-4 h-4" />
+              {showCreator && (
+                <Link
+                  href={creatorItem.href}
+                  onClick={closeRightSidebar}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                      <Clapperboard className="w-4 h-4 text-purple-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{creatorItem.label}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{creatorItem.subtitle}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white font-bold leading-none">{creatorItem.label}</p>
-                    <p className="text-[10px] text-slate-400 font-normal mt-1 leading-none">
-                      {creatorItem.subtitle}
-                    </p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                </Link>
+              )}
 
-              <Link
-                href={reviewerItem.href}
-                onClick={closeRightSidebar}
-                className={`flex items-center justify-between p-2.5 rounded-xl text-xs font-bold transition-all group border ${
-                  pathname.startsWith('/reviewer')
-                    ? 'bg-purple-600/20 border-purple-500/40 text-white shadow-md shadow-purple-600/10'
-                    : 'bg-white/[0.03] hover:bg-white/[0.07] border-white/5 text-slate-200 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <ShieldCheck className="w-4 h-4" />
+              {showReviewer && (
+                <Link
+                  href={reviewerItem.href}
+                  onClick={closeRightSidebar}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{reviewerItem.label}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{reviewerItem.subtitle}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-white font-bold leading-none">{reviewerItem.label}</p>
-                    <p className="text-[10px] text-slate-400 font-normal mt-1 leading-none">
-                      {reviewerItem.subtitle}
-                    </p>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                </Link>
+              )}
+
+              {showAdmin && (
+                <Link
+                  href={adminItem.href}
+                  onClick={closeRightSidebar}
+                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-ruby/10 border border-ruby/20 flex items-center justify-center shrink-0">
+                      <SlidersHorizontal className="w-4 h-4 text-ruby" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{adminItem.label}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{adminItem.subtitle}</p>
+                    </div>
                   </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-slate-300 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
+                </Link>
+              )}
             </div>
-          </div>
+          )}
         </div>
 
+        {/* Footer */}
         <SidebarFooter movie={activeMovie} />
       </aside>
     </>

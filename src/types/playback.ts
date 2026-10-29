@@ -88,3 +88,20 @@ export interface EpisodeAdSlotInput {
   /** Empty = weighted draw among the valid ads. */
   adId?: string | null;
 }
+
+
+/** One row of the member's watch history (GET /playback/history), newest first. */
+export interface WatchHistoryItem {
+  episodeId: string;
+  episodeTitle: string;
+  episodeNumber: number;
+  thumbnailUrl: string | null;
+  movieId: string;
+  movieTitle: string;
+  positionSeconds: number;
+  durationSeconds: number | null;
+  completed: boolean;
+  available: boolean;
+  notice: string | null;
+  lastWatchedAt: string | null;
+}
