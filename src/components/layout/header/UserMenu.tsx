@@ -10,9 +10,12 @@ const ITEM =
 
 const PROFILE_LINKS = [
   { href: '/profile', label: '👤 Hồ sơ cá nhân' },
+  { href: '/profile/saved', label: '🔖 Phim đã lưu' },
+  { href: '/profile/history', label: '🕒 Lịch sử xem phim' },
+  { href: '/profile/devices', label: '📱 Quản lý thiết bị' },
+  { href: '/profile/library', label: '🎬 Kho phim đã mua' },
   { href: '/profile/subscription', label: '👑 Gói dịch vụ hội viên' },
   { href: '/profile/transactions', label: '💳 Lịch sử giao dịch ví' },
-  { href: '/profile/history', label: '🕒 Lịch sử xem phim' },
 ];
 
 /** Avatar button and the member's account menu. */

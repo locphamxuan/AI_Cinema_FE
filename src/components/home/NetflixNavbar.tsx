@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Search, ChevronDown, User, LogOut, Wallet } from 'lucide-react';
+import { Search, ChevronDown, User, LogOut, Wallet, Bookmark, Clock, Laptop, KeyRound, Crown } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import RewardShortcuts from '@/components/wallet/RewardShortcuts';
 import ThemeToggle from '@/components/theme/ThemeToggle';
@@ -202,38 +202,96 @@ export default function NetflixNavbar() {
 
               {/* Dropdown Menu */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-56 p-1.5 rounded-2xl bg-white dark:bg-[#12151E] border border-slate-200 dark:border-white/10 shadow-2xl z-50 animate-fade-in text-xs text-slate-800 dark:text-white">
-                  <div className="px-3 py-2 border-b border-slate-100 dark:border-white/5">
-                    <p className="font-bold truncate">{user.name}</p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">Hội viên</p>
+                <div className="absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl bg-white dark:bg-[#12151E] border border-slate-200 dark:border-white/10 shadow-2xl z-50 animate-fade-in text-xs text-slate-800 dark:text-white">
+                  <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-white/5">
+                    <p className="font-bold truncate text-sm text-slate-900 dark:text-white">{user.name}</p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">
+                        {user.role === 'admin'
+                          ? 'Quản trị viên'
+                          : user.role === 'vip'
+                          ? 'Hội viên VIP'
+                          : 'Hội viên'}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="py-1">
+                  <div className="py-1.5 space-y-0.5">
                     <Link
                       href="/profile"
                       onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
                     >
-                      <User className="w-3.5 h-3.5 text-slate-400" /> Hồ sơ cá nhân
+                      <User className="w-4 h-4 text-indigo-400 shrink-0" />
+                      <span>Hồ sơ cá nhân</span>
                     </Link>
+
+                    <Link
+                      href="/profile/saved"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
+                    >
+                      <Bookmark className="w-4 h-4 text-amber-500 shrink-0 fill-amber-500/20" />
+                      <span>Phim đã lưu</span>
+                    </Link>
+
+                    <Link
+                      href="/profile/history"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
+                    >
+                      <Clock className="w-4 h-4 text-purple-400 shrink-0" />
+                      <span>Lịch sử xem phim</span>
+                    </Link>
+
+                    <Link
+                      href="/profile/devices"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
+                    >
+                      <Laptop className="w-4 h-4 text-sky-400 shrink-0" />
+                      <span>Quản lý thiết bị</span>
+                    </Link>
+
+                    <Link
+                      href="/profile/library"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
+                    >
+                      <KeyRound className="w-4 h-4 text-fuchsia-400 shrink-0" />
+                      <span>Kho tập phim đã mua</span>
+                    </Link>
+
+                    <Link
+                      href="/profile/subscription"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
+                    >
+                      <Crown className="w-4 h-4 text-amber-400 shrink-0" />
+                      <span>Gói hội viên VIP</span>
+                    </Link>
+
                     <Link
                       href="/profile/transactions"
                       onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition"
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
                     >
-                      <Wallet className="w-3.5 h-3.5 text-amber-500" /> Lịch sử ví Coin
+                      <Wallet className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>Lịch sử ví Coin</span>
                     </Link>
                   </div>
 
-                  <div className="pt-1 border-t border-slate-100 dark:border-white/5">
+                  <div className="pt-1.5 mt-1 border-t border-slate-100 dark:border-white/5">
                     <button
                       onClick={() => {
                         setIsUserMenuOpen(false);
                         logout();
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition text-left cursor-pointer"
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition text-left cursor-pointer font-semibold"
                     >
-                      <LogOut className="w-3.5 h-3.5" /> Đăng xuất
+                      <LogOut className="w-4 h-4 shrink-0" />
+                      <span>Đăng xuất</span>
                     </button>
                   </div>
                 </div>
