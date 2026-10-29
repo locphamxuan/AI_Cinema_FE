@@ -66,7 +66,7 @@ export function StudiosPage() {
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {studios.data.map((studio) => {
-                  const used = (studio._count?.movies ?? 0) + (studio._count?.handoffs ?? 0) > 0;
+                  const used = (studio._count?.projects ?? 0) + (studio._count?.handoffs ?? 0) > 0;
                   return (
                     <tr key={studio.id}>
                       <td className="px-4 py-3">
@@ -80,7 +80,7 @@ export function StudiosPage() {
                         {studio.contactName ?? '-'}
                         {studio.phone && <p className="text-slate-400">{studio.phone}</p>}
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{studio._count?.movies ?? 0}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{studio._count?.projects ?? 0}</td>
                       <td className="px-4 py-3">
                         <Badge tone={studio.isActive ? 'emerald' : 'neutral'}>{studio.isActive ? 'Đang hoạt động' : 'Ngừng dùng'}</Badge>
                       </td>

@@ -52,7 +52,7 @@ export function ChangeRequestInbox() {
             key={request.id}
             request={request}
             canDecide
-            projectHref={productionPaths.project('/admin', request.movieId, 'changes')}
+            projectHref={productionPaths.project('/admin', request.projectId, 'changes')}
             onDecided={requests.reload}
           />
         ))}
