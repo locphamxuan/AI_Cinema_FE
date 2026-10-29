@@ -6,11 +6,11 @@ export const BACKEND_ROLES: UserRole[] = ['MEMBER', 'CONTENT_CREATOR', 'CONTENT_
 export const STAFF_ROLES: UserRole[] = ['CONTENT_CREATOR', 'CONTENT_REVIEWER', 'STAFF', 'ADMIN'];
 
 export const BACKEND_ROLE_LABEL: Record<UserRole, string> = {
-  MEMBER: 'Member',
-  CONTENT_CREATOR: 'Content Creator',
-  CONTENT_REVIEWER: 'Content Reviewer',
-  STAFF: 'Staff',
-  ADMIN: 'Admin',
+  MEMBER: 'Thành viên (Khán giả)',
+  CONTENT_CREATOR: 'Nhà sáng tạo nội dung',
+  CONTENT_REVIEWER: 'Kiểm duyệt viên',
+  STAFF: 'Nhân viên vận hành',
+  ADMIN: 'Quản trị viên cấp cao',
 };
 
 export const ROLE_TONE: Record<UserRole, 'purple' | 'emerald' | 'blue' | 'amber' | 'neutral'> = {
@@ -23,12 +23,12 @@ export const ROLE_TONE: Record<UserRole, 'purple' | 'emerald' | 'blue' | 'amber'
 
 /** Groups of the permission catalog (AI_Cinema_BE PERMISSION_CATALOG `area`). */
 export const PERMISSION_AREA_LABEL: Record<string, string> = {
-  'movie-project': 'Dự án phim',
-  studio: 'Studio sản xuất',
-  media: 'Giao tập phim',
+  'movie-project': 'Dự án phim điện ảnh',
+  studio: 'Studio & Đơn vị sản xuất',
+  media: 'Tập phim & Media Ingest',
   review: 'Kiểm duyệt nội dung',
-  publishing: 'Phát hành',
-  catalog: 'Danh mục',
-  advertising: 'Quảng cáo',
-  administration: 'Quản trị',
+  publishing: 'Phát hành & Bản quyền',
+  catalog: 'Danh mục & Thể loại',
+  advertising: 'Quảng cáo & Ad Break',
+  administration: 'Hệ thống & Quản trị',
 };
