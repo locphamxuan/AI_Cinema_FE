@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BadgeDollarSign, Pencil, Plus } from 'lucide-react';
+import { BadgeDollarSign, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -36,7 +36,7 @@ export function PlansPanel() {
       description="Gói Thường miễn phí, tài khoản nào cũng có. Gói Tháng trả bằng Coin, mở mọi tập đã phát hành trong thời hạn gói và tự gia hạn mỗi kỳ."
       actions={
         <Button size="sm" onClick={() => setDialog({ mode: 'create' })}>
-          <Plus className="w-3.5 h-3.5" /> Thêm gói Tháng
+          Thêm gói Tháng
         </Button>
       }
     >
@@ -61,7 +61,7 @@ export function PlansPanel() {
                 <tr key={plan.id}>
                   <td className="py-2">
                     <p className="font-medium text-slate-900 dark:text-white">
-                      {plan.name} {plan.isFeatured && <span className="text-xs text-amber-600">★ Đề xuất</span>}
+                      {plan.name} {plan.isFeatured && <span className="text-xs text-amber-600">Đề xuất</span>}
                     </p>
                     <p className="text-[11px] text-slate-500 tabular-nums">{plan.code}</p>
                   </td>

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/store/useAppStore';
 import { episodeAccessService } from '@/services/episodeAccessService';
 import type { MySubscription } from '@/types/episodeAccess';
-import { Crown, Coins, Clock, Bookmark, Laptop, KeyRound, Wallet, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 
 export default function ProfilePage() {
   const { user, wallet, openDepositModal } = useAppStore();
@@ -54,7 +54,7 @@ export default function ProfilePage() {
                     : 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-muted-light'
                 }`}
               >
-                {isMember ? `👑 ${plan.plan.name}` : 'Gói Thường'}
+                {isMember ? ` ${plan.plan.name}` : 'Gói Thường'}
               </span>
             </div>
 
@@ -65,7 +65,7 @@ export default function ProfilePage() {
                 href="/profile/subscription"
                 className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs font-bold transition-all border border-slate-300 dark:border-white/20"
               >
-                {isMember ? '👑 Quản lý gói Tháng' : '👑 Đăng ký gói Tháng'}
+                {isMember ? 'Quản lý gói Tháng' : 'Đăng ký gói Tháng'}
               </Link>
 
               <button
@@ -73,7 +73,6 @@ export default function ProfilePage() {
                 onClick={openDepositModal}
                 className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black transition-all shadow-md cursor-pointer flex items-center gap-1.5"
               >
-                <Coins className="w-3.5 h-3.5 fill-current" />
                 Nạp Coin Vào Ví
               </button>
             </div>
@@ -114,9 +113,6 @@ export default function ProfilePage() {
             className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-between transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 group-hover:scale-105 transition-transform">
-                <Bookmark className="w-5 h-5 fill-current" />
-              </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-white">Phim đã lưu</p>
                 <p className="text-xs text-slate-500 dark:text-muted-light">Danh sách phim xem sau của bạn</p>
@@ -131,9 +127,6 @@ export default function ProfilePage() {
             className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-between transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-ruby/10 border border-ruby/20 flex items-center justify-center text-ruby group-hover:scale-105 transition-transform">
-                <Clock className="w-5 h-5" />
-              </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-white">Lịch sử xem phim</p>
                 <p className="text-xs text-slate-500 dark:text-muted-light">Tiến trình các tập phim đã theo dõi</p>
@@ -148,9 +141,6 @@ export default function ProfilePage() {
             className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-between transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500 group-hover:scale-105 transition-transform">
-                <Laptop className="w-5 h-5" />
-              </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-white">Quản lý thiết bị</p>
                 <p className="text-xs text-slate-500 dark:text-muted-light">Kiểm soát các máy đăng nhập & luồng xem</p>
@@ -165,9 +155,6 @@ export default function ProfilePage() {
             className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-between transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 group-hover:scale-105 transition-transform">
-                <KeyRound className="w-5 h-5" />
-              </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-white">Kho tập phim đã mua</p>
                 <p className="text-xs text-slate-500 dark:text-muted-light">Tập phim mở khóa vĩnh viễn bằng Coin</p>
@@ -182,9 +169,6 @@ export default function ProfilePage() {
             className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-between transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 group-hover:scale-105 transition-transform">
-                <Crown className="w-5 h-5" />
-              </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-white">Quản lý gói Tháng</p>
                 <p className="text-xs text-slate-500 dark:text-muted-light">Xem chi tiết quyền lợi & gia hạn</p>
@@ -199,9 +183,6 @@ export default function ProfilePage() {
             className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.03] hover:bg-slate-100 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 flex items-center justify-between transition-all group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 group-hover:scale-105 transition-transform">
-                <Wallet className="w-5 h-5" />
-              </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-white">Lịch sử giao dịch ví</p>
                 <p className="text-xs text-slate-500 dark:text-muted-light">Xem biến động số dư sổ cái Coin</p>

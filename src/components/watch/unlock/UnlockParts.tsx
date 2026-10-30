@@ -18,8 +18,8 @@ export function CoinBreakdown({ price, mainBalance, bonusBalance, afterLabel }: 
       <div className="flex justify-between items-center text-slate-400">
         <span>Số dư ví của bạn:</span>
         <div className="flex gap-2 tabular-nums">
-          <span className="text-amber-400">🟡 {mainBalance} Chính</span>
-          <span className="text-purple-400">🎁 {bonusBalance} Thưởng</span>
+          <span className="text-amber-400">{mainBalance} Chính</span>
+          <span className="text-purple-400">{bonusBalance} Thưởng</span>
         </div>
       </div>
 
@@ -42,7 +42,7 @@ export function CoinBreakdown({ price, mainBalance, bonusBalance, afterLabel }: 
         </div>
       ) : (
         <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs">
-          <p className="font-bold">⚠️ Số dư không đủ</p>
+          <p className="font-bold">Số dư không đủ</p>
           <p className="text-[11px] mt-0.5 text-slate-300">
             Bạn đang có <strong className="text-white">{total} Coin</strong>, còn thiếu{' '}
             <strong className="text-rose-400">{price - total} Coin</strong>.
@@ -69,14 +69,14 @@ export function ObtainCoinActions({ onTopUp, onCheckIn }: Readonly<ObtainCoinAct
           onClick={onTopUp}
           className="py-3 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-md shadow-blue-600/25 transition-all active:scale-95 cursor-pointer"
         >
-          💳 Nạp Coin
+           Nạp Coin
         </button>
         <button
           type="button"
           onClick={onCheckIn}
           className="py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs border border-amber-500/30 transition-colors cursor-pointer"
         >
-          🎁 Điểm Danh Nhận Coin
+           Điểm Danh Nhận Coin
         </button>
       </div>
     </div>
@@ -158,7 +158,7 @@ export function GuestPrompt({ onLogin, onRegister }: Readonly<GuestPromptProps>)
   return (
     <div className="py-6 text-center space-y-4">
       <div className="w-14 h-14 rounded-2xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center text-2xl mx-auto">
-        👤
+        
       </div>
       <div>
         <h4 className="text-base font-bold text-white">Đăng nhập để xem tiếp</h4>

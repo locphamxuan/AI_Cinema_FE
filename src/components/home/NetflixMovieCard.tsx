@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Play, Plus, Check, Heart, ChevronDown,  ShieldCheck } from 'lucide-react';
+import { Play, Plus, Check, Heart, ChevronDown } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 interface NetflixMovieCardProps {
@@ -51,7 +51,6 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
 
           {/* Badge: AI label (Top Right) */}
           <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/30 border border-emerald-500/50 text-[10px] font-bold text-emerald-300 backdrop-blur-md shadow-sm">
-            <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
             <span>Nhãn AI</span>
           </div>
 

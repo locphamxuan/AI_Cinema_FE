@@ -1,6 +1,5 @@
 'use client';
 
-import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import type { MediaAsset } from '@/types/production';
 import { INGEST_STATUS, LABEL_TYPE, SOURCE_METHOD } from '../../lib/labels';
@@ -86,7 +85,7 @@ export function MediaVersions({
                       onRetry(v.id);
                     }}
                   >
-                    <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" /> Xử lý lại
+                    Xử lý lại
                   </Button>
                 )}
               </div>

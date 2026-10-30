@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { ImagePlus } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
 import { useAction } from '../../hooks/useAction';
@@ -31,7 +31,7 @@ export function PosterPanel({ canManage }: { canManage: boolean }) {
           <>
             <input ref={input} type="file" accept={IMAGE_ACCEPT} className="hidden" aria-label="Chọn ảnh bìa" onChange={(e) => upload(e.target.files?.[0])} />
             <Button size="sm" variant="secondary" disabled={busy} onClick={() => input.current?.click()}>
-              <ImagePlus className="w-3.5 h-3.5" aria-hidden="true" /> {busy ? 'Đang tải…' : project.posterUrl ? 'Đổi ảnh' : 'Tải ảnh'}
+              {busy ? 'Đang tải…' : project.posterUrl ? 'Đổi ảnh' : 'Tải ảnh'}
             </Button>
           </>
         )

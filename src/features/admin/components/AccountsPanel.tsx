@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Lock, Pencil, Search, Trash2, Unlock, UserPlus } from 'lucide-react';
+import { Lock, Pencil, Search, Trash2, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { adminService, type AccountPage, type AccountRow } from '@/services/adminService';
 import { toast } from '@/components/ui/Toast';
@@ -91,7 +91,7 @@ export function AccountsPanel() {
         <div className="flex flex-wrap items-center gap-2.5">
           {canManage && (
             <Button size="sm" onClick={() => setEditing('new')} className="shadow-xs">
-              <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> Tạo tài khoản
+              Tạo tài khoản
             </Button>
           )}
           <label className="relative">

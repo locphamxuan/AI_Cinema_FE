@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ShieldCheck, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { coinTopUpService } from '@/services/coinTopUpService';
 import type { PaymentProvider, TopUpOptions } from '@/types/episodeAccess';
@@ -68,7 +68,6 @@ export default function DepositModal() {
         <div className="flex items-start justify-between pb-4 mb-5 border-b border-white/10">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 p-[1px] shadow-lg shadow-amber-500/20">
-              <div className="w-full h-full rounded-2xl bg-card flex items-center justify-center text-2xl">🪙</div>
             </div>
             <div>
               <h3 className="text-xl font-black tracking-tight text-white">Nạp Coin Vào Ví</h3>
@@ -149,14 +148,13 @@ export default function DepositModal() {
                   Đang mở cổng thanh toán...
                 </span>
               ) : (
-                <span>Thanh Toán {amountVnd.toLocaleString('vi-VN')} ₫ ➔</span>
+                <span>Thanh Toán {amountVnd.toLocaleString('vi-VN')} ₫</span>
               )}
             </button>
           </div>
         </div>
 
         <div className="mt-3 text-center flex items-center justify-center gap-1.5 text-[10px] text-slate-500">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
           <span>Coin được cộng khi cổng thanh toán xác nhận giao dịch</span>
         </div>
       </div>

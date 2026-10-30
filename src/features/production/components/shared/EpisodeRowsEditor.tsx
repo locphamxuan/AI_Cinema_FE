@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CalendarRange, Plus, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { getTodayDateString } from '@/lib/dateUtils';
@@ -157,7 +157,7 @@ export function EpisodeRowsEditor({
       ))}
       <p className="text-[11px] text-slate-500 pl-10">Hạn giao Studio: ngày Studio phải giao tập (bắt buộc). Dự kiến phát hành: ngày tập dự kiến lên sóng, nằm trong khoảng phát hành của mùa, không trước hạn giao (không bắt buộc).</p>
       <Button type="button" size="sm" variant="secondary" onClick={addEpisode}>
-        <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm tập
+        Thêm tập
       </Button>
     </div>
   );
@@ -169,7 +169,6 @@ export function DeadlineQuickFill({ onApply }: { onApply: (first: string, gapDay
   const [gap, setGap] = useState(7);
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl bg-slate-50 dark:bg-white/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
-      <CalendarRange className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
       <span>Điền nhanh hạn giao: tập đầu</span>
       <input
         type="date"

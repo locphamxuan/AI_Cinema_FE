@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Sparkles, Coins, Crown, Trophy, CheckCircle2 } from 'lucide-react';
+import { Pencil, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -36,9 +36,6 @@ export function RewardWheelPanel() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500">
-                <Trophy className="w-5 h-5" />
-              </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   Vòng quay may mắn
@@ -55,7 +52,6 @@ export function RewardWheelPanel() {
 
           <div className="flex items-center gap-2 shrink-0">
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200/50 dark:border-white/5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               {activePrizes.length}/10 ô đang mở
             </span>
           </div>
@@ -145,7 +141,6 @@ export function RewardWheelPanel() {
                     <td className="py-4 px-4">
                       {isVip ? (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-purple-300 font-bold text-xs">
-                          <Crown className="w-3.5 h-3.5 text-purple-500" />
                           {prize.planDays} ngày VIP Tháng
                         </span>
                       ) : (
@@ -184,7 +179,7 @@ export function RewardWheelPanel() {
                     <td className="py-4 px-4 text-center">
                       {prize.isActive ? (
                         <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                          <CheckCircle2 className="w-3 h-3" /> Đang dùng
+                          Đang dùng
                         </span>
                       ) : (
                         <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full">
@@ -270,7 +265,6 @@ function PrizeModal({ prize, onClose, onDone }: { prize: RewardPrize; onClose: (
         ) : (
           <div className="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-800 dark:text-purple-300">
             <p className="font-bold flex items-center gap-1.5 mb-1">
-              <Crown className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
               Giải thưởng đặc biệt (Gói VIP Tháng)
             </p>
             <p className="text-[11px] leading-relaxed opacity-90">

@@ -145,7 +145,7 @@ function SpinDialog() {
         <div className="glass-card w-full max-w-lg p-6 animate-scale-in relative my-8">
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
             <div>
-              <h2 className="text-xl font-black text-white">🎯 Vòng Quay May Mắn</h2>
+              <h2 className="text-xl font-black text-white">Vòng Quay May Mắn</h2>
               <p className="text-xs text-muted-light mt-0.5">9 ô Coin và 1 ô gói Tháng 30 ngày (cơ hội trúng 2%)</p>
             </div>
             <button
@@ -192,7 +192,7 @@ function SpinDialog() {
 
           {lastWon && (
             <div role="status" className="mt-4 p-4 rounded-2xl bg-verified/20 border border-verified/40 text-center animate-bounce-in">
-              <h3 className="text-base font-bold text-verified">🎉 Chúc mừng bạn trúng thưởng!</h3>
+              <h3 className="text-base font-bold text-verified">Chúc mừng bạn trúng thưởng!</h3>
               <p className="text-white font-extrabold text-lg mt-0.5">{lastWon.prize.name}</p>
               <p className="text-xs text-verified/90 mt-1">
                 {lastWon.bonusCoins

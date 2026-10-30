@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { Inbox, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
@@ -77,9 +77,6 @@ export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () 
 export function Empty({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto flex max-w-prose flex-col items-center gap-3 py-10 text-center">
-      <span className="flex size-11 items-center justify-center rounded-full bg-accent text-accent-foreground">
-        <Inbox className="size-5" aria-hidden="true" />
-      </span>
       <p className="text-sm text-muted-foreground">{children}</p>
     </div>
   );

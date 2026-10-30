@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShieldCheck } from 'lucide-react';
+
 import { useAppStore } from '@/store/useAppStore';
 
 type FooterLink = { href: string; label: string };
@@ -45,7 +45,6 @@ export default function CinemaEnterpriseFooter() {
               Nền tảng xem phim do AI tạo, sản xuất cùng các studio đối tác. Dành cho người xem từ 18 tuổi.
             </p>
             <p className="flex items-start gap-2 max-w-md text-[11px] text-emerald-400">
-              <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
               <span>Mỗi tập phim được kiểm duyệt và gắn nhãn nội dung AI theo Điều 44 Luật AI trước khi phát hành.</span>
             </p>
           </div>

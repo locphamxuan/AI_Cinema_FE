@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { BarChart3, Film, TrendingUp, Users } from 'lucide-react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
 import { useResource } from '@/features/production/hooks/useResource';
@@ -152,7 +151,6 @@ export function AdminOverviewDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <OverviewChartCard
           className="lg:col-span-2"
-          icon={<BarChart3 className="w-4 h-4 text-purple-500" />}
           title="Doanh thu phân bổ theo gói hội viên"
           description="Thống kê số Coin thu được từ từng gói hội viên trong khoảng thời gian đã chọn"
           link={{ href: '/admin/membership-plans?tab=reports', label: 'Chi tiết báo cáo', className: PURPLE_LINK }}
@@ -168,7 +166,6 @@ export function AdminOverviewDashboard() {
 
         <OverviewChartCard
           className="flex flex-col justify-between"
-          icon={<TrendingUp className="w-4 h-4 text-cyan-500" />}
           title="Cơ cấu Coin thu được"
           description="Tỷ trọng giữa tiền nạp thật (Coin chính) và khuyến mãi (Coin thưởng)"
         >
@@ -184,14 +181,13 @@ export function AdminOverviewDashboard() {
             </div>
           )}
           <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 text-[11px] text-slate-500 dark:text-slate-400">
-            💡 Coin thưởng tính vào chi phí quảng bá, chỉ có Coin chính là doanh thu thực.
+             Coin thưởng tính vào chi phí quảng bá, chỉ có Coin chính là doanh thu thực.
           </div>
         </OverviewChartCard>
       </div>
 
       {/* ── Real-time Episode Output Chart ── */}
       <OverviewChartCard
-        icon={<Film className="w-4 h-4 text-emerald-500" />}
         title="Số tập phim theo dự án (Real-time)"
         description="Dữ liệu số lượng tập phim thực tế đang được sản xuất hoặc hoàn tất từ các dự án tiêu biểu"
         link={{ href: '/admin/projects', label: 'Quản lý dự án phim', className: EMERALD_LINK }}
@@ -210,7 +206,6 @@ export function AdminOverviewDashboard() {
       {/* ── Secondary Charts Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <OverviewChartCard
-          icon={<Film className="w-4 h-4 text-purple-500" />}
           title="Trạng thái dự án phim toàn sàn"
           description="Tỷ lệ các dự án đang sản xuất, đã hoàn tất và đang lên kế hoạch"
           link={{ href: '/admin/projects', label: 'Xem danh sách', className: PURPLE_LINK }}
@@ -227,7 +222,6 @@ export function AdminOverviewDashboard() {
         </OverviewChartCard>
 
         <OverviewChartCard
-          icon={<Users className="w-4 h-4 text-emerald-500" />}
           title="Cơ cấu người dùng theo vai trò"
           description="Phân bổ tài khoản khán giả, đội ngũ sáng tạo và quản trị"
           link={{ href: '/admin/permissions?tab=accounts', label: 'Quản lý tài khoản', className: EMERALD_LINK }}

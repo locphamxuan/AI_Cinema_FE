@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Coins, Film, Play, PlusCircle, Sparkles } from 'lucide-react';
+import { Play, Sparkles } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import type { Movie } from '@/types/movie';
 
@@ -17,7 +17,6 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
 
         <div className="flex items-center justify-between mb-2 relative z-10">
           <span className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">
-            <Coins className="w-3.5 h-3.5 text-amber-400" />
             <span>Ví AI Cinema</span>
           </span>
           <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1">
@@ -40,7 +39,6 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
           }}
           className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 relative z-10"
         >
-          <PlusCircle className="w-4 h-4 text-slate-950" />
           <span>Nạp Coin Ngay</span>
         </button>
       </div>
@@ -50,7 +48,6 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
         <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition-all">
           <div className="flex items-center justify-between mb-2">
             <p className="text-[10px] font-black text-slate-400 flex items-center gap-1.5">
-              <Film className="w-3 h-3 text-slate-400" />
               <span>Đang Xem Dở</span>
             </p>
             <span className="text-[10px] font-bold text-ruby">Tập 1</span>

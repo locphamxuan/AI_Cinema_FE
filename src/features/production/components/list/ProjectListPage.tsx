@@ -2,18 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  Plus,
-  Search,
-  Film,
-  Clapperboard,
-  Clock,
-  CheckCircle2,
-  XCircle,
-  Layers,
-  LayoutGrid,
-  List,
-} from 'lucide-react';
+import { Search, Film, Clapperboard, Clock, CheckCircle2, XCircle, Layers, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { useCan } from '@/hooks/useCan';
@@ -85,7 +74,7 @@ export function ProjectListPage() {
           </div>
           {canCreate && (
             <Button onClick={() => setCreating(true)} className="shrink-0">
-              <Plus className="w-4 h-4" aria-hidden="true" /> Tạo dự án
+              Tạo dự án
             </Button>
           )}
         </div>

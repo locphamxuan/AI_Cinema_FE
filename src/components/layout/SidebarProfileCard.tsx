@@ -1,6 +1,5 @@
 'use client';
 
-import { Crown, User } from 'lucide-react';
 import type { UserProfile } from '@/store/slices/types';
 
 /** Avatar, name and plan badge at the top of the member sidebar. */
@@ -34,12 +33,10 @@ export default function SidebarProfileCard({ user, isVIPMode }: { user: UserProf
             >
               {isVIPMode ? (
                 <>
-                  <Crown className="w-3 h-3 text-amber-400" />
                   <span>GÓI THÁNG</span>
                 </>
               ) : (
                 <>
-                  <User className="w-3 h-3 text-slate-400" />
                   <span>FREE TIER</span>
                 </>
               )}

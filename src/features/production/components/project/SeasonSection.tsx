@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, ChevronDown, ChevronRight, Pencil, Plus } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { getTodayDateString } from '@/lib/dateUtils';
 import { seasonLabel, seasonName } from '@/lib/seasonLabel';
@@ -119,7 +119,7 @@ export function SeasonSection({
                 <Pencil className="w-3.5 h-3.5" />
               </Button>
               <Button size="sm" variant="ghost" onClick={onAddEpisode}>
-                <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm tập
+                Thêm tập
               </Button>
             </>
           )}

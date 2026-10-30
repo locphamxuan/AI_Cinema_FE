@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageSquarePlus } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { useCan } from '@/hooks/useCan';
@@ -151,7 +151,7 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
           hint="PDF, DOCX, TXT hoặc ảnh, tối đa 10 MB - ví dụ báo giá của Studio."
         />
         <Button type="submit" className="w-full" disabled={busy || !valid}>
-          <MessageSquarePlus className="w-4 h-4" aria-hidden="true" /> Gửi đề xuất
+          Gửi đề xuất
         </Button>
       </form>
     </Panel>

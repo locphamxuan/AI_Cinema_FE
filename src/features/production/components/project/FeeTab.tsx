@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Coins } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { episodeCountsBySeason, seasonName } from '@/lib/seasonLabel';
@@ -185,7 +185,7 @@ export function FeeTab() {
               <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} className={fieldTextareaClass} />
             </FormField>
             <Button type="submit" className="w-full" disabled={!valid || busy}>
-              <Coins className="w-4 h-4" aria-hidden="true" /> Ghi phí
+              Ghi phí
             </Button>
           </form>
         </Panel>

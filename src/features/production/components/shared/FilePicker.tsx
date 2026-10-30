@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { Paperclip, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { formatBytes } from '../../lib/format';
 
@@ -36,7 +36,7 @@ export function FilePicker({
         <span className="text-xs font-medium text-slate-600 dark:text-slate-300">{label}</span>
         <input ref={input} type="file" accept={accept} multiple={multiple} className="hidden" aria-label={label} onChange={(e) => add(e.target.files)} />
         <Button type="button" size="sm" variant="secondary" disabled={multiple && files.length >= maxFiles} onClick={() => input.current?.click()}>
-          <Paperclip className="w-3.5 h-3.5" aria-hidden="true" /> Chọn tệp
+          Chọn tệp
         </Button>
       </div>
       {hint && <p className="text-[11px] text-slate-500">{hint}</p>}

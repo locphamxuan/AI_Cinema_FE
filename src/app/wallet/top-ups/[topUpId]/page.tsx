@@ -143,7 +143,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
             <div className="flex justify-between items-center pb-2 border-b border-slate-800/80">
               <span className="text-slate-400">Coin nhận được:</span>
               <span className="font-black text-amber-400 text-sm flex items-center gap-1">
-                <span>🪙</span> +{order.coinsGranted} Coin
+                <span></span>+{order.coinsGranted} Coin
               </span>
             </div>
           </>

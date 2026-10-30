@@ -67,8 +67,7 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
                     {signed(line.bonusAmount)}
                   </td>
                   <td className="px-4 py-3 text-right text-xs tabular-nums text-slate-600 dark:text-muted-light whitespace-nowrap">
-                    {line.mainBalanceAfter} 🟡 · {line.bonusBalanceAfter} 🎁
-                  </td>
+                    Chính {line.mainBalanceAfter} / Thưởng {line.bonusBalanceAfter}</td>
                   <td className="px-4 py-3 text-right">
                     <span className="text-xs text-slate-600 dark:text-muted-light font-medium">{day}</span>
                     <br />
@@ -93,10 +92,10 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
             {line.description && <p className="text-sm text-foreground">{describeLine(line.description)}</p>}
             <div className="flex gap-3 text-xs font-bold">
               {line.mainAmount !== 0 && (
-                <span className={amountClass(line.mainAmount, 'text-verified')}>🟡 {signed(line.mainAmount)}</span>
+                <span className={amountClass(line.mainAmount, 'text-verified')}>Chính {signed(line.mainAmount)}</span>
               )}
               {line.bonusAmount !== 0 && (
-                <span className={amountClass(line.bonusAmount, 'text-neon')}>🎁 {signed(line.bonusAmount)}</span>
+                <span className={amountClass(line.bonusAmount, 'text-neon')}>Thưởng {signed(line.bonusAmount)}</span>
               )}
             </div>
           </li>
@@ -105,7 +104,7 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
 
       {lines.length === 0 && (
         <div className="p-12 text-center">
-          <div className="text-4xl mb-3">📭</div>
+          <div className="text-4xl mb-3"></div>
           <p className="text-foreground font-medium">Chưa có giao dịch nào</p>
           <p className="text-muted-light text-sm mt-1">Thử đổi bộ lọc, hoặc nạp Coin để bắt đầu.</p>
         </div>

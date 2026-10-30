@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BarChart3, ChevronDown, ChevronUp, Clapperboard, Film, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
 import { StatCard } from '@/components/data/StatCard';
@@ -61,7 +61,6 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
       <div className="flex items-center justify-between gap-3 border-b px-6 py-4">
         <div className="min-w-0">
           <h2 className="flex items-center gap-2 font-heading text-base font-semibold">
-            <BarChart3 className="size-4 text-primary" aria-hidden="true" />
             Thống kê sản xuất
           </h2>
           <p className="text-sm text-muted-foreground">Trạng thái dự án và số tập đã làm của {roleTitle}.</p>
@@ -77,20 +76,17 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatCard
               featured
-              icon={<Film />}
               label="Tổng số dự án"
               value={projects.length}
               note={`${statusCounts.production} đang sản xuất`}
             />
             <StatCard
-              icon={<Clapperboard />}
               label="Tập đã có"
               value={totalEpisodes}
               unit="tập"
               note="Trên mọi dự án"
             />
             <StatCard
-              icon={<CheckCircle2 />}
               label="Dự án đã hoàn tất"
               value={statusCounts.done}
               note={`${statusCounts.plan} đang lên kế hoạch`}

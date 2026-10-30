@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Tag } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
@@ -67,7 +67,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
         label &&
         !editing && (
           <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
-            <Tag className="w-3.5 h-3.5" aria-hidden="true" /> Đổi nhãn
+            Đổi nhãn
           </Button>
         )
       }
@@ -126,7 +126,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
           {recheck && <p className="text-[11px] text-amber-600 dark:text-amber-400">Đổi nhãn sẽ đưa tập về “Đã gắn nhãn AI” và phải kiểm tra pháp lý lại.</p>}
           <div className="flex gap-2">
             <Button type="submit" disabled={busy || text.trim().length < 5}>
-              <Tag className="w-3.5 h-3.5" aria-hidden="true" /> {label ? 'Lưu nhãn' : 'Gắn nhãn'}
+              {label ? 'Lưu nhãn' : 'Gắn nhãn'}
             </Button>
             {label && (
               <Button type="button" variant="secondary" onClick={() => setEditing(false)}>

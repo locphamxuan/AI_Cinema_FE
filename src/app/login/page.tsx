@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
-import { ArrowLeft } from 'lucide-react';
+
 import AuthForm from '@/components/auth/AuthForm';
 import AuthBrand from '@/components/auth/AuthBrand';
 
@@ -25,7 +25,6 @@ function LoginCard() {
           href="/"
           className="inline-flex items-center gap-1.5 text-slate-600 dark:text-slate-300 hover:text-ruby dark:hover:text-ruby font-semibold transition-colors"
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
           <span>Quay lại trang chủ Khám Phá</span>
         </Link>
       </div>

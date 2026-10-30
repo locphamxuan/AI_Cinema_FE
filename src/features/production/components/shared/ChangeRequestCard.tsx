@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Download, X } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequest } from '@/types/production';
@@ -71,7 +71,7 @@ export function ChangeRequestCard({
       {cr.requestedTokens !== null && <p className="font-semibold text-amber-700 dark:text-amber-300">Xin thêm {formatNumber(Number(cr.requestedTokens))} Token</p>}
       {cr.attachmentName && (
         <Button size="sm" variant="ghost" onClick={proof}>
-          <Download className="w-3.5 h-3.5" aria-hidden="true" /> Giấy tờ: {cr.attachmentName}
+          Giấy tờ: {cr.attachmentName}
         </Button>
       )}
       {cr.adminResponse && (
@@ -82,10 +82,10 @@ export function ChangeRequestCard({
       {canDecide && cr.status === 'OPEN' && (
         <div className="flex justify-end gap-2">
           <Button size="sm" variant="secondary" disabled={busy} onClick={() => setRejecting(true)}>
-            <X className="w-3.5 h-3.5" aria-hidden="true" /> Từ chối
+            Từ chối
           </Button>
           <Button size="sm" variant="success" disabled={busy} onClick={approve}>
-            <Check className="w-3.5 h-3.5" aria-hidden="true" /> Duyệt
+            Duyệt
           </Button>
         </div>
       )}

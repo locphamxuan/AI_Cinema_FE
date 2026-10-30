@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Copy } from 'lucide-react';
 
 const CARD_NUMBER = '9704198526191432198';
 
@@ -23,7 +22,6 @@ export function VnpaySandboxCard() {
     <div className="mb-5 rounded-2xl bg-gradient-to-br from-indigo-950/60 via-slate-900/80 to-blue-950/40 border border-indigo-500/30 p-3.5 sm:p-4 text-xs">
       <div className="flex items-center justify-between pb-2 mb-2.5 border-b border-indigo-500/20">
         <div className="flex items-center gap-2 text-indigo-300 font-bold">
-          <span className="text-sm">💳</span>
           <span>Thẻ Thanh Toán Test Sandbox (Ngân hàng NCB)</span>
         </div>
         <button
@@ -33,12 +31,10 @@ export function VnpaySandboxCard() {
         >
           {copied ? (
             <>
-              <Check className="w-3 h-3 text-emerald-400" />
               <span className="text-emerald-400">Đã chép số thẻ</span>
             </>
           ) : (
             <>
-              <Copy className="w-3 h-3" />
               <span>Sao chép số thẻ</span>
             </>
           )}

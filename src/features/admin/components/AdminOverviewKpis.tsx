@@ -1,4 +1,3 @@
-import { Clapperboard, CreditCard, Receipt, Users } from 'lucide-react';
 import { StatCard } from '@/components/data/StatCard';
 import { formatNumber } from '@/features/production/lib/format';
 import type { RevenueReport } from '@/types/billing';
@@ -15,7 +14,6 @@ export function AdminOverviewKpis({ revenue, projectCount, completedProjects, ac
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <StatCard
-        icon={<Receipt />}
         label="Doanh thu gói"
         value={formatNumber(revenue?.totals.coins ?? 0)}
         unit="Coin"
@@ -23,19 +21,17 @@ export function AdminOverviewKpis({ revenue, projectCount, completedProjects, ac
         featured
       />
       <StatCard
-        icon={<CreditCard />}
         label="Kỳ thanh toán"
         value={formatNumber(revenue?.totals.paidCycles ?? 0)}
         note="Kỳ gói đã thu Coin"
       />
       <StatCard
-        icon={<Clapperboard />}
         label="Dự án phim"
         value={projectCount}
         note={`${completedProjects} phim đã hoàn tất`}
         noteTone="good"
       />
-      <StatCard icon={<Users />} label="Tài khoản" value={accountCount} note="Đang hoạt động trên nền tảng" />
+      <StatCard label="Tài khoản" value={accountCount} note="Đang hoạt động trên nền tảng" />
     </div>
   );
 }

@@ -152,7 +152,6 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
             {/* Toast Notification when version changes */}
             {versionToast && (
               <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-xl bg-neon/90 backdrop-blur-md text-white text-xs font-bold shadow-2xl animate-slide-down flex items-center gap-2 z-30 border border-white/20">
-                <span>🔄</span>
                 <span>{versionToast}</span>
               </div>
             )}
@@ -162,7 +161,6 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
               onClick={() => setShowComplianceDrawer(true)}
               className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/75 backdrop-blur-md text-[10px] sm:text-xs text-muted-light hover:text-white hover:bg-black/90 transition-all cursor-pointer border border-white/15 shadow-xl z-40"
             >
-              <span className="text-sm">🏷️</span>
               <span className="line-clamp-1">
                 Nội dung tạo 100% bằng AI • Tuân thủ Điều 44 Luật AI & Nghị định 142
               </span>
@@ -197,7 +195,6 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                 className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neon/15 hover:bg-neon/25 border border-neon/35 text-neon text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm shadow-neon/15"
                 title="Bấm để xem lịch sử hiệu chỉnh và quản lý phiên bản"
               >
-                <span>🗂️</span>
                 <span>
                   Phiên bản:{' '}
                   <strong className="text-slate-900 dark:text-white underline decoration-neon">

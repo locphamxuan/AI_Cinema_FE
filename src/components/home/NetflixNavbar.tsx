@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Search, ChevronDown, User, LogOut, Wallet, Bookmark, Clock, Laptop, KeyRound, Crown } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import RewardShortcuts from '@/components/wallet/RewardShortcuts';
 import ThemeToggle from '@/components/theme/ThemeToggle';
@@ -20,13 +20,13 @@ const NAV_LINKS = [
 
 /** Account pages listed in the signed-in user's dropdown. */
 const USER_MENU_LINKS = [
-  { href: '/profile', label: 'Hồ sơ cá nhân', Icon: User, iconClass: 'text-indigo-400' },
-  { href: '/profile/saved', label: 'Phim đã lưu', Icon: Bookmark, iconClass: 'text-amber-500 fill-amber-500/20' },
-  { href: '/profile/history', label: 'Lịch sử xem phim', Icon: Clock, iconClass: 'text-purple-400' },
-  { href: '/profile/devices', label: 'Quản lý thiết bị', Icon: Laptop, iconClass: 'text-sky-400' },
-  { href: '/profile/library', label: 'Kho tập phim đã mua', Icon: KeyRound, iconClass: 'text-fuchsia-400' },
-  { href: '/profile/subscription', label: 'Gói hội viên VIP', Icon: Crown, iconClass: 'text-amber-400' },
-  { href: '/profile/transactions', label: 'Lịch sử ví Coin', Icon: Wallet, iconClass: 'text-emerald-500' },
+  { href: '/profile', label: 'Hồ sơ cá nhân' },
+  { href: '/profile/saved', label: 'Phim đã lưu' },
+  { href: '/profile/history', label: 'Lịch sử xem phim' },
+  { href: '/profile/devices', label: 'Quản lý thiết bị' },
+  { href: '/profile/library', label: 'Kho tập phim đã mua' },
+  { href: '/profile/subscription', label: 'Gói hội viên VIP' },
+  { href: '/profile/transactions', label: 'Lịch sử ví Coin' },
 ];
 
 export default function NetflixNavbar() {
@@ -105,8 +105,8 @@ export default function NetflixNavbar() {
                         ? 'text-primary dark:text-white font-black'
                         : 'text-white font-black'
                       : isScrolled
-                      ? 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium'
-                      : 'text-slate-300 hover:text-white font-medium'
+                        ? 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium'
+                        : 'text-slate-300 hover:text-white font-medium'
                   }`}
                 >
                   {link.label}
@@ -190,7 +190,6 @@ export default function NetflixNavbar() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/15 hover:bg-primary/25 border border-primary/30 text-xs font-bold transition shadow-sm cursor-pointer"
             title="Ví Coin - Bấm để nạp thêm"
           >
-            <span className="text-sm">🪙</span>
             <span className={isScrolled ? 'text-slate-900 dark:text-white' : 'text-white'}>
               {(wallet.mainCoin + wallet.bonusCoin).toLocaleString('vi-VN')}
             </span>
@@ -218,24 +217,19 @@ export default function NetflixNavbar() {
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500" />
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">
-                        {user.role === 'admin'
-                          ? 'Quản trị viên'
-                          : user.role === 'vip'
-                          ? 'Hội viên VIP'
-                          : 'Hội viên'}
+                        {user.role === 'admin' ? 'Quản trị viên' : user.role === 'vip' ? 'Hội viên VIP' : 'Hội viên'}
                       </p>
                     </div>
                   </div>
 
                   <div className="py-1.5 space-y-0.5">
-                    {USER_MENU_LINKS.map(({ href, label, Icon, iconClass }) => (
+                    {USER_MENU_LINKS.map(({ href, label }) => (
                       <Link
                         key={href}
                         href={href}
                         onClick={() => setIsUserMenuOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
                       >
-                        <Icon className={`w-4 h-4 shrink-0 ${iconClass}`} />
                         <span>{label}</span>
                       </Link>
                     ))}
@@ -249,7 +243,6 @@ export default function NetflixNavbar() {
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition text-left cursor-pointer font-semibold"
                     >
-                      <LogOut className="w-4 h-4 shrink-0" />
                       <span>Đăng xuất</span>
                     </button>
                   </div>

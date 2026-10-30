@@ -1,7 +1,6 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { DashboardSidebar } from '@/features/production/components/shell/DashboardSidebar';
 import { ADMIN_SECTIONS, opensSection } from '../sections';
@@ -10,11 +9,10 @@ import { ADMIN_SECTIONS, opensSection } from '../sections';
 export function AdminSidebar() {
   const pathname = usePathname();
   const can = useCan();
-  const items = ADMIN_SECTIONS.filter((s) => opensSection(s, can)).map(({ href, label, icon }) => ({
+  const items = ADMIN_SECTIONS.filter((s) => opensSection(s, can)).map(({ href, label }) => ({
     href,
     label,
-    icon,
     active: href === '/admin' ? pathname === '/admin' : pathname.startsWith(href),
   }));
-  return <DashboardSidebar label="Khu quản trị" title="Quản trị" subtitle="Toàn bộ nền tảng" icon={LayoutDashboard} items={items} />;
+  return <DashboardSidebar label="Khu quản trị" title="Quản trị" subtitle="Toàn bộ nền tảng" items={items} />;
 }

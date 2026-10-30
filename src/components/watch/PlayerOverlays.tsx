@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { SkipForward } from 'lucide-react';
+
 import { formatDuration } from '@/features/production/lib/format';
 import type { AdScheduleItem } from '@/types/playback';
 import type { Episode } from '@/types/movie';
@@ -47,7 +47,7 @@ export function AdBreakOverlay({ cue, onDone }: { cue: AdScheduleItem; onDone: (
             autoFocus
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white text-slate-900 text-sm font-bold shadow-lg hover:bg-amber-100 cursor-pointer"
           >
-            Bỏ qua quảng cáo <SkipForward className="w-4 h-4" aria-hidden="true" />
+            Bỏ qua quảng cáo
           </button>
         )}
       </div>
@@ -75,9 +75,6 @@ export function LockedOverlay({ episode, onUnlock }: { episode: Episode; onUnloc
   return (
     <div className="absolute inset-0 video-blur-overlay flex flex-col items-center justify-center p-6">
       <div className="text-center animate-fade-in max-w-md">
-        <div className="w-16 h-16 rounded-2xl bg-ruby/20 border border-ruby/30 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-ruby/20">
-          🔒
-        </div>
         <h3 className="text-xl font-bold text-white mb-2">Tập Phim Đang Bị Khóa</h3>
         <p className="text-muted-light mb-5 text-xs sm:text-sm leading-relaxed">
           {episode.isPreview
@@ -88,7 +85,7 @@ export function LockedOverlay({ episode, onUnlock }: { episode: Episode; onUnloc
           onClick={onUnlock}
           className="btn-shimmer px-7 py-3 bg-gradient-to-r from-ruby to-ruby-dark text-white rounded-xl font-bold hover:shadow-xl hover:shadow-ruby/40 transition-all active:scale-95 cursor-pointer text-sm shadow-md"
         >
-          🪙 Mở khóa ngay - {episode.price} Coins
+           Mở khóa ngay - {episode.price} Coins
         </button>
       </div>
     </div>

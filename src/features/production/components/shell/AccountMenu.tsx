@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Home, LayoutGrid, LogOut } from 'lucide-react';
 
 export interface AccountMenuProps {
   name: string;
@@ -56,11 +55,11 @@ export function AccountMenu({ name, roleLabel, onLogout, links = [] }: AccountMe
             <p className="text-[11px] text-slate-500 dark:text-slate-400">{roleLabel}</p>
           </div>
           <Link href="/" role="menuitem" onClick={() => setOpen(false)} className={ITEM_CLASS}>
-            <Home className="w-3.5 h-3.5" aria-hidden="true" /> Trang chủ
+            Trang chủ
           </Link>
           {links.map((link) => (
             <Link key={link.href} href={link.href} role="menuitem" onClick={() => setOpen(false)} className={ITEM_CLASS}>
-              <LayoutGrid className="w-3.5 h-3.5" aria-hidden="true" /> {link.label}
+              {link.label}
             </Link>
           ))}
           <button
@@ -72,7 +71,7 @@ export function AccountMenu({ name, roleLabel, onLogout, links = [] }: AccountMe
             }}
             className={`${ITEM_CLASS} hover:!bg-rose-50 dark:hover:!bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400`}
           >
-            <LogOut className="w-3.5 h-3.5" aria-hidden="true" /> Đăng xuất
+            Đăng xuất
           </button>
         </div>
       )}

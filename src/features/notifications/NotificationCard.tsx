@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertTriangle, ArrowRight, Bell, Clapperboard, Clock, Coins, FileText, Film } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Bell, Clapperboard, Coins, FileText, Film } from 'lucide-react';
 import { formatDateTime } from '@/features/production/lib/format';
 import type { AppNotification } from '@/types/production';
 
@@ -135,7 +135,6 @@ export function NotificationCard({ item, href, onOpen }: NotificationCardProps) 
             </div>
 
             <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 font-medium">
-              <Clock className="w-3 h-3" />
               <span>{formatTimeAgo(item.createdAt)}</span>
             </div>
           </div>

@@ -61,7 +61,6 @@ export function AmountGrid({ amounts, rateVnd, selected, onSelect }: Readonly<Am
           >
             <div className="flex items-baseline justify-between mb-2">
               <div className="flex items-center gap-1.5">
-                <span className="text-base">🪙</span>
                 <span className="text-base sm:text-lg font-black text-amber-300 tracking-tight">
                   {rateVnd ? Math.floor(amountVnd / rateVnd).toLocaleString('vi-VN') : '…'}
                 </span>

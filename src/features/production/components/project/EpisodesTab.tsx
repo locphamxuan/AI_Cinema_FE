@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { teamService } from '@/services/teamService';
 import type { Episode, Season } from '@/types/production';
@@ -27,7 +27,7 @@ export function EpisodesTab() {
       {plan && (
         <div className="flex justify-end">
           <Button size="sm" variant="secondary" onClick={() => setAddingSeason(true)}>
-            <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm mùa
+            Thêm mùa
           </Button>
         </div>
       )}

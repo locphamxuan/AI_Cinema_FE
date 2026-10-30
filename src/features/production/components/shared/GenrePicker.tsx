@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { useCan } from '@/hooks/useCan';
@@ -73,7 +73,7 @@ export function GenrePicker({ value, onChange }: { value: string[]; onChange: (i
             className={`${fieldInputClass} py-1.5`}
           />
           <Button type="button" size="sm" variant="secondary" disabled={!newName.trim() || busy} onClick={add}>
-            <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm
+            Thêm
           </Button>
         </div>
       )}

@@ -30,18 +30,15 @@ function formatRelativeTime(dateString: string): string {
 }
 
 function iconOf(type: string): string {
-  if (type.includes('COIN')) return '🪙';
-  if (type.includes('SUB')) return '👑';
-  if (type.includes('EPISODE') || type.includes('MEDIA') || type.includes('CONTENT')) return '🎬';
-  return '🔔';
+  if (type.includes('COIN')) return '';
+  if (type.includes('SUB')) return '';
+  if (type.includes('EPISODE') || type.includes('MEDIA') || type.includes('CONTENT')) return '';
+  return '';
 }
 
 export function GuestNotice({ onLogin }: Readonly<{ onLogin: () => void }>) {
   return (
     <div className="p-6 text-center space-y-3">
-      <div className="w-12 h-12 rounded-2xl bg-purple-500/15 border border-purple-500/30 text-purple-400 flex items-center justify-center text-xl mx-auto shadow-inner">
-        🔔
-      </div>
       <div>
         <h4 className="font-bold text-white text-sm">Đăng nhập để xem thông báo</h4>
         <p className="text-[11px] text-slate-400 mt-1 max-w-xs mx-auto">
@@ -77,7 +74,6 @@ export function NotificationList({ items, loading, onOpen }: Readonly<Notificati
   if (items.length === 0) {
     return (
       <div className="py-12 text-center text-slate-400 space-y-2">
-        <span className="text-3xl block">📭</span>
         <p className="font-bold text-slate-300 text-xs">Chưa có thông báo nào mới</p>
         <p className="text-[10px] text-slate-500 max-w-xs mx-auto">Các cập nhật về phim mới, Coin nạp và quà điểm danh sẽ hiển thị tại đây.</p>
       </div>

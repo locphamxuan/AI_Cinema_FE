@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Plus, CalendarDays, Coins, Gift } from 'lucide-react';
+import { Pencil, Coins, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useResource } from '@/features/production/hooks/useResource';
 import { Empty, ErrorNote, Loading } from '@/features/production/components/shared/ui';
@@ -29,9 +29,6 @@ export function RewardLadderPanel() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
-                <CalendarDays className="w-5 h-5" />
-              </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   Điểm danh hằng ngày
@@ -55,7 +52,6 @@ export function RewardLadderPanel() {
               disabled={takenDays.size >= LADDER_LENGTH}
               className="rounded-xl px-4 py-2 font-bold text-xs flex items-center gap-1.5 shadow-sm"
             >
-              <Plus className="w-3.5 h-3.5" />
               <span>Thêm ngày</span>
             </Button>
           </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { SlidersHorizontal, Wallet } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -147,7 +147,7 @@ function WalletModal({
           {canAdjust && (
             <div className="flex justify-end">
               <Button size="sm" onClick={() => setAdjusting(true)}>
-                <SlidersHorizontal className="w-3.5 h-3.5" /> Điều chỉnh số dư
+                Điều chỉnh số dư
               </Button>
             </div>
           )}

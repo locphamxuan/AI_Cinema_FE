@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ExternalLink, UploadCloud } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import type { ApiResponse } from '@/services/apiClient';
@@ -93,7 +93,7 @@ export function DeliverMediaPanel({
             </p>
             <div className="flex flex-wrap gap-2">
               <a href={studioFilm.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-semibold text-emerald-700 dark:text-emerald-300 hover:underline">
-                <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" /> Xem phim
+                Xem phim
               </a>
               <Button
                 type="button"
@@ -180,7 +180,7 @@ export function DeliverMediaPanel({
         </FormField>
 
         <Button type="submit" className="w-full" disabled={!valid || busy}>
-          <UploadCloud className="w-4 h-4" aria-hidden="true" /> {busy ? 'Đang gửi…' : 'Giao bản dựng'}
+          {busy ? 'Đang gửi…' : 'Giao bản dựng'}
         </Button>
       </form>
     </Panel>

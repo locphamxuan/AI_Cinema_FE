@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Laptop, Smartphone, Monitor, Tv, Trash2, StopCircle, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Laptop, Smartphone, Monitor, Tv, Trash2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { deviceService } from '@/services/deviceService';
 import type { DeviceOverview, LiveStream, RegisteredDevice } from '@/types/device';
@@ -100,9 +100,6 @@ export default function DevicesPage() {
   if (!isAuthenticated) {
     return (
       <div className="max-w-4xl mx-auto py-16 px-4 text-center space-y-4 animate-fade-in">
-        <div className="w-16 h-16 mx-auto rounded-3xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500">
-          <Monitor className="w-8 h-8" />
-        </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Đăng nhập để quản lý thiết bị</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
           Theo dõi các máy đang đăng nhập tài khoản của bạn và quản lý số luồng xem phim đồng thời.
@@ -128,9 +125,6 @@ export default function DevicesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
         <div>
           <h1 className="flex items-center gap-2.5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-            <span className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500 text-sm">
-              <Laptop className="w-4 h-4" />
-            </span>
             Quản lý thiết bị
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -144,7 +138,6 @@ export default function DevicesPage() {
           disabled={loading}
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-ruby bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors w-fit cursor-pointer disabled:opacity-50"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           Làm mới
         </button>
       </div>
@@ -152,7 +145,6 @@ export default function DevicesPage() {
       {/* ── Error Banner ── */}
       {error && (
         <div className="p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -221,7 +213,6 @@ export default function DevicesPage() {
                   onClick={() => handleEndStream(stream)}
                   className="px-3.5 py-1.5 rounded-xl bg-danger/10 hover:bg-danger text-danger hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 w-fit cursor-pointer disabled:opacity-50"
                 >
-                  <StopCircle className="w-3.5 h-3.5" />
                   <span>{actionBusy === stream.id ? 'Đang dừng…' : 'Dừng phát'}</span>
                 </button>
               </div>
@@ -268,7 +259,7 @@ export default function DevicesPage() {
                       <p className="text-xs font-bold text-slate-900 dark:text-white">{device.name}</p>
                       {device.current && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 text-[10px] font-bold border border-sky-500/20">
-                          <CheckCircle2 className="w-3 h-3" /> Thiết bị này
+                          Thiết bị này
                         </span>
                       )}
                     </div>

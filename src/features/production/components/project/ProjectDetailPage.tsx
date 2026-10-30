@@ -3,18 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  Ban,
-  Film,
-  Clapperboard,
-  ShieldCheck,
-  History,
-  CalendarClock,
-  Layers,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, Ban, Film, Clapperboard, ShieldCheck, History, CalendarClock, Layers, Users } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { seasonName } from '@/lib/seasonLabel';
@@ -101,7 +90,7 @@ export function ProjectDetailPage() {
               href={productionPaths.list(base)}
               className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-700 dark:text-sky-300 hover:underline"
             >
-              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Danh sách dự án
+              Danh sách dự án
             </Link>
 
             <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5">

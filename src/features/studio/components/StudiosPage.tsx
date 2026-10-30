@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, Pencil, Plus, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useCan } from '@/hooks/useCan';
@@ -41,7 +41,7 @@ export function StudiosPage() {
         </div>
         {manage && (
           <Button onClick={() => setEditing('new')}>
-            <Plus className="w-4 h-4" aria-hidden="true" /> Thêm Studio
+            Thêm Studio
           </Button>
         )}
       </div>
@@ -71,7 +71,7 @@ export function StudiosPage() {
                     <tr key={studio.id}>
                       <td className="px-4 py-3">
                         <p className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white">
-                          <Building2 className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" /> {studio.name}
+                          {studio.name}
                         </p>
                         <p className="text-slate-500">{studio.email}</p>
                         {studio.note && <p className="text-slate-400">{studio.note}</p>}

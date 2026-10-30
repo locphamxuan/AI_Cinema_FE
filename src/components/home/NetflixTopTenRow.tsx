@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
-import { ChevronLeft, ChevronRight, Play,  ShieldCheck } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 import { onActivateKey } from '@/lib/a11y';
 
@@ -100,7 +100,6 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
                       MỚI #{rank}
                     </span>
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/70 border border-white/20 text-emerald-300 text-[9px] font-bold backdrop-blur-md">
-                      <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
                       Nhãn AI
                     </span>
                   </div>

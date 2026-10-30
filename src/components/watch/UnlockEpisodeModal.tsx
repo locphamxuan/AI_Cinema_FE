@@ -146,10 +146,10 @@ export default function UnlockEpisodeModal() {
         {canJoinPlan && (
           <div className="flex p-1 bg-slate-950/60 border border-slate-800 rounded-2xl mb-4">
             <button type="button" onClick={() => setActiveTab('episode')} className={tabClass('episode', 'text-amber-400 border-amber-500/30')}>
-              🪙 Mở khóa tập này ({episodePrice} Coin)
+               Mở khóa tập này ({episodePrice} Coin)
             </button>
             <button type="button" onClick={() => setActiveTab('plan')} className={tabClass('plan', 'text-purple-400 border-purple-500/30')}>
-              👑 Gói Tháng ({planPrice} Coin)
+               Gói Tháng ({planPrice} Coin)
             </button>
           </div>
         )}
@@ -157,7 +157,7 @@ export default function UnlockEpisodeModal() {
         <div className="space-y-4">
           {tab === 'plan' ? (
             <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-900/40 via-indigo-950/40 to-slate-900 border border-purple-500/30">
-              <p className="text-xs font-black text-purple-300 mb-2">👑 {monthlyPlan?.name}</p>
+              <p className="text-xs font-black text-purple-300 mb-2">{monthlyPlan?.name}</p>
               <ul className="text-xs text-slate-300 space-y-1.5 pl-1">
                 <li>✓ Xem mọi tập đã phát hành, không tốn thêm Coin</li>
                 <li>✓ Không quảng cáo</li>
@@ -186,7 +186,7 @@ export default function UnlockEpisodeModal() {
               tone={tab === 'plan' ? 'purple' : 'amber'}
               busy={isProcessing}
               busyLabel={tab === 'plan' ? 'Đang kích hoạt gói...' : 'Đang mở khóa...'}
-              label={tab === 'plan' ? `👑 Kích hoạt gói Tháng (${price} Coin)` : `🔓 Xác nhận mở khóa (${price} Coin)`}
+              label={tab === 'plan' ? `Kích hoạt gói Tháng (${price} Coin)` : `Xác nhận mở khóa (${price} Coin)`}
               onClick={() => void (tab === 'plan' ? joinPlan() : buyEpisode())}
             />
           ) : (
@@ -211,7 +211,7 @@ export default function UnlockEpisodeModal() {
           <>
             <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-800">
               <div>
-                <h3 className="text-lg font-black text-white">🔒 Mở Khóa Tập Phim</h3>
+                <h3 className="text-lg font-black text-white">Mở Khóa Tập Phim</h3>
                 <p className="text-xs text-slate-400">
                   {currentMovie?.title} • {episode.displayLabel ?? `Tập ${episode.episodeNumber}`}
                 </p>

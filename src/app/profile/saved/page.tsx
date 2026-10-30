@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Bookmark, Film, Trash2, Play, Sparkles } from 'lucide-react';
+import { Bookmark, Trash2, Play } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { savedMovieService, type SavedMovieItem } from '@/services/savedMovieService';
 import MovieDetailQuickModal from '@/components/home/MovieDetailQuickModal';
@@ -53,9 +53,6 @@ export default function SavedMoviesPage() {
   if (!isAuthenticated) {
     return (
       <div className="max-w-4xl mx-auto py-16 px-4 text-center space-y-4 animate-fade-in">
-        <div className="w-16 h-16 mx-auto rounded-3xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500">
-          <Bookmark className="w-8 h-8" />
-        </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Đăng nhập để xem danh sách lưu</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
           Lưu lại những bộ phim AI yêu thích của bạn và đồng bộ trên mọi thiết bị máy tính, điện thoại.
@@ -77,9 +74,6 @@ export default function SavedMoviesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
         <div>
           <h1 className="flex items-center gap-2.5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-            <span className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-sm">
-              <Bookmark className="w-4 h-4 fill-current" />
-            </span>
             Phim đã lưu
             <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 tabular-nums">
               {movies.length} phim
@@ -94,7 +88,6 @@ export default function SavedMoviesPage() {
           href="/phim"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-ruby bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors w-fit"
         >
-          <Film className="w-3.5 h-3.5" />
           Khám phá thêm phim
         </Link>
       </div>
@@ -111,9 +104,6 @@ export default function SavedMoviesPage() {
       {/* ── Empty State ── */}
       {!loading && movies.length === 0 && (
         <div className="py-20 text-center space-y-4 rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/[0.01]">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
-            <Bookmark className="w-7 h-7" />
-          </div>
           <div>
             <p className="text-base font-bold text-slate-900 dark:text-white">Bạn chưa lưu phim nào</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
@@ -124,7 +114,6 @@ export default function SavedMoviesPage() {
             href="/phim"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-ruby hover:bg-ruby-light text-white font-bold text-xs shadow-md shadow-ruby/20 transition-all"
           >
-            <Sparkles className="w-3.5 h-3.5" />
             Khám phá phim ngay
           </Link>
         </div>

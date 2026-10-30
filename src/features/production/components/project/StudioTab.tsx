@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Repeat, Send } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { TokenRequestForm } from '@/features/token-request/TokenRequestForm';
 import { TokenRequestList } from '@/features/token-request/TokenRequestList';
@@ -123,12 +123,12 @@ export function StudioTab() {
           <div className="mt-4 space-y-2">
             {canHandOff && (
               <Button size="sm" className="w-full" onClick={() => setMode('handoff')}>
-                <Send className="w-3.5 h-3.5" aria-hidden="true" /> Bàn giao cho Studio
+                Bàn giao cho Studio
               </Button>
             )}
             {caps.handoff && delivering && all.length > 0 && (
               <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
-                <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi Studio
+                Đổi Studio
               </Button>
             )}
             {caps.creator && project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Reviewer hoàn tất kế hoạch.</p>}

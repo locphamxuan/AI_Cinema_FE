@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Play, Info, Plus, Check, Volume2, VolumeX, ShieldCheck } from 'lucide-react';
+import { Plus, Check, Volume2, VolumeX } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 interface CinematicHeroBillboardProps {
@@ -72,7 +72,6 @@ export default function CinematicHeroBillboard({
 
           {/* Dieu 44 Compliance Verified */}
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold backdrop-blur-md shadow-sm shadow-emerald-500/10">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             Đã gắn nhãn AI
           </span>
 
@@ -111,7 +110,6 @@ export default function CinematicHeroBillboard({
             href={firstEpisode ? `/watch/${firstEpisode.id}` : '#'}
             className="group/btn px-8 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-black font-black text-sm sm:text-base flex items-center gap-2.5 transition-all duration-200 hover:scale-105 active:scale-95 shadow-xl shadow-white/15 cursor-pointer relative overflow-hidden"
           >
-            <Play className="w-5 h-5 fill-black group-hover/btn:scale-110 transition-transform" />
             <span>Phát Tập 1 (Miễn Phí)</span>
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-black/5 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700" />
           </Link>
@@ -122,7 +120,6 @@ export default function CinematicHeroBillboard({
             onClick={() => onOpenDetailModal(movie)}
             className="px-6 py-3.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-sm sm:text-base flex items-center gap-2.5 transition-all duration-200 backdrop-blur-xl active:scale-95 cursor-pointer border border-white/20 hover:border-white/30 shadow-lg"
           >
-            <Info className="w-5 h-5 text-slate-200" />
             <span>Chi Tiết & Kịch Bản</span>
           </button>
 

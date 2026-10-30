@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, MessageSquareWarning } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
 import type { PriceAlert, PriceAlertStatus } from '@/types/production';
@@ -97,12 +97,12 @@ export function PriceAlertsPanel() {
                 <StatusPill {...PRICE_ALERT_STATUS[a.status]} />
                 {a.status === 'OPEN' && (
                   <Button size="sm" variant="secondary" disabled={busy} onClick={() => setAsking(a)}>
-                    <MessageSquareWarning className="w-3.5 h-3.5" aria-hidden="true" /> Yêu cầu đổi giá
+                    Yêu cầu đổi giá
                   </Button>
                 )}
                 {a.status !== 'RESOLVED' && (
                   <Button size="sm" variant="ghost" disabled={busy} onClick={() => resolve(a)}>
-                    <Check className="w-3.5 h-3.5" aria-hidden="true" /> Chấp nhận giá
+                    Chấp nhận giá
                   </Button>
                 )}
               </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Clapperboard, Plus } from 'lucide-react';
+import { Clapperboard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -105,7 +105,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
             />
           ))}
           <Button type="button" size="sm" variant="secondary" onClick={() => setSeasons([...seasons, emptySeason(seasons.length + 1, firstNumbers[seasons.length - 1] + seasons[seasons.length - 1].episodes.length)])}>
-            <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm mùa
+            Thêm mùa
           </Button>
         </fieldset>
 

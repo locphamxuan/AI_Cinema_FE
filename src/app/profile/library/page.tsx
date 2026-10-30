@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { KeyRound, Play, Coins, Film, AlertCircle, Sparkles } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { episodeAccessService } from '@/services/episodeAccessService';
 import type { PurchasedEpisode } from '@/types/episodeAccess';
@@ -52,9 +52,6 @@ export default function LibraryPage() {
   if (!isAuthenticated) {
     return (
       <div className="max-w-4xl mx-auto py-16 px-4 text-center space-y-4 animate-fade-in">
-        <div className="w-16 h-16 mx-auto rounded-3xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500">
-          <KeyRound className="w-8 h-8" />
-        </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Đăng nhập để xem kho phim đã mua</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
           Tất cả các tập phim bạn đã dùng Coin để mở khóa vĩnh viễn sẽ được lưu trữ an toàn tại đây.
@@ -79,9 +76,6 @@ export default function LibraryPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
         <div>
           <h1 className="flex items-center gap-2.5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-            <span className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 text-sm">
-              <KeyRound className="w-4 h-4" />
-            </span>
             Kho tập phim đã mua
             {meta && (
               <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20 tabular-nums">
@@ -98,7 +92,6 @@ export default function LibraryPage() {
           href="/phim"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-ruby bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors w-fit"
         >
-          <Film className="w-3.5 h-3.5" />
           Khám phá thêm phim
         </Link>
       </div>
@@ -106,7 +99,6 @@ export default function LibraryPage() {
       {/* ── Error Banner ── */}
       {error && (
         <div className="p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -123,9 +115,6 @@ export default function LibraryPage() {
       {/* ── Empty State ── */}
       {!loading && items.length === 0 && (
         <div className="py-20 text-center space-y-4 rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/[0.01]">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
-            <KeyRound className="w-7 h-7" />
-          </div>
           <div>
             <p className="text-base font-bold text-slate-900 dark:text-white">Bạn chưa mở khóa tập phim nào</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
@@ -136,7 +125,6 @@ export default function LibraryPage() {
             href="/phim"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-ruby hover:bg-ruby-light text-white font-bold text-xs shadow-md shadow-ruby/20 transition-all"
           >
-            <Sparkles className="w-3.5 h-3.5" />
             Khám phá phim ngay
           </Link>
         </div>
@@ -160,7 +148,6 @@ export default function LibraryPage() {
                   />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 gap-1.5">
-                    <Film className="w-8 h-8 opacity-40" />
                     <span className="text-[11px] tabular-nums">Tập {item.episode.episodeNumber}</span>
                   </div>
                 )}
@@ -201,7 +188,6 @@ export default function LibraryPage() {
 
                 <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                   <span className="inline-flex items-center gap-1 tabular-nums font-bold text-amber-600 dark:text-amber-400">
-                    <Coins className="w-3.5 h-3.5 text-amber-500" />
                     {item.paidCoins > 0 ? `${item.paidCoins} Coin` : 'Miễn phí'}
                   </span>
                   <span>{formatDate(item.grantedAt)}</span>

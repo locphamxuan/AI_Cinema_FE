@@ -2,7 +2,6 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { Bell, Building2, Clapperboard, Coins, ShieldCheck, UserRound } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { reviewerTokenService, TOKENS_CHANGED_EVENT } from '@/services/reviewerTokenService';
@@ -32,26 +31,31 @@ export function ReviewerSidebar() {
     {
       href: '/reviewer/projects',
       label: 'Dự án phim',
-      icon: Clapperboard,
       active: pathname === '/reviewer' || pathname.startsWith('/reviewer/projects'),
     },
     ...(can(PERMISSION.STUDIO_MANAGE)
-      ? [{ href: '/reviewer/studios', label: 'Studio', icon: Building2, active: pathname.startsWith('/reviewer/studios') }]
+      ? [{ href: '/reviewer/studios', label: 'Studio', active: pathname.startsWith('/reviewer/studios') }]
       : []),
     ...(hasBudget
       ? [
           {
             href: '/reviewer/tokens',
             label: 'Token',
-            icon: Coins,
             active: pathname.startsWith('/reviewer/tokens'),
             badge: wallet.data ? { value: formatNumber(wallet.data.balanceTokens), title: 'Token còn lại' } : undefined,
           },
         ]
       : []),
-    { href: '/reviewer/notifications', label: 'Thông báo', icon: Bell, active: pathname.startsWith('/reviewer/notifications') },
-    { href: '/reviewer/profile', label: 'Hồ sơ tài khoản', icon: UserRound, active: pathname.startsWith('/reviewer/profile') },
+    { href: '/reviewer/notifications', label: 'Thông báo', active: pathname.startsWith('/reviewer/notifications') },
+    { href: '/reviewer/profile', label: 'Hồ sơ tài khoản', active: pathname.startsWith('/reviewer/profile') },
   ];
 
-  return <DashboardSidebar label="Khu kiểm duyệt" title="Kiểm duyệt nội dung" subtitle="Dự án, Studio và Token" icon={ShieldCheck} items={items} />;
+  return (
+    <DashboardSidebar
+      label="Khu kiểm duyệt"
+      title="Kiểm duyệt nội dung"
+      subtitle="Dự án, Studio và Token"
+      items={items}
+    />
+  );
 }

@@ -1,13 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface SidebarItem {
   href: string;
   label: string;
-  icon: LucideIcon;
   active: boolean;
   /** A short figure next to the label, such as the Token left. */
   badge?: { value: string; title: string };
@@ -21,14 +19,12 @@ export function DashboardSidebar({
   label,
   title,
   subtitle,
-  icon: TitleIcon,
   items,
 }: {
   /** Accessible name of the navigation. */
   label: string;
   title: string;
   subtitle: string;
-  icon: LucideIcon;
   items: SidebarItem[];
 }) {
   return (
@@ -37,16 +33,13 @@ export function DashboardSidebar({
       className="shrink-0 border-b border-sidebar-border bg-sidebar text-sidebar-foreground md:sticky md:top-14 md:h-[calc(100vh-3.5rem)] md:w-64 md:border-r md:border-b-0"
     >
       <div className="hidden items-center gap-3 px-5 pt-5 pb-3 md:flex">
-        <span className="flex size-8 items-center justify-center rounded-lg bg-sidebar-accent text-sidebar-accent-foreground">
-          <TitleIcon className="size-4" aria-hidden="true" />
-        </span>
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold">{title}</p>
           <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
         </div>
       </div>
       <ul className="flex gap-1 overflow-x-auto p-2 md:flex-col md:px-3">
-        {items.map(({ href, label: text, icon: Icon, active, badge }) => (
+        {items.map(({ href, label: text, active, badge }) => (
           <li key={href}>
             <Link
               href={href}
@@ -58,7 +51,6 @@ export function DashboardSidebar({
                   : 'text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-foreground',
               )}
             >
-              <Icon className={cn('size-4 shrink-0', active && 'text-sidebar-primary')} aria-hidden="true" />
               <span className="flex-1">{text}</span>
               {badge && (
                 <span

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Search, RotateCcw, Shield, Layers } from 'lucide-react';
+import { Search, Shield } from 'lucide-react';
 import { adminService, type PermissionRow, type RolePermissions } from '@/services/adminService';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
@@ -146,7 +146,6 @@ export function RolePermissionsPanel() {
                   onClick={() => setDraft(toMatrix(roles))}
                   className="px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
                   <span>Hoàn tác</span>
                 </Button>
               )}
@@ -234,7 +233,6 @@ export function RolePermissionsPanel() {
                       scope="colgroup"
                       className="px-6 py-2.5 text-left text-xs font-bold text-sky-800 dark:text-sky-300 flex items-center gap-2"
                     >
-                      <Layers className="w-3.5 h-3.5 text-sky-500" />
                       <span>{PERMISSION_AREA_LABEL[area] ?? area}</span>
                       <span className="text-[10px] font-normal text-sky-600 dark:text-sky-400 bg-sky-100 dark:bg-sky-500/20 px-2 py-0.5 rounded-full ml-1 lowercase">
                         {filteredPermissions.filter((p) => p.area === area).length} quyền

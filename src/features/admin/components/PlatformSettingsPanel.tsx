@@ -180,7 +180,7 @@ export function PlatformSettingsPanel() {
           <div className="space-y-6">
             <div>
               <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
-                <Coins className="w-3.5 h-3.5" /> Phân khúc COIN & Nạp tiền
+                Phân khúc COIN & Nạp tiền
               </h3>
               {renderFieldGroup(COIN_FIELDS)}
               <div className="mt-3">{refundToggle}</div>
@@ -188,14 +188,14 @@ export function PlatformSettingsPanel() {
 
             <div>
               <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
-                <Clapperboard className="w-3.5 h-3.5" /> Phân khúc Sản xuất & Token
+                Phân khúc Sản xuất & Token
               </h3>
               {renderFieldGroup(PRODUCTION_FIELDS)}
             </div>
 
             <div>
               <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5" /> Phân khúc Phát sóng & Gia hạn gói
+                Phân khúc Phát sóng & Gia hạn gói
               </h3>
               {renderFieldGroup(STREAMING_FIELDS)}
             </div>
@@ -230,9 +230,6 @@ export function PlatformSettingsPanel() {
         {activeTab === 'rewards' && (
           <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                <Gift className="w-5 h-5" />
-              </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Quy tắc thưởng & Vòng quay may mắn</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">

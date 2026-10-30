@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, X } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -107,10 +107,10 @@ export function TokenRequestList({
             {canAnswer && r.status === 'OPEN' && (
               <div className="flex gap-2 pt-1">
                 <Button size="sm" onClick={() => setApproving(r)}>
-                  <Check className="w-3.5 h-3.5" aria-hidden="true" /> Cấp Token
+                  Cấp Token
                 </Button>
                 <Button size="sm" variant="secondary" onClick={() => setRejecting(r)}>
-                  <X className="w-3.5 h-3.5" aria-hidden="true" /> Từ chối
+                  Từ chối
                 </Button>
               </div>
             )}

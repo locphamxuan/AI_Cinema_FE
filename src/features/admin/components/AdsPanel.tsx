@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pause, Pencil, Play, Plus } from 'lucide-react';
+import { Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/features/production/components/shared/ui';
 import { useAction } from '@/features/production/hooks/useAction';
@@ -50,7 +50,7 @@ export function AdsPanel() {
         description={ads.data ? `${ads.data.length} quảng cáo · ${ads.data.filter((a) => adLiveState(a).tone === 'emerald').length} đang chạy` : undefined}
         actions={
           <Button size="sm" onClick={() => setEditing('new')}>
-            <Plus className="w-3.5 h-3.5" /> Tạo quảng cáo
+            Tạo quảng cáo
           </Button>
         }
       >
@@ -72,7 +72,7 @@ export function AdsPanel() {
               <div className="flex items-center gap-2">
                 <StatusPill {...adLiveState(ad)} />
                 <Button size="sm" variant="secondary" disabled={busy} onClick={() => setEditing(ad)} aria-label={`Sửa ${ad.title}`}>
-                  <Pencil className="w-3.5 h-3.5" /> Sửa
+                  Sửa
                 </Button>
                 <Button size="sm" variant="ghost" disabled={busy} onClick={() => toggle(ad)}>
                   {ad.status === 'ACTIVE' ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}

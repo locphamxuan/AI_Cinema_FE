@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { KeyRound, Save } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { ErrorNote, Facts, Loading, Panel } from '@/features/production/components/shared/ui';
@@ -117,7 +117,7 @@ function EditDetails({ account, onSaved }: { account: AccountDetails; onSaved: (
         {issues.length > 0 && <p className="text-xs text-amber-600">Cần sửa: {issues.join('; ')}.</p>}
         <div className="flex justify-end">
           <Button type="submit" disabled={busy || issues.length > 0}>
-            <Save className="w-3.5 h-3.5" aria-hidden="true" /> Lưu thay đổi
+            Lưu thay đổi
           </Button>
         </div>
       </form>
@@ -164,7 +164,7 @@ function ChangePassword() {
         {issues.length > 0 && <p className="text-xs text-amber-600">Cần sửa: {issues.join('; ')}.</p>}
         <div className="flex justify-end">
           <Button type="submit" disabled={busy || !ready}>
-            <KeyRound className="w-3.5 h-3.5" aria-hidden="true" /> Đổi mật khẩu
+            Đổi mật khẩu
           </Button>
         </div>
       </form>

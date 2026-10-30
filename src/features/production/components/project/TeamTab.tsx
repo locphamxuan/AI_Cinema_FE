@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRightLeft, UserMinus, UserPlus } from 'lucide-react';
+import { UserMinus } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAppStore } from '@/store/useAppStore';
@@ -42,12 +42,12 @@ export function TeamTab() {
         <>
           {caps.manage && editable && project.creator && (
             <Button size="sm" variant="secondary" onClick={() => setAdding(true)}>
-              <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm Creator
+              Thêm Creator
             </Button>
           )}
           {caps.delegate && editable && mySeat && (
             <Button size="sm" variant="secondary" onClick={() => setDelegating(true)}>
-              <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" /> Uỷ quyền tập
+              Uỷ quyền tập
             </Button>
           )}
         </>

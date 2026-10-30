@@ -17,7 +17,6 @@ export default function HeaderSearch() {
   return (
     <div className="relative hidden md:block">
       <div className="relative flex items-center">
-        <span className="absolute left-3 text-slate-400 text-sm pointer-events-none">🔍</span>
         <input
           type="text"
           value={searchQuery}

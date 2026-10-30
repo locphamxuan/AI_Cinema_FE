@@ -4,7 +4,6 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { cn } from '@/lib/utils';
 
 interface OverviewChartCardProps {
-  icon: ReactNode;
   title: string;
   description: string;
   /** `className` is accepted for older callers and ignored: links share one colour. */
@@ -14,12 +13,11 @@ interface OverviewChartCardProps {
 }
 
 /** One chart tile of the admin overview: a titled card with an optional link to the full page. */
-export function OverviewChartCard({ icon, title, description, link, className, children }: OverviewChartCardProps) {
+export function OverviewChartCard({ title, description, link, className, children }: OverviewChartCardProps) {
   return (
     <Card className={cn('gap-4', className)}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 font-heading text-base [&_svg]:size-4 [&_svg]:text-muted-foreground">
-          {icon}
+        <CardTitle className="font-heading text-base">
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>

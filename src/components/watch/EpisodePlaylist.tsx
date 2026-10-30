@@ -57,7 +57,6 @@ export default function EpisodePlaylist({ movie, currentEpisodeId, isPlaying, ca
                 <img src={ep.thumbnailUrl} alt={ep.title} className="w-full h-full object-cover" />
                 {!playable && (
                   <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                    <span className="text-base">🔒</span>
                   </div>
                 )}
                 {isActive && isPlaying && <PlayingBars />}
@@ -90,7 +89,7 @@ export default function EpisodePlaylist({ movie, currentEpisodeId, isPlaying, ca
 
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-[10px] text-muted tabular-nums">{ep.duration}</span>
-                  {!playable && !ep.isFree && <span className="text-[11px] text-coin font-bold">🪙 {ep.price} Coin</span>}
+                  {!playable && !ep.isFree && <span className="text-[11px] text-coin font-bold">{ep.price} Coin</span>}
                 </div>
               </div>
             </button>

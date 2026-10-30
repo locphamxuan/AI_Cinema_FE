@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Building2, Clock, Film } from 'lucide-react';
+import { Film } from 'lucide-react';
 import type { MovieStatus, ProjectSummary } from '@/types/production';
 import { MOVIE_STATUS } from '../../lib/labels';
 import { formatDateTime } from '../../lib/format';
@@ -73,7 +73,6 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
                     title="Cập nhật lần cuối"
                     className="text-white text-[11px] font-semibold px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 shadow-md flex items-center gap-1.5"
                   >
-                    <Clock className="w-3.5 h-3.5 text-sky-300 shrink-0" aria-hidden="true" />
                     {formatDateTime(p.lastActivityAt)}
                   </span>
                 </div>
@@ -86,7 +85,6 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
                 <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300">
                   {p.studio && (
                     <p className="flex items-center gap-2">
-                      <Building2 className="w-3.5 h-3.5 text-amber-500 shrink-0" aria-hidden="true" />
                       <span className="truncate font-medium">{p.studio.name}</span>
                     </p>
                   )}

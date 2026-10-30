@@ -18,7 +18,7 @@ function dayClass(state: DayState): string {
   return 'bg-white/5 border border-white/10';
 }
 
-const DAY_ICON: Record<DayState, string> = { claimed: '✅', next: '🎁', locked: '🔒' };
+const DAY_ICON: Record<DayState, string> = { claimed: 'Đã nhận', next: 'Hôm nay', locked: 'Chưa tới' };
 
 /**
  * SF-C Daily Check-in: one check-in per Vietnam business day; the streak and the reward of each
@@ -143,7 +143,7 @@ export default function DailyCheckInModal() {
     };
   });
 
-  let claimLabel = `🎁 Nhận ${todayReward} Coin Thưởng`;
+  let claimLabel = `Nhận ${todayReward} Coin Thưởng`;
   if (isLoading) claimLabel = 'Đang tải thông tin...';
   else if (isClaiming) claimLabel = 'Đang nhận thưởng...';
   else if (checkedInToday) claimLabel = '✓ Đã nhận hôm nay';
@@ -161,7 +161,7 @@ export default function DailyCheckInModal() {
         <div className="glass-card w-full max-w-md p-6 animate-scale-in">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold text-foreground">🎁 Điểm Danh Hàng Ngày</h2>
+              <h2 className="text-xl font-bold text-foreground">Điểm Danh Hàng Ngày</h2>
               <p className="text-sm text-muted-light mt-1">
                 Chuỗi hiện tại: <span className="text-coin font-bold">{streakDay} ngày</span>
               </p>
@@ -179,7 +179,6 @@ export default function DailyCheckInModal() {
           {status && status.availableSpins > 0 && !claimed && (
             <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-xl">🎯</span>
                 <div>
                   <p className="text-xs font-bold text-white">Bạn có {status.availableSpins} lượt quay may mắn</p>
                   <p className="text-[11px] text-purple-200">Quay để trúng Coin thưởng hoặc ngày gói Tháng</p>
@@ -218,7 +217,7 @@ export default function DailyCheckInModal() {
                 <span className={`text-[10px] font-bold mb-1 ${state === 'next' ? 'text-neon' : 'text-muted-light'}`}>
                   N{day}
                 </span>
-                <span className="text-base mb-1">{grantsSpin ? '🎯' : DAY_ICON[state]}</span>
+                <span className="text-base mb-1">{grantsSpin && state !== 'claimed' ? 'Có lượt quay' : DAY_ICON[state]}</span>
                 <span className={`text-[10px] font-bold ${state === 'claimed' ? 'text-verified' : 'text-coin'}`}>
                   +{reward}
                 </span>
@@ -233,11 +232,11 @@ export default function DailyCheckInModal() {
 
           {claimed && (
             <div className="mb-4 p-3 rounded-xl bg-verified/20 border border-verified/30 text-center animate-bounce-in">
-              <p className="text-verified font-bold text-lg">🎉 Nhận thành công!</p>
+              <p className="text-verified font-bold text-lg">Nhận thành công!</p>
               <p className="text-verified/80 text-sm">+{claimed.bonusGranted} Coin thưởng đã được cộng vào ví</p>
               {claimed.spinGranted && (
                 <div className="mt-2.5 pt-2 border-t border-verified/30 text-center">
-                  <p className="text-amber-300 font-bold text-xs">🎯 Ngày mốc: bạn nhận thêm 1 lượt quay may mắn!</p>
+                  <p className="text-amber-300 font-bold text-xs">Ngày mốc: bạn nhận thêm 1 lượt quay may mắn!</p>
                   <button
                     type="button"
                     onClick={() => {
