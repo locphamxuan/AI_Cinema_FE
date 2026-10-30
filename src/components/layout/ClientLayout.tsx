@@ -145,7 +145,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
             isDashboard
               ? 'flex-1 w-full p-0 m-0 bg-background'
               : isHome
-                ? 'flex-1 w-full p-0 m-0 bg-background text-white overflow-x-hidden'
+                ? 'dark flex-1 w-full p-0 m-0 bg-background text-foreground overflow-x-hidden'
                 : 'flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 transition-all'
           }
         >
