@@ -40,7 +40,7 @@ export default function RewardShortcuts({ withCheckIn = false, light = false }: 
         <span
           aria-label={`Còn ${availableSpins} lượt quay`}
           className={`min-w-5 px-1.5 py-0.5 rounded-full text-[10px] font-black leading-none text-center ${
-            availableSpins > 0 ? 'bg-amber-400 text-neutral-950' : 'bg-white/15 text-slate-300'
+            availableSpins > 0 ? 'bg-highlight text-highlight-foreground' : light ? 'bg-muted text-muted-foreground' : 'bg-white/15 text-slate-300'
           }`}
         >
           {availableSpins}

@@ -49,7 +49,7 @@ function MemberActions() {
   return (
     <>
       <NotificationBell />
-      <RewardShortcuts />
+      <RewardShortcuts light />
       <div className="flex items-center gap-1.5">
         <WalletHeaderBadge />
         <button
@@ -113,6 +113,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const isDashboard = DASHBOARD_PATHS.some((path) => pathname.startsWith(path));
   // The viewer's discovery and browse pages carry their own navbar.
   const isHome = pathname === '/' || pathname === '/phim';
+  const withSidebar = signedIn && !isDashboard && !isHome;
   // The wallet serves members; staff-side accounts never see it.
   const isMemberSide = !user || isMemberRole(user.role);
   const userId = user?.id;
@@ -133,21 +134,24 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <>
       {/* The consumer header is hidden on Home (uses dedicated NetflixNavbar) and Dashboards. */}
-      {!isDashboard && !isHome && <ConsumerHeader signedIn={signedIn} />}
+      {withSidebar && <RightSidebar />}
 
-      {signedIn && !isDashboard && !isHome && <RightSidebar />}
+      {/* The member sidebar is fixed on wide screens; the page keeps its width clear of it. */}
+      <div className={withSidebar ? 'flex flex-1 flex-col lg:pr-80' : 'contents'}>
+        {!isDashboard && !isHome && <ConsumerHeader signedIn={signedIn} />}
 
-      <main
-        className={
-          isDashboard
-            ? 'flex-1 w-full p-0 m-0 bg-background dark:bg-[#0B0C10] transition-colors'
-            : isHome
-              ? 'flex-1 w-full p-0 m-0 bg-background text-white overflow-x-hidden'
-              : 'flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 transition-all'
-        }
-      >
-        {children}
-      </main>
+        <main
+          className={
+            isDashboard
+              ? 'flex-1 w-full p-0 m-0 bg-background'
+              : isHome
+                ? 'flex-1 w-full p-0 m-0 bg-background text-white overflow-x-hidden'
+                : 'flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 transition-all'
+          }
+        >
+          {children}
+        </main>
+      </div>
 
       <AuthModal />
       <DailyCheckInModal />

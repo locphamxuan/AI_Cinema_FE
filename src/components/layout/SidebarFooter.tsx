@@ -12,8 +12,8 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
   return (
     <div className="space-y-3.5 pt-4 mt-4 border-t border-white/10">
       {/* Wallet Quick Action Box */}
-      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/15 via-slate-900/90 to-purple-950/30 border border-amber-500/30 relative overflow-hidden shadow-xl">
-        <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl border border-highlight/30 bg-[linear-gradient(145deg,#2A2440,#15121F_70%)] p-3.5 text-white shadow-xl">
+        <div className="pointer-events-none absolute -top-12 -right-10 size-32 rounded-full bg-highlight/25 blur-2xl" />
 
         <div className="flex items-center justify-between mb-2 relative z-10">
           <span className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">
@@ -30,7 +30,7 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
           <span className="text-2xl font-black text-amber-400 tabular-nums tracking-tight drop-shadow-sm">
             {wallet.mainCoin.toLocaleString()}
           </span>
-          <span className="text-xs font-semibold text-slate-400">Main Coin</span>
+          <span className="text-xs font-medium text-white/60">Coin chính</span>
         </div>
 
         <button
