@@ -1,6 +1,6 @@
 'use client';
 
-import { COIN_ENTRY_LABEL, signed } from '@/lib/coinEntry';
+import { COIN_ENTRY_LABEL, signed, describeLine } from '@/lib/coinEntry';
 import type { CoinEntryType, StatementLine } from '@/types/billing';
 
 const TYPE_COLOR: Partial<Record<CoinEntryType, string>> = {
@@ -59,7 +59,7 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
                       {COIN_ENTRY_LABEL[line.entryType]}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-foreground">{line.description ?? '-'}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-foreground">{describeLine(line.description) ?? '-'}</td>
                   <td className={`px-4 py-3 text-right text-sm font-bold ${amountClass(line.mainAmount, 'text-verified')}`}>
                     {signed(line.mainAmount)}
                   </td>
@@ -90,7 +90,7 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
               </span>
               <span className="text-[10px] text-muted">{when(line.createdAt).day}</span>
             </div>
-            {line.description && <p className="text-sm text-foreground">{line.description}</p>}
+            {line.description && <p className="text-sm text-foreground">{describeLine(line.description)}</p>}
             <div className="flex gap-3 text-xs font-bold">
               {line.mainAmount !== 0 && (
                 <span className={amountClass(line.mainAmount, 'text-verified')}>🟡 {signed(line.mainAmount)}</span>

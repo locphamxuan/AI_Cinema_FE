@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { useCan } from '@/hooks/useCan';
-import { COIN_ENTRY_LABEL, COIN_ENTRY_TYPES, signed } from '@/lib/coinEntry';
+import { COIN_ENTRY_LABEL, COIN_ENTRY_TYPES, signed, describeLine } from '@/lib/coinEntry';
 import { PERMISSION } from '@/lib/permissions';
 import { useAction } from '@/features/production/hooks/useAction';
 import { useResource } from '@/features/production/hooks/useResource';
@@ -74,7 +74,7 @@ export function CoinLedgerPanel() {
                 <tr key={line.id}>
                   <td className="py-2 whitespace-nowrap">{formatDateTime(line.createdAt)}</td>
                   <td className="py-2">{COIN_ENTRY_LABEL[line.entryType]}</td>
-                  <td className="py-2 hidden md:table-cell text-slate-600 dark:text-slate-300">{line.description ?? '-'}</td>
+                  <td className="py-2 hidden md:table-cell text-slate-600 dark:text-slate-300">{describeLine(line.description) ?? '-'}</td>
                   <td className="py-2 text-right tabular-nums">{signed(line.mainAmount)}</td>
                   <td className="py-2 text-right tabular-nums">{signed(line.bonusAmount)}</td>
                   <td className="py-2 text-right">
