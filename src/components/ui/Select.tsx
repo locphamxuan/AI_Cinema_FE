@@ -30,12 +30,12 @@ export interface SelectProps<T extends string = string> {
 }
 
 const TONE_DOTS: Record<SelectTone, string> = {
-  purple: 'bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.55)]',
-  emerald: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.55)]',
-  blue: 'bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.55)]',
-  amber: 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.55)]',
-  rose: 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.55)]',
-  neutral: 'bg-slate-400',
+  purple: 'bg-primary',
+  emerald: 'bg-success',
+  blue: 'bg-primary',
+  amber: 'bg-warning',
+  rose: 'bg-destructive',
+  neutral: 'bg-muted-foreground',
 };
 
 const SIZE_TRIGGER = {
@@ -44,11 +44,7 @@ const SIZE_TRIGGER = {
   lg: 'py-2.5 px-4 text-sm rounded-xl min-h-[46px]',
 };
 
-/**
- * Modern custom dropdown select for OTT Cinema dashboard.
- * Features glassmorphic dark/light aesthetics, glow indicator dots, smooth Chevron rotation,
- * click-outside listener, and an underlying synchronized select for full accessibility & form support.
- */
+/** Dropdown with tone dots, badges and descriptions per option, backed by a native select for forms. */
 export function Select<T extends string = string>({
   value,
   onChange,
