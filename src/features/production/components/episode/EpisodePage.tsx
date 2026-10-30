@@ -96,7 +96,7 @@ export function EpisodePage() {
           <ArrowLeft className="w-3 h-3" aria-hidden="true" /> {project.data.title}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
             Tập {episode.episodeNumber}: {episode.title}
           </h1>
           <StatusPill {...EPISODE_STATUS[episode.status]} />

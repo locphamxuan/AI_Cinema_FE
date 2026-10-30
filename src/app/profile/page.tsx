@@ -46,7 +46,7 @@ export default function ProfilePage() {
 
           <div className="text-center sm:text-left space-y-2 flex-1">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{user.name}</h1>
+              <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">{user.name}</h1>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-black ${
                   isMember

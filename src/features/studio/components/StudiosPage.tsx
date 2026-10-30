@@ -34,7 +34,7 @@ export function StudiosPage() {
     <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">Studio đối tác</h1>
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Studio đối tác</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Studio là đối tác bên thứ 3, không có tài khoản: brief và material được gửi qua email. Mỗi dự án đặt hàng một Studio đang hoạt động.
           </p>

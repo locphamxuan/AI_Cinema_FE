@@ -102,7 +102,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
       </div>
 
       {/* Title */}
-      <h1 className="text-2xl font-black mb-2">
+      <h1 className="font-heading text-2xl font-semibold mb-2 tracking-tight">
         {isSuccess
           ? 'Nạp Coin Thành Công!'
           : isFailed

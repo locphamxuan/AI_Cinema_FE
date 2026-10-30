@@ -76,7 +76,7 @@ export function ReviewerTokensPage() {
   return (
     <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       <div className="border-b border-slate-200/60 dark:border-white/5 pb-4">
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Ví Token Reviewer</h1>
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Ví Token Reviewer</h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Ngân sách do Admin phân bổ để cấp phí sản xuất các dự án phim.</p>
       </div>
       {wallet.error && <ErrorNote message={wallet.error} onRetry={wallet.reload} />}

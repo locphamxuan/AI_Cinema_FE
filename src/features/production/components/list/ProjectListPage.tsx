@@ -77,7 +77,7 @@ export function ProjectListPage() {
         <div className="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-coral-400" aria-hidden="true" />
         <div className="px-6 lg:px-8 pt-6 pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            <h1 className="font-heading text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
               Dự án phim
               {totalCount > 0 && <span className="ml-3 text-base font-medium text-slate-400 tabular-nums">{totalCount}</span>}
             </h1>

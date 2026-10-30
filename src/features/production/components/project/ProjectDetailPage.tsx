@@ -106,7 +106,7 @@ export function ProjectDetailPage() {
 
             <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5">
               <div className="space-y-2 min-w-0">
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">{data.title}</h1>
+                <h1 className="font-heading text-2xl font-semibold text-slate-900 dark:text-white leading-tight tracking-tight">{data.title}</h1>
                 <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
                   <span className="inline-flex items-center gap-1.5">
                     Dự án <StatusPill {...MOVIE_STATUS[data.status]} />
