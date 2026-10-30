@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { BarChart3, Film, TrendingUp, Users, ArrowRight, ShieldCheck } from 'lucide-react';
+import { BarChart3, Film, TrendingUp, Users, ShieldCheck } from 'lucide-react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
 import { useResource } from '@/features/production/hooks/useResource';
@@ -13,6 +12,7 @@ import { adminService } from '@/services/adminService';
 import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
 import type { RevenueReport, ReportRange } from '@/types/billing';
 import { AdminOverviewKpis } from './AdminOverviewKpis';
+import { OverviewChartCard } from './OverviewChartCard';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -21,6 +21,9 @@ const RANGES = [
   { key: '30d', label: '30 ngày qua', days: -30 },
   { key: '90d', label: '90 ngày qua', days: -90 },
 ] as const;
+
+const PURPLE_LINK = 'text-purple-600 dark:text-purple-400';
+const EMERALD_LINK = 'text-emerald-600 dark:text-emerald-400';
 
 export function AdminOverviewDashboard() {
   const [selectedRange, setSelectedRange] = useState<'7d' | '30d' | '90d'>('30d');
@@ -165,53 +168,28 @@ export function AdminOverviewDashboard() {
 
       {/* ── Main Analytics Grid: Revenue breakdown & Coin structure ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Doanh thu theo gói (Bar Chart - 2 Cols) */}
-        <div className="lg:col-span-2 p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-purple-500" />
-                Doanh thu phân bổ theo gói hội viên
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Thống kê số Coin thu được từ từng gói hội viên trong khoảng thời gian đã chọn
-              </p>
-            </div>
-            <Link
-              href="/admin/membership-plans?tab=reports"
-              className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
-            >
-              Chi tiết báo cáo <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
+        <OverviewChartCard
+          className="lg:col-span-2"
+          icon={<BarChart3 className="w-4 h-4 text-purple-500" />}
+          title="Doanh thu phân bổ theo gói hội viên"
+          description="Thống kê số Coin thu được từ từng gói hội viên trong khoảng thời gian đã chọn"
+          link={{ href: '/admin/membership-plans?tab=reports', label: 'Chi tiết báo cáo', className: PURPLE_LINK }}
+        >
           {revenueRes.loading && !revenue && <Loading />}
           {revenueRes.error && <ErrorNote message={revenueRes.error} onRetry={revenueRes.reload} />}
-
           {revenue && (
             <div className="pt-2">
-              <BarChart
-                categories={planCategories}
-                series={planBarSeries}
-                valueUnit="Coin"
-                height={230}
-              />
+              <BarChart categories={planCategories} series={planBarSeries} valueUnit="Coin" height={230} />
             </div>
           )}
-        </div>
+        </OverviewChartCard>
 
-        {/* Cơ cấu Coin chính vs Coin thưởng (Donut - 1 Col) */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4 flex flex-col justify-between">
-          <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-cyan-500" />
-              Cơ cấu Coin thu được
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Tỷ trọng giữa tiền nạp thật (Coin chính) và khuyến mãi (Coin thưởng)
-            </p>
-          </div>
-
+        <OverviewChartCard
+          className="flex flex-col justify-between"
+          icon={<TrendingUp className="w-4 h-4 text-cyan-500" />}
+          title="Cơ cấu Coin thu được"
+          description="Tỷ trọng giữa tiền nạp thật (Coin chính) và khuyến mãi (Coin thưởng)"
+        >
           {revenue && (
             <div className="py-2 flex items-center justify-center">
               <DonutChart
@@ -223,71 +201,38 @@ export function AdminOverviewDashboard() {
               />
             </div>
           )}
-
           <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 text-[11px] text-slate-500 dark:text-slate-400">
             💡 Coin thưởng tính vào chi phí quảng bá, chỉ có Coin chính là doanh thu thực.
           </div>
-        </div>
+        </OverviewChartCard>
       </div>
 
       {/* ── Real-time Episode Output Chart ── */}
-      <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Film className="w-4 h-4 text-emerald-500" />
-              Số tập phim theo dự án (Real-time)
-            </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Dữ liệu số lượng tập phim thực tế đang được sản xuất hoặc hoàn tất từ các dự án tiêu biểu
-            </p>
-          </div>
-          <Link
-            href="/admin/projects"
-            className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
-          >
-            Quản lý dự án phim <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
+      <OverviewChartCard
+        icon={<Film className="w-4 h-4 text-emerald-500" />}
+        title="Số tập phim theo dự án (Real-time)"
+        description="Dữ liệu số lượng tập phim thực tế đang được sản xuất hoặc hoàn tất từ các dự án tiêu biểu"
+        link={{ href: '/admin/projects', label: 'Quản lý dự án phim', className: EMERALD_LINK }}
+      >
         {episodeCategories.length > 0 ? (
           <div className="pt-2">
-            <BarChart
-              categories={episodeCategories}
-              series={episodeBarSeries}
-              valueUnit="tập"
-              height={220}
-            />
+            <BarChart categories={episodeCategories} series={episodeBarSeries} valueUnit="tập" height={220} />
           </div>
         ) : (
           <div className="py-12 text-center text-xs text-slate-400">
             Chưa có dữ liệu tập phim từ các dự án hiện tại.
           </div>
         )}
-      </div>
+      </OverviewChartCard>
 
       {/* ── Secondary Charts Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Phân bổ trạng thái dự án */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Film className="w-4 h-4 text-purple-500" />
-                Trạng thái dự án phim toàn sàn
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Tỷ lệ các dự án đang sản xuất, đã hoàn tất và đang lên kế hoạch
-              </p>
-            </div>
-            <Link
-              href="/admin/projects"
-              className="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
-            >
-              Xem danh sách <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
+        <OverviewChartCard
+          icon={<Film className="w-4 h-4 text-purple-500" />}
+          title="Trạng thái dự án phim toàn sàn"
+          description="Tỷ lệ các dự án đang sản xuất, đã hoàn tất và đang lên kế hoạch"
+          link={{ href: '/admin/projects', label: 'Xem danh sách', className: PURPLE_LINK }}
+        >
           <div className="py-3 flex items-center justify-center">
             <DonutChart
               data={projectDonutData}
@@ -297,28 +242,14 @@ export function AdminOverviewDashboard() {
               size={190}
             />
           </div>
-        </div>
+        </OverviewChartCard>
 
-        {/* Cơ cấu người dùng */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Users className="w-4 h-4 text-emerald-500" />
-                Cơ cấu người dùng theo vai trò
-              </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Phân bổ tài khoản khán giả, đội ngũ sáng tạo và quản trị
-              </p>
-            </div>
-            <Link
-              href="/admin/permissions?tab=accounts"
-              className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
-            >
-              Quản lý tài khoản <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
+        <OverviewChartCard
+          icon={<Users className="w-4 h-4 text-emerald-500" />}
+          title="Cơ cấu người dùng theo vai trò"
+          description="Phân bổ tài khoản khán giả, đội ngũ sáng tạo và quản trị"
+          link={{ href: '/admin/permissions?tab=accounts', label: 'Quản lý tài khoản', className: EMERALD_LINK }}
+        >
           <div className="py-3 flex items-center justify-center">
             <DonutChart
               data={roleDonutData}
@@ -328,7 +259,7 @@ export function AdminOverviewDashboard() {
               size={190}
             />
           </div>
-        </div>
+        </OverviewChartCard>
       </div>
     </div>
   );
