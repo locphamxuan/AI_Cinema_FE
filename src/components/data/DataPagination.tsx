@@ -25,7 +25,15 @@ export function pageWindow(page: number, totalPages: number): (number | null)[] 
 }
 
 /** Numbered paging under a list; hidden when everything fits on one page. */
-export function DataPagination({ page, totalPages, onChange, totalItems, pageSize, unit = 'mục', className }: DataPaginationProps) {
+export function DataPagination({
+  page,
+  totalPages,
+  onChange,
+  totalItems,
+  pageSize,
+  unit = 'mục',
+  className,
+}: DataPaginationProps) {
   if (totalPages <= 1) return null;
   const from = totalItems !== undefined && pageSize ? Math.min(totalItems, (page - 1) * pageSize + 1) : null;
   const to = totalItems !== undefined && pageSize ? Math.min(totalItems, page * pageSize) : null;
@@ -44,7 +52,13 @@ export function DataPagination({ page, totalPages, onChange, totalItems, pageSiz
       <Pagination aria-label="Phân trang" className="mx-0 w-auto">
         <PaginationContent>
           <PaginationItem>
-            <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => onChange(page - 1)} aria-label="Trang trước">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => onChange(page - 1)}
+              aria-label="Trang trước"
+            >
               <ChevronLeft />
               <span className="hidden sm:inline">Trước</span>
             </Button>
@@ -68,7 +82,13 @@ export function DataPagination({ page, totalPages, onChange, totalItems, pageSiz
             </PaginationItem>
           ))}
           <PaginationItem>
-            <Button variant="ghost" size="sm" disabled={page >= totalPages} onClick={() => onChange(page + 1)} aria-label="Trang sau">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => onChange(page + 1)}
+              aria-label="Trang sau"
+            >
               <span className="hidden sm:inline">Sau</span>
               <ChevronRight />
             </Button>

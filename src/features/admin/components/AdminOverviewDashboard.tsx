@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BarChart3, Film, TrendingUp, Users, ShieldCheck } from 'lucide-react';
+import { BarChart3, Film, TrendingUp, Users } from 'lucide-react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
 import { useResource } from '@/features/production/hooks/useResource';
@@ -11,6 +11,8 @@ import { productionService } from '@/services/productionService';
 import { adminService } from '@/services/adminService';
 import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
 import type { RevenueReport, ReportRange } from '@/types/billing';
+import { PageHeader } from '@/components/data/PageHeader';
+import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
 import { AdminOverviewKpis } from './AdminOverviewKpis';
 import { OverviewChartCard } from './OverviewChartCard';
 
@@ -122,42 +124,22 @@ export function AdminOverviewDashboard() {
   ];
 
   return (
-    <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
-      {/* ── Top Hero Banner ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-gradient-to-br from-slate-900 via-card to-purple-950/40 p-6 sm:p-8 text-white shadow-xl">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Trung tâm chỉ huy Quản trị
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Tổng quan hệ thống AI Cinema
-            </h1>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Theo dõi tình hình kinh doanh gói hội viên, tiến độ sản xuất phim và phân bổ tài khoản người dùng trên toàn nền tảng.
-            </p>
-          </div>
-
-          {/* Time range selector */}
-          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 self-start md:self-auto">
-            {RANGES.map((r) => (
-              <button
-                key={r.key}
-                type="button"
-                onClick={() => setSelectedRange(r.key)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  selectedRange === r.key
-                    ? 'bg-purple-600 text-white shadow-md'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+    <div className="mx-auto w-full max-w-7xl space-y-6 p-6 lg:p-8">
+      <PageHeader
+        title="Tổng quan hệ thống"
+        description="Doanh thu gói hội viên, tiến độ sản xuất phim và tài khoản trên toàn nền tảng."
+        actions={
+          <Tabs value={selectedRange} onValueChange={(v) => setSelectedRange(v as typeof selectedRange)}>
+            <TabsList>
+              {RANGES.map((r) => (
+                <TabsTrigger key={r.key} value={r.key}>
+                  {r.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        }
+      />
 
       <AdminOverviewKpis
         revenue={revenue}

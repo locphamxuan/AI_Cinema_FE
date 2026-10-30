@@ -62,7 +62,7 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
             >
               <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-900">
                 <ProjectPoster title={p.title} posterUrl={p.posterUrl} status={p.status} />
-                <div className="absolute top-3 left-3 z-10 drop-shadow-md">
+                <div className="absolute top-3 left-3 z-10 rounded-full bg-background/90 shadow-sm backdrop-blur-sm">
                   <StatusPill {...MOVIE_STATUS[p.status]} />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/95 via-black/60 to-transparent flex items-center justify-between z-10">

@@ -14,6 +14,7 @@ import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_TONE } from '../roles';
 import { Select } from '@/components/ui/Select';
 import { AccountFormModal, DeleteAccountModal } from './AccountFormModal';
 import { DataPagination } from '@/components/data/DataPagination';
+import { InitialsAvatar } from '@/components/data/InitialsAvatar';
 
 const ROLE_FILTER_OPTIONS = [
   { value: '', label: 'Mọi vai trò' },
@@ -141,10 +142,15 @@ export function AccountsPanel() {
               return (
                 <tr key={account.id} className={`hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors ${account.isActive ? '' : 'opacity-60'}`}>
                   <td className="py-3.5 px-5">
-                    <p className="font-semibold text-slate-900 dark:text-white">
-                      {account.fullName} {isMe && <span className="text-sky-700 dark:text-sky-500 font-medium text-[11px] ml-1">(bạn)</span>}
-                    </p>
-                    <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">{account.email}</p>
+                    <div className="flex items-center gap-3">
+                      <InitialsAvatar name={account.fullName} />
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">
+                          {account.fullName} {isMe && <span className="ml-1 text-xs font-normal text-primary">(bạn)</span>}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{account.email}</p>
+                      </div>
+                    </div>
                   </td>
                   <td className="py-3 px-4">
                     <Select
