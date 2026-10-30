@@ -223,7 +223,7 @@ export default function DailyCheckInModal() {
                   +{reward}
                 </span>
                 {grantsSpin && (
-                  <span className="text-[8px] font-black uppercase text-amber-300 tracking-tighter mt-0.5">
+                  <span className="text-[8px] font-black text-amber-300 tracking-tighter mt-0.5">
                     +Lượt quay
                   </span>
                 )}

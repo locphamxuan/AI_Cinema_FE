@@ -130,7 +130,7 @@ export function FeeTab() {
                           <td className="py-2 text-slate-500">
                             {e.season ? seasonName(e.season.seasonNumber, episodeCounts.get(e.season.id)) : 'Cả dự án'}
                           </td>
-                          <td className={`py-2 text-right font-mono ${amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          <td className={`py-2 text-right tabular-nums ${amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                             {amountTokens > 0 ? '+' : ''}
                             {formatNumber(amountTokens)}
                           </td>

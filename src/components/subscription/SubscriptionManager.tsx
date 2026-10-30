@@ -116,7 +116,7 @@ export default function SubscriptionManager() {
 
       {!hasRunningPlan && (
         <section className="space-y-3">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">Chọn gói</h2>
+          <h2 className="text-sm font-bold text-slate-500">Chọn gói</h2>
           <PlanList plans={plans} disabled={busy !== null} busyPlanId={busy} onJoin={(plan) => void join(plan)} />
         </section>
       )}

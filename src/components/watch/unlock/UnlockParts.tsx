@@ -17,14 +17,14 @@ export function CoinBreakdown({ price, mainBalance, bonusBalance, afterLabel }: 
     <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 space-y-2 text-xs">
       <div className="flex justify-between items-center text-slate-400">
         <span>Số dư ví của bạn:</span>
-        <div className="flex gap-2 font-mono">
+        <div className="flex gap-2 tabular-nums">
           <span className="text-amber-400">🟡 {mainBalance} Chính</span>
           <span className="text-purple-400">🎁 {bonusBalance} Thưởng</span>
         </div>
       </div>
 
       {total >= price ? (
-        <div className="pt-2 border-t border-slate-800/80 space-y-1 font-mono text-[11px]">
+        <div className="pt-2 border-t border-slate-800/80 space-y-1 tabular-nums text-[11px]">
           <div className="flex justify-between text-slate-300">
             <span>Trừ Coin chính:</span>
             <span className="text-amber-400 font-bold">-{mainDeduct}</span>
@@ -62,7 +62,7 @@ interface ObtainCoinActionsProps {
 export function ObtainCoinActions({ onTopUp, onCheckIn }: Readonly<ObtainCoinActionsProps>) {
   return (
     <div className="space-y-2 pt-1">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 text-center">Nạp hoặc nhận thêm Coin:</p>
+      <p className="text-[11px] font-bold text-slate-400 text-center">Nạp hoặc nhận thêm Coin:</p>
       <div className="grid grid-cols-2 gap-2">
         <button
           type="button"
@@ -134,7 +134,7 @@ export function PaidNotice({ info }: Readonly<{ info: PaidInfo }>) {
         <h3 className="text-xl font-black text-emerald-400">{info.title}</h3>
         <p className="text-xs text-slate-300 mt-1 max-w-xs mx-auto">{info.description}</p>
       </div>
-      <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 text-xs font-mono max-w-xs mx-auto space-y-1">
+      <div className="p-3 rounded-2xl bg-slate-950/60 border border-slate-800 text-xs tabular-nums max-w-xs mx-auto space-y-1">
         <div className="flex justify-between">
           <span className="text-slate-400">Đã thanh toán:</span>
           <span className="font-bold text-amber-400">{info.paidCoins} Coin</span>

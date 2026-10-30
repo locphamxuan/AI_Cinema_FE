@@ -232,7 +232,7 @@ export function RolePermissionsPanel() {
                     <th
                       colSpan={BACKEND_ROLES.length + 1}
                       scope="colgroup"
-                      className="px-6 py-2.5 text-left text-xs font-bold text-sky-800 dark:text-sky-300 uppercase tracking-wide flex items-center gap-2"
+                      className="px-6 py-2.5 text-left text-xs font-bold text-sky-800 dark:text-sky-300 flex items-center gap-2"
                     >
                       <Layers className="w-3.5 h-3.5 text-sky-500" />
                       <span>{PERMISSION_AREA_LABEL[area] ?? area}</span>
@@ -262,7 +262,7 @@ export function RolePermissionsPanel() {
                               {meta.desc}
                             </p>
                             <div className="mt-1 flex items-center gap-2">
-                              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/50 dark:border-white/5">
+                              <span className="text-[10px] tabular-nums text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/50 dark:border-white/5">
                                 {permission.key}
                               </span>
                             </div>

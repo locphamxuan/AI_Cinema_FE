@@ -83,7 +83,7 @@ export default function LibraryPage() {
             </span>
             Kho Tập Phim Đã Mua
             {meta && (
-              <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20 font-mono">
+              <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20 tabular-nums">
                 {meta.totalItems} tập
               </span>
             )}
@@ -160,7 +160,7 @@ export default function LibraryPage() {
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 gap-1.5">
                     <Film className="w-8 h-8 opacity-40" />
-                    <span className="text-[11px] font-mono">Tập {item.episode.episodeNumber}</span>
+                    <span className="text-[11px] tabular-nums">Tập {item.episode.episodeNumber}</span>
                   </div>
                 )}
 
@@ -190,7 +190,7 @@ export default function LibraryPage() {
               {/* Card Content */}
               <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 truncate">
+                  <p className="text-[11px] font-bold text-purple-600 dark:text-purple-400 truncate">
                     {item.movie.title}
                   </p>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1 mt-0.5">
@@ -199,7 +199,7 @@ export default function LibraryPage() {
                 </div>
 
                 <div className="pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                  <span className="inline-flex items-center gap-1 font-mono font-bold text-amber-600 dark:text-amber-400">
+                  <span className="inline-flex items-center gap-1 tabular-nums font-bold text-amber-600 dark:text-amber-400">
                     <Coins className="w-3.5 h-3.5 text-amber-500" />
                     {item.paidCoins > 0 ? `${item.paidCoins} Coin` : 'Miễn phí'}
                   </span>

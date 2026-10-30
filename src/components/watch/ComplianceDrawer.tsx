@@ -76,7 +76,7 @@ export default function ComplianceDrawer({ isOpen, onClose, compliance }: Compli
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="p-3 rounded-lg bg-white/5">
-      <p className="text-[10px] text-muted-light uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-[10px] text-muted-light mb-1">{label}</p>
       <p className="text-sm text-foreground font-medium">{value}</p>
     </div>
   );

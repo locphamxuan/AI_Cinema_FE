@@ -82,7 +82,7 @@ export default function NetflixNavbar() {
               AI
             </div>
             <span
-              className={`text-xl sm:text-2xl font-black tracking-wider transition-colors ${
+              className={`text-xl sm:text-2xl font-black transition-colors ${
                 isScrolled ? 'text-slate-900 dark:text-white' : 'text-white'
               }`}
             >

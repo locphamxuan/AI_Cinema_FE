@@ -57,7 +57,7 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
 
           {/* Bottom Left Quality / AI Badge */}
           <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1.5">
-            <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[9px] uppercase tracking-wider shadow">
+            <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[9px] shadow">
               {movie.quality || '4K'}
             </span>
             <span className="px-1.5 py-0.5 rounded bg-black/60 border border-white/15 text-slate-300 font-semibold text-[9px] backdrop-blur-md">

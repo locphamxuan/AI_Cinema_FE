@@ -35,7 +35,7 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
           <div className="w-2.5 h-6 rounded-full bg-gradient-to-b from-primary to-red-800 shadow-md shadow-red-600/40" />
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
             <span>10 Phim Mới Phát Hành</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30">
+            <span className="text-[10px] font-bold text-amber-500 dark:text-amber-400 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30">
               Mới nhất
             </span>
           </h2>
@@ -96,7 +96,7 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
 
                   {/* Top Badges */}
                   <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
-                    <span className="px-2 py-0.5 rounded-md bg-primary text-white text-[10px] font-black uppercase tracking-wider shadow-md shadow-red-600/50">
+                    <span className="px-2 py-0.5 rounded-md bg-primary text-white text-[10px] font-black shadow-md shadow-red-600/50">
                       MỚI #{rank}
                     </span>
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/70 border border-white/20 text-emerald-300 text-[9px] font-bold backdrop-blur-md">

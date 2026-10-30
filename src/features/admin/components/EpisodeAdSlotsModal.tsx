@@ -84,7 +84,7 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
               <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">
                 Lần {index + 1}
                 <span className="ml-2 font-normal text-slate-500 dark:text-slate-400">
-                  phát lúc <span className="font-mono">{formatDuration(slot.positionSeconds || 0)}</span>
+                  phát lúc <span className="tabular-nums">{formatDuration(slot.positionSeconds || 0)}</span>
                 </span>
               </p>
               <button

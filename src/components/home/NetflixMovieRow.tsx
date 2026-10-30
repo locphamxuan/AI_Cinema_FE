@@ -46,7 +46,7 @@ export default function NetflixMovieRow({
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
             <span>{title}</span>
             {badge && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/40 text-primary shadow-sm">
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/40 text-primary shadow-sm">
                 {badge}
               </span>
             )}

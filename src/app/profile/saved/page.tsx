@@ -78,7 +78,7 @@ export default function SavedMoviesPage() {
               <Bookmark className="w-4 h-4 fill-current" />
             </span>
             Phim Đã Lưu
-            <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 font-mono">
+            <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 tabular-nums">
               {movies.length} phim
             </span>
           </h1>

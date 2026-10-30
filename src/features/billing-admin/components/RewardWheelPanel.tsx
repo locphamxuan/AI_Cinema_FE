@@ -77,7 +77,7 @@ export function RewardWheelPanel() {
           </div>
           <div className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
             <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">Tổng trọng số kích hoạt</p>
-            <p className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-0.5 font-mono">{totalWeight}</p>
+            <p className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-0.5 tabular-nums">{totalWeight}</p>
           </div>
         </div>
       </div>
@@ -104,7 +104,7 @@ export function RewardWheelPanel() {
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead>
-              <tr className="bg-slate-50/70 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[11px] font-bold">
+              <tr className="bg-slate-50/70 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[11px] font-bold">
                 <th className="py-3.5 px-6">Vị trí & Tên giải</th>
                 <th className="py-3.5 px-4">Mã nhận diện</th>
                 <th className="py-3.5 px-4">Phần thưởng</th>
@@ -124,7 +124,7 @@ export function RewardWheelPanel() {
                     {/* Position & Name */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center font-mono font-bold text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
+                        <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center tabular-nums font-bold text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
                           {idx + 1}
                         </span>
                         <div>
@@ -137,7 +137,7 @@ export function RewardWheelPanel() {
                     </td>
 
                     {/* Code */}
-                    <td className="py-4 px-4 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
+                    <td className="py-4 px-4 tabular-nums text-slate-500 dark:text-slate-400 text-[11px]">
                       {prize.code}
                     </td>
 
@@ -149,7 +149,7 @@ export function RewardWheelPanel() {
                           {prize.planDays} ngày VIP Tháng
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 font-bold font-mono text-xs">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 font-bold tabular-nums text-xs">
                           <Coins className="w-3.5 h-3.5 text-amber-500" />
                           +{prize.bonusCoins} Coin
                         </span>
@@ -157,7 +157,7 @@ export function RewardWheelPanel() {
                     </td>
 
                     {/* Weight */}
-                    <td className="py-4 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                    <td className="py-4 px-4 text-center tabular-nums font-bold text-slate-700 dark:text-slate-300">
                       {prize.weight ?? 0}
                     </td>
 
@@ -165,7 +165,7 @@ export function RewardWheelPanel() {
                     <td className="py-4 px-6">
                       <div className="space-y-1.5 max-w-[140px]">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className={`font-mono font-bold ${isVip ? 'text-purple-600 dark:text-purple-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                          <span className={`tabular-nums font-bold ${isVip ? 'text-purple-600 dark:text-purple-400' : 'text-slate-700 dark:text-slate-300'}`}>
                             {chance.toFixed(1)}%
                           </span>
                         </div>

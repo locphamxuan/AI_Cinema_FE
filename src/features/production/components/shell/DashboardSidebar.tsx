@@ -37,7 +37,7 @@ export function DashboardSidebar({
     >
       {/* Streamlined section header without repeating the top header's full icon badge */}
       <div className="hidden md:block px-5 py-3.5 border-b border-sky-100 dark:border-white/5">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{label || title}</p>
+        <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500">{label || title}</p>
         <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{subtitle}</p>
       </div>
       <ul className="flex md:flex-col gap-0.5 p-2 md:p-3 overflow-x-auto">

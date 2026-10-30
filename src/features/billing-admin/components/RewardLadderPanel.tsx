@@ -43,7 +43,7 @@ export function RewardLadderPanel() {
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
               Bỏ lỡ một ngày thì chuỗi bắt đầu lại từ Ngày 1. Điểm danh đủ 7 ngày liên tục sẽ được nhận tổng cộng{' '}
-              <strong className="text-amber-600 dark:text-amber-400 font-mono font-bold">+{totalStreakCoins} Coin</strong> và tự động tặng thêm{' '}
+              <strong className="text-amber-600 dark:text-amber-400 tabular-nums font-bold">+{totalStreakCoins} Coin</strong> và tự động tặng thêm{' '}
               <strong className="text-purple-600 dark:text-purple-400 font-semibold">1 lượt quay may mắn</strong>.
             </p>
           </div>
@@ -76,7 +76,7 @@ export function RewardLadderPanel() {
                   }`}
                 >
                   {isDay7 && (
-                    <span className="absolute -top-2 right-2 text-[9px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-500/20 px-1.5 py-0.2 rounded-full border border-purple-500/30">
+                    <span className="absolute -top-2 right-2 text-[9px] font-black text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-500/20 px-1.5 py-0.2 rounded-full border border-purple-500/30">
                       Đặc biệt
                     </span>
                   )}
@@ -84,7 +84,7 @@ export function RewardLadderPanel() {
                     Ngày {r.streakDay}
                   </p>
                   <div className="my-1.5">
-                    <span className="inline-flex items-center gap-1 text-sm font-black font-mono text-amber-600 dark:text-amber-400">
+                    <span className="inline-flex items-center gap-1 text-sm font-black tabular-nums text-amber-600 dark:text-amber-400">
                       <Coins className="w-3.5 h-3.5 text-amber-500" />
                       +{r.bonusCoins}
                     </span>
@@ -118,7 +118,7 @@ export function RewardLadderPanel() {
       {sortedRules.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50/80 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 uppercase tracking-wider text-left">
+            <thead className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50/80 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 text-left">
               <tr>
                 <th className="py-3 px-6 font-bold w-24">Ngày chuỗi</th>
                 <th className="py-3 px-4 font-bold">Tên hiển thị</th>
@@ -137,7 +137,7 @@ export function RewardLadderPanel() {
                     className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors"
                   >
                     <td className="py-3 px-6 font-bold text-slate-900 dark:text-white whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/5 font-mono text-xs">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/5 tabular-nums text-xs">
                         Ngày {rule.streakDay}
                       </span>
                     </td>
@@ -145,7 +145,7 @@ export function RewardLadderPanel() {
                       {rule.name}
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 font-mono font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 text-xs">
+                      <span className="inline-flex items-center gap-1 tabular-nums font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 text-xs">
                         <Coins className="w-3.5 h-3.5 text-amber-500" />
                         +{rule.bonusCoins} Coin
                       </span>
@@ -157,7 +157,7 @@ export function RewardLadderPanel() {
                           <span>+1 Lượt quay</span>
                         </span>
                       ) : (
-                        <span className="text-slate-400 dark:text-slate-600 font-mono">—</span>
+                        <span className="text-slate-400 dark:text-slate-600 tabular-nums">—</span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-center whitespace-nowrap">

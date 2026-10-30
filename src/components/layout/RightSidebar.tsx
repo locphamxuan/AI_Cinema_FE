@@ -163,7 +163,7 @@ export default function RightSidebar() {
         <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/10">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-ruby animate-pulse" />
-            <span className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">
+            <span className="text-xs font-black text-slate-700 dark:text-slate-300">
               Khu Vực Thành Viên
             </span>
           </div>
@@ -242,7 +242,7 @@ export default function RightSidebar() {
           {/* Role Special Portals */}
           {portals.length > 0 && (
             <div className="pt-2 border-t border-slate-200 dark:border-white/10 space-y-1">
-              <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2.5 pb-1">
+              <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 px-2.5 pb-1">
                 Khu Vực Phân Quyền
               </p>
 

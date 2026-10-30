@@ -181,7 +181,7 @@ function SpinDialog() {
               type="button"
               onClick={() => void handleSpin()}
               disabled={isLoading || isSpinning || (availableSpins <= 0 && !pendingSpinKey) || prizes.length === 0}
-              className="mt-6 w-full max-w-xs py-3.5 px-6 rounded-2xl font-black text-base uppercase tracking-wider transition-all duration-200 cursor-pointer bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-neutral-950 hover:brightness-110 active:scale-95 shadow-lg shadow-amber-500/25 disabled:grayscale disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="mt-6 w-full max-w-xs py-3.5 px-6 rounded-2xl font-black text-base transition-all duration-200 cursor-pointer bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-neutral-950 hover:brightness-110 active:scale-95 shadow-lg shadow-amber-500/25 disabled:grayscale disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {spinLabel}
             </button>
@@ -212,7 +212,7 @@ function SpinDialog() {
                     className="flex items-center justify-between text-[11px] px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/5 text-slate-300"
                   >
                     <span>{item.prize?.name ?? 'Giải thưởng'}</span>
-                    <span className="text-muted-light font-mono text-[10px]">
+                    <span className="text-muted-light tabular-nums text-[10px]">
                       {item.spunAt ? new Date(item.spunAt).toLocaleDateString('vi-VN') : ''}
                     </span>
                   </li>

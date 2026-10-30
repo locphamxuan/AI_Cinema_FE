@@ -76,7 +76,7 @@ export default function EpisodeVersionDrawer({
                 {/* Top line: Version Badge, Status, Date */}
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-ruby/20 text-ruby font-mono text-xs font-bold">
+                    <span className="px-2.5 py-1 rounded-lg bg-ruby/20 text-ruby tabular-nums text-xs font-bold">
                       {ver.versionNumber}
                     </span>
                     <span
@@ -135,7 +135,7 @@ export default function EpisodeVersionDrawer({
 
                 {/* Changelog list */}
                 <div className="mt-2">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-light font-bold mb-1.5">
+                  <p className="text-[10px] text-muted-light font-bold mb-1.5">
                     📝 Nhật ký hiệu chỉnh (Changelog):
                   </p>
                   <ul className="space-y-1">

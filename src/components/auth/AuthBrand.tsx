@@ -4,8 +4,8 @@ export default function AuthBrand() {
     <div className="text-center mb-6">
       <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-ruby via-ruby-dark to-slate-950 border border-ruby/40 mb-3 shadow-xl shadow-ruby/25 ring-4 ring-ruby/10">
         <div className="flex flex-col items-center justify-center leading-none">
-          <span className="text-sm font-black text-white tracking-wider">AI</span>
-          <span className="text-[8px] font-black text-rose-200 tracking-widest uppercase">CINEMA</span>
+          <span className="text-sm font-black text-white">AI</span>
+          <span className="text-[8px] font-black text-rose-200">CINEMA</span>
         </div>
       </div>
       <h2 className="text-2xl font-bold text-slate-900 dark:text-foreground">AI Cinema</h2>

@@ -93,7 +93,7 @@ export function TokenRequestList({
                 ) : (
                   r.project.movie.title
                 )}{' '}
-                · Mùa {r.season.seasonNumber} · xin <span className="font-mono">{formatNumber(r.requestedTokens)}</span> Token
+                · Mùa {r.season.seasonNumber} · xin <span className="tabular-nums">{formatNumber(r.requestedTokens)}</span> Token
               </p>
               <StatusPill {...TOKEN_REQUEST_STATUS[r.status]} />
             </div>

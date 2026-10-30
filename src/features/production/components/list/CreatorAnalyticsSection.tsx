@@ -100,10 +100,10 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
                 <Film className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                   Tổng số dự án
                 </p>
-                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
+                <p className="text-xl font-black text-slate-900 dark:text-white tabular-nums">
                   {projects.length}
                 </p>
               </div>
@@ -114,10 +114,10 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
                 <Clapperboard className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                   Tổng tập hoàn thành
                 </p>
-                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
+                <p className="text-xl font-black text-slate-900 dark:text-white tabular-nums">
                   {totalEpisodes}
                 </p>
               </div>
@@ -128,10 +128,10 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                   Dự án đã đóng máy
                 </p>
-                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
+                <p className="text-xl font-black text-slate-900 dark:text-white tabular-nums">
                   {statusCounts.done}
                 </p>
               </div>
@@ -162,7 +162,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
                   <span className="w-2 h-2 rounded-full bg-emerald-500" />
                   Số tập phim theo dự án
                 </h4>
-                <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">
+                <span className="text-[11px] tabular-nums text-slate-400 dark:text-slate-500">
                   Real-time Data
                 </span>
               </div>

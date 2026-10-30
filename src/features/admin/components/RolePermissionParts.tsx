@@ -55,7 +55,7 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
             <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
               {ROLE_SHORT_LABEL[role]}
             </p>
-            <p className="text-lg font-black font-mono text-slate-900 dark:text-white mt-0.5">
+            <p className="text-lg font-black tabular-nums text-slate-900 dark:text-white mt-0.5">
               {count} <span className="text-xs font-normal text-slate-400">quyền</span>
             </p>
           </div>
@@ -72,7 +72,7 @@ export function RoleColumnHeaders() {
       <tr>
         <th
           scope="col"
-          className="py-3.5 px-6 text-left font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 w-1/3 min-w-[280px]"
+          className="py-3.5 px-6 text-left font-bold text-slate-700 dark:text-slate-300 w-1/3 min-w-[280px]"
         >
           Chức năng & Diễn giải quyền hạn
         </th>

@@ -75,8 +75,8 @@ export function CoinLedgerPanel() {
                   <td className="py-2 whitespace-nowrap">{formatDateTime(line.createdAt)}</td>
                   <td className="py-2">{COIN_ENTRY_LABEL[line.entryType]}</td>
                   <td className="py-2 hidden md:table-cell text-slate-600 dark:text-slate-300">{line.description ?? '-'}</td>
-                  <td className="py-2 text-right font-mono">{signed(line.mainAmount)}</td>
-                  <td className="py-2 text-right font-mono">{signed(line.bonusAmount)}</td>
+                  <td className="py-2 text-right tabular-nums">{signed(line.mainAmount)}</td>
+                  <td className="py-2 text-right tabular-nums">{signed(line.bonusAmount)}</td>
                   <td className="py-2 text-right">
                     {canWallet && (
                       <Button size="sm" variant="ghost" aria-label="Xem ví của tài khoản này" onClick={() => setWalletOf(line.userId)}>
@@ -120,11 +120,11 @@ function WalletModal({
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
               <p className="text-slate-500">Coin chính</p>
-              <p className="text-lg font-bold font-mono">{formatNumber(w.mainBalance)}</p>
+              <p className="text-lg font-bold tabular-nums">{formatNumber(w.mainBalance)}</p>
             </div>
             <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
               <p className="text-slate-500">Coin thưởng</p>
-              <p className="text-lg font-bold font-mono">{formatNumber(w.bonusBalance)}</p>
+              <p className="text-lg font-bold tabular-nums">{formatNumber(w.bonusBalance)}</p>
             </div>
           </div>
           <div>

@@ -160,7 +160,7 @@ export function NotificationCard({ item, href, onOpen }: NotificationCardProps) 
 
           {/* Footer timestamp and link action */}
           <div className="flex items-center justify-between pt-1">
-            <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">
+            <span className="text-[11px] tabular-nums text-slate-400 dark:text-slate-500">
               {formatDateTime(item.createdAt)}
             </span>
 

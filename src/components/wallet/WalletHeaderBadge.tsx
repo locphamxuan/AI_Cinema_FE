@@ -41,7 +41,7 @@ export default function WalletHeaderBadge() {
           </div>
 
           <div className="flex items-baseline gap-1">
-            <span className="text-xs font-black text-amber-600 dark:text-amber-400 font-mono tracking-tight">
+            <span className="text-xs font-black text-amber-600 dark:text-amber-400 tabular-nums tracking-tight">
               {wallet.mainCoin.toLocaleString()}
             </span>
           </div>
@@ -71,7 +71,7 @@ export default function WalletHeaderBadge() {
           </div>
 
           <div className="flex items-baseline gap-1">
-            <span className="text-xs font-black text-purple-600 dark:text-purple-300 font-mono tracking-tight group-hover:text-purple-800 dark:group-hover:text-white transition-colors">
+            <span className="text-xs font-black text-purple-600 dark:text-purple-300 tabular-nums tracking-tight group-hover:text-purple-800 dark:group-hover:text-white transition-colors">
               +{wallet.bonusCoin.toLocaleString()}
             </span>
           </div>

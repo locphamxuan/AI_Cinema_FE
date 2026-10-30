@@ -48,7 +48,7 @@ export default function ProfilePage() {
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">{user.name}</h1>
               <span
-                className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                className={`px-3 py-1 rounded-full text-xs font-black ${
                   isMember
                     ? 'bg-amber-400 text-slate-950 shadow-md shadow-amber-400/30'
                     : 'bg-slate-200 text-slate-700 dark:bg-white/10 dark:text-muted-light'
@@ -58,7 +58,7 @@ export default function ProfilePage() {
               </span>
             </div>
 
-            <p className="text-sm text-slate-500 dark:text-muted-light font-mono">{user.email}</p>
+            <p className="text-sm text-slate-500 dark:text-muted-light tabular-nums">{user.email}</p>
 
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-2">
               <Link
@@ -84,19 +84,19 @@ export default function ProfilePage() {
       {/* Grid Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-md">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-muted-light">Số Dư Main Coin</p>
-          <p className="text-3xl font-black text-amber-500 font-mono mt-1">{wallet.mainCoin.toLocaleString('vi-VN')}</p>
+          <p className="text-xs font-bold text-slate-400 dark:text-muted-light">Số Dư Main Coin</p>
+          <p className="text-3xl font-black text-amber-500 tabular-nums mt-1">{wallet.mainCoin.toLocaleString('vi-VN')}</p>
           <p className="text-xs text-slate-500 dark:text-muted-light mt-1">Từ nạp tiền, trừ trước khi mở khóa</p>
         </div>
 
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-md">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-muted-light">Coin Thưởng</p>
-          <p className="text-3xl font-black text-purple-500 font-mono mt-1">+{wallet.bonusCoin.toLocaleString('vi-VN')}</p>
+          <p className="text-xs font-bold text-slate-400 dark:text-muted-light">Coin Thưởng</p>
+          <p className="text-3xl font-black text-purple-500 tabular-nums mt-1">+{wallet.bonusCoin.toLocaleString('vi-VN')}</p>
           <p className="text-xs text-slate-500 dark:text-muted-light mt-1">Tặng từ điểm danh & vòng quay</p>
         </div>
 
         <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 shadow-md">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-muted-light">Trạng Thái Gói</p>
+          <p className="text-xs font-bold text-slate-400 dark:text-muted-light">Trạng Thái Gói</p>
           <p className="text-xl font-black text-ruby mt-1">{isMember ? plan.plan.name : 'Gói Thường'}</p>
           <p className="text-xs text-slate-500 dark:text-muted-light mt-1">
             {isMember ? `Hiệu lực đến ${new Date(plan.currentPeriodEnd).toLocaleDateString('vi-VN')}` : 'Xem tập miễn phí, mở khóa tập bằng Coin'}

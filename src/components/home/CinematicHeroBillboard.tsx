@@ -61,7 +61,7 @@ export default function CinematicHeroBillboard({
         {/* Feature Tags & Badges */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-4 animate-slide-up">
           {/* AI Masterpiece Badge */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-primary text-white text-[11px] font-black uppercase tracking-wider shadow-lg shadow-red-600/40">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-primary text-white text-[11px] font-black shadow-lg shadow-red-600/40">
             AI Masterpiece
           </span>
 
@@ -147,7 +147,7 @@ export default function CinematicHeroBillboard({
         {/* Spotlight Carousel Selector (When multiple featured movies exist) */}
         {featuredMovies.length > 1 && onSelectMovie && (
           <div className="hidden md:flex items-center gap-2 p-1.5 rounded-2xl bg-black/50 border border-white/15 backdrop-blur-xl shadow-2xl">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">
+            <span className="text-[11px] font-bold text-slate-400 px-2">
               Tiêu điểm:
             </span>
             <div className="flex items-center gap-1.5">
@@ -188,7 +188,7 @@ export default function CinematicHeroBillboard({
               <span className="w-1 h-3 bg-red-500 rounded-full animate-pulse" />
               <span className="w-1 h-4 bg-red-400 rounded-full animate-pulse delay-75" />
               <span className="w-1 h-2 bg-red-600 rounded-full animate-pulse delay-150" />
-              <span className="ml-1 text-[10px] font-mono text-white">Trailer Audio</span>
+              <span className="ml-1 text-[10px] tabular-nums text-white">Trailer Audio</span>
             </div>
           )}
 

@@ -80,7 +80,7 @@ export default function DepositModal() {
             {isAuthenticated && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/[0.04] border border-white/10 text-xs">
                 <span className="text-slate-400">Số dư:</span>
-                <span className="font-mono font-bold text-amber-400">
+                <span className="tabular-nums font-bold text-amber-400">
                   {(wallet.mainCoin + wallet.bonusCoin).toLocaleString('vi-VN')}
                 </span>
                 <span className="text-[10px] text-slate-500">Coin</span>
@@ -107,7 +107,7 @@ export default function DepositModal() {
         )}
 
         <div className="mb-5">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">1. Chọn số tiền nạp</p>
+          <p className="text-xs font-bold text-slate-400 mb-3">1. Chọn số tiền nạp</p>
           <AmountGrid amounts={amounts} rateVnd={rateVnd} selected={amountVnd} onSelect={setAmountVnd} />
           {rateVnd && (
             <p className="text-[11px] text-slate-500 mt-2">Tỉ giá hiện tại: {rateVnd.toLocaleString('vi-VN')} ₫ = 1 Coin</p>
@@ -115,7 +115,7 @@ export default function DepositModal() {
         </div>
 
         <div className="mb-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5">2. Phương thức thanh toán trực tuyến</p>
+          <p className="text-xs font-bold text-slate-400 mb-2.5">2. Phương thức thanh toán trực tuyến</p>
           <MethodPicker selected={provider} onSelect={setProvider} />
         </div>
 
@@ -124,7 +124,7 @@ export default function DepositModal() {
         <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-left w-full sm:w-auto">
             <span className="text-[11px] text-slate-400 block">Nhận vào ví (Coin chính):</span>
-            <span className="text-xl font-black text-amber-300 font-mono">
+            <span className="text-xl font-black text-amber-300 tabular-nums">
               {coins === null ? '…' : `+${coins.toLocaleString('vi-VN')} Coin`}
             </span>
           </div>
@@ -141,7 +141,7 @@ export default function DepositModal() {
               type="button"
               onClick={() => void handleConfirm()}
               disabled={isProcessing || (isAuthenticated && !amounts.includes(amountVnd))}
-              className="flex-1 sm:flex-initial py-3 px-8 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-400 hover:to-amber-600 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed tracking-wide"
+              className="flex-1 sm:flex-initial py-3 px-8 rounded-xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-400 hover:to-amber-600 text-slate-950 font-black text-sm shadow-xl shadow-amber-500/25 transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isProcessing ? (
                 <span className="flex items-center gap-2 text-white">

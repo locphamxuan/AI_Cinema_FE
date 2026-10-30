@@ -96,7 +96,7 @@ export function SubscriptionsPanel() {
                     <StatusPill {...SUBSCRIPTION_STATUS[row.status]} />
                   </td>
                   <td className="py-2">{formatDay(row.currentPeriodEnd)}</td>
-                  <td className="py-2 text-right font-mono">{formatNumber(row.priceCoins)}</td>
+                  <td className="py-2 text-right tabular-nums">{formatNumber(row.priceCoins)}</td>
                 </tr>
               ))}
             </tbody>
@@ -203,7 +203,7 @@ function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
               {formatDay(c.periodStart)} → {formatDay(c.periodEnd)}
             </td>
             <td className="py-1">{c.status === 'PAID' ? 'Đã thu' : (c.failureReason ?? 'Không thu được')}</td>
-            <td className="py-1 text-right font-mono">
+            <td className="py-1 text-right tabular-nums">
               {c.mainCoinsCharged} + {c.bonusCoinsCharged}
             </td>
           </tr>

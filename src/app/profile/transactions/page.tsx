@@ -66,11 +66,11 @@ export default function TransactionsPage() {
 
       <div className="grid grid-cols-2 gap-3 max-w-md">
         <div className="glass-card-sm p-4">
-          <p className="text-[10px] text-muted-light uppercase tracking-wider">Coin chính</p>
+          <p className="text-[10px] text-muted-light">Coin chính</p>
           <p className="text-2xl font-bold text-coin mt-1">{wallet.mainCoin.toLocaleString('vi-VN')}</p>
         </div>
         <div className="glass-card-sm p-4">
-          <p className="text-[10px] text-muted-light uppercase tracking-wider">Coin thưởng</p>
+          <p className="text-[10px] text-muted-light">Coin thưởng</p>
           <p className="text-2xl font-bold text-neon mt-1">{wallet.bonusCoin.toLocaleString('vi-VN')}</p>
         </div>
       </div>

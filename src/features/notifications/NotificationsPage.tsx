@@ -154,7 +154,7 @@ export function NotificationsPage() {
                 <span>{t.label}</span>
                 {unreadCount > 0 && (
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider ${
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
                       isActive
                         ? 'bg-rose-500 text-white shadow-xs'
                         : 'bg-rose-500/20 text-rose-600 dark:text-rose-400'
@@ -171,7 +171,7 @@ export function NotificationsPage() {
         {/* Sub-sections Pills (If current tab has multiple sections) */}
         {tab.sections.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 px-1 pt-1">
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mr-1">
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mr-1">
               Lọc theo mục:
             </span>
             <button

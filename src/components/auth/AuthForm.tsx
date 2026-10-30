@@ -121,7 +121,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
       <div className="my-4">
         <GoogleSignInButton mode={mode} onSignedIn={goOn} />
 
-        <div className="flex items-center gap-3 my-3 text-[11px] text-slate-400 dark:text-muted uppercase tracking-wider">
+        <div className="flex items-center gap-3 my-3 text-[11px] text-slate-400 dark:text-muted">
           <span className="flex-1 h-px bg-slate-200/80 dark:bg-white/10" />
           <span>{mode === 'login' ? 'hoặc dùng email' : 'hoặc đăng ký bằng email'}</span>
           <span className="flex-1 h-px bg-slate-200/80 dark:bg-white/10" />
@@ -234,7 +234,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 rounded-2xl font-black text-white bg-gradient-to-r from-ruby to-action-strong hover:shadow-xl hover:shadow-ruby/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-lg shadow-ruby/20 cursor-pointer text-sm tracking-wide"
+          className="w-full py-3.5 rounded-2xl font-black text-white bg-gradient-to-r from-ruby to-action-strong hover:shadow-xl hover:shadow-ruby/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-lg shadow-ruby/20 cursor-pointer text-sm"
         >
           {loading ? 'Đang xác thực…' : mode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'}
         </button>

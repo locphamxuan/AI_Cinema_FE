@@ -37,7 +37,7 @@ export default function CinemaEnterpriseFooter() {
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-red-800 flex items-center justify-center text-white font-black text-sm">
                 AI
               </div>
-              <span className="text-xl font-black tracking-wider text-white">
+              <span className="text-xl font-black text-white">
                 CINEMA<span className="text-primary">.</span>
               </span>
             </Link>
@@ -52,7 +52,7 @@ export default function CinemaEnterpriseFooter() {
 
           {columns.map((col) => (
             <nav key={col.title} aria-label={col.title} className="space-y-3">
-              <h4 className="text-sm font-bold text-white uppercase tracking-wider">{col.title}</h4>
+              <h4 className="text-sm font-bold text-white">{col.title}</h4>
               <ul className="space-y-2">
                 {col.links.map((l) => (
                   <li key={l.href}>

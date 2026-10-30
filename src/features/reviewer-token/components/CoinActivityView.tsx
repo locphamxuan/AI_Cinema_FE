@@ -49,11 +49,11 @@ export function CoinActivityView({ activity, projectHref }: { activity?: CoinAct
                 {e.note && <span className="block text-xs text-slate-400">{e.note}</span>}
               </td>
               <td className="py-2 px-2">{e.movie.title} · tập {e.episodeNumber}</td>
-              <td className={`py-2 px-2 text-right font-mono ${e.coins < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+              <td className={`py-2 px-2 text-right tabular-nums ${e.coins < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 {e.coins > 0 ? '+' : ''}
                 {formatNumber(e.coins)}
               </td>
-              <td className="py-2 px-2 text-right font-mono text-slate-500">{formatNumber(e.vnd)}</td>
+              <td className="py-2 px-2 text-right tabular-nums text-slate-500">{formatNumber(e.vnd)}</td>
             </tr>
           ))}
         </tbody>

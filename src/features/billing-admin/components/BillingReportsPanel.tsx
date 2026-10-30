@@ -17,7 +17,7 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
   return (
     <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
       <p className="text-[11px] text-slate-500">{label}</p>
-      <p className="text-lg font-bold font-mono text-slate-900 dark:text-white">{value}</p>
+      <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{value}</p>
       {hint && <p className="text-xs text-slate-500">{hint}</p>}
     </div>
   );
@@ -91,9 +91,9 @@ function RevenueSection({ rangeKey, query }: { rangeKey: string; query: ReportRa
                   {r.byPlan.map((row) => (
                     <tr key={row.plan.id}>
                       <td className="py-1 font-medium">{row.plan.name}</td>
-                      <td className="py-1 text-right font-mono">{row.cycles}</td>
-                      <td className="py-1 text-right font-mono">{formatNumber(row.mainCoins)}</td>
-                      <td className="py-1 text-right font-mono">{formatNumber(row.bonusCoins)}</td>
+                      <td className="py-1 text-right tabular-nums">{row.cycles}</td>
+                      <td className="py-1 text-right tabular-nums">{formatNumber(row.mainCoins)}</td>
+                      <td className="py-1 text-right tabular-nums">{formatNumber(row.bonusCoins)}</td>
                     </tr>
                   ))}
                 </tbody>

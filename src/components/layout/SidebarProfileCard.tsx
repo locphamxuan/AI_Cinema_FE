@@ -22,11 +22,11 @@ export default function SidebarProfileCard({ user, isVIPMode }: { user: UserProf
           <p className="text-sm font-black text-white truncate group-hover:text-ruby-light transition-colors">
             {user.name}
           </p>
-          <p className="text-[11px] text-slate-400 truncate font-mono mt-0.5">{user.email || 'user@aicinema.vn'}</p>
+          <p className="text-[11px] text-slate-400 truncate tabular-nums mt-0.5">{user.email || 'user@aicinema.vn'}</p>
 
           <div className="flex items-center gap-1.5 mt-1.5">
             <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase tracking-wider border ${
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${
                 isVIPMode
                   ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/10 text-amber-300 border-amber-500/40 shadow-xs'
                   : 'bg-white/10 text-slate-300 border-white/15'

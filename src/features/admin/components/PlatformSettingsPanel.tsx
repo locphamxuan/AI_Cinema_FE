@@ -113,7 +113,7 @@ export function PlatformSettingsPanel() {
               step={1}
               value={value(f.key)}
               onChange={(e) => setDraft({ ...draft, [f.key]: e.target.value })}
-              className={`${fieldInputClass} w-28 py-1.5 text-right font-mono`}
+              className={`${fieldInputClass} w-28 py-1.5 text-right tabular-nums`}
             />
             <span className="w-20 text-slate-500">{f.unit}</span>
           </span>
@@ -145,7 +145,7 @@ export function PlatformSettingsPanel() {
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Cài đặt nền tảng</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Cập nhật lần cuối: <span className="font-mono text-slate-700 dark:text-slate-300">{formatDateTime(current.updatedAt)}</span>
+            Cập nhật lần cuối: <span className="tabular-nums text-slate-700 dark:text-slate-300">{formatDateTime(current.updatedAt)}</span>
           </p>
         </div>
         {changes > 0 && (
@@ -179,7 +179,7 @@ export function PlatformSettingsPanel() {
         {activeTab === 'all' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
                 <Coins className="w-3.5 h-3.5" /> Phân khúc COIN & Nạp tiền
               </h3>
               {renderFieldGroup(COIN_FIELDS)}
@@ -187,14 +187,14 @@ export function PlatformSettingsPanel() {
             </div>
 
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
                 <Clapperboard className="w-3.5 h-3.5" /> Phân khúc Sản xuất & Token
               </h3>
               {renderFieldGroup(PRODUCTION_FIELDS)}
             </div>
 
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
                 <Radio className="w-3.5 h-3.5" /> Phân khúc Phát sóng & Gia hạn gói
               </h3>
               {renderFieldGroup(STREAMING_FIELDS)}

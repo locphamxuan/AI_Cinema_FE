@@ -38,8 +38,8 @@ function KpiCard({ icon, tone, label, value, note }: KpiCardProps) {
         {icon}
       </div>
       <div className="min-w-0">
-        <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</p>
-        <p className="text-2xl font-black font-mono text-slate-900 dark:text-white truncate">{value}</p>
+        <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{label}</p>
+        <p className="text-2xl font-black tabular-nums text-slate-900 dark:text-white truncate">{value}</p>
         <p className={`text-[11px] font-medium truncate ${TONES[tone].note}`}>{note}</p>
       </div>
     </div>

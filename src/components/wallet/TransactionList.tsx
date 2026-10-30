@@ -28,7 +28,7 @@ const when = (iso: string) => {
   };
 };
 
-const HEAD = 'px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold';
+const HEAD = 'px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light font-bold';
 
 /** The member's Coin ledger: a table on desktop, cards on mobile, balances as the BE recorded them. */
 export default function TransactionList({ lines }: Readonly<{ lines: StatementLine[] }>) {
@@ -66,7 +66,7 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
                   <td className={`px-4 py-3 text-right text-sm font-bold ${amountClass(line.bonusAmount, 'text-neon')}`}>
                     {signed(line.bonusAmount)}
                   </td>
-                  <td className="px-4 py-3 text-right text-xs font-mono text-slate-600 dark:text-muted-light whitespace-nowrap">
+                  <td className="px-4 py-3 text-right text-xs tabular-nums text-slate-600 dark:text-muted-light whitespace-nowrap">
                     {line.mainBalanceAfter} 🟡 · {line.bonusBalanceAfter} 🎁
                   </td>
                   <td className="px-4 py-3 text-right">

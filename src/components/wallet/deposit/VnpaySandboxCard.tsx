@@ -45,14 +45,14 @@ export function VnpaySandboxCard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] tabular-nums">
         <div className="p-2 rounded-xl bg-black/40 border border-white/5">
           <span className="text-slate-400 block text-[10px]">Ngân hàng:</span>
           <span className="font-bold text-white text-xs">NCB</span>
         </div>
         <div className="p-2 rounded-xl bg-black/40 border border-white/5 col-span-2 sm:col-span-1">
           <span className="text-slate-400 block text-[10px]">Số thẻ:</span>
-          <span className="font-bold text-amber-400 text-xs tracking-wider">9704 1985 2619 1432</span>
+          <span className="font-bold text-amber-400 text-xs">9704 1985 2619 1432</span>
         </div>
         <div className="p-2 rounded-xl bg-black/40 border border-white/5">
           <span className="text-slate-400 block text-[10px]">Tên chủ thẻ:</span>

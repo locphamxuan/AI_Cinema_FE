@@ -187,7 +187,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                 </span>
               )}
               {levels.length > 1 && <QualitySelect levels={levels} value={level} onChange={handleSelectLevel} />}
-              <span className="text-muted-light text-xs font-mono">{currentEpisode.duration}</span>
+              <span className="text-muted-light text-xs tabular-nums">{currentEpisode.duration}</span>
             </div>
 
             {/* VERSION CONTROL PILL BUTTON */}
@@ -222,7 +222,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
           {activeVersion && (
             <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-neon/20 text-neon font-bold font-mono text-[11px]">
+                <span className="px-2 py-0.5 rounded bg-neon/20 text-neon font-bold tabular-nums text-[11px]">
                   {activeVersion.versionNumber}
                 </span>
                 <span className="text-slate-800 dark:text-white font-medium">{activeVersion.versionTitle}</span>

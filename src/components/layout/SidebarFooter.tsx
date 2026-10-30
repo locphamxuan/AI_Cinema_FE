@@ -16,7 +16,7 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
         <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none" />
 
         <div className="flex items-center justify-between mb-2 relative z-10">
-          <span className="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+          <span className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">
             <Coins className="w-3.5 h-3.5 text-amber-400" />
             <span>Ví AI Cinema</span>
           </span>
@@ -27,7 +27,7 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
         </div>
 
         <div className="flex items-baseline gap-1.5 mb-3 relative z-10">
-          <span className="text-2xl font-black text-amber-400 font-mono tracking-tight drop-shadow-sm">
+          <span className="text-2xl font-black text-amber-400 tabular-nums tracking-tight drop-shadow-sm">
             {wallet.mainCoin.toLocaleString()}
           </span>
           <span className="text-xs font-semibold text-slate-400">Main Coin</span>
@@ -49,7 +49,7 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
       {movie && (
         <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
+            <p className="text-[10px] font-black text-slate-400 flex items-center gap-1.5">
               <Film className="w-3 h-3 text-slate-400" />
               <span>Đang Xem Dở</span>
             </p>
