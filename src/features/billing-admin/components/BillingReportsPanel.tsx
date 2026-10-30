@@ -71,8 +71,8 @@ function RevenueSection({ rangeKey, query }: { rangeKey: string; query: ReportRa
               <BarChart
                 categories={r.byPlan.map((row) => row.plan.name)}
                 series={[
-                  { name: 'Coin chính', color: '#8b5cf6', values: r.byPlan.map((row) => row.mainCoins) },
-                  { name: 'Coin thưởng', color: '#38bdf8', values: r.byPlan.map((row) => row.bonusCoins) },
+                  { name: 'Coin chính', color: 'var(--chart-1)', values: r.byPlan.map((row) => row.mainCoins) },
+                  { name: 'Coin thưởng', color: 'var(--chart-5)', values: r.byPlan.map((row) => row.bonusCoins) },
                 ]}
                 valueUnit="Coin"
                 height={200}

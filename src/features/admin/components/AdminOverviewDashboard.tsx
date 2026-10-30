@@ -58,10 +58,10 @@ export function AdminOverviewDashboard() {
   };
 
   const projectDonutData = [
-    { label: 'Đang sản xuất', value: projectStats.production, color: '#8b5cf6' },
-    { label: 'Hoàn tất', value: projectStats.done, color: '#10b981' },
-    { label: 'Lên kế hoạch', value: projectStats.plan, color: '#f59e0b' },
-    { label: 'Đã huỷ', value: projectStats.cancelled, color: '#ef4444' },
+    { label: 'Đang sản xuất', value: projectStats.production, color: 'var(--chart-1)' },
+    { label: 'Hoàn tất', value: projectStats.done, color: 'var(--chart-3)' },
+    { label: 'Lên kế hoạch', value: projectStats.plan, color: 'var(--chart-2)' },
+    { label: 'Đã huỷ', value: projectStats.cancelled, color: 'var(--chart-4)' },
   ];
 
   // Real-time episode output by project
@@ -80,7 +80,7 @@ export function AdminOverviewDashboard() {
   const episodeBarSeries = [
     {
       name: 'Số tập phim',
-      color: '#10b981',
+      color: 'var(--chart-3)',
       values: topProjectsWithEpisodes.map((p) => p._count?.episodes ?? 0),
     },
   ];
@@ -90,20 +90,20 @@ export function AdminOverviewDashboard() {
   const planBarSeries = [
     {
       name: 'Coin chính',
-      color: '#8b5cf6',
+      color: 'var(--chart-1)',
       values: revenue?.byPlan.map((p) => p.mainCoins) ?? [],
     },
     {
       name: 'Coin thưởng',
-      color: '#38bdf8',
+      color: 'var(--chart-5)',
       values: revenue?.byPlan.map((p) => p.bonusCoins) ?? [],
     },
   ];
 
   // Coin composition donut
   const coinCompositionData = [
-    { label: 'Coin chính', value: revenue?.totals.mainCoins ?? 0, color: '#8b5cf6' },
-    { label: 'Coin thưởng', value: revenue?.totals.bonusCoins ?? 0, color: '#38bdf8' },
+    { label: 'Coin chính', value: revenue?.totals.mainCoins ?? 0, color: 'var(--chart-1)' },
+    { label: 'Coin thưởng', value: revenue?.totals.bonusCoins ?? 0, color: 'var(--chart-5)' },
   ];
 
   // User role breakdown
@@ -115,16 +115,16 @@ export function AdminOverviewDashboard() {
   };
 
   const roleDonutData = [
-    { label: 'Khán giả (Member)', value: roleStats.member, color: '#3b82f6' },
-    { label: 'Creator', value: roleStats.creator, color: '#8b5cf6' },
-    { label: 'Reviewer', value: roleStats.reviewer, color: '#10b981' },
-    { label: 'Quản trị & Staff', value: roleStats.staff, color: '#f59e0b' },
+    { label: 'Khán giả (Member)', value: roleStats.member, color: 'var(--chart-5)' },
+    { label: 'Creator', value: roleStats.creator, color: 'var(--chart-1)' },
+    { label: 'Reviewer', value: roleStats.reviewer, color: 'var(--chart-3)' },
+    { label: 'Quản trị & Staff', value: roleStats.staff, color: 'var(--chart-2)' },
   ];
 
   return (
     <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* ── Top Hero Banner ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-gradient-to-br from-slate-900 via-[#161928] to-purple-950/40 p-6 sm:p-8 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-gradient-to-br from-slate-900 via-card to-purple-950/40 p-6 sm:p-8 text-white shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold">

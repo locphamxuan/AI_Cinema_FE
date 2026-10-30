@@ -23,10 +23,10 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
   };
 
   const donutData = [
-    { label: 'Đang sản xuất', value: statusCounts.production, color: '#8b5cf6' },
-    { label: 'Hoàn tất', value: statusCounts.done, color: '#10b981' },
-    { label: 'Lên kế hoạch', value: statusCounts.plan, color: '#f59e0b' },
-    { label: 'Đã huỷ', value: statusCounts.cancelled, color: '#ef4444' },
+    { label: 'Đang sản xuất', value: statusCounts.production, color: 'var(--chart-1)' },
+    { label: 'Hoàn tất', value: statusCounts.done, color: 'var(--chart-3)' },
+    { label: 'Lên kế hoạch', value: statusCounts.plan, color: 'var(--chart-2)' },
+    { label: 'Đã huỷ', value: statusCounts.cancelled, color: 'var(--chart-4)' },
   ];
 
   // Real-time active projects with episode counts (Top 6)
@@ -46,7 +46,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
   const barSeries = [
     {
       name: 'Số tập đã quay / dựng',
-      color: '#10b981',
+      color: 'var(--chart-3)',
       values: recentProjects.map((p) => p._count?.episodes ?? 0),
     },
   ];
@@ -54,7 +54,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
   const totalEpisodes = projects.reduce((acc, p) => acc + (p._count?.episodes ?? 0), 0);
 
   return (
-    <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm overflow-hidden mb-6">
+    <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card shadow-sm overflow-hidden mb-6">
       {/* ── Header Bar ── */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
         <div className="flex items-center gap-3">
