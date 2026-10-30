@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { SkipForward } from 'lucide-react';
 import { formatDuration } from '@/features/production/lib/format';
 import type { AdScheduleItem } from '@/types/playback';
+import type { Episode } from '@/types/movie';
 
 /**
  * The mid-roll ad over the paused episode (BR-33). It plays to the end; only then does "Bỏ qua quảng cáo"
@@ -65,6 +66,31 @@ export function ResumePrompt({ at, onAnswer }: { at: number; onAnswer: (resume: 
       <button type="button" onClick={() => onAnswer(false)} className="px-2.5 py-1 rounded-lg bg-white/10 cursor-pointer">
         Xem từ đầu
       </button>
+    </div>
+  );
+}
+
+/** Over a locked episode: why it is locked (a preview stops at 30s) and the Coin price to unlock it. */
+export function LockedOverlay({ episode, onUnlock }: { episode: Episode; onUnlock: () => void }) {
+  return (
+    <div className="absolute inset-0 video-blur-overlay flex flex-col items-center justify-center p-6">
+      <div className="text-center animate-fade-in max-w-md">
+        <div className="w-16 h-16 rounded-2xl bg-ruby/20 border border-ruby/30 flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg shadow-ruby/20">
+          🔒
+        </div>
+        <h3 className="text-xl font-bold text-white mb-2">Tập Phim Đang Bị Khóa</h3>
+        <p className="text-muted-light mb-5 text-xs sm:text-sm leading-relaxed">
+          {episode.isPreview
+            ? 'Bạn chỉ được xem thử 30 giây đầu. Mở khóa bằng Coin hoặc đăng ký gói Tháng để xem trọn bộ.'
+            : 'Mở khóa tập phim bằng Coin để thưởng thức nội dung AI đỉnh cao.'}
+        </p>
+        <button
+          onClick={onUnlock}
+          className="btn-shimmer px-7 py-3 bg-gradient-to-r from-ruby to-ruby-dark text-white rounded-xl font-bold hover:shadow-xl hover:shadow-ruby/40 transition-all active:scale-95 cursor-pointer text-sm shadow-md"
+        >
+          🪙 Mở khóa ngay - {episode.price} Coins
+        </button>
+      </div>
     </div>
   );
 }
