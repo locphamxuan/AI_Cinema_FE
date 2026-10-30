@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
-  ChevronLeft,
-  ChevronRight,
   Plus,
   Search,
   Film,
@@ -29,6 +27,7 @@ import { CreateProjectModal } from './CreateProjectModal';
 import { ProjectGrid } from './ProjectGrid';
 import { ProjectTable } from './ProjectTable';
 import { CreatorAnalyticsSection } from './CreatorAnalyticsSection';
+import { DataPagination } from '@/components/data/DataPagination';
 
 const FILTERS: { key: string; label: string; status?: MovieStatus[]; icon: React.ElementType }[] = [
   { key: 'all', label: 'Tất cả', icon: Layers },
@@ -188,33 +187,15 @@ export function ProjectListPage() {
               <ProjectTable projects={projects.data.data} base={base} />
             )}
 
-            {projects.data.meta.totalPages > 1 && (
-              <div className="flex items-center justify-center gap-3 pt-6 text-sm text-slate-500">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
-                  aria-label="Trang trước"
-                  className="rounded-xl border border-sky-100 dark:border-white/10"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </Button>
-                <span className="font-semibold">
-                  Trang {projects.data.meta.currentPage} / {projects.data.meta.totalPages}
-                </span>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  disabled={page >= projects.data.meta.totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                  aria-label="Trang sau"
-                  className="rounded-xl border border-sky-100 dark:border-white/10"
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-            )}
+            <DataPagination
+              page={page}
+              totalPages={projects.data.meta.totalPages}
+              totalItems={projects.data.meta.totalItems}
+              pageSize={projects.data.meta.itemsPerPage}
+              unit="dự án"
+              onChange={setPage}
+              className="pt-6"
+            />
           </>
         )}
       </div>

@@ -10,6 +10,7 @@ import { formatDuration } from '@/features/production/lib/format';
 import { adAdminService } from '@/services/adAdminService';
 import type { AdInput, AdminAd } from '@/types/playback';
 import { AdFormModal } from './AdFormModal';
+import { Pager, pageOf } from '@/features/production/components/shared/Pager';
 
 /** Whether the mid-roll draw can pick the ad: an active ad runs until the Admin pauses it. */
 export function adLiveState(ad: AdminAd): { label: string; tone: 'emerald' | 'neutral' } {
@@ -20,6 +21,8 @@ export function adLiveState(ad: AdminAd): { label: string; tone: 'emerald' | 'ne
 export function AdsPanel() {
   const ads = useResource('admin:ads', adAdminService.ads);
   const [editing, setEditing] = useState<AdminAd | 'new' | null>(null);
+  const [page, setPage] = useState(1);
+  const paged = pageOf(ads.data ?? [], page, 10);
   const { busy, run } = useAction();
 
   const save = async (input: AdInput) => {
@@ -55,7 +58,7 @@ export function AdsPanel() {
         {ads.loading && !ads.data && <Loading />}
         {ads.data?.length === 0 && <Empty>Chưa có quảng cáo nào. Tập phim của gói có quảng cáo sẽ không chèn gì.</Empty>}
         <ul className="divide-y divide-slate-100 dark:divide-white/5 -my-3">
-          {ads.data?.map((ad) => (
+          {paged.rows?.map((ad) => (
             <li key={ad.id} className="py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="min-w-0 space-y-0.5">
                 <p className="font-semibold text-slate-900 dark:text-white">{ad.title}</p>
@@ -79,6 +82,7 @@ export function AdsPanel() {
             </li>
           ))}
         </ul>
+        <Pager page={page} totalPages={paged.totalPages} onChange={setPage} />
       </Panel>
       {editing && <AdFormModal ad={editing === 'new' ? null : editing} busy={busy} onClose={() => setEditing(null)} onSubmit={save} />}
     </div>

@@ -13,6 +13,7 @@ import { Empty, ErrorNote, Loading, Panel } from '@/features/production/componen
 import { TokenHistoryTable, TokenTotalsCards } from '@/features/reviewer-token/components/TokenWalletView';
 import { reviewerTokenService } from '@/services/reviewerTokenService';
 import type { ReviewerBudgetRow, ReviewerTokenEntryType } from '@/types/reviewer-token';
+import { Pager, pageOf } from '@/features/production/components/shared/Pager';
 
 type Dialog = { reviewer: ReviewerBudgetRow; mode: ReviewerTokenEntryType | 'history' };
 
@@ -20,6 +21,8 @@ type Dialog = { reviewer: ReviewerBudgetRow; mode: ReviewerTokenEntryType | 'his
 export function ReviewerTokensPanel() {
   const reviewers = useResource('admin:reviewer-tokens', reviewerTokenService.listReviewers);
   const [dialog, setDialog] = useState<Dialog | null>(null);
+  const [page, setPage] = useState(1);
+  const paged = pageOf(reviewers.data ?? [], page, 10);
 
   return (
     <Panel
@@ -42,7 +45,7 @@ export function ReviewerTokensPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-              {reviewers.data.map((r) => (
+              {paged.rows.map((r) => (
                 <tr key={r.id}>
                   <td className="py-2">
                     <p className="font-medium text-slate-900 dark:text-white">
@@ -50,9 +53,9 @@ export function ReviewerTokensPanel() {
                     </p>
                     <p className="text-[11px] text-slate-500">{r.email}</p>
                   </td>
-                  <td className="py-2 text-right font-mono">{formatNumber(r.grantedTokens)}</td>
-                  <td className="py-2 text-right font-mono hidden sm:table-cell">{formatNumber(r.allocatedTokens)}</td>
-                  <td className="py-2 text-right font-mono font-semibold text-sky-800 dark:text-sky-300">{formatNumber(r.balanceTokens)}</td>
+                  <td className="py-2 text-right tabular-nums">{formatNumber(r.grantedTokens)}</td>
+                  <td className="py-2 text-right tabular-nums hidden sm:table-cell">{formatNumber(r.allocatedTokens)}</td>
+                  <td className="py-2 text-right tabular-nums font-semibold text-sky-800 dark:text-sky-300">{formatNumber(r.balanceTokens)}</td>
                   <td className="py-2 text-right whitespace-nowrap">
                     <Button size="sm" variant="ghost" aria-label={`Cấp Token cho ${r.fullName}`} onClick={() => setDialog({ reviewer: r, mode: 'GRANT' })}>
                       <PlusCircle className="w-3.5 h-3.5 text-emerald-600" />
@@ -74,6 +77,7 @@ export function ReviewerTokensPanel() {
               ))}
             </tbody>
           </table>
+          <Pager page={page} totalPages={paged.totalPages} onChange={setPage} className="px-4 pb-4" />
         </div>
       )}
 

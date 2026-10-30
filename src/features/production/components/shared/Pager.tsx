@@ -1,24 +1,20 @@
 'use client';
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
+import { DataPagination } from '@/components/data/DataPagination';
 
-/** Page x/y with previous / next; hidden when everything fits on one page. */
-export function Pager({ page, totalPages, onChange }: { page: number; totalPages: number; onChange: (page: number) => void }) {
-  if (totalPages <= 1) return null;
-  return (
-    <nav aria-label="Phân trang" className="flex items-center justify-end gap-2 pt-3 text-xs text-slate-500">
-      <span>
-        Trang {page}/{totalPages}
-      </span>
-      <Button size="sm" variant="ghost" disabled={page <= 1} onClick={() => onChange(page - 1)} aria-label="Trang trước">
-        <ChevronLeft className="w-3.5 h-3.5" />
-      </Button>
-      <Button size="sm" variant="ghost" disabled={page >= totalPages} onClick={() => onChange(page + 1)} aria-label="Trang sau">
-        <ChevronRight className="w-3.5 h-3.5" />
-      </Button>
-    </nav>
-  );
+/** Numbered paging; hidden when everything fits on one page. */
+export function Pager({
+  page,
+  totalPages,
+  onChange,
+  className,
+}: {
+  page: number;
+  totalPages: number;
+  onChange: (page: number) => void;
+  className?: string;
+}) {
+  return <DataPagination page={page} totalPages={totalPages} onChange={onChange} className={className} />;
 }
 
 /** The slice of `items` on `page` (1-based), for lists the API returns whole. */

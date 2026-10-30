@@ -12,6 +12,7 @@ import { PRICE_ALERT_STATUS } from '@/features/production/lib/labels';
 import { formatDateTime } from '@/features/production/lib/format';
 import { productionPaths } from '@/features/production/lib/routes';
 import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/features/production/components/shared/ui';
+import { Pager as BillingPager } from '@/features/billing-admin/components/Pager';
 
 const FILTERS: { key: PriceAlertStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Mới' },
@@ -23,7 +24,10 @@ const FILTERS: { key: PriceAlertStatus | 'ALL'; label: string }[] = [
 /** BR-47: episode prices outside the valid range. The Admin asks the Reviewer to change them, never edits them. */
 export function PriceAlertsPanel() {
   const [filter, setFilter] = useState<PriceAlertStatus | 'ALL'>('OPEN');
-  const alerts = useResource(`price-alerts:${filter}`, () => productionService.listPriceAlerts(1, filter === 'ALL' ? undefined : filter));
+  const [page, setPage] = useState(1);
+  const alerts = useResource(`price-alerts:${filter}:${page}`, () =>
+    productionService.listPriceAlerts(page, filter === 'ALL' ? undefined : filter),
+  );
   const [asking, setAsking] = useState<PriceAlert | null>(null);
   const { busy, run } = useAction();
 
@@ -51,7 +55,10 @@ export function PriceAlertsPanel() {
               key={f.key}
               type="button"
               aria-pressed={filter === f.key}
-              onClick={() => setFilter(f.key)}
+              onClick={() => {
+                setFilter(f.key);
+                setPage(1);
+              }}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 filter === f.key
                   ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white font-semibold shadow-xs'
@@ -102,6 +109,7 @@ export function PriceAlertsPanel() {
             </li>
           ))}
         </ul>
+        {alerts.data && <BillingPager meta={alerts.data.meta} onPage={setPage} />}
       </div>
       <TextPromptModal
         open={!!asking}

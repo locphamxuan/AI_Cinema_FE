@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Lock, Pencil, Search, Trash2, Unlock, UserPlus } from 'lucide-react';
+import { Lock, Pencil, Search, Trash2, Unlock, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { adminService, type AccountPage, type AccountRow } from '@/services/adminService';
 import { toast } from '@/components/ui/Toast';
@@ -13,6 +13,7 @@ import type { UserRole } from '@/types/production';
 import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_TONE } from '../roles';
 import { Select } from '@/components/ui/Select';
 import { AccountFormModal, DeleteAccountModal } from './AccountFormModal';
+import { DataPagination } from '@/components/data/DataPagination';
 
 const ROLE_FILTER_OPTIONS = [
   { value: '', label: 'Mọi vai trò' },
@@ -227,31 +228,15 @@ export function AccountsPanel() {
       )}
       {deleting && <DeleteAccountModal account={deleting} onClose={() => setDeleting(null)} onDeleted={load} />}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-100 dark:border-white/5 text-xs">
-          <button
-            type="button"
-            aria-label="Trang trước"
-            disabled={page <= 1}
-            onClick={() => setPage(page - 1)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <span className="text-slate-500 dark:text-slate-400">
-            Trang {page}/{totalPages}
-          </span>
-          <button
-            type="button"
-            aria-label="Trang sau"
-            disabled={page >= totalPages}
-            onClick={() => setPage(page + 1)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer"
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
+      <DataPagination
+        page={page}
+        totalPages={totalPages}
+        totalItems={result?.meta.totalItems}
+        pageSize={result?.meta.itemsPerPage}
+        unit="tài khoản"
+        onChange={setPage}
+        className="border-t px-5 pb-4"
+      />
     </section>
   );
 }
