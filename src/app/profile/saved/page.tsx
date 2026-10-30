@@ -8,12 +8,15 @@ import { savedMovieService, type SavedMovieItem } from '@/services/savedMovieSer
 import MovieDetailQuickModal from '@/components/home/MovieDetailQuickModal';
 import type { Movie } from '@/types/movie';
 import { toast } from '@/components/ui/Toast';
+import { Pager, pageOf } from '@/features/production/components/shared/Pager';
 
 export default function SavedMoviesPage() {
   const { isAuthenticated, openAuthModal } = useAppStore();
   const [movies, setMovies] = useState<SavedMovieItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [page, setPage] = useState(1);
+  const paged = pageOf(movies, page, 12);
 
   const fetchSaved = () =>
     savedMovieService
@@ -73,11 +76,11 @@ export default function SavedMoviesPage() {
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2.5">
+          <h1 className="flex items-center gap-2.5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
             <span className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 text-sm">
               <Bookmark className="w-4 h-4 fill-current" />
             </span>
-            Phim Đã Lưu
+            Phim đã lưu
             <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20 tabular-nums">
               {movies.length} phim
             </span>
@@ -130,7 +133,7 @@ export default function SavedMoviesPage() {
       {/* ── Movie Poster Grid ── */}
       {!loading && movies.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-5">
-          {movies.map((movie) => (
+          {paged.rows.map((movie) => (
             <div
               key={movie.id}
               onClick={() => setSelectedMovie(movie)}
@@ -186,6 +189,7 @@ export default function SavedMoviesPage() {
           ))}
         </div>
       )}
+      <Pager page={page} totalPages={paged.totalPages} onChange={setPage} className="pt-6" />
 
       {/* Modal for viewing detail */}
       <MovieDetailQuickModal movie={selectedMovie} onClose={() => setSelectedMovie(null)} />

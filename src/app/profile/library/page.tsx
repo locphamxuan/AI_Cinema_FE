@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { KeyRound, Play, Coins, Film, AlertCircle, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { KeyRound, Play, Coins, Film, AlertCircle, Sparkles } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { episodeAccessService } from '@/services/episodeAccessService';
 import type { PurchasedEpisode } from '@/types/episodeAccess';
 import type { Page } from '@/types/production';
+import { DataPagination } from '@/components/data/DataPagination';
 
 function formatDate(dateStr: string): string {
   if (!dateStr) return '';
@@ -77,11 +78,11 @@ export default function LibraryPage() {
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2.5">
+          <h1 className="flex items-center gap-2.5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
             <span className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 text-sm">
               <KeyRound className="w-4 h-4" />
             </span>
-            Kho Tập Phim Đã Mua
+            Kho tập phim đã mua
             {meta && (
               <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20 tabular-nums">
                 {meta.totalItems} tập
@@ -212,29 +213,14 @@ export default function LibraryPage() {
       )}
 
       {/* ── Pagination ── */}
-      {meta && meta.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-6">
-          <button
-            type="button"
-            disabled={currentPage <= 1}
-            onClick={() => goToPage(Math.max(1, currentPage - 1))}
-            className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 px-3">
-            Trang {currentPage} / {meta.totalPages}
-          </span>
-          <button
-            type="button"
-            disabled={currentPage >= meta.totalPages}
-            onClick={() => goToPage(currentPage + 1)}
-            className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+      <DataPagination
+        page={currentPage}
+        totalPages={meta?.totalPages ?? 1}
+        totalItems={meta?.totalItems}
+        pageSize={meta?.itemsPerPage}
+        unit="tập đã mua"
+        onChange={goToPage}
+      />
     </div>
   );
 }

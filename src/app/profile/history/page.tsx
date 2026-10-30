@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Play, Clock, Film, AlertCircle, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Play, Clock, Film, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { playbackService } from '@/services/playbackService';
 import type { WatchHistoryItem } from '@/types/playback';
 import type { Page } from '@/types/production';
+import { DataPagination } from '@/components/data/DataPagination';
 
 function formatDuration(seconds: number | null): string {
   if (!seconds || seconds <= 0) return '0:00';
@@ -86,11 +87,11 @@ export default function WatchHistoryPage() {
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2.5">
+          <h1 className="flex items-center gap-2.5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
             <span className="w-8 h-8 rounded-xl bg-ruby/10 border border-ruby/20 flex items-center justify-center text-ruby text-sm">
               <Clock className="w-4 h-4" />
             </span>
-            Lịch Sử Xem Phim
+            Lịch sử xem phim
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
             Theo dõi tiến trình các tập phim bạn đã xem và tiếp tục xem ngay tại vị trí đã dừng.
@@ -243,29 +244,14 @@ export default function WatchHistoryPage() {
       )}
 
       {/* ── Pagination ── */}
-      {meta && meta.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-6">
-          <button
-            type="button"
-            disabled={currentPage <= 1}
-            onClick={() => goToPage(Math.max(1, currentPage - 1))}
-            className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 px-3">
-            Trang {currentPage} / {meta.totalPages}
-          </span>
-          <button
-            type="button"
-            disabled={currentPage >= meta.totalPages}
-            onClick={() => goToPage(currentPage + 1)}
-            className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+      <DataPagination
+        page={currentPage}
+        totalPages={meta?.totalPages ?? 1}
+        totalItems={meta?.totalItems}
+        pageSize={meta?.itemsPerPage}
+        unit="tập đã xem"
+        onChange={goToPage}
+      />
     </div>
   );
 }
