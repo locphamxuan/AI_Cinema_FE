@@ -9,18 +9,15 @@ import { addDays, formatNumber } from '@/features/production/lib/format';
 import { ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import { BarChart } from '@/components/charts/BarChart';
+import { DonutChart } from '@/components/charts/DonutChart';
+import { StatCard } from '@/components/data/StatCard';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
 import type { ChurnReport, ReportRange, RevenueReport } from '@/types/billing';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
 function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
-      <p className="text-[11px] text-slate-500">{label}</p>
-      <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{value}</p>
-      {hint && <p className="text-xs text-slate-500">{hint}</p>}
-    </div>
-  );
+  return <StatCard label={label} value={value} unit={hint === 'Coin' ? 'Coin' : undefined} note={hint === 'Coin' ? undefined : hint} />;
 }
 
 /** MF-2 reports over a date range: plan revenue (main and bonus Coins apart) and churn. */
@@ -78,26 +75,26 @@ function RevenueSection({ rangeKey, query }: { rangeKey: string; query: ReportRa
                 height={200}
               />
 
-              <table className="w-full text-xs pt-2">
-                <thead className="text-slate-500 text-left">
-                  <tr>
-                    <th className="py-1 font-medium">Gói</th>
-                    <th className="py-1 font-medium text-right">Kỳ</th>
-                    <th className="py-1 font-medium text-right">Coin chính</th>
-                    <th className="py-1 font-medium text-right">Coin thưởng</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Gói</TableHead>
+                    <TableHead className="text-right">Kỳ</TableHead>
+                    <TableHead className="text-right">Coin chính</TableHead>
+                    <TableHead className="text-right">Coin thưởng</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {r.byPlan.map((row) => (
-                    <tr key={row.plan.id}>
-                      <td className="py-1 font-medium">{row.plan.name}</td>
-                      <td className="py-1 text-right tabular-nums">{row.cycles}</td>
-                      <td className="py-1 text-right tabular-nums">{formatNumber(row.mainCoins)}</td>
-                      <td className="py-1 text-right tabular-nums">{formatNumber(row.bonusCoins)}</td>
-                    </tr>
+                    <TableRow key={row.plan.id}>
+                      <TableCell className="font-medium">{row.plan.name}</TableCell>
+                      <TableCell className="text-right tabular-nums">{row.cycles}</TableCell>
+                      <TableCell className="text-right tabular-nums">{formatNumber(row.mainCoins)}</TableCell>
+                      <TableCell className="text-right tabular-nums">{formatNumber(row.bonusCoins)}</TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             </div>
           )}
         </div>
@@ -114,17 +111,43 @@ function ChurnSection({ rangeKey, query }: { rangeKey: string; query: ReportRang
       {report.error && <ErrorNote message={report.error} onRetry={report.reload} />}
       {report.loading && !c && <Loading />}
       {c && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <Stat label="Gói mới" value={formatNumber(c.started)} />
-          <Stat label="Lượt gia hạn" value={formatNumber(c.renewed)} />
-          <Stat label="Gói kết thúc" value={formatNumber(c.ended)} />
-          <Stat label="Tỉ lệ rời gói" value={`${(c.churnRate * 100).toFixed(1)}%`} hint="kết thúc / gói mới" />
-          <Stat label="Member tự huỷ" value={formatNumber(c.cancelledByMember)} />
-          <Stat label="Admin huỷ" value={formatNumber(c.cancelledByAdmin)} />
-          <Stat label="Hết hạn vì thiếu Coin" value={formatNumber(c.expiredForPayment)} />
-          <Stat label="Hết kỳ, không gia hạn" value={formatNumber(c.expiredUnused)} />
-          <Stat label="Gia hạn thất bại" value={formatNumber(c.failedRenewals)} />
-          <Stat label="Gói đang chạy" value={formatNumber(c.running)} hint="tại thời điểm hiện tại" />
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Stat label="Gói mới" value={formatNumber(c.started)} />
+            <Stat label="Lượt gia hạn" value={formatNumber(c.renewed)} />
+            <Stat label="Gói kết thúc" value={formatNumber(c.ended)} />
+            <Stat label="Tỉ lệ rời gói" value={`${(c.churnRate * 100).toFixed(1)}%`} hint="kết thúc / gói mới" />
+          </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <section className="rounded-xl border p-5">
+              <h3 className="mb-4 text-sm font-semibold">Gói vào và ra</h3>
+              <BarChart
+                categories={['Gói mới', 'Gia hạn', 'Kết thúc', 'Gia hạn lỗi']}
+                series={[
+                  { name: 'Số gói', color: 'var(--chart-1)', values: [c.started, c.renewed, c.ended, c.failedRenewals] },
+                ]}
+                valueUnit="gói"
+                height={220}
+              />
+            </section>
+            <section className="rounded-xl border p-5">
+              <h3 className="mb-4 text-sm font-semibold">Vì sao gói kết thúc</h3>
+              <DonutChart
+                data={[
+                  { label: 'Member tự huỷ', value: c.cancelledByMember, color: 'var(--chart-1)' },
+                  { label: 'Admin huỷ', value: c.cancelledByAdmin, color: 'var(--chart-4)' },
+                  { label: 'Hết hạn vì thiếu Coin', value: c.expiredForPayment, color: 'var(--chart-2)' },
+                  { label: 'Hết kỳ, không gia hạn', value: c.expiredUnused, color: 'var(--chart-3)' },
+                ]}
+                centerLabel="gói kết thúc"
+                valueUnit="gói"
+                size={170}
+              />
+            </section>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Đang chạy lúc này: <span className="font-medium text-foreground tabular-nums">{formatNumber(c.running)}</span> gói.
+          </p>
         </div>
       )}
     </Panel>
