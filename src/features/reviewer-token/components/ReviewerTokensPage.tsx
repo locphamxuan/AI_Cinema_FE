@@ -9,6 +9,7 @@ import { reviewerTokenService } from '@/services/reviewerTokenService';
 import type { ReviewerWallet, TokenHistoryEntry } from '@/types/reviewer-token';
 import { CoinActivityView } from './CoinActivityView';
 import { TokenHistoryTable, TokenTotalsCards } from './TokenWalletView';
+import { TrendChart, type TrendPoint } from '@/components/charts/TrendChart';
 
 type TabKey = 'all' | 'admin' | 'project' | 'request' | 'coin';
 
@@ -41,6 +42,16 @@ function entriesOf(wallet: ReviewerWallet, tab: TabKey): TokenHistoryEntry[] {
 }
 
 /** The Reviewer's Token: totals, then the history split by who moved it and why, and the MF-2 Coin of their movies. */
+/** The balance after each history line, oldest first; anchored so the last point is today's balance. */
+function balanceTrend(wallet: ReviewerWallet): TrendPoint[] {
+  const lines = [...wallet.history].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  let balance = wallet.balanceTokens - lines.reduce((sum, l) => sum + Number(l.amountTokens), 0);
+  return lines.map((l) => {
+    balance += Number(l.amountTokens);
+    return { label: new Date(l.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }), value: balance };
+  });
+}
+
 export function ReviewerTokensPage() {
   const wallet = useResource('reviewer-tokens:me', reviewerTokenService.mine);
   const [tab, setTab] = useState<TabKey>('all');
@@ -73,6 +84,9 @@ export function ReviewerTokensPage() {
       {wallet.data && (
         <>
           <TokenTotalsCards totals={wallet.data} rateVnd={wallet.data.tokenRateVnd} />
+          <Panel title="Số dư Token theo thời gian" description="Số dư ngay sau mỗi lần Admin cấp, thu hồi hoặc bạn cấp phí cho dự án.">
+            <TrendChart points={balanceTrend(wallet.data)} name="Số dư" valueUnit="Token" />
+          </Panel>
           <div role="tablist" aria-label="Lịch sử Token" className="flex gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-white/5 overflow-x-auto">
             {TABS.map((t) => (
               <button
