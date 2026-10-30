@@ -47,7 +47,7 @@ export default function CatalogFilterNav() {
   const genreOptions = ['Tất cả thể loại', ...genres.map((g) => g.name)];
 
   return (
-    <nav className="hidden xl:flex items-center gap-2 text-sm font-medium text-muted-foreground">
+    <nav className="hidden 2xl:flex items-center gap-2 text-sm font-medium text-muted-foreground">
       <FilterDropdown
         label="Thể loại"
         selected={selectedGenre}

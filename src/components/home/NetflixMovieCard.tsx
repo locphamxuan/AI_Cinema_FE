@@ -57,7 +57,7 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
 
           {/* Bottom Left Quality / AI Badge */}
           <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1.5">
-            <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[9px] shadow">
+            <span className="px-1.5 py-0.5 rounded bg-primary text-white font-black text-[9px] shadow">
               {movie.quality || '4K'}
             </span>
             <span className="px-1.5 py-0.5 rounded bg-black/60 border border-white/15 text-slate-300 font-semibold text-[9px] backdrop-blur-md">
@@ -84,7 +84,7 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
         {/* Info Container */}
         <div className="p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2 mb-1.5">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-primary dark:group-hover:text-primary transition-colors">
               {movie.title}
             </h3>
           </div>
@@ -117,7 +117,7 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
             <div className="flex items-center gap-2">
               <Link
                 href={firstEpisode ? `/watch/${firstEpisode.id}` : '#'}
-                className="w-8 h-8 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center transition-transform hover:scale-110 active:scale-95 shadow-md shadow-red-600/30"
+                className="w-8 h-8 rounded-full bg-primary hover:bg-action-strong text-white flex items-center justify-center transition-transform hover:scale-110 active:scale-95 shadow-md shadow-primary/30"
                 title="Xem ngay"
               >
                 <Play className="w-3.5 h-3.5 fill-white translate-x-0.5" />
@@ -149,12 +149,12 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
                 }}
                 className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs transition-all ${
                   isLiked
-                    ? 'bg-red-500/20 border-red-500 text-red-500'
+                    ? 'bg-primary/20 border-primary text-primary'
                     : 'bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 border-slate-200 dark:border-white/20 text-slate-700 dark:text-white'
                 }`}
                 title={isLiked ? 'Đã thích' : 'Thích phim này'}
               >
-                <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-red-500' : ''}`} />
+                <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-primary' : ''}`} />
               </button>
             </div>
 

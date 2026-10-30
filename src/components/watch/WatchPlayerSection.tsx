@@ -212,7 +212,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
               {currentMovie.title} - {currentEpisode.title}
             </h1>
             <EngagementActions {...engagementState} />

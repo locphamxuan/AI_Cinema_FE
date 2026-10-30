@@ -89,7 +89,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
           {/* Hero Meta Info */}
           <div className="absolute bottom-6 left-6 right-6 z-20 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white font-black text-[10px]">
+              <span className="px-2.5 py-0.5 rounded-full bg-primary text-white font-black text-[10px]">
                 {movie.badge || 'Độc Quyền AI'}
               </span>
               <span className="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white text-xs font-semibold">

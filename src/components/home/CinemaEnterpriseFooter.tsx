@@ -34,7 +34,7 @@ export default function CinemaEnterpriseFooter() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
           <div className="sm:col-span-2 space-y-4">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-red-800 flex items-center justify-center text-white font-black text-sm">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-action-strong flex items-center justify-center text-white font-black text-sm">
                 AI
               </div>
               <span className="text-xl font-black text-white">

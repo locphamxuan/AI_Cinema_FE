@@ -61,7 +61,7 @@ export default function CinematicHeroBillboard({
         {/* Feature Tags & Badges */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-4 animate-slide-up">
           {/* AI Masterpiece Badge */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-primary text-white text-[11px] font-black shadow-lg shadow-red-600/40">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-primary to-primary text-white text-[11px] font-black shadow-lg shadow-primary/40">
             AI Masterpiece
           </span>
 
@@ -83,7 +83,7 @@ export default function CinematicHeroBillboard({
         </div>
 
         {/* Hero Title */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.08] mb-3.5 drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] max-w-3xl">
+        <h1 className="font-heading text-3xl sm:text-5xl md:text-6xl font-semibold text-white tracking-tight leading-[1.08] mb-3.5 drop-shadow-[0_4px_24px_rgba(0,0,0,0.9)] max-w-3xl">
           {movie.title}
         </h1>
 
@@ -159,7 +159,7 @@ export default function CinematicHeroBillboard({
                     onClick={() => onSelectMovie(fMovie)}
                     className={`relative rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
                       isActive
-                        ? 'w-24 h-12 ring-2 ring-primary scale-105 shadow-lg shadow-red-600/30'
+                        ? 'w-24 h-12 ring-2 ring-primary scale-105 shadow-lg shadow-primary/30'
                         : 'w-16 h-12 opacity-60 hover:opacity-100 hover:w-20'
                     }`}
                     title={fMovie.title}
@@ -185,9 +185,9 @@ export default function CinematicHeroBillboard({
         <div className="flex items-center gap-3">
           {isPlayingAudio && !isMuted && (
             <div className="flex items-center gap-0.5 px-3 py-1.5 rounded-full bg-black/60 border border-white/20 backdrop-blur-md text-[11px] text-slate-300">
-              <span className="w-1 h-3 bg-red-500 rounded-full animate-pulse" />
-              <span className="w-1 h-4 bg-red-400 rounded-full animate-pulse delay-75" />
-              <span className="w-1 h-2 bg-red-600 rounded-full animate-pulse delay-150" />
+              <span className="w-1 h-3 bg-primary rounded-full animate-pulse" />
+              <span className="w-1 h-4 bg-primary rounded-full animate-pulse delay-75" />
+              <span className="w-1 h-2 bg-primary rounded-full animate-pulse delay-150" />
               <span className="ml-1 text-[10px] tabular-nums text-white">Trailer Audio</span>
             </div>
           )}
@@ -198,7 +198,7 @@ export default function CinematicHeroBillboard({
             className="w-11 h-11 rounded-full bg-black/60 hover:bg-black/90 text-white/90 hover:text-white border border-white/20 backdrop-blur-xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 cursor-pointer shadow-2xl"
             title={isMuted ? 'Bật âm thanh trailer' : 'Tắt âm thanh trailer'}
           >
-            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 text-red-400" />}
+            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5 text-primary" />}
           </button>
         </div>
       </div>

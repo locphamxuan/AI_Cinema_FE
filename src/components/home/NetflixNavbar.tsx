@@ -78,7 +78,7 @@ export default function NetflixNavbar() {
         {/* Left: Brand Logo & Navigation Links */}
         <div className="flex items-center gap-7 lg:gap-10">
           <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-red-800 flex items-center justify-center text-white font-black text-base shadow-lg shadow-red-600/30 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-action-strong flex items-center justify-center text-white font-black text-base shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform">
               AI
             </div>
             <span
@@ -146,7 +146,7 @@ export default function NetflixNavbar() {
                     setIsSearchOpen(false);
                     setSearchQuery('');
                   }}
-                  className="text-xs text-slate-400 hover:text-red-500"
+                  className="text-xs text-slate-400 hover:text-primary"
                 >
                   ✕
                 </button>
@@ -259,7 +259,7 @@ export default function NetflixNavbar() {
           ) : (
             <button
               onClick={() => openAuthModal('login')}
-              className="px-4 py-2 rounded-full bg-primary hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+              className="px-4 py-2 rounded-full bg-primary hover:bg-action-strong text-white font-bold text-xs shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
             >
               Đăng Nhập
             </button>
