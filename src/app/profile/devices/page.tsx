@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { Laptop, Smartphone, Monitor, ShieldCheck, Tv, Trash2, StopCircle, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Laptop, Smartphone, Monitor, Tv, Trash2, StopCircle, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { deviceService } from '@/services/deviceService';
 import type { DeviceOverview, LiveStream, RegisteredDevice } from '@/types/device';

@@ -49,7 +49,7 @@ export const PERMISSION_AREA_LABEL: Record<string, string> = {
 /**
  * Vietnamese human-friendly translation and explanation for all system permissions.
  */
-export const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
+const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Movie project
   'project:manage': {
     title: 'Khởi tạo & Quản trị dự án phim',

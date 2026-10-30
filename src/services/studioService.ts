@@ -17,7 +17,7 @@ const S = API_ROUTES.STUDIOS;
 const R = API_ROUTES.PRODUCTION;
 
 /** Multipart body of a hand-off: the choice of studio and season plus the files that go with the brief. */
-export function handoffForm(input: HandOffInput & { reason?: string }): FormData {
+function handoffForm(input: HandOffInput & { reason?: string }): FormData {
   const form = new FormData();
   if (input.studioId) form.append('studioId', input.studioId);
   if (input.studioEmail) form.append('studioEmail', input.studioEmail);

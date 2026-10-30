@@ -20,7 +20,7 @@ const POSITION: Record<LabelLocation, string> = {
 };
 
 /** What the viewer sees over the video: the AI label at the chosen place (BR-40, Điều 44 Luật AI, Điều 18 NĐ 142). */
-export function LabelPreview({ text, location }: { text: string; location: LabelLocation }) {
+function LabelPreview({ text, location }: { text: string; location: LabelLocation }) {
   return (
     <div
       role="img"

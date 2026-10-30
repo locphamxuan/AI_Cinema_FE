@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, User, Calendar, ShieldCheck, Check, Sparkles } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
 import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
 import GoogleSignInButton from './GoogleSignInButton';
-import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
+import { MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
 
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
@@ -55,7 +54,6 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
-  const [hasSavedCredentials, setHasSavedCredentials] = useState(() => Boolean(savedEmail()));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -68,14 +66,6 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
   const switchMode = (next: AuthMode) => {
     setMode(next);
     setError(null);
-  };
-
-  const forgetSaved = () => {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      setEmail('');
-      setHasSavedCredentials(false);
-    } catch {}
   };
 
   const signUpError = (): string | null => {

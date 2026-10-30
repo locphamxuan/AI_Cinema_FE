@@ -10,7 +10,6 @@ import {
   BACKEND_ROLE_LABEL,
   BACKEND_ROLES,
   PERMISSION_AREA_LABEL,
-  ROLE_SHORT_LABEL,
   getPermissionMeta,
 } from '../roles';
 import { PermissionCell, RoleColumnHeaders, RoleSummaryCards, type Matrix } from './RolePermissionParts';

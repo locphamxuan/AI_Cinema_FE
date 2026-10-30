@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell, CheckCheck, Inbox } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Empty, ErrorNote, Loading } from '@/features/production/components/shared/ui';
+import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
 import { useResource } from '@/features/production/hooks/useResource';
 import { notificationHref } from '@/features/production/lib/routes';
 import { notificationService } from '@/services/notificationService';

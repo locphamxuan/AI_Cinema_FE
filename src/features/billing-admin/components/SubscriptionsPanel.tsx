@@ -15,7 +15,7 @@ import { billingAdminService } from '@/services/billingAdminService';
 import type { AdminSubscription, SubscriptionCycle, SubscriptionEndReason, SubscriptionStatus } from '@/types/billing';
 import { Pager } from './Pager';
 
-export const SUBSCRIPTION_STATUS: Record<SubscriptionStatus, { label: string; tone: Tone }> = {
+const SUBSCRIPTION_STATUS: Record<SubscriptionStatus, { label: string; tone: Tone }> = {
   PENDING: { label: 'Chờ thanh toán', tone: 'neutral' },
   ACTIVE: { label: 'Đang chạy', tone: 'emerald' },
   PAST_DUE: { label: 'Gia hạn lỗi', tone: 'amber' },

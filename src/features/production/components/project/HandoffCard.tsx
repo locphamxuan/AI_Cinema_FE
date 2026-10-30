@@ -18,7 +18,7 @@ const EMAIL_STATUS = {
   FAILED: { label: 'Gửi email lỗi', tone: 'rose' },
 } as const;
 
-export const scopeLabel = (h: Pick<StudioHandoff, 'season'>, episodeCount?: number) =>
+const scopeLabel = (h: Pick<StudioHandoff, 'season'>, episodeCount?: number) =>
   h.season ? seasonLabel(h.season.seasonNumber, episodeCount, h.season.title) : 'Cả dự án';
 
 /** One hand-off (or studio change) on the Studio timeline: who it went to, what was sent, every milestone and Submission. */

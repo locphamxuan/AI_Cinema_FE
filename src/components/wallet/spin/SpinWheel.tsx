@@ -12,7 +12,7 @@ const RADIUS = 130;
 const CENTER = 150;
 const HUB_RADIUS = 40;
 
-export const prizeLabel = (p: Pick<RewardPrize, 'type' | 'bonusCoins' | 'planDays'>) =>
+const prizeLabel = (p: Pick<RewardPrize, 'type' | 'bonusCoins' | 'planDays'>) =>
   p.type === 'BONUS_COIN' ? `+${p.bonusCoins} Coin` : `+${p.planDays} ngày gói`;
 
 /**

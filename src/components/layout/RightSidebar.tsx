@@ -62,7 +62,6 @@ export default function RightSidebar() {
     movies,
     isRightSidebarOpen,
     closeRightSidebar,
-    toggleRightSidebar,
   } = useAppStore();
 
   // The movie being watched, else the first one in the catalog (none while it loads).

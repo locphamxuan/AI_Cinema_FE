@@ -16,7 +16,7 @@ export interface PaymentMethod {
   icon: ReactNode;
 }
 
-export const PAYMENT_METHODS: PaymentMethod[] = [
+const PAYMENT_METHODS: PaymentMethod[] = [
   {
     id: 'VNPAY',
     name: 'Cổng VNPAY Sandbox',

@@ -10,7 +10,7 @@ import { productionService } from '@/services/productionService';
 import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
 
-export const MAX_GENRES = 5;
+const MAX_GENRES = 5;
 
 /** Toggle chips over the genre catalog; at most MAX_GENRES (BR-12). */
 export function GenrePicker({ value, onChange }: { value: string[]; onChange: (ids: string[]) => void }) {

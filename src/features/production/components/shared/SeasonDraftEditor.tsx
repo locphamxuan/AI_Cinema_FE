@@ -26,7 +26,7 @@ export interface SeasonDraft {
   episodes: EpisodeDraft[];
 }
 
-export const MAX_EPISODE_COST = 100_000_000;
+const MAX_EPISODE_COST = 100_000_000;
 
 export function emptySeason(number: number, firstEpisode = 1): SeasonDraft {
   return { title: `Mùa ${number}`, cost: 0, windowStart: '', windowEnd: '', episodes: [emptyEpisode(firstEpisode)] };

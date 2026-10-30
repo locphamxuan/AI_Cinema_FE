@@ -15,7 +15,7 @@ import { announceTokensChanged } from '@/services/reviewerTokenService';
 import { tokenRequestService } from '@/services/tokenRequestService';
 import type { TokenRequest, TokenRequestStatus } from '@/types/token-request';
 
-export const TOKEN_REQUEST_STATUS: Record<TokenRequestStatus, { label: string; tone: 'amber' | 'emerald' | 'rose' }> = {
+const TOKEN_REQUEST_STATUS: Record<TokenRequestStatus, { label: string; tone: 'amber' | 'emerald' | 'rose' }> = {
   OPEN: { label: 'Chờ Reviewer', tone: 'amber' },
   APPROVED: { label: 'Đã cấp', tone: 'emerald' },
   REJECTED: { label: 'Từ chối', tone: 'rose' },

@@ -3,7 +3,7 @@ import { playbackService } from '@/services/playbackService';
 import type { StreamingSession } from '@/types/playback';
 
 /** The BE expects a beat every 10-15s and closes a silent session, paused or not. */
-export const HEARTBEAT_SECONDS = 15;
+const HEARTBEAT_SECONDS = 15;
 /** A saved position this close to the start is not worth the resume question. */
 const MIN_RESUME_SECONDS = 5;
 

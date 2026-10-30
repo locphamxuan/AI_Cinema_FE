@@ -11,7 +11,6 @@ import DailyCheckInModal from '@/components/wallet/DailyCheckInModal';
 import RewardSpinModal from '@/components/wallet/RewardSpinModal';
 import DepositModal from '@/components/wallet/DepositModal';
 import UnlockEpisodeModal from '@/components/watch/UnlockEpisodeModal';
-import SupportChatWidget from '@/components/chat/SupportChatWidget';
 import AuthModal from '@/components/auth/AuthModal';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import RightSidebar from '@/components/layout/RightSidebar';
@@ -114,7 +113,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const isDashboard = DASHBOARD_PATHS.some((path) => pathname.startsWith(path));
   // The viewer's discovery and browse pages carry their own navbar.
   const isHome = pathname === '/' || pathname === '/phim';
-  // The chat assistant and the wallet serve members; staff-side accounts never see them.
+  // The wallet serves members; staff-side accounts never see it.
   const isMemberSide = !user || isMemberRole(user.role);
   const userId = user?.id;
 
@@ -156,11 +155,6 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <DepositModal />
       <UnlockEpisodeModal />
 
-      {isMemberSide && !isDashboard && (
-        <>
-          <SupportChatWidget />
-        </>
-      )}
       <ToastContainer />
     </>
   );

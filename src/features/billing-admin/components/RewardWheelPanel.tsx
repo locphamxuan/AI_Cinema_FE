@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Sparkles, Coins, Crown, Percent, HelpCircle, Trophy, CheckCircle2 } from 'lucide-react';
+import { Pencil, Sparkles, Coins, Crown, Trophy, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
