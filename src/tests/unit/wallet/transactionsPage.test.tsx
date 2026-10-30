@@ -39,7 +39,7 @@ describe('TransactionsPage (GET /wallet/statements)', () => {
 
     render(<TransactionsPage />);
     await screen.findAllByText('Mua tập 3');
-    fireEvent.click(screen.getByRole('button', { name: '🎁 Coin thưởng' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Coin thưởng' }));
 
     await waitFor(() => expect(callsOf(fetchMock).some((c) => c.includes('kind=BONUS'))).toBe(true));
   });
