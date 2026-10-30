@@ -5,15 +5,15 @@ import { History, MinusCircle, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatNumber } from '@/features/production/lib/format';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatNumber } from '@/lib/format';
 import { productionPaths } from '@/features/production/lib/routes';
-import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { TokenHistoryTable, TokenTotalsCards } from '@/features/reviewer-token/components/TokenWalletView';
 import { reviewerTokenService } from '@/services/reviewerTokenService';
 import type { ReviewerBudgetRow, ReviewerTokenEntryType } from '@/types/reviewer-token';
-import { Pager, pageOf } from '@/features/production/components/shared/Pager';
+import { Pager, pageOf } from '@/components/data/Pager';
 
 type Dialog = { reviewer: ReviewerBudgetRow; mode: ReviewerTokenEntryType | 'history' };
 

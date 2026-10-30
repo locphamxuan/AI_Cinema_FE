@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Select } from '@/components/ui/Select';
-import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDuration } from '@/features/production/lib/format';
+import { ErrorNote, Loading } from '@/components/data/ui';
+import { useResource } from '@/hooks/useResource';
+import { formatDuration } from '@/lib/format';
 import { MAX_AD_SLOTS_PER_EPISODE, adAdminService, adSlotProblem } from '@/services/adAdminService';
 import type { EpisodeAdSlotInput, EpisodeAdSlots } from '@/types/playback';
 

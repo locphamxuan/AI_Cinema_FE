@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Pencil, Coins, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { useResource } from '@/features/production/hooks/useResource';
-import { Empty, ErrorNote, Loading } from '@/features/production/components/shared/ui';
+import { useResource } from '@/hooks/useResource';
+import { Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { RewardRule } from '@/types/billing';
 import { LADDER_LENGTH, RewardRuleModal } from './RewardRuleModal';

@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { ComplianceInput, ReviewSheet } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { REVIEWED_EPISODE, isIn } from '../../lib/capabilities';
 import { AI_PARTS, COMPLIANCE_CHECK, COMPLIANCE_RESULT, LABEL_TYPE } from '../../lib/labels';
-import { formatDateTime, formatDuration } from '../../lib/format';
-import { Facts, Panel, StatusPill, TextPromptModal } from '../shared/ui';
+import { formatDateTime, formatDuration } from '@/lib/format';
+import { Facts, Panel, StatusPill, TextPromptModal } from '@/components/data/ui';
 import { LabelPanel } from './LabelPanel';
 
 /**

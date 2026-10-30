@@ -7,7 +7,7 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
 import { productionService } from '@/services/productionService';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { emptyEpisode } from '../shared/EpisodeRowsEditor';
 import { GenrePicker } from '../shared/GenrePicker';
 import { emptyProjectInfo, ProjectInfoFields, releaseYearValid, type ProjectInfoDraft } from '../shared/ProjectInfoFields';

@@ -7,12 +7,12 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
 import type { Episode, MovieStatus, Publication, UnpublishMode, UnpublishReason } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { EDITABLE_PROJECT, RELEASABLE_EPISODE, RELEASING_PROJECT, isIn } from '../../lib/capabilities';
 import { UNPUBLISH_MODE, UNPUBLISH_REASON } from '../../lib/labels';
-import { formatDateTime, formatNumber, localDateTimeToIso } from '../../lib/format';
-import { Empty, Panel } from '../shared/ui';
+import { formatDateTime, formatNumber, localDateTimeToIso } from '@/lib/format';
+import { Empty, Panel } from '@/components/data/ui';
 
 /** Steps 12–16: Coin price (BR-29, BR-47), release now or on a schedule, take an episode down (BR-52, BR-56). */
 export function PublishPanel({

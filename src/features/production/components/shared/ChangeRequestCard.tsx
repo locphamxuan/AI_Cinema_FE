@@ -6,11 +6,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequest } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { CHANGE_REQUEST_STATUS, CHANGE_REQUEST_TYPE } from '../../lib/labels';
 import { downloadFile } from '../../lib/download';
-import { formatDateTime, formatNumber } from '../../lib/format';
-import { StatusPill, TextPromptModal } from './ui';
+import { formatDateTime, formatNumber } from '@/lib/format';
+import { StatusPill, TextPromptModal } from '@/components/data/ui';
 
 /** One request to the Admin: what was asked and why, the proof, and the Admin's decision (BR-55). */
 export function ChangeRequestCard({

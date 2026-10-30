@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { Film } from 'lucide-react';
 import type { MovieStatus, ProjectSummary } from '@/types/production';
 import { MOVIE_STATUS } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime } from '@/lib/format';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
-import { StatusPill } from '../shared/ui';
+import { StatusPill } from '@/components/data/ui';
 
 const STATUS_GRADIENTS: Record<MovieStatus, string> = {
   DRAFT: 'from-slate-600 via-slate-700 to-slate-800',

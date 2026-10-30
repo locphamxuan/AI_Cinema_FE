@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useResource } from '@/features/production/hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { productionPaths } from '@/features/production/lib/routes';
-import { ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
+import { ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { TokenRequestList } from '@/features/token-request/TokenRequestList';
 import { reviewerTokenService } from '@/services/reviewerTokenService';
 import type { ReviewerWallet, TokenHistoryEntry } from '@/types/reviewer-token';

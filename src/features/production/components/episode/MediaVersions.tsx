@@ -3,8 +3,8 @@
 import { Button } from '@/components/ui/Button';
 import type { MediaAsset } from '@/types/production';
 import { INGEST_STATUS, LABEL_TYPE, SOURCE_METHOD } from '../../lib/labels';
-import { formatBytes, formatDateTime, formatDuration } from '../../lib/format';
-import { Empty, StatusPill } from '../shared/ui';
+import { formatBytes, formatDateTime, formatDuration } from '@/lib/format';
+import { Empty, StatusPill } from '@/components/data/ui';
 
 const JOB_LABEL = { DOWNLOAD: 'Tải về', TRANSCODE: 'Chuyển mã', VALIDATE: 'Kiểm tra' } as const;
 

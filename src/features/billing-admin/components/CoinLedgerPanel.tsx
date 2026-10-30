@@ -8,13 +8,13 @@ import { Modal } from '@/components/ui/Modal';
 import { useCan } from '@/hooks/useCan';
 import { COIN_ENTRY_LABEL, COIN_ENTRY_TYPES, signed, describeLine } from '@/lib/coinEntry';
 import { PERMISSION } from '@/lib/permissions';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime, formatDay, formatNumber } from '@/features/production/lib/format';
-import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime, formatDay, formatNumber } from '@/lib/format';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { CoinEntryType } from '@/types/billing';
-import { Pager } from './Pager';
+import { MetaPager } from '@/components/data/MetaPager';
 
 const LOT_SOURCE_LABEL: Record<string, string> = { ...COIN_ENTRY_LABEL, TOP_UP_PROMO: 'Khuyến mãi nạp' };
 
@@ -88,7 +88,7 @@ export function CoinLedgerPanel() {
               ))}
             </tbody>
           </table>
-          <Pager meta={ledger.data.meta} onPage={setPage} />
+          <MetaPager meta={ledger.data.meta} onPage={setPage} />
         </div>
       )}
       {walletOf && <WalletModal userId={walletOf} canAdjust={canAdjust} onClose={() => setWalletOf(null)} onAdjusted={ledger.reload} />}

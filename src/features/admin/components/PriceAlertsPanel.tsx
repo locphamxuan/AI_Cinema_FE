@@ -6,13 +6,13 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
 import type { PriceAlert, PriceAlertStatus } from '@/types/production';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { PRICE_ALERT_STATUS } from '@/features/production/lib/labels';
-import { formatDateTime } from '@/features/production/lib/format';
+import { formatDateTime } from '@/lib/format';
 import { productionPaths } from '@/features/production/lib/routes';
-import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/features/production/components/shared/ui';
-import { Pager as BillingPager } from '@/features/billing-admin/components/Pager';
+import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/components/data/ui';
+import { MetaPager } from '@/components/data/MetaPager';
 
 const FILTERS: { key: PriceAlertStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Mới' },
@@ -109,7 +109,7 @@ export function PriceAlertsPanel() {
             </li>
           ))}
         </ul>
-        {alerts.data && <BillingPager meta={alerts.data.meta} onPage={setPage} />}
+        {alerts.data && <MetaPager meta={alerts.data.meta} onPage={setPage} />}
       </div>
       <TextPromptModal
         open={!!asking}

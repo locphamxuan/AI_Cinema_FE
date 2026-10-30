@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
-import { formatDuration } from '@/features/production/lib/format';
+import { formatDuration } from '@/lib/format';
 import { MAX_AD_DURATION_SECONDS, MAX_AD_VIDEO_BYTES, MAX_AD_WEIGHT, adAdminService, adInputProblem } from '@/services/adAdminService';
 import type { AdInput, AdminAd } from '@/types/playback';
 

@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { PlatformSettings } from '@/types/production';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime } from '@/features/production/lib/format';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime } from '@/lib/format';
 
 type Key = { [K in keyof PlatformSettings]-?: PlatformSettings[K] extends number ? K : never }[keyof PlatformSettings];
 

@@ -1,5 +1,5 @@
 import { StatCard } from '@/components/data/StatCard';
-import { formatNumber } from '@/features/production/lib/format';
+import { formatNumber } from '@/lib/format';
 import type { RevenueReport } from '@/types/billing';
 
 interface AdminOverviewKpisProps {

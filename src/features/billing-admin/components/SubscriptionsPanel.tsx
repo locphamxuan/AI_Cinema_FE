@@ -6,14 +6,14 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime, formatDay, formatNumber } from '@/features/production/lib/format';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime, formatDay, formatNumber } from '@/lib/format';
 import type { Tone } from '@/features/production/lib/labels';
-import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/features/production/components/shared/ui';
+import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { AdminSubscription, SubscriptionCycle, SubscriptionEndReason, SubscriptionStatus } from '@/types/billing';
-import { Pager } from './Pager';
+import { MetaPager } from '@/components/data/MetaPager';
 
 const SUBSCRIPTION_STATUS: Record<SubscriptionStatus, { label: string; tone: Tone }> = {
   PENDING: { label: 'Chờ thanh toán', tone: 'neutral' },
@@ -101,7 +101,7 @@ export function SubscriptionsPanel() {
               ))}
             </tbody>
           </table>
-          <Pager meta={list.data.meta} onPage={setPage} />
+          <MetaPager meta={list.data.meta} onPage={setPage} />
         </div>
       )}
       {openId && <SubscriptionModal id={openId} onClose={() => setOpenId(null)} onChanged={list.reload} />}

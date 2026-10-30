@@ -13,7 +13,7 @@ import { StatCard } from '@/components/data/StatCard';
 import { TrendChart, type TrendPoint } from '@/components/charts/TrendChart';
 import { Card } from '@/components/shadcn/card';
 import { fieldInputClass } from '@/components/ui/FormField';
-import { Loading } from '@/features/production/components/shared/ui';
+import { Loading } from '@/components/data/ui';
 
 const KINDS: { value: StatementKind; label: string }[] = [
   { value: 'ALL', label: 'Tất cả' },

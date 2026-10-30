@@ -18,7 +18,7 @@ interface DataPaginationProps {
 }
 
 /** Page numbers to show: the ends, the current page and its neighbours, gaps as null. */
-export function pageWindow(page: number, totalPages: number): (number | null)[] {
+function pageWindow(page: number, totalPages: number): (number | null)[] {
   const pages = new Set([1, totalPages, page - 1, page, page + 1].filter((p) => p >= 1 && p <= totalPages));
   const sorted = [...pages].sort((a, b) => a - b);
   return sorted.flatMap((p, i) => (i > 0 && p - sorted[i - 1] > 1 ? [null, p] : [p]));

@@ -7,8 +7,8 @@ import { fieldInputClass } from '@/components/ui/FormField';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { productionService } from '@/services/productionService';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 
 const MAX_GENRES = 5;
 

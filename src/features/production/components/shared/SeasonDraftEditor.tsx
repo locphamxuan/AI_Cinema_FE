@@ -4,7 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import type { NewSeasonInput } from '@/types/production';
-import { formatNumber } from '../../lib/format';
+import { formatNumber } from '@/lib/format';
 import {
   DeadlineQuickFill,
   EpisodeRowsEditor,

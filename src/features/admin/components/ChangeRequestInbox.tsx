@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequestStatus } from '@/types/production';
-import { useResource } from '@/features/production/hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { ChangeRequestCard } from '@/features/production/components/shared/ChangeRequestCard';
 import { productionPaths } from '@/features/production/lib/routes';
-import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
-import { Pager, pageOf } from '@/features/production/components/shared/Pager';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
+import { Pager, pageOf } from '@/components/data/Pager';
 
 const FILTERS: { key: ChangeRequestStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Chờ duyệt' },

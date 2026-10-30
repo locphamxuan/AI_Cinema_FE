@@ -7,9 +7,9 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { seasonLabel } from '@/lib/seasonLabel';
 import { studioService } from '@/services/studioService';
-import { formatNumber } from '../../lib/format';
+import { formatNumber } from '@/lib/format';
 import { swapPreview } from '../../lib/studioSwap';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { FilePicker } from '../shared/FilePicker';
 import { DeadlineList, deadlineUsable } from './DueDateRows';
 import { useProject } from './ProjectContext';

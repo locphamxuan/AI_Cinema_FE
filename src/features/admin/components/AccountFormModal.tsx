@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { useAction } from '@/features/production/hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { PASSWORD_HINT, passwordValid } from '@/lib/registration';
 import { adminService, type AccountRow } from '@/services/adminService';
 import type { UserRole } from '@/types/production';

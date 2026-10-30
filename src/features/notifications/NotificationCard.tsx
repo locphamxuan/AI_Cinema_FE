@@ -1,7 +1,7 @@
 'use client';
 
 import { AlertTriangle, ArrowRight, Bell, Clapperboard, Coins, FileText, Film } from 'lucide-react';
-import { formatDateTime } from '@/features/production/lib/format';
+import { formatDateTime } from '@/lib/format';
 import type { AppNotification } from '@/types/production';
 
 /** Get modern icon and color accent for notification by type / keywords */

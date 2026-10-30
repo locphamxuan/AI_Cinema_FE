@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { formatBytes } from '../../lib/format';
+import { formatBytes } from '@/lib/format';
 
 /** Chooses one or several files; shows the chosen ones with a remove button. The parent keeps the list. */
 export function FilePicker({

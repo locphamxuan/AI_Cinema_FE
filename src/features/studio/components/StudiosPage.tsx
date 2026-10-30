@@ -8,9 +8,9 @@ import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { studioService } from '@/services/studioService';
 import type { Studio } from '@/types/production';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { CARD, Empty, ErrorNote, Loading } from '@/features/production/components/shared/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { CARD, Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { StudioModal } from './StudioModal';
 
 /** Catalog of partner studios (BR-59): the Reviewer adds, edits, deactivates and removes the studios a project can be ordered from. */

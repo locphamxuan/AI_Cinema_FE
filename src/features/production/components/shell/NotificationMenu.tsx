@@ -6,7 +6,7 @@ import { Bell } from 'lucide-react';
 import { productionService } from '@/services/productionService';
 import { useAppStore } from '@/store/useAppStore';
 import type { AppNotification } from '@/types/production';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime } from '@/lib/format';
 import { notificationHref } from '../../lib/routes';
 
 const POLL_MS = 60_000;

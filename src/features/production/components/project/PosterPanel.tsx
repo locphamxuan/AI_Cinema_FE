@@ -4,8 +4,8 @@ import { useRef } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
-import { useAction } from '../../hooks/useAction';
-import { Panel } from '../shared/ui';
+import { useAction } from '@/hooks/useAction';
+import { Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 const IMAGE_ACCEPT = 'image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif';

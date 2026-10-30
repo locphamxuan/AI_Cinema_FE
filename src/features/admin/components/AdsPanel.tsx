@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/features/production/components/shared/ui';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDuration } from '@/features/production/lib/format';
+import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDuration } from '@/lib/format';
 import { adAdminService } from '@/services/adAdminService';
 import type { AdInput, AdminAd } from '@/types/playback';
 import { AdFormModal } from './AdFormModal';
-import { Pager, pageOf } from '@/features/production/components/shared/Pager';
+import { Pager, pageOf } from '@/components/data/Pager';
 
 /** Whether the mid-roll draw can pick the ad: an active ad runs until the Admin pauses it. */
 export function adLiveState(ad: AdminAd): { label: string; tone: 'emerald' | 'neutral' } {

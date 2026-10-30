@@ -8,12 +8,12 @@ import { episodeCountsBySeason, seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { announceTokensChanged, reviewerTokenService } from '@/services/reviewerTokenService';
 import type { SeasonFee } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { OPEN_PROJECT, isIn } from '../../lib/capabilities';
 import { FEE_ENTRY } from '../../lib/labels';
-import { formatDateTime, formatNumber } from '../../lib/format';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { formatDateTime, formatNumber } from '@/lib/format';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 import { SeasonFeeTable } from './SeasonFeeTable';
 

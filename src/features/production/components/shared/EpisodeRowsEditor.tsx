@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { getTodayDateString } from '@/lib/dateUtils';
 import type { NewEpisodeInput } from '@/types/production';
-import { addDays } from '../../lib/format';
+import { addDays } from '@/lib/format';
 
 export interface EpisodeDraft {
   title: string;

@@ -3,8 +3,8 @@
 import { Button } from '@/components/ui/Button';
 import { seasonLabel } from '@/lib/seasonLabel';
 import type { SeasonFee } from '@/types/production';
-import { formatNumber } from '../../lib/format';
-import { Empty } from '../shared/ui';
+import { formatNumber } from '@/lib/format';
+import { Empty } from '@/components/data/ui';
 
 /** What each season costs (price × episodes) against what was paid out, with the "+… Token thêm" so far (BR-37, BR-46). */
 export function SeasonFeeTable({

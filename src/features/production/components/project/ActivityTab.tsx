@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { productionService } from '@/services/productionService';
 import type { ProjectEvent } from '@/types/production';
-import { useResource } from '../../hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { EVENT_LABEL } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
-import { Pager, pageOf } from '../shared/Pager';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { formatDateTime } from '@/lib/format';
+import { Pager, pageOf } from '@/components/data/Pager';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 const PAGE_SIZE = 15;

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { formatDuration } from '@/features/production/lib/format';
+import { formatDuration } from '@/lib/format';
 import type { AdScheduleItem } from '@/types/playback';
 import type { Episode } from '@/types/movie';
 

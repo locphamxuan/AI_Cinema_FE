@@ -5,9 +5,9 @@ import { Pencil, Coins } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { Empty, ErrorNote, Loading } from '@/features/production/components/shared/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { rewardSpinService } from '@/services/rewardSpinService';
 import type { RewardPrize } from '@/types/episodeAccess';
 

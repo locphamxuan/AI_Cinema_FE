@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import type { Tone } from '../../lib/labels';
+import type { Tone } from '@/features/production/lib/labels';
 
 export const CARD = 'rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 shadow-xs';
 

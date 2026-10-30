@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Empty } from '@/features/production/components/shared/ui';
-import { Pager, pageOf } from '@/features/production/components/shared/Pager';
-import { formatDateTime, formatNumber } from '@/features/production/lib/format';
+import { Empty } from '@/components/data/ui';
+import { Pager, pageOf } from '@/components/data/Pager';
+import { formatDateTime, formatNumber } from '@/lib/format';
 import type { CoinActivity } from '@/types/reviewer-token';
 
 const PAGE_SIZE = 15;

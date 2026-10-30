@@ -7,11 +7,11 @@ import { Button } from '@/components/ui/Button';
 import { useAppStore } from '@/store/useAppStore';
 import { teamService } from '@/services/teamService';
 import type { CreatorSeat } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { TEAM_EDITABLE_PROJECT, isIn } from '../../lib/capabilities';
-import { formatDateTime } from '../../lib/format';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { formatDateTime } from '@/lib/format';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { AddCreatorModal, DelegateModal } from './TeamModals';
 import { useProject } from './ProjectContext';
 

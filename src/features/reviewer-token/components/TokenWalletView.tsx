@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Empty } from '@/features/production/components/shared/ui';
+import { Empty } from '@/components/data/ui';
 import { FEE_ENTRY } from '@/features/production/lib/labels';
-import { formatDateTime, formatNumber } from '@/features/production/lib/format';
+import { formatDateTime, formatNumber } from '@/lib/format';
 import type { ReviewerWallet, TokenHistoryEntry, TokenTotals } from '@/types/reviewer-token';
 
 /** Left, granted and allocated Token, with the VND value at today's rate. */

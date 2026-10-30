@@ -9,12 +9,12 @@ import { PERMISSION } from '@/lib/permissions';
 import { seasonName } from '@/lib/seasonLabel';
 import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequestType } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { CHANGE_REQUEST_TYPE } from '../../lib/labels';
 import { ChangeRequestCard } from '../shared/ChangeRequestCard';
 import { FilePicker } from '../shared/FilePicker';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 /** BR-55: the Reviewer or a Creator sends the Admin a request with the reason and proof; the Admin decides. */

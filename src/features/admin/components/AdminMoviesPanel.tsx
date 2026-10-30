@@ -3,16 +3,16 @@
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, Coins, Eye, Film, Heart, Megaphone, ShoppingCart } from 'lucide-react';
-import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatNumber } from '@/features/production/lib/format';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
+import { useResource } from '@/hooks/useResource';
+import { formatNumber } from '@/lib/format';
 import { productionPaths } from '@/features/production/lib/routes';
 import { filmReportService } from '@/services/filmReportService';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import type { FilmFigures } from '@/types/film-report';
 import { EpisodeAdSlotsModal } from './EpisodeAdSlotsModal';
-import { Pager, pageOf } from '@/features/production/components/shared/Pager';
+import { Pager, pageOf } from '@/components/data/Pager';
 
 const STAT = 'inline-flex items-center gap-1 tabular-nums';
 

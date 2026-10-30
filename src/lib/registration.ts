@@ -2,7 +2,7 @@ import { APPLICATION_MESSAGES } from './applicationMessages';
 
 /** Sign-up rules the backend enforces (RegisterRequestDto), checked first so the form answers at once. */
 export const MIN_PASSWORD_LENGTH = 8;
-export const MAX_PASSWORD_LENGTH = 72;
+const MAX_PASSWORD_LENGTH = 72;
 /** BR-54: Members must be at least this old. */
 const MIN_MEMBER_AGE = 18;
 

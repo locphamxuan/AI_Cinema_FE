@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { teamService } from '@/services/teamService';
 import type { Episode, Season } from '@/types/production';
-import { useResource } from '../../hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { OPEN_PROJECT, isIn } from '../../lib/capabilities';
 import { AddEpisodeModal, AddSeasonModal, EditEpisodeModal, EditSeasonModal } from './EpisodeModals';
 import { useProject } from './ProjectContext';

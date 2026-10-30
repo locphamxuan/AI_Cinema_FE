@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { reviewerTokenService, TOKENS_CHANGED_EVENT } from '@/services/reviewerTokenService';
-import { useResource } from '../../hooks/useResource';
-import { formatNumber } from '../../lib/format';
+import { useResource } from '@/hooks/useResource';
+import { formatNumber } from '@/lib/format';
 import { DashboardSidebar, type SidebarItem } from './DashboardSidebar';
 
 /**

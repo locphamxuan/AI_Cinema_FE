@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
-import { useResource } from '@/features/production/hooks/useResource';
-import { addDays, formatNumber } from '@/features/production/lib/format';
+import { useResource } from '@/hooks/useResource';
+import { addDays, formatNumber } from '@/lib/format';
 import { billingAdminService } from '@/services/billingAdminService';
 import { productionService } from '@/services/productionService';
 import { adminService } from '@/services/adminService';
-import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
+import { ErrorNote, Loading } from '@/components/data/ui';
 import type { RevenueReport, ReportRange } from '@/types/billing';
 import { PageHeader } from '@/components/data/PageHeader';
 import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';

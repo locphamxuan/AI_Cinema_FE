@@ -8,7 +8,7 @@ import { savedMovieService, type SavedMovieItem } from '@/services/savedMovieSer
 import MovieDetailQuickModal from '@/components/home/MovieDetailQuickModal';
 import type { Movie } from '@/types/movie';
 import { toast } from '@/components/ui/Toast';
-import { Pager, pageOf } from '@/features/production/components/shared/Pager';
+import { Pager, pageOf } from '@/components/data/Pager';
 
 export default function SavedMoviesPage() {
   const { isAuthenticated, openAuthModal } = useAppStore();

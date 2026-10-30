@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
 import type { IdeaFile, IdeaFilePurpose } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { ATTACHMENT_ACCEPT, ATTACHMENT_HINT } from '../../lib/attachments';
 import { downloadFile } from '../../lib/download';
-import { formatBytes } from '../../lib/format';
-import { Empty, Panel } from '../shared/ui';
+import { formatBytes } from '@/lib/format';
+import { Empty, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 const COPY: Record<IdeaFilePurpose, { title: string; description: string; noun: string }> = {

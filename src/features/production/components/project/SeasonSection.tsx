@@ -9,13 +9,13 @@ import { seasonLabel, seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { teamService } from '@/services/teamService';
 import type { CreatorSeat, Episode, Season, SeasonFee } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { BEFORE_APPROVAL_EPISODE, OPEN_PROJECT, TEAM_EDITABLE_PROJECT, isIn } from '../../lib/capabilities';
-import { formatDay, formatDuration, formatNumber } from '../../lib/format';
+import { formatDay, formatDuration, formatNumber } from '@/lib/format';
 import { EPISODE_STATUS, INGEST_STATUS, SEASON_STATUS } from '../../lib/labels';
 import { productionPaths } from '../../lib/routes';
-import { CARD, Empty, StatusPill } from '../shared/ui';
+import { CARD, Empty, StatusPill } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 /** Submissions of one episode: every version of media the Creator uploaded from the studio's deliveries. */

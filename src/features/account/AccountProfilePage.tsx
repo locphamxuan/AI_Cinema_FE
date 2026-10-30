@@ -4,10 +4,10 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
-import { ErrorNote, Facts, Loading, Panel } from '@/features/production/components/shared/ui';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime } from '@/features/production/lib/format';
+import { ErrorNote, Facts, Loading, Panel } from '@/components/data/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime } from '@/lib/format';
 import { accountService, PHONE_PATTERN, type AccountDetails } from '@/services/accountService';
 import { productionService } from '@/services/productionService';
 import { useAppStore } from '@/store/useAppStore';

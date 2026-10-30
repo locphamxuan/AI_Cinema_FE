@@ -7,9 +7,9 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import type { ApiResponse } from '@/services/apiClient';
 import { productionService } from '@/services/productionService';
 import type { AiDisclosure, LabelType, MediaMetadataInput, StudioFilmLink } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { AI_PARTS, LABEL_TYPE } from '../../lib/labels';
-import { Panel } from '../shared/ui';
+import { Panel } from '@/components/data/ui';
 
 type Method = 'UPLOAD' | 'HLS_URL' | 'REMOTE_FILE';
 

@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/Button';
 import { seasonLabel } from '@/lib/seasonLabel';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
 import { MATERIAL_KIND, MILESTONE_STATUS } from '../../lib/labels';
-import { formatBytes, formatDateTime, formatNumber } from '../../lib/format';
+import { formatBytes, formatDateTime, formatNumber } from '@/lib/format';
 import { canMove } from '../../lib/milestones';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
-import { StatusPill } from '../shared/ui';
+import { StatusPill } from '@/components/data/ui';
 
 const EMAIL_STATUS = {
   QUEUED: { label: 'Đang gửi', tone: 'amber' },

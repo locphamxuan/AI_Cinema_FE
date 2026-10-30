@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ProjectSummary } from '@/types/production';
 import { MOVIE_STATUS } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime } from '@/lib/format';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
-import { CARD, StatusPill } from '../shared/ui';
+import { CARD, StatusPill } from '@/components/data/ui';
 
 /** The projects as a table; a Creator sees who reviews each one, the others who creates it. */
 export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; base: ProductionBase }) {

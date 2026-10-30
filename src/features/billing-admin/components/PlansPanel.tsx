@@ -7,15 +7,15 @@ import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatNumber, localDateTimeToIso } from '@/features/production/lib/format';
-import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/features/production/components/shared/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatNumber, localDateTimeToIso } from '@/lib/format';
+import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { AdminPlan, PlanPeriod } from '@/types/billing';
 import { featuresSummary, MAX_PLAN_PRICE_COINS, priceError } from '../lib/planForm';
 import { PlanFormModal } from './PlanFormModal';
-import { Pager, pageOf } from '@/features/production/components/shared/Pager';
+import { Pager, pageOf } from '@/components/data/Pager';
 
 const PERIOD_LABEL: Record<PlanPeriod, string> = { WEEKLY: 'Tuần', MONTHLY: 'Tháng', YEARLY: 'Năm' };
 

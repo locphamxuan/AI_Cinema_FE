@@ -4,9 +4,9 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
-import { Panel } from '@/features/production/components/shared/ui';
-import { useAction } from '@/features/production/hooks/useAction';
-import { formatNumber } from '@/features/production/lib/format';
+import { Panel } from '@/components/data/ui';
+import { useAction } from '@/hooks/useAction';
+import { formatNumber } from '@/lib/format';
 import { seasonLabel } from '@/lib/seasonLabel';
 import { tokenRequestService } from '@/services/tokenRequestService';
 import type { ProjectDetail } from '@/types/production';

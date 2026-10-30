@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { useAction } from '@/features/production/hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { AdminPlan } from '@/types/billing';
 import {

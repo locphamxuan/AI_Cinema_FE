@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { LabelLocation, LabelType, ReviewSheet } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { LABEL_DEFAULT_TEXT, LABEL_LOCATION, LABEL_TYPE } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
-import { Facts, Panel } from '../shared/ui';
+import { formatDateTime } from '@/lib/format';
+import { Facts, Panel } from '@/components/data/ui';
 
 const POSITION: Record<LabelLocation, string> = {
   TOP_RIGHT: 'top-2 right-2',

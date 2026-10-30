@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
-import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
-import { useResource } from '@/features/production/hooks/useResource';
+import { ErrorNote, Loading } from '@/components/data/ui';
+import { useResource } from '@/hooks/useResource';
 import { notificationHref } from '@/features/production/lib/routes';
 import { notificationService } from '@/services/notificationService';
 import { useAppStore } from '@/store/useAppStore';
