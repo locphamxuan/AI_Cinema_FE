@@ -46,6 +46,14 @@ const ALL_FIELDS = [...COIN_FIELDS, ...PRODUCTION_FIELDS, ...STREAMING_FIELDS];
 
 type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards';
 
+const TABS: { key: SettingsTab; label: string; Icon?: typeof Coins }[] = [
+  { key: 'all', label: 'Tất cả' },
+  { key: 'coin', label: 'COIN & Nạp tiền', Icon: Coins },
+  { key: 'production', label: 'Sản xuất & Token', Icon: Clapperboard },
+  { key: 'streaming', label: 'Phát sóng & Gói', Icon: Radio },
+  { key: 'rewards', label: 'Điểm danh & Vòng quay', Icon: Gift },
+];
+
 /** Segmented platform policies: Coin, Production, Playback & Rewards */
 export function PlatformSettingsPanel() {
   const settings = useResource('settings', productionService.getPlatformSettings);
@@ -114,6 +122,23 @@ export function PlatformSettingsPanel() {
     </div>
   );
 
+  const refundToggle = (
+    <div className="p-3 rounded-2xl bg-sky-50/50 dark:bg-sky-500/5 border border-sky-200/50 dark:border-sky-500/10">
+      <label className="flex items-start gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={refund ?? current.refundOnRemoval}
+          onChange={(e) => setRefund(e.target.checked)}
+          className="mt-0.5 accent-sky-600"
+        />
+        <span>
+          <span className="block font-semibold text-slate-800 dark:text-slate-200">Hoàn Coin khi gỡ hẳn tập</span>
+          <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả.</span>
+        </span>
+      </label>
+    </div>
+  );
+
   return (
     <section className="bg-white dark:bg-[#0F1C27] rounded-3xl border border-sky-100 dark:border-white/10 p-6 sm:p-8 space-y-6 max-w-3xl shadow-sm">
       <div className="border-b border-slate-100 dark:border-white/5 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -132,69 +157,21 @@ export function PlatformSettingsPanel() {
 
       {/* Segmented Navigation Tabs */}
       <div className="flex flex-wrap gap-1.5 border-b border-slate-100 dark:border-white/5 pb-3">
-        <button
-          type="button"
-          onClick={() => setActiveTab('all')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'all'
-              ? 'bg-sky-500 text-white shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <span>Tất cả</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('coin')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'coin'
-              ? 'bg-sky-500 text-white shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Coins className="w-3.5 h-3.5" />
-          <span>COIN & Nạp tiền</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('production')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'production'
-              ? 'bg-sky-500 text-white shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Clapperboard className="w-3.5 h-3.5" />
-          <span>Sản xuất & Token</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('streaming')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'streaming'
-              ? 'bg-sky-500 text-white shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Radio className="w-3.5 h-3.5" />
-          <span>Phát sóng & Gói</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('rewards')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'rewards'
-              ? 'bg-sky-500 text-white shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Gift className="w-3.5 h-3.5" />
-          <span>Điểm danh & Vòng quay</span>
-        </button>
+        {TABS.map(({ key, label, Icon }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setActiveTab(key)}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === key
+                ? 'bg-sky-500 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
+            }`}
+          >
+            {Icon && <Icon className="w-3.5 h-3.5" />}
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
 
       <form onSubmit={save} className="space-y-5 text-xs">
@@ -206,20 +183,7 @@ export function PlatformSettingsPanel() {
                 <Coins className="w-3.5 h-3.5" /> Phân khúc COIN & Nạp tiền
               </h3>
               {renderFieldGroup(COIN_FIELDS)}
-              <div className="mt-3 p-3 rounded-2xl bg-sky-50/50 dark:bg-sky-500/5 border border-sky-200/50 dark:border-sky-500/10">
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={refund ?? current.refundOnRemoval}
-                    onChange={(e) => setRefund(e.target.checked)}
-                    className="mt-0.5 accent-sky-600"
-                  />
-                  <span>
-                    <span className="block font-semibold text-slate-800 dark:text-slate-200">Hoàn Coin khi gỡ hẳn tập</span>
-                    <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả.</span>
-                  </span>
-                </label>
-              </div>
+              <div className="mt-3">{refundToggle}</div>
             </div>
 
             <div>
@@ -242,20 +206,7 @@ export function PlatformSettingsPanel() {
         {activeTab === 'coin' && (
           <div className="space-y-4">
             {renderFieldGroup(COIN_FIELDS)}
-            <div className="p-3 rounded-2xl bg-sky-50/50 dark:bg-sky-500/5 border border-sky-200/50 dark:border-sky-500/10">
-              <label className="flex items-start gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={refund ?? current.refundOnRemoval}
-                  onChange={(e) => setRefund(e.target.checked)}
-                  className="mt-0.5 accent-sky-600"
-                />
-                <span>
-                  <span className="block font-semibold text-slate-800 dark:text-slate-200">Hoàn Coin khi gỡ hẳn tập</span>
-                  <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả.</span>
-                </span>
-              </label>
-            </div>
+            {refundToggle}
             {topUpInvalid && <p className="text-rose-600">Mức nạp tối thiểu không được lớn hơn mức tối đa.</p>}
           </div>
         )}

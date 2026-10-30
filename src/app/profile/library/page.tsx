@@ -28,12 +28,7 @@ export default function LibraryPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
+    if (!isAuthenticated) return;
     episodeAccessService
       .getPurchasedEpisodes(currentPage, 12)
       .then((res) => {
@@ -47,6 +42,11 @@ export default function LibraryPage() {
       .catch(() => setError('Lỗi kết nối khi tải kho phim đã mua.'))
       .finally(() => setLoading(false));
   }, [isAuthenticated, currentPage]);
+
+  const goToPage = (page: number) => {
+    setLoading(true);
+    setCurrentPage(page);
+  };
 
   if (!isAuthenticated) {
     return (
@@ -217,7 +217,7 @@ export default function LibraryPage() {
           <button
             type="button"
             disabled={currentPage <= 1}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+            onClick={() => goToPage(Math.max(1, currentPage - 1))}
             className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -228,7 +228,7 @@ export default function LibraryPage() {
           <button
             type="button"
             disabled={currentPage >= meta.totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
+            onClick={() => goToPage(currentPage + 1)}
             className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
           >
             <ChevronRight className="w-4 h-4" />

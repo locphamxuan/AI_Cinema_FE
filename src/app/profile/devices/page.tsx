@@ -35,8 +35,7 @@ export default function DevicesPage() {
   const [error, setError] = useState<string | null>(null);
   const [actionBusy, setActionBusy] = useState<string | null>(null);
 
-  const load = () => {
-    setLoading(true);
+  const fetchOverview = () =>
     deviceService
       .overview()
       .then((res) => {
@@ -49,11 +48,14 @@ export default function DevicesPage() {
       })
       .catch(() => setError('Lỗi kết nối khi tải thiết bị.'))
       .finally(() => setLoading(false));
+
+  const load = () => {
+    setLoading(true);
+    fetchOverview();
   };
 
   useEffect(() => {
-    if (isAuthenticated) load();
-    else setLoading(false);
+    if (isAuthenticated) fetchOverview();
   }, [isAuthenticated]);
 
   const handleRemoveDevice = async (device: RegisteredDevice) => {

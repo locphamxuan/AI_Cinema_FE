@@ -21,6 +21,37 @@ import {
   KeyRound,
 } from 'lucide-react';
 
+/** Work areas a staff role can open from the sidebar; an admin sees all three. */
+const ROLE_PORTALS = [
+  {
+    href: '/creator',
+    label: 'AI Studio (Maker)',
+    subtitle: 'Đạo diễn & Sản xuất phim AI',
+    Icon: Clapperboard,
+    iconBox: 'bg-purple-500/10 border-purple-500/20',
+    iconColor: 'text-purple-400',
+    roles: ['CREATOR', 'ADMIN'],
+  },
+  {
+    href: '/reviewer',
+    label: 'Kiểm duyệt (Reviewer)',
+    subtitle: 'Kiểm duyệt & Cấp phép AI',
+    Icon: ShieldCheck,
+    iconBox: 'bg-emerald-500/10 border-emerald-500/20',
+    iconColor: 'text-emerald-400',
+    roles: ['REVIEWER', 'ADMIN'],
+  },
+  {
+    href: '/admin',
+    label: 'Quản trị (Admin)',
+    subtitle: 'Quản lý toàn bộ hệ thống',
+    Icon: SlidersHorizontal,
+    iconBox: 'bg-ruby/10 border-ruby/20',
+    iconColor: 'text-ruby',
+    roles: ['ADMIN'],
+  },
+];
+
 export default function RightSidebar() {
   const pathname = usePathname();
   const {
@@ -107,34 +138,8 @@ export default function RightSidebar() {
     },
   ];
 
-  const creatorItem = {
-    href: '/creator',
-    label: 'AI Studio (Maker)',
-    subtitle: 'Đạo diễn & Sản xuất phim AI',
-    icon: Clapperboard,
-    roleBadge: 'Maker',
-  };
-
-  const reviewerItem = {
-    href: '/reviewer',
-    label: 'Kiểm duyệt (Reviewer)',
-    subtitle: 'Kiểm duyệt & Cấp phép AI',
-    icon: ShieldCheck,
-    roleBadge: 'Reviewer',
-  };
-
-  const adminItem = {
-    href: '/admin',
-    label: 'Quản trị (Admin)',
-    subtitle: 'Quản lý toàn bộ hệ thống',
-    icon: SlidersHorizontal,
-    roleBadge: 'Admin',
-  };
-
   const userRole = user?.role?.toUpperCase();
-  const showCreator = userRole === 'CREATOR' || userRole === 'ADMIN';
-  const showReviewer = userRole === 'REVIEWER' || userRole === 'ADMIN';
-  const showAdmin = userRole === 'ADMIN';
+  const portals = ROLE_PORTALS.filter((portal) => userRole && portal.roles.includes(userRole));
 
   return (
     <>
@@ -236,68 +241,31 @@ export default function RightSidebar() {
           </div>
 
           {/* Role Special Portals */}
-          {(showCreator || showReviewer || showAdmin) && (
+          {portals.length > 0 && (
             <div className="pt-2 border-t border-slate-200 dark:border-white/10 space-y-1">
               <p className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2.5 pb-1">
                 Khu Vực Phân Quyền
               </p>
 
-              {showCreator && (
+              {portals.map(({ href, label, subtitle, Icon, iconBox, iconColor }) => (
                 <Link
-                  href={creatorItem.href}
+                  key={href}
+                  href={href}
                   onClick={closeRightSidebar}
                   className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
-                      <Clapperboard className="w-4 h-4 text-purple-400" />
+                    <div className={`w-8 h-8 rounded-lg border flex items-center justify-center shrink-0 ${iconBox}`}>
+                      <Icon className={`w-4 h-4 ${iconColor}`} />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{creatorItem.label}</p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{creatorItem.subtitle}</p>
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{label}</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{subtitle}</p>
                     </div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
                 </Link>
-              )}
-
-              {showReviewer && (
-                <Link
-                  href={reviewerItem.href}
-                  onClick={closeRightSidebar}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{reviewerItem.label}</p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{reviewerItem.subtitle}</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
-                </Link>
-              )}
-
-              {showAdmin && (
-                <Link
-                  href={adminItem.href}
-                  onClick={closeRightSidebar}
-                  className="flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-all group"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-lg bg-ruby/10 border border-ruby/20 flex items-center justify-center shrink-0">
-                      <SlidersHorizontal className="w-4 h-4 text-ruby" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{adminItem.label}</p>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{adminItem.subtitle}</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform shrink-0" />
-                </Link>
-              )}
+              ))}
             </div>
           )}
         </div>

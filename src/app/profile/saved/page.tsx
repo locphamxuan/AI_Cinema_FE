@@ -15,8 +15,7 @@ export default function SavedMoviesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const loadSaved = () => {
-    setLoading(true);
+  const fetchSaved = () =>
     savedMovieService
       .list()
       .then((res) => {
@@ -25,11 +24,14 @@ export default function SavedMoviesPage() {
         }
       })
       .finally(() => setLoading(false));
+
+  const loadSaved = () => {
+    setLoading(true);
+    fetchSaved();
   };
 
   useEffect(() => {
-    if (isAuthenticated) loadSaved();
-    else setLoading(false);
+    if (isAuthenticated) fetchSaved();
   }, [isAuthenticated]);
 
   const handleUnsave = async (e: React.MouseEvent, movie: SavedMovieItem) => {

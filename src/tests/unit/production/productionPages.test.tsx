@@ -147,7 +147,6 @@ describe('ProjectListPage', () => {
     // The analytics chart names the project too; the card is the one in the list.
     const titles = await screen.findAllByText('Mưa Sài Gòn');
     const card = titles.map((title) => title.closest('li')).find(Boolean)!;
-    const card = (await screen.findByRole('heading', { name: 'Mưa Sài Gòn' })).closest('li')!;
     expect(within(card).getByText('Studio đang sản xuất')).toBeInTheDocument();
     expect(within(card).getByText('Studio Sao Mai')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Tạo dự án/ })).toBeInTheDocument();

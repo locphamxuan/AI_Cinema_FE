@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Play, Lock, CheckCircle, ShieldCheck, Calendar, Info, Bookmark, Heart } from 'lucide-react';
+import { X, Play, Lock, CheckCircle, ShieldCheck, Bookmark, Heart } from 'lucide-react';
 import type { Movie, Episode } from '@/types/movie';
 import { useAppStore } from '@/store/useAppStore';
 import { onActivateKey } from '@/lib/a11y';
-import { savedMovieService } from '@/services/savedMovieService';
-import { engagementService, type MovieEngagement } from '@/services/engagementService';
-import { toast } from '@/components/ui/Toast';
+import { useMovieEngagement } from '@/hooks/useMovieEngagement';
+import { MovieBriefPanel, MovieCompliancePanel } from './MovieDetailPanels';
 
 interface MovieDetailQuickModalProps {
   movie: Movie | null;
@@ -19,12 +18,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
   const { wallet, openUnlockModal, openAuthModal, isAuthenticated } = useAppStore();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'episodes' | 'compliance' | 'brief'>('episodes');
-
-  // Engagement & Save states
-  const [isSaved, setIsSaved] = useState(false);
-  const [savingBusy, setSavingBusy] = useState(false);
-  const [engagement, setEngagement] = useState<MovieEngagement | null>(null);
-  const [likingBusy, setLikingBusy] = useState(false);
+  const { isSaved, savingBusy, engagement, likingBusy, toggleSave, toggleLike } = useMovieEngagement(movie);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -33,24 +27,12 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
     if (movie) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
-
-      // Fetch saved status if logged in
-      if (isAuthenticated) {
-        savedMovieService.isSaved(movie.id).then((res) => {
-          if (res.success && res.data) setIsSaved(res.data.saved);
-        }).catch(() => {});
-      }
-
-      // Fetch like / engagement summary
-      engagementService.summary(movie.id).then((res) => {
-        if (res.success && res.data) setEngagement(res.data);
-      }).catch(() => {});
     }
     return () => {
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [movie, onClose, isAuthenticated]);
+  }, [movie, onClose]);
 
   if (!movie) return null;
 
@@ -69,62 +51,6 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
   const handlePlayFirstEpisode = () => {
     const ep = movie.episodes.find((e) => e.isFree || e.isUnlocked) || movie.episodes[0];
     if (ep) handleEpisodeClick(ep);
-  };
-
-  const handleToggleSave = async () => {
-    if (!isAuthenticated) {
-      openAuthModal('login');
-      return;
-    }
-
-    setSavingBusy(true);
-    const nextSaved = !isSaved;
-    setIsSaved(nextSaved);
-
-    const res = nextSaved ? await savedMovieService.save(movie.id) : await savedMovieService.unsave(movie.id);
-    setSavingBusy(false);
-
-    if (res.success) {
-      toast.success(
-        nextSaved ? 'Đã lưu phim' : 'Đã bỏ lưu',
-        nextSaved ? `"${movie.title}" đã được thêm vào danh sách xem sau.` : `Đã xóa "${movie.title}" khỏi danh sách.`,
-      );
-    } else {
-      setIsSaved(!nextSaved);
-      toast.error('Thao tác thất bại', 'Vui lòng thử lại sau.');
-    }
-  };
-
-  const handleToggleLike = async () => {
-    if (!isAuthenticated) {
-      openAuthModal('login');
-      return;
-    }
-
-    setLikingBusy(true);
-    const wasLiked = engagement?.likedByMe ?? false;
-    const currentCount = engagement?.likeCount ?? 0;
-
-    // Optimistic
-    setEngagement((prev) => ({
-      likeCount: wasLiked ? Math.max(0, currentCount - 1) : currentCount + 1,
-      viewCount: prev?.viewCount ?? 0,
-      likedByMe: !wasLiked,
-    }));
-
-    const res = wasLiked ? await engagementService.unlike(movie.id) : await engagementService.like(movie.id);
-    setLikingBusy(false);
-
-    if (res.success && res.data) {
-      setEngagement(res.data);
-    } else {
-      // Revert on failure
-      setEngagement((prev) => ({
-        likeCount: currentCount,
-        viewCount: prev?.viewCount ?? 0,
-        likedByMe: wasLiked,
-      }));
-    }
   };
 
   return (
@@ -197,7 +123,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
               <button
                 type="button"
                 disabled={savingBusy}
-                onClick={handleToggleSave}
+                onClick={toggleSave}
                 className={`px-4 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 border transition-all cursor-pointer ${
                   isSaved
                     ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
@@ -212,7 +138,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
               <button
                 type="button"
                 disabled={likingBusy}
-                onClick={handleToggleLike}
+                onClick={toggleLike}
                 className={`px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5 border transition-all cursor-pointer ${
                   engagement?.likedByMe
                     ? 'bg-ruby/20 text-ruby-light border-ruby/40 hover:bg-ruby/30'
@@ -350,67 +276,9 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
             </div>
           )}
 
-          {/* TAB 2: COMPLIANCE DISCLOSURE (ARTICLE 44) */}
-          {activeTab === 'compliance' && (
-            <div className="space-y-4 animate-fade-in">
-              <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3">
-                <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="text-sm font-bold text-emerald-300">
-                    Chứng Nhận Tuân Thủ Pháp Lý Trí Tuệ Nhân Tạo (AI Compliance)
-                  </h4>
-                  <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                    Tác phẩm này đã được Ban Thẩm Định nền tảng kiểm tra, cấp mã chứng nhận và gắn nhãn theo{' '}
-                    <strong>{movie.aiCompliance.complianceArticle}</strong>.
-                  </p>
-                </div>
-              </div>
+          {activeTab === 'compliance' && <MovieCompliancePanel compliance={movie.aiCompliance} />}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span>Nhãn nội dung AI</span>
-                  </div>
-                  <p className="text-sm font-bold text-white">{movie.aiCompliance.disclaimer}</p>
-                  <p className="text-[11px] text-slate-400">Reviewer gắn nhãn cho từng tập sau khi kiểm duyệt nội dung và pháp lý.</p>
-                </div>
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                    <Calendar className="w-4 h-4 text-amber-400" />
-                    <span>Phân loại độ tuổi</span>
-                  </div>
-                  <p className="text-sm font-bold text-white">{movie.aiCompliance.contentRating}</p>
-                </div>
-              </div>
-
-              <div className="p-3.5 rounded-xl bg-black/40 border border-white/10 text-xs text-slate-400 italic leading-relaxed">
-                &ldquo;{movie.aiCompliance.disclaimer}&rdquo;
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: BRIEF & SCRIPT OVERVIEW */}
-          {activeTab === 'brief' && (
-            <div className="space-y-4 animate-fade-in text-xs sm:text-sm text-slate-300 leading-relaxed">
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
-                <h4 className="font-bold text-white text-sm flex items-center gap-2">
-                  <Info className="w-4 h-4 text-[#8B5CF6]" />
-                  <span>Tóm tắt phim</span>
-                </h4>
-                <p>{movie.contentBrief || 'Chưa có tóm tắt.'}</p>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
-                <h4 className="font-bold text-white text-sm">Phát hành trên AI Cinema</h4>
-                <ul className="list-disc list-inside space-y-1 text-slate-400 text-xs">
-                  <li>Mỗi tập được kiểm duyệt nội dung và pháp lý trước khi phát hành.</li>
-                  <li>Các tập đầu của mỗi phim xem miễn phí; các tập sau mở khoá bằng Coin.</li>
-                  <li>Mọi tập đều mang nhãn nội dung AI.</li>
-                </ul>
-              </div>
-            </div>
-          )}
+          {activeTab === 'brief' && <MovieBriefPanel contentBrief={movie.contentBrief} />}
         </div>
       </div>
     </div>
