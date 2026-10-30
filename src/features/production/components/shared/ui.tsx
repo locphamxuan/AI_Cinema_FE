@@ -8,7 +8,7 @@ import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import type { Tone } from '../../lib/labels';
 
-export const CARD = 'bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10';
+export const CARD = 'bg-white dark:bg-card rounded-2xl border border-sky-100 dark:border-white/10';
 
 export function StatusPill({ label, tone }: { label: string; tone: Tone }) {
   return (

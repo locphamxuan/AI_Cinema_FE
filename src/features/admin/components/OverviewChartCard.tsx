@@ -15,7 +15,7 @@ interface OverviewChartCardProps {
 export function OverviewChartCard({ icon, title, description, link, className = '', children }: OverviewChartCardProps) {
   return (
     <div
-      className={`p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm space-y-4 ${className}`}
+      className={`p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card shadow-sm space-y-4 ${className}`}
     >
       <div className="flex items-center justify-between">
         <div>

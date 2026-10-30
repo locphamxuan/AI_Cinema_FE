@@ -44,13 +44,13 @@ export function AccountMenu({ name, roleLabel, onLogout, links = [] }: AccountMe
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Tài khoản ${name}`}
-        className="w-8 h-8 rounded-full bg-sky-600 text-white text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-sky-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#12141A]"
+        className="w-8 h-8 rounded-full bg-sky-600 text-white text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-sky-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-card"
       >
         {name.charAt(0).toUpperCase()}
       </button>
 
       {open && (
-        <div role="menu" className="absolute right-0 top-full mt-2 w-56 p-1.5 rounded-xl bg-white dark:bg-[#0F1C27] border border-slate-200 dark:border-white/10 shadow-lg z-40">
+        <div role="menu" className="absolute right-0 top-full mt-2 w-56 p-1.5 rounded-xl bg-white dark:bg-card border border-slate-200 dark:border-white/10 shadow-lg z-40">
           <div className="px-3 py-2 mb-1 border-b border-slate-100 dark:border-white/5">
             <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{name}</p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">{roleLabel}</p>

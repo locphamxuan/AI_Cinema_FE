@@ -60,7 +60,7 @@ function BrowseMovies({ initial }: { initial: MovieFilters }) {
   }, [loadCatalog]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#07090E] text-slate-900 dark:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-background dark:bg-background text-slate-900 dark:text-white flex flex-col justify-between">
       <div>
         <NetflixNavbar />
         <main className="max-w-[1800px] mx-auto px-4 sm:px-8 md:px-14 pt-24 pb-10 space-y-6">

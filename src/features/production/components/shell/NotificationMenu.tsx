@@ -87,7 +87,7 @@ export function NotificationMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 max-h-[70vh] overflow-y-auto rounded-xl bg-white dark:bg-[#0F1C27] border border-slate-200 dark:border-white/10 shadow-lg z-40">
+        <div className="absolute right-0 top-full mt-2 w-80 max-h-[70vh] overflow-y-auto rounded-xl bg-white dark:bg-card border border-slate-200 dark:border-white/10 shadow-lg z-40">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 dark:border-white/5">
             <p className="text-xs font-semibold text-slate-900 dark:text-white">Thông báo</p>
             <button

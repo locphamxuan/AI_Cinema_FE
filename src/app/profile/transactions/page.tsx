@@ -95,7 +95,7 @@ export default function TransactionsPage() {
           <select
             value={entryType}
             onChange={(e) => refilter(() => setEntryType(e.target.value as CoinEntryType | ''))}
-            className="bg-slate-100 dark:bg-[#161922] border border-slate-300 dark:border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-foreground"
+            className="bg-slate-100 dark:bg-card border border-slate-300 dark:border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-foreground"
           >
             <option value="">Tất cả</option>
             {COIN_ENTRY_TYPES.map((t) => (

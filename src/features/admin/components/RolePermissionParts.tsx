@@ -39,7 +39,7 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
             className={`p-4 rounded-2xl border transition-all ${
               isChanged
                 ? 'border-amber-400 bg-amber-50/40 dark:bg-amber-500/10 shadow-sm'
-                : 'border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720]'
+                : 'border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card'
             }`}
           >
             <div className="flex items-center justify-between mb-2">

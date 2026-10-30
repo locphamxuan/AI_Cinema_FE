@@ -49,7 +49,7 @@ export function MovieBriefPanel({ contentBrief }: { contentBrief?: string | null
     <div className="space-y-4 animate-fade-in text-xs sm:text-sm text-slate-300 leading-relaxed">
       <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
         <h4 className="font-bold text-white text-sm flex items-center gap-2">
-          <Info className="w-4 h-4 text-[#8B5CF6]" />
+          <Info className="w-4 h-4 text-primary" />
           <span>Tóm tắt phim</span>
         </h4>
         <p>{contentBrief || 'Chưa có tóm tắt.'}</p>

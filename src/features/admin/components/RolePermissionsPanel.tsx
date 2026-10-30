@@ -118,7 +118,7 @@ export function RolePermissionsPanel() {
       <RoleSummaryCards draft={draft} changedRoles={changedRoles} />
 
       {/* ── Main Panel Card ── */}
-      <section className="bg-white dark:bg-[#0F1C27] rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
+      <section className="bg-white dark:bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
         {/* Panel Header */}
         <div className="p-6 border-b border-slate-100 dark:border-white/5 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

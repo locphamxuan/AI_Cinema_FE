@@ -35,7 +35,7 @@ export default function CinematicHeroBillboard({
   const firstEpisode = movie.episodes?.[0];
 
   return (
-    <div className="relative w-full h-[80vh] min-h-[640px] max-h-[860px] overflow-hidden select-none bg-[#07090E]">
+    <div className="relative w-full h-[80vh] min-h-[640px] max-h-[860px] overflow-hidden select-none bg-background">
       {/* Background Image with Smooth Ambient Dark Gradients */}
       <div className="absolute inset-0">
         <img
@@ -47,9 +47,9 @@ export default function CinematicHeroBillboard({
 
         {/* Ambient Dark Cinema Gradients - Multiple Layers for Depth */}
         {/* Bottom fade: deep black merging into rows */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C10] via-[#0A0C10]/60 via-40% to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 via-40% to-transparent" />
         {/* Left vignette: dramatic side shading for text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0A0C10] via-[#0A0C10]/85 via-45% to-transparent w-full lg:w-4/5" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 via-45% to-transparent w-full lg:w-4/5" />
         {/* Top gradient shadow for floating navbar */}
         <div className="absolute top-0 inset-x-0 h-44 bg-gradient-to-b from-black/90 via-black/40 to-transparent" />
         {/* Subtle radial center glow */}
@@ -61,7 +61,7 @@ export default function CinematicHeroBillboard({
         {/* Feature Tags & Badges */}
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mb-4 animate-slide-up">
           {/* AI Masterpiece Badge */}
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-[#E50914] text-white text-[11px] font-black uppercase tracking-wider shadow-lg shadow-red-600/40">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-red-600 to-primary text-white text-[11px] font-black uppercase tracking-wider shadow-lg shadow-red-600/40">
             AI Masterpiece
           </span>
 
@@ -159,7 +159,7 @@ export default function CinematicHeroBillboard({
                     onClick={() => onSelectMovie(fMovie)}
                     className={`relative rounded-xl overflow-hidden transition-all duration-300 cursor-pointer ${
                       isActive
-                        ? 'w-24 h-12 ring-2 ring-[#E50914] scale-105 shadow-lg shadow-red-600/30'
+                        ? 'w-24 h-12 ring-2 ring-primary scale-105 shadow-lg shadow-red-600/30'
                         : 'w-16 h-12 opacity-60 hover:opacity-100 hover:w-20'
                     }`}
                     title={fMovie.title}

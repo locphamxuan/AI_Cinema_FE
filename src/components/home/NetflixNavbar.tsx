@@ -70,7 +70,7 @@ export default function NetflixNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/95 dark:bg-[#07090E]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10 shadow-lg dark:shadow-2xl py-2.5 text-slate-900 dark:text-white'
+          ? 'bg-white/95 dark:bg-background/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10 shadow-lg dark:shadow-2xl py-2.5 text-slate-900 dark:text-white'
           : 'bg-gradient-to-b from-black/95 via-black/60 to-transparent py-4 text-white'
       }`}
     >
@@ -78,7 +78,7 @@ export default function NetflixNavbar() {
         {/* Left: Brand Logo & Navigation Links */}
         <div className="flex items-center gap-7 lg:gap-10">
           <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#E50914] to-red-800 flex items-center justify-center text-white font-black text-base shadow-lg shadow-red-600/30 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-red-800 flex items-center justify-center text-white font-black text-base shadow-lg shadow-red-600/30 group-hover:scale-105 transition-transform">
               AI
             </div>
             <span
@@ -86,7 +86,7 @@ export default function NetflixNavbar() {
                 isScrolled ? 'text-slate-900 dark:text-white' : 'text-white'
               }`}
             >
-              CINEMA<span className="text-[#8B5CF6]">.</span>
+              CINEMA<span className="text-primary">.</span>
             </span>
           </Link>
 
@@ -102,7 +102,7 @@ export default function NetflixNavbar() {
                   className={`text-sm font-semibold transition-all relative py-1 cursor-pointer ${
                     isActive
                       ? isScrolled
-                        ? 'text-[#E50914] dark:text-white font-black'
+                        ? 'text-primary dark:text-white font-black'
                         : 'text-white font-black'
                       : isScrolled
                       ? 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium'
@@ -111,7 +111,7 @@ export default function NetflixNavbar() {
                 >
                   {link.label}
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#E50914] rounded-full shadow-[0_0_8px_#E50914]" />
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_var(--primary)]" />
                   )}
                 </Link>
               );
@@ -187,14 +187,14 @@ export default function NetflixNavbar() {
           {/* Coin Wallet Badge */}
           <button
             onClick={openDepositModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#8B5CF6]/15 hover:bg-[#8B5CF6]/25 border border-[#8B5CF6]/30 text-xs font-bold transition shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/15 hover:bg-primary/25 border border-primary/30 text-xs font-bold transition shadow-sm cursor-pointer"
             title="Ví Coin - Bấm để nạp thêm"
           >
             <span className="text-sm">🪙</span>
             <span className={isScrolled ? 'text-slate-900 dark:text-white' : 'text-white'}>
               {(wallet.mainCoin + wallet.bonusCoin).toLocaleString('vi-VN')}
             </span>
-            <span className="text-[10px] text-[#8B5CF6] font-semibold hidden md:inline">Coin</span>
+            <span className="text-[10px] text-primary font-semibold hidden md:inline">Coin</span>
           </button>
 
           {/* User Account Menu or Login Button */}
@@ -202,9 +202,9 @@ export default function NetflixNavbar() {
             <div ref={userMenuRef} className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-[#8B5CF6]/40 transition cursor-pointer"
+                className="flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-primary/40 transition cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#8B5CF6] to-pink-500 text-white font-black text-xs flex items-center justify-center shadow-md">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-pink-500 text-white font-black text-xs flex items-center justify-center shadow-md">
                   {user.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:inline" />
@@ -212,7 +212,7 @@ export default function NetflixNavbar() {
 
               {/* Dropdown Menu */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl bg-white dark:bg-[#12151E] border border-slate-200 dark:border-white/10 shadow-2xl z-50 animate-fade-in text-xs text-slate-800 dark:text-white">
+                <div className="absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-white/10 shadow-2xl z-50 animate-fade-in text-xs text-slate-800 dark:text-white">
                   <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-white/5">
                     <p className="font-bold truncate text-sm text-slate-900 dark:text-white">{user.name}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
@@ -259,7 +259,7 @@ export default function NetflixNavbar() {
           ) : (
             <button
               onClick={() => openAuthModal('login')}
-              className="px-4 py-2 rounded-full bg-[#E50914] hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+              className="px-4 py-2 rounded-full bg-primary hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
             >
               Đăng Nhập
             </button>

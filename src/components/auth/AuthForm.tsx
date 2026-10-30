@@ -234,7 +234,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 rounded-2xl font-black text-white bg-gradient-to-r from-ruby to-[#B90910] hover:shadow-xl hover:shadow-ruby/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-lg shadow-ruby/20 cursor-pointer text-sm tracking-wide"
+          className="w-full py-3.5 rounded-2xl font-black text-white bg-gradient-to-r from-ruby to-action-strong hover:shadow-xl hover:shadow-ruby/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-lg shadow-ruby/20 cursor-pointer text-sm tracking-wide"
         >
           {loading ? 'Đang xác thực…' : mode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'}
         </button>

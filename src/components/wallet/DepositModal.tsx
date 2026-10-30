@@ -61,14 +61,14 @@ export default function DepositModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-xl animate-fade-in overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-gradient-to-b from-[#141824] to-[#0D1017] border border-white/10 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] p-5 sm:p-7 overflow-hidden text-white my-auto">
+      <div className="relative w-full max-w-2xl bg-gradient-to-b from-card to-[#0D1017] border border-white/10 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] p-5 sm:p-7 overflow-hidden text-white my-auto">
         <div className="absolute top-0 left-1/4 right-1/4 h-[2px] bg-gradient-to-r from-transparent via-amber-400 to-transparent blur-xs" />
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-32 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
 
         <div className="flex items-start justify-between pb-4 mb-5 border-b border-white/10">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 p-[1px] shadow-lg shadow-amber-500/20">
-              <div className="w-full h-full rounded-2xl bg-[#141824] flex items-center justify-center text-2xl">🪙</div>
+              <div className="w-full h-full rounded-2xl bg-card flex items-center justify-center text-2xl">🪙</div>
             </div>
             <div>
               <h3 className="text-xl font-black tracking-tight text-white">Nạp Coin Vào Ví</h3>

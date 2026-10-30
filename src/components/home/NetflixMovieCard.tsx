@@ -34,7 +34,7 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Base Card Frame */}
-      <div className="relative rounded-2xl overflow-hidden bg-white dark:bg-[#151821] border border-slate-200 dark:border-white/10 transition-all duration-300 group-hover:scale-105 group-hover:border-[#8B5CF6] group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.18)] dark:group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.85)] shadow-sm dark:shadow-md">
+      <div className="relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-slate-200 dark:border-white/10 transition-all duration-300 group-hover:scale-105 group-hover:border-primary group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.18)] dark:group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.85)] shadow-sm dark:shadow-md">
         {/* Poster / Thumbnail Image */}
         <div className={aspectRatio === '16/9' ? 'aspect-[16/9] relative overflow-hidden bg-black' : 'aspect-[2/3] relative overflow-hidden bg-black'}>
           <img

@@ -78,7 +78,7 @@ export function AccountsPanel() {
   const totalPages = result?.meta.totalPages ?? 1;
 
   return (
-    <section className="bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
+    <section className="bg-white dark:bg-card rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
       <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Quản lý Tài khoản</h2>

@@ -140,9 +140,9 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <main
         className={
           isDashboard
-            ? 'flex-1 w-full p-0 m-0 bg-[#F8FAFC] dark:bg-[#0B0C10] transition-colors'
+            ? 'flex-1 w-full p-0 m-0 bg-background dark:bg-[#0B0C10] transition-colors'
             : isHome
-              ? 'flex-1 w-full p-0 m-0 bg-[#0A0C10] text-white overflow-x-hidden'
+              ? 'flex-1 w-full p-0 m-0 bg-background text-white overflow-x-hidden'
               : 'flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 transition-all'
         }
       >

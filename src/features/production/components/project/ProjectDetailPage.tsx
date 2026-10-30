@@ -94,7 +94,7 @@ export function ProjectDetailPage() {
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
       <main className="w-full">
-        <div className="bg-white dark:bg-[#0F1C27] border-b border-sky-100 dark:border-white/10">
+        <div className="bg-white dark:bg-card border-b border-sky-100 dark:border-white/10">
           <div className="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-coral-400" aria-hidden="true" />
           <div className="px-6 lg:px-8 pt-4 pb-5 space-y-4">
             <Link

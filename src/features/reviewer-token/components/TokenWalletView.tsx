@@ -40,7 +40,7 @@ export function TokenTotalsCards({ totals, rateVnd }: { totals: TokenTotals; rat
           className={`relative rounded-2xl p-5 border transition-all duration-200 ${
             c.primary
               ? 'bg-gradient-to-br from-sky-500/10 via-sky-500/5 to-transparent border-sky-500/25'
-              : 'bg-white dark:bg-[#0F1C27] border-slate-200/80 dark:border-white/10 shadow-xs'
+              : 'bg-white dark:bg-card border-slate-200/80 dark:border-white/10 shadow-xs'
           }`}
         >
           <div className="flex items-center justify-between gap-2">

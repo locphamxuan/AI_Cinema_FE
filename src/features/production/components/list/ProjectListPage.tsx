@@ -74,7 +74,7 @@ export function ProjectListPage() {
 
   return (
     <main className="w-full">
-      <div className="bg-white dark:bg-[#0F1C27]">
+      <div className="bg-white dark:bg-card">
         <div className="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-coral-400" aria-hidden="true" />
         <div className="px-6 lg:px-8 pt-6 pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
@@ -92,7 +92,7 @@ export function ProjectListPage() {
         </div>
       </div>
 
-      <div className="px-6 lg:px-8 py-3 border-y border-sky-100 dark:border-white/5 bg-white dark:bg-[#0F1C27] flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="px-6 lg:px-8 py-3 border-y border-sky-100 dark:border-white/5 bg-white dark:bg-card flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div role="tablist" aria-label="Lọc theo trạng thái" className="flex flex-wrap items-center gap-1.5">
           {FILTERS.map(({ key, label, icon: Icon }) => (
             <button

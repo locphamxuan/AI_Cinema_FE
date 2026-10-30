@@ -107,7 +107,7 @@ export function OverviewTab() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       {/* ── Left: main info ── */}
       <div className="lg:col-span-2 space-y-5">
-        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-[#0F1C27] overflow-hidden">
+        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-card overflow-hidden">
           <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center">
@@ -156,7 +156,7 @@ export function OverviewTab() {
       <div className="space-y-5">
         <PosterPanel canManage={canEdit} />
 
-        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-[#0F1C27] overflow-hidden">
+        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-card overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100 dark:border-white/5">
             <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center">
               <UserPlus className="w-3.5 h-3.5 text-sky-600 dark:text-sky-300" aria-hidden="true" />

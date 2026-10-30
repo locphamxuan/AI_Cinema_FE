@@ -33,7 +33,7 @@ export function DashboardSidebar({
   return (
     <nav
       aria-label={label}
-      className="md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-sky-100 dark:border-white/5 bg-white dark:bg-[#0F1C27] md:min-h-[calc(100vh-3.5rem)] transition-colors"
+      className="md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-sky-100 dark:border-white/5 bg-white dark:bg-card md:min-h-[calc(100vh-3.5rem)] transition-colors"
     >
       {/* Streamlined section header without repeating the top header's full icon badge */}
       <div className="hidden md:block px-5 py-3.5 border-b border-sky-100 dark:border-white/5">

@@ -64,7 +64,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
       />
 
       {/* Modal Dialog Body */}
-      <div className="relative w-full max-w-4xl bg-[#12151E] border border-white/10 rounded-3xl overflow-hidden shadow-2xl z-10 max-h-[92vh] flex flex-col my-auto text-white">
+      <div className="relative w-full max-w-4xl bg-card border border-white/10 rounded-3xl overflow-hidden shadow-2xl z-10 max-h-[92vh] flex flex-col my-auto text-white">
         {/* Close Button Top Right */}
         <button
           onClick={onClose}
@@ -83,8 +83,8 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
           />
 
           {/* Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#12151E] via-[#12151E]/50 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#12151E] via-transparent to-transparent w-2/3" />
+          <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-card via-transparent to-transparent w-2/3" />
 
           {/* Hero Meta Info */}
           <div className="absolute bottom-6 left-6 right-6 z-20 space-y-3">
@@ -153,7 +153,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
         </div>
 
         {/* Navigation Tabs Bar */}
-        <div className="flex items-center gap-6 px-6 border-b border-white/10 bg-[#0E1118] shrink-0 text-sm font-semibold">
+        <div className="flex items-center gap-6 px-6 border-b border-white/10 bg-background shrink-0 text-sm font-semibold">
           <button
             onClick={() => setActiveTab('episodes')}
             className={`py-3.5 relative transition-colors cursor-pointer ${
@@ -162,7 +162,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
           >
             <span>Danh Sách Tập ({movie.episodes.length})</span>
             {activeTab === 'episodes' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#E50914] rounded-full shadow-[0_0_8px_#E50914]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_var(--primary)]" />
             )}
           </button>
 
@@ -175,7 +175,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>Minh Bạch AI (Điều 44)</span>
             {activeTab === 'compliance' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-400 rounded-full shadow-[0_0_8px_#10B981]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-400 rounded-full shadow-[0_0_8px_var(--success)]" />
             )}
           </button>
 
@@ -187,7 +187,7 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
           >
             <span>Kịch Bản & Hồ Sơ Phim</span>
             {activeTab === 'brief' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8B5CF6] rounded-full shadow-[0_0_8px_#8B5CF6]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_var(--primary)]" />
             )}
           </button>
         </div>
@@ -240,8 +240,8 @@ export default function MovieDetailQuickModal({ movie, onClose }: MovieDetailQui
                     {/* Episode Title & Synopsis */}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-[#E50914]">{ep.displayLabel ?? `Tập ${ep.episodeNumber}`}</span>
-                        <h4 className="text-sm font-bold text-white group-hover/ep:text-[#E50914] transition-colors truncate">
+                        <span className="text-xs font-black text-primary">{ep.displayLabel ?? `Tập ${ep.episodeNumber}`}</span>
+                        <h4 className="text-sm font-bold text-white group-hover/ep:text-primary transition-colors truncate">
                           {ep.title}
                         </h4>
                       </div>

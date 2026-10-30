@@ -32,7 +32,7 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
       {/* Header */}
       <div className="flex items-center justify-between px-4 sm:px-8 md:px-14">
         <div className="flex items-center gap-3">
-          <div className="w-2.5 h-6 rounded-full bg-gradient-to-b from-[#E50914] to-red-800 shadow-md shadow-red-600/40" />
+          <div className="w-2.5 h-6 rounded-full bg-gradient-to-b from-primary to-red-800 shadow-md shadow-red-600/40" />
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
             <span>10 Phim Mới Phát Hành</span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-amber-500 dark:text-amber-400 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30">
@@ -83,7 +83,7 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
                 </div>
 
                 {/* Poster Card */}
-                <div className="relative z-10 w-[145px] sm:w-[175px] md:w-[200px] aspect-[2/3] rounded-2xl overflow-hidden bg-white dark:bg-[#12151E] border border-slate-200 dark:border-white/10 group-hover/card:border-[#E50914] group-hover/card:shadow-[0_12px_36px_rgba(229,9,20,0.35)] transition-all duration-300 shadow-sm dark:shadow-xl">
+                <div className="relative z-10 w-[145px] sm:w-[175px] md:w-[200px] aspect-[2/3] rounded-2xl overflow-hidden bg-white dark:bg-card border border-slate-200 dark:border-white/10 group-hover/card:border-primary group-hover/card:shadow-[0_12px_36px_rgba(229,9,20,0.35)] transition-all duration-300 shadow-sm dark:shadow-xl">
                   <img
                     src={movie.posterUrl}
                     alt={movie.title}
@@ -96,7 +96,7 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
 
                   {/* Top Badges */}
                   <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between z-10">
-                    <span className="px-2 py-0.5 rounded-md bg-[#E50914] text-white text-[10px] font-black uppercase tracking-wider shadow-md shadow-red-600/50">
+                    <span className="px-2 py-0.5 rounded-md bg-primary text-white text-[10px] font-black uppercase tracking-wider shadow-md shadow-red-600/50">
                       MỚI #{rank}
                     </span>
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/70 border border-white/20 text-emerald-300 text-[9px] font-bold backdrop-blur-md">
@@ -114,7 +114,7 @@ export default function NetflixTopTenRow({ movies, onOpenDetail }: NetflixTopTen
 
                   {/* Bottom Info */}
                   <div className="absolute bottom-3 inset-x-3 z-10">
-                    <p className="text-xs font-bold text-white line-clamp-1 group-hover/card:text-[#E50914] transition-colors drop-shadow">
+                    <p className="text-xs font-bold text-white line-clamp-1 group-hover/card:text-primary transition-colors drop-shadow">
                       {movie.title}
                     </p>
                     <div className="flex items-center justify-between text-[10px] text-slate-300 mt-1">

@@ -52,7 +52,7 @@ export default function EpisodePlaylist({ movie, currentEpisodeId, isPlaying, ca
                   : 'bg-white dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 shadow-sm'
               }`}
             >
-              <div className="relative w-28 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-200 dark:bg-[#161922] border border-slate-200 dark:border-white/10">
+              <div className="relative w-28 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-200 dark:bg-card border border-slate-200 dark:border-white/10">
                 {/* eslint-disable-next-line @next/next/no-img-element -- thumbnails come from arbitrary hosts */}
                 <img src={ep.thumbnailUrl} alt={ep.title} className="w-full h-full object-cover" />
                 {!playable && (

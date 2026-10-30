@@ -53,7 +53,7 @@ export function AreaGuard({ area, children }: AreaGuardProps) {
 
   return (
     <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-white dark:bg-[#161922] border border-amber-200 dark:border-amber-500/30 rounded-2xl p-8 shadow-xl text-center space-y-6">
+      <div className="max-w-md w-full bg-white dark:bg-card border border-amber-200 dark:border-amber-500/30 rounded-2xl p-8 shadow-xl text-center space-y-6">
         <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto">
           <AlertCircle className="w-7 h-7" aria-hidden="true" />
         </div>

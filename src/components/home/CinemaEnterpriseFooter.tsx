@@ -29,16 +29,16 @@ export default function CinemaEnterpriseFooter() {
     { title: 'Tài khoản', links: isAuthenticated ? MEMBER_LINKS : GUEST_LINKS },
   ];
   return (
-    <footer className="mt-20 border-t border-white/10 bg-[#07090E] text-slate-400 text-xs">
+    <footer className="mt-20 border-t border-white/10 bg-background text-slate-400 text-xs">
       <div className="max-w-[1800px] mx-auto px-4 sm:px-8 md:px-14 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
           <div className="sm:col-span-2 space-y-4">
             <Link href="/" className="inline-flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#E50914] to-red-800 flex items-center justify-center text-white font-black text-sm">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-red-800 flex items-center justify-center text-white font-black text-sm">
                 AI
               </div>
               <span className="text-xl font-black tracking-wider text-white">
-                CINEMA<span className="text-[#8B5CF6]">.</span>
+                CINEMA<span className="text-primary">.</span>
               </span>
             </Link>
             <p className="leading-relaxed max-w-md">
