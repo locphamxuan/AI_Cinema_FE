@@ -18,6 +18,17 @@ const NAV_LINKS = [
   { href: `/phim?the-loai=${encodeURIComponent('Hoạt hình')}`, label: 'Hoạt Hình' },
 ];
 
+/** Account pages listed in the signed-in user's dropdown. */
+const USER_MENU_LINKS = [
+  { href: '/profile', label: 'Hồ sơ cá nhân', Icon: User, iconClass: 'text-indigo-400' },
+  { href: '/profile/saved', label: 'Phim đã lưu', Icon: Bookmark, iconClass: 'text-amber-500 fill-amber-500/20' },
+  { href: '/profile/history', label: 'Lịch sử xem phim', Icon: Clock, iconClass: 'text-purple-400' },
+  { href: '/profile/devices', label: 'Quản lý thiết bị', Icon: Laptop, iconClass: 'text-sky-400' },
+  { href: '/profile/library', label: 'Kho tập phim đã mua', Icon: KeyRound, iconClass: 'text-fuchsia-400' },
+  { href: '/profile/subscription', label: 'Gói hội viên VIP', Icon: Crown, iconClass: 'text-amber-400' },
+  { href: '/profile/transactions', label: 'Lịch sử ví Coin', Icon: Wallet, iconClass: 'text-emerald-500' },
+];
+
 export default function NetflixNavbar() {
   const pathname = usePathname();
   const params = useSearchParams();
@@ -54,7 +65,6 @@ export default function NetflixNavbar() {
     const q = searchQuery.trim();
     router.push(q ? `/phim?q=${encodeURIComponent(q)}` : '/phim');
   };
-
 
   return (
     <nav
@@ -218,68 +228,17 @@ export default function NetflixNavbar() {
                   </div>
 
                   <div className="py-1.5 space-y-0.5">
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
-                    >
-                      <User className="w-4 h-4 text-indigo-400 shrink-0" />
-                      <span>Hồ sơ cá nhân</span>
-                    </Link>
-
-                    <Link
-                      href="/profile/saved"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
-                    >
-                      <Bookmark className="w-4 h-4 text-amber-500 shrink-0 fill-amber-500/20" />
-                      <span>Phim đã lưu</span>
-                    </Link>
-
-                    <Link
-                      href="/profile/history"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
-                    >
-                      <Clock className="w-4 h-4 text-purple-400 shrink-0" />
-                      <span>Lịch sử xem phim</span>
-                    </Link>
-
-                    <Link
-                      href="/profile/devices"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
-                    >
-                      <Laptop className="w-4 h-4 text-sky-400 shrink-0" />
-                      <span>Quản lý thiết bị</span>
-                    </Link>
-
-                    <Link
-                      href="/profile/library"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
-                    >
-                      <KeyRound className="w-4 h-4 text-fuchsia-400 shrink-0" />
-                      <span>Kho tập phim đã mua</span>
-                    </Link>
-
-                    <Link
-                      href="/profile/subscription"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
-                    >
-                      <Crown className="w-4 h-4 text-amber-400 shrink-0" />
-                      <span>Gói hội viên VIP</span>
-                    </Link>
-
-                    <Link
-                      href="/profile/transactions"
-                      onClick={() => setIsUserMenuOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
-                    >
-                      <Wallet className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Lịch sử ví Coin</span>
-                    </Link>
+                    {USER_MENU_LINKS.map(({ href, label, Icon, iconClass }) => (
+                      <Link
+                        key={href}
+                        href={href}
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
+                      >
+                        <Icon className={`w-4 h-4 shrink-0 ${iconClass}`} />
+                        <span>{label}</span>
+                      </Link>
+                    ))}
                   </div>
 
                   <div className="pt-1.5 mt-1 border-t border-slate-100 dark:border-white/5">
