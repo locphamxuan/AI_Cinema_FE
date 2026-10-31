@@ -69,7 +69,7 @@ export function SubscriptionsPanel() {
       {list.data?.data.length === 0 && <Empty>Không có đăng ký nào.</Empty>}
       {list.data && list.data.data.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-xs table-cells">
             <thead className="text-slate-500 dark:text-slate-400 text-left">
               <tr>
                 <th className="py-2 font-medium">Member</th>

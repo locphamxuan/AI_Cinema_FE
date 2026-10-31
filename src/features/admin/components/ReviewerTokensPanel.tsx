@@ -34,7 +34,7 @@ export function ReviewerTokensPanel() {
       {reviewers.data?.length === 0 && <Empty>Chưa có tài khoản Reviewer nào.</Empty>}
       {reviewers.data && reviewers.data.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-xs table-cells">
             <thead className="text-slate-500 dark:text-slate-400 text-left">
               <tr>
                 <th className="py-2 font-medium">Reviewer</th>

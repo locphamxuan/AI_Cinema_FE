@@ -58,7 +58,7 @@ export function CoinLedgerPanel() {
       {ledger.data?.data.length === 0 && <Empty>Chưa có giao dịch nào.</Empty>}
       {ledger.data && ledger.data.data.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
+          <table className="w-full text-xs table-cells">
             <thead className="text-slate-500 dark:text-slate-400 text-left">
               <tr>
                 <th className="py-2 font-medium">Thời gian</th>

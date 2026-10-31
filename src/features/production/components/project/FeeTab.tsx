@@ -111,7 +111,7 @@ export function FeeTab() {
               {ledger.data.entries.length === 0 ? (
                 <Empty>Chưa cấp phí. Cấp phí cho mọi mùa trước khi giao dự án cho Creator.</Empty>
               ) : (
-                <table className="w-full text-xs">
+                <table className="w-full text-xs table-cells">
                   <thead className="text-slate-500 dark:text-slate-400 text-left">
                     <tr>
                       <th className="py-2 font-medium">Loại</th>

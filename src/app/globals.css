@@ -605,3 +605,16 @@ select:not(.sr-only) option {
     @apply font-sans;
   }
 }
+
+/* Data tables: room between columns so right-aligned numbers never run into the next header. */
+@utility table-cells {
+  & :is(th, td) {
+    padding-inline: 0.75rem;
+  }
+  & th {
+    white-space: nowrap;
+  }
+  & :is(th, td):first-child {
+    padding-left: 0;
+  }
+}
