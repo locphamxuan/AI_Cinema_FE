@@ -93,15 +93,15 @@ export function ProjectDetailPage() {
               Danh sách dự án
             </Link>
 
-            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5">
+            <div className="flex flex-col gap-4">
               <div className="space-y-2 min-w-0">
                 <h1 className="font-heading text-2xl font-semibold text-slate-900 dark:text-white leading-tight tracking-tight">{data.title}</h1>
                 <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                     Dự án <StatusPill {...MOVIE_STATUS[data.status]} />
                   </span>
                   {data.seasons.map((season) => (
-                    <span key={season.id} className="inline-flex items-center gap-1.5">
+                    <span key={season.id} className="inline-flex items-center gap-1.5 whitespace-nowrap">
                       {seasonName(season.seasonNumber, season.episodes.length)} <StatusPill {...SEASON_STATUS[season.status]} />
                     </span>
                   ))}
@@ -111,9 +111,9 @@ export function ProjectDetailPage() {
                 )}
               </div>
 
-              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3 shrink-0 rounded-xl bg-sky-50/70 dark:bg-white/[0.04] px-5 py-3">
+              <dl className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3 rounded-xl bg-sky-50/70 dark:bg-white/[0.04] px-5 py-3">
                 <Fact label="Reviewer" value={data.reviewer.fullName} />
-                <Fact label={caps.creator ? (caps.lead ? 'Creator chính (bạn)' : 'Creator chính') : 'Creator chính'} value={data.creator?.fullName ?? 'Chưa giao'} />
+                <Fact label={caps.creator && caps.lead ? 'Creator chính (bạn)' : 'Creator chính'} value={data.creator?.fullName ?? 'Chưa giao'} />
                 <Fact label="Studio" value={data.studio?.name ?? 'Chưa chọn'} />
                 <Fact label="Quy mô" value={`${data.seasons.length} mùa, ${totalEpisodes} tập`} />
               </dl>
