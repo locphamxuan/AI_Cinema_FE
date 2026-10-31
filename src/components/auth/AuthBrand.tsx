@@ -9,7 +9,7 @@ export default function AuthBrand() {
         </div>
       </div>
       <h2 className="text-2xl font-bold text-slate-900 dark:text-foreground">AI Cinema</h2>
-      <p className="text-xs text-slate-500 dark:text-muted-light mt-1">Nền tảng xem phim do AI tạo, dành cho người từ 18 tuổi.</p>
+      <p className="text-xs text-slate-500 dark:text-muted-light mt-1">Nền tảng xem phim do AI tạo.</p>
     </div>
   );
 }

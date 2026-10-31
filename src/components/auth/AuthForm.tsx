@@ -7,7 +7,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
 import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
 import GoogleSignInButton from './GoogleSignInButton';
-import { MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
+import { MIN_PASSWORD_LENGTH, registrationError } from '@/lib/registration';
 
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
@@ -52,7 +52,6 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -70,7 +69,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
 
   const signUpError = (): string | null => {
     if (name.trim().length < 2) return 'Họ và tên cần ít nhất 2 ký tự.';
-    const problem = registrationError(password, dateOfBirth);
+    const problem = registrationError(password);
     if (problem) return problem;
     if (password !== confirmPassword) return 'Mật khẩu nhập lại không khớp.';
     return null;
@@ -89,7 +88,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
     }
 
     setLoading(true);
-    const res = mode === 'login' ? await login(email, password) : await register(name, email, password, dateOfBirth);
+    const res = mode === 'login' ? await login(email, password) : await register(name, email, password);
     setLoading(false);
 
     if (!res.success) {
@@ -139,41 +138,23 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
 
       <form onSubmit={handleSubmit} className="space-y-4" noValidate={mode === 'register'}>
         {mode === 'register' && (
-          <>
-            <div>
-              <label htmlFor="auth-name" className={LABEL}>
-                Họ và tên
-              </label>
-              <input
-                id="auth-name"
-                type="text"
-                required
-                autoComplete="name"
-                minLength={2}
-                maxLength={255}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nguyễn Văn A"
-                className={INPUT}
-              />
-            </div>
-            <div>
-              <label htmlFor="auth-dob" className={LABEL}>
-                Ngày sinh <span className="font-normal text-slate-500 text-[11px]">(từ 18 tuổi · Yêu cầu Điều 44)</span>
-              </label>
-              <input
-                id="auth-dob"
-                type="date"
-                required
-                autoComplete="bday"
-                max={latestAdultBirthDate()}
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                className={`${INPUT} dark:[color-scheme:dark]`}
-              />
-              <p className="text-[11px] text-slate-400 dark:text-muted mt-1">Định dạng theo năm-tháng-ngày.</p>
-            </div>
-          </>
+          <div>
+            <label htmlFor="auth-name" className={LABEL}>
+              Họ và tên
+            </label>
+            <input
+              id="auth-name"
+              type="text"
+              required
+              autoComplete="name"
+              minLength={2}
+              maxLength={255}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nguyễn Văn A"
+              className={INPUT}
+            />
+          </div>
         )}
 
         <div>
