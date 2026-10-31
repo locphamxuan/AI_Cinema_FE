@@ -1,18 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import { CalendarClock, Coins, Rocket, Undo2 } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
 import type { Episode, MovieStatus, Publication, UnpublishMode, UnpublishReason } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { EDITABLE_PROJECT, RELEASABLE_EPISODE, RELEASING_PROJECT, isIn } from '../../lib/capabilities';
 import { UNPUBLISH_MODE, UNPUBLISH_REASON } from '../../lib/labels';
-import { formatDateTime, formatNumber, localDateTimeToIso } from '../../lib/format';
-import { Empty, Panel } from '../shared/ui';
+import { formatDateTime, formatNumber, localDateTimeToIso } from '@/lib/format';
+import { Empty, Panel } from '@/components/data/ui';
 
 /** Steps 12–16: Coin price (BR-29, BR-47), release now or on a schedule, take an episode down (BR-52, BR-56). */
 export function PublishPanel({
@@ -73,7 +73,7 @@ export function PublishPanel({
               <input type="number" min={0} step={1} value={price} onChange={(e) => setPrice(e.target.value)} className={fieldInputClass} />
             </FormField>
             <Button type="submit" variant="secondary" disabled={busy || !priceValid || priceValue === episode.coinPrice}>
-              <Coins className="w-3.5 h-3.5" aria-hidden="true" /> Lưu giá
+              Lưu giá
             </Button>
             {outOfRange && <p className="w-full text-amber-600">Giá ngoài khoảng: vẫn lưu được nhưng Admin sẽ nhận cảnh báo.</p>}
           </form>
@@ -86,7 +86,7 @@ export function PublishPanel({
             {episode.coinPrice === null && <p className="text-amber-600">Đặt giá Coin trước khi phát hành.</p>}
             <div className="flex flex-wrap items-end gap-2">
               <Button disabled={busy || episode.coinPrice === null} onClick={() => publish(false)}>
-                <Rocket className="w-4 h-4" aria-hidden="true" /> Phát hành ngay
+                Phát hành ngay
               </Button>
               <span className="text-slate-400 px-1">hoặc</span>
               <FormField label="Lên lịch lúc" className="w-56">
@@ -97,7 +97,7 @@ export function PublishPanel({
                 disabled={busy || episode.coinPrice === null || !scheduleAt || new Date(scheduleAt) <= new Date()}
                 onClick={() => publish(true)}
               >
-                <CalendarClock className="w-4 h-4" aria-hidden="true" /> {episode.status === 'SCHEDULED' ? 'Đổi lịch' : 'Lên lịch'}
+                {episode.status === 'SCHEDULED' ? 'Đổi lịch' : 'Lên lịch'}
               </Button>
             </div>
           </div>
@@ -126,7 +126,7 @@ export function PublishPanel({
                 )}
                 {canAct && p === active && isIn(episode.status, ['PUBLISHED', 'SCHEDULED']) && (
                   <Button size="sm" variant="ghost" className="!px-0 text-rose-600" onClick={() => setTakingDown(p)}>
-                    <Undo2 className="w-3.5 h-3.5" aria-hidden="true" /> {p.publishedAt ? 'Gỡ tập' : 'Huỷ lịch'}
+                    {p.publishedAt ? 'Gỡ tập' : 'Huỷ lịch'}
                   </Button>
                 )}
               </li>

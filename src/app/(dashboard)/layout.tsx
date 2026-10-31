@@ -1,13 +1,13 @@
-import { Be_Vietnam_Pro } from 'next/font/google';
 import { DashboardHeader } from '@/features/production/components/shell/DashboardHeader';
-
-// Drawn for Vietnamese: the stacked diacritics of the back office stay crisp at small sizes.
-const beVietnam = Be_Vietnam_Pro({ subsets: ['latin', 'vietnamese'], weight: ['400', '500', '600', '700'], display: 'swap' });
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    // The back office acts in sky: buttons, focus rings and selections shared with the member site follow it.
-    <div className={`${beVietnam.className} [--action:#0284C7] [--action-strong:#0369A1] min-h-screen bg-[#F3F9FC] dark:bg-[#0B1620] text-slate-900 dark:text-white flex flex-col transition-colors`}>
+    <div className="relative isolate flex min-h-screen flex-col bg-background text-foreground">
+      {/* The projector beam: a soft violet-to-amber glow over the top of every back-office page. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] bg-[radial-gradient(60%_80%_at_70%_0%,color-mix(in_oklab,var(--primary)_16%,transparent),transparent_70%),radial-gradient(40%_60%_at_95%_0%,color-mix(in_oklab,var(--highlight)_14%,transparent),transparent_70%)]"
+      />
       <DashboardHeader />
       {children}
     </div>

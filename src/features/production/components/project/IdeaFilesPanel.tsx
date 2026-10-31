@@ -1,16 +1,16 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Download, Trash2, Upload } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
 import type { IdeaFile, IdeaFilePurpose } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { ATTACHMENT_ACCEPT, ATTACHMENT_HINT } from '../../lib/attachments';
 import { downloadFile } from '../../lib/download';
-import { formatBytes } from '../../lib/format';
-import { Empty, Panel } from '../shared/ui';
+import { formatBytes } from '@/lib/format';
+import { Empty, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 const COPY: Record<IdeaFilePurpose, { title: string; description: string; noun: string }> = {
@@ -63,7 +63,7 @@ export function IdeaFilesPanel({ canManage, purpose = 'IDEA' }: { canManage: boo
           <>
             <input ref={input} type="file" accept={ATTACHMENT_ACCEPT} className="hidden" onChange={(e) => upload(e.target.files?.[0])} />
             <Button size="sm" variant="secondary" disabled={busy} onClick={() => input.current?.click()}>
-              <Upload className="w-3.5 h-3.5" aria-hidden="true" /> {busy ? 'Đang tải…' : 'Tải lên'}
+              {busy ? 'Đang tải…' : 'Tải lên'}
             </Button>
           </>
         )

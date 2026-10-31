@@ -31,10 +31,10 @@ export default function EpisodePlaylist({ movie, currentEpisodeId, isPlaying, ca
   return (
     <div className="w-full lg:w-88 shrink-0 space-y-3">
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-sm font-bold text-slate-700 dark:text-muted-light uppercase tracking-wider">
+        <h3 className="text-sm font-bold text-slate-700 dark:text-muted-light">
           Danh sách tập ({movie.totalEpisodes} tập)
         </h3>
-        <span className="text-xs text-neon font-mono font-semibold">HLS Audio Synced</span>
+        <span className="text-xs text-neon tabular-nums font-semibold">HLS Audio Synced</span>
       </div>
 
       <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1 no-scrollbar">
@@ -52,12 +52,11 @@ export default function EpisodePlaylist({ movie, currentEpisodeId, isPlaying, ca
                   : 'bg-white dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/5 border-slate-200 dark:border-white/5 hover:border-slate-300 dark:hover:border-white/10 shadow-sm'
               }`}
             >
-              <div className="relative w-28 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-200 dark:bg-[#161922] border border-slate-200 dark:border-white/10">
+              <div className="relative w-28 h-16 rounded-xl overflow-hidden shrink-0 bg-slate-200 dark:bg-card border border-slate-200 dark:border-white/10">
                 {/* eslint-disable-next-line @next/next/no-img-element -- thumbnails come from arbitrary hosts */}
                 <img src={ep.thumbnailUrl} alt={ep.title} className="w-full h-full object-cover" />
                 {!playable && (
                   <div className="absolute inset-0 bg-black/70 flex items-center justify-center">
-                    <span className="text-base">🔒</span>
                   </div>
                 )}
                 {isActive && isPlaying && <PlayingBars />}
@@ -74,7 +73,7 @@ export default function EpisodePlaylist({ movie, currentEpisodeId, isPlaying, ca
                     </span>
                   )}
                   {ep.versions && (
-                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-muted-light font-mono">
+                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-muted-light tabular-nums">
                       {ep.currentVersion || 'v1.0'}
                     </span>
                   )}
@@ -89,8 +88,8 @@ export default function EpisodePlaylist({ movie, currentEpisodeId, isPlaying, ca
                 </p>
 
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-[10px] text-muted font-mono">{ep.duration}</span>
-                  {!playable && !ep.isFree && <span className="text-[11px] text-coin font-bold">🪙 {ep.price} Coin</span>}
+                  <span className="text-[10px] text-muted tabular-nums">{ep.duration}</span>
+                  {!playable && !ep.isFree && <span className="text-[11px] text-coin font-bold">{ep.price} Coin</span>}
                 </div>
               </div>
             </button>

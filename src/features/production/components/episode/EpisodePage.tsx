@@ -3,19 +3,19 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname } from 'next/navigation';
-import { AlertTriangle, ArrowLeft } from 'lucide-react';
+
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { productionService } from '@/services/productionService';
 import { studioService } from '@/services/studioService';
 import type { MediaAsset, StudioHandoff } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { DELIVERY_PROJECT, SUBMITTABLE_EPISODE, holdsEpisode, isIn, projectCapabilities } from '../../lib/capabilities';
 import { EPISODE_STATUS } from '../../lib/labels';
-import { formatDay, formatDuration, formatNumber } from '../../lib/format';
+import { formatDay, formatDuration, formatNumber } from '@/lib/format';
 import { baseFromPath, productionPaths } from '../../lib/routes';
-import { ErrorNote, Facts, Loading, Panel, StatusPill } from '../shared/ui';
+import { ErrorNote, Facts, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { DeliverMediaPanel, deliverAsCreator } from './DeliverMediaPanel';
 import { HlsPreview } from './HlsPreview';
 import { MediaVersions } from './MediaVersions';
@@ -93,10 +93,10 @@ export function EpisodePage() {
     <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       <div className="space-y-2">
         <Link href={productionPaths.project(base, projectId, 'episodes')} className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-sky-700">
-          <ArrowLeft className="w-3 h-3" aria-hidden="true" /> {project.data.title}
+          {project.data.title}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
             Tập {episode.episodeNumber}: {episode.title}
           </h1>
           <StatusPill {...EPISODE_STATUS[episode.status]} />
@@ -105,7 +105,6 @@ export function EpisodePage() {
 
       {episode.revisionStartedAt && (
         <p className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300">
-          <AlertTriangle className="w-4 h-4 shrink-0" aria-hidden="true" />
           Tập đã bị gỡ để sửa: người xem thấy thông báo bảo trì, người đã mua vẫn giữ quyền xem. Giao bản sửa rồi phát hành lại.
         </p>
       )}

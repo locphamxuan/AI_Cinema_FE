@@ -1,20 +1,21 @@
 'use client';
 
 import { useState } from 'react';
-import { BadgeDollarSign, Pencil, Plus } from 'lucide-react';
+import { BadgeDollarSign, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatNumber, localDateTimeToIso } from '@/features/production/lib/format';
-import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/features/production/components/shared/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatNumber, localDateTimeToIso } from '@/lib/format';
+import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { AdminPlan, PlanPeriod } from '@/types/billing';
 import { featuresSummary, MAX_PLAN_PRICE_COINS, priceError } from '../lib/planForm';
 import { PlanFormModal } from './PlanFormModal';
+import { Pager, pageOf } from '@/components/data/Pager';
 
 const PERIOD_LABEL: Record<PlanPeriod, string> = { WEEKLY: 'Tuần', MONTHLY: 'Tháng', YEARLY: 'Năm' };
 
@@ -26,6 +27,8 @@ export function PlansPanel() {
   const can = useCan();
   const canPrice = can(PERMISSION.BILLING_PRICE_MANAGE);
   const [dialog, setDialog] = useState<Dialog | null>(null);
+  const [page, setPage] = useState(1);
+  const paged = pageOf(plans.data ?? [], page, 10);
 
   return (
     <Panel
@@ -33,7 +36,7 @@ export function PlansPanel() {
       description="Gói Thường miễn phí, tài khoản nào cũng có. Gói Tháng trả bằng Coin, mở mọi tập đã phát hành trong thời hạn gói và tự gia hạn mỗi kỳ."
       actions={
         <Button size="sm" onClick={() => setDialog({ mode: 'create' })}>
-          <Plus className="w-3.5 h-3.5" /> Thêm gói Tháng
+          Thêm gói Tháng
         </Button>
       }
     >
@@ -54,16 +57,16 @@ export function PlansPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-              {plans.data.map((plan) => (
+              {paged.rows.map((plan) => (
                 <tr key={plan.id}>
                   <td className="py-2">
                     <p className="font-medium text-slate-900 dark:text-white">
-                      {plan.name} {plan.isFeatured && <span className="text-xs text-amber-600">★ Đề xuất</span>}
+                      {plan.name} {plan.isFeatured && <span className="text-xs text-amber-600">Đề xuất</span>}
                     </p>
-                    <p className="text-[11px] text-slate-500 font-mono">{plan.code}</p>
+                    <p className="text-[11px] text-slate-500 tabular-nums">{plan.code}</p>
                   </td>
                   <td className="py-2">{plan.isFree ? 'Không thời hạn' : `${PERIOD_LABEL[plan.period]} · ${plan.durationDays} ngày`}</td>
-                  <td className="py-2 text-right font-mono">
+                  <td className="py-2 text-right tabular-nums">
                     {plan.isFree ? 'Miễn phí' : plan.priceCoins === null ? 'Chưa đặt giá' : `${formatNumber(plan.priceCoins)} Coin`}
                   </td>
                   <td className="py-2 pl-4 text-slate-600 dark:text-slate-300">{featuresSummary(plan.features) || 'Theo mặc định'}</td>
@@ -87,6 +90,7 @@ export function PlansPanel() {
               ))}
             </tbody>
           </table>
+          <Pager page={page} totalPages={paged.totalPages} onChange={setPage} className="px-4 pb-4" />
         </div>
       )}
 

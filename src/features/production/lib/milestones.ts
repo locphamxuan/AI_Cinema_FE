@@ -30,7 +30,7 @@ export function currentHandoff(handoffs: StudioHandoff[], seasonId: string | nul
 }
 
 /** Episodes a hand-off covers: one season, or every season when it is for the whole project. */
-export function episodesOfHandoff(handoff: Pick<StudioHandoff, 'seasonId'>, seasons: Season[]): Episode[] {
+function episodesOfHandoff(handoff: Pick<StudioHandoff, 'seasonId'>, seasons: Season[]): Episode[] {
   return seasons.filter((s) => !handoff.seasonId || s.id === handoff.seasonId).flatMap((s) => s.episodes);
 }
 

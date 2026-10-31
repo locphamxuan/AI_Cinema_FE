@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Play, Clock, Film, AlertCircle, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { playbackService } from '@/services/playbackService';
 import type { WatchHistoryItem } from '@/types/playback';
 import type { Page } from '@/types/production';
+import { DataPagination } from '@/components/data/DataPagination';
 
 function formatDuration(seconds: number | null): string {
   if (!seconds || seconds <= 0) return '0:00';
@@ -60,9 +61,6 @@ export default function WatchHistoryPage() {
   if (!isAuthenticated) {
     return (
       <div className="max-w-4xl mx-auto py-16 px-4 text-center space-y-4 animate-fade-in">
-        <div className="w-16 h-16 mx-auto rounded-3xl bg-ruby/10 border border-ruby/20 flex items-center justify-center text-ruby">
-          <Clock className="w-8 h-8" />
-        </div>
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">Đăng nhập để xem lịch sử</h2>
         <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
           Lưu lại tiến trình xem phim của bạn trên mọi thiết bị và xem tiếp dễ dàng bất cứ lúc nào.
@@ -86,11 +84,8 @@ export default function WatchHistoryPage() {
       {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-white/10">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-xl bg-ruby/10 border border-ruby/20 flex items-center justify-center text-ruby text-sm">
-              <Clock className="w-4 h-4" />
-            </span>
-            Lịch Sử Xem Phim
+          <h1 className="flex items-center gap-2.5 font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
+            Lịch sử xem phim
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
             Theo dõi tiến trình các tập phim bạn đã xem và tiếp tục xem ngay tại vị trí đã dừng.
@@ -101,7 +96,6 @@ export default function WatchHistoryPage() {
           href="/phim"
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-ruby bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors w-fit"
         >
-          <Film className="w-3.5 h-3.5" />
           Khám phá thêm phim
         </Link>
       </div>
@@ -109,7 +103,6 @@ export default function WatchHistoryPage() {
       {/* ── Error Banner ── */}
       {error && (
         <div className="p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -126,9 +119,6 @@ export default function WatchHistoryPage() {
       {/* ── Empty State ── */}
       {!loading && items.length === 0 && (
         <div className="py-20 text-center space-y-4 rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/[0.01]">
-          <div className="w-14 h-14 mx-auto rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400">
-            <Film className="w-7 h-7" />
-          </div>
           <div>
             <p className="text-base font-bold text-slate-900 dark:text-white">Bạn chưa xem phim nào</p>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -139,7 +129,6 @@ export default function WatchHistoryPage() {
             href="/"
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-ruby hover:bg-ruby-light text-white font-bold text-xs shadow-md shadow-ruby/20 transition-all"
           >
-            <Play className="w-3.5 h-3.5 fill-current" />
             Khám phá phim ngay
           </Link>
         </div>
@@ -167,8 +156,7 @@ export default function WatchHistoryPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 gap-1.5">
-                      <Film className="w-8 h-8 opacity-40" />
-                      <span className="text-[11px] font-mono">Tập {item.episodeNumber}</span>
+                      <span className="text-[11px] tabular-nums">Tập {item.episodeNumber}</span>
                     </div>
                   )}
 
@@ -179,7 +167,7 @@ export default function WatchHistoryPage() {
                     </span>
                     {item.completed && (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-600/90 text-[10px] font-bold text-white">
-                        <CheckCircle2 className="w-3 h-3" /> Đã xem xong
+                        Đã xem xong
                       </span>
                     )}
                   </div>
@@ -208,7 +196,7 @@ export default function WatchHistoryPage() {
                 {/* Card Content */}
                 <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-ruby truncate">
+                    <p className="text-[11px] font-bold text-ruby truncate">
                       {item.movieTitle}
                     </p>
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1 mt-0.5">
@@ -217,7 +205,7 @@ export default function WatchHistoryPage() {
                   </div>
 
                   <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-2 text-[11px] text-slate-500 dark:text-slate-400">
-                    <div className="flex items-center justify-between font-mono">
+                    <div className="flex items-center justify-between tabular-nums">
                       <span>
                         {formatDuration(item.positionSeconds)} / {formatDuration(item.durationSeconds)}
                       </span>
@@ -243,29 +231,14 @@ export default function WatchHistoryPage() {
       )}
 
       {/* ── Pagination ── */}
-      {meta && meta.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 pt-6">
-          <button
-            type="button"
-            disabled={currentPage <= 1}
-            onClick={() => goToPage(Math.max(1, currentPage - 1))}
-            className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <span className="text-xs font-bold text-slate-700 dark:text-slate-300 px-3">
-            Trang {currentPage} / {meta.totalPages}
-          </span>
-          <button
-            type="button"
-            disabled={currentPage >= meta.totalPages}
-            onClick={() => goToPage(currentPage + 1)}
-            className="p-2 rounded-xl border border-slate-200 dark:border-white/10 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-white/5"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
-      )}
+      <DataPagination
+        page={currentPage}
+        totalPages={meta?.totalPages ?? 1}
+        totalItems={meta?.totalItems}
+        pageSize={meta?.itemsPerPage}
+        unit="tập đã xem"
+        onChange={goToPage}
+      />
     </div>
   );
 }

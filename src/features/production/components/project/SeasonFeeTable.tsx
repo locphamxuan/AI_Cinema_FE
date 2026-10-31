@@ -3,8 +3,8 @@
 import { Button } from '@/components/ui/Button';
 import { seasonLabel } from '@/lib/seasonLabel';
 import type { SeasonFee } from '@/types/production';
-import { formatNumber } from '../../lib/format';
-import { Empty } from '../shared/ui';
+import { formatNumber } from '@/lib/format';
+import { Empty } from '@/components/data/ui';
 
 /** What each season costs (price × episodes) against what was paid out, with the "+… Token thêm" so far (BR-37, BR-46). */
 export function SeasonFeeTable({
@@ -52,13 +52,13 @@ export function SeasonFeeTable({
               <td className="py-2 text-right">{formatNumber(season.episodeProductionCost)}</td>
               <td className="py-2 text-right">{season.episodeCount}</td>
               <td className="py-2 text-right">{formatNumber(season.baselineTokens)}</td>
-              <td className="py-2 text-right font-mono text-emerald-600">{formatNumber(season.allocatedTokens)}</td>
-              <td className="py-2 text-right font-mono text-emerald-600">{season.supplementTokens ? `+${formatNumber(season.supplementTokens)}` : '-'}</td>
-              <td className={`py-2 text-right font-mono ${season.missingTokens ? 'text-amber-600' : 'text-slate-400'}`}>{formatNumber(season.missingTokens)}</td>
-              <td className={`py-2 text-right font-mono ${season.lostTokens ? 'text-rose-600' : 'text-slate-400'}`}>
+              <td className="py-2 text-right tabular-nums text-emerald-600">{formatNumber(season.allocatedTokens)}</td>
+              <td className="py-2 text-right tabular-nums text-emerald-600">{season.supplementTokens ? `+${formatNumber(season.supplementTokens)}` : '-'}</td>
+              <td className={`py-2 text-right tabular-nums ${season.missingTokens ? 'text-amber-600' : 'text-slate-400'}`}>{formatNumber(season.missingTokens)}</td>
+              <td className={`py-2 text-right tabular-nums ${season.lostTokens ? 'text-rose-600' : 'text-slate-400'}`}>
                 {season.lostTokens ? `-${formatNumber(season.lostTokens)}` : '-'}
               </td>
-              <td className={`py-2 text-right font-mono ${season.availableTokens ? 'text-slate-800 dark:text-slate-100' : 'text-rose-600'}`}>
+              <td className={`py-2 text-right tabular-nums ${season.availableTokens ? 'text-slate-800 dark:text-slate-100' : 'text-rose-600'}`}>
                 {formatNumber(season.availableTokens)}
               </td>
               <td className="py-2 text-right">

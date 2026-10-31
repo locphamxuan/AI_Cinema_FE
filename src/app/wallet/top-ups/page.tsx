@@ -25,7 +25,7 @@ function TopUpGeneralContent() {
         </div>
       </div>
 
-      <h1 className="text-xl font-black mb-2">
+      <h1 className="font-heading text-2xl sm:text-3xl font-semibold mb-2 tracking-tight">
         {isSuccess ? 'Nạp Tiền Thành Công!' : 'Giao Dịch Bị Hủy'}
       </h1>
       <p className="text-xs text-slate-400 mb-6">

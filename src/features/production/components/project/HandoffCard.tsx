@@ -1,16 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, ExternalLink, FileText } from 'lucide-react';
+import { Download, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { seasonLabel } from '@/lib/seasonLabel';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
 import { MATERIAL_KIND, MILESTONE_STATUS } from '../../lib/labels';
-import { formatBytes, formatDateTime, formatNumber } from '../../lib/format';
+import { formatBytes, formatDateTime, formatNumber } from '@/lib/format';
 import { canMove } from '../../lib/milestones';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
-import { StatusPill } from '../shared/ui';
+import { StatusPill } from '@/components/data/ui';
 
 const EMAIL_STATUS = {
   QUEUED: { label: 'Đang gửi', tone: 'amber' },
@@ -18,7 +18,7 @@ const EMAIL_STATUS = {
   FAILED: { label: 'Gửi email lỗi', tone: 'rose' },
 } as const;
 
-export const scopeLabel = (h: Pick<StudioHandoff, 'season'>, episodeCount?: number) =>
+const scopeLabel = (h: Pick<StudioHandoff, 'season'>, episodeCount?: number) =>
   h.season ? seasonLabel(h.season.seasonNumber, episodeCount, h.season.title) : 'Cả dự án';
 
 /** One hand-off (or studio change) on the Studio timeline: who it went to, what was sent, every milestone and Submission. */
@@ -113,7 +113,6 @@ export function HandoffCard({
         <ul className="space-y-1">
           {h.briefFileKey && (
             <li className="flex items-center gap-2">
-              <FileText className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
               <span className="flex-1">Brief PDF</span>
               <Button size="sm" variant="ghost" onClick={onBrief} aria-label="Tải brief">
                 <Download className="w-3.5 h-3.5" />
@@ -122,7 +121,6 @@ export function HandoffCard({
           )}
           {h.materials.map((m) => (
             <li key={m.id} className="flex items-center gap-2">
-              <FileText className="w-3.5 h-3.5 text-slate-400" aria-hidden="true" />
               <span className="flex-1 min-w-0 truncate">
                 {m.fileName} <span className="text-slate-400">· {MATERIAL_KIND[m.kind]} · {formatBytes(Number(m.sizeBytes))}</span>
               </span>

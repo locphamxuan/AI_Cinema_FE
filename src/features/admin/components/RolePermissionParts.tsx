@@ -1,6 +1,6 @@
 'use client';
 
-import { Lock, Check, Film, Users, ShieldCheck, UserCog, Crown } from 'lucide-react';
+import { Film, Users, ShieldCheck, UserCog, Crown } from 'lucide-react';
 import type { PermissionRow } from '@/services/adminService';
 import type { UserRole } from '@/types/production';
 import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_SHORT_LABEL } from '../roles';
@@ -39,7 +39,7 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
             className={`p-4 rounded-2xl border transition-all ${
               isChanged
                 ? 'border-amber-400 bg-amber-50/40 dark:bg-amber-500/10 shadow-sm'
-                : 'border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720]'
+                : 'border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
@@ -55,7 +55,7 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
             <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
               {ROLE_SHORT_LABEL[role]}
             </p>
-            <p className="text-lg font-black font-mono text-slate-900 dark:text-white mt-0.5">
+            <p className="text-lg font-black tabular-nums text-slate-900 dark:text-white mt-0.5">
               {count} <span className="text-xs font-normal text-slate-400">quyền</span>
             </p>
           </div>
@@ -72,7 +72,7 @@ export function RoleColumnHeaders() {
       <tr>
         <th
           scope="col"
-          className="py-3.5 px-6 text-left font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 w-1/3 min-w-[280px]"
+          className="py-3.5 px-6 text-left font-bold text-slate-700 dark:text-slate-300 w-1/3 min-w-[280px]"
         >
           Chức năng & Diễn giải quyền hạn
         </th>
@@ -122,7 +122,6 @@ export function PermissionCell({ role, permission, title, isLocked, isGranted, o
           title="Quyền cốt lõi bắt buộc của hệ thống, không thể thu hồi"
           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 select-none"
         >
-          <Lock className="w-3 h-3 text-amber-500 shrink-0" />
           <span>Cố định</span>
         </span>
       </td>
@@ -145,12 +144,10 @@ export function PermissionCell({ role, permission, title, isLocked, isGranted, o
       >
         {isGranted ? (
           <>
-            <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>Được phép</span>
           </>
         ) : (
           <>
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-sky-500 transition-colors shrink-0"></span>
             <span className="text-[11px] text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-300">
               Chưa cấp
             </span>

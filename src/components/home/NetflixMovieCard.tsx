@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Play, Plus, Check, Heart, ChevronDown,  ShieldCheck } from 'lucide-react';
+import { Play, Plus, Check, Heart, ChevronDown } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 interface NetflixMovieCardProps {
@@ -34,7 +34,7 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Base Card Frame */}
-      <div className="relative rounded-2xl overflow-hidden bg-white dark:bg-[#151821] border border-slate-200 dark:border-white/10 transition-all duration-300 group-hover:scale-105 group-hover:border-[#8B5CF6] group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.18)] dark:group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.85)] shadow-sm dark:shadow-md">
+      <div className="relative rounded-2xl overflow-hidden bg-white dark:bg-card border border-slate-200 dark:border-white/10 transition-all duration-300 group-hover:scale-105 group-hover:border-primary group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.18)] dark:group-hover:shadow-[0_12px_36px_rgba(0,0,0,0.85)] shadow-sm dark:shadow-md">
         {/* Poster / Thumbnail Image */}
         <div className={aspectRatio === '16/9' ? 'aspect-[16/9] relative overflow-hidden bg-black' : 'aspect-[2/3] relative overflow-hidden bg-black'}>
           <img
@@ -51,13 +51,12 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
 
           {/* Badge: AI label (Top Right) */}
           <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-500/30 border border-emerald-500/50 text-[10px] font-bold text-emerald-300 backdrop-blur-md shadow-sm">
-            <ShieldCheck className="w-2.5 h-2.5 text-emerald-400" />
             <span>Nhãn AI</span>
           </div>
 
           {/* Bottom Left Quality / AI Badge */}
           <div className="absolute bottom-2.5 left-2.5 z-10 flex items-center gap-1.5">
-            <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-black text-[9px] uppercase tracking-wider shadow">
+            <span className="px-1.5 py-0.5 rounded bg-primary text-white font-black text-[9px] shadow">
               {movie.quality || '4K'}
             </span>
             <span className="px-1.5 py-0.5 rounded bg-black/60 border border-white/15 text-slate-300 font-semibold text-[9px] backdrop-blur-md">
@@ -84,7 +83,7 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
         {/* Info Container */}
         <div className="p-3.5 flex flex-col justify-between">
           <div className="flex items-center justify-between gap-2 mb-1.5">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-red-600 dark:group-hover:text-red-500 transition-colors">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-primary dark:group-hover:text-primary transition-colors">
               {movie.title}
             </h3>
           </div>
@@ -117,7 +116,7 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
             <div className="flex items-center gap-2">
               <Link
                 href={firstEpisode ? `/watch/${firstEpisode.id}` : '#'}
-                className="w-8 h-8 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center transition-transform hover:scale-110 active:scale-95 shadow-md shadow-red-600/30"
+                className="w-8 h-8 rounded-full bg-primary hover:bg-action-strong text-white flex items-center justify-center transition-transform hover:scale-110 active:scale-95 shadow-md shadow-primary/30"
                 title="Xem ngay"
               >
                 <Play className="w-3.5 h-3.5 fill-white translate-x-0.5" />
@@ -149,12 +148,12 @@ export default function NetflixMovieCard({ movie, onOpenDetail, aspectRatio = '1
                 }}
                 className={`w-8 h-8 rounded-full border flex items-center justify-center text-xs transition-all ${
                   isLiked
-                    ? 'bg-red-500/20 border-red-500 text-red-500'
+                    ? 'bg-primary/20 border-primary text-primary'
                     : 'bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 border-slate-200 dark:border-white/20 text-slate-700 dark:text-white'
                 }`}
                 title={isLiked ? 'Đã thích' : 'Thích phim này'}
               >
-                <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-red-500' : ''}`} />
+                <Heart className={`w-3.5 h-3.5 ${isLiked ? 'fill-primary' : ''}`} />
               </button>
             </div>
 

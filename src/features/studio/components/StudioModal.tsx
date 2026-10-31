@@ -6,7 +6,7 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { studioService } from '@/services/studioService';
 import type { Studio, StudioInput } from '@/types/production';
-import { useAction } from '@/features/production/hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 
 const EMAIL = /^\S+@\S+\.\S+$/;
 const PHONE = /^[0-9+().\s-]{6,30}$/;

@@ -38,7 +38,7 @@ export default function HomePage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#07090E] text-slate-900 dark:text-white selection:bg-[#E50914] selection:text-white flex flex-col justify-between transition-colors duration-300">
+    <div className="min-h-screen bg-background dark:bg-background text-slate-900 dark:text-white selection:bg-primary selection:text-white flex flex-col justify-between transition-colors duration-300">
       <div>
         {/* The navbar reads the query string to mark the current link. */}
         <Suspense>
@@ -55,7 +55,7 @@ export default function HomePage() {
         )}
 
         {!heroMovie && isCatalogLoading && (
-          <div className="relative w-full h-[75vh] min-h-[600px] bg-slate-200 dark:bg-[#0E1118] animate-pulse flex items-end px-4 sm:px-8 md:px-16 pb-24 select-none">
+          <div className="relative w-full h-[75vh] min-h-[600px] bg-slate-200 dark:bg-background animate-pulse flex items-end px-4 sm:px-8 md:px-16 pb-24 select-none">
             <div className="space-y-4 max-w-xl">
               <div className="h-6 w-36 bg-slate-300 dark:bg-white/10 rounded-full" />
               <div className="h-10 sm:h-14 w-72 sm:w-96 bg-slate-300 dark:bg-white/15 rounded-xl" />

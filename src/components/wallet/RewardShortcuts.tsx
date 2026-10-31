@@ -3,7 +3,7 @@
 import { useAppStore } from '@/store/useAppStore';
 
 const BUTTON =
-  'relative flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#8B5CF6]/15 hover:bg-[#8B5CF6]/25 border border-[#8B5CF6]/30 text-xs font-bold transition shadow-sm cursor-pointer';
+  'relative flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/15 hover:bg-primary/25 border border-primary/30 text-xs font-bold transition shadow-sm cursor-pointer';
 
 /**
  * Header entries of the member's rewards: the reward wheel is always reachable (it shows how many spins
@@ -22,10 +22,9 @@ export default function RewardShortcuts({ withCheckIn = false, light = false }: 
           className={BUTTON}
           title="Điểm danh nhận Coin thưởng mỗi ngày"
         >
-          <span className="text-sm" aria-hidden="true">🎁</span>
           <span className={`hidden md:inline ${text}`}>Điểm danh</span>
           {!checkInStreak.todayClaimed && (
-            <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-purple-500 ring-2 ring-white dark:ring-[#07090E]" />
+            <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-purple-500 ring-2 ring-white dark:ring-background" />
           )}
         </button>
       )}
@@ -35,12 +34,11 @@ export default function RewardShortcuts({ withCheckIn = false, light = false }: 
         className={BUTTON}
         title={`Vòng quay may mắn • Bạn còn ${availableSpins} lượt`}
       >
-        <span className="text-sm" aria-hidden="true">🎯</span>
         <span className={`hidden md:inline ${text}`}>Vòng quay</span>
         <span
           aria-label={`Còn ${availableSpins} lượt quay`}
           className={`min-w-5 px-1.5 py-0.5 rounded-full text-[10px] font-black leading-none text-center ${
-            availableSpins > 0 ? 'bg-amber-400 text-neutral-950' : 'bg-white/15 text-slate-300'
+            availableSpins > 0 ? 'bg-highlight text-highlight-foreground' : light ? 'bg-muted text-muted-foreground' : 'bg-white/15 text-slate-300'
           }`}
         >
           {availableSpins}

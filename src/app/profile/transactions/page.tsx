@@ -7,24 +7,37 @@ import TransactionList from '@/components/wallet/TransactionList';
 import { COIN_ENTRY_LABEL, COIN_ENTRY_TYPES } from '@/lib/coinEntry';
 import type { CoinEntryType, StatementKind, StatementLine } from '@/types/billing';
 import type { Page } from '@/types/production';
+import { DataPagination } from '@/components/data/DataPagination';
+import { PageHeader } from '@/components/data/PageHeader';
+import { StatCard } from '@/components/data/StatCard';
+import { TrendChart, type TrendPoint } from '@/components/charts/TrendChart';
+import { Card } from '@/components/shadcn/card';
+import { fieldInputClass } from '@/components/ui/FormField';
+import { Loading } from '@/components/data/ui';
 
 const KINDS: { value: StatementKind; label: string }[] = [
   { value: 'ALL', label: 'Tất cả' },
-  { value: 'MAIN', label: '🟡 Coin chính' },
-  { value: 'BONUS', label: '🎁 Coin thưởng' },
+  { value: 'MAIN', label: 'Coin chính' },
+  { value: 'BONUS', label: 'Coin thưởng' },
 ];
 
 const chip = (active: boolean) =>
-  `px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
-    active
-      ? 'bg-neon/20 text-neon border border-neon/30'
-      : 'bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-white/5 dark:text-muted-light dark:hover:bg-white/10 border border-slate-200 dark:border-white/5'
+  `rounded-md px-3.5 py-1.5 text-sm transition-colors cursor-pointer ${
+    active ? 'bg-background font-medium text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
   }`;
 
 interface Loaded {
   key: string;
   page?: Page<StatementLine>;
   error?: string;
+}
+
+/** Main plus bonus balance after each line on this page, oldest first. */
+function balanceTrend(lines: StatementLine[]): TrendPoint[] {
+  return [...lines].reverse().map((l) => ({
+    label: new Date(l.createdAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }),
+    value: l.mainBalanceAfter + l.bonusBalanceAfter,
+  }));
 }
 
 /** MF-2: the member's Coin history straight from the BE ledger (GET /wallet/statements). */
@@ -46,7 +59,7 @@ export default function TransactionsPage() {
   }, [isAuthenticated, kind, entryType, page, key]);
 
   if (!isAuthenticated) {
-    return <p className="py-20 text-center text-sm text-slate-500">Đăng nhập để xem lịch sử giao dịch.</p>;
+    return <p className="py-20 text-center text-sm text-muted-foreground">Đăng nhập để xem lịch sử giao dịch.</p>;
   }
 
   const loading = loaded?.key !== key;
@@ -59,24 +72,21 @@ export default function TransactionsPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">📋 Lịch Sử Giao Dịch</h1>
-        <p className="text-muted-light text-sm mt-1">Mọi lần Coin vào và ra ví, ghi nhận từ sổ cái của hệ thống.</p>
-      </div>
+      <PageHeader title="Lịch sử giao dịch" description="Mọi lần Coin vào và ra ví, ghi nhận từ sổ cái của hệ thống." />
 
-      <div className="grid grid-cols-2 gap-3 max-w-md">
-        <div className="glass-card-sm p-4">
-          <p className="text-[10px] text-muted-light uppercase tracking-wider">Coin chính</p>
-          <p className="text-2xl font-bold text-coin mt-1">{wallet.mainCoin.toLocaleString('vi-VN')}</p>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-1">
+          <StatCard featured label="Coin chính" value={wallet.mainCoin.toLocaleString('vi-VN')} unit="Coin" note="Nạp bằng tiền, dùng trước" />
+          <StatCard label="Coin thưởng" value={wallet.bonusCoin.toLocaleString('vi-VN')} unit="Coin" note="Từ điểm danh và vòng quay" noteTone="brand" />
         </div>
-        <div className="glass-card-sm p-4">
-          <p className="text-[10px] text-muted-light uppercase tracking-wider">Coin thưởng</p>
-          <p className="text-2xl font-bold text-neon mt-1">{wallet.bonusCoin.toLocaleString('vi-VN')}</p>
-        </div>
+        <Card className="gap-2 px-5 py-4 lg:col-span-2">
+          <p className="text-sm font-medium">Tổng số dư sau mỗi giao dịch</p>
+          <TrendChart points={balanceTrend(loaded?.page?.data ?? [])} name="Số dư" valueUnit="Coin" height={170} />
+        </Card>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-        <fieldset className="flex flex-wrap gap-2 flex-1">
+        <fieldset className="inline-flex w-fit flex-wrap gap-1 rounded-lg bg-muted p-1">
           <legend className="sr-only">Loại Coin</legend>
           {KINDS.map((k) => (
             <button
@@ -90,12 +100,12 @@ export default function TransactionsPage() {
             </button>
           ))}
         </fieldset>
-        <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-muted-light">
+        <label className="flex items-center gap-2 text-sm text-muted-foreground sm:ml-auto">
           <span>Loại giao dịch</span>
           <select
             value={entryType}
             onChange={(e) => refilter(() => setEntryType(e.target.value as CoinEntryType | ''))}
-            className="bg-slate-100 dark:bg-[#161922] border border-slate-300 dark:border-white/10 rounded-lg px-3 py-1.5 text-xs text-slate-900 dark:text-foreground"
+            className={`${fieldInputClass} w-auto py-1.5`}
           >
             <option value="">Tất cả</option>
             {COIN_ENTRY_TYPES.map((t) => (
@@ -108,24 +118,21 @@ export default function TransactionsPage() {
       </div>
 
       {!loading && loaded?.error && (
-        <p role="alert" className="text-sm text-rose-600">
+        <p role="alert" className="text-sm text-destructive">
           {loaded.error}
         </p>
       )}
-      {loading ? <p className="text-sm text-slate-500">Đang tải…</p> : <TransactionList lines={loaded?.page?.data ?? []} />}
+      {loading ? <Loading /> : <TransactionList lines={loaded?.page?.data ?? []} />}
 
-      {meta && totalPages > 1 && (
-        <nav aria-label="Phân trang" className="flex items-center justify-center gap-3 text-xs">
-          <button type="button" className={chip(false)} disabled={page <= 1} onClick={() => setPage(page - 1)}>
-            ← Trước
-          </button>
-          <span>
-            Trang {meta.currentPage}/{totalPages}
-          </span>
-          <button type="button" className={chip(false)} disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-            Sau →
-          </button>
-        </nav>
+      {meta && (
+        <DataPagination
+          page={page}
+          totalPages={totalPages}
+          totalItems={meta.totalItems}
+          pageSize={meta.itemsPerPage}
+          unit="giao dịch"
+          onChange={setPage}
+        />
       )}
     </div>
   );

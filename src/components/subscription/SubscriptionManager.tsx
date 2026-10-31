@@ -88,7 +88,7 @@ export default function SubscriptionManager() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-black text-slate-900 dark:text-foreground tracking-tight">🎬 Gói Thành Viên</h1>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">Gói thành viên</h1>
         <p className="text-slate-500 dark:text-muted-light text-xs sm:text-sm mt-1">
           Gói Tháng trả bằng Coin, xem toàn bộ tập đã phát hành và tự gia hạn mỗi kỳ.
         </p>
@@ -116,7 +116,7 @@ export default function SubscriptionManager() {
 
       {!hasRunningPlan && (
         <section className="space-y-3">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">Chọn gói</h2>
+          <h2 className="text-sm font-bold text-slate-500">Chọn gói</h2>
           <PlanList plans={plans} disabled={busy !== null} busyPlanId={busy} onJoin={(plan) => void join(plan)} />
         </section>
       )}

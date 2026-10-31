@@ -3,27 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  Ban,
-  Film,
-  Clapperboard,
-  ShieldCheck,
-  History,
-  CalendarClock,
-  Layers,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, Ban, Film, Clapperboard, ShieldCheck, History, CalendarClock, Layers, Users } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
-import { useResource } from '../../hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { projectCapabilities } from '../../lib/capabilities';
 import { MOVIE_STATUS, SEASON_STATUS } from '../../lib/labels';
 import { baseFromPath, productionPaths } from '../../lib/routes';
-import { ErrorNote, Loading, StatusPill } from '../shared/ui';
+import { ErrorNote, Loading, StatusPill } from '@/components/data/ui';
 import { ProjectProvider } from './ProjectContext';
 import { OverviewTab } from './OverviewTab';
 import { EpisodesTab } from './EpisodesTab';
@@ -94,19 +83,19 @@ export function ProjectDetailPage() {
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
       <main className="w-full">
-        <div className="bg-white dark:bg-[#0F1C27] border-b border-sky-100 dark:border-white/10">
+        <div className="bg-white dark:bg-card border-b border-sky-100 dark:border-white/10">
           <div className="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-coral-400" aria-hidden="true" />
           <div className="px-6 lg:px-8 pt-4 pb-5 space-y-4">
             <Link
               href={productionPaths.list(base)}
               className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-700 dark:text-sky-300 hover:underline"
             >
-              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Danh sách dự án
+              Danh sách dự án
             </Link>
 
             <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5">
               <div className="space-y-2 min-w-0">
-                <h1 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">{data.title}</h1>
+                <h1 className="font-heading text-2xl font-semibold text-slate-900 dark:text-white leading-tight tracking-tight">{data.title}</h1>
                 <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
                   <span className="inline-flex items-center gap-1.5">
                     Dự án <StatusPill {...MOVIE_STATUS[data.status]} />

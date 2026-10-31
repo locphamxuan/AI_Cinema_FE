@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useCan } from '@/hooks/useCan';
 import type { PermissionKey } from '@/lib/permissions';
+import { PageHeader } from '@/components/data/PageHeader';
 
 export interface SectionTab {
   key: string;
@@ -31,22 +32,19 @@ function Tabs({ title, description, tabs }: { title: string; description: string
   const current = open.find((t) => t.key === requested) ?? open[0];
 
   return (
-    <main className="w-full px-6 lg:px-8 py-6 space-y-5">
-      <header className="space-y-1">
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-white">{title}</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
-      </header>
+    <main className="mx-auto w-full max-w-7xl space-y-5 px-6 py-6 lg:px-8">
+      <PageHeader title={title} description={description} />
       {open.length > 1 && (
-        <nav aria-label={title} className="flex gap-1 border-b border-sky-100 dark:border-white/10 overflow-x-auto">
+        <nav aria-label={title} className="inline-flex max-w-full gap-1 overflow-x-auto rounded-lg bg-muted p-1">
           {open.map((t) => (
             <Link
               key={t.key}
               href={`${pathname}?tab=${t.key}`}
               aria-current={t === current ? 'page' : undefined}
-              className={`-mb-px px-4 py-2.5 text-sm whitespace-nowrap border-b-2 transition-colors ${
+              className={`rounded-md px-3.5 py-1.5 text-sm whitespace-nowrap transition-colors ${
                 t === current
-                  ? 'border-sky-500 text-sky-800 dark:text-sky-200 font-semibold'
-                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-background font-medium text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {t.label}

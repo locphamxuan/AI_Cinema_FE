@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { notificationTabsFor, typesOf } from '@/features/notifications/notificationCatalog';
-import { pageOf } from '@/features/production/components/shared/Pager';
+import { pageOf } from '@/components/data/Pager';
 import { downloadFile } from '@/features/production/lib/download';
 import { TokenRequestList } from '@/features/token-request/TokenRequestList';
 import { routeFetch } from '@/tests/support/routeFetch';

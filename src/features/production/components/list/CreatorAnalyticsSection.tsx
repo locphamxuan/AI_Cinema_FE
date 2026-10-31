@@ -1,9 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { BarChart3, ChevronDown, ChevronUp, Clapperboard, Film, CheckCircle2 } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
+import { StatCard } from '@/components/data/StatCard';
+import { Card } from '@/components/shadcn/card';
+import { Button } from '@/components/shadcn/button';
 import type { ProjectSummary } from '@/types/production';
 
 interface CreatorAnalyticsSectionProps {
@@ -23,10 +26,10 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
   };
 
   const donutData = [
-    { label: 'Đang sản xuất', value: statusCounts.production, color: '#8b5cf6' },
-    { label: 'Hoàn tất', value: statusCounts.done, color: '#10b981' },
-    { label: 'Lên kế hoạch', value: statusCounts.plan, color: '#f59e0b' },
-    { label: 'Đã huỷ', value: statusCounts.cancelled, color: '#ef4444' },
+    { label: 'Đang sản xuất', value: statusCounts.production, color: 'var(--chart-1)' },
+    { label: 'Hoàn tất', value: statusCounts.done, color: 'var(--chart-3)' },
+    { label: 'Lên kế hoạch', value: statusCounts.plan, color: 'var(--chart-2)' },
+    { label: 'Đã huỷ', value: statusCounts.cancelled, color: 'var(--chart-4)' },
   ];
 
   // Real-time active projects with episode counts (Top 6)
@@ -45,8 +48,8 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
 
   const barSeries = [
     {
-      name: 'Số tập đã quay / dựng',
-      color: '#10b981',
+      name: 'Số tập',
+      color: 'var(--chart-3)',
       values: recentProjects.map((p) => p._count?.episodes ?? 0),
     },
   ];
@@ -54,98 +57,46 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
   const totalEpisodes = projects.reduce((acc, p) => acc + (p._count?.episodes ?? 0), 0);
 
   return (
-    <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm overflow-hidden mb-6">
-      {/* ── Header Bar ── */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
-            <BarChart3 className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-              Thống kê & Tiến độ sản xuất
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Tổng quan phân bổ dự án và số lượng tập phim thực tế của {roleTitle}
-            </p>
-          </div>
+    <Card className="mb-6 gap-0 py-0">
+      <div className="flex items-center justify-between gap-3 border-b px-6 py-4">
+        <div className="min-w-0">
+          <h2 className="flex items-center gap-2 font-heading text-base font-semibold">
+            Thống kê sản xuất
+          </h2>
+          <p className="text-sm text-muted-foreground">Trạng thái dự án và số tập đã làm của {roleTitle}.</p>
         </div>
-
-        <button
-          type="button"
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
-        >
-          {collapsed ? (
-            <>
-              <span>Mở biểu đồ</span>
-              <ChevronDown className="w-3.5 h-3.5" />
-            </>
-          ) : (
-            <>
-              <span>Thu gọn</span>
-              <ChevronUp className="w-3.5 h-3.5" />
-            </>
-          )}
-        </button>
+        <Button variant="ghost" size="sm" aria-expanded={!collapsed} onClick={() => setCollapsed(!collapsed)}>
+          {collapsed ? 'Mở biểu đồ' : 'Thu gọn'}
+          {collapsed ? <ChevronDown /> : <ChevronUp />}
+        </Button>
       </div>
 
-      {/* ── Collapsible Body ── */}
       {!collapsed && (
-        <div className="p-6 space-y-6 animate-fade-in">
-          {/* 3 KPI Summary Tiles */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
-                <Film className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Tổng số dự án
-                </p>
-                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
-                  {projects.length}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-                <Clapperboard className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Tổng tập hoàn thành
-                </p>
-                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
-                  {totalEpisodes}
-                </p>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-                <CheckCircle2 className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                  Dự án đã đóng máy
-                </p>
-                <p className="text-xl font-black text-slate-900 dark:text-white font-mono">
-                  {statusCounts.done}
-                </p>
-              </div>
-            </div>
+        <div className="space-y-6 p-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <StatCard
+              featured
+              label="Tổng số dự án"
+              value={projects.length}
+              note={`${statusCounts.production} đang sản xuất`}
+            />
+            <StatCard
+              label="Tập đã có"
+              value={totalEpisodes}
+              unit="tập"
+              note="Trên mọi dự án"
+            />
+            <StatCard
+              label="Dự án đã hoàn tất"
+              value={statusCounts.done}
+              note={`${statusCounts.plan} đang lên kế hoạch`}
+              noteTone="good"
+            />
           </div>
 
-          {/* Charts Row: 2 Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
-            {/* Donut Chart: Project Status Distribution */}
-            <div className="p-5 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.02]">
-              <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-purple-500" />
-                Phân bổ trạng thái dự án
-              </h4>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <section className="rounded-xl border p-5">
+              <h3 className="mb-4 text-sm font-semibold">Phân bổ trạng thái dự án</h3>
               <DonutChart
                 data={donutData}
                 centerLabel="dự án"
@@ -153,35 +104,14 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
                 valueUnit="phim"
                 size={180}
               />
-            </div>
-
-            {/* Bar Chart: Episode Output (Real-time data) */}
-            <div className="p-5 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/40 dark:bg-white/[0.02]">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  Số tập phim theo dự án
-                </h4>
-                <span className="text-[11px] font-mono text-slate-400 dark:text-slate-500">
-                  Real-time Data
-                </span>
-              </div>
-              {barCategories.length > 0 ? (
-                <BarChart
-                  categories={barCategories}
-                  series={barSeries}
-                  valueUnit="tập"
-                  height={180}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-[180px] text-xs text-slate-400">
-                  Chưa có dữ liệu tập phim cho các dự án.
-                </div>
-              )}
-            </div>
+            </section>
+            <section className="rounded-xl border p-5">
+              <h3 className="mb-4 text-sm font-semibold">Số tập theo dự án</h3>
+              <BarChart categories={barCategories} series={barSeries} valueUnit="tập" height={200} />
+            </section>
           </div>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ProjectSummary } from '@/types/production';
 import { MOVIE_STATUS } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime } from '@/lib/format';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
-import { CARD, StatusPill } from '../shared/ui';
+import { CARD, StatusPill } from '@/components/data/ui';
 
 /** The projects as a table; a Creator sees who reviews each one, the others who creates it. */
 export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; base: ProductionBase }) {
@@ -51,7 +51,7 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
                 <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">
                   {(isCreator ? p.reviewer : p.creator)?.fullName ?? 'Chưa giao'}
                 </td>
-                <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300 font-bold font-mono">
+                <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300 font-bold tabular-nums">
                   {p._count.episodes}
                 </td>
                 <td className="px-4 py-3 hidden lg:table-cell text-slate-500 dark:text-slate-400">{formatDateTime(p.lastActivityAt)}</td>

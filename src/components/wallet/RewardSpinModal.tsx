@@ -145,7 +145,7 @@ function SpinDialog() {
         <div className="glass-card w-full max-w-lg p-6 animate-scale-in relative my-8">
           <div className="flex items-center justify-between pb-3 mb-4 border-b border-white/10">
             <div>
-              <h2 className="text-xl font-black text-white">🎯 Vòng Quay May Mắn</h2>
+              <h2 className="text-xl font-black text-white">Vòng Quay May Mắn</h2>
               <p className="text-xs text-muted-light mt-0.5">9 ô Coin và 1 ô gói Tháng 30 ngày (cơ hội trúng 2%)</p>
             </div>
             <button
@@ -181,7 +181,7 @@ function SpinDialog() {
               type="button"
               onClick={() => void handleSpin()}
               disabled={isLoading || isSpinning || (availableSpins <= 0 && !pendingSpinKey) || prizes.length === 0}
-              className="mt-6 w-full max-w-xs py-3.5 px-6 rounded-2xl font-black text-base uppercase tracking-wider transition-all duration-200 cursor-pointer bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-neutral-950 hover:brightness-110 active:scale-95 shadow-lg shadow-amber-500/25 disabled:grayscale disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              className="mt-6 w-full max-w-xs py-3.5 px-6 rounded-2xl font-black text-base transition-all duration-200 cursor-pointer bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-neutral-950 hover:brightness-110 active:scale-95 shadow-lg shadow-amber-500/25 disabled:grayscale disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
             >
               {spinLabel}
             </button>
@@ -192,7 +192,7 @@ function SpinDialog() {
 
           {lastWon && (
             <div role="status" className="mt-4 p-4 rounded-2xl bg-verified/20 border border-verified/40 text-center animate-bounce-in">
-              <h3 className="text-base font-bold text-verified">🎉 Chúc mừng bạn trúng thưởng!</h3>
+              <h3 className="text-base font-bold text-verified">Chúc mừng bạn trúng thưởng!</h3>
               <p className="text-white font-extrabold text-lg mt-0.5">{lastWon.prize.name}</p>
               <p className="text-xs text-verified/90 mt-1">
                 {lastWon.bonusCoins
@@ -212,7 +212,7 @@ function SpinDialog() {
                     className="flex items-center justify-between text-[11px] px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/5 text-slate-300"
                   >
                     <span>{item.prize?.name ?? 'Giải thưởng'}</span>
-                    <span className="text-muted-light font-mono text-[10px]">
+                    <span className="text-muted-light tabular-nums text-[10px]">
                       {item.spunAt ? new Date(item.spunAt).toLocaleDateString('vi-VN') : ''}
                     </span>
                   </li>

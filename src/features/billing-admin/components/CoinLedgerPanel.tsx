@@ -1,20 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { SlidersHorizontal, Wallet } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { useCan } from '@/hooks/useCan';
-import { COIN_ENTRY_LABEL, COIN_ENTRY_TYPES, signed } from '@/lib/coinEntry';
+import { COIN_ENTRY_LABEL, COIN_ENTRY_TYPES, signed, describeLine } from '@/lib/coinEntry';
 import { PERMISSION } from '@/lib/permissions';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime, formatDay, formatNumber } from '@/features/production/lib/format';
-import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime, formatDay, formatNumber } from '@/lib/format';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { CoinEntryType } from '@/types/billing';
-import { Pager } from './Pager';
+import { MetaPager } from '@/components/data/MetaPager';
 
 const LOT_SOURCE_LABEL: Record<string, string> = { ...COIN_ENTRY_LABEL, TOP_UP_PROMO: 'Khuyến mãi nạp' };
 
@@ -74,9 +74,9 @@ export function CoinLedgerPanel() {
                 <tr key={line.id}>
                   <td className="py-2 whitespace-nowrap">{formatDateTime(line.createdAt)}</td>
                   <td className="py-2">{COIN_ENTRY_LABEL[line.entryType]}</td>
-                  <td className="py-2 hidden md:table-cell text-slate-600 dark:text-slate-300">{line.description ?? '-'}</td>
-                  <td className="py-2 text-right font-mono">{signed(line.mainAmount)}</td>
-                  <td className="py-2 text-right font-mono">{signed(line.bonusAmount)}</td>
+                  <td className="py-2 hidden md:table-cell text-slate-600 dark:text-slate-300">{describeLine(line.description) ?? '-'}</td>
+                  <td className="py-2 text-right tabular-nums">{signed(line.mainAmount)}</td>
+                  <td className="py-2 text-right tabular-nums">{signed(line.bonusAmount)}</td>
                   <td className="py-2 text-right">
                     {canWallet && (
                       <Button size="sm" variant="ghost" aria-label="Xem ví của tài khoản này" onClick={() => setWalletOf(line.userId)}>
@@ -88,7 +88,7 @@ export function CoinLedgerPanel() {
               ))}
             </tbody>
           </table>
-          <Pager meta={ledger.data.meta} onPage={setPage} />
+          <MetaPager meta={ledger.data.meta} onPage={setPage} />
         </div>
       )}
       {walletOf && <WalletModal userId={walletOf} canAdjust={canAdjust} onClose={() => setWalletOf(null)} onAdjusted={ledger.reload} />}
@@ -120,11 +120,11 @@ function WalletModal({
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
               <p className="text-slate-500">Coin chính</p>
-              <p className="text-lg font-bold font-mono">{formatNumber(w.mainBalance)}</p>
+              <p className="text-lg font-bold tabular-nums">{formatNumber(w.mainBalance)}</p>
             </div>
             <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
               <p className="text-slate-500">Coin thưởng</p>
-              <p className="text-lg font-bold font-mono">{formatNumber(w.bonusBalance)}</p>
+              <p className="text-lg font-bold tabular-nums">{formatNumber(w.bonusBalance)}</p>
             </div>
           </div>
           <div>
@@ -147,7 +147,7 @@ function WalletModal({
           {canAdjust && (
             <div className="flex justify-end">
               <Button size="sm" onClick={() => setAdjusting(true)}>
-                <SlidersHorizontal className="w-3.5 h-3.5" /> Điều chỉnh số dư
+                Điều chỉnh số dư
               </Button>
             </div>
           )}

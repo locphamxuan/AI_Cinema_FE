@@ -1,6 +1,6 @@
 'use client';
 
-import { COIN_ENTRY_LABEL, signed } from '@/lib/coinEntry';
+import { COIN_ENTRY_LABEL, signed, describeLine } from '@/lib/coinEntry';
 import type { CoinEntryType, StatementLine } from '@/types/billing';
 
 const TYPE_COLOR: Partial<Record<CoinEntryType, string>> = {
@@ -28,7 +28,7 @@ const when = (iso: string) => {
   };
 };
 
-const HEAD = 'px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light uppercase tracking-wider font-bold';
+const HEAD = 'px-4 py-3 text-[10px] text-slate-500 dark:text-muted-light font-bold';
 
 /** The member's Coin ledger: a table on desktop, cards on mobile, balances as the BE recorded them. */
 export default function TransactionList({ lines }: Readonly<{ lines: StatementLine[] }>) {
@@ -59,16 +59,15 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
                       {COIN_ENTRY_LABEL[line.entryType]}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-foreground">{line.description ?? '-'}</td>
+                  <td className="px-4 py-3 text-sm font-medium text-slate-900 dark:text-foreground">{describeLine(line.description) ?? '-'}</td>
                   <td className={`px-4 py-3 text-right text-sm font-bold ${amountClass(line.mainAmount, 'text-verified')}`}>
                     {signed(line.mainAmount)}
                   </td>
                   <td className={`px-4 py-3 text-right text-sm font-bold ${amountClass(line.bonusAmount, 'text-neon')}`}>
                     {signed(line.bonusAmount)}
                   </td>
-                  <td className="px-4 py-3 text-right text-xs font-mono text-slate-600 dark:text-muted-light whitespace-nowrap">
-                    {line.mainBalanceAfter} 🟡 · {line.bonusBalanceAfter} 🎁
-                  </td>
+                  <td className="px-4 py-3 text-right text-xs tabular-nums text-slate-600 dark:text-muted-light whitespace-nowrap">
+                    Chính {line.mainBalanceAfter} / Thưởng {line.bonusBalanceAfter}</td>
                   <td className="px-4 py-3 text-right">
                     <span className="text-xs text-slate-600 dark:text-muted-light font-medium">{day}</span>
                     <br />
@@ -90,13 +89,13 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
               </span>
               <span className="text-[10px] text-muted">{when(line.createdAt).day}</span>
             </div>
-            {line.description && <p className="text-sm text-foreground">{line.description}</p>}
+            {line.description && <p className="text-sm text-foreground">{describeLine(line.description)}</p>}
             <div className="flex gap-3 text-xs font-bold">
               {line.mainAmount !== 0 && (
-                <span className={amountClass(line.mainAmount, 'text-verified')}>🟡 {signed(line.mainAmount)}</span>
+                <span className={amountClass(line.mainAmount, 'text-verified')}>Chính {signed(line.mainAmount)}</span>
               )}
               {line.bonusAmount !== 0 && (
-                <span className={amountClass(line.bonusAmount, 'text-neon')}>🎁 {signed(line.bonusAmount)}</span>
+                <span className={amountClass(line.bonusAmount, 'text-neon')}>Thưởng {signed(line.bonusAmount)}</span>
               )}
             </div>
           </li>
@@ -105,7 +104,7 @@ export default function TransactionList({ lines }: Readonly<{ lines: StatementLi
 
       {lines.length === 0 && (
         <div className="p-12 text-center">
-          <div className="text-4xl mb-3">📭</div>
+          <div className="text-4xl mb-3"></div>
           <p className="text-foreground font-medium">Chưa có giao dịch nào</p>
           <p className="text-muted-light text-sm mt-1">Thử đổi bộ lọc, hoặc nạp Coin để bắt đầu.</p>
         </div>

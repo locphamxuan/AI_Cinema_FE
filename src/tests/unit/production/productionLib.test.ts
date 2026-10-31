@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { notificationHref, productionBaseFor, productionPaths } from '@/features/production/lib/routes';
 import { holdsEpisode, projectCapabilities } from '@/features/production/lib/capabilities';
-import { addDays, formatDay, formatDuration } from '@/features/production/lib/format';
+import { addDays, formatDay, formatDuration } from '@/lib/format';
 import {
   deadlineValid,
   releaseDateValid,

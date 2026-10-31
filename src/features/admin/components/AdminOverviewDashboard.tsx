@@ -1,16 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { BarChart3, Film, TrendingUp, Users, ShieldCheck } from 'lucide-react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
-import { useResource } from '@/features/production/hooks/useResource';
-import { addDays, formatNumber } from '@/features/production/lib/format';
+import { useResource } from '@/hooks/useResource';
+import { addDays, formatNumber } from '@/lib/format';
 import { billingAdminService } from '@/services/billingAdminService';
 import { productionService } from '@/services/productionService';
 import { adminService } from '@/services/adminService';
-import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
+import { ErrorNote, Loading } from '@/components/data/ui';
 import type { RevenueReport, ReportRange } from '@/types/billing';
+import { PageHeader } from '@/components/data/PageHeader';
+import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
 import { AdminOverviewKpis } from './AdminOverviewKpis';
 import { OverviewChartCard } from './OverviewChartCard';
 
@@ -58,10 +59,10 @@ export function AdminOverviewDashboard() {
   };
 
   const projectDonutData = [
-    { label: 'Đang sản xuất', value: projectStats.production, color: '#8b5cf6' },
-    { label: 'Hoàn tất', value: projectStats.done, color: '#10b981' },
-    { label: 'Lên kế hoạch', value: projectStats.plan, color: '#f59e0b' },
-    { label: 'Đã huỷ', value: projectStats.cancelled, color: '#ef4444' },
+    { label: 'Đang sản xuất', value: projectStats.production, color: 'var(--chart-1)' },
+    { label: 'Hoàn tất', value: projectStats.done, color: 'var(--chart-3)' },
+    { label: 'Lên kế hoạch', value: projectStats.plan, color: 'var(--chart-2)' },
+    { label: 'Đã huỷ', value: projectStats.cancelled, color: 'var(--chart-4)' },
   ];
 
   // Real-time episode output by project
@@ -80,7 +81,7 @@ export function AdminOverviewDashboard() {
   const episodeBarSeries = [
     {
       name: 'Số tập phim',
-      color: '#10b981',
+      color: 'var(--chart-3)',
       values: topProjectsWithEpisodes.map((p) => p._count?.episodes ?? 0),
     },
   ];
@@ -90,20 +91,20 @@ export function AdminOverviewDashboard() {
   const planBarSeries = [
     {
       name: 'Coin chính',
-      color: '#8b5cf6',
+      color: 'var(--chart-1)',
       values: revenue?.byPlan.map((p) => p.mainCoins) ?? [],
     },
     {
       name: 'Coin thưởng',
-      color: '#38bdf8',
+      color: 'var(--chart-5)',
       values: revenue?.byPlan.map((p) => p.bonusCoins) ?? [],
     },
   ];
 
   // Coin composition donut
   const coinCompositionData = [
-    { label: 'Coin chính', value: revenue?.totals.mainCoins ?? 0, color: '#8b5cf6' },
-    { label: 'Coin thưởng', value: revenue?.totals.bonusCoins ?? 0, color: '#38bdf8' },
+    { label: 'Coin chính', value: revenue?.totals.mainCoins ?? 0, color: 'var(--chart-1)' },
+    { label: 'Coin thưởng', value: revenue?.totals.bonusCoins ?? 0, color: 'var(--chart-5)' },
   ];
 
   // User role breakdown
@@ -115,49 +116,29 @@ export function AdminOverviewDashboard() {
   };
 
   const roleDonutData = [
-    { label: 'Khán giả (Member)', value: roleStats.member, color: '#3b82f6' },
-    { label: 'Creator', value: roleStats.creator, color: '#8b5cf6' },
-    { label: 'Reviewer', value: roleStats.reviewer, color: '#10b981' },
-    { label: 'Quản trị & Staff', value: roleStats.staff, color: '#f59e0b' },
+    { label: 'Khán giả (Member)', value: roleStats.member, color: 'var(--chart-5)' },
+    { label: 'Creator', value: roleStats.creator, color: 'var(--chart-1)' },
+    { label: 'Reviewer', value: roleStats.reviewer, color: 'var(--chart-3)' },
+    { label: 'Quản trị & Staff', value: roleStats.staff, color: 'var(--chart-2)' },
   ];
 
   return (
-    <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
-      {/* ── Top Hero Banner ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-gradient-to-br from-slate-900 via-[#161928] to-purple-950/40 p-6 sm:p-8 text-white shadow-xl">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              Trung tâm chỉ huy Quản trị
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Tổng quan hệ thống AI Cinema
-            </h1>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Theo dõi tình hình kinh doanh gói hội viên, tiến độ sản xuất phim và phân bổ tài khoản người dùng trên toàn nền tảng.
-            </p>
-          </div>
-
-          {/* Time range selector */}
-          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 self-start md:self-auto">
-            {RANGES.map((r) => (
-              <button
-                key={r.key}
-                type="button"
-                onClick={() => setSelectedRange(r.key)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  selectedRange === r.key
-                    ? 'bg-purple-600 text-white shadow-md'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+    <div className="mx-auto w-full max-w-7xl space-y-6 p-6 lg:p-8">
+      <PageHeader
+        title="Tổng quan hệ thống"
+        description="Doanh thu gói hội viên, tiến độ sản xuất phim và tài khoản trên toàn nền tảng."
+        actions={
+          <Tabs value={selectedRange} onValueChange={(v) => setSelectedRange(v as typeof selectedRange)}>
+            <TabsList>
+              {RANGES.map((r) => (
+                <TabsTrigger key={r.key} value={r.key}>
+                  {r.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        }
+      />
 
       <AdminOverviewKpis
         revenue={revenue}
@@ -170,7 +151,6 @@ export function AdminOverviewDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <OverviewChartCard
           className="lg:col-span-2"
-          icon={<BarChart3 className="w-4 h-4 text-purple-500" />}
           title="Doanh thu phân bổ theo gói hội viên"
           description="Thống kê số Coin thu được từ từng gói hội viên trong khoảng thời gian đã chọn"
           link={{ href: '/admin/membership-plans?tab=reports', label: 'Chi tiết báo cáo', className: PURPLE_LINK }}
@@ -186,7 +166,6 @@ export function AdminOverviewDashboard() {
 
         <OverviewChartCard
           className="flex flex-col justify-between"
-          icon={<TrendingUp className="w-4 h-4 text-cyan-500" />}
           title="Cơ cấu Coin thu được"
           description="Tỷ trọng giữa tiền nạp thật (Coin chính) và khuyến mãi (Coin thưởng)"
         >
@@ -202,14 +181,13 @@ export function AdminOverviewDashboard() {
             </div>
           )}
           <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 text-[11px] text-slate-500 dark:text-slate-400">
-            💡 Coin thưởng tính vào chi phí quảng bá, chỉ có Coin chính là doanh thu thực.
+             Coin thưởng tính vào chi phí quảng bá, chỉ có Coin chính là doanh thu thực.
           </div>
         </OverviewChartCard>
       </div>
 
       {/* ── Real-time Episode Output Chart ── */}
       <OverviewChartCard
-        icon={<Film className="w-4 h-4 text-emerald-500" />}
         title="Số tập phim theo dự án (Real-time)"
         description="Dữ liệu số lượng tập phim thực tế đang được sản xuất hoặc hoàn tất từ các dự án tiêu biểu"
         link={{ href: '/admin/projects', label: 'Quản lý dự án phim', className: EMERALD_LINK }}
@@ -228,7 +206,6 @@ export function AdminOverviewDashboard() {
       {/* ── Secondary Charts Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <OverviewChartCard
-          icon={<Film className="w-4 h-4 text-purple-500" />}
           title="Trạng thái dự án phim toàn sàn"
           description="Tỷ lệ các dự án đang sản xuất, đã hoàn tất và đang lên kế hoạch"
           link={{ href: '/admin/projects', label: 'Xem danh sách', className: PURPLE_LINK }}
@@ -245,7 +222,6 @@ export function AdminOverviewDashboard() {
         </OverviewChartCard>
 
         <OverviewChartCard
-          icon={<Users className="w-4 h-4 text-emerald-500" />}
           title="Cơ cấu người dùng theo vai trò"
           description="Phân bổ tài khoản khán giả, đội ngũ sáng tạo và quản trị"
           link={{ href: '/admin/permissions?tab=accounts', label: 'Quản lý tài khoản', className: EMERALD_LINK }}

@@ -7,8 +7,8 @@ import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
 import { teamService } from '@/services/teamService';
 import type { AgeRating, Person } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { GenrePicker } from '../shared/GenrePicker';
 import { useProject } from './ProjectContext';
 

@@ -18,7 +18,7 @@ interface FilterDropdownProps {
 function FilterDropdown({ label, selected, allOption, options, widthClass, onSelect }: FilterDropdownProps) {
   return (
     <div className="relative group/filter">
-      <button className="flex items-center gap-1 py-1.5 px-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer">
+      <button className="flex items-center gap-1 whitespace-nowrap rounded-lg px-2.5 py-1.5 transition-colors hover:bg-muted cursor-pointer">
         <span>{selected === 'Tất cả' ? label : selected}</span>
         <span className="text-[10px] text-slate-400">▾</span>
       </button>
@@ -47,7 +47,7 @@ export default function CatalogFilterNav() {
   const genreOptions = ['Tất cả thể loại', ...genres.map((g) => g.name)];
 
   return (
-    <nav className="hidden lg:flex items-center gap-4 text-xs font-semibold text-slate-700 dark:text-zinc-300">
+    <nav className="hidden 2xl:flex items-center gap-2 text-sm font-medium text-muted-foreground">
       <FilterDropdown
         label="Thể loại"
         selected={selectedGenre}

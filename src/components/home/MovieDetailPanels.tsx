@@ -1,4 +1,4 @@
-import { Calendar, Info, ShieldCheck } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 import type { Movie } from '@/types/movie';
 
 /** Article 44 disclosure of a movie: the certified AI label and the age rating. */
@@ -21,7 +21,6 @@ export function MovieCompliancePanel({ compliance }: { compliance: Movie['aiComp
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
           <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
             <span>Nhãn nội dung AI</span>
           </div>
           <p className="text-sm font-bold text-white">{compliance.disclaimer}</p>
@@ -29,7 +28,6 @@ export function MovieCompliancePanel({ compliance }: { compliance: Movie['aiComp
         </div>
         <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-1.5">
           <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-            <Calendar className="w-4 h-4 text-amber-400" />
             <span>Phân loại độ tuổi</span>
           </div>
           <p className="text-sm font-bold text-white">{compliance.contentRating}</p>
@@ -49,7 +47,6 @@ export function MovieBriefPanel({ contentBrief }: { contentBrief?: string | null
     <div className="space-y-4 animate-fade-in text-xs sm:text-sm text-slate-300 leading-relaxed">
       <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
         <h4 className="font-bold text-white text-sm flex items-center gap-2">
-          <Info className="w-4 h-4 text-[#8B5CF6]" />
           <span>Tóm tắt phim</span>
         </h4>
         <p>{contentBrief || 'Chưa có tóm tắt.'}</p>

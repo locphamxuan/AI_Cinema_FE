@@ -11,7 +11,6 @@ import DailyCheckInModal from '@/components/wallet/DailyCheckInModal';
 import RewardSpinModal from '@/components/wallet/RewardSpinModal';
 import DepositModal from '@/components/wallet/DepositModal';
 import UnlockEpisodeModal from '@/components/watch/UnlockEpisodeModal';
-import SupportChatWidget from '@/components/chat/SupportChatWidget';
 import AuthModal from '@/components/auth/AuthModal';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import RightSidebar from '@/components/layout/RightSidebar';
@@ -50,7 +49,7 @@ function MemberActions() {
   return (
     <>
       <NotificationBell />
-      <RewardShortcuts />
+      <RewardShortcuts light />
       <div className="flex items-center gap-1.5">
         <WalletHeaderBadge />
         <button
@@ -114,7 +113,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const isDashboard = DASHBOARD_PATHS.some((path) => pathname.startsWith(path));
   // The viewer's discovery and browse pages carry their own navbar.
   const isHome = pathname === '/' || pathname === '/phim';
-  // The chat assistant and the wallet serve members; staff-side accounts never see them.
+  const withSidebar = signedIn && !isDashboard && !isHome;
+  // The wallet serves members; staff-side accounts never see it.
   const isMemberSide = !user || isMemberRole(user.role);
   const userId = user?.id;
 
@@ -134,21 +134,24 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <>
       {/* The consumer header is hidden on Home (uses dedicated NetflixNavbar) and Dashboards. */}
-      {!isDashboard && !isHome && <ConsumerHeader signedIn={signedIn} />}
+      {withSidebar && <RightSidebar />}
 
-      {signedIn && !isDashboard && !isHome && <RightSidebar />}
+      {/* The member sidebar is fixed on wide screens; the page keeps its width clear of it. */}
+      <div className={withSidebar ? 'flex flex-1 flex-col lg:pr-80' : 'contents'}>
+        {!isDashboard && !isHome && <ConsumerHeader signedIn={signedIn} />}
 
-      <main
-        className={
-          isDashboard
-            ? 'flex-1 w-full p-0 m-0 bg-[#F8FAFC] dark:bg-[#0B0C10] transition-colors'
-            : isHome
-              ? 'flex-1 w-full p-0 m-0 bg-[#0A0C10] text-white overflow-x-hidden'
-              : 'flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 transition-all'
-        }
-      >
-        {children}
-      </main>
+        <main
+          className={
+            isDashboard
+              ? 'flex-1 w-full p-0 m-0 bg-background'
+              : isHome
+                ? 'dark flex-1 w-full p-0 m-0 bg-background text-foreground overflow-x-hidden'
+                : 'flex-1 max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-6 transition-all'
+          }
+        >
+          {children}
+        </main>
+      </div>
 
       <AuthModal />
       <DailyCheckInModal />
@@ -156,11 +159,6 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
       <DepositModal />
       <UnlockEpisodeModal />
 
-      {isMemberSide && !isDashboard && (
-        <>
-          <SupportChatWidget />
-        </>
-      )}
       <ToastContainer />
     </>
   );

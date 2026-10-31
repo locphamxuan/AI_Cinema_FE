@@ -2,20 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, X } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/features/production/components/shared/ui';
-import { Pager } from '@/features/production/components/shared/Pager';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime, formatNumber } from '@/features/production/lib/format';
+import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/components/data/ui';
+import { Pager } from '@/components/data/Pager';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime, formatNumber } from '@/lib/format';
 import { announceTokensChanged } from '@/services/reviewerTokenService';
 import { tokenRequestService } from '@/services/tokenRequestService';
 import type { TokenRequest, TokenRequestStatus } from '@/types/token-request';
 
-export const TOKEN_REQUEST_STATUS: Record<TokenRequestStatus, { label: string; tone: 'amber' | 'emerald' | 'rose' }> = {
+const TOKEN_REQUEST_STATUS: Record<TokenRequestStatus, { label: string; tone: 'amber' | 'emerald' | 'rose' }> = {
   OPEN: { label: 'Chờ Reviewer', tone: 'amber' },
   APPROVED: { label: 'Đã cấp', tone: 'emerald' },
   REJECTED: { label: 'Từ chối', tone: 'rose' },
@@ -93,7 +93,7 @@ export function TokenRequestList({
                 ) : (
                   r.project.movie.title
                 )}{' '}
-                · Mùa {r.season.seasonNumber} · xin <span className="font-mono">{formatNumber(r.requestedTokens)}</span> Token
+                · Mùa {r.season.seasonNumber} · xin <span className="tabular-nums">{formatNumber(r.requestedTokens)}</span> Token
               </p>
               <StatusPill {...TOKEN_REQUEST_STATUS[r.status]} />
             </div>
@@ -107,10 +107,10 @@ export function TokenRequestList({
             {canAnswer && r.status === 'OPEN' && (
               <div className="flex gap-2 pt-1">
                 <Button size="sm" onClick={() => setApproving(r)}>
-                  <Check className="w-3.5 h-3.5" aria-hidden="true" /> Cấp Token
+                  Cấp Token
                 </Button>
                 <Button size="sm" variant="secondary" onClick={() => setRejecting(r)}>
-                  <X className="w-3.5 h-3.5" aria-hidden="true" /> Từ chối
+                  Từ chối
                 </Button>
               </div>
             )}

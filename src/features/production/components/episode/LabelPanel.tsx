@@ -1,15 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Tag } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { LabelLocation, LabelType, ReviewSheet } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { LABEL_DEFAULT_TEXT, LABEL_LOCATION, LABEL_TYPE } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
-import { Facts, Panel } from '../shared/ui';
+import { formatDateTime } from '@/lib/format';
+import { Facts, Panel } from '@/components/data/ui';
 
 const POSITION: Record<LabelLocation, string> = {
   TOP_RIGHT: 'top-2 right-2',
@@ -20,7 +20,7 @@ const POSITION: Record<LabelLocation, string> = {
 };
 
 /** What the viewer sees over the video: the AI label at the chosen place (BR-40, Điều 44 Luật AI, Điều 18 NĐ 142). */
-export function LabelPreview({ text, location }: { text: string; location: LabelLocation }) {
+function LabelPreview({ text, location }: { text: string; location: LabelLocation }) {
   return (
     <div
       role="img"
@@ -67,7 +67,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
         label &&
         !editing && (
           <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
-            <Tag className="w-3.5 h-3.5" aria-hidden="true" /> Đổi nhãn
+            Đổi nhãn
           </Button>
         )
       }
@@ -126,7 +126,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
           {recheck && <p className="text-[11px] text-amber-600 dark:text-amber-400">Đổi nhãn sẽ đưa tập về “Đã gắn nhãn AI” và phải kiểm tra pháp lý lại.</p>}
           <div className="flex gap-2">
             <Button type="submit" disabled={busy || text.trim().length < 5}>
-              <Tag className="w-3.5 h-3.5" aria-hidden="true" /> {label ? 'Lưu nhãn' : 'Gắn nhãn'}
+              {label ? 'Lưu nhãn' : 'Gắn nhãn'}
             </Button>
             {label && (
               <Button type="button" variant="secondary" onClick={() => setEditing(false)}>

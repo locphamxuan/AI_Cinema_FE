@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertTriangle, Check, ShieldCheck, Undo2 } from 'lucide-react';
+import { AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { ComplianceInput, ReviewSheet } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { REVIEWED_EPISODE, isIn } from '../../lib/capabilities';
 import { AI_PARTS, COMPLIANCE_CHECK, COMPLIANCE_RESULT, LABEL_TYPE } from '../../lib/labels';
-import { formatDateTime, formatDuration } from '../../lib/format';
-import { Facts, Panel, StatusPill, TextPromptModal } from '../shared/ui';
+import { formatDateTime, formatDuration } from '@/lib/format';
+import { Facts, Panel, StatusPill, TextPromptModal } from '@/components/data/ui';
 import { LabelPanel } from './LabelPanel';
 
 /**
@@ -45,11 +45,11 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
           (underReview || reviewed) && (
             <>
               <Button size="sm" variant="secondary" disabled={busy} onClick={() => setRequesting(true)}>
-                <Undo2 className="w-3.5 h-3.5" aria-hidden="true" /> Yêu cầu sửa
+                Yêu cầu sửa
               </Button>
               {underReview && (
                 <Button size="sm" variant="success" disabled={busy} onClick={approve}>
-                  <Check className="w-3.5 h-3.5" aria-hidden="true" /> Duyệt
+                  Duyệt
                 </Button>
               )}
             </>

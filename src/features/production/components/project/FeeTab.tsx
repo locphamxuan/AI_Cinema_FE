@@ -1,19 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import { Coins } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { episodeCountsBySeason, seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { announceTokensChanged, reviewerTokenService } from '@/services/reviewerTokenService';
 import type { SeasonFee } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { OPEN_PROJECT, isIn } from '../../lib/capabilities';
 import { FEE_ENTRY } from '../../lib/labels';
-import { formatDateTime, formatNumber } from '../../lib/format';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { formatDateTime, formatNumber } from '@/lib/format';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 import { SeasonFeeTable } from './SeasonFeeTable';
 
@@ -130,7 +130,7 @@ export function FeeTab() {
                           <td className="py-2 text-slate-500">
                             {e.season ? seasonName(e.season.seasonNumber, episodeCounts.get(e.season.id)) : 'Cả dự án'}
                           </td>
-                          <td className={`py-2 text-right font-mono ${amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+                          <td className={`py-2 text-right tabular-nums ${amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                             {amountTokens > 0 ? '+' : ''}
                             {formatNumber(amountTokens)}
                           </td>
@@ -185,7 +185,7 @@ export function FeeTab() {
               <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} className={fieldTextareaClass} />
             </FormField>
             <Button type="submit" className="w-full" disabled={!valid || busy}>
-              <Coins className="w-4 h-4" aria-hidden="true" /> Ghi phí
+              Ghi phí
             </Button>
           </form>
         </Panel>

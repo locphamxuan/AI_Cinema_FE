@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { useAction } from '@/features/production/hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { RewardRule } from '@/types/billing';
 
@@ -111,7 +111,6 @@ export function RewardRuleModal({
           </p>
         )}
         <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 text-xs text-sky-800 dark:text-sky-300 flex items-start gap-2">
-          <Sparkles className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
           <span>
             {day === LADDER_LENGTH
               ? 'Ngày 7 là mốc chặng cuối chuỗi: hệ thống sẽ tự động tặng thêm 1 lượt quay may mắn.'

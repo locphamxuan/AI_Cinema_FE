@@ -17,7 +17,6 @@ export default function HeaderSearch() {
   return (
     <div className="relative hidden md:block">
       <div className="relative flex items-center">
-        <span className="absolute left-3 text-slate-400 text-sm pointer-events-none">🔍</span>
         <input
           type="text"
           value={searchQuery}
@@ -39,7 +38,7 @@ export default function HeaderSearch() {
 
       {isFocused && results.length > 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/15 rounded-2xl shadow-2xl p-2 z-50 animate-scale-in space-y-1 max-h-80 overflow-y-auto">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-muted-light px-2 py-1">
+          <p className="text-[10px] font-bold text-slate-400 dark:text-muted-light px-2 py-1">
             Kết Quả Tìm Kiếm ({results.length})
           </p>
           {results.map((m) => (

@@ -152,7 +152,6 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
             {/* Toast Notification when version changes */}
             {versionToast && (
               <div className="absolute top-4 left-1/2 -translate-x-1/2 px-4 py-2.5 rounded-xl bg-neon/90 backdrop-blur-md text-white text-xs font-bold shadow-2xl animate-slide-down flex items-center gap-2 z-30 border border-white/20">
-                <span>🔄</span>
                 <span>{versionToast}</span>
               </div>
             )}
@@ -162,7 +161,6 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
               onClick={() => setShowComplianceDrawer(true)}
               className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/75 backdrop-blur-md text-[10px] sm:text-xs text-muted-light hover:text-white hover:bg-black/90 transition-all cursor-pointer border border-white/15 shadow-xl z-40"
             >
-              <span className="text-sm">🏷️</span>
               <span className="line-clamp-1">
                 Nội dung tạo 100% bằng AI • Tuân thủ Điều 44 Luật AI & Nghị định 142
               </span>
@@ -187,7 +185,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                 </span>
               )}
               {levels.length > 1 && <QualitySelect levels={levels} value={level} onChange={handleSelectLevel} />}
-              <span className="text-muted-light text-xs font-mono">{currentEpisode.duration}</span>
+              <span className="text-muted-light text-xs tabular-nums">{currentEpisode.duration}</span>
             </div>
 
             {/* VERSION CONTROL PILL BUTTON */}
@@ -197,7 +195,6 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
                 className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-neon/15 hover:bg-neon/25 border border-neon/35 text-neon text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-sm shadow-neon/15"
                 title="Bấm để xem lịch sử hiệu chỉnh và quản lý phiên bản"
               >
-                <span>🗂️</span>
                 <span>
                   Phiên bản:{' '}
                   <strong className="text-slate-900 dark:text-white underline decoration-neon">
@@ -212,7 +209,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
               {currentMovie.title} - {currentEpisode.title}
             </h1>
             <EngagementActions {...engagementState} />
@@ -222,7 +219,7 @@ export default function WatchPlayerSection({ episodeId }: WatchPlayerSectionProp
           {activeVersion && (
             <div className="p-3 rounded-xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-neon/20 text-neon font-bold font-mono text-[11px]">
+                <span className="px-2 py-0.5 rounded bg-neon/20 text-neon font-bold tabular-nums text-[11px]">
                   {activeVersion.versionNumber}
                 </span>
                 <span className="text-slate-800 dark:text-white font-medium">{activeVersion.versionTitle}</span>

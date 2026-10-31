@@ -3,17 +3,18 @@
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
 import { ChevronDown, ChevronRight, Coins, Eye, Film, Heart, Megaphone, ShoppingCart } from 'lucide-react';
-import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatNumber } from '@/features/production/lib/format';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
+import { useResource } from '@/hooks/useResource';
+import { formatNumber } from '@/lib/format';
 import { productionPaths } from '@/features/production/lib/routes';
 import { filmReportService } from '@/services/filmReportService';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import type { FilmFigures } from '@/types/film-report';
 import { EpisodeAdSlotsModal } from './EpisodeAdSlotsModal';
+import { Pager, pageOf } from '@/components/data/Pager';
 
-const STAT = 'inline-flex items-center gap-1 font-mono';
+const STAT = 'inline-flex items-center gap-1 tabular-nums';
 
 /**
  * Film management: one tab per genre (a movie of several genres shows in each of them), and for every movie its
@@ -28,12 +29,14 @@ export function AdminMoviesPanel() {
   const [adsOf, setAdsOf] = useState<{ id: string; label: string } | null>(null);
   const can = useCan();
   const rows = films.data ?? [];
+  const [page, setPage] = useState(1);
+  const paged = pageOf(rows ?? [], page, 10);
   const total = (key: 'likeCount' | 'viewCount' | 'purchases' | 'coinsEarned') => rows.reduce((n, f) => n + f[key], 0);
 
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Quản lý phim</h1>
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Quản lý phim</h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
           Phim đang có trên nền tảng theo từng thể loại: số tim, lượt xem, lượt mua và Coin Member đã trả, chi tiết tới từng tập.
         </p>
@@ -80,7 +83,7 @@ export function AdminMoviesPanel() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                  {rows.map((film) => (
+                  {paged.rows.map((film) => (
                     <FilmRow
                       key={film.id}
                       film={film}
@@ -91,6 +94,7 @@ export function AdminMoviesPanel() {
                   ))}
                 </tbody>
               </table>
+              <Pager page={page} totalPages={paged.totalPages} onChange={setPage} className="px-4 pb-4" />
             </div>
           )}
         </Panel>
@@ -167,10 +171,10 @@ function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
                 {film.episodes.map((e) => (
                   <tr key={e.id} className="border-t border-slate-200/60 dark:border-white/5">
                     <td className="py-1.5 pl-10">Tập {e.episodeNumber}{e.title && e.title !== `Tập ${e.episodeNumber}` ? ` - ${e.title}` : ''}</td>
-                    <td className="py-1.5 text-right font-mono">{e.coinPrice ? `${e.coinPrice} Coin` : 'Miễn phí'}</td>
-                    <td className="py-1.5 text-right font-mono">{formatNumber(e.views)}</td>
-                    <td className="py-1.5 text-right font-mono">{formatNumber(e.purchases)}</td>
-                    <td className="py-1.5 text-right font-mono text-amber-600">
+                    <td className="py-1.5 text-right tabular-nums">{e.coinPrice ? `${e.coinPrice} Coin` : 'Miễn phí'}</td>
+                    <td className="py-1.5 text-right tabular-nums">{formatNumber(e.views)}</td>
+                    <td className="py-1.5 text-right tabular-nums">{formatNumber(e.purchases)}</td>
+                    <td className="py-1.5 text-right tabular-nums text-amber-600">
                       {formatNumber(e.coinsEarned)}
                       {e.refundedCoins > 0 && <span className="text-rose-500"> (hoàn {formatNumber(e.refundedCoins)})</span>}
                     </td>

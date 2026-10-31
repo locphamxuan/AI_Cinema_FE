@@ -1,27 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Pencil,
-  UserPlus,
-  XCircle,
-  Globe,
-  Calendar,
-  Clock,
-  CheckCircle2,
-  Tag,
-  ShieldCheck,
-  Clapperboard,
-  Film,
-  Gift,
-  Building2,
-} from 'lucide-react';
+import { XCircle, Globe, Calendar, Clock, CheckCircle2, Tag, ShieldCheck, Clapperboard, Gift, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { EDITABLE_PROJECT, OPEN_PROJECT, isIn } from '../../lib/capabilities';
-import { formatDateTime } from '../../lib/format';
-import { TextPromptModal } from '../shared/ui';
+import { formatDateTime } from '@/lib/format';
+import { TextPromptModal } from '@/components/data/ui';
 import { IdeaFilesPanel } from './IdeaFilesPanel';
 import { PosterPanel } from './PosterPanel';
 import { AssignCreatorModal, EditProjectModal } from './ProjectModals';
@@ -107,17 +93,14 @@ export function OverviewTab() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       {/* ── Left: main info ── */}
       <div className="lg:col-span-2 space-y-5">
-        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-[#0F1C27] overflow-hidden">
+        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-card overflow-hidden">
           <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center">
-                <Film className="w-3.5 h-3.5 text-sky-600 dark:text-sky-300" aria-hidden="true" />
-              </div>
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">Thông tin phim</h2>
             </div>
             {canEdit && (
               <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
-                <Pencil className="w-3.5 h-3.5" aria-hidden="true" /> Sửa
+                Sửa
               </Button>
             )}
           </div>
@@ -156,11 +139,8 @@ export function OverviewTab() {
       <div className="space-y-5">
         <PosterPanel canManage={canEdit} />
 
-        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-[#0F1C27] overflow-hidden">
+        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-card overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100 dark:border-white/5">
-            <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-500/10 flex items-center justify-center">
-              <UserPlus className="w-3.5 h-3.5 text-sky-600 dark:text-sky-300" aria-hidden="true" />
-            </div>
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">Phân công</h2>
           </div>
           <div className="p-5 space-y-3">
@@ -199,7 +179,7 @@ export function OverviewTab() {
                   disabled={project.productionFeeTokens <= 0}
                   onClick={() => setAssigning(true)}
                 >
-                  <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> {project.creator ? 'Đổi Creator' : 'Giao cho Creator'}
+                  {project.creator ? 'Đổi Creator' : 'Giao cho Creator'}
                 </Button>
                 {project.productionFeeTokens <= 0 && (
                   <p className="text-[11px] text-amber-600 dark:text-amber-400 text-center">
@@ -220,7 +200,7 @@ export function OverviewTab() {
               </div>
               <p className="text-[11px] text-rose-500/80 dark:text-rose-400/70 mb-3">Rút cả các lịch phát hành đang chờ. Không hoàn tác được.</p>
               <Button size="sm" variant="danger" className="w-full" onClick={() => setCancelling(true)}>
-                <XCircle className="w-3.5 h-3.5" aria-hidden="true" /> Huỷ dự án
+                Huỷ dự án
               </Button>
             </div>
           </div>

@@ -45,19 +45,19 @@ export function DashboardHeader() {
   const AreaIcon = AREA_ICON[area] ?? Film;
 
   return (
-    <header className="bg-white/95 dark:bg-[#0F1C27]/95 backdrop-blur-md border-b border-sky-100 dark:border-white/[0.08] sticky top-0 z-30 w-full transition-colors">
+    <header className="sticky top-0 z-30 w-full border-b bg-background/90 backdrop-blur-md">
       <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
         {/* Logo + Area */}
         <Link href={AREAS[area].path} className="flex items-center gap-3 min-w-0 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-cyan-400 flex items-center justify-center shrink-0">
-            <AreaIcon className="w-4 h-4 text-white" aria-hidden="true" />
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <AreaIcon className="size-4" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <span className="text-sm font-semibold text-slate-900 dark:text-white leading-tight block">AI Cinema</span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">{AREAS[area].label}</span>
+            <span className="block font-heading text-sm font-semibold leading-tight">AI Cinema</span>
+            <span className="text-xs leading-tight text-muted-foreground">{AREAS[area].label}</span>
           </div>
           {oversight && (
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-500/10 text-sky-800 dark:text-sky-200 border border-sky-200 dark:border-sky-500/20">
+            <span className="rounded-md border border-primary/20 bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
               Chế độ giám sát
             </span>
           )}
@@ -68,9 +68,9 @@ export function DashboardHeader() {
           {user && (
             <span
               aria-label="Vai trò của tài khoản"
-              className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 text-xs font-semibold text-sky-800 dark:text-sky-200"
+              className="hidden items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground sm:flex"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-coral-500" aria-hidden="true" />
+              <span className="size-1.5 rounded-full bg-highlight" aria-hidden="true" />
               {ROLE_LABEL[user.role ?? 'user']}
             </span>
           )}
