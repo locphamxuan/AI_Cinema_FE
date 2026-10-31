@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/shadcn/button';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem } from '@/components/shadcn/pagination';
 import { cn } from '@/lib/utils';
@@ -59,6 +59,7 @@ export function DataPagination({
               onClick={() => onChange(page - 1)}
               aria-label="Trang trước"
             >
+              <ChevronLeft />
               <span className="hidden sm:inline">Trước</span>
             </Button>
           </PaginationItem>
