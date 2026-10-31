@@ -6,7 +6,7 @@ import { Clapperboard, ShieldCheck, Users, Sparkles, Film } from 'lucide-react';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
-import { AREAS, PERMISSION, ROLE_LABEL, canEnter, type Area } from '@/lib/permissions';
+import { AREAS, PERMISSION, ROLE_LABEL, type Area } from '@/lib/permissions';
 import { AccountMenu } from './AccountMenu';
 import { NotificationMenu } from './NotificationMenu';
 
@@ -32,10 +32,6 @@ export function DashboardHeader() {
   const area = AREA_ORDER.find((a) => pathname.startsWith(`/${a}`)) ?? 'reviewer';
   // The Admin oversees production: it reads every project and decides the change requests, never edits a project (BR-55).
   const oversight = area === 'reviewer' && !can(PERMISSION.PROJECT_MANAGE) && can(PERMISSION.PROJECT_READ_ALL);
-  const links = AREA_ORDER.filter((a) => a !== area && canEnter(a, user?.role)).map((a) => ({
-    href: AREAS[a].path,
-    label: AREAS[a].label,
-  }));
 
   const handleLogout = () => {
     logout();
@@ -76,7 +72,7 @@ export function DashboardHeader() {
           )}
           {user && <NotificationMenu />}
           <ThemeToggle />
-          <AccountMenu name={user?.name ?? 'Tài khoản'} roleLabel={ROLE_LABEL[user?.role ?? 'user']} onLogout={handleLogout} links={links} />
+          <AccountMenu name={user?.name ?? 'Tài khoản'} roleLabel={ROLE_LABEL[user?.role ?? 'user']} onLogout={handleLogout} profileHref={`/${area}/profile`} />
         </div>
       </div>
     </header>

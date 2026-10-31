@@ -127,4 +127,16 @@ describe('DashboardHeader', () => {
 
     expect(screen.getByLabelText('Vai trò của tài khoản')).toHaveTextContent(label);
   });
+
+  it('keeps only the profile of the current area and sign out in the account menu', async () => {
+    nav.pathname = '/admin/accounts';
+    signInAs('admin');
+    routeFetch({});
+    render(<DashboardHeader />);
+
+    await userEvent.click(screen.getByRole('button', { name: /^Tài khoản/ }));
+    const items = screen.getAllByRole('menuitem');
+    expect(items.map((item) => item.textContent)).toEqual(['Hồ sơ tài khoản', 'Đăng xuất']);
+    expect(items[0]).toHaveAttribute('href', '/admin/profile');
+  });
 });
