@@ -5,7 +5,7 @@ export const ATTACHMENT_ACCEPT = [
   '.mp4', '.m4v', '.mov', '.webm', '.mkv', '.avi',
 ].join(',');
 
-export const ATTACHMENT_MAX_BYTES = 100 * 1024 * 1024;
+const ATTACHMENT_MAX_BYTES = 100 * 1024 * 1024;
 
 export const ATTACHMENT_HINT = 'Word, PDF, TXT, Excel, PowerPoint, ảnh hoặc video - tối đa 100 MB mỗi tệp.';
 

@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, User, Calendar, ShieldCheck, Check, Sparkles } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
 import { ModeTabs, PasswordField, type AuthMode } from './AuthFields';
 import GoogleSignInButton from './GoogleSignInButton';
-import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, latestAdultBirthDate, registrationError } from '@/lib/registration';
+import { MIN_PASSWORD_LENGTH, registrationError } from '@/lib/registration';
 
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
@@ -53,9 +52,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [name, setName] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
-  const [hasSavedCredentials, setHasSavedCredentials] = useState(() => Boolean(savedEmail()));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -70,17 +67,9 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
     setError(null);
   };
 
-  const forgetSaved = () => {
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-      setEmail('');
-      setHasSavedCredentials(false);
-    } catch {}
-  };
-
   const signUpError = (): string | null => {
     if (name.trim().length < 2) return 'Họ và tên cần ít nhất 2 ký tự.';
-    const problem = registrationError(password, dateOfBirth);
+    const problem = registrationError(password);
     if (problem) return problem;
     if (password !== confirmPassword) return 'Mật khẩu nhập lại không khớp.';
     return null;
@@ -99,7 +88,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
     }
 
     setLoading(true);
-    const res = mode === 'login' ? await login(email, password) : await register(name, email, password, dateOfBirth);
+    const res = mode === 'login' ? await login(email, password) : await register(name, email, password);
     setLoading(false);
 
     if (!res.success) {
@@ -131,7 +120,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
       <div className="my-4">
         <GoogleSignInButton mode={mode} onSignedIn={goOn} />
 
-        <div className="flex items-center gap-3 my-3 text-[11px] text-slate-400 dark:text-muted uppercase tracking-wider">
+        <div className="flex items-center gap-3 my-3 text-[11px] text-slate-400 dark:text-muted">
           <span className="flex-1 h-px bg-slate-200/80 dark:bg-white/10" />
           <span>{mode === 'login' ? 'hoặc dùng email' : 'hoặc đăng ký bằng email'}</span>
           <span className="flex-1 h-px bg-slate-200/80 dark:bg-white/10" />
@@ -149,41 +138,23 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
 
       <form onSubmit={handleSubmit} className="space-y-4" noValidate={mode === 'register'}>
         {mode === 'register' && (
-          <>
-            <div>
-              <label htmlFor="auth-name" className={LABEL}>
-                Họ và tên
-              </label>
-              <input
-                id="auth-name"
-                type="text"
-                required
-                autoComplete="name"
-                minLength={2}
-                maxLength={255}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Nguyễn Văn A"
-                className={INPUT}
-              />
-            </div>
-            <div>
-              <label htmlFor="auth-dob" className={LABEL}>
-                Ngày sinh <span className="font-normal text-slate-500 text-[11px]">(từ 18 tuổi · Yêu cầu Điều 44)</span>
-              </label>
-              <input
-                id="auth-dob"
-                type="date"
-                required
-                autoComplete="bday"
-                max={latestAdultBirthDate()}
-                value={dateOfBirth}
-                onChange={(e) => setDateOfBirth(e.target.value)}
-                className={`${INPUT} dark:[color-scheme:dark]`}
-              />
-              <p className="text-[11px] text-slate-400 dark:text-muted mt-1">Định dạng theo năm-tháng-ngày.</p>
-            </div>
-          </>
+          <div>
+            <label htmlFor="auth-name" className={LABEL}>
+              Họ và tên
+            </label>
+            <input
+              id="auth-name"
+              type="text"
+              required
+              autoComplete="name"
+              minLength={2}
+              maxLength={255}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nguyễn Văn A"
+              className={INPUT}
+            />
+          </div>
         )}
 
         <div>
@@ -244,7 +215,7 @@ export default function AuthForm({ initialMode, initialEmail, fallbackUrl }: Aut
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3.5 rounded-2xl font-black text-white bg-gradient-to-r from-ruby to-[#B90910] hover:shadow-xl hover:shadow-ruby/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-lg shadow-ruby/20 cursor-pointer text-sm tracking-wide"
+          className="w-full py-3.5 rounded-2xl font-black text-white bg-gradient-to-r from-ruby to-action-strong hover:shadow-xl hover:shadow-ruby/30 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-lg shadow-ruby/20 cursor-pointer text-sm"
         >
           {loading ? 'Đang xác thực…' : mode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'}
         </button>

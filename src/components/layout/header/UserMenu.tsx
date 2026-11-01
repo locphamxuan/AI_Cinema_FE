@@ -9,13 +9,13 @@ const ITEM =
   'flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-foreground hover:bg-slate-100 dark:hover:bg-white/10 transition-colors';
 
 const PROFILE_LINKS = [
-  { href: '/profile', label: '👤 Hồ sơ cá nhân' },
-  { href: '/profile/saved', label: '🔖 Phim đã lưu' },
-  { href: '/profile/history', label: '🕒 Lịch sử xem phim' },
-  { href: '/profile/devices', label: '📱 Quản lý thiết bị' },
-  { href: '/profile/library', label: '🎬 Kho phim đã mua' },
-  { href: '/profile/subscription', label: '👑 Gói dịch vụ hội viên' },
-  { href: '/profile/transactions', label: '💳 Lịch sử giao dịch ví' },
+  { href: '/profile', label: 'Hồ sơ cá nhân' },
+  { href: '/profile/saved', label: 'Phim đã lưu' },
+  { href: '/profile/history', label: 'Lịch sử xem phim' },
+  { href: '/profile/devices', label: 'Quản lý thiết bị' },
+  { href: '/profile/library', label: 'Kho phim đã mua' },
+  { href: '/profile/subscription', label: 'Gói dịch vụ hội viên' },
+  { href: '/profile/transactions', label: 'Lịch sử giao dịch ví' },
 ];
 
 /** Avatar button and the member's account menu. */
@@ -41,7 +41,7 @@ export default function UserMenu() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-[#161922] p-3 shadow-2xl border border-slate-200 dark:border-white/15 rounded-2xl animate-scale-in z-50">
+        <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-card p-3 shadow-2xl border border-slate-200 dark:border-white/15 rounded-2xl animate-scale-in z-50">
           <div className="pb-3 mb-2 border-b border-slate-100 dark:border-white/10">
             <p className="text-sm font-bold text-slate-900 dark:text-foreground truncate">{user.name}</p>
             <p className="text-xs text-slate-500 dark:text-muted-light truncate">{user.email}</p>
@@ -70,7 +70,7 @@ export default function UserMenu() {
               }}
               className={`${ITEM} w-full cursor-pointer text-left`}
             >
-              <span>⚙️ Bảng điều khiển Sidebar</span>
+              <span>Bảng điều khiển Sidebar</span>
               <span className="text-slate-400">›</span>
             </button>
           </div>

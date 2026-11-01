@@ -31,7 +31,7 @@ describe('TransactionsPage (GET /wallet/statements)', () => {
     expect((await screen.findAllByText('Mua tập 3')).length).toBeGreaterThan(0);
     expect(screen.getAllByText('-8').length).toBeGreaterThan(0);
     expect(screen.getAllByText('-2').length).toBeGreaterThan(0);
-    expect(screen.getByText('92 🟡 · 18 🎁')).toBeInTheDocument();
+    expect(screen.getByText('Chính 92 / Thưởng 18')).toBeInTheDocument();
   });
 
   it('asks the BE again with the counter the member picked', async () => {
@@ -39,7 +39,7 @@ describe('TransactionsPage (GET /wallet/statements)', () => {
 
     render(<TransactionsPage />);
     await screen.findAllByText('Mua tập 3');
-    fireEvent.click(screen.getByRole('button', { name: '🎁 Coin thưởng' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Coin thưởng' }));
 
     await waitFor(() => expect(callsOf(fetchMock).some((c) => c.includes('kind=BONUS'))).toBe(true));
   });

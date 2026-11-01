@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Search, RotateCcw, Shield, Layers } from 'lucide-react';
+import { Search, Shield } from 'lucide-react';
 import { adminService, type PermissionRow, type RolePermissions } from '@/services/adminService';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
@@ -10,7 +10,6 @@ import {
   BACKEND_ROLE_LABEL,
   BACKEND_ROLES,
   PERMISSION_AREA_LABEL,
-  ROLE_SHORT_LABEL,
   getPermissionMeta,
 } from '../roles';
 import { PermissionCell, RoleColumnHeaders, RoleSummaryCards, type Matrix } from './RolePermissionParts';
@@ -119,7 +118,7 @@ export function RolePermissionsPanel() {
       <RoleSummaryCards draft={draft} changedRoles={changedRoles} />
 
       {/* ── Main Panel Card ── */}
-      <section className="bg-white dark:bg-[#0F1C27] rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
+      <section className="bg-white dark:bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
         {/* Panel Header */}
         <div className="p-6 border-b border-slate-100 dark:border-white/5 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -147,7 +146,6 @@ export function RolePermissionsPanel() {
                   onClick={() => setDraft(toMatrix(roles))}
                   className="px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                 >
-                  <RotateCcw className="w-3.5 h-3.5" />
                   <span>Hoàn tác</span>
                 </Button>
               )}
@@ -233,9 +231,8 @@ export function RolePermissionsPanel() {
                     <th
                       colSpan={BACKEND_ROLES.length + 1}
                       scope="colgroup"
-                      className="px-6 py-2.5 text-left text-xs font-bold text-sky-800 dark:text-sky-300 uppercase tracking-wide flex items-center gap-2"
+                      className="px-6 py-2.5 text-left text-xs font-bold text-sky-800 dark:text-sky-300 flex items-center gap-2"
                     >
-                      <Layers className="w-3.5 h-3.5 text-sky-500" />
                       <span>{PERMISSION_AREA_LABEL[area] ?? area}</span>
                       <span className="text-[10px] font-normal text-sky-600 dark:text-sky-400 bg-sky-100 dark:bg-sky-500/20 px-2 py-0.5 rounded-full ml-1 lowercase">
                         {filteredPermissions.filter((p) => p.area === area).length} quyền
@@ -263,7 +260,7 @@ export function RolePermissionsPanel() {
                               {meta.desc}
                             </p>
                             <div className="mt-1 flex items-center gap-2">
-                              <span className="text-[10px] font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/50 dark:border-white/5">
+                              <span className="text-[10px] tabular-nums text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/50 dark:border-white/5">
                                 {permission.key}
                               </span>
                             </div>

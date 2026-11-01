@@ -28,7 +28,7 @@ const MODULES: Module[] = [
   { key: 'marketing', title: 'Marketing', description: 'Chiến dịch cho phim sắp và đã phát hành.', icon: Megaphone, comingSoon: true },
 ];
 
-const CARD = 'bg-white dark:bg-[#0F1C27] rounded-xl border border-sky-100 dark:border-white/10';
+const CARD = 'bg-white dark:bg-card rounded-xl border border-sky-100 dark:border-white/10';
 
 /** Staff operations dashboard (MF-5): only the modules this role holds a permission for (BR-21). */
 export function StaffPage() {
@@ -38,7 +38,7 @@ export function StaffPage() {
   return (
     <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
       <div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Vận hành</h1>
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Vận hành</h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Các mục bạn được cấp quyền. Dữ liệu ở đây chỉ để xem, không sửa được.</p>
       </div>
 

@@ -32,8 +32,6 @@ export interface RegisterCredentials {
   name: string;
   email: string;
   password: string;
-  /** YYYY-MM-DD; Members must be 18 or older (BR-54). */
-  dateOfBirth: string;
 }
 
 /** Body of POST /auth/google. */

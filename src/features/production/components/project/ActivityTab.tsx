@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { productionService } from '@/services/productionService';
 import type { ProjectEvent } from '@/types/production';
-import { useResource } from '../../hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { EVENT_LABEL } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
-import { Pager, pageOf } from '../shared/Pager';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { formatDateTime } from '@/lib/format';
+import { Pager, pageOf } from '@/components/data/Pager';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 const PAGE_SIZE = 15;
@@ -27,7 +27,7 @@ export function ActivityTab() {
       <ol className="relative border-l border-slate-200 dark:border-white/10 ml-2 space-y-4">
         {rows.map((ev) => (
           <li key={ev.id} className="ml-4 text-xs">
-            <span className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-sky-500 border-2 border-white dark:border-[#151822]" />
+            <span className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-sky-500 border-2 border-white dark:border-card" />
             <p className="font-semibold text-slate-800 dark:text-slate-100">{EVENT_LABEL[ev.action] ?? ev.action}</p>
             <p className="text-slate-500 dark:text-slate-400">
               {actorName(ev)} · {formatDateTime(ev.createdAt)}

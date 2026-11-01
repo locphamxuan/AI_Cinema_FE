@@ -1,14 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { Select } from '@/components/ui/Select';
-import { ErrorNote, Loading } from '@/features/production/components/shared/ui';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDuration } from '@/features/production/lib/format';
+import { ErrorNote, Loading } from '@/components/data/ui';
+import { useResource } from '@/hooks/useResource';
+import { formatDuration } from '@/lib/format';
 import { MAX_AD_SLOTS_PER_EPISODE, adAdminService, adSlotProblem } from '@/services/adAdminService';
 import type { EpisodeAdSlotInput, EpisodeAdSlots } from '@/types/playback';
 
@@ -84,7 +84,7 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
               <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">
                 Lần {index + 1}
                 <span className="ml-2 font-normal text-slate-500 dark:text-slate-400">
-                  phát lúc <span className="font-mono">{formatDuration(slot.positionSeconds || 0)}</span>
+                  phát lúc <span className="tabular-nums">{formatDuration(slot.positionSeconds || 0)}</span>
                 </span>
               </p>
               <button
@@ -124,7 +124,7 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
         ))}
       </ul>
       <Button type="button" variant="secondary" size="sm" onClick={add} disabled={slots.length >= MAX_AD_SLOTS_PER_EPISODE}>
-        <Plus className="w-3.5 h-3.5" /> Thêm lần chèn
+        Thêm lần chèn
       </Button>
       {(problem || error) && <p role="alert" className="text-xs text-rose-600">{problem || error}</p>}
       <div className="flex flex-wrap justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">

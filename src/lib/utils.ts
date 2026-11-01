@@ -1,6 +1,8 @@
 /**
  * AI Cinema - Utility Functions
  */
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 /**
  * Format numbers with Vietnamese locale separators
@@ -72,8 +74,8 @@ export function formatDate(dateString: string, includeTime: boolean = false): st
 }
 
 /**
- * Combine multiple classnames cleanly
+ * Combine class names; later Tailwind utilities override earlier conflicting ones.
  */
-export function cn(...classes: (string | boolean | undefined | null)[]): string {
-  return classes.filter(Boolean).join(' ');
+export function cn(...inputs: ClassValue[]): string {
+  return twMerge(clsx(inputs));
 }

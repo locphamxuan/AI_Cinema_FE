@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Search, ChevronDown, User, LogOut, Wallet, Bookmark, Clock, Laptop, KeyRound, Crown } from 'lucide-react';
+import { Search, ChevronDown } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import RewardShortcuts from '@/components/wallet/RewardShortcuts';
 import ThemeToggle from '@/components/theme/ThemeToggle';
@@ -20,13 +20,13 @@ const NAV_LINKS = [
 
 /** Account pages listed in the signed-in user's dropdown. */
 const USER_MENU_LINKS = [
-  { href: '/profile', label: 'Hồ sơ cá nhân', Icon: User, iconClass: 'text-indigo-400' },
-  { href: '/profile/saved', label: 'Phim đã lưu', Icon: Bookmark, iconClass: 'text-amber-500 fill-amber-500/20' },
-  { href: '/profile/history', label: 'Lịch sử xem phim', Icon: Clock, iconClass: 'text-purple-400' },
-  { href: '/profile/devices', label: 'Quản lý thiết bị', Icon: Laptop, iconClass: 'text-sky-400' },
-  { href: '/profile/library', label: 'Kho tập phim đã mua', Icon: KeyRound, iconClass: 'text-fuchsia-400' },
-  { href: '/profile/subscription', label: 'Gói hội viên VIP', Icon: Crown, iconClass: 'text-amber-400' },
-  { href: '/profile/transactions', label: 'Lịch sử ví Coin', Icon: Wallet, iconClass: 'text-emerald-500' },
+  { href: '/profile', label: 'Hồ sơ cá nhân' },
+  { href: '/profile/saved', label: 'Phim đã lưu' },
+  { href: '/profile/history', label: 'Lịch sử xem phim' },
+  { href: '/profile/devices', label: 'Quản lý thiết bị' },
+  { href: '/profile/library', label: 'Kho tập phim đã mua' },
+  { href: '/profile/subscription', label: 'Gói hội viên VIP' },
+  { href: '/profile/transactions', label: 'Lịch sử ví Coin' },
 ];
 
 export default function NetflixNavbar() {
@@ -70,7 +70,7 @@ export default function NetflixNavbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? 'bg-white/95 dark:bg-[#07090E]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10 shadow-lg dark:shadow-2xl py-2.5 text-slate-900 dark:text-white'
+          ? 'bg-white/95 dark:bg-background/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-white/10 shadow-lg dark:shadow-2xl py-2.5 text-slate-900 dark:text-white'
           : 'bg-gradient-to-b from-black/95 via-black/60 to-transparent py-4 text-white'
       }`}
     >
@@ -78,15 +78,15 @@ export default function NetflixNavbar() {
         {/* Left: Brand Logo & Navigation Links */}
         <div className="flex items-center gap-7 lg:gap-10">
           <Link href="/" className="flex items-center gap-2 group shrink-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#E50914] to-red-800 flex items-center justify-center text-white font-black text-base shadow-lg shadow-red-600/30 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-action-strong flex items-center justify-center text-white font-black text-base shadow-lg shadow-primary/30 group-hover:scale-105 transition-transform">
               AI
             </div>
             <span
-              className={`text-xl sm:text-2xl font-black tracking-wider transition-colors ${
+              className={`text-xl sm:text-2xl font-black transition-colors ${
                 isScrolled ? 'text-slate-900 dark:text-white' : 'text-white'
               }`}
             >
-              CINEMA<span className="text-[#8B5CF6]">.</span>
+              CINEMA<span className="text-primary">.</span>
             </span>
           </Link>
 
@@ -102,16 +102,16 @@ export default function NetflixNavbar() {
                   className={`text-sm font-semibold transition-all relative py-1 cursor-pointer ${
                     isActive
                       ? isScrolled
-                        ? 'text-[#E50914] dark:text-white font-black'
+                        ? 'text-primary dark:text-white font-black'
                         : 'text-white font-black'
                       : isScrolled
-                      ? 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium'
-                      : 'text-slate-300 hover:text-white font-medium'
+                        ? 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-medium'
+                        : 'text-slate-300 hover:text-white font-medium'
                   }`}
                 >
                   {link.label}
                   {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#E50914] rounded-full shadow-[0_0_8px_#E50914]" />
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full shadow-[0_0_8px_var(--primary)]" />
                   )}
                 </Link>
               );
@@ -146,7 +146,7 @@ export default function NetflixNavbar() {
                     setIsSearchOpen(false);
                     setSearchQuery('');
                   }}
-                  className="text-xs text-slate-400 hover:text-red-500"
+                  className="text-xs text-slate-400 hover:text-primary"
                 >
                   ✕
                 </button>
@@ -187,14 +187,13 @@ export default function NetflixNavbar() {
           {/* Coin Wallet Badge */}
           <button
             onClick={openDepositModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#8B5CF6]/15 hover:bg-[#8B5CF6]/25 border border-[#8B5CF6]/30 text-xs font-bold transition shadow-sm cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/15 hover:bg-primary/25 border border-primary/30 text-xs font-bold transition shadow-sm cursor-pointer"
             title="Ví Coin - Bấm để nạp thêm"
           >
-            <span className="text-sm">🪙</span>
             <span className={isScrolled ? 'text-slate-900 dark:text-white' : 'text-white'}>
               {(wallet.mainCoin + wallet.bonusCoin).toLocaleString('vi-VN')}
             </span>
-            <span className="text-[10px] text-[#8B5CF6] font-semibold hidden md:inline">Coin</span>
+            <span className="text-[10px] text-primary font-semibold hidden md:inline">Coin</span>
           </button>
 
           {/* User Account Menu or Login Button */}
@@ -202,9 +201,9 @@ export default function NetflixNavbar() {
             <div ref={userMenuRef} className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-[#8B5CF6]/40 transition cursor-pointer"
+                className="flex items-center gap-1.5 p-1 rounded-full hover:ring-2 hover:ring-primary/40 transition cursor-pointer"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#8B5CF6] to-pink-500 text-white font-black text-xs flex items-center justify-center shadow-md">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-primary to-pink-500 text-white font-black text-xs flex items-center justify-center shadow-md">
                   {user.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
                 <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:inline" />
@@ -212,30 +211,25 @@ export default function NetflixNavbar() {
 
               {/* Dropdown Menu */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl bg-white dark:bg-[#12151E] border border-slate-200 dark:border-white/10 shadow-2xl z-50 animate-fade-in text-xs text-slate-800 dark:text-white">
+                <div className="absolute right-0 top-full mt-2 w-64 p-2 rounded-2xl bg-white dark:bg-card border border-slate-200 dark:border-white/10 shadow-2xl z-50 animate-fade-in text-xs text-slate-800 dark:text-white">
                   <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-white/5">
                     <p className="font-bold truncate text-sm text-slate-900 dark:text-white">{user.name}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500" />
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">
-                        {user.role === 'admin'
-                          ? 'Quản trị viên'
-                          : user.role === 'vip'
-                          ? 'Hội viên VIP'
-                          : 'Hội viên'}
+                        {user.role === 'admin' ? 'Quản trị viên' : user.role === 'vip' ? 'Hội viên VIP' : 'Hội viên'}
                       </p>
                     </div>
                   </div>
 
                   <div className="py-1.5 space-y-0.5">
-                    {USER_MENU_LINKS.map(({ href, label, Icon, iconClass }) => (
+                    {USER_MENU_LINKS.map(({ href, label }) => (
                       <Link
                         key={href}
                         href={href}
                         onClick={() => setIsUserMenuOpen(false)}
                         className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition font-medium"
                       >
-                        <Icon className={`w-4 h-4 shrink-0 ${iconClass}`} />
                         <span>{label}</span>
                       </Link>
                     ))}
@@ -249,7 +243,6 @@ export default function NetflixNavbar() {
                       }}
                       className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition text-left cursor-pointer font-semibold"
                     >
-                      <LogOut className="w-4 h-4 shrink-0" />
                       <span>Đăng xuất</span>
                     </button>
                   </div>
@@ -259,7 +252,7 @@ export default function NetflixNavbar() {
           ) : (
             <button
               onClick={() => openAuthModal('login')}
-              className="px-4 py-2 rounded-full bg-[#E50914] hover:bg-red-700 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
+              className="px-4 py-2 rounded-full bg-primary hover:bg-action-strong text-white font-bold text-xs shadow-lg shadow-primary/30 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
             >
               Đăng Nhập
             </button>

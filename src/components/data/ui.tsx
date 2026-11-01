@@ -6,9 +6,9 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import type { Tone } from '../../lib/labels';
+import type { Tone } from '@/features/production/lib/labels';
 
-export const CARD = 'bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10';
+export const CARD = 'rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 shadow-xs';
 
 export function StatusPill({ label, tone }: { label: string; tone: Tone }) {
   return (
@@ -34,10 +34,10 @@ export function Panel({
 }) {
   return (
     <section className={`${CARD} ${className}`} aria-label={title}>
-      <header className="flex flex-wrap items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-slate-100 dark:border-white/5">
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b px-6 pt-5 pb-4">
         <div className="min-w-0 max-w-prose">
-          <h2 className="text-base font-semibold text-slate-900 dark:text-white">{title}</h2>
-          {description && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{description}</p>}
+          <h2 className="font-heading text-base font-semibold">{title}</h2>
+          {description && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{description}</p>}
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
       </header>
@@ -48,15 +48,22 @@ export function Panel({
 
 export function Loading({ label = 'Đang tải…' }: { label?: string }) {
   return (
-    <p className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 py-8 justify-center" role="status">
-      <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" /> {label}
-    </p>
+    <div role="status" className="space-y-3 py-6">
+      <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="size-4 animate-spin" aria-hidden="true" /> {label}
+      </p>
+      <div className="mx-auto max-w-md space-y-2" aria-hidden="true">
+        <div className="h-3 animate-pulse rounded-full bg-muted" />
+        <div className="h-3 w-4/5 animate-pulse rounded-full bg-muted" />
+        <div className="h-3 w-3/5 animate-pulse rounded-full bg-muted" />
+      </div>
+    </div>
   );
 }
 
 export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className="rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-4 text-sm text-rose-700 dark:text-rose-300 flex items-center justify-between gap-3">
+    <div role="alert" className="flex items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/8 p-4 text-sm text-destructive">
       <span>{message}</span>
       {onRetry && (
         <Button size="sm" variant="secondary" onClick={onRetry}>
@@ -68,7 +75,11 @@ export function ErrorNote({ message, onRetry }: { message: string; onRetry?: () 
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <p className="text-sm text-slate-500 dark:text-slate-400 py-8 text-center max-w-prose mx-auto">{children}</p>;
+  return (
+    <div className="mx-auto flex max-w-prose flex-col items-center gap-3 py-10 text-center">
+      <p className="text-sm text-muted-foreground">{children}</p>
+    </div>
+  );
 }
 
 /** Label/value pairs in two columns; `stacked` keeps one pair per row for narrow side panels. */
@@ -77,8 +88,8 @@ export function Facts({ items, stacked = false }: { items: [string, ReactNode][]
     <dl className={`grid grid-cols-1 ${stacked ? '' : 'sm:grid-cols-2'} gap-x-8 gap-y-2.5 text-sm`}>
       {items.map(([label, value]) => (
         <div key={label} className="flex gap-2 min-w-0">
-          <dt className="text-slate-500 dark:text-slate-400 shrink-0 w-36">{label}</dt>
-          <dd className="text-slate-900 dark:text-slate-100 font-medium min-w-0 break-words">{value}</dd>
+          <dt className="w-36 shrink-0 text-muted-foreground">{label}</dt>
+          <dd className="min-w-0 font-medium break-words">{value}</dd>
         </div>
       ))}
     </dl>

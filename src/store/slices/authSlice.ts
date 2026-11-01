@@ -48,12 +48,12 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
     return { success: true, redirectUrl: redirectUrlFor(res.data.role ?? 'user') };
   },
 
-  register: async (name, email, password, dateOfBirth) => {
-    if (!name.trim() || !email.trim() || !password || !dateOfBirth) {
+  register: async (name, email, password) => {
+    if (!name.trim() || !email.trim() || !password) {
       return { success: false, error: APPLICATION_MESSAGES.MSG02.message };
     }
 
-    const res = await authService.register({ name, email, password, dateOfBirth });
+    const res = await authService.register({ name, email, password });
     if (!res.success || !res.data) {
       return { success: false, error: res.message ?? 'Đăng ký không thành công.' };
     }

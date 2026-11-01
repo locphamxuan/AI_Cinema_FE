@@ -31,6 +31,13 @@ const eslintConfig = defineConfig([
       "max-lines": "off",
     },
   },
+  {
+    // shadcn/ui components are vendored as generated; keep them diffable against upstream.
+    files: ["src/components/shadcn/**/*.{ts,tsx}"],
+    rules: {
+      "max-lines": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

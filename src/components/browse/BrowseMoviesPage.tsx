@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { RotateCcw, Search, SlidersHorizontal } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import type { Movie } from '@/types/movie';
 import NetflixNavbar from '@/components/home/NetflixNavbar';
@@ -39,7 +39,7 @@ const SORTS: { value: MovieSort; label: string }[] = [
 ];
 
 const SELECT =
-  'w-full py-2 px-3 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs font-semibold outline-none focus:border-red-600 transition cursor-pointer';
+  'w-full py-2 px-3 rounded-xl bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-xs font-semibold outline-none focus:border-primary transition cursor-pointer';
 
 /** /phim: every released movie, filtered by name, genre, format and age rating. */
 export function BrowseMoviesPage() {
@@ -60,13 +60,13 @@ function BrowseMovies({ initial }: { initial: MovieFilters }) {
   }, [loadCatalog]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#07090E] text-slate-900 dark:text-white flex flex-col justify-between">
+    <div className="min-h-screen bg-background dark:bg-background text-slate-900 dark:text-white flex flex-col justify-between">
       <div>
         <NetflixNavbar />
         <main className="max-w-[1800px] mx-auto px-4 sm:px-8 md:px-14 pt-24 pb-10 space-y-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-2.5">
-              <SlidersHorizontal className="w-6 h-6 text-red-600" aria-hidden="true" /> Lọc phim
+            <h1 className="font-heading text-2xl sm:text-3xl font-semibold flex items-center gap-2.5 tracking-tight">
+              Lọc phim
             </h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Tìm phim theo tên, thể loại, loại phim và độ tuổi.</p>
           </div>
@@ -132,7 +132,7 @@ function BrowseMovies({ initial }: { initial: MovieFilters }) {
                 onClick={() => setFilters(NO_FILTERS)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-200 dark:bg-white/10 hover:bg-slate-300 dark:hover:bg-white/20 text-xs font-semibold text-slate-700 dark:text-slate-300 transition cursor-pointer"
               >
-                <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" /> Xoá bộ lọc
+                Xoá bộ lọc
               </button>
             </div>
           </section>

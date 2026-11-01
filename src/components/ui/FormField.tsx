@@ -10,11 +10,11 @@ export interface FormFieldProps {
   error?: string | null;
 }
 
-/** Shared label+control wrapper for form fields - the "block text-slate-300 mb-1 font-semibold label + input" pattern repeated across every modal and editor form. */
+/** A labelled form control with an optional help line or error under it. */
 export function FormField({ label, children, className = '', hint, error }: FormFieldProps) {
   const field = (
     <label className={`block ${hint || error ? '' : className}`}>
-      <span className="block text-slate-600 dark:text-slate-300 mb-1 text-xs font-medium">{label}</span>
+      <span className="mb-1.5 block text-sm font-medium text-foreground">{label}</span>
       {children}
     </label>
   );
@@ -24,18 +24,19 @@ export function FormField({ label, children, className = '', hint, error }: Form
     <div className={className}>
       {field}
       {error ? (
-        <p role="alert" className="mt-1 text-[11px] text-rose-600">
+        <p role="alert" className="mt-1.5 text-xs text-destructive">
           {error}
         </p>
       ) : (
-        <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">{hint}</p>
+        <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>
       )}
     </div>
   );
 }
 
+// The shadcn input look, for the native <input>, <select> and <textarea> the forms render.
 const FIELD_BASE =
-  'w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-action/30 focus-visible:border-action transition dark:[color-scheme:dark] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
+  'w-full min-w-0 rounded-lg border border-input bg-card px-3 py-2 text-sm text-foreground shadow-xs transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:bg-input/30 dark:[color-scheme:dark] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none';
 
 export const fieldInputClass = FIELD_BASE;
 export const fieldTextareaClass = `${FIELD_BASE} resize-none`;

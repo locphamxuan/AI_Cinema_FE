@@ -39,7 +39,6 @@ describe('Zustand App Store (src/store/useAppStore.ts)', () => {
     const store = useAppStore.getState();
     store.logout();
     useAppStore.setState({
-      chatMessages: [],
       currentMovie: fixtureMovie,
       movies: [fixtureMovie],
       checkInStreak: { currentStreak: 0, lastCheckInDate: null, todayClaimed: false },
@@ -51,7 +50,6 @@ describe('Zustand App Store (src/store/useAppStore.ts)', () => {
     it('starts with API-ready empty state instead of seeded mock data', () => {
       const state = useAppStore.getState();
       expect(state.wallet).toEqual({ mainCoin: 0, bonusCoin: 0 });
-      expect(state.chatMessages).toEqual([]);
       expect(state.checkInStreak.currentStreak).toBe(0);
       expect(state.isVIPMode).toBe(false);
     });

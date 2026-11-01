@@ -126,7 +126,7 @@ export default function NotificationBell({ className = '', isScrolled = false }:
       >
         <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#E50914] ring-2 ring-slate-900 animate-pulse" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary ring-2 ring-slate-900 animate-pulse" />
         )}
       </button>
 

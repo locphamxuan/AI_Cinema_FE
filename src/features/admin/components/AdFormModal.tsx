@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { UploadCloud } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
-import { formatDuration } from '@/features/production/lib/format';
+import { formatDuration } from '@/lib/format';
 import { MAX_AD_DURATION_SECONDS, MAX_AD_VIDEO_BYTES, MAX_AD_WEIGHT, adAdminService, adInputProblem } from '@/services/adAdminService';
 import type { AdInput, AdminAd } from '@/types/playback';
 
@@ -76,7 +76,6 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
           <div className="flex gap-2">
             <input type="url" value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} maxLength={1000} placeholder="https://…" className={fieldInputClass} required />
             <label className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-sky-100 dark:border-white/10 px-3 text-sm font-medium ${uploading ? 'opacity-60' : 'cursor-pointer hover:border-sky-500'}`}>
-              <UploadCloud className="w-4 h-4" aria-hidden="true" />
               {uploading ? 'Đang tải lên…' : 'Tải từ máy'}
               <input
                 type="file"

@@ -1,5 +1,5 @@
 import { toast } from '@/components/ui/Toast';
-import { saveBlob } from './format';
+import { saveBlob } from '@/lib/format';
 
 /** Fetches a file behind auth and saves it; says so when it cannot be read instead of failing silently. */
 export async function downloadFile(load: () => Promise<Blob | null>, fileName: string): Promise<boolean> {

@@ -24,7 +24,7 @@ export default function ComplianceDrawer({ isOpen, onClose, compliance }: Compli
         <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-5" />
 
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-          🛡️ Thông Tin Tuân Thủ Nội Dung AI
+           Thông Tin Tuân Thủ Nội Dung AI
         </h3>
 
         <div className="space-y-4">
@@ -38,7 +38,7 @@ export default function ComplianceDrawer({ isOpen, onClose, compliance }: Compli
                   ? 'bg-warning/20 text-warning'
                   : 'bg-danger/20 text-danger'
             }`}>
-              {compliance.reviewStatus === 'approved' ? '✅ Đã duyệt' : compliance.reviewStatus === 'pending' ? '⏳ Đang chờ' : '🚫 Bị gắn cờ'}
+              {compliance.reviewStatus === 'approved' ? 'Đã duyệt' : compliance.reviewStatus === 'pending' ? '⏳ Đang chờ' : 'Bị gắn cờ'}
             </span>
           </div>
 
@@ -57,7 +57,7 @@ export default function ComplianceDrawer({ isOpen, onClose, compliance }: Compli
 
           {/* Disclaimer */}
           <div className="p-4 rounded-xl bg-neon/10 border border-neon/20">
-            <p className="text-xs text-muted-light mb-1 font-medium">📋 Tuyên bố miễn trừ</p>
+            <p className="text-xs text-muted-light mb-1 font-medium">Tuyên bố miễn trừ</p>
             <p className="text-sm text-foreground/80">{compliance.disclaimer}</p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function ComplianceDrawer({ isOpen, onClose, compliance }: Compli
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
     <div className="p-3 rounded-lg bg-white/5">
-      <p className="text-[10px] text-muted-light uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-[10px] text-muted-light mb-1">{label}</p>
       <p className="text-sm text-foreground font-medium">{value}</p>
     </div>
   );

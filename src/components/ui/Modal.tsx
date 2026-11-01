@@ -1,7 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { X } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shadcn/dialog';
+import { cn } from '@/lib/utils';
 
 export interface ModalProps {
   open: boolean;
@@ -13,56 +14,25 @@ export interface ModalProps {
   maxWidth?: string;
 }
 
-/** Shared modal shell - centers a dialog card over a dim backdrop, with a title bar and close button, so every page stops hand-rolling this. */
+/** A dialog with a title bar; focus stays inside while it is open and returns to the trigger after. */
 export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth = 'max-w-lg' }: ModalProps) {
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-[2px] p-3 sm:p-6 animate-fade-in overflow-y-auto"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape') onClose();
-      }}
-    >
-      <div
-        className={`relative bg-white dark:bg-[#0F1C27] border border-slate-200/80 dark:border-white/15 rounded-2xl w-full ${maxWidth} shadow-2xl shadow-slate-900/20 overflow-hidden my-auto animate-scale-in flex flex-col max-h-[92vh]`}
+    <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
+      <DialogContent
+        className={cn('flex max-h-[92vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-none', maxWidth)}
+        {...(subtitle ? {} : { 'aria-describedby': undefined })}
       >
-        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-slate-100 dark:border-white/10 shrink-0">
-          <div className="flex items-start gap-3">
-            {icon && (
-              <div className="w-9 h-9 rounded-xl bg-action/10 text-action flex items-center justify-center shrink-0">
-                {icon}
-              </div>
-            )}
-            <div>
-              <h3 id="modal-title" className="text-lg font-semibold text-slate-900 dark:text-white">
-                {title}
-              </h3>
-              {subtitle && (
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>
-              )}
-            </div>
+        <DialogHeader className="flex-row items-start gap-3 border-b px-6 pt-5 pb-4 pr-12 text-left">
+          {icon && (
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">{icon}</div>
+          )}
+          <div className="space-y-1">
+            <DialogTitle className="font-heading text-lg font-semibold">{title}</DialogTitle>
+            {subtitle && <DialogDescription>{subtitle}</DialogDescription>}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Đóng"
-            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action/40"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="px-6 py-5 overflow-y-auto space-y-4 flex-1">
-          {children}
-        </div>
-      </div>
-    </div>
+        </DialogHeader>
+        <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">{children}</div>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,17 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Repeat, Send } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { TokenRequestForm } from '@/features/token-request/TokenRequestForm';
 import { TokenRequestList } from '@/features/token-request/TokenRequestList';
 import { studioService } from '@/services/studioService';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
-import { useResource } from '../../hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { DELIVERY_PROJECT, OPEN_PROJECT, isIn } from '../../lib/capabilities';
 import { downloadFile } from '../../lib/download';
-import { Pager, pageOf } from '../shared/Pager';
-import { Empty, ErrorNote, Facts, Loading, Panel } from '../shared/ui';
+import { Pager, pageOf } from '@/components/data/Pager';
+import { Empty, ErrorNote, Facts, Loading, Panel } from '@/components/data/ui';
 import { HandoffCard } from './HandoffCard';
 import { ChangeStudioModal, HandOffModal } from './HandoffModals';
 import { MilestoneModal } from './MilestoneModal';
@@ -123,12 +123,12 @@ export function StudioTab() {
           <div className="mt-4 space-y-2">
             {canHandOff && (
               <Button size="sm" className="w-full" onClick={() => setMode('handoff')}>
-                <Send className="w-3.5 h-3.5" aria-hidden="true" /> Bàn giao cho Studio
+                Bàn giao cho Studio
               </Button>
             )}
             {caps.handoff && delivering && all.length > 0 && (
               <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
-                <Repeat className="w-3.5 h-3.5" aria-hidden="true" /> Đổi Studio
+                Đổi Studio
               </Button>
             )}
             {caps.creator && project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Reviewer hoàn tất kế hoạch.</p>}

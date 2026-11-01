@@ -42,11 +42,11 @@ export default function NetflixMovieRow({
       {/* Row Header */}
       <div className="flex items-end justify-between px-4 sm:px-8 md:px-14">
         <div className="flex items-center gap-3">
-          <div className="w-2.5 h-6 rounded-full bg-gradient-to-b from-[#8B5CF6] to-purple-800 shadow-md shadow-purple-600/40" />
+          <div className="w-2.5 h-6 rounded-full bg-gradient-to-b from-primary to-purple-800 shadow-md shadow-purple-600/40" />
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5">
             <span>{title}</span>
             {badge && (
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#8B5CF6]/15 border border-[#8B5CF6]/40 text-[#8B5CF6] shadow-sm">
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/15 border border-primary/40 text-primary shadow-sm">
                 {badge}
               </span>
             )}

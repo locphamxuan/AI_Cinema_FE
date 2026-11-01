@@ -1,7 +1,6 @@
 import type { WebRole } from '@/lib/permissions';
 import { WalletState, CheckInStreak } from '@/types/wallet';
 import { Movie } from '@/types/movie';
-import { ChatMessage, ChatPhase, SupportTicket } from '@/types/chat';
 
 export interface UserProfile {
   id: string;
@@ -18,12 +17,7 @@ export interface AuthSlice {
   isAuthenticated: boolean;
   user: UserProfile | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
-  register: (
-    name: string,
-    email: string,
-    password: string,
-    dateOfBirth: string,
-  ) => Promise<{ success: boolean; error?: string }>;
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   /** One tap: signs in, links or opens the account behind a Google ID token. */
   loginWithGoogle: (idToken: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
   logout: () => void;
@@ -88,18 +82,6 @@ export interface MovieSlice {
   closeUnlockModal: () => void;
 }
 
-export interface ChatSlice {
-  chatMessages: ChatMessage[];
-  chatPhase: ChatPhase;
-  chatIsOpen: boolean;
-  chatTicket: SupportTicket | null;
-  estimatedWaitMinutes: number;
-  toggleChat: () => void;
-  sendMessage: (content: string) => void;
-  handleQuickAction: (actionId: string) => void;
-  escalateToAgent: () => void;
-}
-
 export interface UiModalsSlice {
   isRightSidebarOpen: boolean;
   openRightSidebar: () => void;
@@ -128,6 +110,5 @@ export type AppState = AuthSlice &
   AccountSlice &
   WalletSlice &
   MovieSlice &
-  ChatSlice &
   UiModalsSlice &
   SearchFilterSlice;

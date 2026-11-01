@@ -86,13 +86,12 @@ export const authService = {
     return { ...res, data: profile };
   },
 
-  /** Members sign up for themselves (18+, BR-54); every other role is created by the Admin. */
+  /** Members sign up for themselves, without a birthday (BR-54); every other role is created by the Admin. */
   async register(credentials: RegisterCredentials): Promise<ApiResponse<UserProfile>> {
     const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.REGISTER, {
       email: credentials.email.trim().toLowerCase(),
       password: credentials.password,
       fullName: credentials.name.trim(),
-      dateOfBirth: credentials.dateOfBirth,
     });
 
     if (!res.success) {

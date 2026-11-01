@@ -56,7 +56,7 @@ export function projectsUrl({ page = 1, limit = 12, search, status }: ProjectQue
 }
 
 /** Multipart body of an episode delivery: the video plus the AI Disclosure as JSON. */
-export function mediaForm(file: File, input: MediaMetadataInput): FormData {
+function mediaForm(file: File, input: MediaMetadataInput): FormData {
   const form = new FormData();
   form.append('file', file);
   form.append('proposedLabelType', input.proposedLabelType);

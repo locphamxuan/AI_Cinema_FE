@@ -7,7 +7,7 @@ import {
   toSeasonInput,
   type SeasonDraft,
 } from '@/features/production/components/shared/SeasonDraftEditor';
-import { addDays } from '@/features/production/lib/format';
+import { addDays } from '@/lib/format';
 import { getTodayDateString } from '@/lib/dateUtils';
 
 const today = getTodayDateString();

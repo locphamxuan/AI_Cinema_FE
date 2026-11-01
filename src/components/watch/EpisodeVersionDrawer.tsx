@@ -34,7 +34,6 @@ export default function EpisodeVersionDrawer({
         <div className="flex items-start justify-between pb-4 border-b border-white/10">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xl">🗂️</span>
               <h2 className="text-lg font-bold text-foreground">
                 Quản Lý Phiên Bản & Lịch Sử Hiệu Chỉnh
               </h2>
@@ -53,7 +52,6 @@ export default function EpisodeVersionDrawer({
 
         {/* AI Compliance Note */}
         <div className="my-4 p-3 rounded-xl bg-neon/10 border border-neon/20 flex items-start gap-2.5">
-          <span className="text-base">🛡️</span>
           <p className="text-[11px] text-neon-light leading-relaxed">
             <strong>Quy chuẩn kiểm duyệt Điều 44 Luật AI:</strong> Mọi lần cập nhật prompt, đổi model render hoặc cắt ghép video AI đều được hệ thống gắn nhãn phiên bản, ghi nhật ký thay đổi (changelog) và lưu vết kiểm duyệt minh bạch.
           </p>
@@ -76,7 +74,7 @@ export default function EpisodeVersionDrawer({
                 {/* Top line: Version Badge, Status, Date */}
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-ruby/20 text-ruby font-mono text-xs font-bold">
+                    <span className="px-2.5 py-1 rounded-lg bg-ruby/20 text-ruby tabular-nums text-xs font-bold">
                       {ver.versionNumber}
                     </span>
                     <span
@@ -92,7 +90,7 @@ export default function EpisodeVersionDrawer({
                     </span>
                     {ver.isCurrent && (
                       <span className="px-2 py-0.5 rounded-full bg-coin/20 text-coin text-[10px] font-bold border border-coin/30">
-                        ⭐ Bản chính thức
+                         Bản chính thức
                       </span>
                     )}
                   </div>
@@ -135,8 +133,8 @@ export default function EpisodeVersionDrawer({
 
                 {/* Changelog list */}
                 <div className="mt-2">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-light font-bold mb-1.5">
-                    📝 Nhật ký hiệu chỉnh (Changelog):
+                  <p className="text-[10px] text-muted-light font-bold mb-1.5">
+                     Nhật ký hiệu chỉnh (Changelog):
                   </p>
                   <ul className="space-y-1">
                     {ver.changelog.map((item, cIdx) => (

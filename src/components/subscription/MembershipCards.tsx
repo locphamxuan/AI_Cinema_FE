@@ -33,7 +33,7 @@ export function CurrentPlan({ subscription, busy, onCancelRenew, onResumeRenew }
     <div className="p-5 rounded-2xl border border-purple-500/30 bg-gradient-to-br from-purple-500/10 to-transparent space-y-3">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase font-bold tracking-wider text-purple-500">Gói hiện tại</p>
+          <p className="text-xs font-bold text-purple-500">Gói hiện tại</p>
           <p className="text-lg font-black text-slate-900 dark:text-white">{subscription.plan.name}</p>
         </div>
         <span className="text-sm font-black text-amber-500">{subscription.priceCoins} Coin / {subscription.plan.durationDays} ngày</span>

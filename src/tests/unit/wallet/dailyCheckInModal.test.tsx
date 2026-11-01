@@ -31,16 +31,16 @@ describe('DailyCheckInModal ladder', () => {
     mockApi({ 'GET /daily-rewards/status': status(false, 7) });
     render(<DailyCheckInModal />);
     await screen.findByRole('button', { name: /Nhận 5 Coin Thưởng/ });
-    expect(screen.queryAllByText('✅')).toHaveLength(0);
+    expect(screen.queryAllByText('Đã nhận')).toHaveLength(0);
     // Day 1 is the next one to claim, days 2-6 are locked and day 7 carries the spin.
-    expect(screen.getAllByText('🎁')).toHaveLength(1);
-    expect(screen.getAllByText('🔒')).toHaveLength(5);
+    expect(screen.getAllByText('Hôm nay')).toHaveLength(1);
+    expect(screen.getAllByText('Chưa tới')).toHaveLength(5);
   });
 
   it('marks the days already claimed in the current round', async () => {
     mockApi({ 'GET /daily-rewards/status': status(false, 2) });
     render(<DailyCheckInModal />);
     await screen.findByRole('button', { name: /Nhận 5 Coin Thưởng/ });
-    expect(screen.getAllByText('✅')).toHaveLength(2);
+    expect(screen.getAllByText('Đã nhận')).toHaveLength(2);
   });
 });

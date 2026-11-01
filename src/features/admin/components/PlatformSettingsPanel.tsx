@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { PlatformSettings } from '@/types/production';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime } from '@/features/production/lib/format';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime } from '@/lib/format';
 
 type Key = { [K in keyof PlatformSettings]-?: PlatformSettings[K] extends number ? K : never }[keyof PlatformSettings];
 
@@ -113,7 +113,7 @@ export function PlatformSettingsPanel() {
               step={1}
               value={value(f.key)}
               onChange={(e) => setDraft({ ...draft, [f.key]: e.target.value })}
-              className={`${fieldInputClass} w-28 py-1.5 text-right font-mono`}
+              className={`${fieldInputClass} w-28 py-1.5 text-right tabular-nums`}
             />
             <span className="w-20 text-slate-500">{f.unit}</span>
           </span>
@@ -140,12 +140,12 @@ export function PlatformSettingsPanel() {
   );
 
   return (
-    <section className="bg-white dark:bg-[#0F1C27] rounded-3xl border border-sky-100 dark:border-white/10 p-6 sm:p-8 space-y-6 max-w-3xl shadow-sm">
+    <section className="bg-white dark:bg-card rounded-3xl border border-sky-100 dark:border-white/10 p-6 sm:p-8 space-y-6 max-w-3xl shadow-sm">
       <div className="border-b border-slate-100 dark:border-white/5 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Cài đặt nền tảng</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Cập nhật lần cuối: <span className="font-mono text-slate-700 dark:text-slate-300">{formatDateTime(current.updatedAt)}</span>
+            Cập nhật lần cuối: <span className="tabular-nums text-slate-700 dark:text-slate-300">{formatDateTime(current.updatedAt)}</span>
           </p>
         </div>
         {changes > 0 && (
@@ -179,23 +179,23 @@ export function PlatformSettingsPanel() {
         {activeTab === 'all' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Coins className="w-3.5 h-3.5" /> Phân khúc COIN & Nạp tiền
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
+                Phân khúc COIN & Nạp tiền
               </h3>
               {renderFieldGroup(COIN_FIELDS)}
               <div className="mt-3">{refundToggle}</div>
             </div>
 
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Clapperboard className="w-3.5 h-3.5" /> Phân khúc Sản xuất & Token
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
+                Phân khúc Sản xuất & Token
               </h3>
               {renderFieldGroup(PRODUCTION_FIELDS)}
             </div>
 
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5" /> Phân khúc Phát sóng & Gia hạn gói
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
+                Phân khúc Phát sóng & Gia hạn gói
               </h3>
               {renderFieldGroup(STREAMING_FIELDS)}
             </div>
@@ -230,9 +230,6 @@ export function PlatformSettingsPanel() {
         {activeTab === 'rewards' && (
           <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                <Gift className="w-5 h-5" />
-              </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Quy tắc thưởng & Vòng quay may mắn</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">

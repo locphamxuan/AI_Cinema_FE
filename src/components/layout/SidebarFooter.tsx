@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Coins, Film, Play, PlusCircle, Sparkles } from 'lucide-react';
+import { Play, Sparkles } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import type { Movie } from '@/types/movie';
 
@@ -12,12 +12,11 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
   return (
     <div className="space-y-3.5 pt-4 mt-4 border-t border-white/10">
       {/* Wallet Quick Action Box */}
-      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/15 via-slate-900/90 to-purple-950/30 border border-amber-500/30 relative overflow-hidden shadow-xl">
-        <div className="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl border border-highlight/30 bg-[linear-gradient(145deg,#2A2440,#15121F_70%)] p-3.5 text-white shadow-xl">
+        <div className="pointer-events-none absolute -top-12 -right-10 size-32 rounded-full bg-highlight/25 blur-2xl" />
 
         <div className="flex items-center justify-between mb-2 relative z-10">
-          <span className="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-            <Coins className="w-3.5 h-3.5 text-amber-400" />
+          <span className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">
             <span>Ví AI Cinema</span>
           </span>
           <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 flex items-center gap-1">
@@ -27,10 +26,10 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
         </div>
 
         <div className="flex items-baseline gap-1.5 mb-3 relative z-10">
-          <span className="text-2xl font-black text-amber-400 font-mono tracking-tight drop-shadow-sm">
+          <span className="text-2xl font-black text-amber-400 tabular-nums tracking-tight drop-shadow-sm">
             {wallet.mainCoin.toLocaleString()}
           </span>
-          <span className="text-xs font-semibold text-slate-400">Main Coin</span>
+          <span className="text-xs font-medium text-white/60">Coin chính</span>
         </div>
 
         <button
@@ -40,7 +39,6 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
           }}
           className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xs shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2 relative z-10"
         >
-          <PlusCircle className="w-4 h-4 text-slate-950" />
           <span>Nạp Coin Ngay</span>
         </button>
       </div>
@@ -49,8 +47,7 @@ export default function SidebarFooter({ movie }: { movie: Movie | null }) {
       {movie && (
         <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 hover:border-white/20 transition-all">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-1.5">
-              <Film className="w-3 h-3 text-slate-400" />
+            <p className="text-[10px] font-black text-slate-400 flex items-center gap-1.5">
               <span>Đang Xem Dở</span>
             </p>
             <span className="text-[10px] font-bold text-ruby">Tập 1</span>

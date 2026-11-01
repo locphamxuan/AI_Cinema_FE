@@ -18,7 +18,6 @@ export const API_ROUTES = {
     LOGIN: '/auth/login',
     REGISTER: '/auth/register',
     GOOGLE: '/auth/google',
-    REFRESH_TOKEN: '/auth/refresh',
     PROFILE: '/auth/me',
     CHANGE_PASSWORD: '/auth/me/password',
   },
@@ -34,28 +33,7 @@ export const API_ROUTES = {
   // Wallet & Coin (MF-2)
   WALLET: {
     BALANCE: '/wallet',
-    CHECK_IN: '/daily-rewards/check-in',
-    STREAK: '/daily-rewards/status',
-    AFFORDABILITY: '/wallet/affordability',
-    TOP_UPS: '/wallet/top-ups',
     STATEMENTS: '/wallet/statements',
-    TRANSACTIONS: '/wallet/statements',
-    UNLOCK_EPISODE: (episodeId: string) => `/episodes/${episodeId}/purchase`,
-    ACCESS: (episodeId: string) => `/episodes/${episodeId}/access`,
-  },
-  // Subscriptions
-  SUBSCRIPTIONS: {
-    PLANS: '/subscriptions/plans',
-    CURRENT: '/subscriptions/current',
-    UPGRADE: '/subscriptions/upgrade',
-    CANCEL: '/subscriptions/cancel',
-    AUTO_RENEW: '/subscriptions/auto-renew',
-  },
-  // Chat & Support
-  CHAT: {
-    SEND_MESSAGE: '/chat/message',
-    CONVERSATION: '/chat/conversation',
-    ESCALATE: '/chat/escalate',
   },
   // Accounts & permissions (Admin), member list (Staff)
   ADMIN: {

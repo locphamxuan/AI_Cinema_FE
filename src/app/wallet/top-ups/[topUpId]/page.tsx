@@ -102,7 +102,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
       </div>
 
       {/* Title */}
-      <h1 className="text-2xl font-black tracking-wide mb-2">
+      <h1 className="font-heading text-2xl font-semibold mb-2 tracking-tight">
         {isSuccess
           ? 'Nạp Coin Thành Công!'
           : isFailed
@@ -121,7 +121,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
       <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 mb-6 text-left space-y-3 font-sans text-xs">
         <div className="flex justify-between items-center pb-2 border-b border-slate-800/80">
           <span className="text-slate-400">Mã đơn hàng:</span>
-          <span className="font-mono text-slate-200 text-[11px] truncate max-w-[200px]" title={topUpId}>
+          <span className="tabular-nums text-slate-200 text-[11px] truncate max-w-[200px]" title={topUpId}>
             {topUpId}
           </span>
         </div>
@@ -143,7 +143,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
             <div className="flex justify-between items-center pb-2 border-b border-slate-800/80">
               <span className="text-slate-400">Coin nhận được:</span>
               <span className="font-black text-amber-400 text-sm flex items-center gap-1">
-                <span>🪙</span> +{order.coinsGranted} Coin
+                <span></span>+{order.coinsGranted} Coin
               </span>
             </div>
           </>
@@ -152,7 +152,7 @@ function TopUpResultContent({ topUpId }: ContentProps) {
         <div className="flex justify-between items-center">
           <span className="text-slate-400">Trạng thái:</span>
           <span
-            className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
+            className={`px-2.5 py-1 rounded-full text-[11px] font-bold ${
               isSuccess
                 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                 : isFailed

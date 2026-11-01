@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Empty } from '@/features/production/components/shared/ui';
+import { Empty } from '@/components/data/ui';
 import { FEE_ENTRY } from '@/features/production/lib/labels';
-import { formatDateTime, formatNumber } from '@/features/production/lib/format';
+import { formatDateTime, formatNumber } from '@/lib/format';
 import type { ReviewerWallet, TokenHistoryEntry, TokenTotals } from '@/types/reviewer-token';
 
 /** Left, granted and allocated Token, with the VND value at today's rate. */
@@ -40,7 +40,7 @@ export function TokenTotalsCards({ totals, rateVnd }: { totals: TokenTotals; rat
           className={`relative rounded-2xl p-5 border transition-all duration-200 ${
             c.primary
               ? 'bg-gradient-to-br from-sky-500/10 via-sky-500/5 to-transparent border-sky-500/25'
-              : 'bg-white dark:bg-[#0F1C27] border-slate-200/80 dark:border-white/10 shadow-xs'
+              : 'bg-white dark:bg-card border-slate-200/80 dark:border-white/10 shadow-xs'
           }`}
         >
           <div className="flex items-center justify-between gap-2">
@@ -50,12 +50,12 @@ export function TokenTotalsCards({ totals, rateVnd }: { totals: TokenTotals; rat
             )}
           </div>
           <div className="mt-2.5">
-            <p className={`text-2xl font-bold font-mono tracking-tight ${c.primary ? 'text-sky-800 dark:text-sky-300' : 'text-slate-900 dark:text-white'}`}>
+            <p className={`text-2xl font-bold tabular-nums tracking-tight ${c.primary ? 'text-sky-800 dark:text-sky-300' : 'text-slate-900 dark:text-white'}`}>
               {formatNumber(c.value)} <span className="text-sm font-semibold font-sans">Token</span>
             </p>
             <div className="mt-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-white/5">
               <span>Quy đổi:</span>
-              <span className="font-semibold text-slate-700 dark:text-slate-300 font-mono">≈ {formatNumber(c.vnd)} ₫</span>
+              <span className="font-semibold text-slate-700 dark:text-slate-300 tabular-nums">≈ {formatNumber(c.vnd)} ₫</span>
             </div>
           </div>
         </div>
@@ -116,7 +116,7 @@ export function TokenHistoryTable({
                 )}
                 {e.season && <span className="block text-xs text-slate-400 mt-0.5">Mùa {e.season.seasonNumber}{e.season.title ? ` - ${e.season.title}` : ''}</span>}
               </td>
-              <td className={`py-3 px-4 text-right font-mono font-bold ${e.amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+              <td className={`py-3 px-4 text-right tabular-nums font-bold ${e.amountTokens < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                 {e.amountTokens > 0 ? '+' : ''}
                 {formatNumber(e.amountTokens)} <span className="text-xs font-normal">Token</span>
               </td>
