@@ -94,6 +94,7 @@ export const API_ROUTES = {
     MATERIAL: (movieId: string, handoffId: string, materialId: string) =>
       `/projects/${movieId}/handoffs/${handoffId}/materials/${materialId}/content`,
     EPISODE_MEDIA: (episodeId: string) => `/episodes/${episodeId}/media`,
+    EPISODE_NOTES: (episodeId: string) => `/episodes/${episodeId}/notes`,
     EPISODE_MEDIA_UPLOAD: (episodeId: string) => `/episodes/${episodeId}/media/upload`,
     MEDIA_ASSET: (id: string) => `/media-assets/${id}`,
     MEDIA_RETRY: (id: string) => `/media-assets/${id}/retry`,

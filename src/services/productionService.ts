@@ -9,6 +9,7 @@ import type {
   ComplianceInput,
   CreateProjectInput,
   Episode,
+  EpisodeNote,
   FeeLedger,
   Genre,
   MediaAsset,
@@ -119,6 +120,11 @@ export const productionService = {
   uploadMedia: (episodeId: string, file: File, input: MediaMetadataInput) =>
     apiClient.postForm<MediaAsset>(R.EPISODE_MEDIA_UPLOAD(episodeId), mediaForm(file, input)),
   retryMedia: (mediaAssetId: string) => apiClient.post<MediaAsset>(R.MEDIA_RETRY(mediaAssetId)),
+
+  // ---- Notes between the Creator holding an episode and the lead (BR-67) ----
+  listEpisodeNotes: (episodeId: string) => apiClient.get<EpisodeNote[]>(R.EPISODE_NOTES(episodeId)),
+  sendEpisodeNote: (episodeId: string, message: string) =>
+    apiClient.post<EpisodeNote[]>(R.EPISODE_NOTES(episodeId), { message }),
 
   // ---- Review, AI label, compliance (steps 8–11) ----
   getReviewSheet: (mediaAssetId: string) => apiClient.get<ReviewSheet>(R.REVIEW_SHEET(mediaAssetId)),

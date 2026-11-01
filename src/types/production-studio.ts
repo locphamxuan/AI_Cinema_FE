@@ -8,6 +8,14 @@ import type {
   TokenEntryType,
 } from './production-enums';
 
+/** A note between the Creator holding an episode and the lead Creator (BR-67). */
+export interface EpisodeNote {
+  id: string;
+  message: string;
+  createdAt: string;
+  author: { id: string; fullName: string } | null;
+}
+
 export interface Person {
   id: string;
   fullName: string;

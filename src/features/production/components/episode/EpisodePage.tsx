@@ -17,6 +17,7 @@ import { formatDay, formatDuration, formatNumber } from '@/lib/format';
 import { baseFromPath, productionPaths } from '../../lib/routes';
 import { ErrorNote, Facts, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { DeliverMediaPanel, deliverAsCreator } from './DeliverMediaPanel';
+import { EpisodeNotesPanel } from './EpisodeNotesPanel';
 import { HlsPreview } from './HlsPreview';
 import { MediaVersions } from './MediaVersions';
 import { PublishPanel } from './PublishPanel';
@@ -82,6 +83,8 @@ export function EpisodePage() {
   const delivering = isIn(project.data.status, DELIVERY_PROJECT);
   const mine = caps.ingest && holdsEpisode(caps, episode, userId);
   const canDeliver = mine && delivering && isIn(episode.status, SUBMITTABLE_EPISODE);
+  // BR-67: an episode given to a co-Creator carries the notes between them and the lead.
+  const heldByCoCreator = !!episode.assignedCreatorId && episode.assignedCreatorId !== project.data.creatorId;
   const refreshAll = async () => {
     await Promise.all([project.reload(), media.reload(), sheet.reload()]);
   };
@@ -151,6 +154,15 @@ export function EpisodePage() {
               deliver={deliverAsCreator(episode.id)}
               onDelivered={refreshAll}
               studioFilm={latestFilmLink(handoffs.data, episode.id)}
+            />
+          )}
+
+          {heldByCoCreator && (
+            <EpisodeNotesPanel
+              episodeId={episode.id}
+              canWrite={caps.ingest && (caps.lead || episode.assignedCreatorId === userId)}
+              isLead={caps.lead}
+              leadName={project.data.creator?.fullName ?? ''}
             />
           )}
 
