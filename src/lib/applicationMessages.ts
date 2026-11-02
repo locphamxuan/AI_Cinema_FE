@@ -29,11 +29,6 @@ export const APPLICATION_MESSAGES = {
     scenario: 'The email address is already registered.',
     message: 'Email này đã được đăng ký tài khoản.',
   },
-  MSG07: {
-    type: 'Inline, under the date-of-birth field',
-    scenario: 'A person under 18 attempts to register.',
-    message: 'AI Cinema chỉ dành cho khán giả từ 18 tuổi trở lên.',
-  },
   MSG08: {
     type: 'Inline or toast',
     scenario: 'A deactivated account attempts to sign in.',
@@ -107,13 +102,6 @@ const PLAYBACK_REASONS: Record<string, string> = {
   PLAYBACK_ACCESS_REVOKED: 'Quyền xem tập này đã hết hiệu lực.',
 };
 
-/** Google sign-in refusals, keyed by the BE `details.reason`. */
-const GOOGLE_REASONS: Record<string, string> = {
-  GOOGLE_ACCOUNT_MISMATCH: 'Email này đã được liên kết với một tài khoản Google khác.',
-  GOOGLE_STAFF_ACCOUNT: 'Đăng nhập Google chỉ dành cho thành viên. Tài khoản quản trị / nhân sự hãy đăng nhập bằng mật khẩu.',
-  PROVIDER_NOT_CONFIGURED: 'Đăng nhập bằng Google hiện chưa được bật.',
-};
-
 export function localizeApiError(
   rawMessage: unknown,
   status: number,
@@ -139,16 +127,9 @@ export function localizeApiError(
   ) {
     return APPLICATION_MESSAGES.MSG13.message;
   }
-  const playback = PLAYBACK_REASONS[String(reason)] ?? GOOGLE_REASONS[String(reason)];
+  const playback = PLAYBACK_REASONS[String(reason)];
   if (playback) return playback;
-  if (normalized.includes('google id token') || normalized.includes('google account email is not verified')) {
-    return 'Không xác thực được tài khoản Google. Vui lòng thử lại.';
-  }
-  if (normalized.includes('uses google sign-in') || normalized.includes('has no password')) {
-    return 'Tài khoản này đăng nhập bằng Google, không có mật khẩu. Hãy dùng nút "Đăng nhập với Google".';
-  }
   if (normalized.includes('cannot be released yet')) return APPLICATION_MESSAGES.MSG14.message;
-  if (normalized.includes('viewers aged 18 or older')) return APPLICATION_MESSAGES.MSG07.message;
   if (normalized.includes('account with this email already exists')) return APPLICATION_MESSAGES.MSG06.message;
   if (normalized === 'incorrect email or password') return APPLICATION_MESSAGES.MSG05.message;
   if (normalized.includes('account has been deactivated')) return APPLICATION_MESSAGES.MSG08.message;
@@ -157,14 +138,13 @@ export function localizeApiError(
   }
   if (
     normalized === 'the request is invalid' ||
-    normalized === 'birthday cannot be in the future' ||
     normalized.includes('validation failed')
   ) {
     return APPLICATION_MESSAGES.MSG03.message;
   }
   // Session, rate limit and server faults read the same whatever the server said, and never leak internals.
   if (status === 429) return APPLICATION_MESSAGES.MSG19.message;
-  if (status === 401 && (endpoint.includes('/auth/login') || endpoint.includes('/auth/google'))) return APPLICATION_MESSAGES.MSG05.message;
+  if (status === 401 && endpoint.includes('/auth/login')) return APPLICATION_MESSAGES.MSG05.message;
   if (status === 401) return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
   if (status >= 500) return APPLICATION_MESSAGES.MSG18.message;
 

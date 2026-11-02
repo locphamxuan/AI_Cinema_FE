@@ -1,6 +1,4 @@
 import type { WebRole } from '@/lib/permissions';
-import { WalletState, CheckInStreak } from '@/types/wallet';
-import { Movie } from '@/types/movie';
 
 export interface UserProfile {
   id: string;
@@ -17,16 +15,8 @@ export interface AuthSlice {
   isAuthenticated: boolean;
   user: UserProfile | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
-  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  /** One tap: signs in, links or opens the account behind a Google ID token. */
-  loginWithGoogle: (idToken: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
   logout: () => void;
   restoreSession: () => void;
-  isAuthModalOpen: boolean;
-  authModalMode: 'login' | 'register';
-  initialAuthEmail: string;
-  openAuthModal: (mode?: 'login' | 'register', email?: string) => void;
-  closeAuthModal: () => void;
 }
 
 export interface ThemeSlice {
@@ -35,80 +25,4 @@ export interface ThemeSlice {
   toggleTheme: () => void;
 }
 
-export interface AccountSlice {
-  /** The member's monthly plan is running (from GET /subscriptions/me): every episode is open. */
-  isVIPMode: boolean;
-  /** Reloads the wallet and the plan from the BE. */
-  syncAccount: () => Promise<void>;
-}
-
-export interface WalletSlice {
-  wallet: WalletState;
-  checkInStreak: CheckInStreak;
-  /** Records a check-in the API already credited: flags today, never touches the wallet. */
-  markCheckedInToday: (streakDay: number) => void;
-  syncCheckInStreak: () => void;
-  /** Reward-wheel spins the member still has (from the BE); 0 until loaded. */
-  availableSpins: number;
-  setAvailableSpins: (spins: number) => void;
-  /** Reads today's check-in and the spins left from the BE, which decide both. */
-  syncRewards: () => Promise<void>;
-  setWalletBalance: (main: number, bonus: number) => void;
-  isDepositModalOpen: boolean;
-  openDepositModal: () => void;
-  closeDepositModal: () => void;
-}
-
-export interface CatalogGenre {
-  id: string;
-  name: string;
-}
-
-export interface MovieSlice {
-  movies: Movie[];
-  genres: CatalogGenre[];
-  isCatalogLoading: boolean;
-  catalogError: string | null;
-  /** Fetches published movies and genres once; later calls are no-ops unless `force`. */
-  loadCatalog: (force?: boolean) => Promise<void>;
-  /** Movie that contains the episode being watched, or null until the catalog has it. */
-  currentMovie: Movie | null;
-  selectEpisode: (episodeId: string) => Promise<void>;
-  /** Flags an episode the API already granted (bought, plan, free); the wallet is left alone. */
-  markEpisodeUnlocked: (episodeId: string) => void;
-  isUnlockModalOpen: boolean;
-  selectedEpisodeId: string | null;
-  openUnlockModal: (episodeId: string) => void;
-  closeUnlockModal: () => void;
-}
-
-export interface UiModalsSlice {
-  isRightSidebarOpen: boolean;
-  openRightSidebar: () => void;
-  closeRightSidebar: () => void;
-  toggleRightSidebar: () => void;
-  isCheckInModalOpen: boolean;
-  setCheckInModalOpen: (open: boolean) => void;
-  isRewardSpinModalOpen: boolean;
-  openRewardSpinModal: () => void;
-  closeRewardSpinModal: () => void;
-}
-
-export interface SearchFilterSlice {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  selectedGenre: string;
-  setSelectedGenre: (genre: string) => void;
-  selectedCountry: string;
-  setSelectedCountry: (country: string) => void;
-  selectedYear: string;
-  setSelectedYear: (year: string) => void;
-}
-
-export type AppState = AuthSlice &
-  ThemeSlice &
-  AccountSlice &
-  WalletSlice &
-  MovieSlice &
-  UiModalsSlice &
-  SearchFilterSlice;
+export type AppState = AuthSlice & ThemeSlice;

@@ -21,9 +21,9 @@ const display = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "AI Cinema - Nền Tảng Streaming Phim AI",
+  title: "AI Cinema - Quản trị nội dung",
   description:
-    "AI Cinema - Nền tảng OTT Streaming phim AI với hệ thống ví tiền tệ kép, tuân thủ quy chuẩn nội dung số Việt Nam.",
+    "Khu làm việc của Reviewer, Creator, Staff và Admin trên AI Cinema.",
   keywords: ["AI Cinema", "streaming", "phim AI", "OTT", "Việt Nam"],
 };
 
