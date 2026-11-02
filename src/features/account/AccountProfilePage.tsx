@@ -54,7 +54,6 @@ export function AccountProfilePage() {
               items={[
                 ['Email', account.data.email],
                 ['Số điện thoại', account.data.phoneNumber ?? '-'],
-                ['Ngày sinh', account.data.dateOfBirth ? account.data.dateOfBirth.slice(0, 10) : '-'],
                 ['Trạng thái', account.data.isActive ? 'Đang hoạt động' : 'Đã khoá'],
                 ['Tham gia', formatDateTime(account.data.createdAt)],
                 ['Dự án phim', projects.data ? String(projects.data.meta.totalItems) : '-'],
@@ -74,13 +73,10 @@ export function AccountProfilePage() {
 function EditDetails({ account, onSaved }: { account: AccountDetails; onSaved: () => Promise<void> }) {
   const [fullName, setFullName] = useState(account.fullName);
   const [phone, setPhone] = useState(account.phoneNumber ?? '');
-  const [birthday, setBirthday] = useState(account.dateOfBirth?.slice(0, 10) ?? '');
   const { busy, run } = useAction();
-  const today = new Date().toISOString().slice(0, 10);
   const issues = [
     fullName.trim().length < 2 ? 'họ tên ít nhất 2 ký tự' : null,
     phone.trim() && !PHONE_PATTERN.test(phone.trim()) ? 'số điện thoại 8–15 chữ số' : null,
-    birthday && birthday > today ? 'ngày sinh không ở tương lai' : null,
   ].filter(Boolean);
 
   const submit = async (e: React.FormEvent) => {
@@ -91,7 +87,6 @@ function EditDetails({ account, onSaved }: { account: AccountDetails; onSaved: (
         accountService.update({
           fullName: fullName.trim(),
           phoneNumber: phone.trim() || null,
-          ...(birthday ? { dateOfBirth: birthday } : {}),
         }),
       'Đã lưu hồ sơ',
     );
@@ -109,9 +104,6 @@ function EditDetails({ account, onSaved }: { account: AccountDetails; onSaved: (
           </FormField>
           <FormField label="Số điện thoại">
             <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} placeholder="0912 345 678" className={fieldInputClass} />
-          </FormField>
-          <FormField label="Ngày sinh">
-            <input type="date" max={today} value={birthday} onChange={(e) => setBirthday(e.target.value)} className={fieldInputClass} />
           </FormField>
         </div>
         {issues.length > 0 && <p className="text-xs text-amber-600">Cần sửa: {issues.join('; ')}.</p>}
