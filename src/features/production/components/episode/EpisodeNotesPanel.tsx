@@ -5,10 +5,10 @@ import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldTextareaClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
-import { formatDateTime } from '../../lib/format';
-import { ErrorNote, Panel } from '../shared/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime } from '@/lib/format';
+import { ErrorNote, Panel } from '@/components/data/ui';
 
 const MAX = 2000;
 
