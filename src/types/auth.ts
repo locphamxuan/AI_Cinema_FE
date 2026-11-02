@@ -28,13 +28,3 @@ export interface LoginCredentials {
 
 export type AuthRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
 
-export interface RegisterCredentials {
-  name: string;
-  email: string;
-  password: string;
-}
-
-/** Body of POST /auth/google. */
-export interface GoogleSignIn {
-  idToken: string;
-}

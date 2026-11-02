@@ -1,29 +1,26 @@
 import type { StateCreator } from 'zustand';
 import { authService, redirectUrlFor } from '@/services/authService';
-import { APPLICATION_MESSAGES } from '@/lib/applicationMessages';
 import type { AppState, AuthSlice, UserProfile } from './types';
 
-// The wallet and the plan are read from the BE right after (syncAccount), never assumed here.
+/** Members and guests use the mobile app; the web is the back office only. */
+const MEMBER_REFUSED = 'Tài khoản thành viên chỉ dùng được trên ứng dụng di động AI Cinema.';
+
 function sessionStateFor(user: UserProfile) {
-  return { isAuthenticated: true, user, isVIPMode: false, isAuthModalOpen: false };
+  return { isAuthenticated: true, user };
 }
 
 export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) => ({
   isAuthenticated: false,
   user: null,
-  isAuthModalOpen: false,
-  authModalMode: 'login',
-  initialAuthEmail: '',
-
-  openAuthModal: (mode = 'login', email = '') =>
-    set({ isAuthModalOpen: true, authModalMode: mode, initialAuthEmail: email }),
-
-  closeAuthModal: () => set({ isAuthModalOpen: false }),
 
   restoreSession: () => {
     if (!authService.hasSession()) return;
     const user = authService.getStoredUser();
     if (!user) return;
+    if (user.role === 'user') {
+      authService.logout();
+      return;
+    }
 
     set(sessionStateFor(user));
     // The Admin may have changed this role's permissions or the account's role since the last visit.
@@ -43,30 +40,9 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
       return { success: false, error: errorMsg };
     }
 
-    set(sessionStateFor(res.data));
-
-    return { success: true, redirectUrl: redirectUrlFor(res.data.role ?? 'user') };
-  },
-
-  register: async (name, email, password) => {
-    if (!name.trim() || !email.trim() || !password) {
-      return { success: false, error: APPLICATION_MESSAGES.MSG02.message };
-    }
-
-    const res = await authService.register({ name, email, password });
-    if (!res.success || !res.data) {
-      return { success: false, error: res.message ?? 'Đăng ký không thành công.' };
-    }
-
-    set(sessionStateFor(res.data));
-
-    return { success: true };
-  },
-
-  loginWithGoogle: async (idToken) => {
-    const res = await authService.googleLogin({ idToken });
-    if (!res.success || !res.data) {
-      return { success: false, error: res.message ?? 'Đăng nhập bằng Google thất bại.' };
+    if (res.data.role === 'user') {
+      authService.logout();
+      return { success: false, error: MEMBER_REFUSED };
     }
 
     set(sessionStateFor(res.data));
@@ -76,13 +52,6 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
 
   logout: () => {
     authService.logout();
-    set({
-      isAuthenticated: false,
-      user: null,
-      isVIPMode: false,
-      wallet: { mainCoin: 0, bonusCoin: 0 },
-      checkInStreak: { currentStreak: 0, lastCheckInDate: null, todayClaimed: false },
-      availableSpins: 0,
-    });
+    set({ isAuthenticated: false, user: null });
   },
 });
