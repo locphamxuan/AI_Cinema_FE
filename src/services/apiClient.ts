@@ -119,6 +119,7 @@ class ApiClient {
           response.status === 401 &&
           !options._isRetry &&
           !endpoint.includes('/auth/login') &&
+          !endpoint.includes('/auth/google') &&
           !endpoint.includes('/auth/refresh')
         ) {
           const refreshed = await this.tryRefreshToken();

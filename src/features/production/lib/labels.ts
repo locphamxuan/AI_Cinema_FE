@@ -194,7 +194,6 @@ export const EVENT_LABEL: Record<string, string> = {
   CREATOR_REMOVED: 'Gỡ Creator khỏi dự án',
   EPISODE_ASSIGNED: 'Giao tập cho Creator',
   EPISODE_DELEGATED: 'Creator uỷ quyền tập',
-  EPISODE_NOTE_SENT: 'Ghi chú về tập',
   PROJECT_CANCELLED: 'Huỷ dự án',
   PROJECT_COMPLETED: 'Hoàn tất dự án',
   PROJECT_UNDER_REVISION: 'Dự án có tập đang sửa',

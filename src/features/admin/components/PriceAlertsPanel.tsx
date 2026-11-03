@@ -2,17 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-
+import { Check, MessageSquareWarning } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
 import type { PriceAlert, PriceAlertStatus } from '@/types/production';
-import { useAction } from '@/hooks/useAction';
-import { useResource } from '@/hooks/useResource';
+import { useAction } from '@/features/production/hooks/useAction';
+import { useResource } from '@/features/production/hooks/useResource';
 import { PRICE_ALERT_STATUS } from '@/features/production/lib/labels';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime } from '@/features/production/lib/format';
 import { productionPaths } from '@/features/production/lib/routes';
-import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/components/data/ui';
-import { MetaPager } from '@/components/data/MetaPager';
+import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/features/production/components/shared/ui';
 
 const FILTERS: { key: PriceAlertStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Mới' },
@@ -24,10 +23,7 @@ const FILTERS: { key: PriceAlertStatus | 'ALL'; label: string }[] = [
 /** BR-47: episode prices outside the valid range. The Admin asks the Reviewer to change them, never edits them. */
 export function PriceAlertsPanel() {
   const [filter, setFilter] = useState<PriceAlertStatus | 'ALL'>('OPEN');
-  const [page, setPage] = useState(1);
-  const alerts = useResource(`price-alerts:${filter}:${page}`, () =>
-    productionService.listPriceAlerts(page, filter === 'ALL' ? undefined : filter),
-  );
+  const alerts = useResource(`price-alerts:${filter}`, () => productionService.listPriceAlerts(1, filter === 'ALL' ? undefined : filter));
   const [asking, setAsking] = useState<PriceAlert | null>(null);
   const { busy, run } = useAction();
 
@@ -43,7 +39,7 @@ export function PriceAlertsPanel() {
   };
 
   return (
-    <section className="bg-white dark:bg-card rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
+    <section className="bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Cảnh báo giá Coin</h2>
@@ -55,10 +51,7 @@ export function PriceAlertsPanel() {
               key={f.key}
               type="button"
               aria-pressed={filter === f.key}
-              onClick={() => {
-                setFilter(f.key);
-                setPage(1);
-              }}
+              onClick={() => setFilter(f.key)}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 filter === f.key
                   ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white font-semibold shadow-xs'
@@ -97,19 +90,18 @@ export function PriceAlertsPanel() {
                 <StatusPill {...PRICE_ALERT_STATUS[a.status]} />
                 {a.status === 'OPEN' && (
                   <Button size="sm" variant="secondary" disabled={busy} onClick={() => setAsking(a)}>
-                    Yêu cầu đổi giá
+                    <MessageSquareWarning className="w-3.5 h-3.5" aria-hidden="true" /> Yêu cầu đổi giá
                   </Button>
                 )}
                 {a.status !== 'RESOLVED' && (
                   <Button size="sm" variant="ghost" disabled={busy} onClick={() => resolve(a)}>
-                    Chấp nhận giá
+                    <Check className="w-3.5 h-3.5" aria-hidden="true" /> Chấp nhận giá
                   </Button>
                 )}
               </div>
             </li>
           ))}
         </ul>
-        {alerts.data && <MetaPager meta={alerts.data.meta} onPage={setPage} />}
       </div>
       <TextPromptModal
         open={!!asking}

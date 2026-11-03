@@ -3,11 +3,10 @@
 import { useState } from 'react';
 import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequestStatus } from '@/types/production';
-import { useResource } from '@/hooks/useResource';
+import { useResource } from '@/features/production/hooks/useResource';
 import { ChangeRequestCard } from '@/features/production/components/shared/ChangeRequestCard';
 import { productionPaths } from '@/features/production/lib/routes';
-import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
-import { Pager, pageOf } from '@/components/data/Pager';
+import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
 
 const FILTERS: { key: ChangeRequestStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Chờ duyệt' },
@@ -20,8 +19,6 @@ const FILTERS: { key: ChangeRequestStatus | 'ALL'; label: string }[] = [
 export function ChangeRequestInbox() {
   const [filter, setFilter] = useState<ChangeRequestStatus | 'ALL'>('OPEN');
   const requests = useResource(`change-requests:${filter}`, () => changeRequestService.inbox(filter === 'ALL' ? undefined : filter));
-  const [page, setPage] = useState(1);
-  const paged = pageOf(requests.data ?? [], page, 10);
 
   return (
     <Panel
@@ -35,10 +32,7 @@ export function ChangeRequestInbox() {
             type="button"
             role="tab"
             aria-selected={filter === key}
-            onClick={() => {
-              setFilter(key);
-              setPage(1);
-            }}
+            onClick={() => setFilter(key)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
               filter === key
                 ? 'bg-sky-600 text-white'
@@ -53,17 +47,16 @@ export function ChangeRequestInbox() {
       {requests.loading && !requests.data && <Loading />}
       {requests.data?.length === 0 && <Empty>Không có đề xuất nào.</Empty>}
       <ul className="space-y-3">
-        {paged.rows?.map((request) => (
+        {requests.data?.map((request) => (
           <ChangeRequestCard
             key={request.id}
             request={request}
             canDecide
-            projectHref={productionPaths.project('/admin', request.projectId, 'changes')}
+            projectHref={productionPaths.project('/admin', request.movieId, 'changes')}
             onDecided={requests.reload}
           />
         ))}
       </ul>
-      <Pager page={page} totalPages={paged.totalPages} onChange={setPage} />
     </Panel>
   );
 }

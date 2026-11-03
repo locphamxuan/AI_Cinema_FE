@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { AreaGuard } from '@/components/auth/AreaGuard';
 import { useAppStore } from '@/store/useAppStore';
-import { canEnter, homeAreaOf } from '@/lib/permissions';
+import { canEnter, homeAreaOf, isMemberRole } from '@/lib/permissions';
 import { toUserProfile } from '@/services/authService';
 import { signInAs } from '@/tests/support/signIn';
 
@@ -23,11 +23,13 @@ describe('Areas of the web portal', () => {
     expect(homeAreaOf(role)).toBe(home);
   });
 
-  it('gives a member no area on the web: every other role has its own', () => {
+  it('keeps the viewer site for members: every other role has an area of its own', () => {
     for (const role of ['user', 'vip'] as const) {
+      expect(isMemberRole(role)).toBe(true);
       expect(homeAreaOf(role)).toBeNull();
     }
     for (const role of ['creator', 'reviewer', 'staff', 'admin'] as const) {
+      expect(isMemberRole(role)).toBe(false);
       expect(homeAreaOf(role)).not.toBeNull();
     }
   });

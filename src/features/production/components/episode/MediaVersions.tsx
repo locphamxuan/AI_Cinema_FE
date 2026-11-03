@@ -1,10 +1,11 @@
 'use client';
 
+import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import type { MediaAsset } from '@/types/production';
 import { INGEST_STATUS, LABEL_TYPE, SOURCE_METHOD } from '../../lib/labels';
-import { formatBytes, formatDateTime, formatDuration } from '@/lib/format';
-import { Empty, StatusPill } from '@/components/data/ui';
+import { formatBytes, formatDateTime, formatDuration } from '../../lib/format';
+import { Empty, StatusPill } from '../shared/ui';
 
 const JOB_LABEL = { DOWNLOAD: 'Tải về', TRANSCODE: 'Chuyển mã', VALIDATE: 'Kiểm tra' } as const;
 
@@ -85,7 +86,7 @@ export function MediaVersions({
                       onRetry(v.id);
                     }}
                   >
-                    Xử lý lại
+                    <RotateCcw className="w-3.5 h-3.5" aria-hidden="true" /> Xử lý lại
                   </Button>
                 )}
               </div>

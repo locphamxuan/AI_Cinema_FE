@@ -135,7 +135,7 @@ export interface AutoRenewState {
 }
 
 export type TopUpStatus = 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'EXPIRED';
-export type PaymentProvider = 'VNPAY';
+export type PaymentProvider = 'VNPAY' | 'MOMO';
 
 /** POST /wallet/top-ups, GET /wallet/top-ups/:topUpId */
 export interface CoinTopUp {

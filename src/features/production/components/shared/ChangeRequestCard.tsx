@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-
+import { Check, Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequest } from '@/types/production';
-import { useAction } from '@/hooks/useAction';
+import { useAction } from '../../hooks/useAction';
 import { CHANGE_REQUEST_STATUS, CHANGE_REQUEST_TYPE } from '../../lib/labels';
 import { downloadFile } from '../../lib/download';
-import { formatDateTime, formatNumber } from '@/lib/format';
-import { StatusPill, TextPromptModal } from '@/components/data/ui';
+import { formatDateTime, formatNumber } from '../../lib/format';
+import { StatusPill, TextPromptModal } from './ui';
 
 /** One request to the Admin: what was asked and why, the proof, and the Admin's decision (BR-55). */
 export function ChangeRequestCard({
@@ -55,9 +55,9 @@ export function ChangeRequestCard({
           <StatusPill {...CHANGE_REQUEST_STATUS[cr.status]} />
         </div>
       </div>
-      {cr.project && projectHref && (
+      {cr.movie && projectHref && (
         <Link href={projectHref} className="font-semibold text-sky-700 dark:text-sky-300 hover:underline">
-          {cr.project.movie.title}
+          {cr.movie.title}
         </Link>
       )}
       <div>
@@ -71,7 +71,7 @@ export function ChangeRequestCard({
       {cr.requestedTokens !== null && <p className="font-semibold text-amber-700 dark:text-amber-300">Xin thêm {formatNumber(Number(cr.requestedTokens))} Token</p>}
       {cr.attachmentName && (
         <Button size="sm" variant="ghost" onClick={proof}>
-          Giấy tờ: {cr.attachmentName}
+          <Download className="w-3.5 h-3.5" aria-hidden="true" /> Giấy tờ: {cr.attachmentName}
         </Button>
       )}
       {cr.adminResponse && (
@@ -82,17 +82,17 @@ export function ChangeRequestCard({
       {canDecide && cr.status === 'OPEN' && (
         <div className="flex justify-end gap-2">
           <Button size="sm" variant="secondary" disabled={busy} onClick={() => setRejecting(true)}>
-            Từ chối
+            <X className="w-3.5 h-3.5" aria-hidden="true" /> Từ chối
           </Button>
           <Button size="sm" variant="success" disabled={busy} onClick={approve}>
-            Duyệt
+            <Check className="w-3.5 h-3.5" aria-hidden="true" /> Duyệt
           </Button>
         </div>
       )}
       <TextPromptModal
         open={rejecting}
         title="Từ chối đề xuất"
-        subtitle={cr.project?.movie.title}
+        subtitle={cr.movie?.title}
         label="Lý do (người đề xuất sẽ nhận được)"
         confirmLabel="Từ chối"
         minLength={1}

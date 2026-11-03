@@ -1,6 +1,6 @@
 'use client';
 
-import { Panel } from '@/components/data/ui';
+import { Panel } from '@/features/production/components/shared/ui';
 import { productionPaths } from '@/features/production/lib/routes';
 import { TokenRequestList } from './TokenRequestList';
 

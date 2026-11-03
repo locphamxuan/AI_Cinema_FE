@@ -177,3 +177,5 @@ export interface AppNotification {
   readAt: string | null;
   createdAt: string;
 }
+
+export interface EpisodeNote { id: string; message: string; createdAt: string; author: { id: string; fullName: string } | null; }

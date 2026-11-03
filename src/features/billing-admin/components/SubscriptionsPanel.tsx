@@ -6,16 +6,16 @@ import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/
 import { Modal } from '@/components/ui/Modal';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
-import { useAction } from '@/hooks/useAction';
-import { useResource } from '@/hooks/useResource';
-import { formatDateTime, formatDay, formatNumber } from '@/lib/format';
+import { useAction } from '@/features/production/hooks/useAction';
+import { useResource } from '@/features/production/hooks/useResource';
+import { formatDateTime, formatDay, formatNumber } from '@/features/production/lib/format';
 import type { Tone } from '@/features/production/lib/labels';
-import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
+import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/features/production/components/shared/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { AdminSubscription, SubscriptionCycle, SubscriptionEndReason, SubscriptionStatus } from '@/types/billing';
-import { MetaPager } from '@/components/data/MetaPager';
+import { Pager } from './Pager';
 
-const SUBSCRIPTION_STATUS: Record<SubscriptionStatus, { label: string; tone: Tone }> = {
+export const SUBSCRIPTION_STATUS: Record<SubscriptionStatus, { label: string; tone: Tone }> = {
   PENDING: { label: 'Chờ thanh toán', tone: 'neutral' },
   ACTIVE: { label: 'Đang chạy', tone: 'emerald' },
   PAST_DUE: { label: 'Gia hạn lỗi', tone: 'amber' },
@@ -69,7 +69,7 @@ export function SubscriptionsPanel() {
       {list.data?.data.length === 0 && <Empty>Không có đăng ký nào.</Empty>}
       {list.data && list.data.data.length > 0 && (
         <div className="overflow-x-auto">
-          <table className="w-full text-xs table-cells">
+          <table className="w-full text-xs">
             <thead className="text-slate-500 dark:text-slate-400 text-left">
               <tr>
                 <th className="py-2 font-medium">Member</th>
@@ -96,12 +96,12 @@ export function SubscriptionsPanel() {
                     <StatusPill {...SUBSCRIPTION_STATUS[row.status]} />
                   </td>
                   <td className="py-2">{formatDay(row.currentPeriodEnd)}</td>
-                  <td className="py-2 text-right tabular-nums">{formatNumber(row.priceCoins)}</td>
+                  <td className="py-2 text-right font-mono">{formatNumber(row.priceCoins)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <MetaPager meta={list.data.meta} onPage={setPage} />
+          <Pager meta={list.data.meta} onPage={setPage} />
         </div>
       )}
       {openId && <SubscriptionModal id={openId} onClose={() => setOpenId(null)} onChanged={list.reload} />}
@@ -203,7 +203,7 @@ function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
               {formatDay(c.periodStart)} → {formatDay(c.periodEnd)}
             </td>
             <td className="py-1">{c.status === 'PAID' ? 'Đã thu' : (c.failureReason ?? 'Không thu được')}</td>
-            <td className="py-1 text-right tabular-nums">
+            <td className="py-1 text-right font-mono">
               {c.mainCoinsCharged} + {c.bonusCoinsCharged}
             </td>
           </tr>

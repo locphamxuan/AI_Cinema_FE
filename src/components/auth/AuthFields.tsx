@@ -2,6 +2,34 @@
 
 import { useState } from 'react';
 
+export type AuthMode = 'login' | 'register';
+
+const TABS: { mode: AuthMode; label: string }[] = [
+  { mode: 'login', label: 'Đăng Nhập' },
+  { mode: 'register', label: 'Đăng Ký' },
+];
+
+export function ModeTabs({ mode, onChange }: { mode: AuthMode; onChange: (mode: AuthMode) => void }) {
+  return (
+    <div className="flex bg-slate-100 dark:bg-black/40 rounded-xl p-1 mb-5 border border-slate-200 dark:border-white/10">
+      {TABS.map((tab) => (
+        <button
+          key={tab.mode}
+          type="button"
+          onClick={() => onChange(tab.mode)}
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+            mode === tab.mode
+              ? 'bg-ruby text-white shadow-md shadow-ruby/30'
+              : 'text-slate-600 dark:text-muted-light hover:text-slate-900 dark:hover:text-foreground'
+          }`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function EyeIcon({ open }: { open: boolean }) {
   return (
     <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

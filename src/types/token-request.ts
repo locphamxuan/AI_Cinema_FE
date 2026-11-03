@@ -1,11 +1,9 @@
-import type { ProjectRef } from './production-studio';
-
 /** A Creator asks the Reviewer for more production-fee Token for a season (AI_Cinema_BE token-request). */
 export type TokenRequestStatus = 'OPEN' | 'APPROVED' | 'REJECTED';
 
 export interface TokenRequest {
   id: string;
-  projectId: string;
+  movieId: string;
   seasonId: string;
   requestedTokens: number;
   grantedTokens: number | null;
@@ -14,7 +12,7 @@ export interface TokenRequest {
   reviewerResponse: string | null;
   resolvedAt: string | null;
   createdAt: string;
-  project: ProjectRef;
+  movie: { id: string; title: string };
   season: { id: string; seasonNumber: number; title: string | null };
   requestedBy: { id: string; fullName: string; email: string };
   resolvedBy: { id: string; fullName: string } | null;
