@@ -89,9 +89,9 @@ export function TokenRequestList({
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-semibold text-slate-900 dark:text-white">
                 {projectHref ? (
-                  <Link href={projectHref(r.movie.id)} className="text-sky-700 dark:text-sky-500 hover:underline">{r.movie.title}</Link>
+                  <Link href={projectHref((r as any).movie?.id ?? (r as any).projectId ?? (r as any).project?.id ?? "")} className="text-sky-700 dark:text-sky-500 hover:underline">{(r as any).movie?.title ?? (r as any).project?.movie?.title ?? "Dự án phim"}</Link>
                 ) : (
-                  r.movie.title
+                  (r as any).movie?.title ?? (r as any).project?.movie?.title ?? "Dự án phim"
                 )}{' '}
                 · Mùa {r.season.seasonNumber} · xin <span className="font-mono">{formatNumber(r.requestedTokens)}</span> Token
               </p>
