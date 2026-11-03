@@ -19,6 +19,7 @@ import { ToastContainer } from '@/components/ui/Toast';
 import CatalogFilterNav from './header/CatalogFilterNav';
 import HeaderSearch from './header/HeaderSearch';
 import NotificationBell from './header/NotificationBell';
+import { SlidersHorizontal } from 'lucide-react';
 import UserMenu from './header/UserMenu';
 
 // Work areas without the consumer header, sidebar and widgets; /studio/ is the outside studio's portal.
@@ -46,7 +47,7 @@ function GuestActions() {
 }
 
 function MemberActions() {
-  const { openDepositModal } = useAppStore();
+  const { openDepositModal, toggleRightSidebar } = useAppStore();
   return (
     <>
       <NotificationBell />
@@ -63,6 +64,7 @@ function MemberActions() {
       </div>
       <UserMenu />
       <ThemeToggle />
+      <button type="button" onClick={toggleRightSidebar} aria-label="Mở Bảng Điều Khiển" title="Bảng điều khiển thành viên" className="p-1.5 rounded-xl text-slate-600 dark:text-slate-300 hover:text-ruby dark:hover:text-ruby hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"><SlidersHorizontal className="w-5 h-5" /></button>
     </>
   );
 }

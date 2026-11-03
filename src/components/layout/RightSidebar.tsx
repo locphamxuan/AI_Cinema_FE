@@ -141,7 +141,7 @@ export default function RightSidebar() {
       {/* Backdrop for mobile */}
       {isRightSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 lg:hidden animate-fade-in"
+          className="fixed inset-0 bg-black/60 backdrop-blur-xs z-40 animate-fade-in"
           onClick={closeRightSidebar}
           aria-hidden="true"
         />
@@ -151,7 +151,7 @@ export default function RightSidebar() {
       <aside
         id="right-sidebar"
         aria-label="Bảng điều khiển cá nhân"
-        className={`fixed top-0 right-0 h-full w-80 bg-white/95 dark:bg-[#080B11]/95 backdrop-blur-xl border-l border-slate-200 dark:border-white/10 z-50 flex flex-col transition-transform duration-300 ease-in-out shadow-2xl lg:translate-x-0 ${
+        className={`fixed top-0 right-0 h-full w-80 bg-white/95 dark:bg-[#080B11]/95 backdrop-blur-xl border-l border-slate-200 dark:border-white/10 z-50 flex flex-col transition-transform duration-300 ease-in-out shadow-2xl ${
           isRightSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -166,7 +166,7 @@ export default function RightSidebar() {
           <button
             onClick={closeRightSidebar}
             aria-label="Đóng bảng điều khiển"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer lg:hidden"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
