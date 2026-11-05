@@ -43,7 +43,7 @@ export function HandoffCard({
 }) {
   const status = MILESTONE_STATUS[h.milestoneStatus];
   return (
-    <li className="rounded-xl border border-sky-100 dark:border-white/10 p-4 text-xs space-y-3">
+    <li className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-4 text-xs space-y-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <p className="font-semibold text-slate-900 dark:text-white">

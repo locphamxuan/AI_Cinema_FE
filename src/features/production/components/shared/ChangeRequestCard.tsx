@@ -43,7 +43,7 @@ export function ChangeRequestCard({
   };
 
   return (
-    <li className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs space-y-2">
+    <li className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5 text-xs space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-slate-500 dark:text-slate-400">
           {cr.requestedBy.fullName} · {formatDateTime(cr.createdAt)}

@@ -8,7 +8,7 @@ import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import type { Tone } from '../../lib/labels';
 
-export const CARD = 'bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10';
+export const CARD = 'bg-white dark:bg-[#131722] rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs';
 
 export function StatusPill({ label, tone }: { label: string; tone: Tone }) {
   return (
@@ -34,7 +34,7 @@ export function Panel({
 }) {
   return (
     <section className={`${CARD} ${className}`} aria-label={title}>
-      <header className="flex flex-wrap items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-slate-100 dark:border-white/5">
+      <header className="flex flex-wrap items-start justify-between gap-3 px-6 pt-5 pb-4 border-b border-slate-100 dark:border-white/[0.06]">
         <div className="min-w-0 max-w-prose">
           <h2 className="text-base font-semibold text-slate-900 dark:text-white">{title}</h2>
           {description && <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">{description}</p>}
