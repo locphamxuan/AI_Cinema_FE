@@ -98,7 +98,6 @@ export function CreatorStudioPortal() {
   // Combined project pool: user created + 4 showcase + backend projects
   const allProjects = useMemo<StudioProjectItem[]>(() => {
     const combined = [...userCreatedProjects, ...SHOWCASE_STUDIO_PROJECTS];
-    // Append mapped backend projects that aren't duplicates
     for (const bp of mappedBackendProjects) {
       if (!combined.some((item) => item.id === bp.id)) {
         combined.push(bp);
@@ -110,13 +109,11 @@ export function CreatorStudioPortal() {
   // Filter & Search
   const filteredProjects = useMemo(() => {
     return allProjects.filter((p) => {
-      // Status filter
       if (activeFilter === 'published' && p.status !== 'PUBLISHED') return false;
       if (activeFilter === 'review' && p.status !== 'IN_REVIEW') return false;
       if (activeFilter === 'revision' && p.status !== 'REVISION') return false;
       if (activeFilter === 'draft' && p.status !== 'DRAFT') return false;
 
-      // Search query filter
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase().trim();
         const matchTitle = p.title.toLowerCase().includes(query);
@@ -148,13 +145,11 @@ export function CreatorStudioPortal() {
     };
   }, [allProjects]);
 
-  // Destination link for cards: if it's a real project id use it, else link to first real project if available
   const firstRealId = backendProjects[0]?.id || 'showcase-cyber-saigon-2077';
   const getProjectHref = (p: StudioProjectItem) => {
     if (p.id.includes('-') && p.id.length > 20 && !p.id.startsWith('showcase-')) {
       return `/creator/projects/${p.id}`;
     }
-    // For demo showcase items, link to first real project or id
     return `/creator/projects/${firstRealId}`;
   };
 
@@ -163,36 +158,36 @@ export function CreatorStudioPortal() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#0A0D14] text-slate-100 font-sans selection:bg-[#E50914] selection:text-white">
-      {/* Ambient Cinema Glows */}
+    <div className="relative min-h-screen w-full bg-[#F8FAFC] dark:bg-[#0A0D14] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
+      {/* Ambient Cinema Glows (Dark Mode Only) */}
       <div
-        className="pointer-events-none absolute top-0 left-1/4 w-[600px] h-[350px] bg-[#E50914] opacity-[0.04] blur-[140px] rounded-full"
+        className="hidden dark:block pointer-events-none absolute top-0 left-1/4 w-[600px] h-[350px] bg-[#E50914] opacity-[0.04] blur-[140px] rounded-full"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute top-32 right-1/4 w-[500px] h-[350px] bg-[#8B5CF6] opacity-[0.05] blur-[150px] rounded-full"
+        className="hidden dark:block pointer-events-none absolute top-32 right-1/4 w-[500px] h-[350px] bg-[#8B5CF6] opacity-[0.05] blur-[150px] rounded-full"
         aria-hidden="true"
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* 1. Header & Quick Action Bar */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-200 dark:border-white/[0.08]">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/[0.05] border border-white/10 text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-[#E50914] animate-ping" />
-              <Clapperboard className="w-3.5 h-3.5 text-[#E50914]" />
-              <span>Studio Partner Portal • Chế Độ Điện Ảnh</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-[#E50914] animate-ping" />
+              <Clapperboard className="w-3.5 h-3.5 text-indigo-600 dark:text-[#E50914]" />
+              <span>Studio Partner Portal • Quản Trị Phát Hành</span>
               {loadingBackend && (
-                <span className="flex items-center gap-1 text-[11px] text-slate-400 pl-2 border-l border-white/10">
-                  <Loader2 className="w-3 h-3 animate-spin text-purple-400" />
+                <span className="flex items-center gap-1 text-[11px] text-slate-400 pl-2 border-l border-slate-200 dark:border-white/10">
+                  <Loader2 className="w-3 h-3 animate-spin text-indigo-500 dark:text-purple-400" />
                   Đồng bộ dữ liệu...
                 </span>
               )}
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Studio Partner Portal
             </h1>
-            <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
+            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
               Quản lý danh mục phim, nộp hồ sơ phát hành và kiểm soát tuân thủ AI theo Điều 44.
             </p>
           </div>
@@ -201,7 +196,7 @@ export function CreatorStudioPortal() {
             <button
               type="button"
               onClick={() => setIsRegisterModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-white bg-[#E50914] hover:bg-[#D10813] shadow-lg shadow-red-950/40 hover:shadow-red-900/60 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-[#E50914] dark:hover:bg-[#D10813] shadow-sm hover:shadow transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>+ Đăng Ký Dự Án Phim</span>
@@ -209,7 +204,7 @@ export function CreatorStudioPortal() {
           </div>
         </header>
 
-        {/* 2. Top Metric Bar (Replaces old bloated charts) */}
+        {/* 2. Top Metric Bar */}
         <StudioMetricBar metrics={metrics} />
 
         {/* 3. Filter & Search Bar */}
@@ -226,10 +221,10 @@ export function CreatorStudioPortal() {
         {/* 4. Projects Content (Grid or Table) */}
         <section aria-label="Danh sách dự án phim">
           {filteredProjects.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/[0.12] p-12 text-center bg-[#131722]/50">
-              <Film className="w-12 h-12 mx-auto text-slate-600 mb-3" />
-              <h3 className="text-base font-bold text-white">Không tìm thấy dự án nào</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+            <div className="rounded-2xl border border-dashed border-slate-300 dark:border-white/[0.12] p-12 text-center bg-white dark:bg-[#131722]/50">
+              <Film className="w-12 h-12 mx-auto text-slate-400 dark:text-slate-600 mb-3" />
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Không tìm thấy dự án nào</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
                 Không có phim nào khớp với bộ lọc hoặc từ khóa tìm kiếm. Hãy thử đổi trạng thái hoặc xóa từ khóa.
               </p>
               <button
@@ -238,7 +233,7 @@ export function CreatorStudioPortal() {
                   setSearchQuery('');
                   setActiveFilter('all');
                 }}
-                className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold bg-white/[0.08] text-white hover:bg-white/[0.12] transition-colors"
+                className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-white/[0.08] dark:text-white dark:hover:bg-white/[0.12] transition-colors"
               >
                 Đặt lại bộ lọc
               </button>
