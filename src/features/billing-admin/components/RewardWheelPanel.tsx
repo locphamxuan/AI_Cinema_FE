@@ -120,7 +120,7 @@ export function RewardWheelPanel() {
                 const isVip = prize.type === 'PLAN_DAYS';
 
                 return (
-                  <tr key={prize.id} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
+                  <tr key={prize.id} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors duration-150 cursor-default">
                     {/* Position & Name */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">

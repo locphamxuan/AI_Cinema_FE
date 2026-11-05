@@ -37,7 +37,7 @@ export function TokenTotalsCards({ totals, rateVnd }: { totals: TokenTotals; rat
       {cards.map((c) => (
         <div
           key={c.label}
-          className={`relative rounded-2xl p-5 border transition-all duration-200 ${
+          className={`relative rounded-2xl p-5 border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md cursor-default ${
             c.primary
               ? 'bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent border-indigo-500/30 dark:from-[#E50914]/15 dark:via-[#E50914]/5 dark:border-[#E50914]/30'
               : 'bg-white dark:bg-[#131722] border-slate-200/80 dark:border-white/[0.08] shadow-xs'
@@ -96,7 +96,7 @@ export function TokenHistoryTable({
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
           {entries.map((e) => (
-            <tr key={`${e.kind}:${e.id}`} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.02] transition-colors">
+            <tr key={`${e.kind}:${e.id}`} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors duration-150 cursor-default">
               <td className="py-3 px-4 text-slate-500 whitespace-nowrap text-[11px]">{formatDateTime(e.createdAt)}</td>
               <td className="py-3 px-4">
                 <span className="font-medium text-slate-800 dark:text-slate-200">{kindLabel(e)}</span>

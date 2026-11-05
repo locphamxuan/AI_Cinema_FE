@@ -74,7 +74,7 @@ export function RewardLadderPanel() {
               return (
                 <div
                   key={r.id}
-                  className={`relative p-3 rounded-2xl border transition-all text-center flex flex-col justify-between ${
+                  className={`relative p-3 rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-md text-center flex flex-col justify-between cursor-default ${
                     isDay7
                       ? 'bg-gradient-to-b from-purple-500/10 via-amber-500/5 to-transparent border-purple-500/30 shadow-xs'
                       : 'bg-slate-50/80 dark:bg-white/[0.02] border-slate-200/70 dark:border-white/5'

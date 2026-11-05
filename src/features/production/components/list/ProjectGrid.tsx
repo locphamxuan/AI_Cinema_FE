@@ -58,7 +58,7 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
           <li key={p.id}>
             <Link
               href={productionPaths.project(base, p.id)}
-              className="group flex flex-col h-full rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] hover:border-indigo-400 dark:hover:border-[#E50914]/50 hover:shadow-xl hover:shadow-indigo-500/5 dark:hover:shadow-[#E50914]/10 transition-all duration-300 overflow-hidden"
+              className="group flex flex-col h-full rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] hover:border-indigo-400 dark:hover:border-[#E50914]/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/5 dark:hover:shadow-[#E50914]/10 transition-all duration-300 overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 dark:focus-visible:ring-[#E50914]/50"
             >
               <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-900">
                 <ProjectPoster title={p.title} posterUrl={p.posterUrl} status={p.status} />

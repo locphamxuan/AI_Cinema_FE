@@ -19,7 +19,7 @@ export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-[2px] p-3 sm:p-6 animate-fade-in overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-3 sm:p-6 animate-fade-in overflow-y-auto"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"

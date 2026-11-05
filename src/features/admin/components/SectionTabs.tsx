@@ -33,8 +33,8 @@ function Tabs({ title, description, tabs }: { title: string; description: string
   return (
     <main className="w-full px-6 lg:px-8 py-6 space-y-5">
       <header className="space-y-1">
-        <h1 className="text-xl font-semibold text-slate-900 dark:text-white">{title}</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">{title}</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>
       </header>
       {open.length > 1 && (
         <nav aria-label={title} className="flex gap-1 border-b border-slate-200 dark:border-white/10 overflow-x-auto">
@@ -46,7 +46,7 @@ function Tabs({ title, description, tabs }: { title: string; description: string
               className={`-mb-px px-4 py-2.5 text-sm whitespace-nowrap border-b-2 transition-colors ${
                 t === current
                   ? 'border-indigo-600 text-indigo-600 dark:border-[#E50914] dark:text-[#E50914] font-semibold'
-                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white font-medium hover:bg-slate-50 dark:hover:bg-white/[0.04] rounded-t-lg'
               }`}
             >
               {t.label}

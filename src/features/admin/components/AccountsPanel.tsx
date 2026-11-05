@@ -138,7 +138,7 @@ export function AccountsPanel() {
               const isMe = account.id === myId;
               const locked = !canManage || isMe || savingId === account.id;
               return (
-                <tr key={account.id} className={`hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors ${account.isActive ? '' : 'opacity-60'}`}>
+                <tr key={account.id} className={`hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors duration-150 ${account.isActive ? '' : 'opacity-60'}`}>
                   <td className="py-3.5 px-5">
                     <p className="font-semibold text-slate-900 dark:text-white">
                       {account.fullName} {isMe && <span className="text-indigo-600 dark:text-[#E50914] font-medium text-[11px] ml-1">(bạn)</span>}
@@ -208,7 +208,7 @@ export function AccountsPanel() {
             })}
             {result && accounts.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-slate-500 dark:text-slate-400">
+                <td colSpan={5} className="py-16 text-center text-slate-500 dark:text-slate-400">
                   Không có tài khoản nào khớp.
                 </td>
               </tr>
@@ -234,7 +234,7 @@ export function AccountsPanel() {
             aria-label="Trang trước"
             disabled={page <= 1}
             onClick={() => setPage(page - 1)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer"
+            className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:scale-105 transition-all duration-150"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
@@ -246,7 +246,7 @@ export function AccountsPanel() {
             aria-label="Trang sau"
             disabled={page >= totalPages}
             onClick={() => setPage(page + 1)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer"
+            className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:scale-105 transition-all duration-150"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>

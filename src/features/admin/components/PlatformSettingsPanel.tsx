@@ -137,7 +137,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('all')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'all'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -149,7 +149,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('coin')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'coin'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -162,7 +162,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('production')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'production'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -175,7 +175,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('streaming')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'streaming'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -188,7 +188,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('rewards')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'rewards'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -295,7 +295,7 @@ export function PlatformSettingsPanel() {
             <div className="pt-2">
               <Link
                 href="/admin/rewards"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors shadow-md shadow-amber-500/20"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 hover:scale-[1.02] text-white font-bold text-xs transition-all duration-200 shadow-md shadow-amber-500/20"
               >
                 <span>Mở trang Quản lý Điểm danh & Vòng quay</span>
                 <ArrowRight className="w-3.5 h-3.5" />

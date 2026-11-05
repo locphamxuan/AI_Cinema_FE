@@ -157,7 +157,7 @@ export function RolePermissionsPanel() {
           return (
             <div
               key={role}
-              className={`p-4 rounded-2xl border transition-all ${
+              className={`p-4 rounded-2xl border transition-all hover:-translate-y-0.5 hover:shadow-md cursor-default ${
                 isChanged
                   ? 'border-amber-400 bg-amber-50/40 dark:bg-amber-500/10 shadow-sm'
                   : 'border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722]'

@@ -71,7 +71,7 @@ export function CoinLedgerPanel() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
               {ledger.data.data.map((line) => (
-                <tr key={line.id}>
+                <tr key={line.id} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors duration-150">
                   <td className="py-2 whitespace-nowrap">{formatDateTime(line.createdAt)}</td>
                   <td className="py-2">{COIN_ENTRY_LABEL[line.entryType]}</td>
                   <td className="py-2 hidden md:table-cell text-slate-600 dark:text-slate-300">{line.description ?? '-'}</td>

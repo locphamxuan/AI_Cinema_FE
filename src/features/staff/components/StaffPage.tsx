@@ -28,7 +28,7 @@ const MODULES: Module[] = [
   { key: 'marketing', title: 'Marketing', description: 'Chiến dịch cho phim sắp và đã phát hành.', icon: Megaphone, comingSoon: true },
 ];
 
-const CARD = 'bg-white dark:bg-[#131722] rounded-xl border border-slate-200/80 dark:border-white/[0.08]';
+const CARD = 'bg-white dark:bg-[#131722] rounded-xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200';
 
 /** Staff operations dashboard (MF-5): only the modules this role holds a permission for (BR-21). */
 export function StaffPage() {

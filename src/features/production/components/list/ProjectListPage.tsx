@@ -95,7 +95,7 @@ export function ProjectListPage() {
         </div>
       </div>
 
-      <div className="px-6 lg:px-8 py-3 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-[#0F121C] flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="px-6 lg:px-8 py-3 border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0F121C]/80 backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div role="tablist" aria-label="Lọc theo trạng thái" className="flex flex-wrap items-center gap-1.5">
           {FILTERS.map(({ key, label, icon: Icon }) => (
             <button
@@ -107,10 +107,10 @@ export function ProjectListPage() {
                 setFilter(key);
                 setPage(1);
               }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 dark:focus-visible:ring-[#E50914]/50 ${
                 filter === key
-                  ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
+                  ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-xs scale-[1.02]'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white hover:scale-[1.02]'
               }`}
             >
               <Icon className="w-3.5 h-3.5" aria-hidden="true" />

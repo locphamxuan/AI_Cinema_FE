@@ -55,7 +55,7 @@ export function PlansPanel() {
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
               {plans.data.map((plan) => (
-                <tr key={plan.id}>
+                <tr key={plan.id} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors duration-150">
                   <td className="py-2">
                     <p className="font-medium text-slate-900 dark:text-white">
                       {plan.name} {plan.isFeatured && <span className="text-xs text-amber-600">★ Đề xuất</span>}

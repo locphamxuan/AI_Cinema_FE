@@ -34,11 +34,11 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
           {projects.map((p) => {
             const href = productionPaths.project(base, p.id);
             return (
-              <tr key={p.id} onClick={() => router.push(href)} className="hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors">
+              <tr key={p.id} onClick={() => router.push(href)} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] cursor-pointer transition-colors duration-150">
                 <td className="px-4 py-3">
                   <Link
                     href={href}
-                    className="font-semibold text-slate-900 dark:text-white hover:underline hover:text-indigo-600 dark:hover:text-[#E50914]"
+                  className="font-semibold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-[#E50914] underline-offset-2 hover:underline decoration-indigo-400/50 dark:decoration-[#E50914]/50 transition-colors duration-150"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {p.title}

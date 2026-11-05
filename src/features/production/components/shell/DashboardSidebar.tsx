@@ -49,14 +49,14 @@ export function DashboardSidebar({
             <Link
               href={href}
               aria-current={active ? 'page' : undefined}
-              className={`relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 dark:focus-visible:ring-[#E50914]/50 ${
+              className={`group relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 dark:focus-visible:ring-[#E50914]/50 ${
                 active
                   ? 'bg-indigo-50 dark:bg-white/10 text-indigo-600 dark:text-white font-semibold dark:font-bold md:before:absolute md:before:left-0 md:before:top-2 md:before:bottom-2 md:before:w-[3px] md:before:rounded-full md:before:bg-indigo-600 dark:md:before:bg-[#E50914]'
                   : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Icon
-                className={`w-4 h-4 shrink-0 transition-colors ${
+                className={`w-4 h-4 shrink-0 transition-all duration-200 group-hover:scale-110 ${
                   active ? 'text-indigo-600 dark:text-[#E50914]' : 'text-slate-400 dark:text-slate-400'
                 }`}
                 aria-hidden="true"

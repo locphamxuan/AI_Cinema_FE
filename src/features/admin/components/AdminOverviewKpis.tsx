@@ -33,8 +33,8 @@ interface KpiCardProps {
 
 function KpiCard({ icon, tone, label, value, note }: KpiCardProps) {
   return (
-    <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm flex items-center gap-4">
-      <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 ${TONES[tone].icon}`}>
+    <div className="group p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-slate-300/80 dark:hover:border-white/20 transition-all duration-200 flex items-center gap-4 cursor-default">
+      <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-110 ${TONES[tone].icon}`}>
         {icon}
       </div>
       <div className="min-w-0">

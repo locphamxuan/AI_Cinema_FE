@@ -95,8 +95,8 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
         <div className="p-6 space-y-6 animate-fade-in">
           {/* 3 KPI Summary Tiles */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+            <div className="group p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
                 <Film className="w-5 h-5" />
               </div>
               <div>
@@ -109,8 +109,8 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+            <div className="group p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
+              <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
                 <Clapperboard className="w-5 h-5" />
               </div>
               <div>
@@ -123,8 +123,8 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <div className="group p-4 rounded-2xl border border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] flex items-center gap-3.5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-200">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <div>

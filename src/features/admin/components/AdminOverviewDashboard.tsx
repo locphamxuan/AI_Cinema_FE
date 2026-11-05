@@ -122,6 +122,9 @@ export function AdminOverviewDashboard() {
     <div className="p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
       {/* ── Top Hero Banner ── */}
       <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-gradient-to-br from-slate-900 via-[#161928] to-purple-950/40 p-6 sm:p-8 text-white shadow-xl">
+        {/* Decorative grid */}
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)', backgroundSize: '32px 32px' }} aria-hidden="true" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" aria-hidden="true" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs font-semibold">
@@ -166,7 +169,7 @@ export function AdminOverviewDashboard() {
       {/* ── Main Analytics Grid: Revenue breakdown & Coin structure ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Doanh thu theo gói (Bar Chart - 2 Cols) */}
-        <div className="lg:col-span-2 p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm space-y-4">
+        <div className="lg:col-span-2 p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm hover:shadow-md transition-all duration-200 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -201,7 +204,7 @@ export function AdminOverviewDashboard() {
         </div>
 
         {/* Cơ cấu Coin chính vs Coin thưởng (Donut - 1 Col) */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm space-y-4 flex flex-col justify-between">
+        <div className="group p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm hover:shadow-md transition-all duration-200 space-y-4 flex flex-col justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-cyan-500" />
@@ -231,7 +234,7 @@ export function AdminOverviewDashboard() {
       </div>
 
       {/* ── Real-time Episode Output Chart ── */}
-      <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm space-y-4">
+      <div className="group p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm hover:shadow-md transition-all duration-200 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -260,16 +263,14 @@ export function AdminOverviewDashboard() {
             />
           </div>
         ) : (
-          <div className="py-12 text-center text-xs text-slate-400">
-            Chưa có dữ liệu tập phim từ các dự án hiện tại.
-          </div>
+          <div className="py-16 flex flex-col items-center gap-3 text-center"><div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center"><Film className="w-7 h-7 text-emerald-500/60" /></div><p className="text-sm font-medium text-slate-500 dark:text-slate-400">Chưa có dữ liệu tập phim</p><p className="text-xs text-slate-400 dark:text-slate-500">Các dự án đang trong giai đoạn lên kế hoạch</p></div>
         )}
       </div>
 
       {/* ── Secondary Charts Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Phân bổ trạng thái dự án */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm space-y-4">
+        <div className="group p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm hover:shadow-md transition-all duration-200 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
@@ -300,7 +301,7 @@ export function AdminOverviewDashboard() {
         </div>
 
         {/* Cơ cấu người dùng */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm space-y-4">
+        <div className="group p-6 rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm hover:shadow-md transition-all duration-200 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">

@@ -19,7 +19,7 @@ export function CoinActivityView({ activity, projectHref }: { activity?: CoinAct
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {activity.movies.map((m) => (
-          <div key={m.movie.id} className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3 text-xs bg-slate-50/50 dark:bg-white/[0.02]">
+          <div key={m.movie.id} className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3.5 text-xs bg-slate-50/50 dark:bg-white/[0.02] hover:-translate-y-0.5 hover:shadow-sm hover:border-indigo-200 dark:hover:border-white/20 transition-all duration-200 cursor-default">
             <Link href={projectHref(m.movie.id)} className="font-semibold text-indigo-600 dark:text-[#E50914] hover:underline">
               {m.movie.title}
             </Link>
@@ -42,7 +42,7 @@ export function CoinActivityView({ activity, projectHref }: { activity?: CoinAct
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-white/5">
           {rows.map((e) => (
-            <tr key={e.id}>
+            <tr key={e.id} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors duration-150 cursor-default">
               <td className="py-2 px-2 text-slate-500 whitespace-nowrap">{formatDateTime(e.at)}</td>
               <td className="py-2 px-2">
                 {e.kind === 'REFUND' ? 'Hoàn Coin khi gỡ tập' : 'Mở khoá tập'}
