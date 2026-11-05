@@ -26,7 +26,8 @@ export const SHOWCASE_STUDIO_PROJECTS: StudioProjectItem[] = [
     id: 'showcase-neo-hanoi',
     title: 'Mạng Lưới Sinh Học: Neo Hanoi',
     tagline: 'Hà Nội năm 2085: Cấy ghép tế bào sinh học và xung đột trí tuệ nhân tạo.',
-    posterUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
+    // High-tech futuristic biotech cybernetic android with dark cinematic sci-fi atmosphere
+    posterUrl: 'https://images.unsplash.com/photo-1535378620166-273708d44e4c?auto=format&fit=crop&w=1200&q=80',
     status: 'IN_REVIEW',
     movieStatus: 'IN_PRODUCTION',
     statusLabel: 'Chờ kiểm định Điều 44',
@@ -88,8 +89,8 @@ export const SHOWCASE_STUDIO_PROJECTS: StudioProjectItem[] = [
 ];
 
 export const INITIAL_STUDIO_METRICS: StudioPortalMetrics = {
-  totalProjects: 12,
-  publishedEpisodes: 41,
+  totalProjects: 16,
+  publishedEpisodes: 44,
   pendingReviews: 3,
-  totalRevenueCoins: 128450,
+  totalRevenueCoins: 548400,
 };

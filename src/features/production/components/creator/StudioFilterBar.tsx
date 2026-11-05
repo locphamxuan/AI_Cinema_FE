@@ -13,7 +13,7 @@ interface StudioFilterBarProps {
   totalFilteredCount: number;
 }
 
-const FILTER_OPTIONS: { key: StudioFilterKey; label: string; countBadge?: number }[] = [
+const FILTER_OPTIONS: { key: StudioFilterKey; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'published', label: 'Đang phát hành' },
   { key: 'review', label: 'Chờ thẩm định' },
@@ -32,7 +32,7 @@ export function StudioFilterBar({
 }: StudioFilterBarProps) {
   return (
     <div className="w-full flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 py-3 border-y border-white/[0.08]">
-      {/* Filter Pills */}
+      {/* Filter Pills with Cinema Red Primary Accent */}
       <div
         role="tablist"
         aria-label="Lọc danh mục dự án phim"
@@ -49,13 +49,13 @@ export function StudioFilterBar({
               onClick={() => onFilterChange(key)}
               className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                 isActive
-                  ? 'bg-gradient-to-r from-[#E50914] to-[#8B5CF6] text-white shadow-md shadow-red-900/30'
+                  ? 'bg-[#E50914] text-white shadow-md shadow-red-950/50 ring-1 ring-red-500/40 font-bold'
                   : 'bg-[#131722] text-slate-300 hover:text-white hover:bg-white/[0.06] border border-white/[0.08]'
               }`}
             >
               <span>{label}</span>
               {isActive && (
-                <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-black/30 text-[10px] font-bold">
+                <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-black/40 text-[10px] font-bold text-white">
                   {totalFilteredCount}
                 </span>
               )}
@@ -77,7 +77,7 @@ export function StudioFilterBar({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Tìm kiếm theo tên phim, thể loại..."
-            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#131722] border border-white/[0.08] text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#8B5CF6] focus:ring-1 focus:ring-[#8B5CF6] transition-all"
+            className="w-full pl-10 pr-4 py-2 rounded-xl bg-[#131722] border border-white/[0.08] text-xs text-white placeholder-slate-400 focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] transition-all"
           />
         </div>
 

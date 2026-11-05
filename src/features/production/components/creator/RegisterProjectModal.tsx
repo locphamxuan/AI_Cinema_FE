@@ -277,7 +277,7 @@ export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: R
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#E50914] to-[#8B5CF6] hover:opacity-90 shadow-lg shadow-red-900/30 flex items-center gap-2 transition-all cursor-pointer"
+              className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#E50914] hover:bg-[#D10813] shadow-lg shadow-red-950/40 flex items-center gap-2 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>{isSubmitting ? 'Đang tạo...' : 'Xác Nhận Đăng Ký'}</span>

@@ -6,8 +6,8 @@ const beVietnam = Be_Vietnam_Pro({ subsets: ['latin', 'vietnamese'], weight: ['4
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    // The back office acts in sky: buttons, focus rings and selections shared with the member site follow it.
-    <div className={`${beVietnam.className} [--action:#0284C7] [--action-strong:#0369A1] min-h-screen bg-[#F3F9FC] dark:bg-[#0B1620] text-slate-900 dark:text-white flex flex-col transition-colors`}>
+    // Cinema Dark Theme: deep charcoal background and cinema red accents
+    <div className={`${beVietnam.className} [--action:#E50914] [--action-strong:#B91C1C] min-h-screen bg-[#0A0D14] text-white flex flex-col transition-colors`}>
       <DashboardHeader />
       {children}
     </div>

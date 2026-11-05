@@ -201,7 +201,7 @@ export function CreatorStudioPortal() {
             <button
               type="button"
               onClick={() => setIsRegisterModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-[#E50914] via-[#D10813] to-[#8B5CF6] hover:opacity-95 shadow-lg shadow-red-900/30 hover:shadow-red-800/50 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl font-bold text-sm text-white bg-[#E50914] hover:bg-[#D10813] shadow-lg shadow-red-950/40 hover:shadow-red-900/60 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>+ Đăng Ký Dự Án Phim</span>
