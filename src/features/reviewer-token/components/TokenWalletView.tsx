@@ -50,7 +50,7 @@ export function TokenTotalsCards({ totals, rateVnd }: { totals: TokenTotals; rat
             )}
           </div>
           <div className="mt-2.5">
-            <p className={`text-2xl font-bold font-mono tracking-tight ${c.primary ? 'text-indigo-700 dark:text-[#E50914]' : 'text-slate-900 dark:text-white'}`}>
+            <p className="text-2xl font-bold font-mono tracking-tight text-slate-900 dark:text-white">
               {formatNumber(c.value)} <span className="text-sm font-semibold font-sans">Token</span>
             </p>
             <div className="mt-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-white/5">

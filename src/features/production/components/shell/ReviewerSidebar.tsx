@@ -45,7 +45,7 @@ export function ReviewerSidebar() {
             label: 'Hạn Ngạch Token',
             icon: Coins,
             active: pathname.startsWith('/reviewer/tokens'),
-            badge: wallet.data ? { value: formatNumber(wallet.data.balanceTokens), title: 'Token còn lại' } : undefined,
+            badge: wallet.data ? { value: formatNumber(wallet.data.balanceTokens), title: `Token còn lại: ${formatNumber(wallet.data.balanceTokens)}` } : undefined,
           },
         ]
       : []),
