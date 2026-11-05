@@ -31,7 +31,7 @@ export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth
       }}
     >
       <div
-        className={`relative bg-white dark:bg-[#0F1C27] border border-slate-200/80 dark:border-white/15 rounded-2xl w-full ${maxWidth} shadow-2xl shadow-slate-900/20 overflow-hidden my-auto animate-scale-in flex flex-col max-h-[92vh]`}
+        className={`relative bg-white dark:bg-[#131722] border border-slate-200/80 dark:border-white/15 rounded-2xl w-full ${maxWidth} shadow-2xl shadow-slate-900/20 overflow-hidden my-auto animate-scale-in flex flex-col max-h-[92vh]`}
       >
         <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-4 border-b border-slate-100 dark:border-white/10 shrink-0">
           <div className="flex items-start gap-3">

@@ -70,7 +70,7 @@ export function SeasonDraftEditor({
   const estimate = season.cost * season.episodes.length;
 
   return (
-    <div className="rounded-xl border border-sky-100 dark:border-white/10 p-3 space-y-3">
+    <div className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3 space-y-3">
       <div className="flex items-center gap-2">
         <input
           value={season.title}

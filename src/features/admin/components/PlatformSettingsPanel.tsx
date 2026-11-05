@@ -115,7 +115,7 @@ export function PlatformSettingsPanel() {
   );
 
   return (
-    <section className="bg-white dark:bg-[#0F1C27] rounded-3xl border border-sky-100 dark:border-white/10 p-6 sm:p-8 space-y-6 max-w-3xl shadow-sm">
+    <section className="bg-white dark:bg-[#131722] rounded-3xl border border-slate-200/80 dark:border-white/[0.08] p-6 sm:p-8 space-y-6 max-w-3xl shadow-sm">
       <div className="border-b border-slate-100 dark:border-white/5 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Cài đặt nền tảng</h2>
@@ -137,7 +137,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('all')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'all'
-              ? 'bg-sky-500 text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -149,7 +149,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('coin')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'coin'
-              ? 'bg-sky-500 text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -162,7 +162,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('production')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'production'
-              ? 'bg-sky-500 text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -175,7 +175,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('streaming')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'streaming'
-              ? 'bg-sky-500 text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >
@@ -188,7 +188,7 @@ export function PlatformSettingsPanel() {
           onClick={() => setActiveTab('rewards')}
           className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'rewards'
-              ? 'bg-sky-500 text-white shadow-sm'
+              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm'
               : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
           }`}
         >

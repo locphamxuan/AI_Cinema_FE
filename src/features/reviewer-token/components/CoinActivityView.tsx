@@ -19,8 +19,8 @@ export function CoinActivityView({ activity, projectHref }: { activity?: CoinAct
     <div className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {activity.movies.map((m) => (
-          <div key={m.movie.id} className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs">
-            <Link href={projectHref(m.movie.id)} className="font-semibold text-sky-700 dark:text-sky-500 hover:underline">
+          <div key={m.movie.id} className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3 text-xs bg-slate-50/50 dark:bg-white/[0.02]">
+            <Link href={projectHref(m.movie.id)} className="font-semibold text-indigo-600 dark:text-[#E50914] hover:underline">
               {m.movie.title}
             </Link>
             <p className="text-slate-500 mt-1">

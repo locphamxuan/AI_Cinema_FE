@@ -28,7 +28,7 @@ export function RewardLadderPanel() {
   const totalStreakCoins = sortedRules.reduce((sum, r) => sum + (r.isActive ? r.bonusCoins : 0), 0);
 
   return (
-    <section className="bg-white dark:bg-[#0F1C27] rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
+    <section className="bg-white dark:bg-[#131722] rounded-3xl border border-slate-200/80 dark:border-white/[0.08] overflow-hidden shadow-sm">
       {/* ── Panel Header ── */}
       <div className="p-6 border-b border-slate-100 dark:border-white/5 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -310,7 +310,7 @@ function RuleModal({
             Ngày {day} đã có cấu hình đang dùng; hãy sửa hoặc tắt nó trước.
           </p>
         )}
-        <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 text-xs text-sky-800 dark:text-sky-300 flex items-start gap-2">
+        <div className="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-xs text-indigo-900 dark:text-indigo-300 flex items-start gap-2">
           <Sparkles className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
           <span>
             {day === LADDER_LENGTH

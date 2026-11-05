@@ -54,7 +54,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: Cre
   const totalEpisodes = projects.reduce((acc, p) => acc + (p._count?.episodes ?? 0), 0);
 
   return (
-    <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#141720] shadow-sm overflow-hidden mb-6">
+    <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-sm overflow-hidden mb-6">
       {/* ── Header Bar ── */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
         <div className="flex items-center gap-3">

@@ -78,7 +78,7 @@ export function AccountsPanel() {
   const totalPages = result?.meta.totalPages ?? 1;
 
   return (
-    <section className="bg-white dark:bg-[#0F1C27] rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
+    <section className="bg-white dark:bg-[#131722] rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden">
       <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Quản lý Tài khoản</h2>
@@ -141,7 +141,7 @@ export function AccountsPanel() {
                 <tr key={account.id} className={`hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors ${account.isActive ? '' : 'opacity-60'}`}>
                   <td className="py-3.5 px-5">
                     <p className="font-semibold text-slate-900 dark:text-white">
-                      {account.fullName} {isMe && <span className="text-sky-700 dark:text-sky-500 font-medium text-[11px] ml-1">(bạn)</span>}
+                      {account.fullName} {isMe && <span className="text-indigo-600 dark:text-[#E50914] font-medium text-[11px] ml-1">(bạn)</span>}
                     </p>
                     <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">{account.email}</p>
                   </td>

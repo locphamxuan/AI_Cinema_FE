@@ -82,7 +82,7 @@ export function ReviewerTokensPage() {
                 aria-selected={tab === t.key}
                 onClick={() => select(t.key)}
                 className={`shrink-0 px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer ${
-                  tab === t.key ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
+                  tab === t.key ? 'bg-white dark:bg-[#E50914] text-indigo-700 dark:text-white shadow-xs font-bold' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 {t.label}
@@ -103,7 +103,7 @@ export function ReviewerTokensPage() {
                         aria-pressed={sub === f.key}
                         onClick={() => setSub(f.key)}
                         className={`px-2.5 py-1 rounded-full text-xs border cursor-pointer ${
-                          sub === f.key ? 'bg-sky-600 border-sky-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
+                          sub === f.key ? 'bg-indigo-600 dark:bg-[#E50914] border-transparent text-white shadow-xs font-semibold' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5'
                         }`}
                       >
                         {f.label}

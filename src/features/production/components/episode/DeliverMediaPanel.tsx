@@ -137,7 +137,7 @@ export function DeliverMediaPanel({
           </FormField>
         )}
 
-        <fieldset className="space-y-3 rounded-xl border border-sky-100 dark:border-white/10 p-3">
+        <fieldset className="space-y-3 rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3">
           <legend className="px-1 font-semibold text-slate-800 dark:text-slate-200">
             {declarant === 'studio' ? 'Khai báo và cam kết sử dụng AI của studio' : 'Khai báo AI của studio (Creator nhập thay)'}
           </legend>

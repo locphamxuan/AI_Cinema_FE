@@ -37,7 +37,7 @@ function Tabs({ title, description, tabs }: { title: string; description: string
         <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
       </header>
       {open.length > 1 && (
-        <nav aria-label={title} className="flex gap-1 border-b border-sky-100 dark:border-white/10 overflow-x-auto">
+        <nav aria-label={title} className="flex gap-1 border-b border-slate-200 dark:border-white/10 overflow-x-auto">
           {open.map((t) => (
             <Link
               key={t.key}
@@ -45,7 +45,7 @@ function Tabs({ title, description, tabs }: { title: string; description: string
               aria-current={t === current ? 'page' : undefined}
               className={`-mb-px px-4 py-2.5 text-sm whitespace-nowrap border-b-2 transition-colors ${
                 t === current
-                  ? 'border-sky-500 text-sky-800 dark:text-sky-200 font-semibold'
+                  ? 'border-indigo-600 text-indigo-600 dark:border-[#E50914] dark:text-[#E50914] font-semibold'
                   : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >

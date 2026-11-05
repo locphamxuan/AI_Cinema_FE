@@ -85,11 +85,11 @@ export function TokenRequestList({
       {list.data && rows.length === 0 && <Empty>Chưa có yêu cầu thêm Token nào.</Empty>}
       <ul className="space-y-2">
         {rows.map((r) => (
-          <li key={r.id} className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs space-y-1.5">
+          <li key={r.id} className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3 text-xs space-y-1.5 bg-slate-50/50 dark:bg-white/[0.02]">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-semibold text-slate-900 dark:text-white">
                 {projectHref ? (
-                  <Link href={projectHref((r as any).movie?.id ?? (r as any).projectId ?? (r as any).project?.id ?? "")} className="text-sky-700 dark:text-sky-500 hover:underline">{(r as any).movie?.title ?? (r as any).project?.movie?.title ?? "Dự án phim"}</Link>
+                  <Link href={projectHref((r as any).movie?.id ?? (r as any).projectId ?? (r as any).project?.id ?? "")} className="text-indigo-600 dark:text-[#E50914] hover:underline">{(r as any).movie?.title ?? (r as any).project?.movie?.title ?? "Dự án phim"}</Link>
                 ) : (
                   (r as any).movie?.title ?? (r as any).project?.movie?.title ?? "Dự án phim"
                 )}{' '}

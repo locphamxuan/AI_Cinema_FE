@@ -42,7 +42,7 @@ export function ReviewerSidebar() {
       ? [
           {
             href: '/reviewer/tokens',
-            label: 'Token',
+            label: 'Hạn Ngạch Token',
             icon: Coins,
             active: pathname.startsWith('/reviewer/tokens'),
             badge: wallet.data ? { value: formatNumber(wallet.data.balanceTokens), title: 'Token còn lại' } : undefined,
@@ -53,5 +53,13 @@ export function ReviewerSidebar() {
     { href: '/reviewer/profile', label: 'Hồ sơ tài khoản', icon: UserRound, active: pathname.startsWith('/reviewer/profile') },
   ];
 
-  return <DashboardSidebar label="Khu kiểm duyệt" title="Kiểm duyệt nội dung" subtitle="Dự án, Studio và Token" icon={ShieldCheck} items={items} />;
+  return (
+    <DashboardSidebar
+      label="CONTENT REVIEW"
+      title="CONTENT REVIEW"
+      subtitle="Thẩm Định & Phát Hành"
+      icon={ShieldCheck}
+      items={items}
+    />
+  );
 }

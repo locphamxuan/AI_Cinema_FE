@@ -82,7 +82,7 @@ export function PublishPanel({
         )}
 
         {canRelease && (
-          <div className="space-y-2 rounded-xl border border-sky-100 dark:border-white/10 p-3">
+          <div className="space-y-2 rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3">
             {episode.coinPrice === null && <p className="text-amber-600">Đặt giá Coin trước khi phát hành.</p>}
             <div className="flex flex-wrap items-end gap-2">
               <Button disabled={busy || episode.coinPrice === null} onClick={() => publish(false)}>

@@ -39,18 +39,18 @@ export function TokenTotalsCards({ totals, rateVnd }: { totals: TokenTotals; rat
           key={c.label}
           className={`relative rounded-2xl p-5 border transition-all duration-200 ${
             c.primary
-              ? 'bg-gradient-to-br from-sky-500/10 via-sky-500/5 to-transparent border-sky-500/25'
-              : 'bg-white dark:bg-[#0F1C27] border-slate-200/80 dark:border-white/10 shadow-xs'
+              ? 'bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent border-indigo-500/30 dark:from-[#E50914]/15 dark:via-[#E50914]/5 dark:border-[#E50914]/30'
+              : 'bg-white dark:bg-[#131722] border-slate-200/80 dark:border-white/[0.08] shadow-xs'
           }`}
         >
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{c.label}</p>
             {c.primary && (
-              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" title="Đang sẵn sàng sử dụng" />
+              <span className="w-2 h-2 rounded-full bg-indigo-500 dark:bg-[#E50914] animate-pulse" title="Đang sẵn sàng sử dụng" />
             )}
           </div>
           <div className="mt-2.5">
-            <p className={`text-2xl font-bold font-mono tracking-tight ${c.primary ? 'text-sky-800 dark:text-sky-300' : 'text-slate-900 dark:text-white'}`}>
+            <p className={`text-2xl font-bold font-mono tracking-tight ${c.primary ? 'text-indigo-700 dark:text-[#E50914]' : 'text-slate-900 dark:text-white'}`}>
               {formatNumber(c.value)} <span className="text-sm font-semibold font-sans">Token</span>
             </p>
             <div className="mt-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-100 dark:border-white/5">
