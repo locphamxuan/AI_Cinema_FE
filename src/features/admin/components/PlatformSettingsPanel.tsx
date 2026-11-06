@@ -30,7 +30,6 @@ const COIN_FIELDS: SettingField[] = [
 ];
 
 const PRODUCTION_FIELDS: SettingField[] = [
-  { key: 'tokenRateVnd', label: 'Tỷ giá Token', unit: '₫ / Token', hint: 'Giá trị 1 Token phí sản xuất; áp cho các lần ghi phí từ nay.', min: 1 },
   { key: 'episodeCoinPriceMin', label: 'Giá tập thấp nhất', unit: 'Coin', hint: 'Giá ngoài khoảng vẫn lưu được nhưng báo Admin.', min: 0 },
   { key: 'episodeCoinPriceMax', label: 'Giá tập cao nhất', unit: 'Coin', hint: '', min: 0 },
 ];
@@ -167,7 +166,7 @@ export function PlatformSettingsPanel() {
           }`}
         >
           <Clapperboard className="w-3.5 h-3.5" />
-          <span>Sản xuất & Token</span>
+          <span>Giá tập</span>
         </button>
 
         <button
@@ -224,7 +223,7 @@ export function PlatformSettingsPanel() {
 
             <div>
               <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Clapperboard className="w-3.5 h-3.5" /> Phân khúc Sản xuất & Token
+                <Clapperboard className="w-3.5 h-3.5" /> Khoảng giá tập
               </h3>
               {renderFieldGroup(PRODUCTION_FIELDS)}
             </div>

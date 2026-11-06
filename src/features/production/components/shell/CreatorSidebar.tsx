@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Bell, Clapperboard, Coins, UserRound } from 'lucide-react';
+import { Bell, Clapperboard, UserRound } from 'lucide-react';
 import { DashboardSidebar } from './DashboardSidebar';
 
 /** Left navigation of the Content Creator area in Cinema Dark theme. */
@@ -13,12 +13,6 @@ export function CreatorSidebar() {
       label: 'Dự án phim',
       icon: Clapperboard,
       active: pathname === '/creator' || pathname.startsWith('/creator/projects'),
-    },
-    {
-      href: '/creator/token-requests',
-      label: 'Hạn Ngạch & Doanh Thu',
-      icon: Coins,
-      active: pathname.startsWith('/creator/token-requests'),
     },
     {
       href: '/creator/notifications',

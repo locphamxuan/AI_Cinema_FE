@@ -46,11 +46,11 @@ function getNotificationMeta(item: AppNotification): {
   const type = item.type?.toUpperCase() ?? '';
   const text = `${item.title} ${item.body ?? ''}`.toLowerCase();
 
-  if (type.includes('TOKEN') || text.includes('token') || text.includes('cấp phí') || text.includes('ngân sách')) {
+  if (type.startsWith('COST_') || text.includes('chi phí') || text.includes('ngân sách')) {
     return {
       icon: Coins,
       colorClass: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25',
-      badgeLabel: 'Ngân sách Token',
+      badgeLabel: 'Chi phí sản xuất',
       badgeTone: 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/25',
     };
   }
@@ -206,7 +206,7 @@ export function NotificationsPage() {
               Thông báo hệ thống
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Theo dõi kịp thời mọi biến động về cấp ngân sách Token, phê duyệt đề xuất, tiến độ gửi phim từ Studio và cảnh báo nền tảng.
+              Theo dõi kịp thời mọi biến động về ngân sách và chi phí sản xuất, phê duyệt đề xuất, tiến độ gửi phim từ Studio và cảnh báo nền tảng.
             </p>
           </div>
 

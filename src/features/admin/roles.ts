@@ -55,9 +55,17 @@ export const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> 
     title: 'Khởi tạo & Quản trị dự án phim',
     desc: 'Tạo dự án phim, chỉnh sửa các mùa, tập phim, ý tưởng, gán Creator và hủy dự án.',
   },
-  'project:fee.allocate': {
-    title: 'Phân bổ ngân sách sản xuất (Token)',
-    desc: 'Phân bổ, nạp thêm và điều chỉnh ngân sách Token sản xuất cho từng dự án phim.',
+  'cost:request': {
+    title: 'Yêu cầu thêm chi phí sản xuất',
+    desc: 'Gửi Admin yêu cầu thêm chi phí (VND) cho dự án mình phụ trách, kèm báo giá của Studio.',
+  },
+  'cost:approve': {
+    title: 'Duyệt yêu cầu thêm chi phí sản xuất',
+    desc: 'Cấp đủ, cấp một phần hoặc từ chối yêu cầu thêm chi phí sản xuất của Reviewer.',
+  },
+  'cost:adjust': {
+    title: 'Đặt và điều chỉnh ngân sách sản xuất',
+    desc: 'Đặt ngân sách sản xuất (VND) cho dự án phim và điều chỉnh khi cần, kèm lý do.',
   },
   'project:read.all': {
     title: 'Xem toàn bộ dự án phim trên sàn',
@@ -202,10 +210,6 @@ export const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> 
   'platform:settings.manage': {
     title: 'Cài đặt chính sách nền tảng',
     desc: 'Điều chỉnh tỷ giá Coin, khung giá gói cước, số tập xem thử miễn phí và thông số hệ thống.',
-  },
-  'token-budget:manage': {
-    title: 'Quản lý hạn mức ngân sách Token',
-    desc: 'Cấp hạn mức Token sản xuất cho Kiểm duyệt viên và thu hồi lượng Token chưa phân bổ.',
   },
 };
 

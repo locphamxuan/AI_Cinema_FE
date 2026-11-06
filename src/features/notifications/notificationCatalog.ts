@@ -18,17 +18,16 @@ const section = (key: string, label: string, ...types: string[]): NotificationSe
 
 /**
  * Reviewer: what the Creator did, what the Studio answered (recorded by the Creator or reported by Studio Web),
- * what the Admin decided about Token and requests, and releases.
+ * what the Admin decided about the budget and requests, and releases.
  */
 const REVIEWER_TABS: NotificationTab[] = [
   {
     key: 'creator',
     label: 'Creator',
-    description: 'Creator bàn giao, nộp tập, đề xuất và xin thêm Token.',
+    description: 'Creator bàn giao, nộp tập và đề xuất.',
     sections: [
       section('delivery', 'Nộp tập', 'MEDIA_SUBMITTED', 'MEDIA_READY'),
       section('handoff', 'Bàn giao Studio', 'STUDIO_HANDOFF_SENT'),
-      section('token', 'Xin thêm Token', 'TOKEN_REQUESTED'),
       section('change', 'Đề xuất', 'PROJECT_CHANGE_REQUESTED'),
     ],
   },
@@ -46,10 +45,11 @@ const REVIEWER_TABS: NotificationTab[] = [
   },
   {
     key: 'admin',
-    label: 'Admin & Token',
-    description: 'Admin cấp / thu hồi Token, trả lời đề xuất và cảnh báo giá.',
+    label: 'Admin & chi phí',
+    description: 'Admin đặt / điều chỉnh ngân sách, trả lời yêu cầu thêm chi phí, đề xuất và cảnh báo giá.',
     sections: [
-      section('token', 'Cấp / thu hồi Token', 'TOKEN_GRANTED', 'TOKEN_REVOKED'),
+      section('budget', 'Ngân sách sản xuất', 'COST_BUDGET_CHANGED'),
+      section('cost', 'Yêu cầu thêm chi phí', 'COST_REQUEST_APPROVED', 'COST_REQUEST_REJECTED'),
       section('change', 'Trả lời đề xuất', 'PROJECT_CHANGE_RESOLVED'),
       section('price', 'Giá Coin', 'PRICE_CHANGE_REQUEST', 'PRICE_OUT_OF_RANGE'),
     ],
@@ -81,11 +81,10 @@ const CREATOR_TABS: NotificationTab[] = [
   {
     key: 'reviewer',
     label: 'Reviewer',
-    description: 'Giao dự án / tập, kết quả duyệt, trả lời xin Token và đề xuất.',
+    description: 'Giao dự án / tập, kết quả duyệt và đề xuất.',
     sections: [
       section('assign', 'Giao việc', 'PROJECT_ASSIGNED', 'EPISODE_ASSIGNED', 'PROJECT_CANCELLED'),
       section('review', 'Kết quả duyệt', 'CONTENT_APPROVED', 'CONTENT_CHANGES_REQUESTED'),
-      section('token', 'Xin thêm Token', 'TOKEN_REQUEST_APPROVED', 'TOKEN_REQUEST_REJECTED'),
       section('change', 'Đề xuất', 'PROJECT_CHANGE_RESOLVED'),
     ],
   },
@@ -105,19 +104,18 @@ const CREATOR_TABS: NotificationTab[] = [
 const ADMIN_TABS: NotificationTab[] = [
   {
     key: 'requests',
-    label: 'Đề xuất & xin Token',
-    description: 'Đề xuất của Reviewer / Creator và yêu cầu thêm Token của Creator.',
+    label: 'Đề xuất & chi phí',
+    description: 'Đề xuất của Reviewer / Creator và yêu cầu thêm chi phí sản xuất của Reviewer.',
     sections: [
       section('change', 'Đề xuất', 'PROJECT_CHANGE_REQUESTED'),
-      section('token', 'Xin thêm Token', 'TOKEN_REQUESTED', 'TOKEN_REQUEST_APPROVED', 'TOKEN_REQUEST_REJECTED'),
+      section('cost', 'Yêu cầu thêm chi phí', 'COST_REQUESTED'),
     ],
   },
   {
     key: 'budget',
-    label: 'Ngân sách & giá',
-    description: 'Reviewer cấp phí dự án và cảnh báo giá Coin.',
+    label: 'Giá',
+    description: 'Cảnh báo giá Coin.',
     sections: [
-      section('fee', 'Cấp phí dự án', 'TOKEN_ALLOCATED'),
       section('price', 'Giá Coin', 'PRICE_OUT_OF_RANGE', 'PRICE_CHANGE_REQUEST'),
     ],
   },

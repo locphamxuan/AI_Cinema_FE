@@ -7,7 +7,7 @@ export default function Page() {
   return (
     <SectionTabs
       title="Cài đặt nền tảng"
-      description="Khoảng giá Coin, tỉ giá Token, quảng cáo và các cảnh báo khi giá tập nằm ngoài khoảng."
+      description="Khoảng giá Coin, quảng cáo và các cảnh báo khi giá tập nằm ngoài khoảng."
       tabs={[
         { key: 'general', label: 'Cài đặt chung', permission: PERMISSION.PLATFORM_SETTINGS_MANAGE, content: <PlatformSettingsPanel /> },
         { key: 'price-alerts', label: 'Cảnh báo giá', permission: PERMISSION.PRICE_ALERT_MANAGE, content: <PriceAlertsPanel /> },

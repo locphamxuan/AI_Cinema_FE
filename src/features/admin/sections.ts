@@ -30,7 +30,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     href: '/admin/requests',
     label: 'Duyệt yêu cầu',
     icon: Inbox,
-    permissions: [PERMISSION.PROJECT_CHANGE_REVIEW, PERMISSION.TOKEN_BUDGET_MANAGE],
+    permissions: [PERMISSION.PROJECT_CHANGE_REVIEW, PERMISSION.COST_APPROVE],
   },
   { href: '/admin/movies', label: 'Quản lý phim', icon: Film, permissions: [PERMISSION.PROJECT_READ_ALL] },
   { href: '/admin/ads', label: 'Quảng cáo', icon: Megaphone, permissions: [PERMISSION.AD_MANAGE] },

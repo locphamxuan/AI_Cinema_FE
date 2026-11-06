@@ -8,7 +8,7 @@ export interface SidebarItem {
   label: string;
   icon: LucideIcon;
   active: boolean;
-  /** A short figure next to the label, such as the Token left. */
+  /** A short figure next to the label, such as a count. */
   badge?: { value: string; title: string };
 }
 
