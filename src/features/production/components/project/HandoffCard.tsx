@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { seasonLabel } from '@/lib/seasonLabel';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
 import { MATERIAL_KIND, MILESTONE_STATUS } from '../../lib/labels';
-import { formatBytes, formatDateTime, formatNumber } from '../../lib/format';
+import { formatBytes, formatDateTime, formatVnd } from '../../lib/format';
 import { canMove } from '../../lib/milestones';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
 import { StatusPill } from '../shared/ui';
@@ -50,8 +50,8 @@ export function HandoffCard({
             {h.studio.name} <Badge tone="blue">{scopeLabel(h, episodeCount)}</Badge>
           </p>
           <p className="text-slate-500 dark:text-slate-400">
-            Giao ngày {formatDateTime(h.createdAt)} bởi {h.createdBy.fullName} · {h.studio.email} · ngân sách trong brief:{' '}
-            {formatNumber(Number(h.productionFeeTokens))} Token
+            Giao ngày {formatDateTime(h.createdAt)} bởi {h.createdBy.fullName} · {h.studio.email} · phí đề xuất trong brief:{' '}
+            {formatVnd(h.offeredFeeVnd)}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -66,9 +66,9 @@ export function HandoffCard({
       </div>
 
       {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi Studio: {h.changeReason}</p>}
-      {Number(h.lostTokens) > 0 && (
+      {Number(h.forfeitedVnd) > 0 && (
         <p className="text-rose-600">
-          Đã đổi sang Studio khác: {formatNumber(Number(h.lostTokens))} Token đã gửi cho Studio này bị mất, không hoàn.
+          Đã đổi sang Studio khác: Studio này giữ lại {formatVnd(h.forfeitedVnd)} (đã chi hoặc đền bù); phần còn lại trả về ngân sách.
         </p>
       )}
       {h.emailMessage?.errorMessage && <p className="text-rose-600">{h.emailMessage.errorMessage}</p>}

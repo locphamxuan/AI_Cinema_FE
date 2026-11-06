@@ -3,12 +3,10 @@
 import { useState } from 'react';
 import { Repeat, Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { TokenRequestForm } from '@/features/token-request/TokenRequestForm';
-import { TokenRequestList } from '@/features/token-request/TokenRequestList';
 import { studioService } from '@/services/studioService';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
 import { useResource } from '../../hooks/useResource';
-import { DELIVERY_PROJECT, OPEN_PROJECT, isIn } from '../../lib/capabilities';
+import { DELIVERY_PROJECT, isIn } from '../../lib/capabilities';
 import { downloadFile } from '../../lib/download';
 import { Pager, pageOf } from '../shared/Pager';
 import { Empty, ErrorNote, Facts, Loading, Panel } from '../shared/ui';
@@ -40,13 +38,12 @@ export function StudioTab() {
   const [moving, setMoving] = useState<StudioHandoff | null>(null);
   const [filter, setFilter] = useState('all');
   const [page, setPage] = useState(1);
-  const [requestsVersion, setRequestsVersion] = useState(0);
   const history = useResource(`handoffs:${project.id}:${project.updatedAt}`, () => studioService.listHandoffs(project.id));
   const delivering = isIn(project.status, DELIVERY_PROJECT);
   const canHandOff = caps.handoff && (project.status === 'ASSIGNED' || delivering);
-  const canAskTokens = caps.askTokens && isIn(project.status, [...OPEN_PROJECT, 'UNDER_REVISION']);
   const all = history.data ?? [];
   const declined = all.some((h) => h.milestoneStatus === 'STUDIO_DECLINED');
+  const asksCost = caps.costRequest && declined;
   const matching = all.filter(FILTERS.find((f) => f.key === filter)!.match);
   const { rows, totalPages } = pageOf(matching, page, PAGE_SIZE);
 
@@ -99,10 +96,6 @@ export function StudioTab() {
           </ol>
           <Pager page={Math.min(page, totalPages)} totalPages={totalPages} onChange={setPage} />
         </Panel>
-
-        <Panel title="Yêu cầu thêm Token" description="Creator gửi Reviewer khi Studio không chấp nhận mức Token; Admin theo dõi.">
-          <TokenRequestList movieId={project.id} canAnswer={caps.feeAllocate} refreshKey={requestsVersion} />
-        </Panel>
       </div>
 
       <div className="space-y-5">
@@ -135,34 +128,22 @@ export function StudioTab() {
             {project.status === 'ASSIGNED' && !caps.handoff && <p className="text-xs text-slate-500">Chờ Creator chính bàn giao cho Studio.</p>}
             {caps.creator && !caps.lead && (
               <p className="rounded-xl border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 p-3 text-xs text-sky-800 dark:text-sky-300">
-                Bạn là Creator phụ: Creator chính {project.creator?.fullName ?? ''} bàn giao, đổi Studio, cập nhật mốc và xin thêm Token. Studio CC bạn
+                Bạn là Creator phụ: Creator chính {project.creator?.fullName ?? ''} bàn giao, đổi Studio và cập nhật mốc. Studio CC bạn
                 khi gửi phim; tải tập của bạn rồi upload Submission ở trang tập để gửi lên Creator chính.
               </p>
             )}
           </div>
         </Panel>
-        {canAskTokens && (
-          <>
-            {declined && (
-              <p className="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300">
-                Studio đã từ chối. Nếu lý do là mức Token, hãy xin thêm Token từ Reviewer bên dưới.
-              </p>
-            )}
-            <TokenRequestForm project={project} onSent={() => setRequestsVersion((v) => v + 1)} />
-          </>
+        {asksCost && (
+          <p className="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300">
+            Studio đã từ chối. Nếu lý do là mức phí và giá Studio đòi vượt ngân sách còn lại, hãy gửi Admin yêu cầu thêm chi phí sản xuất ở tab
+            Chi phí sản xuất.
+          </p>
         )}
       </div>
 
       {mode === 'handoff' && <HandOffModal onClose={() => setMode(null)} />}
-      {mode === 'change' && (
-        <ChangeStudioModal
-          onClose={() => setMode(null)}
-          onAskTokens={() => {
-            setMode(null);
-            document.getElementById('xin-them-token')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }}
-        />
-      )}
+      {mode === 'change' && <ChangeStudioModal onClose={() => setMode(null)} />}
       {moving && (
         <MilestoneModal
           handoff={moving}
