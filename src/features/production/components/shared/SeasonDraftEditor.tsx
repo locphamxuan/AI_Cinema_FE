@@ -4,7 +4,6 @@ import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import type { NewSeasonInput } from '@/types/production';
-import { formatNumber } from '../../lib/format';
 import {
   DeadlineQuickFill,
   EpisodeRowsEditor,
@@ -16,42 +15,33 @@ import {
   type EpisodeDraft,
 } from './EpisodeRowsEditor';
 
-/** A season as the Reviewer plans it: price of one episode, release window and episodes (BR-37, BR-60). */
+/** A season as the Reviewer plans it: release window and episodes (BR-37, BR-60). */
 export interface SeasonDraft {
   title: string;
-  /** Token paid for one episode of the season; a whole number above 0. */
-  cost: number;
   windowStart: string;
   windowEnd: string;
   episodes: EpisodeDraft[];
 }
 
-export const MAX_EPISODE_COST = 100_000_000;
-
 export function emptySeason(number: number, firstEpisode = 1): SeasonDraft {
-  return { title: `Mùa ${number}`, cost: 0, windowStart: '', windowEnd: '', episodes: [emptyEpisode(firstEpisode)] };
-}
-
-export function seasonCostValid(cost: number): boolean {
-  return Number.isInteger(cost) && cost >= 1 && cost <= MAX_EPISODE_COST;
+  return { title: `Mùa ${number}`, windowStart: '', windowEnd: '', episodes: [emptyEpisode(firstEpisode)] };
 }
 
 export function seasonValid(season: SeasonDraft): boolean {
   const window = { start: season.windowStart, end: season.windowEnd };
-  return seasonCostValid(season.cost) && windowValid(window) && episodesValid(season.episodes, window);
+  return windowValid(window) && episodesValid(season.episodes, window);
 }
 
 export function toSeasonInput(season: SeasonDraft): NewSeasonInput {
   return {
     title: season.title.trim() || undefined,
-    episodeProductionCost: season.cost,
     ...(season.windowStart ? { releaseStartDate: season.windowStart } : {}),
     ...(season.windowEnd ? { releaseEndDate: season.windowEnd } : {}),
     episodes: season.episodes.map(toEpisodeInput),
   };
 }
 
-/** Title, price, release window and episode rows of one season; `onRemove` shows a remove button. */
+/** Title, release window and episode rows of one season; `onRemove` shows a remove button. */
 export function SeasonDraftEditor({
   season,
   number,
@@ -67,7 +57,6 @@ export function SeasonDraftEditor({
 }) {
   const patch = (changes: Partial<SeasonDraft>) => onChange({ ...season, ...changes });
   const window = { start: season.windowStart, end: season.windowEnd };
-  const estimate = season.cost * season.episodes.length;
 
   return (
     <div className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3 space-y-3">
@@ -86,18 +75,7 @@ export function SeasonDraftEditor({
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <FormField label="Đơn giá 1 tập (Token)">
-          <input
-            type="number"
-            min={1}
-            max={MAX_EPISODE_COST}
-            value={season.cost || ''}
-            onChange={(e) => patch({ cost: Number(e.target.value) })}
-            aria-label={`Đơn giá 1 tập của mùa ${number}`}
-            className={`${fieldInputClass} ${season.cost && !seasonCostValid(season.cost) ? 'border-rose-500' : ''}`}
-          />
-        </FormField>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <FormField label="Phát hành từ ngày">
           <input
             type="date"
@@ -118,9 +96,6 @@ export function SeasonDraftEditor({
           />
         </FormField>
       </div>
-      <p className="text-[11px] text-slate-500 dark:text-slate-400">
-        Dự trù kinh phí mùa = đơn giá × số tập = <strong>{formatNumber(estimate)} Token</strong>. Cấp phí ở tab Phí sản xuất sau khi tạo dự án.
-      </p>
 
       <DeadlineQuickFill
         onApply={(first, gap) => {

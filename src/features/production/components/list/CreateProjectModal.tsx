@@ -35,7 +35,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
     !releaseYearValid(info.releaseYear) ? 'năm phát hành từ 2000 đến 2100' : null,
     tooLarge([...info.ideaFiles, ...info.synopsisFiles]).length ? 'mỗi tệp tối đa 100 MB' : null,
     seasons.some((s) => !seasonValid(s))
-      ? 'mỗi mùa cần đơn giá tập (Token), khoảng phát hành hợp lệ và mọi tập có tiêu đề, thời lượng 1–720 phút, hạn giao không ở quá khứ'
+      ? 'mỗi mùa cần khoảng phát hành hợp lệ và mọi tập có tiêu đề, thời lượng 1–720 phút, hạn giao không ở quá khứ'
       : null,
   ].filter((issue): issue is string => issue !== null);
   const valid = validationIssues.length === 0;

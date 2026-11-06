@@ -196,14 +196,14 @@ export function OverviewTab() {
                   size="sm"
                   className="w-full mt-1"
                   variant="secondary"
-                  disabled={project.productionFeeTokens <= 0}
+                  disabled={project.cost.budgetVnd <= 0}
                   onClick={() => setAssigning(true)}
                 >
                   <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> {project.creator ? 'Đổi Creator' : 'Giao cho Creator'}
                 </Button>
-                {project.productionFeeTokens <= 0 && (
+                {project.cost.budgetVnd <= 0 && (
                   <p className="text-[11px] text-amber-600 dark:text-amber-400 text-center">
-                    Cấp phí cho từng mùa (tab Phí sản xuất) trước khi giao Creator.
+                    Chờ Admin đặt ngân sách sản xuất (tab Chi phí sản xuất) trước khi giao Creator.
                   </p>
                 )}
               </>

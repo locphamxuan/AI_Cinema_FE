@@ -71,7 +71,6 @@ export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: R
           seasons: [
             {
               title: 'Phần 1',
-              episodeProductionCost: 50,
               episodes: Array.from({ length: Math.max(1, episodesCount) }).map((_, i) => ({
                 title: `Tập ${i + 1}`,
                 targetDurationSeconds: 600,

@@ -9,7 +9,7 @@ import type { ChangeRequest } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { CHANGE_REQUEST_STATUS, CHANGE_REQUEST_TYPE } from '../../lib/labels';
 import { downloadFile } from '../../lib/download';
-import { formatDateTime, formatNumber } from '../../lib/format';
+import { formatDateTime } from '../../lib/format';
 import { StatusPill, TextPromptModal } from './ui';
 
 /** One request to the Admin: what was asked and why, the proof, and the Admin's decision (BR-55). */
@@ -68,7 +68,6 @@ export function ChangeRequestCard({
         <p className="font-semibold text-slate-700 dark:text-slate-200">Lý do</p>
         <p className="whitespace-pre-line text-slate-600 dark:text-slate-300">{cr.reason}</p>
       </div>
-      {cr.requestedTokens !== null && <p className="font-semibold text-amber-700 dark:text-amber-300">Xin thêm {formatNumber(Number(cr.requestedTokens))} Token</p>}
       {cr.attachmentName && (
         <Button size="sm" variant="ghost" onClick={proof}>
           <Download className="w-3.5 h-3.5" aria-hidden="true" /> Giấy tờ: {cr.attachmentName}

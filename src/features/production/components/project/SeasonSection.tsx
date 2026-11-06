@@ -8,7 +8,7 @@ import { getTodayDateString } from '@/lib/dateUtils';
 import { seasonLabel, seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { teamService } from '@/services/teamService';
-import type { CreatorSeat, Episode, Season, SeasonFee } from '@/types/production';
+import type { CreatorSeat, Episode, Season } from '@/types/production';
 import { useAction } from '../../hooks/useAction';
 import { useResource } from '../../hooks/useResource';
 import { BEFORE_APPROVAL_EPISODE, OPEN_PROJECT, TEAM_EDITABLE_PROJECT, isIn } from '../../lib/capabilities';
@@ -74,17 +74,15 @@ function Assignee({ episode, seats, editable }: { episode: Episode; seats: Creat
   );
 }
 
-/** One season: status, release window, price and the budget it needs, then its episodes (Mentor 14/10, §4.1.10). */
+/** One season: status and release window, then its episodes (Mentor 14/10, §4.1.10). */
 export function SeasonSection({
   season,
-  fee,
   seats,
   onAddEpisode,
   onEditSeason,
   onEditEpisode,
 }: {
   season: Season;
-  fee: SeasonFee | undefined;
   seats: CreatorSeat[];
   onAddEpisode: () => void;
   onEditSeason: () => void;
@@ -95,7 +93,6 @@ export function SeasonSection({
   const plan = caps.manage && isIn(project.status, OPEN_PROJECT);
   const assign = (caps.manage || caps.lead) && isIn(project.status, TEAM_EDITABLE_PROJECT);
   const today = getTodayDateString();
-  const cost = Number(season.episodeProductionCost);
 
   return (
     <section className={`${CARD} overflow-hidden`} aria-label={seasonName(season.seasonNumber, season.episodes.length)}>
@@ -106,10 +103,7 @@ export function SeasonSection({
             <StatusPill {...SEASON_STATUS[season.status]} />
           </h2>
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            Phát hành {season.releaseStartDate || season.releaseEndDate ? `${formatDay(season.releaseStartDate)} → ${formatDay(season.releaseEndDate)}` : 'chưa đặt khoảng'} ·
-            đơn giá {formatNumber(cost)} Token/tập · dự trù {formatNumber(fee?.baselineTokens ?? cost * season.episodes.length)} Token
-            {fee && fee.totalTokens > 0 && ` · đã cấp ${formatNumber(fee.totalTokens)}`}
-            {fee && fee.missingTokens > 0 && <span className="text-amber-600"> · thiếu {formatNumber(fee.missingTokens)}</span>}
+            Phát hành {season.releaseStartDate || season.releaseEndDate ? `${formatDay(season.releaseStartDate)} → ${formatDay(season.releaseEndDate)}` : 'chưa đặt khoảng'}
           </p>
         </div>
         <div className="flex gap-1">
@@ -136,7 +130,6 @@ export function SeasonSection({
                 <th className="px-3 py-2 font-medium">Tập</th>
                 <th className="px-3 py-2 font-medium">Trạng thái</th>
                 <th className="px-3 py-2 font-medium hidden md:table-cell">Creator phụ trách</th>
-                <th className="px-3 py-2 font-medium hidden lg:table-cell text-right">Giá sản xuất</th>
                 <th className="px-3 py-2 font-medium hidden sm:table-cell text-right">Giá bán (Coin)</th>
                 <th className="px-3 py-2 font-medium hidden md:table-cell">Ngày dự kiến phát hành</th>
                 <th className="px-3 py-2 font-medium hidden lg:table-cell">Hạn giao Studio</th>
@@ -164,7 +157,6 @@ export function SeasonSection({
                       <td className="px-3 py-2.5 hidden md:table-cell text-slate-600 dark:text-slate-300">
                         <Assignee episode={ep} seats={seats} editable={assign && ep.status !== 'PUBLISHED'} />
                       </td>
-                      <td className="px-3 py-2.5 hidden lg:table-cell text-right text-slate-600 dark:text-slate-300">{formatNumber(cost)} Token</td>
                       <td className="px-3 py-2.5 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{formatNumber(ep.coinPrice)}</td>
                       <td className="px-3 py-2.5 hidden md:table-cell text-slate-600 dark:text-slate-300">{formatDay(ep.expectedReleaseDate)}</td>
                       <td className={`px-3 py-2.5 hidden lg:table-cell ${overdue ? 'text-rose-600 font-semibold' : 'text-slate-600 dark:text-slate-300'}`}>

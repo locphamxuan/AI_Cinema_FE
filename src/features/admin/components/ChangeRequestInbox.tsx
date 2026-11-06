@@ -23,7 +23,7 @@ export function ChangeRequestInbox() {
   return (
     <Panel
       title="Đề xuất từ Reviewer và Creator"
-      description="Đề xuất chỉnh sửa dự án, xin thêm kinh phí hoặc gia hạn, kèm lý do và giấy tờ. Duyệt đề xuất xin kinh phí sẽ tự cấp Token cho Reviewer của dự án."
+      description="Đề xuất chỉnh sửa dự án hoặc gia hạn, kèm lý do và giấy tờ. Chi phí sản xuất được xin ở tab Yêu cầu thêm chi phí."
     >
       <div role="tablist" aria-label="Lọc đề xuất" className="flex flex-wrap gap-1 mb-4">
         {FILTERS.map(({ key, label }) => (

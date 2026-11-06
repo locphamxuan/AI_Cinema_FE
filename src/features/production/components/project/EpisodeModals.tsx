@@ -49,11 +49,10 @@ export function AddSeasonModal({ firstNumber, nextSeason, onClose }: { firstNumb
   );
 }
 
-/** Title, price of one episode and release window of a season. A new price after the allocation needs a top-up. */
+/** Title and release window of a season. */
 export function EditSeasonModal({ season, onClose }: { season: Season; onClose: () => void }) {
   const { reload } = useProject();
   const [title, setTitle] = useState(season.title ?? '');
-  const [cost, setCost] = useState(Number(season.episodeProductionCost));
   const [start, setStart] = useState(toDateInput(season.releaseStartDate));
   const [end, setEnd] = useState(toDateInput(season.releaseEndDate));
   const { busy, run } = useAction();
@@ -65,7 +64,6 @@ export function EditSeasonModal({ season, onClose }: { season: Season; onClose: 
       () =>
         productionService.updateSeason(season.id, {
           title: title.trim() || undefined,
-          episodeProductionCost: cost,
           releaseStartDate: start || null,
           releaseEndDate: end || null,
         }),
@@ -83,9 +81,6 @@ export function EditSeasonModal({ season, onClose }: { season: Season; onClose: 
         <FormField label="Tên mùa">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} className={fieldInputClass} />
         </FormField>
-        <FormField label="Đơn giá 1 tập (Token)">
-          <input type="number" min={1} value={cost || ''} onChange={(e) => setCost(Number(e.target.value))} required className={fieldInputClass} />
-        </FormField>
         <div className="grid grid-cols-2 gap-3">
           <FormField label="Phát hành từ ngày">
             <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className={fieldInputClass} />
@@ -98,7 +93,7 @@ export function EditSeasonModal({ season, onClose }: { season: Season; onClose: 
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !windowOk || !Number.isInteger(cost) || cost < 1}>
+          <Button type="submit" disabled={busy || !windowOk}>
             Lưu
           </Button>
         </div>

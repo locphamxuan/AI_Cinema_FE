@@ -36,7 +36,6 @@ export function EpisodesTab() {
         <SeasonSection
           key={season.id}
           season={season}
-          fee={project.seasonFees.find((fee) => fee.seasonId === season.id)}
           seats={team.data ?? []}
           onAddEpisode={() => setAddingTo(season)}
           onEditSeason={() => setEditingSeason(season)}
