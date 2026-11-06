@@ -28,7 +28,7 @@ import { ProjectProvider } from './ProjectContext';
 import { OverviewTab } from './OverviewTab';
 import { EpisodesTab } from './EpisodesTab';
 import { StudioTab } from './StudioTab';
-import { FeeTab } from './FeeTab';
+import { CostTab } from './CostTab';
 import { TeamTab } from './TeamTab';
 import { ChangeRequestsTab } from './ChangeRequestsTab';
 import { ActivityTab } from './ActivityTab';
@@ -38,7 +38,7 @@ const TABS = [
   { key: 'episodes', label: 'Mùa & tập phim', icon: Clapperboard },
   { key: 'team', label: 'Creator', icon: Users },
   { key: 'studio', label: 'Studio', icon: Layers },
-  { key: 'fee', label: 'Phí sản xuất', icon: CalendarClock },
+  { key: 'fee', label: 'Chi phí sản xuất', icon: CalendarClock },
   { key: 'changes', label: 'Đề xuất cho Admin', icon: ShieldCheck },
   { key: 'activity', label: 'Lịch sử', icon: History },
 ] as const;
@@ -182,7 +182,7 @@ export function ProjectDetailPage() {
           {tab === 'episodes' && <EpisodesTab />}
           {tab === 'team' && <TeamTab />}
           {tab === 'studio' && <StudioTab />}
-          {tab === 'fee' && <FeeTab />}
+          {tab === 'fee' && <CostTab />}
           {tab === 'changes' && <ChangeRequestsTab />}
           {tab === 'activity' && <ActivityTab />}
         </div>

@@ -13,10 +13,10 @@ import type {
   PriceAlertStatus,
   SeasonStatus,
   StudioMilestoneStatus,
-  TokenEntryType,
   UnpublishMode,
   UnpublishReason,
 } from '@/types/production';
+import type { CostEntryType, CostRequestStatus } from '@/types/cost';
 
 export type Tone = 'neutral' | 'amber' | 'emerald' | 'blue' | 'purple' | 'rose';
 
@@ -105,10 +105,16 @@ export const COMPLIANCE_RESULT: Record<ComplianceResult, Label> = {
   FAIL: { label: 'Không đạt', tone: 'rose' },
 };
 
-export const FEE_ENTRY: Record<TokenEntryType, string> = {
-  INITIAL: 'Cấp theo đơn giá mùa',
-  TOP_UP: 'Token thêm',
+export const COST_ENTRY: Record<CostEntryType, string> = {
+  BUDGET: 'Ngân sách ban đầu',
+  ADDITIONAL: 'Cấp thêm theo yêu cầu',
   CORRECTION: 'Điều chỉnh',
+};
+
+export const COST_REQUEST_STATUS: Record<CostRequestStatus, Label> = {
+  OPEN: { label: 'Chờ Admin duyệt', tone: 'amber' },
+  APPROVED: { label: 'Admin đã cấp', tone: 'emerald' },
+  REJECTED: { label: 'Admin từ chối', tone: 'rose' },
 };
 
 export const CHANGE_REQUEST_STATUS: Record<ChangeRequestStatus, Label> = {
@@ -119,7 +125,6 @@ export const CHANGE_REQUEST_STATUS: Record<ChangeRequestStatus, Label> = {
 
 export const CHANGE_REQUEST_TYPE: Record<ChangeRequestType, string> = {
   PROJECT_UPDATE: 'Chỉnh sửa dự án',
-  BUDGET_SUPPLEMENT: 'Xin thêm kinh phí',
   DEADLINE_EXTENSION: 'Gia hạn thời gian',
   OTHER: 'Khác',
 };
@@ -180,9 +185,12 @@ export const EVENT_LABEL: Record<string, string> = {
   PROJECT_UPDATED: 'Sửa thông tin dự án',
   IDEA_FILE_UPLOADED: 'Tải file ý tưởng',
   IDEA_FILE_DELETED: 'Xoá file ý tưởng',
-  FEE_ALLOCATED: 'Cấp phí sản xuất',
-  FEE_TOPPED_UP: 'Cấp thêm phí sản xuất',
-  FEE_CORRECTED: 'Điều chỉnh phí sản xuất',
+  COST_BUDGET_SET: 'Admin đặt ngân sách sản xuất',
+  COST_ADDED: 'Cấp thêm chi phí sản xuất',
+  COST_CORRECTED: 'Điều chỉnh ngân sách sản xuất',
+  COST_REQUESTED: 'Yêu cầu thêm chi phí sản xuất',
+  COST_REQUEST_APPROVED: 'Admin duyệt yêu cầu thêm chi phí',
+  COST_REQUEST_REJECTED: 'Admin từ chối yêu cầu thêm chi phí',
   PROJECT_ASSIGNED: 'Giao cho Creator',
   STUDIO_HANDOFF_SENT: 'Gửi brief cho studio',
   STUDIO_CHANGED: 'Đổi studio',
