@@ -10,7 +10,7 @@ import type {
   CreateProjectInput,
   Episode,
   EpisodeNote,
-  FeeLedger,
+  CostLedger,
   Genre,
   MediaAsset,
   MediaMetadataInput,
@@ -30,7 +30,6 @@ import type {
   Publication,
   ReviewDecision,
   ReviewSheet,
-  TokenEntryType,
   UnpublishMode,
   UnpublishReason,
   UpdateProjectInput,
@@ -101,14 +100,11 @@ export const productionService = {
   deleteIdeaFile: (movieId: string, fileId: string) => apiClient.delete<null>(R.IDEA_FILE(movieId, fileId)),
   downloadIdeaFile: (movieId: string, fileId: string) => apiClient.getBlob(R.IDEA_FILE_CONTENT(movieId, fileId)),
 
-  // ---- Production fee (Token, BR-45/46/50) ----
-  getFee: (movieId: string) => apiClient.get<FeeLedger>(R.FEE(movieId)),
-  /** INITIAL names the season (its amount is price × episodes); a top-up or correction may too. */
-  addFeeEntry: (
-    movieId: string,
-    entry: { entryType: TokenEntryType; seasonId?: string; amountTokens?: number; reason?: string },
-  ) =>
-    apiClient.post<FeeLedger>(R.FEE_ENTRIES(movieId), entry),
+  // ---- Production cost (VND, BR-45/46) ----
+  getCosts: (movieId: string) => apiClient.get<CostLedger>(R.COSTS(movieId)),
+  /** Admin: BUDGET once, then CORRECTION with a reason; ADDITIONAL only comes from an approved cost request. */
+  addCostEntry: (movieId: string, entry: { entryType: 'BUDGET' | 'CORRECTION'; amountVnd: number; reason?: string }) =>
+    apiClient.post<CostLedger>(R.COST_ENTRIES(movieId), entry),
 
   // ---- Media delivery (steps 5–7) ----
   listMedia: (episodeId: string) => apiClient.get<MediaAsset[]>(R.EPISODE_MEDIA(episodeId)),

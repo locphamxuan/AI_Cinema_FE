@@ -6,10 +6,12 @@
 export const PERMISSION = {
   // MF-1 - movie projects
   PROJECT_MANAGE: 'project:manage',
-  PROJECT_FEE_ALLOCATE: 'project:fee.allocate',
   PROJECT_READ_ALL: 'project:read.all',
   PROJECT_SUGGEST: 'project:suggest',
   PROJECT_CHANGE_REVIEW: 'project:change.review',
+  COST_REQUEST: 'cost:request',
+  COST_APPROVE: 'cost:approve',
+  COST_ADJUST: 'cost:adjust',
   STUDIO_HANDOFF: 'studio:handoff',
   STUDIO_MANAGE: 'studio:manage',
   MEDIA_INGEST: 'media:ingest',
@@ -41,7 +43,6 @@ export const PERMISSION = {
   USER_MANAGE: 'user:manage',
   ROLE_MANAGE: 'role:manage',
   PLATFORM_SETTINGS_MANAGE: 'platform:settings.manage',
-  TOKEN_BUDGET_MANAGE: 'token-budget:manage',
 } as const;
 
 export type PermissionKey = (typeof PERMISSION)[keyof typeof PERMISSION];

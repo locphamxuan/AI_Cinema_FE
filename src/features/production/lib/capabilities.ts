@@ -21,11 +21,12 @@ export interface ProjectCapabilities {
   creator: boolean;
   /** The lead Creator, who also gives episodes to the others. */
   lead: boolean;
-  feeAllocate: boolean;
+  /** Set and correct the production budget (VND): the Admin. */
+  costAdjust: boolean;
+  /** Ask the Admin for more production cost: the Reviewer who owns the project. */
+  costRequest: boolean;
   /** Speak to the studio: hand off, change studio, move milestones. Only the lead (BE `lead` role). */
   handoff: boolean;
-  /** Ask the Reviewer for more Token: only the lead. */
-  askTokens: boolean;
   ingest: boolean;
   review: boolean;
   publish: boolean;
@@ -53,9 +54,9 @@ export function projectCapabilities(
     manage: owner && can(PERMISSION.PROJECT_MANAGE),
     creator,
     lead,
-    feeAllocate: owner && can(PERMISSION.PROJECT_FEE_ALLOCATE),
+    costAdjust: can(PERMISSION.COST_ADJUST),
+    costRequest: owner && can(PERMISSION.COST_REQUEST),
     handoff: lead && can(PERMISSION.STUDIO_HANDOFF),
-    askTokens: lead && can(PERMISSION.PROJECT_SUGGEST),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),
     review: owner && can(PERMISSION.CONTENT_REVIEW),
     publish: owner && can(PERMISSION.EPISODE_PUBLISH),

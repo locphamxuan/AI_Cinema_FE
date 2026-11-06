@@ -7,12 +7,14 @@ import type {
   SeasonStatus,
   UserRole,
 } from './production-enums';
-import type { CreatorSeat, Person, SeasonFee, Studio, StudioHandoff } from './production-studio';
+import type { CostSummary } from './cost';
+import type { CreatorSeat, Person, Studio, StudioHandoff } from './production-studio';
 
 export * from './production-enums';
 export * from './production-media';
 export * from './production-requests';
 export * from './production-studio';
+export * from './cost';
 
 export interface Genre {
   id: string;
@@ -82,8 +84,6 @@ export interface Season {
   seasonNumber: number;
   title: string | null;
   status: SeasonStatus;
-  /** Token paid for one episode of this season (BR-37). */
-  episodeProductionCost: number | string;
   releaseStartDate: string | null;
   releaseEndDate: string | null;
   episodes: Episode[];
@@ -135,8 +135,8 @@ export interface ProjectDetail {
   ideaFiles: IdeaFile[];
   studioHandoffs: StudioHandoff[];
   creatorAssignments: CreatorSeat[];
-  productionFeeTokens: number;
-  seasonFees: SeasonFee[];
+  /** Budget, committed and left, in VND (BR-46). */
+  cost: CostSummary;
   openChangeRequests: number;
   revision: RevisionSummary;
 }
@@ -153,7 +153,6 @@ export interface ProjectEvent {
 
 export interface PlatformSettings {
   freeStarterEpisodeCount: number;
-  tokenRateVnd: number;
   coinRateVnd: number;
   episodeCoinPriceMin: number;
   episodeCoinPriceMax: number;

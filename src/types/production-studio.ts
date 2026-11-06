@@ -5,7 +5,6 @@ import type {
   HandoffMaterialKind,
   MediaIngestStatus,
   StudioMilestoneStatus,
-  TokenEntryType,
 } from './production-enums';
 
 export interface Person {
@@ -64,9 +63,10 @@ export interface StudioHandoff {
   studio: { id: string; name: string; email: string };
   season: { id: string; seasonNumber: number; title: string | null } | null;
   seasonId: string | null;
-  productionFeeTokens: number | string;
-  /** Token this hand-off cost when its studio was replaced (BR-59); 0 otherwise. */
-  lostTokens: number | string;
+  /** Fixed fee (VND) the brief offered the studio. */
+  offeredFeeVnd: number | string;
+  /** VND the studio kept when it was replaced (BR-59); 0 otherwise. */
+  forfeitedVnd: number | string;
   changeReason: string | null;
   briefFileKey: string | null;
   milestoneStatus: StudioMilestoneStatus;
@@ -100,51 +100,12 @@ export interface CreatorSeat {
   episodes: { id: string; episodeNumber: number; title: string; assignedCreatorId: string | null }[];
 }
 
-/** Production fee of one season: what it costs against what was paid out (BR-37, BR-46). */
-export interface SeasonFee {
-  seasonId: string;
-  seasonNumber: number;
-  title: string | null;
-  episodeProductionCost: number;
-  episodeCount: number;
-  baselineTokens: number;
-  allocatedTokens: number;
-  supplementTokens: number;
-  correctionTokens: number;
-  totalTokens: number;
-  missingTokens: number;
-  /** Spent on studios that were replaced: gone, never refunded (BR-59). */
-  lostTokens: number;
-  /** What a new brief of the season may still promise. */
-  availableTokens: number;
-  hasInitial: boolean;
-}
-
-export interface FeeEntry {
-  id: string;
-  entryType: TokenEntryType;
-  amountTokens: number | string;
-  rateVnd: number;
-  reason: string | null;
-  createdAt: string;
-  createdBy: Person;
-  season: { id: string; seasonNumber: number; title: string | null } | null;
-}
-
-export interface FeeLedger {
-  totalTokens: number;
-  totalVnd: number;
-  seasons: SeasonFee[];
-  entries: FeeEntry[];
-}
-
 export interface ChangeRequest {
   id: string;
   movieId: string;
   requestType: ChangeRequestType;
   content: string;
   reason: string;
-  requestedTokens: number | string | null;
   attachmentName: string | null;
   status: ChangeRequestStatus;
   adminResponse: string | null;

@@ -14,8 +14,6 @@ export interface NewEpisodeInput {
 
 export interface NewSeasonInput {
   title?: string;
-  /** Token the studio is paid for one episode (BR-37). */
-  episodeProductionCost: number;
   releaseStartDate?: string;
   releaseEndDate?: string;
   episodes: NewEpisodeInput[];
@@ -23,7 +21,6 @@ export interface NewSeasonInput {
 
 export interface UpdateSeasonInput {
   title?: string;
-  episodeProductionCost?: number;
   /** null clears the date. */
   releaseStartDate?: string | null;
   releaseEndDate?: string | null;
@@ -86,19 +83,22 @@ export interface HandOffInput {
   /** Falls back to the project's current studio (first hand-off only). */
   studioId?: string;
   seasonId?: string;
+  /** Fixed fee (VND) the brief offers the studio, at most the budget left. */
+  offeredFeeVnd: number;
   scripts?: File[];
   references?: File[];
 }
 
 export interface ChangeStudioInput extends HandOffInput {
   reason: string;
+  /** VND the replaced studio keeps; the rest of its fee returns to the budget. */
+  forfeitedVnd?: number;
 }
 
 export interface ChangeRequestInput {
   requestType: ChangeRequestType;
   content: string;
   reason: string;
-  requestedTokens?: number;
   seasonId?: string;
   episodeId?: string;
   proof?: File;

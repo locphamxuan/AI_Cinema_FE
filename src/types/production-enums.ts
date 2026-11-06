@@ -28,10 +28,9 @@ export type LabelLocation = 'TOP_RIGHT' | 'TOP_LEFT' | 'BOTTOM_RIGHT' | 'BOTTOM_
 export type ReviewDecision = 'APPROVED' | 'CHANGES_REQUESTED';
 export type ComplianceCheckType = 'AI_LABEL_PRESENCE' | 'DECREE_142_NOTICE' | 'CONTENT_SAFETY' | 'REAL_PERSON_LIKENESS';
 export type ComplianceResult = 'PENDING' | 'PASS' | 'FAIL';
-export type TokenEntryType = 'INITIAL' | 'TOP_UP' | 'CORRECTION';
 /** Requests go from a Reviewer or Creator to the Admin (BR-55). */
 export type ChangeRequestStatus = 'OPEN' | 'APPROVED' | 'REJECTED';
-export type ChangeRequestType = 'PROJECT_UPDATE' | 'BUDGET_SUPPLEMENT' | 'DEADLINE_EXTENSION' | 'OTHER';
+export type ChangeRequestType = 'PROJECT_UPDATE' | 'DEADLINE_EXTENSION' | 'OTHER';
 export type StudioMilestoneStatus =
   | 'BRIEF_SENT'
   | 'STUDIO_ACCEPTED'
