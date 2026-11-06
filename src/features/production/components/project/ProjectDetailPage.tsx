@@ -93,13 +93,13 @@ export function ProjectDetailPage() {
 
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
-      <main className="w-full bg-[#F8FAFC] dark:bg-[#0A0D14] min-h-screen text-slate-900 dark:text-slate-100 transition-colors duration-200">
-        <div className="bg-white dark:bg-[#0F121C] border-b border-slate-200 dark:border-white/10 transition-colors">
+      <main className="w-full bg-[#F8FAFC] dark:bg-[#090B10] min-h-screen text-slate-900 dark:text-slate-100 transition-colors duration-200">
+        <div className="bg-white dark:bg-[#0D1017] border-b border-slate-200 dark:border-white/[0.08] transition-colors">
           <div className="h-1 bg-gradient-to-r from-indigo-500 via-indigo-400 to-rose-400 dark:from-[#E50914] dark:via-[#D10813] dark:to-[#8B5CF6]" aria-hidden="true" />
           <div className="px-6 lg:px-8 pt-4 pb-5 space-y-4">
             <Link
               href={productionPaths.list(base)}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-[#E50914] hover:underline"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-red-400 hover:text-red-300 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Danh sách dự án
             </Link>
@@ -122,7 +122,7 @@ export function ProjectDetailPage() {
                 )}
               </div>
 
-              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3 shrink-0 rounded-2xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200/80 dark:border-white/10 px-5 py-3 shadow-xs">
+              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3 shrink-0 rounded-2xl bg-slate-50 dark:bg-[#121622] border border-slate-200/80 dark:border-white/[0.08] px-5 py-3 shadow-sm dark:shadow-md">
                 <Fact label="Reviewer" value={data.reviewer.fullName} />
                 <Fact label={caps.creator ? (caps.lead ? 'Creator chính (bạn)' : 'Creator chính') : 'Creator chính'} value={data.creator?.fullName ?? 'Chưa giao'} />
                 <Fact label="Studio" value={data.studio?.name ?? 'Chưa chọn'} />
@@ -141,7 +141,7 @@ export function ProjectDetailPage() {
                 onClick={() => selectTab(key)}
                 className={`shrink-0 flex items-center gap-2 px-4 py-3 text-sm border-b-2 whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none ${
                   tab === key
-                    ? 'border-indigo-600 dark:border-[#E50914] text-indigo-600 dark:text-white font-bold'
+                    ? 'border-indigo-600 dark:border-[#E50914] text-indigo-600 dark:text-[#E50914] font-bold'
                     : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >

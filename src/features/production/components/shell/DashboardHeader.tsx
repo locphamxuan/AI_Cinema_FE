@@ -44,7 +44,7 @@ export function DashboardHeader() {
   const AreaIcon = AREA_ICON[area] ?? Film;
 
   return (
-    <header className="bg-white/95 dark:bg-[#0F121C]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/10 sticky top-0 z-30 w-full transition-colors duration-200 text-slate-900 dark:text-white">
+    <header className="bg-white/95 dark:bg-[#0D1017]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/[0.08] sticky top-0 z-30 w-full transition-colors duration-200 text-slate-900 dark:text-white">
       <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
         {/* Logo + Area */}
         <Link href={AREAS[area].path} className="flex items-center gap-3 min-w-0 group">

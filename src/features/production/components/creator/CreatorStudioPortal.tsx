@@ -158,10 +158,10 @@ export function CreatorStudioPortal() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#F8FAFC] dark:bg-[#0A0D14] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
+    <div className="relative min-h-screen w-full bg-[#F8FAFC] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-200">
       {/* Ambient Cinema Glows (Dark Mode Only) */}
       <div
-        className="hidden dark:block pointer-events-none absolute top-0 left-1/4 w-[600px] h-[350px] bg-[#E50914] opacity-[0.04] blur-[140px] rounded-full"
+        className="hidden dark:block pointer-events-none absolute top-0 left-1/4 w-[600px] h-[350px] bg-[#E50914] opacity-[0.05] blur-[140px] rounded-full"
         aria-hidden="true"
       />
       <div
@@ -176,7 +176,7 @@ export function CreatorStudioPortal() {
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white dark:bg-white/[0.05] border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-300 shadow-xs">
               <span className="w-2 h-2 rounded-full bg-indigo-600 dark:bg-[#E50914] animate-ping" />
               <Clapperboard className="w-3.5 h-3.5 text-indigo-600 dark:text-[#E50914]" />
-              <span>Studio Partner Portal • Quản Trị Phát Hành</span>
+              <span>Studio Partner Portal • Quản Trị Phân Phối</span>
               {loadingBackend && (
                 <span className="flex items-center gap-1 text-[11px] text-slate-400 pl-2 border-l border-slate-200 dark:border-white/10">
                   <Loader2 className="w-3 h-3 animate-spin text-indigo-500 dark:text-purple-400" />
@@ -188,7 +188,7 @@ export function CreatorStudioPortal() {
               Studio Partner Portal
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed">
-              Quản lý danh mục phim, nộp hồ sơ phát hành và kiểm soát tuân thủ AI theo Điều 44.
+              Quản trị danh mục phim, nộp hồ sơ phân phối và thẩm định tuân thủ AI Điều 44.
             </p>
           </div>
 
@@ -196,7 +196,7 @@ export function CreatorStudioPortal() {
             <button
               type="button"
               onClick={() => setIsRegisterModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-[#E50914] dark:hover:bg-[#D10813] shadow-sm hover:shadow transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-[#E50914] dark:hover:bg-[#B81D24] shadow-md dark:shadow-lg dark:shadow-red-950/50 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>+ Đăng Ký Dự Án Phim</span>
@@ -221,7 +221,7 @@ export function CreatorStudioPortal() {
         {/* 4. Projects Content (Grid or Table) */}
         <section aria-label="Danh sách dự án phim">
           {filteredProjects.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-slate-300 dark:border-white/[0.12] p-12 text-center bg-white dark:bg-[#131722]/50">
+            <div className="rounded-2xl border border-dashed border-slate-300 dark:border-white/[0.12] p-12 text-center bg-white dark:bg-[#121622]/60">
               <Film className="w-12 h-12 mx-auto text-slate-400 dark:text-slate-600 mb-3" />
               <h3 className="text-base font-bold text-slate-900 dark:text-white">Không tìm thấy dự án nào</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
@@ -233,7 +233,7 @@ export function CreatorStudioPortal() {
                   setSearchQuery('');
                   setActiveFilter('all');
                 }}
-                className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-white/[0.08] dark:text-white dark:hover:bg-white/[0.12] transition-colors"
+                className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-white/[0.08] dark:text-white dark:hover:bg-white/[0.12] transition-colors cursor-pointer"
               >
                 Đặt lại bộ lọc
               </button>

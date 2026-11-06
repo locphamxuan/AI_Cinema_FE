@@ -107,11 +107,11 @@ export function OverviewTab() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       {/* ── Left: main info ── */}
       <div className="lg:col-span-2 space-y-5">
-        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-xs overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#121622] shadow-sm dark:shadow-xl overflow-hidden">
           <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/[0.06]">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-white/10 flex items-center justify-center">
-                <Film className="w-3.5 h-3.5 text-indigo-600 dark:text-[#E50914]" aria-hidden="true" />
+              <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-white/[0.06] border border-slate-200/50 dark:border-white/10 flex items-center justify-center">
+                <Film className="w-4 h-4 text-indigo-600 dark:text-[#E50914]" aria-hidden="true" />
               </div>
               <h2 className="text-base font-bold text-slate-900 dark:text-white">Thông tin phim</h2>
             </div>
@@ -156,10 +156,10 @@ export function OverviewTab() {
       <div className="space-y-5">
         <PosterPanel canManage={canEdit} />
 
-        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] shadow-xs overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#121622] shadow-sm dark:shadow-xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100 dark:border-white/[0.06]">
-            <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-white/10 flex items-center justify-center">
-              <UserPlus className="w-3.5 h-3.5 text-indigo-600 dark:text-[#E50914]" aria-hidden="true" />
+            <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-white/[0.06] border border-slate-200/50 dark:border-white/10 flex items-center justify-center">
+              <UserPlus className="w-4 h-4 text-indigo-600 dark:text-[#E50914]" aria-hidden="true" />
             </div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">Phân công</h2>
           </div>

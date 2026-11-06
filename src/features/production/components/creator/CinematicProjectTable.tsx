@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles, ArrowRight, ShieldCheck, Film, Building2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Film, Building2 } from 'lucide-react';
 import type { StudioProjectItem } from './types';
 
 interface CinematicProjectTableProps {
@@ -11,14 +11,14 @@ interface CinematicProjectTableProps {
 
 export function CinematicProjectTable({ projects, getHref }: CinematicProjectTableProps) {
   return (
-    <div className="w-full overflow-hidden rounded-2xl bg-white dark:bg-[#131722] border border-slate-200/80 dark:border-white/[0.08] shadow-xs">
+    <div className="w-full overflow-hidden rounded-2xl bg-white dark:bg-[#121622] border border-slate-200/80 dark:border-white/[0.08] shadow-sm dark:shadow-xl">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-slate-200 dark:border-white/[0.08] bg-slate-50/80 dark:bg-white/[0.02] text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
               <th className="py-4 px-5">Tác Phẩm & Studio</th>
-              <th className="py-4 px-4">Thể Loại & Tool AI</th>
-              <th className="py-4 px-4">Tiến Độ Tập</th>
+              <th className="py-4 px-4">Thể Loại & Quy Mô</th>
+              <th className="py-4 px-4">Tiến Độ Phát Hành</th>
               <th className="py-4 px-4">Trạng Thái & Điều 44</th>
               <th className="py-4 px-4">Cập Nhật</th>
               <th className="py-4 px-5 text-right">Thao Tác</th>
@@ -67,9 +67,9 @@ export function CinematicProjectTable({ projects, getHref }: CinematicProjectTab
                     </div>
                   </td>
 
-                  {/* Genre & AI Tools */}
+                  {/* Genre & Episodes */}
                   <td className="py-3.5 px-4">
-                    <div className="flex flex-col gap-1.5">
+                    <div className="flex flex-col gap-1">
                       <div className="flex flex-wrap gap-1">
                         {p.genreTags.slice(0, 2).map((tag) => (
                           <span
@@ -80,17 +80,9 @@ export function CinematicProjectTable({ projects, getHref }: CinematicProjectTab
                           </span>
                         ))}
                       </div>
-                      <div className="flex flex-wrap gap-1">
-                        {p.aiTools.slice(0, 2).map((tool) => (
-                          <span
-                            key={tool}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 dark:bg-[#8B5CF6]/15 text-indigo-700 dark:text-[#C4B5FD] border border-indigo-100 dark:border-[#8B5CF6]/30"
-                          >
-                            <Sparkles className="w-2.5 h-2.5 text-indigo-500 dark:text-[#A78BFA]" />
-                            {tool}
-                          </span>
-                        ))}
-                      </div>
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        {p.totalEpisodes} Tập
+                      </span>
                     </div>
                   </td>
 
@@ -98,14 +90,14 @@ export function CinematicProjectTable({ projects, getHref }: CinematicProjectTab
                   <td className="py-3.5 px-4 min-w-[140px]">
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-[11px]">
-                        <span className="font-semibold text-slate-900 dark:text-white">
+                        <span className="font-semibold text-slate-900 dark:text-white font-mono">
                           {p.approvedEpisodes} / {p.totalEpisodes} Tập
                         </span>
-                        <span className="text-slate-500 dark:text-slate-400">{progressPercent}%</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-mono">{progressPercent}%</span>
                       </div>
                       <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-white/[0.08] overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-rose-500 dark:from-[#8B5CF6] dark:to-[#E50914]"
+                          className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-rose-500 dark:from-[#E50914] dark:via-[#F59E0B] dark:to-[#10B981]"
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
@@ -118,9 +110,9 @@ export function CinematicProjectTable({ projects, getHref }: CinematicProjectTab
                       <span className="inline-block px-2.5 py-1 rounded-md text-[11px] font-semibold bg-slate-100 dark:bg-white/[0.06] text-slate-800 dark:text-white border border-slate-200 dark:border-white/10">
                         {p.statusLabel}
                       </span>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                        <span className="truncate max-w-[160px]">{p.complianceBadge.label}</span>
+                      <p className="text-[10px] text-emerald-400 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                        <span className="truncate max-w-[160px]">Đạt kiểm định Điều 44</span>
                       </p>
                     </div>
                   </td>
@@ -134,7 +126,7 @@ export function CinematicProjectTable({ projects, getHref }: CinematicProjectTab
                   <td className="py-3.5 px-5 text-right">
                     <Link
                       href={getHref(p)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-indigo-600 text-slate-700 hover:text-white border border-slate-200 hover:border-indigo-600 dark:bg-white/[0.06] dark:hover:bg-[#E50914] dark:text-white dark:border-white/[0.1] dark:hover:border-transparent text-xs font-semibold transition-all duration-200 shadow-xs"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-indigo-600 text-slate-700 hover:text-white border border-slate-200 hover:border-indigo-600 dark:bg-red-600/10 dark:hover:bg-[#E50914] dark:text-red-400 dark:hover:text-white dark:border-red-500/30 text-xs font-semibold transition-all duration-200 shadow-xs"
                     >
                       <span>Quản lý</span>
                       <ArrowRight className="w-3.5 h-3.5" />
