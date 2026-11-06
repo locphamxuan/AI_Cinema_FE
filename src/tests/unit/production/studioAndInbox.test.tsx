@@ -69,10 +69,9 @@ describe('ChangeRequestInbox (BR-55)', () => {
   const request = {
     id: 'cr1',
     movieId: 'm1',
-    requestType: 'BUDGET_SUPPLEMENT',
-    content: 'Studio báo giá lại, cần thêm Token.',
+    requestType: 'DEADLINE_EXTENSION',
+    content: 'Lùi hạn giao tập 2 thêm một tuần.',
     reason: 'Kịch bản dài hơn dự kiến.',
-    requestedTokens: '12000',
     attachmentName: 'bao-gia.pdf',
     status: 'OPEN',
     adminResponse: null,
@@ -85,14 +84,14 @@ describe('ChangeRequestInbox (BR-55)', () => {
     movie: { id: 'm1', title: 'Mưa Sài Gòn', reviewerId: 'r1' },
   };
 
-  it('lists open requests with their reason, proof and tokens for the Admin to decide', async () => {
+  it('lists open requests with their reason and proof for the Admin to decide', async () => {
     signInAs('admin');
     const calls = routeFetch({ '/change-requests': [request] });
     render(<ChangeRequestInbox />);
 
     expect(await screen.findByText('Mưa Sài Gòn')).toBeInTheDocument();
     expect(screen.getByText('Kịch bản dài hơn dự kiến.')).toBeInTheDocument();
-    expect(screen.getByText(/Xin thêm 12\.000 Token/)).toBeInTheDocument();
+    expect(screen.getByText('Gia hạn thời gian')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /bao-gia\.pdf/ })).toBeInTheDocument();
     expect(calls[0]).toMatchObject({ path: '/change-requests', method: 'GET' });
 

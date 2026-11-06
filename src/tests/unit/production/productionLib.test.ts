@@ -42,19 +42,19 @@ describe('production routes', () => {
 
 describe('projectCapabilities', () => {
   const project = { status: 'IN_PRODUCTION' as const, reviewerId: 'rev', creatorId: 'cre' };
-  const reviewerKeys = grant(PERMISSION.PROJECT_MANAGE, PERMISSION.PROJECT_FEE_ALLOCATE, PERMISSION.CONTENT_REVIEW, PERMISSION.EPISODE_PUBLISH);
+  const reviewerKeys = grant(PERMISSION.PROJECT_MANAGE, PERMISSION.COST_REQUEST, PERMISSION.CONTENT_REVIEW, PERMISSION.EPISODE_PUBLISH);
 
   it('lets only the Reviewer in charge manage, review and publish', () => {
-    expect(projectCapabilities(project, 'rev', reviewerKeys)).toMatchObject({ manage: true, review: true, publish: true, handoff: false });
+    expect(projectCapabilities(project, 'rev', reviewerKeys)).toMatchObject({ manage: true, review: true, publish: true, costRequest: true, handoff: false });
     // Another Reviewer holds the same permissions but does not own the project.
-    expect(projectCapabilities(project, 'other', reviewerKeys)).toMatchObject({ manage: false, review: false, publish: false });
+    expect(projectCapabilities(project, 'other', reviewerKeys)).toMatchObject({ manage: false, review: false, publish: false, costRequest: false });
   });
 
   it('lets only the lead Creator speak to the studio; the other Creators deliver their own episodes', () => {
     const creatorKeys = grant(PERMISSION.STUDIO_HANDOFF, PERMISSION.MEDIA_INGEST, PERMISSION.PROJECT_SUGGEST);
     const team = { ...project, creatorAssignments: [{ creatorId: 'cre' }, { creatorId: 'second' }] };
-    expect(projectCapabilities(team, 'cre', creatorKeys)).toMatchObject({ creator: true, lead: true, handoff: true, askTokens: true, ingest: true, manage: false });
-    expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, handoff: false, askTokens: false, ingest: true, delegate: true });
+    expect(projectCapabilities(team, 'cre', creatorKeys)).toMatchObject({ creator: true, lead: true, handoff: true, costRequest: false, ingest: true, manage: false });
+    expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, handoff: false, ingest: true, delegate: true });
     expect(projectCapabilities(team, 'someone', creatorKeys)).toMatchObject({ creator: false, handoff: false, ingest: false, suggest: false });
   });
 

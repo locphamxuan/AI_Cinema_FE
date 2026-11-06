@@ -47,11 +47,11 @@ describe('AdminSidebar', () => {
   it('lists the Admin sections, the requests and settings merged into one each', () => {
     signInAs('admin');
     render(<AdminSidebar />);
-    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
+    const nav = screen.getByRole('navigation', { name: 'ADMIN CONSOLE' });
     for (const label of ['Tài khoản & Phân quyền', 'Dự án phim', 'Duyệt yêu cầu', 'Quản lý phim', 'Cài đặt nền tảng']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }
-    for (const merged of ['Token Reviewer', 'Cảnh báo giá', 'Đề xuất chờ duyệt', 'Yêu cầu cấp thêm Token']) {
+    for (const merged of ['Cảnh báo giá', 'Đề xuất chờ duyệt', 'Yêu cầu thêm chi phí']) {
       expect(within(nav).queryByRole('link', { name: merged })).toBeNull();
     }
     expect(within(nav).getByRole('link', { name: 'Tài khoản & Phân quyền' })).toHaveAttribute('aria-current', 'page');

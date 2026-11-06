@@ -4,7 +4,7 @@ import { SectionTabs } from '@/features/admin/components/SectionTabs';
 import { PERMISSION } from '@/lib/permissions';
 import { signInAs } from '@/tests/support/signIn';
 
-const search = { tab: 'tokens' };
+const search = { tab: 'costs' };
 vi.mock('next/navigation', () => ({
   usePathname: () => '/admin/requests',
   useSearchParams: () => new URLSearchParams(search),
@@ -12,8 +12,8 @@ vi.mock('next/navigation', () => ({
 
 const tabs = [
   { key: 'changes', label: 'Đề xuất thay đổi', permission: PERMISSION.PROJECT_CHANGE_REVIEW, content: <p>Hộp đề xuất</p> },
-  { key: 'tokens', label: 'Xin thêm Token', permission: PERMISSION.PROJECT_CHANGE_REVIEW, content: <p>Danh sách xin Token</p> },
-  { key: 'budgets', label: 'Ngân sách Token Reviewer', permission: PERMISSION.TOKEN_BUDGET_MANAGE, content: <p>Ngân sách</p> },
+  { key: 'costs', label: 'Yêu cầu thêm chi phí', permission: PERMISSION.COST_APPROVE, content: <p>Danh sách yêu cầu chi phí</p> },
+  { key: 'budgets', label: 'Ngân sách', permission: PERMISSION.COST_ADJUST, content: <p>Ngân sách</p> },
 ];
 
 describe('SectionTabs', () => {
@@ -21,17 +21,17 @@ describe('SectionTabs', () => {
     signInAs('admin');
     render(<SectionTabs title="Duyệt yêu cầu" description="Mô tả" tabs={tabs} />);
 
-    expect(screen.getByText('Danh sách xin Token')).toBeInTheDocument();
+    expect(screen.getByText('Danh sách yêu cầu chi phí')).toBeInTheDocument();
     expect(screen.queryByText('Hộp đề xuất')).toBeNull();
-    expect(screen.getByRole('link', { name: 'Xin thêm Token' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: 'Ngân sách Token Reviewer' })).toHaveAttribute('href', '/admin/requests?tab=budgets');
+    expect(screen.getByRole('link', { name: 'Yêu cầu thêm chi phí' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Ngân sách' })).toHaveAttribute('href', '/admin/requests?tab=budgets');
   });
 
   it('hides the tabs a permission does not open and falls back to the first open one', () => {
-    signInAs('admin', [PERMISSION.TOKEN_BUDGET_MANAGE]);
+    signInAs('admin', [PERMISSION.COST_ADJUST]);
     render(<SectionTabs title="Duyệt yêu cầu" description="Mô tả" tabs={tabs} />);
 
     expect(screen.getByText('Ngân sách')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Xin thêm Token' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Yêu cầu thêm chi phí' })).toBeNull();
   });
 });

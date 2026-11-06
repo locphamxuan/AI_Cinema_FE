@@ -59,7 +59,6 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
         seasonNumber: 1,
         title: 'Mùa 1',
         status: 'DRAFT',
-        episodeProductionCost: 500,
         releaseStartDate: '2027-01-01T00:00:00.000Z',
         releaseEndDate: '2027-03-31T00:00:00.000Z',
         episodes: [
@@ -91,8 +90,7 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
     ideaFiles: [],
     studioHandoffs: [],
     creatorAssignments: [],
-    productionFeeTokens: 500,
-    seasonFees: [],
+    cost: { budgetVnd: 100_000_000, committedVnd: 0, remainingVnd: 100_000_000 },
     openChangeRequests: 0,
     revision: { episodeCount: 0, bySeason: [] },
     ...overrides,
@@ -198,6 +196,13 @@ describe('ProjectDetailPage', () => {
     await userEvent.type(await within(dialog).findByLabelText('Tên Studio'), 'Studio Ánh Trăng');
     expect(send).toBeDisabled();
     await userEvent.type(within(dialog).getByLabelText('Email Studio'), 'contact@anhtrang.studio');
+    // The fee is VND in whole thousands and fits in the budget left (100 000 000).
+    expect(send).toBeDisabled();
+    const fee = within(dialog).getByLabelText('Phí đề xuất');
+    await userEvent.type(fee, '100001000');
+    expect(send).toBeDisabled();
+    await userEvent.clear(fee);
+    await userEvent.type(fee, '80000000');
     expect(send).toBeEnabled();
   });
 
@@ -227,9 +232,8 @@ describe('ProjectDetailPage', () => {
 
     const season = await screen.findByRole('region', { name: 'Phần 1 (trọn bộ)' });
     expect(season).toHaveTextContent('01/01/2027 → 31/03/2027');
-    expect(season).toHaveTextContent('đơn giá 500 Token/tập');
+    expect(season).not.toHaveTextContent('Token');
     expect(within(season).getByRole('columnheader', { name: 'Creator phụ trách' })).toBeInTheDocument();
-    expect(within(season).getByRole('columnheader', { name: 'Giá sản xuất' })).toBeInTheDocument();
     expect(within(season).getByRole('columnheader', { name: 'Giá bán (Coin)' })).toBeInTheDocument();
     expect(within(season).getByRole('columnheader', { name: 'Ngày dự kiến phát hành' })).toBeInTheDocument();
     expect(within(season).queryByRole('columnheader', { name: 'Thời hạn' })).not.toBeInTheDocument();

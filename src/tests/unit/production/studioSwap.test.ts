@@ -1,46 +1,28 @@
 import { describe, expect, it } from 'vitest';
-import { lostOnReplace, swapPreview } from '@/features/production/lib/studioSwap';
-import type { SeasonFee } from '@/types/production';
+import { swapPreview } from '@/features/production/lib/studioSwap';
 
 type Status = 'BRIEF_SENT' | 'STUDIO_ACCEPTED' | 'IN_PROGRESS' | 'DELIVERED' | 'STUDIO_DECLINED' | 'SUPERSEDED';
 
-const handoff = (
-  seasonId: string | null,
-  milestoneStatus: Status,
-  fee: number,
-  lost = 0,
-  email: 'QUEUED' | 'SENT' | 'FAILED' = 'SENT',
-) => ({ seasonId, milestoneStatus, productionFeeTokens: fee, lostTokens: lost, emailMessage: { status: email } });
-
-const fee = (seasonId: string, availableTokens: number) => ({ seasonId, availableTokens }) as SeasonFee;
+const handoff = (seasonId: string | null, milestoneStatus: Status, offeredFeeVnd: number) => ({ seasonId, milestoneStatus, offeredFeeVnd });
+const cost = (remainingVnd: number) => ({ budgetVnd: 0, committedVnd: 0, remainingVnd });
 
 describe('studio swap preview (BR-59)', () => {
-  it('spends the fee of a studio that got the brief, not of one that declined or never got it', () => {
-    expect(lostOnReplace(handoff(null, 'IN_PROGRESS', 500))).toBe(500);
-    expect(lostOnReplace(handoff(null, 'STUDIO_DECLINED', 500))).toBe(0);
-    expect(lostOnReplace(handoff(null, 'BRIEF_SENT', 500, 0, 'FAILED'))).toBe(0);
+  it('gives the replaced fee back to the budget when the old studio keeps nothing', () => {
+    const project = { cost: cost(10_000_000), studioHandoffs: [handoff('s1', 'IN_PROGRESS', 40_000_000), handoff('s2', 'BRIEF_SENT', 50_000_000)] };
+    expect(swapPreview(project, 's2')).toEqual({ replacedFeeVnd: 50_000_000, maxOfferVnd: 60_000_000 });
   });
 
-  it('leaves nothing for the new studio when the season fee went to the old one', () => {
+  it('takes off what the old studio keeps, never more than its fee', () => {
+    const project = { cost: cost(10_000_000), studioHandoffs: [handoff('s1', 'DELIVERED', 40_000_000)] };
+    expect(swapPreview(project, 's1', 15_000_000)).toEqual({ replacedFeeVnd: 40_000_000, maxOfferVnd: 35_000_000 });
+    expect(swapPreview(project, 's1', 90_000_000).maxOfferVnd).toBe(10_000_000);
+  });
+
+  it('ignores hand-offs already replaced and other scopes', () => {
     const project = {
-      productionFeeTokens: 900,
-      seasonFees: [fee('s1', 400), fee('s2', 500)],
-      studioHandoffs: [handoff('s1', 'IN_PROGRESS', 400), handoff('s2', 'BRIEF_SENT', 500)],
+      cost: cost(5_000_000),
+      studioHandoffs: [handoff(null, 'SUPERSEDED', 30_000_000), handoff(null, 'IN_PROGRESS', 20_000_000), handoff('s1', 'IN_PROGRESS', 9_000_000)],
     };
-    expect(swapPreview(project, 's2')).toEqual({ lostTokens: 500, availableTokens: 0 });
-  });
-
-  it('gives the new studio a top-up made after an earlier swap', () => {
-    const project = {
-      productionFeeTokens: 1300,
-      seasonFees: [fee('s1', 400)],
-      studioHandoffs: [handoff('s1', 'STUDIO_DECLINED', 400), handoff('s1', 'SUPERSEDED', 500, 500)],
-    };
-    expect(swapPreview(project, 's1')).toEqual({ lostTokens: 0, availableTokens: 400 });
-  });
-
-  it('works on the whole project when no season is picked', () => {
-    const project = { productionFeeTokens: 1000, seasonFees: [], studioHandoffs: [handoff(null, 'DELIVERED', 600)] };
-    expect(swapPreview(project, null)).toEqual({ lostTokens: 600, availableTokens: 400 });
+    expect(swapPreview(project, null)).toEqual({ replacedFeeVnd: 20_000_000, maxOfferVnd: 25_000_000 });
   });
 });

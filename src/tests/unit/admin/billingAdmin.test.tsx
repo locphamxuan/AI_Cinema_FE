@@ -68,7 +68,7 @@ describe('Admin MF-2 sections', () => {
   it('opens the billing and reward sections to the Admin', () => {
     signInAs('admin');
     render(<AdminSidebar />);
-    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
+    const nav = screen.getByRole('navigation', { name: 'ADMIN CONSOLE' });
     for (const label of ['Gói thành viên & Doanh thu', 'Giao dịch Coin', 'Điểm danh & vòng quay']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }
@@ -192,7 +192,6 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
     signInAs('admin');
     const settings = {
       freeStarterEpisodeCount: 2,
-      tokenRateVnd: 1000,
       coinRateVnd: 1000,
       episodeCoinPriceMin: 1,
       episodeCoinPriceMax: 50,

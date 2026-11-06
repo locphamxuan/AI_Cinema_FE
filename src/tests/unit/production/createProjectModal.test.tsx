@@ -35,7 +35,6 @@ it('sends the viewer information with the project and uploads idea and synopsis 
   const files = screen.getAllByLabelText(/Tệp (ý tưởng gửi Studio|tóm tắt cho người xem)/) as HTMLInputElement[];
   await userEvent.upload(files[0], new File(['idea'], 'y-tuong.docx'));
   await userEvent.upload(files[1], new File(['video'], 'teaser.mp4', { type: 'video/mp4' }));
-  fireEvent.change(screen.getByLabelText('Đơn giá 1 tập của mùa 1'), { target: { value: '3000' } });
   fireEvent.change(screen.getByLabelText('Hạn giao tập 1'), { target: { value: getTodayDateString() } });
   fireEvent.change(screen.getByLabelText('Hạn giao tập 2'), { target: { value: getTodayDateString() } });
 
@@ -49,6 +48,7 @@ it('sends the viewer information with the project and uploads idea and synopsis 
     releaseYear: 2026,
     genreIds: ['g1'],
   });
+  expect(created!.body as string).not.toContain('episodeProductionCost');
   const uploads = calls.filter((c) => c.path === '/projects/m-new/idea-files');
   expect(uploads).toHaveLength(2);
 });
