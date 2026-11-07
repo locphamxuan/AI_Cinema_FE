@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { costRequestService } from '@/services/costRequestService';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
-import { formatVnd } from '../../lib/format';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatVnd } from '@/lib/format';
 import { CostRequestCard, parseVnd } from '../shared/CostRequestCard';
 import { FilePicker } from '../shared/FilePicker';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 const PROOF_ACCEPT = '.pdf,.docx,.txt,.png,.jpg,.jpeg,.webp';

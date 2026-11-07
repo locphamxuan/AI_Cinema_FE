@@ -7,8 +7,8 @@ import { Modal } from '@/components/ui/Modal';
 import { getTodayDateString } from '@/lib/dateUtils';
 import { productionService } from '@/services/productionService';
 import type { Episode, Season } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { toDateInput } from '../../lib/format';
+import { useAction } from '@/hooks/useAction';
+import { toDateInput } from '@/lib/format';
 import {
   MAX_EPISODE_MINUTES,
   deadlineValid,

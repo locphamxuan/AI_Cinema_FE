@@ -5,45 +5,51 @@ import AuthForm from '@/components/auth/AuthForm';
 import { useToastStore } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 
+const push = vi.fn();
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ push, replace: vi.fn() }),
 }));
 
-describe('AuthForm sign-up', () => {
-  const register = vi.fn();
+describe('AuthForm sign-in', () => {
+  const login = vi.fn();
 
   beforeEach(() => {
-    register.mockReset().mockResolvedValue({ success: true });
+    push.mockReset();
+    login.mockReset().mockResolvedValue({ success: true, redirectUrl: '/reviewer' });
     localStorage.clear();
     useToastStore.setState({ toasts: [] });
-    useAppStore.setState({ register });
+    useAppStore.setState({ login });
   });
 
-  it('asks for every field of the account and sends them to the backend', async () => {
-    render(<AuthForm initialMode="register" />);
+  it('offers email and password only: no sign-up and no Google', () => {
+    render(<AuthForm />);
 
-    await userEvent.type(screen.getByLabelText('Họ và tên'), 'Nguyễn Minh Anh');
-    await userEvent.type(screen.getByLabelText(/Ngày sinh/), '2000-05-14');
-    await userEvent.type(screen.getByLabelText('Email'), 'anh@example.com');
-    await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.type(screen.getByLabelText('Nhập lại mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Tạo Tài Khoản' }));
-
-    expect(register).toHaveBeenCalledWith('Nguyễn Minh Anh', 'anh@example.com', 'matkhau123', '2000-05-14');
-    expect(useToastStore.getState().toasts[0]?.title).toBe('Tài khoản của bạn đã được tạo thành công.');
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.getByLabelText('Mật khẩu')).toBeInTheDocument();
+    expect(screen.queryByText(/Đăng Ký|Tạo tài khoản/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Google/)).not.toBeInTheDocument();
   });
 
-  it('stops when the two passwords differ', async () => {
-    render(<AuthForm initialMode="register" />);
+  it('goes to the area of the role after signing in', async () => {
+    render(<AuthForm />);
 
-    await userEvent.type(screen.getByLabelText('Họ và tên'), 'Nguyễn Minh Anh');
-    await userEvent.type(screen.getByLabelText(/Ngày sinh/), '2000-05-14');
-    await userEvent.type(screen.getByLabelText('Email'), 'anh@example.com');
+    await userEvent.type(screen.getByLabelText('Email'), 'reviewer@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.type(screen.getByLabelText('Nhập lại mật khẩu'), 'matkhau124');
-    await userEvent.click(screen.getByRole('button', { name: 'Tạo Tài Khoản' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Mật khẩu nhập lại không khớp.');
-    expect(register).not.toHaveBeenCalled();
+    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123');
+    expect(push).toHaveBeenCalledWith('/reviewer');
+  });
+
+  it('shows why a sign-in was refused and stays on the form', async () => {
+    login.mockResolvedValue({ success: false, error: 'Tài khoản thành viên chỉ dùng được trên ứng dụng di động AI Cinema.' });
+    render(<AuthForm />);
+
+    await userEvent.type(screen.getByLabelText('Email'), 'member@example.com');
+    await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+
+    expect(screen.getByRole('alert')).toHaveTextContent('ứng dụng di động');
+    expect(push).not.toHaveBeenCalled();
   });
 });

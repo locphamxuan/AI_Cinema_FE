@@ -7,9 +7,9 @@ import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { PlatformSettings } from '@/types/production';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime } from '@/features/production/lib/format';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime } from '@/lib/format';
 
 type Key = { [K in keyof PlatformSettings]-?: PlatformSettings[K] extends number ? K : never }[keyof PlatformSettings];
 
@@ -44,6 +44,14 @@ const STREAMING_FIELDS: SettingField[] = [
 const ALL_FIELDS = [...COIN_FIELDS, ...PRODUCTION_FIELDS, ...STREAMING_FIELDS];
 
 type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards';
+
+const TABS: { key: SettingsTab; label: string; Icon?: typeof Coins }[] = [
+  { key: 'all', label: 'Tất cả' },
+  { key: 'coin', label: 'COIN & Nạp tiền', Icon: Coins },
+  { key: 'production', label: 'Giá tập', Icon: Clapperboard },
+  { key: 'streaming', label: 'Phát sóng & Gói', Icon: Radio },
+  { key: 'rewards', label: 'Điểm danh & Vòng quay', Icon: Gift },
+];
 
 /** Segmented platform policies: Coin, Production, Playback & Rewards */
 export function PlatformSettingsPanel() {
@@ -104,7 +112,7 @@ export function PlatformSettingsPanel() {
               step={1}
               value={value(f.key)}
               onChange={(e) => setDraft({ ...draft, [f.key]: e.target.value })}
-              className={`${fieldInputClass} w-28 py-1.5 text-right font-mono`}
+              className={`${fieldInputClass} w-28 py-1.5 text-right tabular-nums`}
             />
             <span className="w-20 text-slate-500">{f.unit}</span>
           </span>
@@ -113,13 +121,30 @@ export function PlatformSettingsPanel() {
     </div>
   );
 
+  const refundToggle = (
+    <div className="p-3 rounded-2xl bg-sky-50/50 dark:bg-sky-500/5 border border-sky-200/50 dark:border-sky-500/10">
+      <label className="flex items-start gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={refund ?? current.refundOnRemoval}
+          onChange={(e) => setRefund(e.target.checked)}
+          className="mt-0.5 accent-sky-600"
+        />
+        <span>
+          <span className="block font-semibold text-slate-800 dark:text-slate-200">Hoàn Coin khi gỡ hẳn tập</span>
+          <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả.</span>
+        </span>
+      </label>
+    </div>
+  );
+
   return (
-    <section className="bg-white dark:bg-[#131722] rounded-3xl border border-slate-200/80 dark:border-white/[0.08] p-6 sm:p-8 space-y-6 max-w-3xl shadow-sm">
+    <section className="bg-white dark:bg-card rounded-3xl border border-sky-100 dark:border-white/10 p-6 sm:p-8 space-y-6 max-w-3xl shadow-sm">
       <div className="border-b border-slate-100 dark:border-white/5 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Cài đặt nền tảng</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Cập nhật lần cuối: <span className="font-mono text-slate-700 dark:text-slate-300">{formatDateTime(current.updatedAt)}</span>
+            Cập nhật lần cuối: <span className="tabular-nums text-slate-700 dark:text-slate-300">{formatDateTime(current.updatedAt)}</span>
           </p>
         </div>
         {changes > 0 && (
@@ -131,69 +156,21 @@ export function PlatformSettingsPanel() {
 
       {/* Segmented Navigation Tabs */}
       <div className="flex flex-wrap gap-1.5 border-b border-slate-100 dark:border-white/5 pb-3">
-        <button
-          type="button"
-          onClick={() => setActiveTab('all')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'all'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <span>Tất cả</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('coin')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'coin'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Coins className="w-3.5 h-3.5" />
-          <span>COIN & Nạp tiền</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('production')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'production'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Clapperboard className="w-3.5 h-3.5" />
-          <span>Giá tập</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('streaming')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'streaming'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Radio className="w-3.5 h-3.5" />
-          <span>Phát sóng & Gói</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('rewards')}
-          className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'rewards'
-              ? 'bg-indigo-600 dark:bg-[#E50914] text-white shadow-sm scale-[1.03]'
-              : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
-          }`}
-        >
-          <Gift className="w-3.5 h-3.5" />
-          <span>Điểm danh & Vòng quay</span>
-        </button>
+        {TABS.map(({ key, label, Icon }) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setActiveTab(key)}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === key
+                ? 'bg-sky-500 text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
+            }`}
+          >
+            {Icon && <Icon className="w-3.5 h-3.5" />}
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
 
       <form onSubmit={save} className="space-y-5 text-xs">
@@ -201,36 +178,23 @@ export function PlatformSettingsPanel() {
         {activeTab === 'all' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Coins className="w-3.5 h-3.5" /> Phân khúc COIN & Nạp tiền
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
+                Phân khúc COIN & Nạp tiền
               </h3>
               {renderFieldGroup(COIN_FIELDS)}
-              <div className="mt-3 p-3 rounded-2xl bg-sky-50/50 dark:bg-sky-500/5 border border-sky-200/50 dark:border-sky-500/10">
-                <label className="flex items-start gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={refund ?? current.refundOnRemoval}
-                    onChange={(e) => setRefund(e.target.checked)}
-                    className="mt-0.5 accent-sky-600"
-                  />
-                  <span>
-                    <span className="block font-semibold text-slate-800 dark:text-slate-200">Hoàn Coin khi gỡ hẳn tập</span>
-                    <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả.</span>
-                  </span>
-                </label>
-              </div>
+              <div className="mt-3">{refundToggle}</div>
             </div>
 
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Clapperboard className="w-3.5 h-3.5" /> Khoảng giá tập
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
+                Khoảng giá tập
               </h3>
               {renderFieldGroup(PRODUCTION_FIELDS)}
             </div>
 
             <div>
-              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5" /> Phân khúc Phát sóng & Gia hạn gói
+              <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
+                Phân khúc Phát sóng & Gia hạn gói
               </h3>
               {renderFieldGroup(STREAMING_FIELDS)}
             </div>
@@ -241,20 +205,7 @@ export function PlatformSettingsPanel() {
         {activeTab === 'coin' && (
           <div className="space-y-4">
             {renderFieldGroup(COIN_FIELDS)}
-            <div className="p-3 rounded-2xl bg-sky-50/50 dark:bg-sky-500/5 border border-sky-200/50 dark:border-sky-500/10">
-              <label className="flex items-start gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={refund ?? current.refundOnRemoval}
-                  onChange={(e) => setRefund(e.target.checked)}
-                  className="mt-0.5 accent-sky-600"
-                />
-                <span>
-                  <span className="block font-semibold text-slate-800 dark:text-slate-200">Hoàn Coin khi gỡ hẳn tập</span>
-                  <span className="block text-slate-500 dark:text-slate-400">Người đã mua tập bị gỡ hẳn được hoàn đúng Coin đã trả.</span>
-                </span>
-              </label>
-            </div>
+            {refundToggle}
             {topUpInvalid && <p className="text-rose-600">Mức nạp tối thiểu không được lớn hơn mức tối đa.</p>}
           </div>
         )}
@@ -278,9 +229,6 @@ export function PlatformSettingsPanel() {
         {activeTab === 'rewards' && (
           <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                <Gift className="w-5 h-5" />
-              </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">Quy tắc thưởng & Vòng quay may mắn</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -294,7 +242,7 @@ export function PlatformSettingsPanel() {
             <div className="pt-2">
               <Link
                 href="/admin/rewards"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 hover:scale-[1.02] text-white font-bold text-xs transition-all duration-200 shadow-md shadow-amber-500/20"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors shadow-md shadow-amber-500/20"
               >
                 <span>Mở trang Quản lý Điểm danh & Vòng quay</span>
                 <ArrowRight className="w-3.5 h-3.5" />

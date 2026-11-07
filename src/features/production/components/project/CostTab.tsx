@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { CostLedger } from '@/types/cost';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { OPEN_PROJECT, isIn } from '../../lib/capabilities';
 import { COST_ENTRY } from '../../lib/labels';
-import { formatDateTime, formatVnd } from '../../lib/format';
+import { formatDateTime, formatVnd } from '@/lib/format';
 import { parseVnd } from '../shared/CostRequestCard';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { CostRequestPanel } from './CostRequestPanel';
 import { useProject } from './ProjectContext';
 

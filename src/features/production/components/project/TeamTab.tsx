@@ -1,17 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRightLeft, UserMinus, UserPlus } from 'lucide-react';
+import { UserMinus } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useAppStore } from '@/store/useAppStore';
 import { teamService } from '@/services/teamService';
 import type { CreatorSeat } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { TEAM_EDITABLE_PROJECT, isIn } from '../../lib/capabilities';
-import { formatDateTime } from '../../lib/format';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { formatDateTime } from '@/lib/format';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { AddCreatorModal, DelegateModal } from './TeamModals';
 import { useProject } from './ProjectContext';
 
@@ -42,12 +42,12 @@ export function TeamTab() {
         <>
           {caps.manage && editable && project.creator && (
             <Button size="sm" variant="secondary" onClick={() => setAdding(true)}>
-              <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm Creator
+              Thêm Creator
             </Button>
           )}
           {caps.delegate && editable && mySeat && (
             <Button size="sm" variant="secondary" onClick={() => setDelegating(true)}>
-              <ArrowRightLeft className="w-3.5 h-3.5" aria-hidden="true" /> Uỷ quyền tập
+              Uỷ quyền tập
             </Button>
           )}
         </>

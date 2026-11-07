@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { productionService } from '@/services/productionService';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 
-export const MAX_GENRES = 5;
+const MAX_GENRES = 5;
 
 /** Toggle chips over the genre catalog; at most MAX_GENRES (BR-12). */
 export function GenrePicker({ value, onChange }: { value: string[]; onChange: (ids: string[]) => void }) {
@@ -73,7 +73,7 @@ export function GenrePicker({ value, onChange }: { value: string[]; onChange: (i
             className={`${fieldInputClass} py-1.5`}
           />
           <Button type="button" size="sm" variant="secondary" disabled={!newName.trim() || busy} onClick={add}>
-            <Plus className="w-3.5 h-3.5" aria-hidden="true" /> Thêm
+            Thêm
           </Button>
         </div>
       )}

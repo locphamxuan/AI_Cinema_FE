@@ -47,7 +47,7 @@ describe('AdminSidebar', () => {
   it('lists the Admin sections, the requests and settings merged into one each', () => {
     signInAs('admin');
     render(<AdminSidebar />);
-    const nav = screen.getByRole('navigation', { name: 'ADMIN CONSOLE' });
+    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
     for (const label of ['Tài khoản & Phân quyền', 'Dự án phim', 'Duyệt yêu cầu', 'Quản lý phim', 'Cài đặt nền tảng']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }

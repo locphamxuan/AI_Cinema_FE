@@ -1,23 +1,18 @@
 'use client';
 
 import { ButtonHTMLAttributes, forwardRef } from 'react';
+import { buttonVariants } from '@/components/shadcn/button';
+import { cn } from '@/lib/utils';
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
 type Size = 'sm' | 'md';
 
-const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: 'bg-action hover:bg-action-strong text-white shadow-sm',
-  secondary:
-    'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 dark:bg-white/10 dark:hover:bg-white/15 dark:text-slate-100 dark:border-white/10',
-  ghost:
-    'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-white/10',
-  danger: 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm',
-  success: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm',
-};
-
-const SIZE_CLASSES: Record<Size, string> = {
-  sm: 'px-3 py-1.5 text-xs',
-  md: 'px-4 py-2 text-sm',
+const VARIANT: Record<Variant, 'default' | 'outline' | 'ghost' | 'destructive'> = {
+  primary: 'default',
+  secondary: 'outline',
+  ghost: 'ghost',
+  danger: 'destructive',
+  success: 'default',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,13 +20,18 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: Size;
 }
 
-/** Shared button primitive - keeps action styling consistent across the MF1 dashboards instead of every page hand-rolling its own Tailwind classes. */
+/** The app's button: the shadcn button with the variant names the screens use. */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', className = '', disabled, ...props }, ref) => (
+  ({ variant = 'primary', size = 'md', className, ...props }, ref) => (
     <button
       ref={ref}
-      disabled={disabled}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-xl font-semibold transition cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action/40 focus-visible:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]} ${className}`}
+      className={cn(
+        buttonVariants({ variant: VARIANT[variant], size: size === 'sm' ? 'sm' : 'lg' }),
+        'font-semibold',
+        size === 'md' && 'px-4',
+        variant === 'success' && 'bg-success text-white hover:bg-success/85',
+        className,
+      )}
       {...props}
     />
   )

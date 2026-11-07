@@ -6,7 +6,7 @@ import type { ChangeRequest, ChangeRequestInput, ChangeRequestStatus, CreatorSea
 const R = API_ROUTES.PRODUCTION;
 
 /** Multipart body of a change request: the text fields and, optionally, the proof file. */
-export function changeRequestForm(input: ChangeRequestInput): FormData {
+function changeRequestForm(input: ChangeRequestInput): FormData {
   const form = new FormData();
   form.append('requestType', input.requestType);
   form.append('content', input.content);

@@ -5,11 +5,11 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { contractService } from '@/services/contractService';
 import type { Contract } from '@/types/contract';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { CONTRACT_STATUS } from '../../lib/labels';
-import { formatDateTime, formatVnd } from '../../lib/format';
+import { formatDateTime, formatVnd } from '@/lib/format';
 import { parseVnd } from './CostRequestCard';
-import { StatusPill } from './ui';
+import { StatusPill } from '@/components/data/ui';
 
 /** One round of a hand-off's contract negotiation: the cost proposed (if any) and who has signed so far. */
 export function ContractCard({

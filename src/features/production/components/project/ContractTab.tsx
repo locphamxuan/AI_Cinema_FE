@@ -2,11 +2,11 @@
 
 import { contractService } from '@/services/contractService';
 import type { Contract } from '@/types/contract';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { ContractCard } from '../shared/ContractCard';
 import { Button } from '@/components/ui/Button';
-import { Empty, ErrorNote, Loading, Panel } from '../shared/ui';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
 
 /**

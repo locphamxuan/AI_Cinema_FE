@@ -1,18 +1,29 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Inter } from "next/font/google";
+import { Be_Vietnam_Pro, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "@/components/layout/ClientLayout";
+import { cn } from "@/lib/utils";
 
-const inter = Inter({
-  variable: "--font-inter",
+// Be Vietnam Pro is drawn for Vietnamese, so stacked diacritics stay crisp at small sizes.
+const body = Be_Vietnam_Pro({
+  variable: "--font-face-body",
   subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+// Titles and big figures.
+const display = Bricolage_Grotesque({
+  variable: "--font-face-display",
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "AI Cinema - Nền Tảng Streaming Phim AI",
+  title: "AI Cinema - Quản trị nội dung",
   description:
-    "AI Cinema - Nền tảng OTT Streaming phim AI với hệ thống ví tiền tệ kép, tuân thủ quy chuẩn nội dung số Việt Nam.",
+    "Khu làm việc của Reviewer, Creator, Staff và Admin trên AI Cinema.",
   keywords: ["AI Cinema", "streaming", "phim AI", "OTT", "Việt Nam"],
 };
 
@@ -37,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={`${inter.variable} h-full antialiased`} suppressHydrationWarning>
+    <html lang="vi" className={cn("h-full antialiased", body.variable, display.variable)} suppressHydrationWarning>
       <head>
         <Script id="theme-script" strategy="beforeInteractive">
           {themeInitScript}

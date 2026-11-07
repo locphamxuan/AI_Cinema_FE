@@ -6,8 +6,8 @@ import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { teamService } from '@/services/teamService';
 import type { CreatorSeat } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
-import { useResource } from '../../hooks/useResource';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { useProject } from './ProjectContext';
 
 function CreatorSelect({ value, onChange, exclude }: { value: string; onChange: (id: string) => void; exclude: string[] }) {

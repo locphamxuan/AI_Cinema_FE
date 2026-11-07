@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { costRequestService } from '@/services/costRequestService';
 import type { CostRequestStatus } from '@/types/cost';
-import { useResource } from '@/features/production/hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { CostRequestCard } from '@/features/production/components/shared/CostRequestCard';
 import { productionPaths } from '@/features/production/lib/routes';
-import { Empty, ErrorNote, Loading, Panel } from '@/features/production/components/shared/ui';
+import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 
 const FILTERS: { key: CostRequestStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Chờ duyệt' },

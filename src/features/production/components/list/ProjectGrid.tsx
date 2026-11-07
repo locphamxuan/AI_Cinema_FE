@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Building2, Clock, Film } from 'lucide-react';
+import { Film } from 'lucide-react';
 import type { MovieStatus, ProjectSummary } from '@/types/production';
 import { MOVIE_STATUS } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime } from '@/lib/format';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
-import { StatusPill } from '../shared/ui';
+import { StatusPill } from '@/components/data/ui';
 
 const STATUS_GRADIENTS: Record<MovieStatus, string> = {
   DRAFT: 'from-slate-600 via-slate-700 to-slate-800',
@@ -58,11 +58,11 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
           <li key={p.id}>
             <Link
               href={productionPaths.project(base, p.id)}
-              className="group flex flex-col h-full rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#131722] hover:border-indigo-400 dark:hover:border-[#E50914]/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/5 dark:hover:shadow-[#E50914]/10 transition-all duration-300 overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 dark:focus-visible:ring-[#E50914]/50"
+              className="group flex flex-col h-full rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card hover:border-sky-400/60 dark:hover:border-sky-500/50 hover:shadow-2xl hover:shadow-sky-500/10 dark:hover:shadow-sky-900/30 transition-all duration-300 overflow-hidden"
             >
               <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-900">
                 <ProjectPoster title={p.title} posterUrl={p.posterUrl} status={p.status} />
-                <div className="absolute top-3 left-3 z-10 drop-shadow-md">
+                <div className="absolute top-3 left-3 z-10 rounded-full bg-background/90 shadow-sm backdrop-blur-sm">
                   <StatusPill {...MOVIE_STATUS[p.status]} />
                 </div>
                 <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/95 via-black/60 to-transparent flex items-center justify-between z-10">
@@ -73,27 +73,25 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
                     title="Cập nhật lần cuối"
                     className="text-white text-[11px] font-semibold px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/20 shadow-md flex items-center gap-1.5"
                   >
-                    <Clock className="w-3.5 h-3.5 text-indigo-300 dark:text-rose-400 shrink-0" aria-hidden="true" />
                     {formatDateTime(p.lastActivityAt)}
                   </span>
                 </div>
               </div>
 
               <div className="p-4 flex-1 flex flex-col justify-between gap-3">
-                <h2 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-[#E50914] transition-colors">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-sky-700 dark:group-hover:text-sky-500 transition-colors">
                   {p.title}
                 </h2>
                 <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300">
                   {p.studio && (
                     <p className="flex items-center gap-2">
-                      <Building2 className="w-3.5 h-3.5 text-amber-500 shrink-0" aria-hidden="true" />
                       <span className="truncate font-medium">{p.studio.name}</span>
                     </p>
                   )}
                   <p className="flex items-center gap-2">
                     <span
                       aria-hidden="true"
-                      className="w-4 h-4 rounded-full bg-indigo-500/15 text-indigo-600 dark:bg-[#E50914]/20 dark:text-[#E50914] font-bold flex items-center justify-center text-xs shrink-0"
+                      className="w-4 h-4 rounded-full bg-sky-500/15 text-sky-700 dark:text-sky-500 font-bold flex items-center justify-center text-xs shrink-0"
                     >
                       {inCharge?.charAt(0) ?? '?'}
                     </span>

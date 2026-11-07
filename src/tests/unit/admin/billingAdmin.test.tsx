@@ -68,7 +68,7 @@ describe('Admin MF-2 sections', () => {
   it('opens the billing and reward sections to the Admin', () => {
     signInAs('admin');
     render(<AdminSidebar />);
-    const nav = screen.getByRole('navigation', { name: 'ADMIN CONSOLE' });
+    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
     for (const label of ['Gói thành viên & Doanh thu', 'Giao dịch Coin', 'Điểm danh & vòng quay']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }

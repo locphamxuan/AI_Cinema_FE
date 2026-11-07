@@ -28,17 +28,3 @@ export interface LoginCredentials {
 
 export type AuthRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
 
-export interface RegisterCredentials {
-  name: string;
-  email: string;
-  password: string;
-  /** YYYY-MM-DD; Members must be 18 or older (BR-54). */
-  dateOfBirth: string;
-}
-
-/** Body of POST /auth/google; the extras answer the step a first Google sign-in asks for. */
-export interface GoogleSignIn {
-  idToken: string;
-  dateOfBirth?: string;
-  password?: string;
-}

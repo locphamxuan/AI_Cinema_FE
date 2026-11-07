@@ -12,9 +12,6 @@ describe('application messages', () => {
     expect(localizeApiError('This account has been deactivated', 403, undefined, '/auth/login')).toBe(
       APPLICATION_MESSAGES.MSG08.message,
     );
-    expect(
-      localizeApiError('AI Cinema is only for viewers aged 18 or older', 403, undefined, '/auth/register'),
-    ).toBe(APPLICATION_MESSAGES.MSG07.message);
   });
 
   it('localizes BE business errors using their messages and detail reasons', () => {

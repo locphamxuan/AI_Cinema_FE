@@ -81,9 +81,10 @@ const CREATOR_TABS: NotificationTab[] = [
   {
     key: 'reviewer',
     label: 'Reviewer',
-    description: 'Giao dự án / tập, kết quả duyệt và đề xuất.',
+    description: 'Giao dự án / tập, trao đổi về tập, kết quả duyệt và đề xuất.',
     sections: [
       section('assign', 'Giao việc', 'PROJECT_ASSIGNED', 'EPISODE_ASSIGNED', 'PROJECT_CANCELLED'),
+      section('notes', 'Trao đổi về tập', 'EPISODE_NOTE'),
       section('review', 'Kết quả duyệt', 'CONTENT_APPROVED', 'CONTENT_CHANGES_REQUESTED'),
       section('change', 'Đề xuất', 'PROJECT_CHANGE_RESOLVED'),
     ],

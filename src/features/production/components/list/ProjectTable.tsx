@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ProjectSummary } from '@/types/production';
 import { MOVIE_STATUS } from '../../lib/labels';
-import { formatDateTime } from '../../lib/format';
+import { formatDateTime } from '@/lib/format';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
-import { CARD, StatusPill } from '../shared/ui';
+import { CARD, StatusPill } from '@/components/data/ui';
 
 /** The projects as a table; a Creator sees who reviews each one, the others who creates it. */
 export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; base: ProductionBase }) {
@@ -34,11 +34,11 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
           {projects.map((p) => {
             const href = productionPaths.project(base, p.id);
             return (
-              <tr key={p.id} onClick={() => router.push(href)} className="hover:bg-slate-50/80 dark:hover:bg-white/[0.03] cursor-pointer transition-colors duration-150">
+              <tr key={p.id} onClick={() => router.push(href)} className="hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors">
                 <td className="px-4 py-3">
                   <Link
                     href={href}
-                  className="font-semibold text-slate-900 dark:text-white hover:text-indigo-600 dark:hover:text-[#E50914] underline-offset-2 hover:underline decoration-indigo-400/50 dark:decoration-[#E50914]/50 transition-colors duration-150"
+                    className="font-semibold text-slate-900 dark:text-white hover:underline hover:text-sky-700"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {p.title}
@@ -51,7 +51,7 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
                 <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">
                   {(isCreator ? p.reviewer : p.creator)?.fullName ?? 'Chưa giao'}
                 </td>
-                <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300 font-bold font-mono">
+                <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300 font-bold tabular-nums">
                   {p._count.episodes}
                 </td>
                 <td className="px-4 py-3 hidden lg:table-cell text-slate-500 dark:text-slate-400">{formatDateTime(p.lastActivityAt)}</td>

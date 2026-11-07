@@ -6,7 +6,7 @@ import { Clapperboard, ShieldCheck, Users, Sparkles, Film } from 'lucide-react';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
-import { AREAS, PERMISSION, ROLE_LABEL, canEnter, type Area } from '@/lib/permissions';
+import { AREAS, PERMISSION, ROLE_LABEL, type Area } from '@/lib/permissions';
 import { AccountMenu } from './AccountMenu';
 import { NotificationMenu } from './NotificationMenu';
 
@@ -20,7 +20,8 @@ const AREA_ICON: Record<Area, React.ElementType> = {
 };
 
 /**
- * Topbar supporting both Clean Modern Light Mode (Apple/Linear/Vercel) and Cinema Dark Mode.
+ * Slim top bar of every internal area: where you are, notifications, theme and the account menu.
+ * Every role shares the brand colours; the role shows only in its badge.
  */
 export function DashboardHeader() {
   const pathname = usePathname();
@@ -31,10 +32,6 @@ export function DashboardHeader() {
   const area = AREA_ORDER.find((a) => pathname.startsWith(`/${a}`)) ?? 'reviewer';
   // The Admin oversees production: it reads every project and decides the change requests, never edits a project (BR-55).
   const oversight = area === 'reviewer' && !can(PERMISSION.PROJECT_MANAGE) && can(PERMISSION.PROJECT_READ_ALL);
-  const links = AREA_ORDER.filter((a) => a !== area && canEnter(a, user?.role)).map((a) => ({
-    href: AREAS[a].path,
-    label: AREAS[a].label,
-  }));
 
   const handleLogout = () => {
     logout();
@@ -44,23 +41,19 @@ export function DashboardHeader() {
   const AreaIcon = AREA_ICON[area] ?? Film;
 
   return (
-    <header className="bg-white/95 dark:bg-[#0F121C]/95 backdrop-blur-md border-b border-slate-200 dark:border-white/10 sticky top-0 z-30 w-full transition-colors duration-200 text-slate-900 dark:text-white">
+    <header className="sticky top-0 z-30 w-full border-b bg-background/90 backdrop-blur-md">
       <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
         {/* Logo + Area */}
         <Link href={AREAS[area].path} className="flex items-center gap-3 min-w-0 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 dark:from-[#E50914] dark:to-[#B91C1C] flex items-center justify-center shrink-0 shadow-sm shadow-indigo-200 dark:shadow-red-950/40 group-hover:scale-105 transition-transform text-white">
-            <AreaIcon className="w-4 h-4" aria-hidden="true" />
+          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <AreaIcon className="size-4" aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <span className="text-sm font-bold text-slate-900 dark:text-white leading-tight block tracking-tight group-hover:text-indigo-600 dark:group-hover:text-red-400 transition-colors">
-              AI Cinema
-            </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">
-              {area === 'creator' ? 'Sản xuất nội dung' : AREAS[area].label}
-            </span>
+            <span className="block font-heading text-sm font-semibold leading-tight">AI Cinema</span>
+            <span className="text-xs leading-tight text-muted-foreground">{AREAS[area].label}</span>
           </div>
           {oversight && (
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/15">
+            <span className="rounded-md border border-primary/20 bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
               Chế độ giám sát
             </span>
           )}
@@ -71,15 +64,15 @@ export function DashboardHeader() {
           {user && (
             <span
               aria-label="Vai trò của tài khoản"
-              className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-red-500/30 bg-slate-100/80 dark:bg-red-500/10 text-xs font-semibold text-slate-700 dark:text-red-200"
+              className="hidden items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground sm:flex"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-[#E50914] animate-pulse" aria-hidden="true" />
+              <span className="size-1.5 rounded-full bg-highlight" aria-hidden="true" />
               {ROLE_LABEL[user.role ?? 'user']}
             </span>
           )}
           {user && <NotificationMenu />}
           <ThemeToggle />
-          <AccountMenu name={user?.name ?? 'Tài khoản'} roleLabel={ROLE_LABEL[user?.role ?? 'user']} onLogout={handleLogout} links={links} />
+          <AccountMenu name={user?.name ?? 'Tài khoản'} roleLabel={ROLE_LABEL[user?.role ?? 'user']} onLogout={handleLogout} profileHref={`/${area}/profile`} />
         </div>
       </div>
     </header>

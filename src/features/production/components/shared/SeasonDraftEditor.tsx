@@ -59,7 +59,7 @@ export function SeasonDraftEditor({
   const window = { start: season.windowStart, end: season.windowEnd };
 
   return (
-    <div className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3 space-y-3">
+    <div className="rounded-xl border border-sky-100 dark:border-white/10 p-3 space-y-3">
       <div className="flex items-center gap-2">
         <input
           value={season.title}

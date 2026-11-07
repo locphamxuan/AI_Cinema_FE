@@ -7,11 +7,11 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { costRequestService } from '@/services/costRequestService';
 import type { CostRequest } from '@/types/cost';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { COST_REQUEST_STATUS } from '../../lib/labels';
 import { downloadFile } from '../../lib/download';
-import { formatDateTime, formatVnd } from '../../lib/format';
-import { StatusPill, TextPromptModal } from './ui';
+import { formatDateTime, formatVnd } from '@/lib/format';
+import { StatusPill, TextPromptModal } from '@/components/data/ui';
 
 /** Whole thousands of VND typed in a field; NaN when it is not one. */
 export function parseVnd(text: string): number {
