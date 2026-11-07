@@ -29,6 +29,7 @@ import { OverviewTab } from './OverviewTab';
 import { EpisodesTab } from './EpisodesTab';
 import { StudioTab } from './StudioTab';
 import { CostTab } from './CostTab';
+import { ContractTab } from './ContractTab';
 import { TeamTab } from './TeamTab';
 import { ChangeRequestsTab } from './ChangeRequestsTab';
 import { ActivityTab } from './ActivityTab';
@@ -39,6 +40,7 @@ const TABS = [
   { key: 'team', label: 'Creator', icon: Users },
   { key: 'studio', label: 'Studio', icon: Layers },
   { key: 'fee', label: 'Chi phí sản xuất', icon: CalendarClock },
+  { key: 'contract', label: 'Hợp đồng', icon: ShieldCheck },
   { key: 'changes', label: 'Đề xuất cho Admin', icon: ShieldCheck },
   { key: 'activity', label: 'Lịch sử', icon: History },
 ] as const;
@@ -183,6 +185,7 @@ export function ProjectDetailPage() {
           {tab === 'team' && <TeamTab />}
           {tab === 'studio' && <StudioTab />}
           {tab === 'fee' && <CostTab />}
+          {tab === 'contract' && <ContractTab />}
           {tab === 'changes' && <ChangeRequestsTab />}
           {tab === 'activity' && <ActivityTab />}
         </div>
