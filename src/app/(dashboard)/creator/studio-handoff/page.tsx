@@ -9,11 +9,6 @@ import {
   Clock,
   ArrowRight,
   FileCheck2,
-  Calendar,
-  Layers,
-  FileText,
-  AlertCircle,
-  ExternalLink,
 } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 
@@ -113,177 +108,179 @@ export default function StudioHandoffPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#090B10] text-slate-100 px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
-      {/* Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/[0.05] border border-white/10 text-slate-300 mb-2">
-            <Handshake className="w-3.5 h-3.5 text-[#E50914]" />
-            <span>Chuyển Giao Sản Xuất & Hợp Đồng Studio</span>
-          </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">
-            Tiến Độ Chuyển Giao Studio
-          </h1>
-          <p className="text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            Theo dõi tiến trình ký kết hợp đồng gia công phim, bàn giao storyboard & kịch bản phân cảnh cho các đối tác Studio bên ngoài.
-          </p>
-        </div>
-
-        <Link
-          href="/creator/projects"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/10 text-xs font-bold transition-all shrink-0 cursor-pointer"
-        >
-          <span>Quay Lại Kịch Bản</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
-      </header>
-
-      {/* Top 3 Metric Cards for Handoff */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-[#111420] border border-white/[0.08] p-5 shadow-xl">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Hợp Đồng Đã Ký</p>
-          <p className="text-3xl font-extrabold text-white mt-2 font-mono">4 Dự án</p>
-          <p className="text-xs text-emerald-400 mt-1 flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Đã bàn giao gói kịch bản
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-[#111420] border border-white/[0.08] p-5 shadow-xl">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Đang Gia Công Phim</p>
-          <p className="text-3xl font-extrabold text-white mt-2 font-mono">2 Studio</p>
-          <p className="text-xs text-amber-400 mt-1 flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" /> Theo sát tiến độ dựng phim
-          </p>
-        </div>
-
-        <div className="rounded-2xl bg-[#111420] border border-white/[0.08] p-5 shadow-xl">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Đang Đàm Phán Ký Kết</p>
-          <p className="text-3xl font-extrabold text-white mt-2 font-mono">1 Dự án</p>
-          <p className="text-xs text-purple-400 mt-1 flex items-center gap-1">
-            <Handshake className="w-3.5 h-3.5" /> Thẩm định giá thầu sản xuất
-          </p>
-        </div>
-      </div>
-
-      {/* Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 border-b border-white/[0.08]">
-        {[
-          { key: 'ALL', label: 'Tất cả chuyển giao' },
-          { key: 'IN_PRODUCTION', label: 'Đang sản xuất' },
-          { key: 'CONTRACT_SIGNED', label: 'Đã ký hợp đồng' },
-          { key: 'NEGOTIATING', label: 'Đang thương lượng' },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setFilter(tab.key as any)}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              filter === tab.key
-                ? 'bg-[#E50914] text-white shadow-xs font-bold'
-                : 'bg-[#111420] text-slate-400 hover:text-white border border-white/[0.08]'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* List of Handoff Projects */}
-      <div className="space-y-4">
-        {filtered.map((item) => {
-          const isProd = item.status === 'IN_PRODUCTION';
-          const isSigned = item.status === 'CONTRACT_SIGNED';
-
-          return (
-            <div
-              key={item.id}
-              className="rounded-2xl bg-[#111420] border border-white/[0.08] p-6 shadow-xl hover:border-white/20 transition-all space-y-4"
-            >
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-white/[0.06]">
-                <div className="space-y-1">
-                  <span
-                    className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border mb-1 ${
-                      isProd
-                        ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                        : isSigned
-                          ? 'bg-teal-500/15 text-teal-400 border-teal-500/30'
-                          : 'bg-purple-500/15 text-purple-400 border-purple-500/30'
-                    }`}
-                  >
-                    {item.statusLabel}
-                  </span>
-                  <h3 className="text-xl font-bold text-white">{item.projectTitle}</h3>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-400">
-                    <span className="flex items-center gap-1.5 font-semibold text-amber-400">
-                      <Building2 className="w-3.5 h-3.5" />
-                      {item.studioName}
-                    </span>
-                    <span>•</span>
-                    <span className="font-mono text-slate-300">{item.contractNumber}</span>
-                    <span>•</span>
-                    <span>Quy mô: {item.episodesCount} tập kịch bản</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => handleInspectPackage(item.projectTitle)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/10 text-xs font-semibold transition-all cursor-pointer"
-                  >
-                    <FileCheck2 className="w-4 h-4 text-emerald-400" />
-                    <span>Xem Hồ Sơ Bàn Giao</span>
-                  </button>
-                  <Link
-                    href="/creator/projects"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-red-600/10 hover:bg-[#E50914] text-red-400 hover:text-white border border-red-500/30 text-xs font-semibold transition-all cursor-pointer"
-                  >
-                    <span>Kịch Bản Chi Tiết</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Handoff Assets Checklist */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 pt-1">
-                {[
-                  { label: 'Kịch bản phân cảnh', checked: item.handoffAssets.screenplay },
-                  { label: 'Thiết lập nhân vật (Bible)', checked: item.handoffAssets.characterBible },
-                  { label: 'Phác thảo Storyboard', checked: item.handoffAssets.storyboard },
-                  { label: 'Hướng dẫn lồng tiếng / Âm thoại', checked: item.handoffAssets.voiceGuidelines },
-                ].map((asset, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-center gap-2.5 p-3 rounded-xl border text-xs font-medium ${
-                      asset.checked
-                        ? 'bg-emerald-500/[0.05] border-emerald-500/20 text-emerald-300'
-                        : 'bg-white/[0.02] border-white/[0.06] text-slate-500'
-                    }`}
-                  >
-                    {asset.checked ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                    ) : (
-                      <Clock className="w-4 h-4 text-slate-500 shrink-0" />
-                    )}
-                    <span className="truncate">{asset.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Notes & Timeline */}
-              <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.04] text-xs text-slate-300 space-y-2">
-                <p className="leading-relaxed">
-                  <span className="text-slate-400 font-semibold">Tình trạng chuyển giao:</span> {item.notes}
-                </p>
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[11px] text-slate-400 pt-1 border-t border-white/[0.04]">
-                  <span>Ký hợp đồng: <strong className="text-slate-200">{item.signedDate}</strong></span>
-                  <span>Thời hạn Studio bàn giao phim: <strong className="text-slate-200">{item.deliveryDate}</strong></span>
-                  <span>Đại diện Studio: <strong className="text-amber-400">{item.contactPerson}</strong></span>
-                </div>
-              </div>
+    <div className="min-h-screen w-full bg-[#FAF9F6] dark:bg-[#0D0F17] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6 font-sans">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Header Greeting Card */}
+        <header className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-6 sm:p-7 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-400/10 border border-amber-200/60 dark:border-amber-400/20 text-amber-800 dark:text-amber-300 mb-2">
+              <Handshake className="w-3.5 h-3.5" />
+              <span>Chuyển Giao Sản Xuất & Hợp Đồng Studio</span>
             </div>
-          );
-        })}
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Tiến Độ Chuyển Giao Studio
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
+              Theo dõi tiến trình ký kết hợp đồng gia công phim, bàn giao storyboard & kịch bản phân cảnh cho các đối tác Studio bên ngoài.
+            </p>
+          </div>
+
+          <Link
+            href="/creator/projects"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs sm:text-sm font-bold shadow-xs transition-all shrink-0 cursor-pointer"
+          >
+            <span>Quay lại Kịch Bản</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </header>
+
+        {/* Top 3 Metric Cards for Handoff */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-6 shadow-xs">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Hợp Đồng Đã Ký</p>
+            <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2 font-mono">4 Dự án</p>
+            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Đã bàn giao gói kịch bản
+            </p>
+          </div>
+
+          <div className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-6 shadow-xs">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Đang Gia Công Phim</p>
+            <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2 font-mono">2 Studio</p>
+            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1 font-semibold">
+              <Clock className="w-3.5 h-3.5" /> Theo sát tiến độ dựng phim
+            </p>
+          </div>
+
+          <div className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-6 shadow-xs">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Đang Đàm Phán Ký Kết</p>
+            <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-2 font-mono">1 Dự án</p>
+            <p className="text-xs text-purple-600 dark:text-purple-400 mt-1 flex items-center gap-1 font-semibold">
+              <Handshake className="w-3.5 h-3.5" /> Thẩm định giá thầu sản xuất
+            </p>
+          </div>
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {[
+            { key: 'ALL', label: 'Tất cả chuyển giao' },
+            { key: 'IN_PRODUCTION', label: 'Đang sản xuất' },
+            { key: 'CONTRACT_SIGNED', label: 'Đã ký hợp đồng' },
+            { key: 'NEGOTIATING', label: 'Đang thương lượng' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setFilter(tab.key as any)}
+              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                filter === tab.key
+                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm font-bold'
+                  : 'bg-white dark:bg-[#141724] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-white/10'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* List of Handoff Projects */}
+        <div className="space-y-4">
+          {filtered.map((item) => {
+            const isProd = item.status === 'IN_PRODUCTION';
+            const isSigned = item.status === 'CONTRACT_SIGNED';
+
+            return (
+              <div
+                key={item.id}
+                className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-6 sm:p-7 shadow-xs hover:shadow-md transition-all space-y-4"
+              >
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-white/[0.06]">
+                  <div className="space-y-1">
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border mb-1 ${
+                        isProd
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'
+                          : isSigned
+                            ? 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-500/15 dark:text-teal-300 dark:border-teal-500/30'
+                            : 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30'
+                      }`}
+                    >
+                      {item.statusLabel}
+                    </span>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{item.projectTitle}</h3>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
+                      <span className="flex items-center gap-1.5 font-bold text-amber-600 dark:text-amber-400">
+                        <Building2 className="w-3.5 h-3.5" />
+                        {item.studioName}
+                      </span>
+                      <span>•</span>
+                      <span className="font-mono text-slate-700 dark:text-slate-300 font-semibold">{item.contractNumber}</span>
+                      <span>•</span>
+                      <span>Quy mô: {item.episodesCount} tập kịch bản</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleInspectPackage(item.projectTitle)}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/[0.06] dark:hover:bg-white/10 text-slate-800 dark:text-white text-xs font-semibold transition-all cursor-pointer"
+                    >
+                      <FileCheck2 className="w-4 h-4 text-emerald-500" />
+                      <span>Xem Hồ Sơ Bàn Giao</span>
+                    </button>
+                    <Link
+                      href="/creator/projects"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 text-xs font-bold transition-all cursor-pointer"
+                    >
+                      <span>Kịch Bản Chi Tiết</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Handoff Assets Checklist */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-1">
+                  {[
+                    { label: 'Kịch bản phân cảnh', checked: item.handoffAssets.screenplay },
+                    { label: 'Thiết lập nhân vật (Bible)', checked: item.handoffAssets.characterBible },
+                    { label: 'Phác thảo Storyboard', checked: item.handoffAssets.storyboard },
+                    { label: 'Hướng dẫn lồng tiếng', checked: item.handoffAssets.voiceGuidelines },
+                  ].map((asset, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex items-center gap-2.5 p-3 rounded-2xl border text-xs font-semibold ${
+                        asset.checked
+                          ? 'bg-emerald-50 dark:bg-emerald-500/[0.08] border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-300'
+                          : 'bg-slate-50 dark:bg-white/[0.02] border-slate-200/60 dark:border-white/[0.06] text-slate-400'
+                      }`}
+                    >
+                      {asset.checked ? (
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      ) : (
+                        <Clock className="w-4 h-4 text-slate-400 shrink-0" />
+                      )}
+                      <span className="truncate">{asset.label}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Notes & Timeline */}
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/[0.04] text-xs text-slate-600 dark:text-slate-300 space-y-2">
+                  <p className="leading-relaxed">
+                    <span className="text-slate-800 dark:text-slate-200 font-bold">Tình trạng chuyển giao:</span> {item.notes}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200/60 dark:border-white/[0.04]">
+                    <span>Ký hợp đồng: <strong className="text-slate-800 dark:text-slate-200">{item.signedDate}</strong></span>
+                    <span>Studio giao phim: <strong className="text-slate-800 dark:text-slate-200">{item.deliveryDate}</strong></span>
+                    <span>Đại diện Studio: <strong className="text-amber-600 dark:text-amber-400">{item.contactPerson}</strong></span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

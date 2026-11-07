@@ -1,18 +1,35 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { FileText, Feather, Film, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import {
+  FileText,
+  Plus,
+  BookOpen,
+  Handshake,
+  Heart,
+  ChevronDown,
+  ArrowLeft,
+  ArrowRight,
+  HelpCircle,
+  Sparkles,
+  Layers,
+  Calendar,
+  Share2,
+  CheckCircle2,
+  Clock,
+  Edit3,
+} from 'lucide-react';
+import { toast } from '@/components/ui/Toast';
 import { productionService } from '@/services/productionService';
 import type { ProjectSummary } from '@/types/production';
 import { SHOWCASE_STUDIO_PROJECTS, INITIAL_STUDIO_METRICS } from './mockData';
-import { StudioMetricBar } from './StudioMetricBar';
 import { StudioFilterBar } from './StudioFilterBar';
 import { CinematicProjectCard } from './CinematicProjectCard';
 import { CinematicProjectTable } from './CinematicProjectTable';
 import { RegisterProjectModal } from './RegisterProjectModal';
 import type { ScriptFilterKey, ScriptProjectItem, ScreenwriterMetrics } from './types';
 
-// Cinematic Sci-Fi Concept art fallbacks
 const CYBER_CONCEPT_ARTS = [
   'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80',
   'https://images.unsplash.com/photo-1535378620166-273708d44e4c?auto=format&fit=crop&w=1200&q=80',
@@ -27,14 +44,14 @@ export function CreatorStudioPortal() {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [backendProjects, setBackendProjects] = useState<ProjectSummary[]>([]);
-  const [loadingBackend, setLoadingBackend] = useState(false);
   const [userCreatedProjects, setUserCreatedProjects] = useState<ScriptProjectItem[]>([]);
+  const [timeRange, setTimeRange] = useState('30d');
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   // Fetch real backend projects if available
   useEffect(() => {
     let mounted = true;
     async function fetchBackend() {
-      setLoadingBackend(true);
       try {
         const res = await productionService.listProjects({ page: 1 });
         if (mounted && res?.data?.data) {
@@ -42,8 +59,6 @@ export function CreatorStudioPortal() {
         }
       } catch (err) {
         console.warn('Backend projects fetch note:', err);
-      } finally {
-        if (mounted) setLoadingBackend(false);
       }
     }
     fetchBackend();
@@ -158,57 +173,162 @@ export function CreatorStudioPortal() {
     setUserCreatedProjects((prev) => [newProj, ...prev]);
   };
 
-  return (
-    <div className="relative min-h-screen w-full bg-[#090B10] text-slate-100 font-sans transition-colors duration-200">
-      {/* Ambient Cinema Glows (Obsidian Dark Mode) */}
-      <div
-        className="pointer-events-none absolute top-0 left-1/4 w-[600px] h-[350px] bg-[#E50914] opacity-[0.05] blur-[140px] rounded-full"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute top-32 right-1/4 w-[500px] h-[350px] bg-[#8B5CF6] opacity-[0.05] blur-[150px] rounded-full"
-        aria-hidden="true"
-      />
+  const handleSharePage = () => {
+    navigator.clipboard?.writeText(window.location.href);
+    toast.success('Đã sao chép liên kết trang', 'Liên kết hồ sơ biên kịch đã sẵn sàng chia sẻ.');
+  };
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* 1. Header & Quick Action Bar */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/[0.05] border border-white/10 text-slate-300 shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-[#E50914] animate-ping" />
-              <Feather className="w-3.5 h-3.5 text-[#E50914]" />
-              <span>Cổng Biên Kịch Nội Bộ • In-house Screenwriter Portal</span>
-              {loadingBackend && (
-                <span className="flex items-center gap-1 text-[11px] text-slate-400 pl-2 border-l border-white/10">
-                  <Loader2 className="w-3 h-3 animate-spin text-red-400" />
-                  Đồng bộ dữ liệu...
-                </span>
-              )}
+  return (
+    <div className="relative min-h-screen w-full bg-[#FAF9F6] dark:bg-[#0D0F17] text-slate-900 dark:text-slate-100 font-sans p-4 sm:p-6 lg:p-8 space-y-6 transition-colors duration-200">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* ── 1. Top Profile Greeting Card (Buy Me a Coffee style) ── */}
+        <section
+          aria-label="Hồ sơ biên kịch"
+          className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-6 sm:p-7 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-5 transition-all"
+        >
+          <div className="flex items-center gap-4">
+            {/* Avatar circle */}
+            <div className="relative w-16 h-16 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-white/20 shrink-0 shadow-xs">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+                alt="Avatar Screenwriter"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-              Quản Lý Dự Án & Kịch Bản Phân Cảnh
-            </h1>
-            <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
-              Xây dựng kịch bản từ định hướng của Admin, nộp thẩm định nội dung trước khi chuyển giao sản xuất cho Studio ngoài.
-            </p>
+
+            {/* Name & Handle */}
+            <div className="space-y-0.5">
+              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Hi, Biên Kịch Nội Bộ
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
+                aicinema.vn/creator/<span className="text-slate-700 dark:text-slate-300 font-semibold">@screenwriter</span>
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleSharePage}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-800 dark:text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+            >
+              <Share2 className="w-4 h-4 text-slate-500 dark:text-slate-300" />
+              <span>Chia sẻ trang</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setIsRegisterModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-[#E50914] hover:bg-[#B81D24] shadow-lg shadow-red-950/50 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs sm:text-sm font-bold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
             >
-              <FileText className="w-4 h-4" />
+              <Plus className="w-4 h-4" />
               <span>+ Soạn Kịch Bản Mới</span>
             </button>
           </div>
-        </header>
+        </section>
 
-        {/* 2. Top Metric Bar */}
-        <StudioMetricBar metrics={metrics} />
+        {/* ── 2. "Earnings" style Metric Card: Tiến Độ Kịch Bản & Phân Cảnh ── */}
+        <section
+          aria-label="Thống kê kịch bản phân cảnh"
+          className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-7 shadow-xs space-y-5 transition-all"
+        >
+          {/* Top Row: Title + Time Filter */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              Tiến Độ Kịch Bản
+            </h2>
 
-        {/* 3. Filter & Search Bar */}
+            {/* Time Filter Dropdown Pill */}
+            <div className="relative">
+              <select
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value)}
+                aria-label="Chọn khoảng thời gian"
+                className="appearance-none rounded-full border border-slate-200/80 dark:border-white/10 bg-slate-50 dark:bg-white/5 pl-4 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
+              >
+                <option value="30d">30 ngày qua</option>
+                <option value="quarter">Quý này (Quý IV)</option>
+                <option value="all">Tất cả thời gian</option>
+              </select>
+              <ChevronDown className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Big Number Headline */}
+          <div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight font-sans">
+                {metrics.totalProjects}
+              </span>
+              <span className="text-base font-bold text-slate-500 dark:text-slate-400">
+                Dự án kịch bản được giao
+              </span>
+            </div>
+          </div>
+
+          {/* Legend Dots Bar (Exact Buy Me a Coffee style colored breakdown) */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
+            {/* Dot 1: Amber - Chờ Reviewer */}
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
+              <span>{metrics.pendingReviews} Chờ Reviewer duyệt</span>
+            </div>
+
+            {/* Dot 2: Rose - Cần chỉnh sửa */}
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0" />
+              <span>{metrics.revisionNeeded} Cần hiệu đính phân cảnh</span>
+            </div>
+
+            {/* Dot 3: Emerald - Đã chuyển giao */}
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0" />
+              <span>{metrics.handedOffProjects} Đã chuyển giao Studio</span>
+            </div>
+
+            {/* Dot 4: Slate - Bản nháp */}
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-300 dark:bg-slate-600 shrink-0" />
+              <span>Bản nháp đang viết</span>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 3. Friendly Empty/Welcome Box (Buy Me a Coffee style heart card) ── */}
+        <section
+          aria-label="Khởi tạo kịch bản mới"
+          className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-10 sm:p-12 text-center shadow-xs space-y-4"
+        >
+          {/* Centered Soft Circular Icon */}
+          <div className="w-14 h-14 rounded-full bg-amber-50 dark:bg-amber-400/10 border border-amber-200/60 dark:border-amber-400/20 mx-auto flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-xs">
+            <Heart className="w-6 h-6 fill-amber-400/30" />
+          </div>
+
+          <div className="space-y-1.5 max-w-md mx-auto">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              Bạn đã sẵn sàng cho kịch bản tiếp theo chưa?
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              Khởi tạo hồ sơ kịch bản phân cảnh từ brief định hướng của Admin hoặc quản lý danh mục kịch bản bên dưới.
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setIsRegisterModalOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs sm:text-sm font-bold shadow-xs transition-all cursor-pointer"
+            >
+              <FileText className="w-4 h-4" />
+              <span>Khởi tạo kịch bản phân cảnh mới</span>
+            </button>
+          </div>
+        </section>
+
+        {/* ── 4. Filter & Search Bar ── */}
         <StudioFilterBar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -219,14 +339,14 @@ export function CreatorStudioPortal() {
           totalFilteredCount={filteredProjects.length}
         />
 
-        {/* 4. Projects Content (Grid or Table) */}
-        <section aria-label="Danh sách dự án kịch bản phân cảnh">
+        {/* ── 5. Script Projects Content (Grid or Table) ── */}
+        <section aria-label="Danh sách dự án kịch bản">
           {filteredProjects.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-white/[0.12] p-12 text-center bg-[#111420]/60">
-              <Film className="w-12 h-12 mx-auto text-slate-600 mb-3" />
-              <h3 className="text-base font-bold text-white">Không tìm thấy kịch bản nào</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-                Không có dự án kịch bản nào khớp với bộ lọc hoặc từ khóa tìm kiếm. Hãy thử đổi trạng thái hoặc xóa từ khóa.
+            <div className="rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 text-center bg-white dark:bg-[#141724]">
+              <FileText className="w-12 h-12 mx-auto text-slate-400 mb-3" />
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">Không tìm thấy kịch bản nào</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
+                Không có dự án kịch bản nào khớp với bộ lọc hoặc từ khóa tìm kiếm.
               </p>
               <button
                 type="button"
@@ -234,7 +354,7 @@ export function CreatorStudioPortal() {
                   setSearchQuery('');
                   setActiveFilter('all');
                 }}
-                className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold bg-white/[0.08] text-white hover:bg-white/[0.12] transition-colors cursor-pointer"
+                className="mt-4 px-4 py-2 rounded-full text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 dark:bg-white/10 dark:text-white transition-colors cursor-pointer"
               >
                 Đặt lại bộ lọc
               </button>
@@ -256,7 +376,106 @@ export function CreatorStudioPortal() {
             />
           )}
         </section>
+
+        {/* ── 6. Bottom "More ways to earn" in BMC -> "Tiện ích & Hỗ trợ biên kịch" ── */}
+        <section aria-label="Tiện ích và công cụ biên kịch" className="space-y-4 pt-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              <span>Tiện ích & Hỗ trợ biên kịch</span>
+            </h3>
+
+            {/* Carousel navigation arrows */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setCarouselIndex((prev) => Math.max(0, prev - 1))}
+                aria-label="Xem trước"
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#141724] flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setCarouselIndex((prev) => Math.min(1, prev + 1))}
+                aria-label="Xem tiếp"
+                className="w-8 h-8 rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-[#141724] flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Card 1: Thư viện kịch bản */}
+            <Link
+              href="/creator/scripts"
+              className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-5 shadow-xs hover:shadow-md transition-all space-y-3 group cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shadow-xs">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Thư Viện Kịch Bản Phân Cảnh
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  Lưu trữ các phiên bản Final Draft, act breakdown và xuất bản tệp PDF cho từng tập.
+                </p>
+              </div>
+            </Link>
+
+            {/* Card 2: Tiến độ chuyển giao Studio */}
+            <Link
+              href="/creator/studio-handoff"
+              className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-5 shadow-xs hover:shadow-md transition-all space-y-3 group cursor-pointer"
+            >
+              <div className="w-10 h-10 rounded-2xl bg-rose-100 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 flex items-center justify-center shadow-xs">
+                <Handshake className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
+                  Tiến Độ Chuyển Giao Studio
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  Theo dõi hợp đồng gia công phim và tình trạng bàn giao storyboard cho Studio ngoài.
+                </p>
+              </div>
+            </Link>
+
+            {/* Card 3: Character Bible & Worldbuilding */}
+            <div className="rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 p-5 shadow-xs space-y-3 group">
+              <div className="w-10 h-10 rounded-2xl bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 flex items-center justify-center shadow-xs">
+                <Layers className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Character Bible & Worldbuilding
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                  Tài liệu chuẩn hóa bối cảnh nghệ thuật và tiểu sử nhân vật cho các hoạ sĩ Studio ngoài.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
+
+      {/* ── 7. Floating Help Button (Exact Buy Me a Coffee style '?' button) ── */}
+      <button
+        type="button"
+        onClick={() => {
+          toast.info(
+            'Hỗ trợ biên kịch nội bộ',
+            'Đội ngũ Admin và Reviewer luôn sẵn sàng hỗ trợ phản hồi phân cảnh kịch bản của bạn.'
+          );
+        }}
+        aria-label="Trợ giúp"
+        title="Trợ giúp & Hướng dẫn biên kịch"
+        className="fixed bottom-6 right-6 z-40 w-11 h-11 rounded-full bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 shadow-xl flex items-center justify-center font-bold text-sm hover:scale-105 active:scale-95 transition-all cursor-pointer"
+      >
+        <span className="text-base font-extrabold font-mono">?</span>
+      </button>
 
       {/* Modal Soạn Kịch Bản Mới */}
       <RegisterProjectModal
