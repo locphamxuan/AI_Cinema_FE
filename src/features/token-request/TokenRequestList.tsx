@@ -2,20 +2,20 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, X } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/features/production/components/shared/ui';
-import { Pager } from '@/features/production/components/shared/Pager';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime, formatNumber } from '@/features/production/lib/format';
+import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/components/data/ui';
+import { Pager } from '@/components/data/Pager';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime, formatNumber } from '@/lib/format';
 import { announceTokensChanged } from '@/services/reviewerTokenService';
 import { tokenRequestService } from '@/services/tokenRequestService';
 import type { TokenRequest, TokenRequestStatus } from '@/types/token-request';
 
-export const TOKEN_REQUEST_STATUS: Record<TokenRequestStatus, { label: string; tone: 'amber' | 'emerald' | 'rose' }> = {
+const TOKEN_REQUEST_STATUS: Record<TokenRequestStatus, { label: string; tone: 'amber' | 'emerald' | 'rose' }> = {
   OPEN: { label: 'Chờ Reviewer', tone: 'amber' },
   APPROVED: { label: 'Đã cấp', tone: 'emerald' },
   REJECTED: { label: 'Từ chối', tone: 'rose' },
@@ -85,15 +85,15 @@ export function TokenRequestList({
       {list.data && rows.length === 0 && <Empty>Chưa có yêu cầu thêm Token nào.</Empty>}
       <ul className="space-y-2">
         {rows.map((r) => (
-          <li key={r.id} className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3 text-xs space-y-1.5 bg-slate-50/50 dark:bg-white/[0.02]">
+          <li key={r.id} className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs space-y-1.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="font-semibold text-slate-900 dark:text-white">
                 {projectHref ? (
-                  <Link href={projectHref((r as any).movie?.id ?? (r as any).projectId ?? (r as any).project?.id ?? "")} className="text-indigo-600 dark:text-[#E50914] hover:underline">{(r as any).movie?.title ?? (r as any).project?.movie?.title ?? "Dự án phim"}</Link>
+                  <Link href={projectHref(r.project.id)} className="text-sky-700 dark:text-sky-500 hover:underline">{r.project.movie.title}</Link>
                 ) : (
-                  (r as any).movie?.title ?? (r as any).project?.movie?.title ?? "Dự án phim"
+                  r.project.movie.title
                 )}{' '}
-                · Mùa {r.season.seasonNumber} · xin <span className="font-mono">{formatNumber(r.requestedTokens)}</span> Token
+                · Mùa {r.season.seasonNumber} · xin <span className="tabular-nums">{formatNumber(r.requestedTokens)}</span> Token
               </p>
               <StatusPill {...TOKEN_REQUEST_STATUS[r.status]} />
             </div>
@@ -107,10 +107,10 @@ export function TokenRequestList({
             {canAnswer && r.status === 'OPEN' && (
               <div className="flex gap-2 pt-1">
                 <Button size="sm" onClick={() => setApproving(r)}>
-                  <Check className="w-3.5 h-3.5" aria-hidden="true" /> Cấp Token
+                  Cấp Token
                 </Button>
                 <Button size="sm" variant="secondary" onClick={() => setRejecting(r)}>
-                  <X className="w-3.5 h-3.5" aria-hidden="true" /> Từ chối
+                  Từ chối
                 </Button>
               </div>
             )}
@@ -132,7 +132,7 @@ export function TokenRequestList({
       <TextPromptModal
         open={!!rejecting}
         title="Từ chối yêu cầu thêm Token"
-        subtitle={rejecting ? `${rejecting.movie.title} · Mùa ${rejecting.season.seasonNumber}` : undefined}
+        subtitle={rejecting ? `${rejecting.project.movie.title} · Mùa ${rejecting.season.seasonNumber}` : undefined}
         label="Lý do (Creator sẽ nhận được)"
         confirmLabel="Từ chối"
         danger
@@ -156,7 +156,7 @@ function ApproveModal({ request, onClose, onDone }: { request: TokenRequest; onC
   };
 
   return (
-    <Modal open onClose={onClose} title="Cấp thêm Token" subtitle={`${request.movie.title} · Mùa ${request.season.seasonNumber}`}>
+    <Modal open onClose={onClose} title="Cấp thêm Token" subtitle={`${request.project.movie.title} · Mùa ${request.season.seasonNumber}`}>
       <form onSubmit={submit} className="space-y-4">
         <p className="text-xs text-slate-600 dark:text-slate-300">
           Ghi thành khoản “+ Token thêm” của mùa, trừ vào ví Token của bạn. Không cấp quá số Creator xin ({formatNumber(request.requestedTokens)}).

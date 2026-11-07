@@ -3,27 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  Ban,
-  Film,
-  Clapperboard,
-  ShieldCheck,
-  History,
-  CalendarClock,
-  Layers,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, Ban, Film, Clapperboard, ShieldCheck, History, CalendarClock, Layers, Users } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
-import { useResource } from '../../hooks/useResource';
+import { useResource } from '@/hooks/useResource';
 import { projectCapabilities } from '../../lib/capabilities';
 import { MOVIE_STATUS, SEASON_STATUS } from '../../lib/labels';
 import { baseFromPath, productionPaths } from '../../lib/routes';
-import { ErrorNote, Loading, StatusPill } from '../shared/ui';
+import { ErrorNote, Loading, StatusPill } from '@/components/data/ui';
 import { ProjectProvider } from './ProjectContext';
 import { OverviewTab } from './OverviewTab';
 import { EpisodesTab } from './EpisodesTab';
@@ -80,7 +69,7 @@ export function ProjectDetailPage() {
     return (
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-4">
         <ErrorNote message={project.error ?? 'Không tìm thấy dự án.'} onRetry={project.reload} />
-        <Link href={productionPaths.list(base)} className="text-xs text-indigo-600 dark:text-[#E50914] hover:underline font-semibold">
+        <Link href={productionPaths.list(base)} className="text-xs text-sky-700 hover:underline">
           ← Về danh sách dự án
         </Link>
       </main>
@@ -93,26 +82,26 @@ export function ProjectDetailPage() {
 
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
-      <main className="w-full bg-[#F8FAFC] dark:bg-[#090B10] min-h-screen text-slate-900 dark:text-slate-100 transition-colors duration-200">
-        <div className="bg-white dark:bg-[#0D1017] border-b border-slate-200 dark:border-white/[0.08] transition-colors">
-          <div className="h-1 bg-gradient-to-r from-indigo-500 via-indigo-400 to-rose-400 dark:from-[#E50914] dark:via-[#D10813] dark:to-[#8B5CF6]" aria-hidden="true" />
+      <main className="w-full">
+        <div className="bg-white dark:bg-card border-b border-sky-100 dark:border-white/10">
+          <div className="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-coral-400" aria-hidden="true" />
           <div className="px-6 lg:px-8 pt-4 pb-5 space-y-4">
             <Link
               href={productionPaths.list(base)}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-red-400 hover:text-red-300 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-sky-700 dark:text-sky-300 hover:underline"
             >
-              <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" /> Danh sách dự án
+              Danh sách dự án
             </Link>
 
-            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-5">
+            <div className="flex flex-col gap-4">
               <div className="space-y-2 min-w-0">
-                <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">{data.title}</h1>
+                <h1 className="font-heading text-2xl font-semibold text-slate-900 dark:text-white leading-tight tracking-tight">{data.title}</h1>
                 <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span className="inline-flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                     Dự án <StatusPill {...MOVIE_STATUS[data.status]} />
                   </span>
                   {data.seasons.map((season) => (
-                    <span key={season.id} className="inline-flex items-center gap-1.5">
+                    <span key={season.id} className="inline-flex items-center gap-1.5 whitespace-nowrap">
                       {seasonName(season.seasonNumber, season.episodes.length)} <StatusPill {...SEASON_STATUS[season.status]} />
                     </span>
                   ))}
@@ -122,9 +111,9 @@ export function ProjectDetailPage() {
                 )}
               </div>
 
-              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3 shrink-0 rounded-2xl bg-slate-50 dark:bg-[#121622] border border-slate-200/80 dark:border-white/[0.08] px-5 py-3 shadow-sm dark:shadow-md">
+              <dl className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3 rounded-xl bg-sky-50/70 dark:bg-white/[0.04] px-5 py-3">
                 <Fact label="Reviewer" value={data.reviewer.fullName} />
-                <Fact label={caps.creator ? (caps.lead ? 'Creator chính (bạn)' : 'Creator chính') : 'Creator chính'} value={data.creator?.fullName ?? 'Chưa giao'} />
+                <Fact label={caps.creator && caps.lead ? 'Creator chính (bạn)' : 'Creator chính'} value={data.creator?.fullName ?? 'Chưa giao'} />
                 <Fact label="Studio" value={data.studio?.name ?? 'Chưa chọn'} />
                 <Fact label="Quy mô" value={`${data.seasons.length} mùa, ${totalEpisodes} tập`} />
               </dl>
@@ -139,16 +128,16 @@ export function ProjectDetailPage() {
                 role="tab"
                 aria-selected={tab === key}
                 onClick={() => selectTab(key)}
-                className={`shrink-0 flex items-center gap-2 px-4 py-3 text-sm border-b-2 whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none ${
+                className={`shrink-0 flex items-center gap-2 px-4 py-3 text-sm border-b-2 whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:bg-sky-50 ${
                   tab === key
-                    ? 'border-indigo-600 dark:border-[#E50914] text-indigo-600 dark:text-[#E50914] font-bold'
+                    ? 'border-sky-500 text-sky-800 dark:text-sky-200 font-semibold'
                     : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${tab === key ? 'text-indigo-600 dark:text-[#E50914]' : ''}`} aria-hidden="true" />
+                <Icon className="w-4 h-4" aria-hidden="true" />
                 {key === 'changes' && caps.creator ? 'Đề xuất cho Reviewer và Admin' : label}
                 {key === 'changes' && data.openChangeRequests > 0 && (
-                  <span className="px-1.5 rounded-full bg-rose-500 dark:bg-[#E50914] text-white text-xs font-semibold tabular-nums" title="Đề xuất đang chờ">
+                  <span className="px-1.5 rounded-full bg-coral-500 text-white text-xs font-semibold tabular-nums" title="Đề xuất đang chờ">
                     {data.openChangeRequests}
                   </span>
                 )}

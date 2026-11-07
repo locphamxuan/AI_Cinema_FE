@@ -6,9 +6,7 @@ import { apiClient, ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type {
   AuthRole as BackendRole,
-  GoogleSignIn,
   LoginCredentials,
-  RegisterCredentials,
   UserProfile,
 } from '@/types/auth';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
@@ -84,35 +82,6 @@ export const authService = {
     }
 
     return { ...res, data: profile };
-  },
-
-  /** Members sign up for themselves (18+, BR-54); every other role is created by the Admin. */
-  async register(credentials: RegisterCredentials): Promise<ApiResponse<UserProfile>> {
-    const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.REGISTER, {
-      email: credentials.email.trim().toLowerCase(),
-      password: credentials.password,
-      fullName: credentials.name.trim(),
-      dateOfBirth: credentials.dateOfBirth,
-    });
-
-    if (!res.success) {
-      return { ...res, data: null as unknown as UserProfile };
-    }
-
-    return { ...res, data: persistSession(res.data) };
-  },
-
-  /**
-   * Signs in with a Google ID token. A first sign-in may come back with `reason` asking for a
-   * birthday (new member, BR-54) or the password of the account that already owns the email;
-   * the caller resends the same token with that answer.
-   */
-  async googleLogin(input: GoogleSignIn): Promise<ApiResponse<UserProfile>> {
-    const res = await apiClient.post<AuthSession>(API_ROUTES.AUTH.GOOGLE, input);
-    if (!res.success) {
-      return { ...res, data: null as unknown as UserProfile };
-    }
-    return { ...res, data: persistSession(res.data) };
   },
 
   async me(): Promise<ApiResponse<UserProfile>> {

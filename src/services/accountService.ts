@@ -10,7 +10,6 @@ export interface AccountDetails {
   email: string;
   fullName: string;
   phoneNumber: string | null;
-  dateOfBirth: string | null;
   role: AuthRole;
   isActive: boolean;
   permissions?: string[];
@@ -21,7 +20,6 @@ export interface AccountDetails {
 export interface AccountUpdate {
   fullName?: string;
   phoneNumber?: string | null;
-  dateOfBirth?: string;
 }
 
 /** Same rule as the backend: 8 to 15 digits, an optional leading +, spaces or dots between. */

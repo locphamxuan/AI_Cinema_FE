@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, Lock, Pencil, Search, Trash2, Unlock, UserPlus } from 'lucide-react';
+import { Lock, Pencil, Search, Trash2, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { adminService, type AccountPage, type AccountRow } from '@/services/adminService';
 import { toast } from '@/components/ui/Toast';
@@ -13,6 +13,8 @@ import type { UserRole } from '@/types/production';
 import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_TONE } from '../roles';
 import { Select } from '@/components/ui/Select';
 import { AccountFormModal, DeleteAccountModal } from './AccountFormModal';
+import { DataPagination } from '@/components/data/DataPagination';
+import { InitialsAvatar } from '@/components/data/InitialsAvatar';
 
 const ROLE_FILTER_OPTIONS = [
   { value: '', label: 'Mọi vai trò' },
@@ -78,7 +80,7 @@ export function AccountsPanel() {
   const totalPages = result?.meta.totalPages ?? 1;
 
   return (
-    <section className="bg-white dark:bg-[#131722] rounded-2xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs overflow-hidden">
+    <section className="bg-white dark:bg-card rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
       <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Quản lý Tài khoản</h2>
@@ -89,7 +91,7 @@ export function AccountsPanel() {
         <div className="flex flex-wrap items-center gap-2.5">
           {canManage && (
             <Button size="sm" onClick={() => setEditing('new')} className="shadow-xs">
-              <UserPlus className="w-3.5 h-3.5" aria-hidden="true" /> Tạo tài khoản
+              Tạo tài khoản
             </Button>
           )}
           <label className="relative">
@@ -138,12 +140,17 @@ export function AccountsPanel() {
               const isMe = account.id === myId;
               const locked = !canManage || isMe || savingId === account.id;
               return (
-                <tr key={account.id} className={`hover:bg-slate-50/80 dark:hover:bg-white/[0.03] transition-colors duration-150 ${account.isActive ? '' : 'opacity-60'}`}>
+                <tr key={account.id} className={`hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors ${account.isActive ? '' : 'opacity-60'}`}>
                   <td className="py-3.5 px-5">
-                    <p className="font-semibold text-slate-900 dark:text-white">
-                      {account.fullName} {isMe && <span className="text-indigo-600 dark:text-[#E50914] font-medium text-[11px] ml-1">(bạn)</span>}
-                    </p>
-                    <p className="text-slate-500 dark:text-slate-400 text-[11px] mt-0.5">{account.email}</p>
+                    <div className="flex items-center gap-3">
+                      <InitialsAvatar name={account.fullName} />
+                      <div className="min-w-0">
+                        <p className="truncate font-medium">
+                          {account.fullName} {isMe && <span className="ml-1 text-xs font-normal text-primary">(bạn)</span>}
+                        </p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{account.email}</p>
+                      </div>
+                    </div>
                   </td>
                   <td className="py-3 px-4">
                     <Select
@@ -208,7 +215,7 @@ export function AccountsPanel() {
             })}
             {result && accounts.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-16 text-center text-slate-500 dark:text-slate-400">
+                <td colSpan={5} className="py-8 text-center text-slate-500 dark:text-slate-400">
                   Không có tài khoản nào khớp.
                 </td>
               </tr>
@@ -227,31 +234,15 @@ export function AccountsPanel() {
       )}
       {deleting && <DeleteAccountModal account={deleting} onClose={() => setDeleting(null)} onDeleted={load} />}
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-100 dark:border-white/5 text-xs">
-          <button
-            type="button"
-            aria-label="Trang trước"
-            disabled={page <= 1}
-            onClick={() => setPage(page - 1)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:scale-105 transition-all duration-150"
-          >
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <span className="text-slate-500 dark:text-slate-400">
-            Trang {page}/{totalPages}
-          </span>
-          <button
-            type="button"
-            aria-label="Trang sau"
-            disabled={page >= totalPages}
-            onClick={() => setPage(page + 1)}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-40 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 hover:scale-105 transition-all duration-150"
-          >
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
+      <DataPagination
+        page={page}
+        totalPages={totalPages}
+        totalItems={result?.meta.totalItems}
+        pageSize={result?.meta.itemsPerPage}
+        unit="tài khoản"
+        onChange={setPage}
+        className="border-t px-5 pb-4"
+      />
     </section>
   );
 }

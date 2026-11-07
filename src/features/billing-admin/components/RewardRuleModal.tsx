@@ -110,7 +110,7 @@ export function RewardRuleModal({
             Ngày {day} đã có cấu hình đang dùng; hãy sửa hoặc tắt nó trước.
           </p>
         )}
-        <div className="p-3 rounded-xl bg-indigo-50/70 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 text-xs text-indigo-900 dark:text-indigo-300 flex items-start gap-2">
+        <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 text-xs text-sky-800 dark:text-sky-300 flex items-start gap-2">
           <span>
             {day === LADDER_LENGTH
               ? 'Ngày 7 là mốc chặng cuối chuỗi: hệ thống sẽ tự động tặng thêm 1 lượt quay may mắn.'

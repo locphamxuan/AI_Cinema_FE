@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { notificationTabsFor, typesOf } from '@/features/notifications/notificationCatalog';
-import { pageOf } from '@/features/production/components/shared/Pager';
+import { pageOf } from '@/components/data/Pager';
 import { downloadFile } from '@/features/production/lib/download';
 import { TokenRequestList } from '@/features/token-request/TokenRequestList';
 import { routeFetch } from '@/tests/support/routeFetch';
@@ -20,7 +20,7 @@ vi.mock('next/navigation', () => ({
 
 const REQUEST: TokenRequest = {
   id: 'req-1',
-  movieId: 'm1',
+  projectId: 'm1',
   seasonId: 's1',
   requestedTokens: 4000,
   grantedTokens: null,
@@ -29,7 +29,7 @@ const REQUEST: TokenRequest = {
   reviewerResponse: null,
   resolvedAt: null,
   createdAt: '2026-10-15T08:00:00.000Z',
-  movie: { id: 'm1', title: 'Vùng dịch 704' },
+  project: { id: 'm1', reviewerId: 'r1', creatorId: 'c1', movie: { title: 'Vùng dịch 704' } },
   season: { id: 's1', seasonNumber: 1, title: null },
   requestedBy: { id: 'c1', fullName: 'Creator Một', email: 'c1@x.vn' },
   resolvedBy: null,

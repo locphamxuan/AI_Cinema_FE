@@ -4,7 +4,7 @@ import { Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import type { NewSeasonInput } from '@/types/production';
-import { formatNumber } from '../../lib/format';
+import { formatNumber } from '@/lib/format';
 import {
   DeadlineQuickFill,
   EpisodeRowsEditor,
@@ -26,7 +26,7 @@ export interface SeasonDraft {
   episodes: EpisodeDraft[];
 }
 
-export const MAX_EPISODE_COST = 100_000_000;
+const MAX_EPISODE_COST = 100_000_000;
 
 export function emptySeason(number: number, firstEpisode = 1): SeasonDraft {
   return { title: `Mùa ${number}`, cost: 0, windowStart: '', windowEnd: '', episodes: [emptyEpisode(firstEpisode)] };
@@ -70,7 +70,7 @@ export function SeasonDraftEditor({
   const estimate = season.cost * season.episodes.length;
 
   return (
-    <div className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3 space-y-3">
+    <div className="rounded-xl border border-sky-100 dark:border-white/10 p-3 space-y-3">
       <div className="flex items-center gap-2">
         <input
           value={season.title}

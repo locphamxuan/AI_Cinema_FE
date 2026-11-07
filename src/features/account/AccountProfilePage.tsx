@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { KeyRound, Save } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
-import { ErrorNote, Facts, Loading, Panel } from '@/features/production/components/shared/ui';
-import { useAction } from '@/features/production/hooks/useAction';
-import { useResource } from '@/features/production/hooks/useResource';
-import { formatDateTime } from '@/features/production/lib/format';
+import { ErrorNote, Facts, Loading, Panel } from '@/components/data/ui';
+import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatDateTime } from '@/lib/format';
 import { accountService, PHONE_PATTERN, type AccountDetails } from '@/services/accountService';
 import { productionService } from '@/services/productionService';
 import { useAppStore } from '@/store/useAppStore';
@@ -32,7 +32,7 @@ export function AccountProfilePage() {
   return (
     <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       <div className="border-b border-slate-200/60 dark:border-white/5 pb-4">
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white">Hồ sơ tài khoản</h1>
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Hồ sơ tài khoản</h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Thông tin cá nhân và bảo mật. Email và vai trò do Admin quản lý.</p>
       </div>
       {account.error && <ErrorNote message={account.error} onRetry={account.reload} />}
@@ -54,7 +54,6 @@ export function AccountProfilePage() {
               items={[
                 ['Email', account.data.email],
                 ['Số điện thoại', account.data.phoneNumber ?? '-'],
-                ['Ngày sinh', account.data.dateOfBirth ? account.data.dateOfBirth.slice(0, 10) : '-'],
                 ['Trạng thái', account.data.isActive ? 'Đang hoạt động' : 'Đã khoá'],
                 ['Tham gia', formatDateTime(account.data.createdAt)],
                 ['Dự án phim', projects.data ? String(projects.data.meta.totalItems) : '-'],
@@ -74,13 +73,10 @@ export function AccountProfilePage() {
 function EditDetails({ account, onSaved }: { account: AccountDetails; onSaved: () => Promise<void> }) {
   const [fullName, setFullName] = useState(account.fullName);
   const [phone, setPhone] = useState(account.phoneNumber ?? '');
-  const [birthday, setBirthday] = useState(account.dateOfBirth?.slice(0, 10) ?? '');
   const { busy, run } = useAction();
-  const today = new Date().toISOString().slice(0, 10);
   const issues = [
     fullName.trim().length < 2 ? 'họ tên ít nhất 2 ký tự' : null,
     phone.trim() && !PHONE_PATTERN.test(phone.trim()) ? 'số điện thoại 8–15 chữ số' : null,
-    birthday && birthday > today ? 'ngày sinh không ở tương lai' : null,
   ].filter(Boolean);
 
   const submit = async (e: React.FormEvent) => {
@@ -91,7 +87,6 @@ function EditDetails({ account, onSaved }: { account: AccountDetails; onSaved: (
         accountService.update({
           fullName: fullName.trim(),
           phoneNumber: phone.trim() || null,
-          ...(birthday ? { dateOfBirth: birthday } : {}),
         }),
       'Đã lưu hồ sơ',
     );
@@ -110,14 +105,11 @@ function EditDetails({ account, onSaved }: { account: AccountDetails; onSaved: (
           <FormField label="Số điện thoại">
             <input value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" maxLength={20} placeholder="0912 345 678" className={fieldInputClass} />
           </FormField>
-          <FormField label="Ngày sinh">
-            <input type="date" max={today} value={birthday} onChange={(e) => setBirthday(e.target.value)} className={fieldInputClass} />
-          </FormField>
         </div>
         {issues.length > 0 && <p className="text-xs text-amber-600">Cần sửa: {issues.join('; ')}.</p>}
         <div className="flex justify-end">
           <Button type="submit" disabled={busy || issues.length > 0}>
-            <Save className="w-3.5 h-3.5" aria-hidden="true" /> Lưu thay đổi
+            Lưu thay đổi
           </Button>
         </div>
       </form>
@@ -164,7 +156,7 @@ function ChangePassword() {
         {issues.length > 0 && <p className="text-xs text-amber-600">Cần sửa: {issues.join('; ')}.</p>}
         <div className="flex justify-end">
           <Button type="submit" disabled={busy || !ready}>
-            <KeyRound className="w-3.5 h-3.5" aria-hidden="true" /> Đổi mật khẩu
+            Đổi mật khẩu
           </Button>
         </div>
       </form>

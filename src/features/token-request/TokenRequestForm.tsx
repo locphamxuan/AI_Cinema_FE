@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { HandCoins } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
-import { Panel } from '@/features/production/components/shared/ui';
-import { useAction } from '@/features/production/hooks/useAction';
-import { formatNumber } from '@/features/production/lib/format';
+import { Panel } from '@/components/data/ui';
+import { useAction } from '@/hooks/useAction';
+import { formatNumber } from '@/lib/format';
 import { seasonLabel } from '@/lib/seasonLabel';
 import { tokenRequestService } from '@/services/tokenRequestService';
 import type { ProjectDetail } from '@/types/production';
@@ -66,7 +66,7 @@ export function TokenRequestForm({ project, onSent }: { project: ProjectDetail; 
         </FormField>
         {tokens && !amountValid && <p className="text-xs text-amber-600">Số Token là số nguyên dương.</p>}
         <Button type="submit" size="sm" className="w-full" disabled={busy || !seasonId || !amountValid || !reasonValid}>
-          <HandCoins className="w-3.5 h-3.5" aria-hidden="true" /> Gửi Reviewer
+          Gửi Reviewer
         </Button>
       </form>
     </Panel>

@@ -53,7 +53,7 @@ const RATING_LABELS: Record<string, string> = {
 
 const LABEL_LOCATIONS = ['TOP_LEFT', 'TOP_RIGHT', 'BOTTOM_LEFT', 'BOTTOM_RIGHT'] as const;
 
-export function formatDuration(seconds: number | null): string {
+function formatDuration(seconds: number | null): string {
   if (!seconds) return '';
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;

@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Check, Download, X } from 'lucide-react';
+
 import { Button } from '@/components/ui/Button';
 import { changeRequestService } from '@/services/teamService';
 import type { ChangeRequest } from '@/types/production';
-import { useAction } from '../../hooks/useAction';
+import { useAction } from '@/hooks/useAction';
 import { CHANGE_REQUEST_STATUS, CHANGE_REQUEST_TYPE } from '../../lib/labels';
 import { downloadFile } from '../../lib/download';
-import { formatDateTime, formatNumber } from '../../lib/format';
-import { StatusPill, TextPromptModal } from './ui';
+import { formatDateTime, formatNumber } from '@/lib/format';
+import { StatusPill, TextPromptModal } from '@/components/data/ui';
 
 /** One request to the Admin: what was asked and why, the proof, and the Admin's decision (BR-55). */
 export function ChangeRequestCard({
@@ -43,7 +43,7 @@ export function ChangeRequestCard({
   };
 
   return (
-    <li className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5 text-xs space-y-2">
+    <li className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-slate-500 dark:text-slate-400">
           {cr.requestedBy.fullName} · {formatDateTime(cr.createdAt)}
@@ -55,9 +55,9 @@ export function ChangeRequestCard({
           <StatusPill {...CHANGE_REQUEST_STATUS[cr.status]} />
         </div>
       </div>
-      {cr.movie && projectHref && (
+      {cr.project && projectHref && (
         <Link href={projectHref} className="font-semibold text-sky-700 dark:text-sky-300 hover:underline">
-          {cr.movie.title}
+          {cr.project.movie.title}
         </Link>
       )}
       <div>
@@ -71,7 +71,7 @@ export function ChangeRequestCard({
       {cr.requestedTokens !== null && <p className="font-semibold text-amber-700 dark:text-amber-300">Xin thêm {formatNumber(Number(cr.requestedTokens))} Token</p>}
       {cr.attachmentName && (
         <Button size="sm" variant="ghost" onClick={proof}>
-          <Download className="w-3.5 h-3.5" aria-hidden="true" /> Giấy tờ: {cr.attachmentName}
+          Giấy tờ: {cr.attachmentName}
         </Button>
       )}
       {cr.adminResponse && (
@@ -82,17 +82,17 @@ export function ChangeRequestCard({
       {canDecide && cr.status === 'OPEN' && (
         <div className="flex justify-end gap-2">
           <Button size="sm" variant="secondary" disabled={busy} onClick={() => setRejecting(true)}>
-            <X className="w-3.5 h-3.5" aria-hidden="true" /> Từ chối
+            Từ chối
           </Button>
           <Button size="sm" variant="success" disabled={busy} onClick={approve}>
-            <Check className="w-3.5 h-3.5" aria-hidden="true" /> Duyệt
+            Duyệt
           </Button>
         </div>
       )}
       <TextPromptModal
         open={rejecting}
         title="Từ chối đề xuất"
-        subtitle={cr.movie?.title}
+        subtitle={cr.project?.movie.title}
         label="Lý do (người đề xuất sẽ nhận được)"
         confirmLabel="Từ chối"
         minLength={1}
