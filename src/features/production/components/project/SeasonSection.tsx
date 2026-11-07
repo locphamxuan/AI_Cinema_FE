@@ -6,7 +6,6 @@ import { AlertTriangle, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { getTodayDateString } from '@/lib/dateUtils';
 import { seasonLabel, seasonName } from '@/lib/seasonLabel';
-import { productionService } from '@/services/productionService';
 import { teamService } from '@/services/teamService';
 import type { CreatorSeat, Episode, Season, SeasonFee } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
@@ -17,6 +16,7 @@ import { EPISODE_STATUS, INGEST_STATUS, SEASON_STATUS } from '../../lib/labels';
 import { productionPaths } from '../../lib/routes';
 import { CARD, Empty, StatusPill } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
+import { productionService } from '@/services/productionService';
 
 /** Submissions of one episode: every version of media the Creator uploaded from the studio's deliveries. */
 function Submissions({ episode }: { episode: Episode }) {
@@ -77,14 +77,13 @@ function Assignee({ episode, seats, editable }: { episode: Episode; seats: Creat
 /** One season: status, release window, price and the budget it needs, then its episodes (Mentor 14/10, §4.1.10). */
 export function SeasonSection({
   season,
-  fee,
   seats,
   onAddEpisode,
   onEditSeason,
   onEditEpisode,
 }: {
   season: Season;
-  fee: SeasonFee | undefined;
+  fee?: SeasonFee | undefined;
   seats: CreatorSeat[];
   onAddEpisode: () => void;
   onEditSeason: () => void;
@@ -106,10 +105,7 @@ export function SeasonSection({
             <StatusPill {...SEASON_STATUS[season.status]} />
           </h2>
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            Phát hành {season.releaseStartDate || season.releaseEndDate ? `${formatDay(season.releaseStartDate)} → ${formatDay(season.releaseEndDate)}` : 'chưa đặt khoảng'} ·
-            đơn giá {formatNumber(cost)} Token/tập · dự trù {formatNumber(fee?.baselineTokens ?? cost * season.episodes.length)} Token
-            {fee && fee.totalTokens > 0 && ` · đã cấp ${formatNumber(fee.totalTokens)}`}
-            {fee && fee.missingTokens > 0 && <span className="text-amber-600"> · thiếu {formatNumber(fee.missingTokens)}</span>}
+            Phát hành {season.releaseStartDate || season.releaseEndDate ? `${formatDay(season.releaseStartDate)} → ${formatDay(season.releaseEndDate)}` : 'chưa đặt khoảng'} · đơn giá {formatNumber(cost)} Token/tập · {season.episodes.length} tập
           </p>
         </div>
         <div className="flex gap-1">
@@ -155,7 +151,6 @@ export function SeasonSection({
                         <Link href={productionPaths.episode(base, project.id, ep.id)} className="font-medium text-slate-900 dark:text-white hover:underline">
                           {ep.title}
                         </Link>
-                        <span className="ml-2 text-xs text-slate-400">{formatDuration(ep.targetDurationSeconds)}</span>
                         {ep.revisionStartedAt && <span className="ml-2 text-xs text-amber-600">đang sửa</span>}
                       </td>
                       <td className="px-3 py-2.5">
