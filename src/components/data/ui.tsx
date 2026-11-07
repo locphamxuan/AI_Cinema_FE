@@ -131,7 +131,7 @@ export function TextPromptModal({
   const blocked = required && text.trim().length < minLength;
 
   return (
-    <Modal open={open} onClose={onClose} title={title} subtitle={subtitle}>
+    <Modal open={open} onClose={onClose} title={title} subtitle={subtitle} maxWidth="max-w-md">
       <form
         className="space-y-4"
         onSubmit={(e) => {

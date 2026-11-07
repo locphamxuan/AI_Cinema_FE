@@ -31,7 +31,7 @@ export function ChangeRequestsTab() {
         title={caps.creator ? 'Đề xuất cho Reviewer & Admin' : 'Đề xuất cho Admin'}
         description={
           caps.creator
-            ? 'Đề xuất chỉnh sửa dự án hoặc gia hạn gửi Admin (Reviewer được báo). Xin thêm Token khi Studio không chấp nhận: gửi Reviewer ở tab Studio.'
+            ? 'Đề xuất chỉnh sửa dự án hoặc gia hạn tiến độ gửi Admin (Reviewer được thông báo và đồng hành).'
             : 'Đề xuất chỉnh sửa dự án, xin thêm kinh phí hoặc gia hạn, kèm lý do và giấy tờ minh hoạ. Chỉ Admin duyệt hoặc từ chối.'
         }
       >
@@ -138,7 +138,7 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={5000} required className={fieldTextareaClass} />
         </FormField>
         {budget && (
-          <FormField label="Số Token xin thêm">
+          <FormField label="Kinh phí bổ sung dự kiến (VNĐ)">
             <input type="number" min={1} step={1} value={tokens} onChange={(e) => setTokens(e.target.value)} required className={fieldInputClass} />
           </FormField>
         )}

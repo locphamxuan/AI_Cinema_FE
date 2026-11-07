@@ -27,7 +27,7 @@ export function EpisodeAdSlotsModal({ episode, onClose }: Props) {
   const ads = useResource('admin:ads', adAdminService.ads);
   const current = useResource(`admin:ad-slots:${episode.id}`, () => adAdminService.slots(episode.id));
   return (
-    <Modal open onClose={onClose} title={`Quảng cáo · ${episode.label}`} subtitle="Chọn giây chèn quảng cáo và số lần chèn trong tập." maxWidth="max-w-xl">
+    <Modal open onClose={onClose} title={`Quảng cáo · ${episode.label}`} subtitle="Chọn giây chèn quảng cáo và số lần chèn trong tập." maxWidth="max-w-lg">
       {(current.error || ads.error) && <ErrorNote message={(current.error || ads.error)!} onRetry={current.error ? current.reload : ads.reload} />}
       {(current.loading || ads.loading) && !(current.data && ads.data) && <Loading />}
       {current.data && ads.data && (

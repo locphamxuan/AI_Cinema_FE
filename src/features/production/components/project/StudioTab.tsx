@@ -136,13 +136,13 @@ export function StudioTab() {
             {caps.creator && !caps.lead && (
               <p className="rounded-xl border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 p-3 text-xs text-sky-800 dark:text-sky-300">
                 Bạn là Creator phụ: Creator chính {project.creator?.fullName ?? ''} là người duy nhất làm việc với Studio (bàn giao, đổi Studio, cập nhật mốc,
-                xin thêm Token). Bạn chịu trách nhiệm các tập được giao: kiểm tra phim Studio gửi ở trang tập, nộp Submission, và ghi phần cần sửa ở mục
+                bàn giao, đổi Studio, cập nhật mốc tiến độ). Bạn chịu trách nhiệm các tập được giao: kiểm tra phim Studio gửi ở trang tập, nộp thẩm định, và ghi phần cần sửa ở mục
                 Trao đổi về tập để Creator chính báo Studio.
               </p>
             )}
           </div>
         </Panel>
-        {canAskTokens && (
+        {false && canAskTokens && (
           <>
             {declined && (
               <p className="rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300">

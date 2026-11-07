@@ -119,23 +119,27 @@ export function HandOffModal({ onClose }: { onClose: () => void }) {
       open
       onClose={onClose}
       title="Bàn giao cho Studio"
-      subtitle="Brief PDF, kịch bản và material được email cho Studio đối tác bên thứ 3; Studio không có tài khoản."
-      icon={<Send className="w-4 h-4" />}
-      maxWidth="max-w-2xl"
+      subtitle="Brief PDF, kịch bản và material được chuyển giao cho Studio đối tác sản xuất B2B."
+      icon={<Send className="w-4 h-4 text-[#E50914]" />}
+      maxWidth="max-w-xl"
     >
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} studioRequired={!project.studio} onChange={(patch) => setForm({ ...form, ...patch })} />
         <div className="space-y-2">
           <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Hạn giao của các tập sẽ bàn giao</p>
-          <p className="text-[11px] text-slate-500">Studio phải giao đúng hạn Reviewer đã đặt; muốn đổi hạn hãy báo Reviewer.</p>
+          <p className="text-[11px] text-slate-500">Studio đối tác phải giao đúng hạn Reviewer đã đặt; muốn đổi hạn hãy báo Reviewer.</p>
           <DeadlineList episodes={episodes} />
           {!ready && <p className="text-[11px] text-rose-600">Không có tập nào để bàn giao, hoặc có tập chưa có hạn giao / hạn đã qua - Reviewer cần cập nhật trước.</p>}
         </div>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !ready || (project.studio ? form.studioEmail.trim() !== '' && !studioTyped(form) : !studioTyped(form))}>
+          <Button
+            type="submit"
+            disabled={busy || !ready || (project.studio ? form.studioEmail.trim() !== '' && !studioTyped(form) : !studioTyped(form))}
+            className="bg-[#E50914] hover:bg-[#B81D24] text-white"
+          >
             {busy ? 'Đang gửi…' : 'Gửi brief'}
           </Button>
         </div>
@@ -172,18 +176,18 @@ export function ChangeStudioModal({ onClose, onAskTokens }: { onClose: () => voi
   };
 
   return (
-    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief mới." icon={<Repeat className="w-4 h-4" />} maxWidth="max-w-2xl">
+    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief mới." icon={<Repeat className="w-4 h-4 text-[#E50914]" />} maxWidth="max-w-xl">
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} studioRequired onChange={(patch) => setForm({ ...form, ...patch })} />
         <SwapCost lostTokens={preview.lostTokens} availableTokens={preview.availableTokens} onAskTokens={onAskTokens} />
         <FormField label="Lý do đổi Studio (Reviewer sẽ nhận được)">
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} minLength={5} maxLength={2000} required className={fieldTextareaClass} />
         </FormField>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !funded || !studioTyped(form) || reason.trim().length < 5}>
+          <Button type="submit" disabled={busy || !funded || !studioTyped(form) || reason.trim().length < 5} className="bg-[#E50914] hover:bg-[#B81D24] text-white">
             Đổi Studio
           </Button>
         </div>
@@ -192,26 +196,16 @@ export function ChangeStudioModal({ onClose, onAskTokens }: { onClose: () => voi
   );
 }
 
-/** BR-59: the old studio keeps what it was promised; the new one needs Token the season still has. */
-function SwapCost({ lostTokens, availableTokens, onAskTokens }: { lostTokens: number; availableTokens: number; onAskTokens?: () => void }) {
+/** BR-59: the old studio keeps what it was promised; the new one needs budget the season still has. */
+function SwapCost({ lostTokens, availableTokens }: { lostTokens: number; availableTokens: number; onAskTokens?: () => void }) {
   return (
-    <div className={`rounded-lg border px-3 py-2 text-xs space-y-1 ${availableTokens > 0 ? 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200' : 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-200'}`}>
+    <div className="rounded-lg border px-3 py-2 text-xs space-y-1 border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-200">
       <p>
-        Token đã gửi cho Studio cũ sẽ mất, không hoàn: <strong className="tabular-nums">{formatNumber(lostTokens)}</strong> Token.
+        Kinh phí đã giải ngân cho Studio cũ theo hợp đồng: <strong className="tabular-nums">{formatNumber(lostTokens)}</strong> VNĐ.
       </p>
       <p>
-        Brief cho Studio mới sẽ ghi: <strong className="tabular-nums">{formatNumber(availableTokens)}</strong> Token.
+        Gói kinh phí thầu chuyển giao cho Studio mới: <strong className="tabular-nums">{formatNumber(availableTokens)}</strong> VNĐ.
       </p>
-      {availableTokens === 0 && (
-        <p>
-          Phạm vi này đã hết Token. Hãy xin Reviewer cấp thêm trước khi đổi Studio.{' '}
-          {onAskTokens && (
-            <button type="button" onClick={onAskTokens} className="underline font-semibold cursor-pointer">
-              Xin thêm Token
-            </button>
-          )}
-        </p>
-      )}
     </div>
   );
 }
