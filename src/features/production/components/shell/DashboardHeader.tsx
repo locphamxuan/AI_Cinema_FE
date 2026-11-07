@@ -1,8 +1,6 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Clapperboard, ShieldCheck, Users, Sparkles, Film } from 'lucide-react';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
@@ -12,16 +10,9 @@ import { NotificationMenu } from './NotificationMenu';
 
 const AREA_ORDER: Area[] = ['creator', 'reviewer', 'staff', 'admin'];
 
-const AREA_ICON: Record<Area, React.ElementType> = {
-  creator: Clapperboard,
-  reviewer: ShieldCheck,
-  staff: Users,
-  admin: Sparkles,
-};
-
 /**
  * Slim top bar of every internal area: where you are, notifications, theme and the account menu.
- * Every role shares the brand colours; the role shows only in its badge.
+ * Redundant top logo removed so only the distinctive sidebar brand logo is displayed.
  */
 export function DashboardHeader() {
   const pathname = usePathname();
@@ -38,41 +29,45 @@ export function DashboardHeader() {
     router.push('/login');
   };
 
-  const AreaIcon = AREA_ICON[area] ?? Film;
-
   return (
-    <header className="sticky top-0 z-30 w-full border-b bg-background/90 backdrop-blur-md">
+    <header className="sticky top-0 z-30 w-full border-b border-slate-200 dark:border-white/[0.08] bg-white/95 dark:bg-[#0D1017]/95 backdrop-blur-md transition-colors duration-200 text-slate-900 dark:text-white">
       <div className="w-full px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-        {/* Logo + Area */}
-        <Link href={AREAS[area].path} className="flex items-center gap-3 min-w-0 group">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <AreaIcon className="size-4" aria-hidden="true" />
-          </div>
-          <div className="min-w-0">
-            <span className="block font-heading text-sm font-semibold leading-tight">AI Cinema</span>
-            <span className="text-xs leading-tight text-muted-foreground">{AREAS[area].label}</span>
-          </div>
+        {/* Left area: Clean space / Oversight badge (single logo in sidebar below) */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            {AREAS[area].label}
+          </span>
           {oversight && (
-            <span className="rounded-md border border-primary/20 bg-accent px-2 py-0.5 text-xs font-medium text-accent-foreground">
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/15">
               Chế độ giám sát
             </span>
           )}
-        </Link>
+        </div>
 
         {/* Right controls */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 ml-auto">
           {user && (
             <span
               aria-label="Vai trò của tài khoản"
-              className="hidden items-center gap-2 rounded-md border px-2.5 py-1 text-xs font-medium text-muted-foreground sm:flex"
+              className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-red-500/30 bg-slate-100/80 dark:bg-red-500/10 text-xs font-semibold text-slate-700 dark:text-red-200"
             >
-              <span className="size-1.5 rounded-full bg-highlight" aria-hidden="true" />
-              {ROLE_LABEL[user.role ?? 'user']}
+              <span className="w-1.5 h-1.5 rounded-full bg-[#E50914] animate-pulse" aria-hidden="true" />
+              <span>{ROLE_LABEL[user.role ?? 'user']}</span>
+              {area === 'creator' && (
+                <span className="text-[10px] font-bold text-red-500 dark:text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded-md">
+                  In-house Screenwriter
+                </span>
+              )}
             </span>
           )}
           {user && <NotificationMenu />}
           <ThemeToggle />
-          <AccountMenu name={user?.name ?? 'Tài khoản'} roleLabel={ROLE_LABEL[user?.role ?? 'user']} onLogout={handleLogout} profileHref={`/${area}/profile`} />
+          <AccountMenu
+            name={user?.name ?? 'Tài khoản'}
+            roleLabel={ROLE_LABEL[user?.role ?? 'user']}
+            onLogout={handleLogout}
+            profileHref={`/${area}/profile`}
+          />
         </div>
       </div>
     </header>
