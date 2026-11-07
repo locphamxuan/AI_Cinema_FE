@@ -25,6 +25,8 @@ export interface ProjectCapabilities {
   costAdjust: boolean;
   /** Ask the Admin for more production cost: the Reviewer who owns the project. */
   costRequest: boolean;
+  /** Send, sign or counter-propose a hand-off's contract: the Admin. */
+  contractManage: boolean;
   /** Speak to the studio: hand off, change studio, move milestones. Only the lead (BE `lead` role). */
   handoff: boolean;
   ingest: boolean;
@@ -56,6 +58,7 @@ export function projectCapabilities(
     lead,
     costAdjust: can(PERMISSION.COST_ADJUST),
     costRequest: owner && can(PERMISSION.COST_REQUEST),
+    contractManage: can(PERMISSION.CONTRACT_MANAGE),
     handoff: lead && can(PERMISSION.STUDIO_HANDOFF),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),
     review: owner && can(PERMISSION.CONTENT_REVIEW),

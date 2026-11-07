@@ -17,6 +17,7 @@ import type {
   UnpublishReason,
 } from '@/types/production';
 import type { CostEntryType, CostRequestStatus } from '@/types/cost';
+import type { ContractStatus } from '@/types/contract';
 
 export type Tone = 'neutral' | 'amber' | 'emerald' | 'blue' | 'purple' | 'rose';
 
@@ -115,6 +116,14 @@ export const COST_REQUEST_STATUS: Record<CostRequestStatus, Label> = {
   OPEN: { label: 'Chờ Admin duyệt', tone: 'amber' },
   APPROVED: { label: 'Admin đã cấp', tone: 'emerald' },
   REJECTED: { label: 'Admin từ chối', tone: 'rose' },
+};
+
+export const CONTRACT_STATUS: Record<ContractStatus, Label> = {
+  SENT: { label: 'Đã gửi studio, chờ báo giá', tone: 'neutral' },
+  STUDIO_SIGNED: { label: 'Studio đã ký, chờ Admin', tone: 'amber' },
+  ADMIN_COUNTERED: { label: 'Admin đề xuất giá mới, chờ studio', tone: 'amber' },
+  SIGNED: { label: 'Đã ký đủ 2 bên', tone: 'emerald' },
+  SUPERSEDED: { label: 'Đã thay bằng vòng mới', tone: 'neutral' },
 };
 
 export const CHANGE_REQUEST_STATUS: Record<ChangeRequestStatus, Label> = {

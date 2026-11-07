@@ -12,6 +12,7 @@ export const PERMISSION = {
   COST_REQUEST: 'cost:request',
   COST_APPROVE: 'cost:approve',
   COST_ADJUST: 'cost:adjust',
+  CONTRACT_MANAGE: 'contract:manage',
   STUDIO_HANDOFF: 'studio:handoff',
   STUDIO_MANAGE: 'studio:manage',
   MEDIA_INGEST: 'media:ingest',

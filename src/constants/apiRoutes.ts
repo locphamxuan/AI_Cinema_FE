@@ -131,6 +131,10 @@ export const API_ROUTES = {
     PRICE_ALERTS: '/admin/price-alerts',
     PRICE_ALERT_REQUEST_CHANGE: (id: string) => `/admin/price-alerts/${id}/request-change`,
     PRICE_ALERT_RESOLVE: (id: string) => `/admin/price-alerts/${id}/resolve`,
+    CONTRACTS: (movieId: string) => `/projects/${movieId}/contracts`,
+    CONTRACT_CREATE: (movieId: string, handoffId: string) => `/projects/${movieId}/handoffs/${handoffId}/contracts`,
+    CONTRACT_SIGN: (id: string) => `/contracts/${id}/sign`,
+    CONTRACT_COUNTER: (id: string) => `/contracts/${id}/counter`,
   },
 } as const;
 
