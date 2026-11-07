@@ -36,7 +36,7 @@ export function DashboardSidebar({
       {/* Studio Partner Portal section header */}
       <div className="hidden md:block px-5 py-4 border-b border-slate-200 dark:border-white/[0.08]">
         <p className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-[#E50914]">
-          {label || title}
+          {title || label}
         </p>
         <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate mt-0.5">
           {subtitle}

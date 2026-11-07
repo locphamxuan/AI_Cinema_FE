@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Clapperboard, ShieldCheck, Users, Sparkles, Film } from 'lucide-react';
+import { ShieldCheck, Users, Sparkles, Film, Feather } from 'lucide-react';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
@@ -13,7 +13,7 @@ import { NotificationMenu } from './NotificationMenu';
 const AREA_ORDER: Area[] = ['creator', 'reviewer', 'staff', 'admin'];
 
 const AREA_ICON: Record<Area, React.ElementType> = {
-  creator: Clapperboard,
+  creator: Feather,
   reviewer: ShieldCheck,
   staff: Users,
   admin: Sparkles,
@@ -56,7 +56,7 @@ export function DashboardHeader() {
               AI Cinema
             </span>
             <span className="text-xs text-slate-500 dark:text-slate-400 leading-tight">
-              {area === 'creator' ? 'Sản xuất nội dung' : AREAS[area].label}
+              {area === 'creator' ? 'CỔNG BIÊN KỊCH NỘI BỘ' : AREAS[area].label}
             </span>
           </div>
           {oversight && (
@@ -74,7 +74,12 @@ export function DashboardHeader() {
               className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-red-500/30 bg-slate-100/80 dark:bg-red-500/10 text-xs font-semibold text-slate-700 dark:text-red-200"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-[#E50914] animate-pulse" aria-hidden="true" />
-              {ROLE_LABEL[user.role ?? 'user']}
+              <span>{ROLE_LABEL[user.role ?? 'user']}</span>
+              {area === 'creator' && (
+                <span className="text-[10px] font-bold text-red-400 bg-red-500/20 px-1.5 py-0.5 rounded-md">
+                  In-house Screenwriter
+                </span>
+              )}
             </span>
           )}
           {user && <NotificationMenu />}

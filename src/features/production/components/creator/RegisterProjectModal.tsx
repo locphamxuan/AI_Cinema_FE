@@ -1,46 +1,29 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Sparkles, Clapperboard, Plus, Building2 } from 'lucide-react';
+import { X, FileText, Plus, Building2, BookOpen } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 import { productionService } from '@/services/productionService';
-import type { StudioProjectItem } from './types';
+import type { ScriptProjectItem } from './types';
 
 interface RegisterProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onProjectRegistered: (project: StudioProjectItem) => void;
+  onProjectRegistered: (project: ScriptProjectItem) => void;
 }
 
-const AI_TOOL_SUGGESTIONS = [
-  'Runway Gen-3',
-  'Midjourney v6',
-  'Kling AI',
-  'OpenAI Sora',
-  'ElevenLabs',
-  'Topaz Video AI',
-  'Stable Audio',
-  'Pika Labs',
-];
-
-const GENRE_SUGGESTIONS = ['Sci-Fi', 'Cyberpunk', 'Hành Động', 'Bio-Thriller', 'Kỳ Ảo', 'Space Opera'];
+const GENRE_SUGGESTIONS = ['Sci-Fi', 'Cyberpunk', 'Trinh Thám', 'Bio-Thriller', 'Kỳ Ảo', 'Space Opera', 'Hành Động'];
 
 export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: RegisterProjectModalProps) {
   const [title, setTitle] = useState('');
-  const [tagline, setTagline] = useState('');
-  const [studioName, setStudioName] = useState('');
-  const [episodesCount, setEpisodesCount] = useState(3);
-  const [selectedTools, setSelectedTools] = useState<string[]>(['Runway Gen-3', 'Midjourney v6']);
+  const [logline, setLogline] = useState('');
+  const [targetStudio, setTargetStudio] = useState('');
+  const [episodesCount, setEpisodesCount] = useState(5);
   const [selectedGenres, setSelectedGenres] = useState<string[]>(['Sci-Fi', 'Cyberpunk']);
+  const [adminBrief, setAdminBrief] = useState('Định hướng kịch bản phân cảnh tiêu chuẩn OTT từ Admin System');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isOpen) return null;
-
-  const toggleTool = (tool: string) => {
-    setSelectedTools((prev) =>
-      prev.includes(tool) ? prev.filter((t) => t !== tool) : [...prev, tool]
-    );
-  };
 
   const toggleGenre = (genre: string) => {
     setSelectedGenres((prev) =>
@@ -51,21 +34,21 @@ export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: R
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      toast.error('Vui lòng nhập tên dự án phim');
+      toast.error('Vui lòng nhập tên dự án kịch bản');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      let backendId = `new-proj-${Date.now()}`;
+      let backendId = `new-script-${Date.now()}`;
       try {
         const deadline = new Date();
-        deadline.setDate(deadline.getDate() + 14);
+        deadline.setDate(deadline.getDate() + 30);
         const deadlineStr = deadline.toISOString().split('T')[0];
 
         const createdRes = await productionService.createProject({
           title: title.trim(),
-          ideaDescription: tagline.trim() || 'Hồ sơ sản xuất phim ứng dụng AI theo chuẩn Điều 44.',
+          ideaDescription: logline.trim() || 'Kịch bản phân cảnh sản xuất phim OTT.',
           genreIds: [],
           defaultLanguage: 'vi',
           seasons: [
@@ -87,33 +70,39 @@ export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: R
         console.warn('Backend project creation fallback:', err);
       }
 
-      const newProject: StudioProjectItem = {
+      const newProject: ScriptProjectItem = {
         id: backendId,
         title: title.trim(),
-        tagline: tagline.trim() || 'Dự án phim điện ảnh AI mới đăng ký.',
-        posterUrl: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80',
+        tagline: logline.trim() || 'Dự án kịch bản phân cảnh mới khởi tạo.',
+        conceptArtUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80',
+        posterUrl: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80',
         status: 'DRAFT',
         movieStatus: 'DRAFT',
-        statusLabel: 'Bản nháp kịch bản',
+        statusLabel: 'BẢN NHÁP KỊCH BẢN',
         genreTags: selectedGenres.length > 0 ? selectedGenres : ['Sci-Fi'],
-        aiTools: selectedTools.length > 0 ? selectedTools : ['Runway Gen-3'],
-        approvedEpisodes: 0,
         totalEpisodes: episodesCount,
-        revenueCoin: 0,
-        studioName: studioName.trim() || 'Studio Partner',
+        completedScriptEpisodes: 0,
+        assignedBy: 'Admin System',
+        assignedDate: new Date().toLocaleDateString('vi-VN'),
+        partnerStudioName: targetStudio.trim() || 'Chưa chuyển giao Studio',
+        contractStatus: 'Bản thảo kịch bản',
         reviewerName: 'Chưa phân công',
         lastUpdatedText: 'Vừa xong',
+        notes: adminBrief.trim() || 'Khởi tạo kịch bản phân cảnh',
+        approvedEpisodes: 0,
+        revenueCoin: 0,
+        studioName: targetStudio.trim() || 'Chưa chọn Studio',
         complianceBadge: {
           status: 'DRAFT',
-          label: 'Bản nháp - Đang chuẩn bị hồ sơ Điều 44',
+          label: 'Bản nháp kịch bản phân cảnh',
         },
       };
 
       onProjectRegistered(newProject);
-      toast.success('Đã đăng ký dự án phim thành công!');
+      toast.success('Đã tạo hồ sơ kịch bản phân cảnh mới!');
       onClose();
     } catch {
-      toast.error('Không thể đăng ký dự án, vui lòng thử lại');
+      toast.error('Không thể tạo hồ sơ kịch bản, vui lòng thử lại');
     } finally {
       setIsSubmitting(false);
     }
@@ -123,80 +112,80 @@ export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: R
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
     >
-      <div className="relative w-full max-w-xl rounded-2xl bg-white dark:bg-[#131722] border border-slate-200 dark:border-white/[0.12] p-6 shadow-2xl text-slate-900 dark:text-slate-100">
+      <div className="relative w-full max-w-xl rounded-2xl bg-[#111420] border border-white/[0.12] p-6 shadow-2xl text-slate-100">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.08] transition-colors"
+          className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-white/[0.08]">
-          <div className="w-10 h-10 rounded-xl bg-indigo-600 dark:bg-[#E50914] flex items-center justify-center text-white shadow-xs">
-            <Clapperboard className="w-5 h-5" />
+        <div className="flex items-center gap-3 pb-4 border-b border-white/[0.08]">
+          <div className="w-10 h-10 rounded-xl bg-[#E50914] flex items-center justify-center text-white shadow-xs">
+            <FileText className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Đăng Ký Dự Án Phim AI</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Khai báo hồ sơ dự án, thể loại và công cụ AI theo chuẩn Điều 44
+            <h2 className="text-lg font-bold text-white">Soạn Thảo Kịch Bản Mới</h2>
+            <p className="text-xs text-slate-400">
+              Khởi tạo hồ sơ kịch bản phân cảnh theo brief định hướng của Admin
             </p>
           </div>
         </div>
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          {/* Movie Title */}
+          {/* Script Title */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              Tên Dự Án Phim <span className="text-indigo-600 dark:text-[#E50914]">*</span>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              Tên Dự Án Kịch Bản <span className="text-[#E50914]">*</span>
             </label>
             <input
               type="text"
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="VD: Kỷ Nguyên Số: Sài Gòn 2088"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-[#0A0D14] border border-slate-200 dark:border-white/[0.1] text-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white focus:outline-none focus:border-indigo-500 dark:focus:border-[#8B5CF6] focus:ring-1 focus:ring-indigo-500 dark:focus:ring-[#8B5CF6]"
+              placeholder="VD: Kỷ Nguyên Vô Tận: Cyber Saigon 2077"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white/[0.05] border border-white/10 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]"
             />
           </div>
 
-          {/* Tagline / Idea */}
+          {/* Logline / Plot outline */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              Ý Tưởng / Giới Thiệu Ngắn (Logline)
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              Ý Tưởng / Tóm Tắt Cốt Truyện (Logline)
             </label>
             <textarea
               rows={2}
-              value={tagline}
-              onChange={(e) => setTagline(e.target.value)}
-              placeholder="Mô tả tóm tắt kịch bản và bối cảnh nghệ thuật..."
-              className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#0A0D14] border border-slate-200 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white focus:outline-none focus:border-indigo-500 dark:focus:border-[#8B5CF6] focus:ring-1 focus:ring-indigo-500 dark:focus:ring-[#8B5CF6]"
+              value={logline}
+              onChange={(e) => setLogline(e.target.value)}
+              placeholder="Tóm tắt ngắn gọn tiền đề kịch bản, xung đột trung tâm và thế giới nghệ thuật..."
+              className="w-full px-3.5 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914]"
             />
           </div>
 
-          {/* Studio Name & Number of Episodes */}
+          {/* Studio Target & Episodes Count */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1">
-                <Building2 className="w-3.5 h-3.5 text-amber-500" />
-                Đối Tác Studio
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1">
+                <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                Studio Đề Xuất Chuyển Giao
               </label>
               <input
                 type="text"
-                value={studioName}
-                onChange={(e) => setStudioName(e.target.value)}
-                placeholder="VD: Cyber Saigon VFX"
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#0A0D14] border border-slate-200 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white focus:outline-none focus:border-indigo-500 dark:focus:border-[#8B5CF6]"
+                value={targetStudio}
+                onChange={(e) => setTargetStudio(e.target.value)}
+                placeholder="VD: Studio Saigon VFX (hoặc để trống)"
+                className="w-full px-3.5 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#E50914]"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-                Số Tập Dự Kiến
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                Số Tập Phân Cảnh
               </label>
               <input
                 type="number"
@@ -204,42 +193,15 @@ export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: R
                 max={50}
                 value={episodesCount}
                 onChange={(e) => setEpisodesCount(Number(e.target.value))}
-                className="w-full px-3.5 py-2 rounded-xl bg-slate-50 dark:bg-[#0A0D14] border border-slate-200 dark:border-white/[0.1] text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:bg-white focus:outline-none focus:border-indigo-500 dark:focus:border-[#8B5CF6]"
+                className="w-full px-3.5 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#E50914]"
               />
-            </div>
-          </div>
-
-          {/* AI Tools Selection */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-500 dark:text-purple-400" />
-              Công Cụ AI Khai Báo (Tuân thủ Điều 44)
-            </label>
-            <div className="flex flex-wrap gap-1.5">
-              {AI_TOOL_SUGGESTIONS.map((tool) => {
-                const selected = selectedTools.includes(tool);
-                return (
-                  <button
-                    key={tool}
-                    type="button"
-                    onClick={() => toggleTool(tool)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
-                      selected
-                        ? 'bg-indigo-600 text-white dark:bg-[#8B5CF6] dark:text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-[#0A0D14] dark:text-slate-400 dark:border-white/[0.08] hover:text-slate-900 dark:hover:text-white'
-                    }`}
-                  >
-                    {tool}
-                  </button>
-                );
-              })}
             </div>
           </div>
 
           {/* Genre Selection */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
-              Thể Loại Phim
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              Thể Loại Kịch Bản
             </label>
             <div className="flex flex-wrap gap-1.5">
               {GENRE_SUGGESTIONS.map((genre) => {
@@ -249,10 +211,10 @@ export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: R
                     key={genre}
                     type="button"
                     onClick={() => toggleGenre(genre)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all cursor-pointer ${
                       selected
-                        ? 'bg-indigo-600 text-white dark:bg-[#E50914] dark:text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-[#0A0D14] dark:text-slate-400 dark:border-white/[0.08] hover:text-slate-900 dark:hover:text-white'
+                        ? 'bg-[#E50914] text-white shadow-xs font-bold'
+                        : 'bg-white/[0.04] text-slate-400 border border-white/[0.08] hover:text-white'
                     }`}
                   >
                     {genre}
@@ -262,23 +224,38 @@ export function RegisterProjectModal({ isOpen, onClose, onProjectRegistered }: R
             </div>
           </div>
 
+          {/* Admin Brief Reference */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-amber-400" />
+              Định Hướng Từ Admin System
+            </label>
+            <input
+              type="text"
+              value={adminBrief}
+              onChange={(e) => setAdminBrief(e.target.value)}
+              placeholder="Yêu cầu định hướng phân cảnh, thông điệp kịch bản..."
+              className="w-full px-3.5 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#E50914]"
+            />
+          </div>
+
           {/* Modal Actions */}
-          <div className="pt-4 border-t border-slate-100 dark:border-white/[0.08] flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-white/[0.08] flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-white/[0.04] hover:bg-slate-200 dark:hover:bg-white/[0.08] transition-colors"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] transition-colors cursor-pointer"
             >
               Hủy
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-[#E50914] dark:hover:bg-[#D10813] shadow-md shadow-indigo-600/30 dark:shadow-red-950/40 flex items-center gap-2 transition-all cursor-pointer"
+              className="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-[#E50914] hover:bg-[#B81D24] shadow-md shadow-red-950/50 flex items-center gap-2 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>{isSubmitting ? 'Đang tạo...' : 'Xác Nhận Đăng Ký'}</span>
+              <span>{isSubmitting ? 'Đang tạo...' : 'Tạo Kịch Bản Phân Cảnh'}</span>
             </button>
           </div>
         </form>

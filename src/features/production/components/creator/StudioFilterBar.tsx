@@ -1,24 +1,24 @@
 'use client';
 
 import { Search, LayoutGrid, List } from 'lucide-react';
-import type { StudioFilterKey } from './types';
+import type { ScriptFilterKey } from './types';
 
 interface StudioFilterBarProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  activeFilter: StudioFilterKey;
-  onFilterChange: (filter: StudioFilterKey) => void;
+  activeFilter: ScriptFilterKey;
+  onFilterChange: (filter: ScriptFilterKey) => void;
   viewMode: 'grid' | 'table';
   onViewModeChange: (mode: 'grid' | 'table') => void;
   totalFilteredCount: number;
 }
 
-const FILTER_OPTIONS: { key: StudioFilterKey; label: string }[] = [
+const FILTER_OPTIONS: { key: ScriptFilterKey; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
-  { key: 'published', label: 'Đang phát hành' },
-  { key: 'review', label: 'Chờ thẩm định' },
-  { key: 'revision', label: 'Cần chỉnh sửa' },
   { key: 'draft', label: 'Bản nháp' },
+  { key: 'review', label: 'Chờ Reviewer duyệt' },
+  { key: 'admin_approval', label: 'Chờ Admin chốt' },
+  { key: 'handed_off', label: 'Đã chuyển giao Studio' },
 ];
 
 export function StudioFilterBar({
@@ -35,7 +35,7 @@ export function StudioFilterBar({
       {/* Filter Tabs */}
       <div
         role="tablist"
-        aria-label="Lọc danh mục dự án phim"
+        aria-label="Lọc trạng thái kịch bản phân cảnh"
         className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none"
       >
         {FILTER_OPTIONS.map(({ key, label }) => {
@@ -50,7 +50,7 @@ export function StudioFilterBar({
               className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                 isActive
                   ? 'bg-[#E50914] text-white shadow-lg shadow-red-950/50 font-bold'
-                  : 'bg-[#121622] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.08]'
+                  : 'bg-[#111420] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.08]'
               }`}
             >
               <span>{label}</span>
@@ -76,7 +76,7 @@ export function StudioFilterBar({
             type="search"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Tìm kiếm theo tên phim, thể loại..."
+            placeholder="Tìm theo tên kịch bản, thể loại..."
             className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/[0.05] border border-white/10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#E50914] focus:ring-1 focus:ring-[#E50914] transition-all shadow-xs"
           />
         </div>
@@ -85,7 +85,7 @@ export function StudioFilterBar({
         <div
           role="group"
           aria-label="Chế độ hiển thị"
-          className="flex items-center p-1 rounded-xl bg-[#121622] border border-white/[0.08] shrink-0"
+          className="flex items-center p-1 rounded-xl bg-[#111420] border border-white/[0.08] shrink-0"
         >
           <button
             type="button"
@@ -98,12 +98,12 @@ export function StudioFilterBar({
                 : 'text-slate-500 hover:text-white'
             }`}
           >
-            <LayoutGrid className="w-4 h-4" aria-hidden="true" />
+            <LayoutGrid className="w-4 h-4" />
           </button>
           <button
             type="button"
             onClick={() => onViewModeChange('table')}
-            title="Dạng Bảng (List)"
+            title="Dạng Bảng (Table)"
             aria-pressed={viewMode === 'table'}
             className={`p-2 rounded-lg transition-colors cursor-pointer ${
               viewMode === 'table'
@@ -111,7 +111,7 @@ export function StudioFilterBar({
                 : 'text-slate-500 hover:text-white'
             }`}
           >
-            <List className="w-4 h-4" aria-hidden="true" />
+            <List className="w-4 h-4" />
           </button>
         </div>
       </div>

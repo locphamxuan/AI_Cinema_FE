@@ -18,7 +18,7 @@ export function AdminSidebar() {
   }));
   return (
     <DashboardSidebar
-      label="ADMIN CONSOLE"
+      label="Khu quản trị"
       title="ADMIN CONSOLE"
       subtitle="Vận Hành Toàn Nền Tảng"
       icon={LayoutDashboard}
