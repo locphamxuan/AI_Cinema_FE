@@ -1,5 +1,5 @@
-import { TokenRequestsPage } from '@/features/token-request/TokenRequestsPage';
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return <TokenRequestsPage />;
+  redirect('/creator/projects');
 }

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Repeat, Send } from 'lucide-react';
@@ -121,7 +121,7 @@ export function HandOffModal({ onClose }: { onClose: () => void }) {
       title="Bàn giao cho Studio"
       subtitle="Brief PDF, kịch bản và material được chuyển giao cho Studio đối tác sản xuất B2B."
       icon={<Send className="w-4 h-4 text-[#E50914]" />}
-      maxWidth="max-w-xl"
+      maxWidth="max-w-lg"
     >
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} studioRequired={!project.studio} onChange={(patch) => setForm({ ...form, ...patch })} />
@@ -176,7 +176,7 @@ export function ChangeStudioModal({ onClose, onAskTokens }: { onClose: () => voi
   };
 
   return (
-    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief mới." icon={<Repeat className="w-4 h-4 text-[#E50914]" />} maxWidth="max-w-xl">
+    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief mới." icon={<Repeat className="w-4 h-4 text-[#E50914]" />} maxWidth="max-w-lg">
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} studioRequired onChange={(patch) => setForm({ ...form, ...patch })} />
         <SwapCost lostTokens={preview.lostTokens} availableTokens={preview.availableTokens} onAskTokens={onAskTokens} />
