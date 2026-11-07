@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   Play,
   Pause,
-  AlertCircle,
   PlusCircle,
   Building2,
   MessageSquare,
@@ -61,38 +60,38 @@ export function ReviewerAuditCanvas({
   const progressPercent = Math.min(100, (currentTime / episode.durationSeconds) * 100);
 
   return (
-    <div className="flex-1 min-w-0 bg-[#090B10] text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
+    <div className="flex-1 min-w-0 bg-[#F8FAFC] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto transition-colors duration-200">
       {/* ── 1. Thanh Công Cụ Đầu Canvas (Toolbar) ── */}
-      <header className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/[0.08]">
+      <header className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-white/[0.08]">
         {/* Navigation & Autosave */}
         <div className="flex items-center gap-2 text-xs">
           <button
             type="button"
-            className="w-7 h-7 rounded-lg bg-white/[0.05] hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+            className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-transparent flex items-center justify-center transition-colors shadow-xs"
             title="Thu phóng toàn màn hình"
           >
             <Maximize2 className="w-3.5 h-3.5" />
           </button>
 
-          <div className="flex items-center gap-1 bg-white/[0.03] border border-white/[0.08] rounded-lg p-0.5">
+          <div className="flex items-center gap-1 bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/[0.08] rounded-lg p-0.5 shadow-xs">
             <button
               type="button"
-              className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1 rounded text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
               title="Tập trước: Tập 01"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
-            <span className="px-2 font-medium text-slate-300">Tập 02 / 08</span>
+            <span className="px-2 font-medium text-slate-700 dark:text-slate-300">Tập 02 / 08</span>
             <button
               type="button"
-              className="p-1 rounded text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1 rounded text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
               title="Tập sau: Tập 03"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <span className="hidden sm:inline-flex items-center gap-1.5 text-slate-400 pl-2">
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-slate-500 dark:text-slate-400 pl-2">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>Tự động lưu bản kiểm duyệt lúc 14:20</span>
           </span>
@@ -106,26 +105,26 @@ export function ReviewerAuditCanvas({
             onClick={onToggleAiCompliance}
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-xs cursor-pointer ${
               isComplianceActive
-                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
-                : 'bg-white/[0.05] hover:bg-white/10 text-slate-300 hover:text-white border-white/10'
+                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                : 'bg-white dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-white/10'
             }`}
           >
-            <ShieldCheck className={`w-4 h-4 ${isComplianceActive ? 'text-emerald-400' : 'text-slate-400'}`} />
+            <ShieldCheck className={`w-4 h-4 ${isComplianceActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
             <span>{isComplianceActive ? '✅ Đã Cấp Nhãn Tuân Thủ AI (Điều 44)' : '⚖️ Gắn Nhãn AI Điều 44'}</span>
           </button>
 
           <button
             type="button"
-            className="w-7 h-7 rounded-lg bg-white/[0.05] hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition-colors"
+            className="w-7 h-7 rounded-lg bg-white dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-transparent flex items-center justify-center transition-colors shadow-xs"
           >
             <MoreHorizontal className="w-4 h-4" />
           </button>
         </div>
       </header>
 
-      {/* ── 2. Khung Media Player (Video Master 16:9) ── */}
+      {/* ── 2. Khung Media Player (Video Master 16:9 - Giữ phong cách dark cinematic chuẩn) ── */}
       <section aria-label="Trình thẩm định Video Master" className="space-y-2">
-        <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#0D1017] border border-white/[0.1] shadow-2xl group">
+        <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-[#0D1017] border border-slate-300 dark:border-white/[0.1] shadow-2xl group">
           {/* Visual Poster / Frame */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -241,32 +240,32 @@ export function ReviewerAuditCanvas({
       </section>
 
       {/* ── 3. Thanh Thao Tác Ngắn (Dưới video - Refero Links Style) ── */}
-      <section className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-400 border-b border-white/[0.08] pb-4">
-        <div className="flex items-center gap-1.5 text-slate-300">
+      <section className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-white/[0.08] pb-4">
+        <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
           <Building2 className="w-3.5 h-3.5 text-[#E50914]" />
-          <span>Studio: <strong className="text-white">{episode.studioName}</strong></span>
+          <span>Studio: <strong className="text-slate-900 dark:text-white">{episode.studioName}</strong></span>
         </div>
 
-        <span className="text-slate-600">•</span>
+        <span className="text-slate-300 dark:text-slate-600">•</span>
 
-        <div className="flex items-center gap-1.5 text-amber-400">
+        <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
           <MessageSquare className="w-3.5 h-3.5" />
           <span><strong>{tickets.length} Góp ý cần sửa</strong></span>
         </div>
 
-        <span className="text-slate-600">•</span>
+        <span className="text-slate-300 dark:text-slate-600">•</span>
 
-        <div className="flex items-center gap-1.5 text-slate-300">
-          <Cpu className="w-3.5 h-3.5 text-indigo-400" />
-          <span>Công nghệ: <strong className="text-white">{episode.aiTechStack.join(' • ')}</strong></span>
+        <div className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+          <Cpu className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" />
+          <span>Công nghệ: <strong className="text-slate-900 dark:text-white">{episode.aiTechStack.join(' • ')}</strong></span>
         </div>
 
-        <span className="text-slate-600">•</span>
+        <span className="text-slate-300 dark:text-slate-600">•</span>
 
         <button
           type="button"
           onClick={() => setActiveReportTab('ai_prompts')}
-          className="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-semibold cursor-pointer transition-colors"
+          className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 font-semibold cursor-pointer transition-colors"
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span>✨ Tóm tắt vi phạm AI ({episode.promptsCount} prompts)</span>
@@ -275,26 +274,26 @@ export function ReviewerAuditCanvas({
 
       {/* ── 4. Tiêu Đề & Tag Thông Tin (Refero Headline Style) ── */}
       <section className="space-y-3">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           {episode.projectTitle} - Tập {episode.episodeNumber < 10 ? `0${episode.episodeNumber}` : episode.episodeNumber}: {episode.episodeTitle}
         </h1>
 
         {/* Dãy Pill Tags nhỏ bo tròn */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Pill 1: Thẩm định viên */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-xs font-medium">
-            <User className="w-3 h-3 text-slate-400" />
-            <span>Thẩm định viên: <strong className="text-white">{episode.reviewerName}</strong></span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-medium">
+            <User className="w-3 h-3 text-slate-500 dark:text-slate-400" />
+            <span>Thẩm định viên: <strong className="text-slate-900 dark:text-white">{episode.reviewerName}</strong></span>
           </div>
 
           {/* Pill 2: Bản dựng */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-xs font-medium">
-            <Layers className="w-3 h-3 text-indigo-400" />
-            <span>Bản dựng: <strong className="text-white">{episode.version}</strong></span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 text-xs font-medium">
+            <Layers className="w-3 h-3 text-indigo-500 dark:text-indigo-400" />
+            <span>Bản dựng: <strong className="text-slate-900 dark:text-white">{episode.version}</strong></span>
           </div>
 
           {/* Pill 3: Trạng thái */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-bold">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 text-xs font-bold">
             <Clock className="w-3 h-3" />
             <span>Trạng thái: Đang kiểm duyệt</span>
           </div>
@@ -303,8 +302,8 @@ export function ReviewerAuditCanvas({
           <div
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border transition-colors ${
               isComplianceActive
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : 'bg-slate-800 text-slate-400 border-slate-700'
+                ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700'
             }`}
           >
             <ShieldCheck className="w-3 h-3" />
@@ -314,16 +313,16 @@ export function ReviewerAuditCanvas({
       </section>
 
       {/* ── 5. Khu Vực Báo Cáo Kỹ Thuật (Script / AI Log Preview) ── */}
-      <section className="rounded-2xl bg-[#111420] border border-white/[0.08] p-5 space-y-4">
+      <section className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-5 space-y-4 shadow-sm transition-colors">
         {/* Sub-tabs for technical comparison */}
-        <div className="flex items-center gap-2 border-b border-white/[0.08] pb-3">
+        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-white/[0.08] pb-3">
           <button
             type="button"
             onClick={() => setActiveReportTab('script')}
             className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeReportTab === 'script'
                 ? 'bg-[#E50914]/15 text-[#E50914] border border-[#E50914]/30'
-                : 'text-slate-400 hover:text-white'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
@@ -336,7 +335,7 @@ export function ReviewerAuditCanvas({
             className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeReportTab === 'ai_prompts'
                 ? 'bg-[#E50914]/15 text-[#E50914] border border-[#E50914]/30'
-                : 'text-slate-400 hover:text-white'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <Cpu className="w-3.5 h-3.5" />
@@ -347,7 +346,7 @@ export function ReviewerAuditCanvas({
         {/* Tab 1: Script Screenplay Comparison */}
         {activeReportTab === 'script' ? (
           <div className="space-y-3">
-            <p className="text-xs text-slate-400 italic">
+            <p className="text-xs text-slate-500 dark:text-slate-400 italic">
               * Đối chiếu từng câu thoại và miêu tả hành động trong kịch bản Final Draft từ In-house Creator với diễn biến trên video Master của Studio.
             </p>
 
@@ -359,8 +358,8 @@ export function ReviewerAuditCanvas({
                   onClick={() => setSelectedSceneIndex(idx)}
                   className={`text-left p-2.5 rounded-xl border text-xs transition-all cursor-pointer ${
                     selectedSceneIndex === idx
-                      ? 'bg-white/[0.08] border-[#E50914] text-white shadow-xs'
-                      : 'bg-white/[0.02] border-white/[0.05] text-slate-400 hover:text-slate-200'
+                      ? 'bg-slate-100 dark:bg-white/[0.08] border-[#E50914] text-slate-900 dark:text-white shadow-xs'
+                      : 'bg-slate-50 dark:bg-white/[0.02] border-slate-200 dark:border-white/[0.05] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   <p className="font-bold text-[#E50914]">{item.act}</p>
@@ -369,19 +368,19 @@ export function ReviewerAuditCanvas({
               ))}
             </div>
 
-            <div className="rounded-xl bg-black/40 border border-white/[0.06] p-4 text-xs space-y-2">
-              <div className="flex items-center justify-between text-slate-400">
-                <span className="font-bold text-white uppercase tracking-wider text-[11px]">
+            <div className="rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/[0.06] p-4 text-xs space-y-2">
+              <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
+                <span className="font-bold text-slate-900 dark:text-white uppercase tracking-wider text-[11px]">
                   {episode.scriptExcerpt[selectedSceneIndex].scene}
                 </span>
                 <span className="text-[11px] font-mono text-slate-500">
                   {episode.scriptExcerpt[selectedSceneIndex].act}
                 </span>
               </div>
-              <p className="text-slate-300 leading-relaxed">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 {episode.scriptExcerpt[selectedSceneIndex].description}
               </p>
-              <div className="pt-2 border-t border-white/[0.06] text-amber-300 font-mono">
+              <div className="pt-2 border-t border-slate-200 dark:border-white/[0.06] text-amber-700 dark:text-amber-300 font-mono">
                 {episode.scriptExcerpt[selectedSceneIndex].dialogue}
               </div>
             </div>
@@ -389,7 +388,7 @@ export function ReviewerAuditCanvas({
         ) : (
           /* Tab 2: AI Model Provenance & Prompts Disclosure */
           <div className="space-y-3">
-            <p className="text-xs text-slate-400 italic">
+            <p className="text-xs text-slate-500 dark:text-slate-400 italic">
               * Hồ sơ khai báo dữ liệu AI theo Điều 44 Luật Trí tuệ Nhân tạo. Reviewer đối soát nguồn gốc model và quyền sử dụng thương mại.
             </p>
 
@@ -397,18 +396,18 @@ export function ReviewerAuditCanvas({
               {episode.aiDisclosureLogs.map((log) => (
                 <div
                   key={log.tool}
-                  className="rounded-xl bg-black/40 border border-white/[0.06] p-3 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                  className="rounded-xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/[0.06] p-3 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-white">{log.tool}</span>
-                      <span className="text-[11px] font-mono text-slate-400">({log.model})</span>
+                      <span className="font-bold text-slate-900 dark:text-white">{log.tool}</span>
+                      <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">({log.model})</span>
                     </div>
-                    <p className="text-slate-300">{log.purpose}</p>
+                    <p className="text-slate-700 dark:text-slate-300">{log.purpose}</p>
                     <p className="text-slate-500 text-[11px]">{log.notes}</p>
                   </div>
 
-                  <span className="shrink-0 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold inline-flex items-center gap-1 self-start sm:self-center">
+                  <span className="shrink-0 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 text-[11px] font-bold inline-flex items-center gap-1 self-start sm:self-center">
                     <CheckCircle2 className="w-3 h-3" />
                     <span>Đã Kiểm Định</span>
                   </span>
