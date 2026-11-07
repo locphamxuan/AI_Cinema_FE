@@ -110,25 +110,24 @@ export function AdminExecutivePortal() {
       streamedMovies: prev.streamedMovies + 1,
       awaitingPublish: Math.max(0, prev.awaitingPublish - 1),
     }));
-
     toast.success(
-      'Phát Hành OTT Thành Công! 🚀',
-      `Tác phẩm "${movieTitle}" đã chính thức lên sóng trang chủ AI Cinema và gửi thông báo tới toàn bộ khán giả.`
+      'Phát Hành Thành Công!',
+      `Tác phẩm "${movieTitle}" đã chính thức lên sóng kho phim OTT AI Cinema và xuất hiện tại Banner Trang Chủ.`
     );
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#090B10] text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6 transition-colors duration-200">
+    <div className="min-h-screen w-full bg-[#F8FAFC] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8 space-y-6 transition-colors duration-200">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Sub-tabs điều hướng: Main Flow 1 vs Charts */}
-        <div className="flex items-center gap-2 border-b border-white/[0.08] pb-3 text-xs">
+        <div className="flex items-center gap-2 border-b border-slate-200 dark:border-white/[0.08] pb-3 text-xs">
           <button
             type="button"
             onClick={() => setActiveTab('b2b_projects')}
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
               activeTab === 'b2b_projects'
                 ? 'bg-[#E50914] text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05]'
             }`}
           >
             <Clapperboard className="w-3.5 h-3.5" />
@@ -141,7 +140,7 @@ export function AdminExecutivePortal() {
             className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl font-bold transition-all cursor-pointer ${
               activeTab === 'analytics_charts'
                 ? 'bg-[#E50914] text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05]'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5" />
@@ -156,26 +155,26 @@ export function AdminExecutivePortal() {
             {/* ── 1. Khung Header / Profile Admin (Tầng trên cùng) ── */}
             <section
               aria-label="Hồ sơ quản trị viên"
-              className="rounded-2xl bg-[#111420] border border-white/[0.08] p-6 sm:p-7 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-5 transition-all"
+              className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-6 sm:p-7 shadow-sm dark:shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-5 transition-all"
             >
               <div className="flex items-center gap-4">
                 {/* Avatar circle */}
                 <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gradient-to-tr from-red-600 to-amber-500 p-0.5 shrink-0 shadow-lg">
-                  <div className="w-full h-full rounded-full bg-[#111420] flex items-center justify-center font-black text-2xl text-white">
+                  <div className="w-full h-full rounded-full bg-slate-100 dark:bg-[#111420] flex items-center justify-center font-black text-2xl text-slate-800 dark:text-white">
                     A
                   </div>
                 </div>
 
                 {/* Name & Handle */}
                 <div className="space-y-0.5">
-                  <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                  <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                     <span>Quản Trị Viên Hệ Thống</span>
                     <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-[#E50914] text-[10px] font-mono border border-red-500/20 font-bold">
                       Executive Admin
                     </span>
                   </h1>
-                  <p className="text-xs sm:text-sm text-slate-400 font-medium font-mono">
-                    admin@aicinema.vn • <span className="text-emerald-400 font-sans font-semibold">B2B Studio Contract & Release Authority</span>
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium font-mono">
+                    admin@aicinema.vn • <span className="text-emerald-600 dark:text-emerald-400 font-sans font-semibold">B2B Studio Contract & Release Authority</span>
                   </p>
                 </div>
               </div>
@@ -196,11 +195,11 @@ export function AdminExecutivePortal() {
             {/* ── 2. Khung Số Liệu Trọng Tâm (Metrics - Tương tự Earnings trong BMC) ── */}
             <section
               aria-label="Thống kê dự án và hợp đồng"
-              className="rounded-2xl bg-[#111420] border border-white/[0.08] p-6 sm:p-7 shadow-xl space-y-5 transition-all"
+              className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-6 sm:p-7 shadow-sm dark:shadow-xl space-y-5 transition-all"
             >
               {/* Top Row: Title + Time Dropdown */}
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-extrabold text-white tracking-tight">
+                <h2 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                   Dự Án & Hợp Đồng Đang Chạy
                 </h2>
 
@@ -209,7 +208,7 @@ export function AdminExecutivePortal() {
                     value={timeRange}
                     onChange={(e) => setTimeRange(e.target.value)}
                     aria-label="Khoảng thời gian thống kê"
-                    className="appearance-none rounded-xl border border-white/[0.08] bg-black/40 pl-4 pr-8 py-1.5 text-xs font-semibold text-slate-300 focus:outline-none focus:border-[#E50914] cursor-pointer"
+                    className="appearance-none rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-black/40 pl-4 pr-8 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[#E50914] cursor-pointer shadow-xs"
                   >
                     <option value="all">Toàn bộ thời gian</option>
                     <option value="quarter">Quý này (Quý IV)</option>
@@ -222,32 +221,32 @@ export function AdminExecutivePortal() {
               {/* Big Number Headline */}
               <div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl sm:text-5xl font-black text-white tracking-tight font-sans">
+                  <span className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight font-sans">
                     {metrics.totalProjects}
                   </span>
-                  <span className="text-base font-bold text-slate-400">
+                  <span className="text-base font-bold text-slate-500 dark:text-slate-400">
                     Dự án phim điện ảnh AI trong hệ thống
                   </span>
                 </div>
               </div>
 
               {/* Colored Dot Breakdown */}
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-xs font-semibold text-slate-300">
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-xs font-semibold text-slate-700 dark:text-slate-300">
                 {/* Dot 1: Green - Phim đã lên sóng */}
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 shrink-0" />
                   <span><strong>{metrics.streamedMovies}</strong> Phim đã lên sóng OTT</span>
                 </div>
 
                 {/* Dot 2: Purple - Hợp đồng Studio */}
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-purple-400 shrink-0" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-purple-500 dark:bg-purple-400 shrink-0" />
                   <span><strong>{metrics.activeContracts}</strong> Hợp đồng đã ký với Studio (Đang dựng)</span>
                 </div>
 
                 {/* Dot 3: Yellow - Kịch bản chờ chốt */}
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-500 dark:bg-amber-400 shrink-0" />
                   <span><strong>{metrics.pendingFinalScripts}</strong> Kịch bản chờ Admin duyệt Final</span>
                 </div>
 
@@ -262,36 +261,36 @@ export function AdminExecutivePortal() {
             {/* ── 3. Khu Vực Phê Duyệt Nhanh (Thay cho Empty State) ── */}
             <section
               aria-label="Ký duyệt hợp đồng Studio mới nhất"
-              className="rounded-2xl bg-gradient-to-r from-[#111420] via-[#151928] to-[#111420] border border-white/[0.08] p-6 sm:p-7 shadow-xl space-y-4"
+              className="rounded-2xl bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-[#111420] dark:via-[#151928] dark:to-[#111420] border border-slate-200 dark:border-white/[0.08] p-6 sm:p-7 shadow-sm dark:shadow-xl space-y-4 transition-all"
             >
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 shadow-xs">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0 shadow-xs">
                     <FileSignature className="w-6 h-6" />
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
                         Ký Duyệt Hợp Đồng Studio Mới Nhất
                       </span>
                       {contractSigned ? (
-                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
                           ĐÃ KÝ ĐIỆN TỬ
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[10px] font-bold animate-pulse">
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30 text-[10px] font-bold animate-pulse">
                           CHỜ ADMIN KÝ DUYỆT
                         </span>
                       )}
                     </div>
 
-                    <h3 className="text-lg font-bold text-white">
-                      Dự án: <span className="text-white">Cyber Saigon 2077</span> • Đối tác: <span className="text-indigo-300">Saigon VFX Studio</span>
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                      Dự án: <span className="text-slate-900 dark:text-white">Cyber Saigon 2077</span> • Đối tác: <span className="text-indigo-600 dark:text-indigo-300">Saigon VFX Studio</span>
                     </h3>
 
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Báo giá đề xuất: <strong className="text-emerald-400 font-mono">150,000,000 VND</strong> (Trọn bộ 5 tập 4K Master). Kịch bản phân cảnh đã được Reviewer và In-house Creator xác nhận hoàn thiện.
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      Báo giá đề xuất: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">150,000,000 VND</strong> (Trọn bộ 5 tập 4K Master). Kịch bản phân cảnh đã được Reviewer và In-house Creator xác nhận hoàn thiện.
                     </p>
                   </div>
                 </div>
@@ -300,7 +299,7 @@ export function AdminExecutivePortal() {
                   <button
                     type="button"
                     onClick={() => setIsContractModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] text-white border border-[#E50914]/40 hover:border-[#E50914] text-xs font-bold transition-all shadow-md cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/[0.1] text-slate-800 dark:text-white border border-[#E50914]/40 hover:border-[#E50914] text-xs font-bold transition-all shadow-md cursor-pointer"
                   >
                     <span>{contractSigned ? 'Xem Lại Hợp Đồng Số' : 'Xem Chi Tiết Báo Giá & Ký Số ➔'}</span>
                   </button>
@@ -312,16 +311,16 @@ export function AdminExecutivePortal() {
             <section aria-label="Phim đã kiểm định pháp lý" className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-extrabold text-white tracking-tight flex items-center gap-2">
+                  <h3 className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
                     <Rocket className="w-5 h-5 text-[#E50914]" />
                     <span>Phim Đã Kiểm Định Pháp Lý — Sẵn Sàng Phát Hành</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Các tác phẩm đã được Reviewer đối soát kỹ thuật, hoàn tất nghĩa vụ bản quyền và gắn nhãn Tuân Thủ AI (Điều 44).
                   </p>
                 </div>
 
-                <span className="text-xs font-mono font-bold text-slate-400 bg-white/[0.04] px-2.5 py-1 rounded-lg border border-white/[0.08]">
+                <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/[0.08]">
                   {readyMovies.filter((m) => !m.published).length} Tác phẩm chờ lên sóng
                 </span>
               </div>
@@ -331,11 +330,11 @@ export function AdminExecutivePortal() {
                 {readyMovies.map((movie) => (
                   <div
                     key={movie.id}
-                    className="rounded-2xl bg-[#111420] border border-white/[0.08] p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:border-white/20 transition-all shadow-md"
+                    className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 hover:border-slate-300 dark:hover:border-white/20 transition-all shadow-xs dark:shadow-md"
                   >
                     {/* Cột 1: Thumbnail + Title */}
                     <div className="flex items-center gap-4 min-w-0">
-                      <div className="relative w-28 sm:w-36 aspect-video rounded-xl overflow-hidden bg-black/60 shrink-0 border border-white/[0.08]">
+                      <div className="relative w-28 sm:w-36 aspect-video rounded-xl overflow-hidden bg-black/60 shrink-0 border border-slate-200 dark:border-white/[0.08]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={movie.thumbnailUrl}
@@ -348,21 +347,21 @@ export function AdminExecutivePortal() {
                       </div>
 
                       <div className="space-y-1 min-w-0">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                           {movie.genre}
                         </span>
-                        <h4 className="text-sm sm:text-base font-bold text-white truncate">
+                        <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
                           {movie.title}
                         </h4>
-                        <p className="text-xs text-slate-400">
-                          Thẩm định viên phụ trách: <span className="text-slate-300 font-medium">{movie.reviewerName}</span>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Thẩm định viên phụ trách: <span className="text-slate-700 dark:text-slate-300 font-medium">{movie.reviewerName}</span>
                         </p>
                       </div>
                     </div>
 
                     {/* Cột 2: Badge Tuân Thủ AI Điều 44 */}
                     <div className="shrink-0">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-xs font-bold shadow-xs">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 text-xs font-bold shadow-xs">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span>Đã gắn nhãn AI Điều 44</span>
                       </span>
@@ -371,7 +370,7 @@ export function AdminExecutivePortal() {
                     {/* Cột 3: Studio gia công */}
                     <div className="shrink-0 text-xs">
                       <span className="text-slate-500 block text-[10px]">Studio Gia Công:</span>
-                      <span className="font-bold text-white flex items-center gap-1.5">
+                      <span className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                         <Building2 className="w-3.5 h-3.5 text-slate-400" />
                         <span>{movie.studioName}</span>
                       </span>
@@ -380,7 +379,7 @@ export function AdminExecutivePortal() {
                     {/* Cột 4: Nút Phát Hành Lên Trang Chủ */}
                     <div className="shrink-0">
                       {movie.published ? (
-                        <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold">
+                        <span className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/40 text-xs font-bold">
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Đã Lên Sóng OTT</span>
                         </span>

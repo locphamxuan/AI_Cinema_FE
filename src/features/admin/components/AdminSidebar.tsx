@@ -4,20 +4,17 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Film,
+  LayoutDashboard,
   Clapperboard,
   Inbox,
-  LayoutDashboard,
+  Rocket,
   CreditCard,
   Receipt,
   Gift,
   KeyRound,
-  Settings,
-  Bell,
   Megaphone,
-  UserCheck,
-  Building2,
-  FileCheck,
-  Rocket,
+  Bell,
+  Settings,
 } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
@@ -27,56 +24,56 @@ export function AdminSidebar() {
   const can = useCan();
 
   const isOverview = pathname === '/admin';
-  const isProjects = pathname.startsWith('/admin/projects');
+  const isProjects = pathname === '/admin/projects' || pathname.startsWith('/admin/projects/');
   const isRequests = pathname.startsWith('/admin/requests');
   const isMovies = pathname.startsWith('/admin/movies');
-  const isBilling = pathname.startsWith('/admin/membership-plans') || pathname.startsWith('/admin/billing-reports');
+  const isBilling = pathname.startsWith('/admin/membership-plans');
   const isCoin = pathname.startsWith('/admin/coin-transactions');
   const isRewards = pathname.startsWith('/admin/rewards');
   const isPermissions = pathname.startsWith('/admin/permissions');
+  const isAds = pathname.startsWith('/admin/ads');
   const isNotifications = pathname.startsWith('/admin/notifications');
   const isSettings = pathname.startsWith('/admin/settings');
-  const isAds = pathname.startsWith('/admin/ads');
 
   const linkClass = (active: boolean) =>
-    `group relative flex items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-all duration-200 cursor-pointer ${
+    `group relative flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-medium transition-all duration-200 cursor-pointer ${
       active
         ? 'bg-red-500/10 text-[#E50914] font-bold border border-red-500/20 shadow-xs'
-        : 'text-slate-400 hover:bg-white/[0.05] hover:text-white border border-transparent'
+        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white border border-transparent'
     }`;
 
   const iconClass = (active: boolean) =>
     `w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-      active ? 'text-[#E50914]' : 'text-slate-400 group-hover:text-slate-200'
+      active ? 'text-[#E50914]' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
     }`;
 
   return (
     <nav
       aria-label="Khu quản trị"
-      className="md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-white/[0.08] bg-[#0D1017] text-slate-100 md:min-h-[calc(100vh-3.5rem)] p-3 flex flex-col justify-between transition-colors duration-200"
+      className="md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0D1017] text-slate-800 dark:text-slate-100 md:min-h-[calc(100vh-3.5rem)] p-3 flex flex-col justify-between transition-colors duration-200"
     >
       <div className="space-y-4">
         {/* Phần Đầu: Logo "AI CINEMA" đỏ #E50914 kèm icon cuộn phim & Badge phân quyền */}
-        <div className="px-2 pt-1 pb-2 border-b border-white/[0.06] flex items-center justify-between">
+        <div className="px-2 pt-1 pb-2 border-b border-slate-200 dark:border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#E50914] flex items-center justify-center text-white shadow-md font-black">
               <Film className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-sm font-black text-white tracking-wider">AI CINEMA</p>
+              <p className="text-sm font-black text-slate-900 dark:text-white tracking-wider">AI CINEMA</p>
               <p className="text-[10px] font-bold text-[#E50914] tracking-wide uppercase">
                 ADMIN CONSOLE
               </p>
             </div>
           </div>
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20">
             Executive Admin
           </span>
         </div>
 
         {/* Nhóm 1: QUẢN TRỊ DỰ ÁN & SẢN XUẤT */}
         <div className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 pb-0.5">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
             Dự Án & Sản Xuất
           </p>
 
@@ -115,7 +112,7 @@ export function AdminSidebar() {
               <Clapperboard className={iconClass(isProjects)} />
               <span className="truncate">Dự án phim</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-mono font-bold">
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-mono font-bold">
               2
             </span>
           </Link>
@@ -137,7 +134,7 @@ export function AdminSidebar() {
               <Inbox className={iconClass(isRequests)} />
               <span className="truncate">Duyệt yêu cầu</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-mono font-bold">
+            <span className="px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-mono font-bold">
               3
             </span>
           </Link>
@@ -166,8 +163,8 @@ export function AdminSidebar() {
         </div>
 
         {/* Nhóm 2: TÀI CHÍNH & VẬN HÀNH */}
-        <div className="space-y-1 pt-2 border-t border-white/[0.06]">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 pb-0.5">
+        <div className="space-y-1 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
             Tài Chính & Người Dùng
           </p>
 
@@ -253,8 +250,8 @@ export function AdminSidebar() {
         </div>
 
         {/* Nhóm 3: HỆ THỐNG */}
-        <div className="space-y-1 pt-2 border-t border-white/[0.06]">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 pb-0.5">
+        <div className="space-y-1 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
             Cấu Hình
           </p>
 
@@ -274,14 +271,14 @@ export function AdminSidebar() {
       </div>
 
       {/* Footer Profile: Executive Admin */}
-      <div className="pt-3 border-t border-white/[0.06] px-2 text-xs">
+      <div className="pt-3 border-t border-slate-200 dark:border-white/[0.06] px-2 text-xs">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center text-[#E50914] font-black text-xs">
             A
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-white truncate">Quản Trị Viên</p>
-            <p className="text-[10px] text-slate-400 truncate">admin@aicinema.vn</p>
+            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">Quản Trị Viên</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">admin@aicinema.vn</p>
           </div>
         </div>
       </div>

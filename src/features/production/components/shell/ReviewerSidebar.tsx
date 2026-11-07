@@ -14,7 +14,6 @@ import {
   Bell,
   UserRound,
   ShieldCheck,
-  CheckCircle,
 } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
@@ -47,41 +46,41 @@ export function ReviewerSidebar() {
     `group relative flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-medium transition-all duration-200 cursor-pointer ${
       active
         ? 'bg-red-500/10 text-[#E50914] font-bold border border-red-500/20 shadow-xs'
-        : 'text-slate-400 hover:bg-white/[0.05] hover:text-white border border-transparent'
+        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white border border-transparent'
     }`;
 
   const iconClass = (active: boolean) =>
     `w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-      active ? 'text-[#E50914]' : 'text-slate-400 group-hover:text-slate-200'
+      active ? 'text-[#E50914]' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
     }`;
 
   return (
     <nav
       aria-label="CONTENT REVIEW"
-      className="md:w-60 lg:w-64 shrink-0 border-b md:border-b-0 md:border-r border-white/[0.08] bg-[#0D1017] text-slate-100 md:min-h-[calc(100vh-3.5rem)] p-3 flex flex-col justify-between transition-colors duration-200"
+      className="md:w-60 lg:w-64 shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0D1017] text-slate-800 dark:text-slate-100 md:min-h-[calc(100vh-3.5rem)] p-3 flex flex-col justify-between transition-colors duration-200"
     >
       <div className="space-y-4">
         {/* Brand & Badge: "AI CINEMA" đỏ #E50914 kèm badge nhỏ: Compliance Reviewer */}
-        <div className="px-2 pt-1 pb-2 border-b border-white/[0.06] flex items-center justify-between">
+        <div className="px-2 pt-1 pb-2 border-b border-slate-200 dark:border-white/[0.06] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#E50914] flex items-center justify-center text-white shadow-md font-black">
               <Film className="w-4 h-4" />
             </div>
             <div>
-              <p className="text-sm font-black text-white tracking-wider">AI CINEMA</p>
+              <p className="text-sm font-black text-slate-900 dark:text-white tracking-wider">AI CINEMA</p>
               <p className="text-[10px] font-bold text-[#E50914] tracking-wide uppercase">
                 CONTENT REVIEW
               </p>
             </div>
           </div>
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-red-500/10 text-red-400 border border-red-500/20">
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20">
             Compliance Reviewer
           </span>
         </div>
 
         {/* [ 🔍 Tìm kiếm dự án ] (Search bar phím tắt Ctrl + K) */}
         <div className="px-1">
-          <div className="relative flex items-center rounded-xl bg-white/[0.04] border border-white/[0.08] px-2.5 py-1.5 focus-within:border-white/20 transition-all">
+          <div className="relative flex items-center rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] px-2.5 py-1.5 focus-within:border-slate-400 dark:focus-within:border-white/20 transition-all">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0 mr-2" />
             <input
               type="text"
@@ -89,9 +88,9 @@ export function ReviewerSidebar() {
               onChange={(e) => setSearchVal(e.target.value)}
               placeholder="Tìm kiếm dự án..."
               aria-label="Tìm kiếm dự án"
-              className="w-full bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none"
+              className="w-full bg-transparent text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
             />
-            <kbd className="hidden sm:inline-flex items-center text-[10px] text-slate-400 font-mono bg-white/[0.06] px-1.5 py-0.5 rounded border border-white/10">
+            <kbd className="hidden sm:inline-flex items-center text-[10px] text-slate-500 dark:text-slate-400 font-mono bg-white dark:bg-white/[0.06] px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10">
               Ctrl+K
             </kbd>
           </div>
@@ -99,7 +98,7 @@ export function ReviewerSidebar() {
 
         {/* Nhóm chức năng chính */}
         <div className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 pb-0.5">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
             Thẩm Định Video & Kịch Bản
           </p>
 
@@ -130,7 +129,7 @@ export function ReviewerSidebar() {
               <FileCheck2 className={iconClass(false)} />
               <span className="truncate">Hàng đợi kịch bản</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-mono font-bold">
+            <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-mono font-bold">
               4
             </span>
           </Link>
@@ -144,7 +143,7 @@ export function ReviewerSidebar() {
               <ShieldCheck className={iconClass(false)} />
               <span className="truncate">Kho lưu trữ Điều 44</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-mono font-bold">
+            <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-bold">
               12
             </span>
           </Link>
@@ -158,15 +157,15 @@ export function ReviewerSidebar() {
               <ShieldAlert className={iconClass(false)} />
               <span className="truncate">Yêu cầu chỉnh sửa</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-400 text-[10px] font-mono font-bold">
+            <span className="px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-mono font-bold">
               3
             </span>
           </Link>
         </div>
 
         {/* Nhóm Quản Trị & Hạn Ngạch */}
-        <div className="space-y-1 pt-2 border-t border-white/[0.06]">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 pb-0.5">
+        <div className="space-y-1 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
             Quản Lý & Hạn Ngạch
           </p>
 
@@ -198,7 +197,7 @@ export function ReviewerSidebar() {
               {wallet.data && (
                 <span
                   title={`Token còn lại: ${formatNumber(wallet.data.balanceTokens)}`}
-                  className="shrink-0 ml-1 rounded-md bg-white/[0.08] text-slate-200 px-1.5 py-0.5 text-[10px] font-mono font-bold border border-white/10"
+                  className="shrink-0 ml-1 rounded-md bg-slate-100 dark:bg-white/[0.08] text-slate-700 dark:text-slate-200 px-1.5 py-0.5 text-[10px] font-mono font-bold border border-slate-200 dark:border-white/10"
                 >
                   {formatNumber(wallet.data.balanceTokens)}
                 </span>
@@ -233,12 +232,12 @@ export function ReviewerSidebar() {
       </div>
 
       {/* Footer Status */}
-      <div className="pt-3 border-t border-white/[0.06] px-2 text-xs">
-        <div className="flex items-center gap-2 text-slate-400">
+      <div className="pt-3 border-t border-slate-200 dark:border-white/[0.06] px-2 text-xs">
+        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[11px] font-medium text-slate-300">Trực Thẩm Định OTT</span>
+          <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Trực Thẩm Định OTT</span>
         </div>
-        <p className="text-[10px] text-slate-500 mt-0.5">Sẵn sàng phản hồi Studio</p>
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Sẵn sàng phản hồi Studio</p>
       </div>
     </nav>
   );
