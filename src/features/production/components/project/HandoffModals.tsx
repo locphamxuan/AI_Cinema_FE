@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Repeat, Send } from 'lucide-react';
+import { Repeat } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -12,7 +12,6 @@ import { swapPreview } from '../../lib/studioSwap';
 import { useAction } from '@/hooks/useAction';
 import { parseVnd } from '../shared/CostRequestCard';
 import { FilePicker } from '../shared/FilePicker';
-import { DeadlineList, deadlineUsable } from './DueDateRows';
 import { useProject } from './ProjectContext';
 
 const MATERIAL_ACCEPT = '.pdf,.docx,.txt,.png,.jpg,.jpeg,.webp';
@@ -29,7 +28,7 @@ interface HandoffForm {
   fee: string;
 }
 
-/** Studio, season and files of a hand-off, shared by the first hand-off and a studio change. */
+/** Studio, season and files of the new brief a studio change sends. */
 function HandoffFields(props: {
   studioName: string;
   studioEmail: string;
@@ -38,19 +37,13 @@ function HandoffFields(props: {
   scripts: File[];
   references: File[];
   onChange: (patch: Partial<HandoffForm>) => void;
-  /** The first hand-off may reuse the project's studio, so typing one is optional there. */
-  studioRequired: boolean;
 }) {
   const { project } = useProject();
   return (
     <>
       <fieldset className="space-y-3">
         <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Studio nhận brief (nhập tay)</legend>
-        {!props.studioRequired && project.studio && (
-          <p className="text-[11px] text-slate-500">
-            Để trống để gửi cho Studio của dự án: {project.studio.name}. Email đã có trong hệ thống sẽ dùng lại Studio đó.
-          </p>
-        )}
+        <p className="text-[11px] text-slate-500">Email đã có trong hệ thống sẽ dùng lại Studio đó.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField label="Tên Studio">
             <input value={props.studioName} onChange={(e) => props.onChange({ studioName: e.target.value })} minLength={2} maxLength={255} className={fieldInputClass} aria-label="Tên Studio" />
@@ -109,65 +102,6 @@ function typedStudio(form: HandoffForm) {
 
 const studioTyped = (form: HandoffForm) => form.studioEmail.trim() !== '' && form.studioName.trim().length >= 2;
 
-export function HandOffModal({ onClose }: { onClose: () => void }) {
-  const { project, reload } = useProject();
-  const [form, setForm] = useState(EMPTY);
-  const { busy, run } = useAction();
-  const episodes = project.seasons
-    .filter((s) => !form.seasonId || s.id === form.seasonId)
-    .flatMap((s) => s.episodes)
-    .filter((e) => !e.dueDate);
-  const ready = episodes.length > 0 && episodes.every(deadlineUsable);
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const done = await run(
-      () =>
-        studioService.handOff(project.id, {
-          ...typedStudio(form),
-          ...(form.seasonId ? { seasonId: form.seasonId } : {}),
-          offeredFeeVnd: parseVnd(form.fee),
-          scripts: form.scripts,
-          references: form.references,
-        }),
-      'Đã gửi brief cho Studio',
-    );
-    if (done) {
-      await reload();
-      onClose();
-    }
-  };
-
-  return (
-    <Modal
-      open
-      onClose={onClose}
-      title="Bàn giao cho Studio"
-      subtitle="Brief PDF, kịch bản và material được email cho Studio đối tác bên thứ 3; Studio không có tài khoản."
-      icon={<Send className="w-4 h-4" />}
-      maxWidth="max-w-2xl"
-    >
-      <form onSubmit={submit} className="space-y-4">
-        <HandoffFields {...form} studioRequired={!project.studio} onChange={(patch) => setForm({ ...form, ...patch })} />
-        <FeeField value={form.fee} maxVnd={project.cost.remainingVnd} onChange={(fee) => setForm({ ...form, fee })} />
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Hạn giao của các tập sẽ bàn giao</p>
-          <p className="text-[11px] text-slate-500">Studio phải giao đúng hạn Reviewer đã đặt; muốn đổi hạn hãy báo Reviewer.</p>
-          <DeadlineList episodes={episodes} />
-          {!ready && <p className="text-[11px] text-rose-600">Không có tập nào để bàn giao, hoặc có tập chưa có hạn giao / hạn đã qua - Reviewer cần cập nhật trước.</p>}
-        </div>
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
-            Huỷ
-          </Button>
-          <Button type="submit" disabled={busy || !ready || !feeValid(form.fee, project.cost.remainingVnd) || (project.studio ? form.studioEmail.trim() !== '' && !studioTyped(form) : !studioTyped(form))}>
-            {busy ? 'Đang gửi…' : 'Gửi brief'}
-          </Button>
-        </div>
-      </form>
-    </Modal>
-  );
-}
 
 export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
   const { project, reload } = useProject();
@@ -203,7 +137,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
   return (
     <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief mới." icon={<Repeat className="w-4 h-4" />} maxWidth="max-w-2xl">
       <form onSubmit={submit} className="space-y-4">
-        <HandoffFields {...form} studioRequired onChange={(patch) => setForm({ ...form, ...patch })} />
+        <HandoffFields {...form} onChange={(patch) => setForm({ ...form, ...patch })} />
         <FormField label="Studio cũ giữ lại (₫, đã chi hoặc đền bù)">
           <input inputMode="numeric" value={kept} onChange={(e) => setKept(e.target.value)} placeholder="0" className={fieldInputClass} aria-label="Studio cũ giữ lại" />
           <span className={`block mt-1 text-[11px] ${keptValid ? 'text-slate-500' : 'text-rose-600'}`}>

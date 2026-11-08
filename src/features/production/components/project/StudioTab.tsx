@@ -11,7 +11,7 @@ import { downloadFile } from '../../lib/download';
 import { Pager, pageOf } from '@/components/data/Pager';
 import { Empty, ErrorNote, Facts, Loading, Panel } from '@/components/data/ui';
 import { HandoffCard } from './HandoffCard';
-import { ChangeStudioModal, HandOffModal } from './HandoffModals';
+import { ChangeStudioModal } from './HandoffModals';
 import { MilestoneModal } from './MilestoneModal';
 import { useProject } from './ProjectContext';
 import { episodeCountsBySeason } from '@/lib/seasonLabel';
@@ -30,17 +30,19 @@ const FILTERS: { key: string; label: string; match: (h: StudioHandoff) => boolea
   { key: 'superseded', label: 'Đã đổi Studio', match: (h) => h.milestoneStatus === 'SUPERSEDED' },
 ];
 
-/** The studio timeline of steps 3–4: what went to which Studio and when, every milestone and Submission (BR-58, BR-59). */
+/**
+ * The studio timeline (BR-58, BR-59): the hand-off the signed contract opened, every milestone and Submission, and
+ * studio changes. Since MF-1 07/11/2026 nobody hands off by hand: signing the contract does it.
+ */
 export function StudioTab() {
   const { project, caps, base } = useProject();
   const episodeCounts = episodeCountsBySeason(project.seasons);
-  const [mode, setMode] = useState<'handoff' | 'change' | null>(null);
+  const [changing, setChanging] = useState(false);
   const [moving, setMoving] = useState<StudioHandoff | null>(null);
   const [filter, setFilter] = useState('all');
   const [page, setPage] = useState(1);
   const history = useResource(`handoffs:${project.id}:${project.updatedAt}`, () => studioService.listHandoffs(project.id));
   const delivering = isIn(project.status, DELIVERY_PROJECT);
-  const canHandOff = caps.handoff && (project.status === 'ASSIGNED' || delivering);
   const all = history.data ?? [];
   const declined = all.some((h) => h.milestoneStatus === 'STUDIO_DECLINED');
   const asksCost = caps.costRequest && declined;
@@ -57,7 +59,7 @@ export function StudioTab() {
       <div className="lg:col-span-2 space-y-5">
         <Panel
           title="Dòng thời gian Studio"
-          description="Gửi brief PDF và tài liệu cho Studio đối tác qua email. Sau đó Creator cập nhật tiến độ của Studio và nộp bản phim Studio giao."
+          description="Hợp đồng ký đủ hai bên thì hệ thống tự bàn giao cho Studio (brief PDF và tài liệu). Studio nộp phim từng tập trên Studio Web để Reviewer duyệt."
         >
           <div role="group" aria-label="Lọc theo trạng thái" className="flex flex-wrap gap-1.5 mb-4">
             {FILTERS.map((f) => {
@@ -114,21 +116,18 @@ export function StudioTab() {
             <Empty>Chưa chọn Studio.</Empty>
           )}
           <div className="mt-4 space-y-2">
-            {canHandOff && (
-              <Button size="sm" className="w-full" onClick={() => setMode('handoff')}>
-                Bàn giao cho Studio
-              </Button>
-            )}
             {caps.handoff && delivering && all.length > 0 && (
-              <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
+              <Button size="sm" variant="secondary" className="w-full" onClick={() => setChanging(true)}>
                 Đổi Studio
               </Button>
             )}
-            {caps.creator && project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Reviewer hoàn tất kế hoạch.</p>}
-            {project.status === 'ASSIGNED' && !caps.handoff && <p className="text-xs text-slate-500">Chờ Creator chính bàn giao cho Studio.</p>}
+            {project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Admin giao Creator chính.</p>}
+            {project.status === 'ASSIGNED' && (
+              <p className="text-xs text-slate-500">Bàn giao tự động khi hợp đồng với Studio có đủ chữ ký Admin và Studio (tab Hợp đồng).</p>
+            )}
             {caps.creator && !caps.lead && (
               <p className="rounded-xl border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 p-3 text-xs text-sky-800 dark:text-sky-300">
-                Bạn là Creator phụ: Creator chính {project.creator?.fullName ?? ''} là người duy nhất làm việc với Studio (bàn giao, đổi Studio, cập nhật mốc).
+                Bạn là Creator phụ: Creator chính {project.creator?.fullName ?? ''} theo dõi Studio (đổi Studio, cập nhật mốc).
                 Bạn chịu trách nhiệm các tập được giao: kiểm tra phim Studio gửi ở trang tập, nộp Submission, và ghi phần cần sửa ở mục
                 Trao đổi về tập để Creator chính báo Studio.
               </p>
@@ -143,8 +142,7 @@ export function StudioTab() {
         )}
       </div>
 
-      {mode === 'handoff' && <HandOffModal onClose={() => setMode(null)} />}
-      {mode === 'change' && <ChangeStudioModal onClose={() => setMode(null)} />}
+      {changing && <ChangeStudioModal onClose={() => setChanging(false)} />}
       {moving && (
         <MilestoneModal
           handoff={moving}
