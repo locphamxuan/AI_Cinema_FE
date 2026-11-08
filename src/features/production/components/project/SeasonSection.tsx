@@ -153,6 +153,9 @@ export function SeasonSection({
                       </td>
                       <td className="px-3 py-2.5">
                         <StatusPill {...EPISODE_STATUS[ep.status]} />
+                        {ep.status === 'COMPLIANCE_PASSED' && ep.finalConfirmedAt && (
+                          <span className="block mt-0.5 text-[11px] text-emerald-600">Phim Final, chờ Admin publish</span>
+                        )}
                       </td>
                       <td className="px-3 py-2.5 hidden md:table-cell text-slate-600 dark:text-slate-300">
                         <Assignee episode={ep} seats={seats} editable={assign && ep.status !== 'PUBLISHED'} />

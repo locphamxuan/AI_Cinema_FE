@@ -18,6 +18,7 @@ import { baseFromPath, productionPaths } from '../../lib/routes';
 import { ErrorNote, Facts, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { DeliverMediaPanel, deliverAsCreator } from './DeliverMediaPanel';
 import { EpisodeNotesPanel } from './EpisodeNotesPanel';
+import { FinalFilmPanel } from './FinalFilmPanel';
 import { HlsPreview } from './HlsPreview';
 import { MediaVersions } from './MediaVersions';
 import { PublishPanel } from './PublishPanel';
@@ -35,7 +36,7 @@ const latestFilmLink = (handoffs: StudioHandoff[] | null, episodeId: string) =>
     .filter((link) => link.episodeId === episodeId)
     .sort((a, b) => b.sentAt.localeCompare(a.sentAt))[0];
 
-/** One episode end to end: deliveries, review sheet, label, compliance and release. */
+/** One episode end to end: deliveries, review sheet, label, compliance, Final Film and release. */
 export function EpisodePage() {
   const { projectId, episodeId } = useParams<{ projectId: string; episodeId: string }>();
   const base = baseFromPath(usePathname());
@@ -129,7 +130,14 @@ export function EpisodePage() {
               </p>
             </Panel>
           )}
-          <PublishPanel episode={episode} projectStatus={project.data.status} canAct={caps.publish} onChanged={refreshAll} />
+          <FinalFilmPanel episode={episode} canConfirm={caps.review && delivering} canSendBack={caps.publish} onChanged={refreshAll} />
+          <PublishPanel
+            episode={episode}
+            projectStatus={project.data.status}
+            canPrice={caps.price}
+            canPublish={caps.publish}
+            onChanged={refreshAll}
+          />
         </div>
 
         <div className="lg:col-span-2 space-y-5">

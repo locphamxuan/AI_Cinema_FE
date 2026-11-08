@@ -28,7 +28,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
     if (await run(() => productionService.review(sheet.id, 'APPROVED'), 'Đã duyệt bản này')) await onChanged();
   };
   const requestChanges = async (comments: string) => {
-    if (await run(() => productionService.review(sheet.id, 'CHANGES_REQUESTED', comments), 'Đã gửi yêu cầu sửa cho Creator')) {
+    if (await run(() => productionService.review(sheet.id, 'CHANGES_REQUESTED', comments), 'Đã gửi yêu cầu sửa cho Studio')) {
       setRequesting(false);
       await onChanged();
     }
@@ -95,7 +95,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
       <TextPromptModal
         open={requesting}
         title="Yêu cầu studio sửa"
-        subtitle="Creator sẽ chuyển nhận xét này cho studio và giao bản mới."
+        subtitle="Tài khoản Studio nhận thông báo kèm nhận xét này trên Studio Web và nộp bản mới. Phim Final đã xác nhận (nếu có) sẽ bị huỷ xác nhận."
         label="Nhận xét (ví dụ: phút 03:10 nhân vật bị méo mặt…)"
         confirmLabel="Gửi yêu cầu sửa"
         danger
