@@ -2,25 +2,25 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Film,
   Clapperboard,
-  FileText,
-  Send,
   Bell,
   UserRound,
   Search,
-  Sparkles,
 } from 'lucide-react';
 
 export function CreatorSidebar() {
   const pathname = usePathname();
   const [searchVal, setSearchVal] = useState('');
+  const router = useRouter();
+  const search = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchVal.trim()) router.push(`/creator/projects?q=${encodeURIComponent(searchVal.trim())}`);
+  };
 
   const isProjects = pathname === '/creator' || pathname.startsWith('/creator/projects');
-  const isScripts = pathname.startsWith('/creator/scripts');
-  const isHandoff = pathname.startsWith('/creator/studio-handoff');
   const isNotifications = pathname.startsWith('/creator/notifications');
   const isProfile = pathname.startsWith('/creator/profile');
 
@@ -62,7 +62,7 @@ export function CreatorSidebar() {
 
         {/* [ 🔍 Tìm kiếm kịch bản ] */}
         <div className="px-1">
-          <div className="relative flex items-center rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] px-2.5 py-1.5 focus-within:border-slate-400 dark:focus-within:border-white/20 transition-all">
+          <form onSubmit={search} className="relative flex items-center rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] px-2.5 py-1.5 focus-within:border-slate-400 dark:focus-within:border-white/20 transition-all">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0 mr-2" />
             <input
               type="text"
@@ -72,10 +72,7 @@ export function CreatorSidebar() {
               aria-label="Tìm kịch bản"
               className="w-full bg-transparent text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
             />
-            <kbd className="hidden sm:inline-flex items-center text-[10px] text-slate-500 dark:text-slate-400 font-mono bg-white dark:bg-white/[0.06] px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10">
-              Ctrl+K
-            </kbd>
-          </div>
+          </form>
         </div>
 
         {/* Nhóm chức năng chính của In-house Screenwriter */}
@@ -100,45 +97,6 @@ export function CreatorSidebar() {
             <div className="flex items-center gap-2.5 min-w-0">
               <Clapperboard className={iconClass(isProjects)} />
               <span className="truncate">Dự Án Kịch Bản</span>
-            </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-red-500/20 text-[#E50914] text-[10px] font-mono font-bold">
-              5
-            </span>
-          </Link>
-
-          {/* [ 📝 Thư Viện Kịch Bản Phân Cảnh ] */}
-          <Link
-            href="/creator/scripts"
-            aria-current={isScripts ? 'page' : undefined}
-            className={linkClass(isScripts)}
-          >
-            {isScripts && (
-              <span
-                className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[#E50914] shadow-[0_0_8px_rgba(229,9,20,0.5)]"
-                aria-hidden="true"
-              />
-            )}
-            <div className="flex items-center gap-2.5 min-w-0">
-              <FileText className={iconClass(isScripts)} />
-              <span className="truncate">Thư Viện Phân Cảnh</span>
-            </div>
-          </Link>
-
-          {/* [ 📑 Tiến Độ Chuyển Giao Studio ] */}
-          <Link
-            href="/creator/studio-handoff"
-            aria-current={isHandoff ? 'page' : undefined}
-            className={linkClass(isHandoff)}
-          >
-            {isHandoff && (
-              <span
-                className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[#E50914] shadow-[0_0_8px_rgba(229,9,20,0.5)]"
-                aria-hidden="true"
-              />
-            )}
-            <div className="flex items-center gap-2.5 min-w-0">
-              <Send className={iconClass(isHandoff)} />
-              <span className="truncate">Tiến Độ Studio</span>
             </div>
           </Link>
         </div>
