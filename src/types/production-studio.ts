@@ -15,6 +15,25 @@ export interface EpisodeNote {
   author: { id: string; fullName: string } | null;
 }
 
+/** A note on the idea and direction of a project, between the Admin, the lead Creator and the Reviewer (MF-1 §1). */
+export interface ProjectNote {
+  id: string;
+  message: string;
+  createdAt: string;
+  author: { id: string; fullName: string; role: string } | null;
+}
+
+/** A STUDIO login the Admin opened for a partner studio; it signs in to Studio Web only. */
+export interface StudioAccount {
+  id: string;
+  email: string;
+  fullName: string;
+  role: 'STUDIO';
+  isActive: boolean;
+  studioId: string;
+  createdAt?: string;
+}
+
 export interface Person {
   id: string;
   fullName: string;
@@ -29,7 +48,7 @@ export interface ProjectRef {
   movie: { title: string };
 }
 
-/** A partner studio: third party, no account (BR-15, BR-59). */
+/** A partner studio (BR-59); since MF-1 07/11/2026 it signs in to Studio Web with STUDIO accounts. */
 export interface Studio {
   id: string;
   name: string;

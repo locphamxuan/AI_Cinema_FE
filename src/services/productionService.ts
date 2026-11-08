@@ -41,6 +41,14 @@ import type {
 
 const R = API_ROUTES.PRODUCTION;
 
+/** Active accounts of one role, read from the user list. */
+async function listActive(role: 'CONTENT_CREATOR' | 'CONTENT_REVIEWER', search?: string): Promise<ApiResponse<Person[]>> {
+  const params = new URLSearchParams({ limit: '50', 'filter.role': `$eq:${role}`, 'filter.isActive': '$eq:true' });
+  if (search?.trim()) params.set('search', search.trim());
+  const res = await apiClient.get<Page<Person>>(`${API_ROUTES.ADMIN.USERS}?${params.toString()}`);
+  return { ...res, data: res.success ? res.data.data : [] };
+}
+
 export interface ProjectQuery {
   page?: number;
   limit?: number;
@@ -66,7 +74,7 @@ function mediaForm(file: File, input: MediaMetadataInput): FormData {
 }
 
 export const productionService = {
-  // ---- Projects (steps 1–2) ----
+  // ---- Projects (MF-1 step 1: the Admin creates them and assigns the lead Creator) ----
   listProjects: (query?: ProjectQuery) => apiClient.get<Page<ProjectSummary>>(projectsUrl(query)),
   getProject: (movieId: string) => apiClient.get<ProjectDetail>(R.PROJECT(movieId)),
   createProject: (input: CreateProjectInput) => apiClient.post<ProjectDetail>(R.PROJECTS, input),
@@ -130,6 +138,11 @@ export const productionService = {
     apiClient.post<ReviewSheet>(R.AI_LABELS(mediaAssetId), label),
   runCompliance: (mediaAssetId: string, input: ComplianceInput) => apiClient.post<ReviewSheet>(R.COMPLIANCE(mediaAssetId), input),
 
+  // ---- Final Film (MF-1 §5–6): the Reviewer confirms, the Admin publishes or sends it back ----
+  confirmFinalFilm: (episodeId: string) => apiClient.post<Episode>(R.FINAL_CONFIRMATION(episodeId), {}),
+  rejectFinalFilm: (episodeId: string, reason: string) =>
+    apiClient.post<Episode>(R.FINAL_REJECTION(episodeId), { reason: reason.trim() }),
+
   // ---- Publishing (steps 12–16) ----
   setCoinPrice: (episodeId: string, coinPrice: number) => apiClient.patch<unknown>(R.COIN_PRICE(episodeId), { coinPrice }),
   listPublications: (episodeId: string) => apiClient.get<Publication[]>(R.PUBLICATIONS(episodeId)),
@@ -154,13 +167,10 @@ export const productionService = {
   },
   /** An existing name (ignoring case) answers with that genre instead of a duplicate. */
   createGenre: (name: string) => apiClient.post<Genre>(API_ROUTES.GENRES.LIST, { name }),
-  /** Active Content Creators a Reviewer can assign (the Reviewer holds user:read). */
-  async listCreators(search?: string): Promise<ApiResponse<Person[]>> {
-    const params = new URLSearchParams({ limit: '50', 'filter.role': '$eq:CONTENT_CREATOR', 'filter.isActive': '$eq:true' });
-    if (search?.trim()) params.set('search', search.trim());
-    const res = await apiClient.get<Page<Person>>(`${API_ROUTES.ADMIN.USERS}?${params.toString()}`);
-    return { ...res, data: res.success ? res.data.data : [] };
-  },
+  /** Active Content Creators the Admin can assign as lead (needs user:read). */
+  listCreators: (search?: string) => listActive('CONTENT_CREATOR', search),
+  /** Active Content Reviewers the Admin can put in charge of a project (needs user:read). */
+  listReviewers: (search?: string) => listActive('CONTENT_REVIEWER', search),
   getPlatformSettings: () => apiClient.get<PlatformSettings>(API_ROUTES.PLATFORM_SETTINGS),
   updatePlatformSettings: (input: Partial<PlatformSettings>) =>
     apiClient.patch<PlatformSettings>(API_ROUTES.PLATFORM_SETTINGS, input),

@@ -46,9 +46,14 @@ export interface CreateProjectInput {
   ageRating?: AgeRating;
   releaseYear?: number;
   defaultLanguage?: string;
-  /** Active studio of the catalog (BR-59). */
+  /** Active studio of the catalog (BR-59); the Admin may also pick it on the Final Script. */
   studioId?: string;
-  seasons: NewSeasonInput[];
+  /** Content Reviewer in charge of the project. */
+  reviewerId: string;
+  /** Lead Content Creator; with one the project starts ASSIGNED. */
+  creatorId?: string;
+  /** Seasons and episodes; usually the Reviewer adds them later. */
+  seasons?: NewSeasonInput[];
 }
 
 export interface UpdateProjectInput {
@@ -74,22 +79,18 @@ export interface StudioInput {
   isActive?: boolean;
 }
 
-/** A hand-off: the studio (default: the project's), the season (default: everything left) and the files. */
-export interface HandOffInput {
+/** A studio change: the new studio, the season (default: the whole project), its fee and the files. */
+export interface ChangeStudioInput {
   /** Studio typed by hand: a known email reuses that studio, a new one needs `studioName`. */
   studioName?: string;
   studioEmail?: string;
   studioPhone?: string;
-  /** Falls back to the project's current studio (first hand-off only). */
   studioId?: string;
   seasonId?: string;
   /** Fixed fee (VND) the brief offers the studio, at most the budget left. */
   offeredFeeVnd: number;
   scripts?: File[];
   references?: File[];
-}
-
-export interface ChangeStudioInput extends HandOffInput {
   reason: string;
   /** VND the replaced studio keeps; the rest of its fee returns to the budget. */
   forfeitedVnd?: number;

@@ -1,6 +1,7 @@
 /** Enums of the MF-1 API, spelled as the Prisma schema spells them. */
 
-export type UserRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
+/** STUDIO (MF-1, 07/11/2026): a partner studio's login, used on Studio Web only. */
+export type UserRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STUDIO' | 'STAFF' | 'ADMIN';
 
 export type MovieStatus = 'DRAFT' | 'ASSIGNED' | 'IN_PRODUCTION' | 'COMPLETED' | 'UNDER_REVISION' | 'CANCELLED';
 

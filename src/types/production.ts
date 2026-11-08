@@ -15,6 +15,7 @@ export * from './production-media';
 export * from './production-requests';
 export * from './production-studio';
 export * from './cost';
+export * from './script';
 
 export interface Genre {
   id: string;
@@ -72,6 +73,11 @@ export interface Episode {
   expectedReleaseDate: string | null;
   approvedMediaAssetId: string | null;
   coinPrice: number | null;
+  /** The Reviewer confirmed this version as the Final Film; only then may the Admin publish it. */
+  finalConfirmedAt: string | null;
+  finalConfirmedById: string | null;
+  /** Why the Admin last sent the Final Film back to the Reviewer; cleared on the next confirmation. */
+  finalRejectionNote: string | null;
   revisionStartedAt: string | null;
   createdAt: string;
   updatedAt: string;
