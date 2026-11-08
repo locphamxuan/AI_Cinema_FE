@@ -14,8 +14,12 @@ import {
 } from '../roles';
 import { PermissionCell, RoleColumnHeaders, RoleSummaryCards, type Matrix } from './RolePermissionParts';
 
+/** Every web-known role gets a set, so a role the backend has not listed yet (e.g. a new STUDIO) reads as empty. */
 const toMatrix = (roles: RolePermissions[]) =>
-  Object.fromEntries(roles.map((r) => [r.role, new Set(r.permissions)])) as Matrix;
+  ({
+    ...Object.fromEntries(BACKEND_ROLES.map((role) => [role, new Set<string>()])),
+    ...Object.fromEntries(roles.map((r) => [r.role, new Set(r.permissions)])),
+  }) as Matrix;
 
 const sameSet = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((x) => b.has(x));
 

@@ -8,7 +8,7 @@ import { useAction } from '@/hooks/useAction';
 import { PASSWORD_HINT, passwordValid } from '@/lib/registration';
 import { adminService, type AccountRow } from '@/services/adminService';
 import type { UserRole } from '@/types/production';
-import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_TONE, STAFF_ROLES } from '../roles';
+import { ASSIGNABLE_ROLES, BACKEND_ROLE_LABEL, ROLE_TONE, STAFF_ROLES } from '../roles';
 import { Select } from '@/components/ui/Select';
 
 /**
@@ -36,7 +36,9 @@ export function AccountFormModal({
 
   const passwordOk = creating ? passwordValid(password) : !password || passwordValid(password);
   const valid = fullName.trim().length >= 2 && /\S+@\S+\.\S+/.test(email.trim()) && passwordOk;
-  const roles = creating ? STAFF_ROLES : BACKEND_ROLES;
+  const roles = creating ? STAFF_ROLES : ASSIGNABLE_ROLES;
+  // A STUDIO login keeps its role: it belongs to its studio (Studio đối tác → Tài khoản).
+  const studioLogin = account?.role === 'STUDIO';
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,20 +69,24 @@ export function AccountFormModal({
         <FormField label="Email">
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} required className={fieldInputClass} />
         </FormField>
-        <FormField label="Vai trò">
-          <Select
-            value={role}
-            disabled={isMe}
-            onChange={(val) => setRole(val as UserRole)}
-            options={roles.map((r) => ({
-              value: r,
-              label: BACKEND_ROLE_LABEL[r],
-              tone: ROLE_TONE[r],
-            }))}
-            size="md"
-            aria-label="Vai trò"
-          />
-        </FormField>
+        {studioLogin ? (
+          <p className="text-xs text-slate-500">Vai trò: {BACKEND_ROLE_LABEL.STUDIO} - tài khoản Studio chỉ đăng nhập Studio Web, không đổi vai trò được.</p>
+        ) : (
+          <FormField label="Vai trò">
+            <Select
+              value={role}
+              disabled={isMe}
+              onChange={(val) => setRole(val as UserRole)}
+              options={roles.map((r) => ({
+                value: r,
+                label: BACKEND_ROLE_LABEL[r],
+                tone: ROLE_TONE[r],
+              }))}
+              size="md"
+              aria-label="Vai trò"
+            />
+          </FormField>
+        )}
         <FormField label={creating ? 'Mật khẩu ban đầu' : 'Mật khẩu mới (để trống nếu giữ nguyên)'}>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" maxLength={72} required={creating} className={fieldInputClass} />
         </FormField>

@@ -11,6 +11,7 @@ export interface AdminSection {
 export const ADMIN_SECTIONS: AdminSection[] = [
   { href: '/admin', label: 'Tổng quan', permissions: [PERMISSION.PROJECT_READ_ALL] },
   { href: '/admin/projects', label: 'Dự án phim', permissions: [PERMISSION.PROJECT_READ_ALL] },
+  { href: '/admin/studios', label: 'Studio đối tác', permissions: [PERMISSION.STUDIO_MANAGE] },
   {
     href: '/admin/requests',
     label: 'Duyệt yêu cầu',
