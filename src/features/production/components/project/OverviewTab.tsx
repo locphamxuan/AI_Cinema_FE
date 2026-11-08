@@ -167,7 +167,7 @@ export function OverviewTab() {
                 {project.creator ? project.creator.fullName.charAt(0) : '?'}
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">In-house Creator</p>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Creator chính</p>
                 <p className="text-xs font-bold text-slate-900 dark:text-white">{project.creator?.fullName ?? 'Chưa giao Creator'}</p>
               </div>
             </div>
