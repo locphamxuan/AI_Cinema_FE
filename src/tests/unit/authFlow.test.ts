@@ -43,6 +43,17 @@ describe('auth flow', () => {
     expect(authService.hasSession()).toBe(false);
   });
 
+  it('refuses a studio account like a member: studios sign in to Studio Web', async () => {
+    vi.stubGlobal('fetch', backendAnswers('STUDIO'));
+
+    const result = await useAppStore.getState().login('studio@aicinema.com', 'Aicinema@123');
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('Studio Web');
+    expect(useAppStore.getState().isAuthenticated).toBe(false);
+    expect(authService.hasSession()).toBe(false);
+  });
+
   it('drops a member session saved by an older version of the web', async () => {
     vi.stubGlobal('fetch', backendAnswers('MEMBER'));
     await authService.login({ email: 'alice@example.com', password: 'secret123' });

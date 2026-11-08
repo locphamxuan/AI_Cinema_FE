@@ -71,7 +71,16 @@ describe('notification tabs', () => {
     expect(typesOf(notificationTabsFor('reviewer')[2])).toEqual(
       expect.arrayContaining(['COST_BUDGET_CHANGED', 'COST_REQUEST_APPROVED', 'COST_REQUEST_REJECTED']),
     );
-    expect(typesOf(notificationTabsFor('admin')[0])).toContain('COST_REQUESTED');
+    expect(typesOf(notificationTabsFor('admin')[1])).toContain('COST_REQUESTED');
+  });
+
+  it('files the MF-1 script, idea note, contract and Final Film notifications for each role', () => {
+    const all = (role: 'creator' | 'reviewer' | 'admin') => notificationTabsFor(role).flatMap(typesOf);
+    expect(all('creator')).toEqual(expect.arrayContaining(['SCRIPT_UPDATED', 'PROJECT_NOTE']));
+    expect(all('reviewer')).toEqual(expect.arrayContaining(['SCRIPT_UPDATED', 'PROJECT_NOTE', 'FINAL_FILM_REJECTED']));
+    expect(typesOf(notificationTabsFor('admin')[0])).toEqual(
+      expect.arrayContaining(['SCRIPT_UPDATED', 'PROJECT_NOTE', 'CONTRACT_UPDATED', 'FINAL_FILM_CONFIRMED']),
+    );
   });
 });
 
