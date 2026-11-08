@@ -11,6 +11,7 @@ import { TextPromptModal } from '@/components/data/ui';
 import { IdeaFilesPanel } from './IdeaFilesPanel';
 import { PosterPanel } from './PosterPanel';
 import { AssignCreatorModal, EditProjectModal } from './ProjectModals';
+import { ProjectNotesPanel } from './ProjectNotesPanel';
 import { useProject } from './ProjectContext';
 
 export function OverviewTab() {
@@ -119,7 +120,7 @@ export function OverviewTab() {
 
           <div className="px-5 pb-5 space-y-4 text-sm">
             <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 p-4">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ý tưởng gửi Studio</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ý tưởng phim</p>
               <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">{project.ideaDescription}</p>
             </div>
             {project.synopsis && (
@@ -133,6 +134,7 @@ export function OverviewTab() {
 
         <IdeaFilesPanel canManage={caps.manage && open} purpose="IDEA" />
         <IdeaFilesPanel canManage={caps.manage && open} purpose="SYNOPSIS" />
+        <ProjectNotesPanel />
       </div>
 
       {/* ── Right: sidebar ── */}
@@ -170,23 +172,10 @@ export function OverviewTab() {
               </div>
             </div>
 
-            {caps.manage && open && (
-              <>
-                <Button
-                  size="sm"
-                  className="w-full mt-1"
-                  variant="secondary"
-                  disabled={project.cost.budgetVnd <= 0}
-                  onClick={() => setAssigning(true)}
-                >
-                  {project.creator ? 'Đổi Creator' : 'Giao cho Creator'}
-                </Button>
-                {project.cost.budgetVnd <= 0 && (
-                  <p className="text-[11px] text-amber-600 dark:text-amber-400 text-center">
-                    Chờ Admin đặt ngân sách sản xuất (tab Chi phí sản xuất) trước khi giao Creator.
-                  </p>
-                )}
-              </>
+            {caps.create && open && (
+              <Button size="sm" className="w-full mt-1" variant="secondary" onClick={() => setAssigning(true)}>
+                {project.creator ? 'Đổi Creator' : 'Giao cho Creator'}
+              </Button>
             )}
           </div>
         </div>
