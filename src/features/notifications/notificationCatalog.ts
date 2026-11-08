@@ -24,8 +24,10 @@ const REVIEWER_TABS: NotificationTab[] = [
   {
     key: 'creator',
     label: 'Creator',
-    description: 'Creator bàn giao, nộp tập và đề xuất.',
+    description: 'Kịch bản Creator nộp, trao đổi ý tưởng, phim nộp lên và đề xuất.',
     sections: [
+      section('script', 'Kịch bản', 'SCRIPT_UPDATED'),
+      section('notes', 'Trao đổi ý tưởng', 'PROJECT_NOTE'),
       section('delivery', 'Nộp tập', 'MEDIA_SUBMITTED', 'MEDIA_READY'),
       section('handoff', 'Bàn giao Studio', 'STUDIO_HANDOFF_SENT'),
       section('change', 'Đề xuất', 'PROJECT_CHANGE_REQUESTED'),
@@ -46,8 +48,10 @@ const REVIEWER_TABS: NotificationTab[] = [
   {
     key: 'admin',
     label: 'Admin & chi phí',
-    description: 'Admin đặt / điều chỉnh ngân sách, trả lời yêu cầu thêm chi phí, đề xuất và cảnh báo giá.',
+    description: 'Giao dự án, Phim Final bị trả lại, ngân sách, yêu cầu thêm chi phí, đề xuất và cảnh báo giá.',
     sections: [
+      section('assign', 'Dự án được giao', 'PROJECT_ASSIGNED'),
+      section('final', 'Phim Final bị trả lại', 'FINAL_FILM_REJECTED'),
       section('budget', 'Ngân sách sản xuất', 'COST_BUDGET_CHANGED'),
       section('cost', 'Yêu cầu thêm chi phí', 'COST_REQUEST_APPROVED', 'COST_REQUEST_REJECTED'),
       section('change', 'Trả lời đề xuất', 'PROJECT_CHANGE_RESOLVED'),
@@ -81,9 +85,11 @@ const CREATOR_TABS: NotificationTab[] = [
   {
     key: 'reviewer',
     label: 'Reviewer',
-    description: 'Giao dự án / tập, trao đổi về tập, kết quả duyệt và đề xuất.',
+    description: 'Giao dự án / tập, kịch bản, trao đổi ý tưởng và về tập, kết quả duyệt và đề xuất.',
     sections: [
       section('assign', 'Giao việc', 'PROJECT_ASSIGNED', 'EPISODE_ASSIGNED', 'PROJECT_CANCELLED'),
+      section('script', 'Kịch bản', 'SCRIPT_UPDATED'),
+      section('ideas', 'Trao đổi ý tưởng', 'PROJECT_NOTE'),
       section('notes', 'Trao đổi về tập', 'EPISODE_NOTE'),
       section('review', 'Kết quả duyệt', 'CONTENT_APPROVED', 'CONTENT_CHANGES_REQUESTED'),
       section('change', 'Đề xuất', 'PROJECT_CHANGE_RESOLVED'),
@@ -101,8 +107,19 @@ const CREATOR_TABS: NotificationTab[] = [
   },
 ];
 
-/** Admin: requests to follow, budget and prices. */
+/** Admin: the projects it leads (script, contract, Final Film), requests to follow, budget and prices. */
 const ADMIN_TABS: NotificationTab[] = [
+  {
+    key: 'projects',
+    label: 'Dự án',
+    description: 'Kịch bản chờ duyệt Final, trao đổi ý tưởng, hợp đồng với Studio và Phim Final chờ publish.',
+    sections: [
+      section('script', 'Kịch bản', 'SCRIPT_UPDATED'),
+      section('notes', 'Trao đổi ý tưởng', 'PROJECT_NOTE'),
+      section('contract', 'Hợp đồng', 'CONTRACT_UPDATED'),
+      section('final', 'Phim Final', 'FINAL_FILM_CONFIRMED'),
+    ],
+  },
   {
     key: 'requests',
     label: 'Đề xuất & chi phí',
