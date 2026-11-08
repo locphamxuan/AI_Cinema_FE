@@ -116,7 +116,7 @@ export function StudioTab() {
             <Empty>Chưa chọn Studio.</Empty>
           )}
           <div className="mt-4 space-y-2">
-            {caps.handoff && delivering && all.length > 0 && (
+            {caps.contractManage && delivering && all.length > 0 && (
               <Button size="sm" variant="secondary" className="w-full" onClick={() => setChanging(true)}>
                 Đổi Studio
               </Button>

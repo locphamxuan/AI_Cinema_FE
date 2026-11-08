@@ -109,7 +109,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Studio
   'studio:handoff': {
     title: 'Theo dõi bàn giao Studio',
-    desc: 'Đổi Studio và cập nhật các mốc tiến độ; bàn giao đầu tiên tự mở khi hợp đồng có đủ hai chữ ký.',
+    desc: 'Cập nhật các mốc tiến độ; bàn giao đầu tiên tự mở khi hợp đồng có đủ hai chữ ký.',
   },
   'studio:manage': {
     title: 'Quản lý danh sách Studio đối tác',
