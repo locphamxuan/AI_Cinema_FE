@@ -1,5 +1,5 @@
-import { ProjectListPage } from '@/features/production/components/list/ProjectListPage';
+import { ReviewerAuditWorkspace } from '@/features/reviewer/components/ReviewerAuditWorkspace';
 
-export default function Page() {
-  return <ProjectListPage />;
+export default function ReviewerPage() {
+  return <ReviewerAuditWorkspace />;
 }

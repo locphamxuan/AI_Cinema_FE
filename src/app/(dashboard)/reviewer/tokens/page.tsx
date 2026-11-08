@@ -1,5 +1,5 @@
-import { ReviewerTokensPage } from '@/features/reviewer-token/components/ReviewerTokensPage';
+import { redirect } from 'next/navigation';
 
 export default function Page() {
-  return <ReviewerTokensPage />;
+  redirect('/reviewer/projects');
 }

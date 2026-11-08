@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { UserCog, UserPlus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -59,13 +60,36 @@ export function AccountFormModal({
   };
 
   return (
-    <Modal open onClose={onClose} title={creating ? 'Tạo tài khoản' : 'Sửa tài khoản'} subtitle={creating ? 'Tài khoản nội bộ: Creator, Reviewer, Staff hoặc Admin.' : account.email}>
+    <Modal
+      open
+      onClose={onClose}
+      maxWidth="max-w-md"
+      title={creating ? 'Tạo tài khoản' : 'Sửa tài khoản'}
+      subtitle={creating ? 'Tài khoản nội bộ: Creator, Reviewer, Staff hoặc Admin.' : account.email}
+      icon={creating ? <UserPlus className="w-5 h-5 text-[#E50914]" /> : <UserCog className="w-5 h-5 text-[#E50914]" />}
+    >
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Họ tên">
-          <input value={fullName} onChange={(e) => setFullName(e.target.value)} minLength={2} maxLength={255} required className={fieldInputClass} />
+          <input
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            minLength={2}
+            maxLength={255}
+            required
+            placeholder="Ví dụ: Nguyễn Văn A"
+            className={`${fieldInputClass} text-xs py-2 rounded-xl`}
+          />
         </FormField>
         <FormField label="Email">
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} required className={fieldInputClass} />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            maxLength={255}
+            required
+            placeholder="email@example.com"
+            className={`${fieldInputClass} text-xs py-2 rounded-xl`}
+          />
         </FormField>
         <FormField label="Vai trò">
           <Select
@@ -79,20 +103,36 @@ export function AccountFormModal({
             }))}
             size="md"
             aria-label="Vai trò"
+            className="rounded-xl"
           />
         </FormField>
         <FormField label={creating ? 'Mật khẩu ban đầu' : 'Mật khẩu mới (để trống nếu giữ nguyên)'}>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" maxLength={72} required={creating} className={fieldInputClass} />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="new-password"
+            maxLength={72}
+            required={creating}
+            placeholder={creating ? 'Tối thiểu 8 ký tự…' : 'Nhập mật khẩu mới nếu muốn đổi…'}
+            className={`${fieldInputClass} text-xs py-2 rounded-xl`}
+          />
         </FormField>
-        <p className={`text-[11px] ${passwordOk ? 'text-slate-500' : 'text-rose-600'}`}>
-          {PASSWORD_HINT}
-          {!creating && ' Đặt mật khẩu mới sẽ đăng xuất tài khoản khỏi mọi thiết bị.'}
-        </p>
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
+        <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/[0.06] p-3">
+          <p className={`text-[11px] leading-relaxed ${passwordOk ? 'text-slate-500 dark:text-slate-400' : 'text-rose-500 font-medium'}`}>
+            💡 {PASSWORD_HINT}
+            {!creating && ' Đặt mật khẩu mới sẽ đăng xuất tài khoản khỏi mọi thiết bị.'}
+          </p>
+        </div>
+        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
+          <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 py-2 text-xs">
             Huỷ
           </Button>
-          <Button type="submit" disabled={!valid || busy}>
+          <Button
+            type="submit"
+            disabled={!valid || busy}
+            className="rounded-xl px-5 py-2 text-xs font-semibold bg-[#E50914] hover:bg-[#B81D24] text-white shadow-xs transition-colors"
+          >
             {creating ? 'Tạo tài khoản' : 'Lưu'}
           </Button>
         </div>
@@ -111,17 +151,26 @@ export function DeleteAccountModal({ account, onClose, onDeleted }: { account: A
     }
   };
   return (
-    <Modal open onClose={onClose} title="Xoá tài khoản" subtitle={`${account.fullName} · ${account.email}`}>
-      <p className="text-xs text-slate-600 dark:text-slate-300">
-        Chỉ xoá được tài khoản chưa có hoạt động nào. Tài khoản đã tham gia dự án, kiểm duyệt hay giao dịch là một phần lịch sử: hãy khoá thay vì xoá.
-      </p>
-      <div className="mt-4 flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onClose}>
-          Huỷ
-        </Button>
-        <Button type="button" variant="danger" disabled={busy} onClick={remove}>
-          Xoá tài khoản
-        </Button>
+    <Modal
+      open
+      onClose={onClose}
+      maxWidth="max-w-md"
+      title="Xoá tài khoản"
+      subtitle={`${account.fullName} · ${account.email}`}
+      icon={<Trash2 className="w-5 h-5 text-rose-500" />}
+    >
+      <div className="space-y-4">
+        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+          Chỉ xoá được tài khoản chưa có hoạt động nào. Tài khoản đã tham gia dự án, kiểm duyệt hay giao dịch là một phần lịch sử: hãy khoá thay vì xoá.
+        </p>
+        <div className="flex justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
+          <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 py-2 text-xs">
+            Huỷ
+          </Button>
+          <Button type="button" variant="danger" disabled={busy} onClick={remove} className="rounded-xl px-4 py-2 text-xs font-semibold shadow-xs">
+            Xoá tài khoản
+          </Button>
+        </div>
       </div>
     </Modal>
   );

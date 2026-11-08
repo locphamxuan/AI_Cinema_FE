@@ -24,11 +24,11 @@ const REVIEWER_TABS: NotificationTab[] = [
   {
     key: 'creator',
     label: 'Creator',
-    description: 'Creator bàn giao, nộp tập, đề xuất và xin thêm Token.',
+    description: 'Creator bàn giao, nộp tập và đề xuất dự án.',
     sections: [
       section('delivery', 'Nộp tập', 'MEDIA_SUBMITTED', 'MEDIA_READY'),
       section('handoff', 'Bàn giao Studio', 'STUDIO_HANDOFF_SENT'),
-      section('token', 'Xin thêm Token', 'TOKEN_REQUESTED'),
+      section('token', 'Báo giá & Phụ lục', 'TOKEN_REQUESTED'),
       section('change', 'Đề xuất', 'PROJECT_CHANGE_REQUESTED'),
     ],
   },
@@ -86,7 +86,7 @@ const CREATOR_TABS: NotificationTab[] = [
       section('assign', 'Giao việc', 'PROJECT_ASSIGNED', 'EPISODE_ASSIGNED', 'PROJECT_CANCELLED'),
       section('notes', 'Trao đổi về tập', 'EPISODE_NOTE'),
       section('review', 'Kết quả duyệt', 'CONTENT_APPROVED', 'CONTENT_CHANGES_REQUESTED'),
-      section('token', 'Xin thêm Token', 'TOKEN_REQUEST_APPROVED', 'TOKEN_REQUEST_REJECTED'),
+      section('token', 'Phản hồi kinh phí', 'TOKEN_REQUEST_APPROVED', 'TOKEN_REQUEST_REJECTED'),
       section('change', 'Đề xuất', 'PROJECT_CHANGE_RESOLVED'),
     ],
   },
@@ -106,11 +106,11 @@ const CREATOR_TABS: NotificationTab[] = [
 const ADMIN_TABS: NotificationTab[] = [
   {
     key: 'requests',
-    label: 'Đề xuất & xin Token',
-    description: 'Đề xuất của Reviewer / Creator và yêu cầu thêm Token của Creator.',
+    label: 'Đề xuất & Báo giá',
+    description: 'Đề xuất của Reviewer / Creator và báo giá thầu của Studio.',
     sections: [
       section('change', 'Đề xuất', 'PROJECT_CHANGE_REQUESTED'),
-      section('token', 'Xin thêm Token', 'TOKEN_REQUESTED', 'TOKEN_REQUEST_APPROVED', 'TOKEN_REQUEST_REJECTED'),
+      section('token', 'Báo giá & Phụ lục', 'TOKEN_REQUESTED', 'TOKEN_REQUEST_APPROVED', 'TOKEN_REQUEST_REJECTED'),
     ],
   },
   {

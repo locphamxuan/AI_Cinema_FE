@@ -44,15 +44,13 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('ReviewerSidebar', () => {
-  it('keeps the Reviewer’s Token balance in sight', async () => {
+  it('does not display Token on ReviewerSidebar (no render tokens per Main Flow 1)', async () => {
     signInAs('reviewer');
     routeFetch({ '/reviewer-tokens/me': wallet });
     render(<ReviewerSidebar />);
 
-    expect(screen.getByRole('link', { name: /Dự án phim/ })).toHaveAttribute('aria-current', 'page');
-    const tokens = screen.getByRole('link', { name: /Token/ });
-    expect(tokens).toHaveAttribute('href', '/reviewer/tokens');
-    expect(await within(tokens).findByText('380.000')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Dự án phim/ })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Token/ })).not.toBeInTheDocument();
   });
 
   it('gives the Admin overseeing projects no Token item', () => {

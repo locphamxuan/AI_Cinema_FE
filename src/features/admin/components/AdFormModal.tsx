@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-
+import { Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -61,21 +61,43 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
   const problem = adInputProblem(input) ?? (tooLong ? `Video dài ${formatDuration(seconds)}, quảng cáo tối đa ${MAX_AD_DURATION_SECONDS / 60} phút.` : null);
 
   return (
-    <Modal open onClose={onClose} title={ad ? 'Sửa quảng cáo' : 'Tạo quảng cáo'} subtitle="Quảng cáo chèn giữa tập cho gói có quảng cáo." maxWidth="max-w-xl">
+    <Modal
+      open
+      onClose={onClose}
+      title={ad ? 'Sửa quảng cáo' : 'Tạo quảng cáo'}
+      subtitle="Quảng cáo chèn giữa tập cho gói có quảng cáo."
+      icon={<Megaphone className="w-5 h-5 text-[#E50914]" />}
+      maxWidth="max-w-lg"
+    >
       <form
-        className="space-y-4"
+        className="space-y-4 text-xs"
         onSubmit={(e) => {
           e.preventDefault();
           if (!problem) onSubmit(input);
         }}
       >
         <FormField label="Tên quảng cáo">
-          <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} className={fieldInputClass} required />
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={255}
+            placeholder="Ví dụ: Giới thiệu gói AI Cinema Premium"
+            className={`${fieldInputClass} text-xs py-2 rounded-xl`}
+            required
+          />
         </FormField>
         <FormField label="Video (MP4): dán link hoặc tải file từ máy">
           <div className="flex gap-2">
-            <input type="url" value={mediaUrl} onChange={(e) => setMediaUrl(e.target.value)} maxLength={1000} placeholder="https://…" className={fieldInputClass} required />
-            <label className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-sky-100 dark:border-white/10 px-3 text-sm font-medium ${uploading ? 'opacity-60' : 'cursor-pointer hover:border-sky-500'}`}>
+            <input
+              type="url"
+              value={mediaUrl}
+              onChange={(e) => setMediaUrl(e.target.value)}
+              maxLength={1000}
+              placeholder="https://…"
+              className={`${fieldInputClass} text-xs py-2 rounded-xl`}
+              required
+            />
+            <label className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/10 px-3 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition ${uploading ? 'opacity-60' : 'cursor-pointer'}`}>
               {uploading ? 'Đang tải lên…' : 'Tải từ máy'}
               <input
                 type="file"
@@ -92,33 +114,51 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
           </div>
         </FormField>
         {/^https?:\/\//i.test(mediaUrl) && (
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.06] p-2.5">
             <video
               src={mediaUrl}
               controls
               muted
-              className="w-full max-h-48 rounded-xl bg-black"
+              className="w-full max-h-44 rounded-lg bg-black"
               onLoadedMetadata={(e) => setLength({ url: mediaUrl, seconds: Math.round(e.currentTarget.duration) })}
             />
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
               {seconds !== null
-                ? `Dài ${formatDuration(seconds)}. Người xem phải xem hết quảng cáo rồi mới bấm "Bỏ qua quảng cáo" để xem tiếp phim.`
+                ? `⏱ Dài ${formatDuration(seconds)}. Người xem phải xem hết quảng cáo rồi mới bấm "Bỏ qua quảng cáo" để xem tiếp phim.`
                 : 'Hệ thống tự lấy thời lượng từ video khi lưu.'}
             </p>
           </div>
         )}
         <FormField label="Link khi người xem bấm (không bắt buộc)">
-          <input type="url" value={clickUrl} onChange={(e) => setClickUrl(e.target.value)} maxLength={1000} className={fieldInputClass} />
+          <input
+            type="url"
+            value={clickUrl}
+            onChange={(e) => setClickUrl(e.target.value)}
+            maxLength={1000}
+            placeholder="https://example.com/landing-page"
+            className={`${fieldInputClass} text-xs py-2 rounded-xl`}
+          />
         </FormField>
         <FormField label={`Trọng số (1-${MAX_AD_WEIGHT}): số càng lớn, quảng cáo càng hay được chọn`}>
-          <input type="number" min={1} max={MAX_AD_WEIGHT} value={weight} onChange={(e) => setWeight(Number(e.target.value))} className={fieldInputClass} />
+          <input
+            type="number"
+            min={1}
+            max={MAX_AD_WEIGHT}
+            value={weight}
+            onChange={(e) => setWeight(Number(e.target.value))}
+            className={`${fieldInputClass} text-xs py-2 rounded-xl`}
+          />
         </FormField>
-        {problem && title && mediaUrl && <p role="alert" className="text-xs text-rose-600">{problem}</p>}
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="secondary" onClick={onClose}>
+        {problem && title && mediaUrl && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400 font-medium">{problem}</p>}
+        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
+          <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 py-2 text-xs">
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || uploading || !!problem}>
+          <Button
+            type="submit"
+            disabled={busy || uploading || !!problem}
+            className="rounded-xl px-5 py-2 text-xs font-semibold bg-[#E50914] hover:bg-[#B81D24] text-white shadow-xs transition-colors"
+          >
             {ad ? 'Lưu' : 'Tạo quảng cáo'}
           </Button>
         </div>

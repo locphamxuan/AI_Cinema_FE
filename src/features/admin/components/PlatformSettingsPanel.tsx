@@ -30,7 +30,6 @@ const COIN_FIELDS: SettingField[] = [
 ];
 
 const PRODUCTION_FIELDS: SettingField[] = [
-  { key: 'tokenRateVnd', label: 'Tỷ giá Token', unit: '₫ / Token', hint: 'Giá trị 1 Token phí sản xuất; áp cho các lần ghi phí từ nay.', min: 1 },
   { key: 'episodeCoinPriceMin', label: 'Giá tập thấp nhất', unit: 'Coin', hint: 'Giá ngoài khoảng vẫn lưu được nhưng báo Admin.', min: 0 },
   { key: 'episodeCoinPriceMax', label: 'Giá tập cao nhất', unit: 'Coin', hint: '', min: 0 },
 ];

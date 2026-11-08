@@ -1,5 +1,5 @@
-import { ProjectListPage } from '@/features/production/components/list/ProjectListPage';
+import { ReviewerProjectQueuePage } from '@/features/reviewer/components/ReviewerProjectQueuePage';
 
-export default function Page() {
-  return <ProjectListPage />;
+export default function ReviewerProjectsPage() {
+  return <ReviewerProjectQueuePage />;
 }
