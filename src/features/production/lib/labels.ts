@@ -18,6 +18,7 @@ import type {
 } from '@/types/production';
 import type { CostEntryType, CostRequestStatus } from '@/types/cost';
 import type { ContractStatus } from '@/types/contract';
+import type { ScriptReviewStage, ScriptStatus } from '@/types/script';
 
 export type Tone = 'neutral' | 'amber' | 'emerald' | 'blue' | 'purple' | 'rose';
 
@@ -126,6 +127,15 @@ export const CONTRACT_STATUS: Record<ContractStatus, Label> = {
   SUPERSEDED: { label: 'Đã thay bằng vòng mới', tone: 'neutral' },
 };
 
+export const SCRIPT_STATUS: Record<ScriptStatus, Label> = {
+  SUBMITTED: { label: 'Đã nộp, chờ Reviewer duyệt', tone: 'amber' },
+  REVIEWER_APPROVED: { label: 'Reviewer đã duyệt, chờ Admin', tone: 'blue' },
+  REVISION_REQUESTED: { label: 'Cần sửa', tone: 'rose' },
+  FINAL: { label: 'Kịch bản Final', tone: 'emerald' },
+};
+
+export const SCRIPT_STAGE: Record<ScriptReviewStage, string> = { REVIEWER: 'Reviewer', ADMIN: 'Admin' };
+
 export const CHANGE_REQUEST_STATUS: Record<ChangeRequestStatus, Label> = {
   OPEN: { label: 'Chờ Admin duyệt', tone: 'amber' },
   APPROVED: { label: 'Admin đã duyệt', tone: 'emerald' },
@@ -201,6 +211,18 @@ export const EVENT_LABEL: Record<string, string> = {
   COST_REQUEST_APPROVED: 'Admin duyệt yêu cầu thêm chi phí',
   COST_REQUEST_REJECTED: 'Admin từ chối yêu cầu thêm chi phí',
   PROJECT_ASSIGNED: 'Giao cho Creator',
+  PROJECT_NOTE_SENT: 'Trao đổi ý tưởng',
+  SCRIPT_SUBMITTED: 'Creator nộp kịch bản',
+  SCRIPT_REVIEWED: 'Duyệt kịch bản',
+  SCRIPT_REVISION_REQUESTED: 'Yêu cầu sửa kịch bản',
+  SCRIPT_FINALIZED: 'Admin duyệt Kịch bản Final',
+  CONTRACT_SENT: 'Gửi hợp đồng mẫu cho Studio',
+  CONTRACT_PROPOSED: 'Studio báo giá và ký',
+  CONTRACT_COUNTERED: 'Đề xuất giá mới',
+  CONTRACT_SIGNED: 'Hợp đồng ký đủ 2 bên',
+  STUDIO_ACCOUNT_CREATED: 'Mở tài khoản Studio',
+  FINAL_FILM_CONFIRMED: 'Reviewer xác nhận Phim Final',
+  FINAL_FILM_REJECTED: 'Admin trả lại Phim Final',
   STUDIO_HANDOFF_SENT: 'Gửi brief cho studio',
   STUDIO_CHANGED: 'Đổi studio',
   STUDIO_MILESTONE_UPDATED: 'Cập nhật mốc Studio',
@@ -232,4 +254,13 @@ export const EVENT_LABEL: Record<string, string> = {
   EPISODE_SCHEDULED: 'Lên lịch phát hành',
   EPISODE_PUBLISHED: 'Phát hành tập',
   EPISODE_UNPUBLISHED: 'Gỡ tập',
+};
+
+/** Notification types of the Admin-led MF-1 (07/11/2026), as the inbox badges them. */
+export const NOTIFICATION_TYPE_LABEL: Record<string, string> = {
+  PROJECT_NOTE: 'Trao đổi ý tưởng',
+  SCRIPT_UPDATED: 'Kịch bản',
+  CONTRACT_UPDATED: 'Hợp đồng',
+  FINAL_FILM_CONFIRMED: 'Phim Final chờ duyệt',
+  FINAL_FILM_REJECTED: 'Phim Final bị trả lại',
 };
