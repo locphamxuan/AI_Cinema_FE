@@ -11,31 +11,24 @@ import { formatVnd } from '@/lib/format';
 import { swapPreview } from '../../lib/studioSwap';
 import { useAction } from '@/hooks/useAction';
 import { parseVnd } from '../shared/CostRequestCard';
-import { FilePicker } from '../shared/FilePicker';
 import { useProject } from './ProjectContext';
 
-const MATERIAL_ACCEPT = '.pdf,.docx,.txt,.png,.jpg,.jpeg,.webp';
-const MATERIAL_HINT = 'PDF, DOCX, TXT UTF-8 hoặc ảnh; tối đa 10 tệp, mỗi tệp 50 MB.';
 
 interface HandoffForm {
   studioName: string;
   studioEmail: string;
   studioPhone: string;
   seasonId: string;
-  scripts: File[];
-  references: File[];
   /** Fixed fee (VND) the brief offers, typed as text. */
   fee: string;
 }
 
-/** Studio, season and files of the new brief a studio change sends. */
+/** Studio and season of the new brief a studio change sends; only its PDF is emailed. */
 function HandoffFields(props: {
   studioName: string;
   studioEmail: string;
   studioPhone: string;
   seasonId: string;
-  scripts: File[];
-  references: File[];
   onChange: (patch: Partial<HandoffForm>) => void;
 }) {
   const { project } = useProject();
@@ -66,13 +59,11 @@ function HandoffFields(props: {
           ))}
         </select>
       </FormField>
-      <FilePicker label="Kịch bản gửi kèm" accept={MATERIAL_ACCEPT} files={props.scripts} onChange={(scripts) => props.onChange({ scripts })} hint={MATERIAL_HINT} />
-      <FilePicker label="Tài liệu tham khảo (material)" accept={MATERIAL_ACCEPT} files={props.references} onChange={(references) => props.onChange({ references })} />
     </>
   );
 }
 
-const EMPTY: HandoffForm = { studioName: '', studioEmail: '', studioPhone: '', seasonId: '', scripts: [], references: [], fee: '' };
+const EMPTY: HandoffForm = { studioName: '', studioEmail: '', studioPhone: '', seasonId: '', fee: '' };
 
 /** The fee the brief offers: whole thousands of VND, above 0 and within what the budget allows. */
 function FeeField({ value, maxVnd, onChange }: { value: string; maxVnd: number; onChange: (fee: string) => void }) {
@@ -123,8 +114,6 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
           reason: reason.trim(),
           offeredFeeVnd: parseVnd(form.fee),
           ...(keptVnd > 0 ? { forfeitedVnd: keptVnd } : {}),
-          scripts: form.scripts,
-          references: form.references,
         }),
       'Đã đổi Studio và gửi brief mới',
     );

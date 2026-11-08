@@ -16,7 +16,7 @@ import type {
 const S = API_ROUTES.STUDIOS;
 const R = API_ROUTES.PRODUCTION;
 
-/** Multipart body of a studio change: the new studio and season plus the files that go with the brief. */
+/** Multipart body of a studio change: the new studio and season. */
 export function handoffForm(input: ChangeStudioInput): FormData {
   const form = new FormData();
   if (input.studioId) form.append('studioId', input.studioId);
@@ -27,8 +27,6 @@ export function handoffForm(input: ChangeStudioInput): FormData {
   form.append('reason', input.reason);
   form.append('offeredFeeVnd', String(input.offeredFeeVnd));
   if (input.forfeitedVnd) form.append('forfeitedVnd', String(input.forfeitedVnd));
-  for (const file of input.scripts ?? []) form.append('scripts', file);
-  for (const file of input.references ?? []) form.append('references', file);
   return form;
 }
 

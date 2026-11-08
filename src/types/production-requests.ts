@@ -79,7 +79,7 @@ export interface StudioInput {
   isActive?: boolean;
 }
 
-/** A studio change: the new studio, the season (default: the whole project), its fee and the files. */
+/** A studio change: the new studio, the season (default: the whole project) and its fee. */
 export interface ChangeStudioInput {
   /** Studio typed by hand: a known email reuses that studio, a new one needs `studioName`. */
   studioName?: string;
@@ -89,8 +89,6 @@ export interface ChangeStudioInput {
   seasonId?: string;
   /** Fixed fee (VND) the brief offers the studio, at most the budget left. */
   offeredFeeVnd: number;
-  scripts?: File[];
-  references?: File[];
   reason: string;
   /** VND the replaced studio keeps; the rest of its fee returns to the budget. */
   forfeitedVnd?: number;
