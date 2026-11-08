@@ -5,6 +5,7 @@
  */
 export const PERMISSION = {
   // MF-1 - movie projects
+  PROJECT_CREATE: 'project:create',
   PROJECT_MANAGE: 'project:manage',
   PROJECT_READ_ALL: 'project:read.all',
   PROJECT_SUGGEST: 'project:suggest',
@@ -13,10 +14,14 @@ export const PERMISSION = {
   COST_APPROVE: 'cost:approve',
   COST_ADJUST: 'cost:adjust',
   CONTRACT_MANAGE: 'contract:manage',
+  SCRIPT_WRITE: 'script:write',
+  SCRIPT_APPROVE: 'script:approve',
+  STUDIO_PORTAL: 'studio:portal',
   STUDIO_HANDOFF: 'studio:handoff',
   STUDIO_MANAGE: 'studio:manage',
   MEDIA_INGEST: 'media:ingest',
   CONTENT_REVIEW: 'content:review',
+  EPISODE_PRICE: 'episode:price',
   EPISODE_PUBLISH: 'episode:publish',
   PRICE_ALERT_MANAGE: 'price-alert:manage',
   GENRE_MANAGE: 'genre:manage',
@@ -48,8 +53,8 @@ export const PERMISSION = {
 
 export type PermissionKey = (typeof PERMISSION)[keyof typeof PERMISSION];
 
-/** Web roles (the backend's UserRole, as the web spells it). */
-export type WebRole = 'user' | 'vip' | 'creator' | 'reviewer' | 'staff' | 'admin';
+/** Web roles (the backend's UserRole, as the web spells it). A studio signs in to Studio Web, not here. */
+export type WebRole = 'user' | 'vip' | 'creator' | 'reviewer' | 'studio' | 'staff' | 'admin';
 
 /** Internal areas of the web portal and which roles may enter each. */
 export type Area = 'creator' | 'reviewer' | 'staff' | 'admin';
@@ -67,6 +72,7 @@ export const ROLE_LABEL: Record<WebRole, string> = {
   vip: 'Member',
   creator: 'Content Creator',
   reviewer: 'Content Reviewer',
+  studio: 'Studio',
   staff: 'Staff',
   admin: 'Admin',
 };

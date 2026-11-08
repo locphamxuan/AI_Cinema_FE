@@ -32,6 +32,7 @@ const ROLE_MAP: Record<BackendRole, UserProfile['role']> = {
   MEMBER: 'user',
   CONTENT_CREATOR: 'creator',
   CONTENT_REVIEWER: 'reviewer',
+  STUDIO: 'studio',
   STAFF: 'staff',
   ADMIN: 'admin',
 };
