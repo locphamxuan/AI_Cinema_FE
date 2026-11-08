@@ -4,7 +4,7 @@ import { useCan } from '@/hooks/useCan';
 import { ADMIN_SECTIONS, opensSection } from '../sections';
 import { AdminExecutivePortal } from './AdminExecutivePortal';
 
-/** /admin renders the executive B2B management & overview dashboard. */
+/** /admin renders the what the Admin must decide and the platform charts. */
 export function AdminHome() {
   const can = useCan();
   const hasAccess = ADMIN_SECTIONS.some((s) => opensSection(s, can));
