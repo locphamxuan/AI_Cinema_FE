@@ -1,5 +1,5 @@
-import { ProjectListPage } from '@/features/production/components/list/ProjectListPage';
+import { CreatorStudioPortal } from '@/features/production/components/creator/CreatorStudioPortal';
 
-export default function Page() {
-  return <ProjectListPage />;
+export default function CreatorPage() {
+  return <CreatorStudioPortal />;
 }

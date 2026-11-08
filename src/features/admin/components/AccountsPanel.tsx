@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Lock, Pencil, Search, Trash2, Unlock } from 'lucide-react';
+import { Lock, Pencil, Search, Trash2, Unlock, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { adminService, type AccountPage, type AccountRow } from '@/services/adminService';
 import { toast } from '@/components/ui/Toast';
@@ -82,7 +82,7 @@ export function AccountsPanel() {
   const totalPages = result?.meta.totalPages ?? 1;
 
   return (
-    <section className="bg-white dark:bg-card rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
+    <section className="bg-white dark:bg-card rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden shadow-xs">
       <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white">Quản lý Tài khoản</h2>
@@ -92,7 +92,12 @@ export function AccountsPanel() {
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           {canManage && (
-            <Button size="sm" onClick={() => setEditing('new')} className="shadow-xs">
+            <Button
+              size="sm"
+              onClick={() => setEditing('new')}
+              className="shadow-xs bg-[#E50914] hover:bg-[#B81D24] text-white rounded-xl font-medium inline-flex items-center gap-1.5"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
               Tạo tài khoản
             </Button>
           )}
@@ -147,10 +152,10 @@ export function AccountsPanel() {
                     <div className="flex items-center gap-3">
                       <InitialsAvatar name={account.fullName} />
                       <div className="min-w-0">
-                        <p className="truncate font-medium">
-                          {account.fullName} {isMe && <span className="ml-1 text-xs font-normal text-primary">(bạn)</span>}
+                        <p className="truncate font-medium text-slate-900 dark:text-white">
+                          {account.fullName} {isMe && <span className="ml-1 text-xs font-normal text-[#E50914]">(bạn)</span>}
                         </p>
-                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{account.email}</p>
+                        <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{account.email}</p>
                       </div>
                     </div>
                   </td>
@@ -179,7 +184,7 @@ export function AccountsPanel() {
                   </td>
                   <td className="py-3 px-4">
                     <span
-                      className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                      className={`inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                         account.isActive
                           ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
                           : 'bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-400'
@@ -191,12 +196,12 @@ export function AccountsPanel() {
                   <td className="py-3 px-4 text-slate-500 dark:text-slate-400">{dateFormat.format(new Date(account.createdAt))}</td>
                   <td className="py-3 px-5 text-right whitespace-nowrap">
                     {canManage && (
-                      <Button size="sm" variant="ghost" aria-label={`Sửa ${account.fullName}`} onClick={() => setEditing(account)}>
+                      <Button size="sm" variant="ghost" aria-label={`Sửa ${account.fullName}`} onClick={() => setEditing(account)} className="rounded-lg">
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
                     )}
                     {canManage && !isMe && (
-                      <Button size="sm" variant="ghost" aria-label={`Xoá ${account.fullName}`} onClick={() => setDeleting(account)}>
+                      <Button size="sm" variant="ghost" aria-label={`Xoá ${account.fullName}`} onClick={() => setDeleting(account)} className="rounded-lg">
                         <Trash2 className="w-3.5 h-3.5 text-rose-600" />
                       </Button>
                     )}

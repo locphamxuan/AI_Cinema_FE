@@ -25,10 +25,10 @@ import { ChangeRequestsTab } from './ChangeRequestsTab';
 import { ActivityTab } from './ActivityTab';
 
 const TABS = [
-  { key: 'overview', label: 'Tổng quan', icon: Film },
+  { key: 'overview', label: 'Tổng quan & Ý tưởng', icon: Film },
   { key: 'script', label: 'Kịch bản', icon: ScrollText },
-  { key: 'episodes', label: 'Mùa & tập phim', icon: Clapperboard },
-  { key: 'team', label: 'Creator', icon: Users },
+  { key: 'episodes', label: 'Mùa & Tập phim', icon: Clapperboard },
+  { key: 'team', label: 'Biên kịch Creator', icon: Users },
   { key: 'studio', label: 'Studio', icon: Layers },
   { key: 'fee', label: 'Chi phí sản xuất', icon: CalendarClock },
   { key: 'contract', label: 'Hợp đồng', icon: FileSignature },
@@ -102,65 +102,73 @@ export function ProjectDetailPage() {
                 <h1 className="font-heading text-2xl font-semibold text-slate-900 dark:text-white leading-tight tracking-tight">{data.title}</h1>
                 <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
                   <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                    Dự án <StatusPill {...MOVIE_STATUS[data.status]} />
+                    <span className="font-medium text-slate-700 dark:text-slate-200">Dự án:</span>
+                    <StatusPill {...MOVIE_STATUS[data.status]} />
                   </span>
-                  {data.seasons.map((season) => (
-                    <span key={season.id} className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                      {seasonName(season.seasonNumber, season.episodes.length)} <StatusPill {...SEASON_STATUS[season.status]} />
+                  {data.seasons[0] && (
+                    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                      <span className="font-medium text-slate-700 dark:text-slate-200">
+                        {seasonName(data.seasons[0].seasonNumber, data.seasons[0].episodes.length)}:
+                      </span>
+                      <StatusPill {...SEASON_STATUS[data.seasons[0].status]} />
                     </span>
-                  ))}
+                  )}
+                  <span>·</span>
+                  <span>{data.seasons.length} mùa</span>
+                  <span>·</span>
+                  <span>{totalEpisodes} tập</span>
                 </div>
-                {(data.synopsis || data.ideaDescription) && (
-                  <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 max-w-3xl leading-relaxed">{data.synopsis || data.ideaDescription}</p>
-                )}
               </div>
 
-              <dl className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-3 rounded-xl bg-sky-50/70 dark:bg-white/[0.04] px-5 py-3">
-                <Fact label="Reviewer" value={data.reviewer.fullName} />
-                <Fact label={caps.creator && caps.lead ? 'Creator chính (bạn)' : 'Creator chính'} value={data.creator?.fullName ?? 'Chưa giao'} />
-                <Fact label="Studio" value={data.studio?.name ?? 'Chưa chọn'} />
-                <Fact label="Quy mô" value={`${data.seasons.length} mùa, ${totalEpisodes} tập`} />
+              {/* Facts strip */}
+              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50/60 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
+                <Fact label="Reviewer thẩm định" value={data.reviewer.fullName} />
+                <Fact label="Biên kịch Creator" value={data.creator?.fullName ?? 'Chưa giao'} />
+                <Fact label="Studio đối tác" value={data.studio?.name ?? 'Chưa chọn'} />
+                <Fact label="Cấu trúc" value={`${data.seasons.length} mùa · ${totalEpisodes} tập`} />
               </dl>
             </div>
+
+            {/* Tab navigation */}
+            <nav role="tablist" aria-label="Phần của dự án" className="flex gap-2 overflow-x-auto pt-2 -mb-5 border-b border-transparent">
+              {tabs.map((item) => {
+                const Icon = item.icon;
+                const active = tab === item.key;
+                return (
+                  <button
+                    key={item.key}
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => selectTab(item.key)}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl border-b-2 transition cursor-pointer whitespace-nowrap ${
+                      active
+                        ? 'border-[#E50914] text-[#E50914] bg-red-500/5 dark:bg-red-500/10'
+                        : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {item.label}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
 
-          <div role="tablist" aria-label="Mục của dự án" className="px-6 lg:px-8 flex items-center gap-1 overflow-x-auto scrollbar-none">
-            {tabs.map(({ key, label, icon: Icon }) => (
-              <button
-                key={key}
-                type="button"
-                role="tab"
-                aria-selected={tab === key}
-                onClick={() => selectTab(key)}
-                className={`shrink-0 flex items-center gap-2 px-4 py-3 text-sm border-b-2 whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-none focus-visible:bg-sky-50 ${
-                  tab === key
-                    ? 'border-sky-500 text-sky-800 dark:text-sky-200 font-semibold'
-                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Icon className="w-4 h-4" aria-hidden="true" />
-                {key === 'changes' && caps.creator ? 'Đề xuất cho Reviewer và Admin' : label}
-                {key === 'changes' && data.openChangeRequests > 0 && (
-                  <span className="px-1.5 rounded-full bg-coral-500 text-white text-xs font-semibold tabular-nums" title="Đề xuất đang chờ">
-                    {data.openChangeRequests}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Alerts ── */}
-        <div className="px-6 lg:px-8 space-y-3 pt-4">
+          {/* Banner: project was cancelled */}
           {data.status === 'CANCELLED' && (
-            <div className="flex items-start gap-3 rounded-2xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-4 text-xs text-rose-700 dark:text-rose-300">
-              <Ban className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
-              <span><b>Dự án đã huỷ:</b> {data.cancelReason}</span>
+            <div role="status" className="flex items-start gap-2 bg-rose-50 dark:bg-rose-500/10 border-t border-rose-200 dark:border-rose-500/20 px-6 py-3 text-xs text-rose-700 dark:text-rose-400">
+              <Ban className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>
+                <b>Dự án đã bị huỷ</b>
+                {data.cancelReason && `: ${data.cancelReason}`}
+              </span>
             </div>
           )}
-          {data.revision.episodeCount > 0 && (
-            <div className="flex items-start gap-3 rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-4 text-xs text-amber-800 dark:text-amber-300">
-              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+
+          {/* Banner: episodes under revision */}
+          {data.revision && (
+            <div role="status" className="flex items-start gap-2 bg-amber-50 dark:bg-amber-500/10 border-t border-amber-200 dark:border-amber-500/20 px-6 py-3 text-xs text-amber-800 dark:text-amber-400">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>
                 <b>Đang sửa {data.revision.episodeCount} tập:</b>{' '}
                 {data.revision.bySeason.map((s) => `mùa ${s.seasonNumber}: tập ${s.episodeNumbers.join(', ')}`).join('; ')}

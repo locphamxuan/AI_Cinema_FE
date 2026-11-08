@@ -120,7 +120,7 @@ export function OverviewTab() {
 
           <div className="px-5 pb-5 space-y-4 text-sm">
             <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 p-4">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ý tưởng phim</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ý tưởng & Brief kịch bản</p>
               <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">{project.ideaDescription}</p>
             </div>
             {project.synopsis && (
@@ -143,7 +143,7 @@ export function OverviewTab() {
 
         <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-card overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100 dark:border-white/5">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Phân công</h2>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Phân công nhân sự</h2>
           </div>
           <div className="p-5 space-y-3">
             <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/60 dark:bg-white/[0.03]">
@@ -151,7 +151,7 @@ export function OverviewTab() {
                 {project.reviewer.fullName.charAt(0)}
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Reviewer phụ trách</p>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Reviewer thẩm định</p>
                 <p className="text-xs font-bold text-slate-900 dark:text-white">{project.reviewer.fullName}</p>
               </div>
             </div>
@@ -167,13 +167,13 @@ export function OverviewTab() {
                 {project.creator ? project.creator.fullName.charAt(0) : '?'}
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Creator phụ trách</p>
+                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">In-house Creator</p>
                 <p className="text-xs font-bold text-slate-900 dark:text-white">{project.creator?.fullName ?? 'Chưa giao Creator'}</p>
               </div>
             </div>
 
             {caps.create && open && (
-              <Button size="sm" className="w-full mt-1" variant="secondary" onClick={() => setAssigning(true)}>
+              <Button size="sm" className="w-full mt-1 bg-[#E50914] hover:bg-[#B81D24] text-white rounded-xl" onClick={() => setAssigning(true)}>
                 {project.creator ? 'Đổi Creator' : 'Giao cho Creator'}
               </Button>
             )}

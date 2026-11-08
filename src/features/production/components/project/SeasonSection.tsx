@@ -6,7 +6,6 @@ import { AlertTriangle, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { getTodayDateString } from '@/lib/dateUtils';
 import { seasonLabel, seasonName } from '@/lib/seasonLabel';
-import { productionService } from '@/services/productionService';
 import { teamService } from '@/services/teamService';
 import type { CreatorSeat, Episode, Season } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
@@ -17,6 +16,7 @@ import { EPISODE_STATUS, INGEST_STATUS, SEASON_STATUS } from '../../lib/labels';
 import { productionPaths } from '../../lib/routes';
 import { CARD, Empty, StatusPill } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
+import { productionService } from '@/services/productionService';
 
 /** Submissions of one episode: every version of media the Creator uploaded from the studio's deliveries. */
 function Submissions({ episode }: { episode: Episode }) {
@@ -148,7 +148,6 @@ export function SeasonSection({
                         <Link href={productionPaths.episode(base, project.id, ep.id)} className="font-medium text-slate-900 dark:text-white hover:underline">
                           {ep.title}
                         </Link>
-                        <span className="ml-2 text-xs text-slate-400">{formatDuration(ep.targetDurationSeconds)}</span>
                         {ep.revisionStartedAt && <span className="ml-2 text-xs text-amber-600">đang sửa</span>}
                       </td>
                       <td className="px-3 py-2.5">
