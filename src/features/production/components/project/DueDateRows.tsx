@@ -4,7 +4,7 @@ import { getTodayDateString } from '@/lib/dateUtils';
 import type { Episode } from '@/types/production';
 import { formatDay, toDateInput } from '@/lib/format';
 
-/** The Reviewer's deadline of an episode can be handed to a studio: set, and not already past. */
+/** The Reviewer's deadline of an episode is usable for the studio: set, and not already past. */
 export function deadlineUsable(episode: Pick<Episode, 'deliveryDeadline'>): boolean {
   const deadline = toDateInput(episode.deliveryDeadline);
   return !!deadline && deadline >= getTodayDateString();

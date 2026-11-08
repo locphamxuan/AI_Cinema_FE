@@ -11,7 +11,7 @@ import { formatDateTime, formatVnd } from '@/lib/format';
 import { parseVnd } from './CostRequestCard';
 import { StatusPill } from '@/components/data/ui';
 
-/** One round of a hand-off's contract negotiation: the cost proposed (if any) and who has signed so far. */
+/** One round of a project's contract negotiation: the cost proposed (if any), the terms and who has signed so far. */
 export function ContractCard({
   contract: c,
   canDecide = false,
@@ -43,7 +43,7 @@ export function ContractCard({
     <li className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5 text-xs space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-slate-500 dark:text-slate-400">
-          Vòng {c.round} · Studio {c.handoff.studio.name} · {formatDateTime(c.createdAt)}
+          Vòng {c.round} · Studio {c.studio.name} · {formatDateTime(c.createdAt)}
         </p>
         <StatusPill {...CONTRACT_STATUS[c.status]} />
       </div>
@@ -53,11 +53,15 @@ export function ContractCard({
           <span className="font-semibold text-slate-800 dark:text-slate-100">{formatVnd(c.costVnd)}</span>
         </p>
       )}
+      {c.terms && <p className="whitespace-pre-line text-slate-600 dark:text-slate-300">Điều khoản: {c.terms}</p>}
       <p className="text-slate-600 dark:text-slate-300">
         {c.studioSignedAt && `Studio ký lúc ${formatDateTime(c.studioSignedAt)}. `}
         {c.adminSignedAt && c.adminSignedBy && `${c.adminSignedBy.fullName} (Admin) ký lúc ${formatDateTime(c.adminSignedAt)}.`}
-        {!c.studioSignedAt && !c.adminSignedAt && 'Chưa bên nào ký.'}
+        {!c.studioSignedAt && !c.adminSignedAt && 'Chưa bên nào ký; chờ Studio điền giá và ký trên Studio Web.'}
       </p>
+      {c.status === 'SIGNED' && c.handoff && (
+        <p className="text-emerald-700 dark:text-emerald-300">Đã tự bàn giao cho Studio: dự án vào sản xuất, các tập chờ Studio nộp phim.</p>
+      )}
       {canDecide && c.status === 'STUDIO_SIGNED' && !countering && (
         <div className="flex gap-2 pt-1">
           <Button type="button" size="sm" onClick={sign} disabled={busy}>
