@@ -53,7 +53,7 @@ describe('review queue', () => {
 
   it('lists the real projects of the Reviewer with links into them', async () => {
     signInAs('reviewer');
-    routeFetch({ '/projects': pageOf([{ id: 'm1' }]), '/projects/m1': project(), '/projects/m1/script': script('SUBMITTED') });
+    routeFetch({ '/projects': pageOf([{ id: 'm1', status: 'ASSIGNED' }]), '/projects/m1': project(), '/projects/m1/script': script('SUBMITTED') });
     render(<ReviewerProjectQueuePage />);
 
     const link = await screen.findByRole('link', { name: /Thẩm Định Kịch Bản/ });
@@ -64,7 +64,7 @@ describe('review queue', () => {
   it('opens the filter the sidebar asked for', async () => {
     nav.search = 'filter=revising';
     signInAs('reviewer');
-    routeFetch({ '/projects': pageOf([{ id: 'm1' }]), '/projects/m1': project(), '/projects/m1/script': script('SUBMITTED') });
+    routeFetch({ '/projects': pageOf([{ id: 'm1', status: 'ASSIGNED' }]), '/projects/m1': project(), '/projects/m1/script': script('SUBMITTED') });
     render(<ReviewerProjectQueuePage />);
 
     expect(await screen.findByText('Không có mục nào khớp bộ lọc.')).toBeInTheDocument();
@@ -124,7 +124,13 @@ describe('AdminExecutivePortal', () => {
   const round = { id: 'c1', status: 'STUDIO_SIGNED', round: 1, costVnd: 150_000_000, terms: 'Giao đúng hạn', studioSignedAt: '2026-11-04T00:00:00.000Z', studio: { id: STUDIO.id, name: 'Lumen Studio' } };
   const signedProject = project();
   const portal = (rows: { detail: ProjectDetail; script: ProjectScript }, extra: Record<string, unknown> = {}) =>
-    routeFetch({ '/projects': pageOf([{ id: 'm1' }]), '/projects/m1': rows.detail, '/projects/m1/script': rows.script, '/projects/m1/contracts': [round], ...extra });
+    routeFetch({
+      '/projects': pageOf([{ id: 'm1', status: rows.detail.status }]),
+      '/projects/m1': rows.detail,
+      '/projects/m1/script': rows.script,
+      '/projects/m1/contracts': [round],
+      ...extra,
+    });
 
   it('signs the real contract the studio signed', async () => {
     signInAs('admin');
@@ -160,12 +166,21 @@ describe('AdminExecutivePortal', () => {
 
   it('publishes a confirmed Final Film and links a script waiting for the Final decision', async () => {
     signInAs('admin');
-    const detail = withEpisodes(episode('COMPLIANCE_PASSED', { finalConfirmedAt: '2026-11-05T00:00:00.000Z' }));
-    const calls = portal({ detail, script: script('REVIEWER_APPROVED') }, { '/episodes/e1/publications': { id: 'pub' } });
+    const producing = { ...withEpisodes(episode('COMPLIANCE_PASSED', { finalConfirmedAt: '2026-11-05T00:00:00.000Z' })), id: 'm2' };
+    const calls = portal(
+      { detail: signedProject, script: script('REVIEWER_APPROVED') },
+      {
+        '/projects': pageOf([{ id: 'm1', status: 'ASSIGNED' }, { id: 'm2', status: 'IN_PRODUCTION' }]),
+        '/projects/m2': producing,
+        '/episodes/e1/publications': { id: 'pub' },
+      },
+    );
     render(<AdminExecutivePortal />);
 
     expect(await screen.findByRole('link', { name: 'Duyệt kịch bản: Mưa Sài Gòn' })).toHaveAttribute('href', '/admin/projects/m1?tab=script');
     await userEvent.click(screen.getByRole('button', { name: /Phát Hành Ngay/ }));
     await waitFor(() => expect(calls.some((c) => c.path === '/episodes/e1/publications' && c.method === 'POST')).toBe(true));
+    // Past ASSIGNED the script is settled, so the portal does not read it again.
+    expect(calls.some((c) => c.path === '/projects/m2/script')).toBe(false);
   });
 });

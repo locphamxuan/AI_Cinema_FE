@@ -1,7 +1,7 @@
 /** What the Admin has to act on in MF-1, read from the real API for the executive portal. */
 import type { ApiResponse } from '@/services/apiClient';
 import { contractService } from '@/services/contractService';
-import { loadPipelines, type ProjectPipeline } from '@/services/pipelineService';
+import { loadPipelines, scriptInProgress, type ProjectPipeline } from '@/services/pipelineService';
 import { productionService } from '@/services/productionService';
 import type { Contract } from '@/types/contract';
 import type { Episode, MovieStatus, ProjectDetail } from '@/types/production';
@@ -58,7 +58,7 @@ export async function loadAdminPipeline(): Promise<ApiResponse<AdminPipeline>> {
     countOf(),
     countOf(['COMPLETED']),
     countOf(['IN_PRODUCTION', 'UNDER_REVISION']),
-    loadPipelines(['ASSIGNED', 'IN_PRODUCTION', 'UNDER_REVISION']),
+    loadPipelines({ status: ['ASSIGNED', 'IN_PRODUCTION', 'UNDER_REVISION'], readScript: scriptInProgress }),
   ]);
   const failed = [total, completed, producing, rows].find((res) => !res.success);
   if (failed) return { ...failed, data: EMPTY };

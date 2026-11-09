@@ -8,7 +8,7 @@ import { ErrorNote, Loading } from '@/components/data/ui';
 import { projectCapabilities } from '@/features/production/lib/capabilities';
 import { useCan } from '@/hooks/useCan';
 import { useResource } from '@/hooks/useResource';
-import { loadPipelines } from '@/services/pipelineService';
+import { loadPipelines, scriptInProgress } from '@/services/pipelineService';
 import { productionService } from '@/services/productionService';
 import { scriptService } from '@/services/scriptService';
 import { useAppStore } from '@/store/useAppStore';
@@ -68,7 +68,7 @@ function AuditDesk({ projectId, episodeId, queue }: { projectId: string; episode
 /** /reviewer: the film chosen from the queue (or the first one waiting) next to its review sheet. */
 export function ReviewerAuditWorkspace() {
   const params = useSearchParams();
-  const pipelines = useResource('reviewer-pipelines', () => loadPipelines());
+  const pipelines = useResource('reviewer-pipelines', () => loadPipelines({ readScript: scriptInProgress }));
   const queue = useMemo(() => toQueueItems(pipelines.data ?? []), [pipelines.data]);
   const target = pickEpisode(queue, params.get('project'), params.get('episode'));
 
