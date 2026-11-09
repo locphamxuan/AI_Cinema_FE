@@ -13,59 +13,44 @@ const handoff = (over: Partial<StudioHandoff> = {}) =>
     offeredFeeVnd: '150000000',
     forfeitedVnd: '0',
     createdAt: '2026-10-14T03:00:00.000Z',
-    createdBy: { fullName: 'Creator' },
-    milestoneStatus: 'IN_PROGRESS',
+    createdBy: { fullName: 'Admin' },
+    milestoneStatus: 'DELIVERED',
     emailMessage: null,
     materials: [],
-    filmLinks: [],
-    milestoneEvents: [],
+    milestoneEvents: [
+      {
+        id: 'ev1',
+        fromStatus: 'IN_PROGRESS',
+        toStatus: 'DELIVERED',
+        note: null,
+        createdAt: '2026-10-15T03:00:00.000Z',
+        changedBy: { fullName: 'Studio Ánh Trăng' },
+        mediaAsset: { id: 'a1', version: 1, episodeId: 'e1', ingestStatus: 'READY' },
+      },
+    ],
     briefFileKey: null,
     changeReason: null,
-    filmSentAt: null,
-    filmSentNote: null,
     ...over,
   }) as unknown as StudioHandoff;
 
 const renderCard = (h: StudioHandoff) =>
   render(<HandoffCard handoff={h} movieId="m1" base="/creator" onBrief={vi.fn()} onMaterial={vi.fn()} />);
 
-describe('HandoffCard film sent by the studio', () => {
-  it('shows nothing until the studio reports a film', () => {
+describe('HandoffCard (read-only timeline)', () => {
+  it('lists the milestones the system moved, linking the Submission the studio delivered', () => {
     renderCard(handoff());
+    expect(screen.getByText('Submission v1').getAttribute('href')).toBe('/creator/projects/m1/episodes/e1');
+    expect(screen.getByText(/Studio Ánh Trăng$/, { selector: 'span' })).toBeTruthy();
+  });
+
+  it('offers no way to move a milestone or import a film by hand', () => {
+    renderCard(handoff({ milestoneStatus: 'IN_PROGRESS' }));
+    expect(screen.queryByRole('button', { name: /Cập nhật mốc/ })).toBeNull();
     expect(screen.queryByText(/Studio đã gửi phim/)).toBeNull();
   });
 
-  it('shows the film the studio mailed and waits for the delivered film', () => {
-    renderCard(handoff({ filmSentAt: '2026-10-15T03:00:00.000Z', filmSentNote: 'Studio đã gửi phim qua email: v2 (3 tập).' }));
-    expect(screen.getByText(/Studio đã gửi phim qua email: v2 \(3 tập\)/)).toBeTruthy();
-    expect(screen.getByText(/Chờ Creator nộp bản phim/)).toBeTruthy();
-  });
-
-  it('stops waiting once the milestone is DELIVERED', () => {
-    renderCard(handoff({ milestoneStatus: 'DELIVERED', filmSentAt: '2026-10-15T03:00:00.000Z', filmSentNote: 'Đã gửi.' }));
-    expect(screen.queryByText(/Chờ Creator nộp bản phim/)).toBeNull();
-  });
-
-  it('lists the link of every episode the studio mailed, to its episode page and to the film', () => {
-    renderCard(
-      handoff({
-        filmSentAt: '2026-10-15T03:00:00.000Z',
-        filmSentNote: 'Đã gửi.',
-        filmLinks: [
-          {
-            id: 'l1',
-            episodeId: 'e1',
-            version: 'v1',
-            fileName: 'tap-1.mp4',
-            url: 'http://studio.test/films/a/tap-1.mp4',
-            sentAt: '2026-10-15T03:00:00.000Z',
-            episode: { episodeNumber: 1 },
-          },
-        ],
-      }),
-    );
-    expect(screen.getByText('Tập 1').getAttribute('href')).toBe('/creator/projects/m1/episodes/e1');
-    expect(screen.getByLabelText('Xem phim tập 1').getAttribute('href')).toBe('http://studio.test/films/a/tap-1.mp4');
-    expect(screen.getByText(/tap-1\.mp4/)).toBeTruthy();
+  it('still labels the milestones of older hand-offs the studio accepted or declined', () => {
+    renderCard(handoff({ milestoneStatus: 'STUDIO_DECLINED', milestoneEvents: [] }));
+    expect(screen.getByText('Studio từ chối')).toBeTruthy();
   });
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Download, ExternalLink } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { seasonLabel } from '@/lib/seasonLabel';
@@ -63,41 +63,6 @@ export function HandoffCard({
         </p>
       )}
       {h.emailMessage?.errorMessage && <p className="text-rose-600">{h.emailMessage.errorMessage}</p>}
-      {h.filmSentAt && (
-        <p className="rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-3 py-2">
-          {h.filmSentNote ?? 'Studio đã gửi phim qua email.'} · {formatDateTime(h.filmSentAt)}
-          {h.milestoneStatus !== 'DELIVERED' && ' · Chờ Creator nộp bản phim.'}
-        </p>
-      )}
-      {h.filmLinks.length > 0 && (
-        <div>
-          <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Phim Studio đã gửi</p>
-          <ul className="space-y-1">
-            {h.filmLinks.map((link) => (
-              <li key={link.id} className="flex items-center gap-2">
-                <Link
-                  href={productionPaths.episode(base, movieId, link.episodeId)}
-                  className="shrink-0 font-medium text-sky-700 dark:text-sky-300 hover:underline"
-                >
-                  Tập {link.episode.episodeNumber}
-                </Link>
-                <span className="flex-1 min-w-0 truncate">
-                  {link.fileName} <span className="text-slate-400">· {link.version} · {formatDateTime(link.sentAt)}</span>
-                </span>
-                <a
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Xem phim tập ${link.episode.episodeNumber}`}
-                  className="text-slate-500 hover:text-sky-700"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
 
       <div>
         <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Đã giao những gì</p>
