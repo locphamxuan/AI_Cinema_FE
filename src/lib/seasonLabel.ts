@@ -21,14 +21,3 @@ export function seasonLabel(
 export function episodeCountsBySeason(seasons: { id: string; episodes: unknown[] }[]): Map<string, number> {
   return new Map(seasons.map((season) => [season.id, season.episodes.length]));
 }
-
-interface ListedEpisode {
-  seasonNumber: number;
-  episodeNumber: number;
-}
-
-/** "Tập N", or "Phần N (trọn bộ)" when the episode is the only one of its season. */
-export function episodeLabel(episode: ListedEpisode, episodes: ListedEpisode[]): string {
-  const siblings = episodes.filter((other) => other.seasonNumber === episode.seasonNumber).length;
-  return siblings === 1 ? seasonName(episode.seasonNumber, 1) : `Tập ${episode.episodeNumber}`;
-}
