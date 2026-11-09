@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { rewardSpinService } from '@/services/rewardSpinService';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 function mockFetch(...responses: { body: unknown; status?: number }[]) {
   const fetchMock = vi.fn();
   for (const { body, status = 200 } of responses) {
-    fetchMock.mockResolvedValueOnce({ ok: status < 400, status, json: async () => body, headers: new Headers() });
+    fetchMock.mockResolvedValueOnce(fakeResponse(body, status));
   }
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;

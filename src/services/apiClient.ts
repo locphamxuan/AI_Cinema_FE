@@ -19,6 +19,17 @@ export interface RequestOptions extends RequestInit {
   _isRetry?: boolean;
 }
 
+/**
+ * The JSON of a successful answer, null when there is none: 204 No Content (assign, cancel, delete…), or a
+ * handler that returned null (GET /projects/:id/script before the first version) - Nest then sends an empty
+ * body, and the proxy may drop or keep its Content-Length, so the text itself decides.
+ */
+async function bodyOf(response: Response): Promise<unknown> {
+  if (response.status === 204) return null;
+  const text = await response.text();
+  return text.trim() ? JSON.parse(text) : null;
+}
+
 class ApiClient {
   private baseUrl: string;
   private refreshPromise: Promise<boolean> | null = null;
@@ -140,9 +151,7 @@ class ApiClient {
         };
       }
 
-      // 204 No Content (assign, cancel, delete…) has no body to parse.
-      const empty = response.status === 204 || response.headers?.get('content-length') === '0';
-      const data = (empty ? null : await response.json()) as T;
+      const data = (await bodyOf(response)) as T;
       return { success: true, data, statusCode: response.status };
     } catch (error) {
       return {

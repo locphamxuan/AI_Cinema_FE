@@ -6,6 +6,7 @@ import { ProjectDetailPage } from '@/features/production/components/project/Proj
 import { signInAs } from '@/tests/support/signIn';
 import { useAppStore } from '@/store/useAppStore';
 import type { ProjectDetail } from '@/types/production';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 const nav = vi.hoisted(() => ({ pathname: '/reviewer/projects', params: {} as Record<string, string>, search: '' }));
 
@@ -107,7 +108,7 @@ function routeFetch(routes: Record<string, unknown>) {
     vi.fn(async (url: string) => {
       const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
       const body = path in routes ? routes[path] : [];
-      return { ok: true, status: 200, json: async () => body };
+      return fakeResponse(body);
     }),
   );
 }

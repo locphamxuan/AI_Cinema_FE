@@ -6,6 +6,7 @@ import { AdminMoviesPanel } from '@/features/admin/components/AdminMoviesPanel';
 import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
 import { signInAs } from '@/tests/support/signIn';
 import { useAppStore } from '@/store/useAppStore';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
@@ -29,7 +30,7 @@ function routeFetch(routes: Record<string, { status?: number; body: unknown }>) 
     const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
     const hit = routes[`${init?.method ?? 'GET'} ${path}`] ?? { body: [] };
     const status = hit.status ?? 200;
-    return { ok: status < 400, status, json: async () => hit.body, headers: new Headers() };
+    return fakeResponse(hit.body, status);
   });
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;

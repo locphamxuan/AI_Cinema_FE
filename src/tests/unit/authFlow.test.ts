@@ -1,17 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAppStore } from '@/store/useAppStore';
 import { authService } from '@/services/authService';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 function backendAnswers(role: string) {
-  return vi.fn().mockResolvedValue({
-    ok: true,
-    status: 200,
-    json: async () => ({
+  return vi.fn().mockResolvedValue(
+    fakeResponse({
       accessToken: 'jwt-access',
       refreshToken: 'jwt-refresh',
       user: { id: 'u-1', fullName: 'Alice', email: 'alice@example.com', role, isActive: true },
     }),
-  });
+  );
 }
 
 describe('auth flow', () => {

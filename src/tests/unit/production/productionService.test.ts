@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { productionService, projectsUrl } from '@/services/productionService';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 function mockFetch(body: unknown, status = 200) {
-  const fetchMock = vi.fn().mockResolvedValue({ ok: status < 400, status, json: async () => body });
+  const fetchMock = vi.fn().mockResolvedValue(fakeResponse(body, status));
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
 }
@@ -37,15 +38,16 @@ describe('productionService', () => {
   });
 
   it('treats a 204 No Content write as a success without reading a body', async () => {
-    const json = vi.fn().mockRejectedValue(new SyntaxError('Unexpected end of JSON input'));
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 204, json }));
+    const answer = fakeResponse(undefined, 204);
+    const text = vi.spyOn(answer, 'text');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(answer));
     const res = await productionService.assignCreator('m1', 'c1');
     expect(res).toMatchObject({ success: true, data: null });
-    expect(json).not.toHaveBeenCalled();
+    expect(text).not.toHaveBeenCalled();
   });
 
   it('deletes an idea file by id', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 204, json: vi.fn() });
+    const fetchMock = vi.fn().mockResolvedValue(fakeResponse(undefined, 204));
     vi.stubGlobal('fetch', fetchMock);
     const res = await productionService.deleteIdeaFile('m1', 'f1');
     expect(res.success).toBe(true);

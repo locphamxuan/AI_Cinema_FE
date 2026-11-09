@@ -4,6 +4,7 @@ import { MAX_AD_VIDEO_BYTES, adAdminService, adInputProblem } from '@/services/a
 import { adLiveState } from '@/features/admin/components/AdsPanel';
 import { AdFormModal } from '@/features/admin/components/AdFormModal';
 import type { AdminAd, AdInput } from '@/types/playback';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 const input = (patch: Partial<AdInput> = {}): AdInput => ({
   title: 'Trà sữa',
@@ -40,7 +41,7 @@ describe('Admin ads (MF-3)', () => {
   });
 
   it('creates an ad and pauses one with a status-only patch', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ad(), headers: new Headers() });
+    const fetchMock = vi.fn().mockResolvedValue(fakeResponse(ad()));
     vi.stubGlobal('fetch', fetchMock);
 
     await adAdminService.createAd(input());
@@ -54,7 +55,7 @@ describe('Admin ads (MF-3)', () => {
   });
 
   it('uploads an ad video from the computer as multipart', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 201, json: async () => ({ mediaUrl: 'https://cdn.example/ads/x.mp4' }), headers: new Headers() });
+    const fetchMock = vi.fn().mockResolvedValue(fakeResponse({ mediaUrl: 'https://cdn.example/ads/x.mp4' }, 201));
     vi.stubGlobal('fetch', fetchMock);
 
     const res = await adAdminService.uploadVideo(new File(['mp4'], 'ad.mp4', { type: 'video/mp4' }));

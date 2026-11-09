@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import { fakeResponse } from './fakeResponse';
 
 /**
  * Answers each API path with the given body (anything else is an empty list) and records the calls,
@@ -12,7 +13,7 @@ export function routeFetch(routes: Record<string, unknown>) {
       const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
       calls.push({ path, method: init?.method ?? 'GET', body: init?.body });
       const body = path in routes ? routes[path] : [];
-      return { ok: true, status: 200, json: async () => body };
+      return fakeResponse(body);
     }),
   );
   return calls;
