@@ -12,6 +12,7 @@ interface ApiCatalogMovie {
   id: string;
   title: string;
   genres: { id: string; name: string }[];
+  episodeCount: number;
 }
 
 /** The paginated shape of list endpoints (nestjs pagination). */
@@ -28,25 +29,14 @@ export interface CatalogMovie {
   episodeCount: number;
 }
 
-/** Released episodes of a movie; the list endpoint does not count them. */
-async function episodeCountOf(movieId: string): Promise<number> {
-  const res = await apiClient.get<unknown[]>(API_ROUTES.MOVIES.EPISODES(movieId));
-  return res.success && Array.isArray(res.data) ? res.data.length : 0;
-}
-
 export const movieService = {
   /** Released movies, newest first, each with its released episode count. */
   async getMovies(): Promise<ApiResponse<CatalogMovie[]>> {
     const res = await apiClient.get<Page<ApiCatalogMovie>>(`${API_ROUTES.MOVIES.LIST}?limit=${CATALOG_PAGE_SIZE}`);
     if (!res.success || !res.data) return { ...res, data: [] };
-    const movies = await Promise.all(
-      res.data.data.map(async (movie) => ({
-        id: movie.id,
-        title: movie.title,
-        genres: movie.genres.map((g) => g.name),
-        episodeCount: await episodeCountOf(movie.id),
-      })),
-    );
-    return { ...res, data: movies };
+    return {
+      ...res,
+      data: res.data.data.map(({ id, title, genres, episodeCount }) => ({ id, title, genres: genres.map((g) => g.name), episodeCount })),
+    };
   },
 };

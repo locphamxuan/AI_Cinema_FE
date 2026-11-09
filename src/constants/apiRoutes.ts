@@ -22,7 +22,6 @@ export const API_ROUTES = {
   // Movies & Video
   MOVIES: {
     LIST: '/movies',
-    EPISODES: (id: string) => `/movies/${id}/episodes`,
   },
   GENRES: {
     LIST: '/genres',
