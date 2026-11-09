@@ -92,7 +92,6 @@ export const API_ROUTES = {
       `/projects/${movieId}/handoffs/${handoffId}/materials/${materialId}/content`,
     EPISODE_MEDIA: (episodeId: string) => `/episodes/${episodeId}/media`,
     EPISODE_NOTES: (episodeId: string) => `/episodes/${episodeId}/notes`,
-    MEDIA_ASSET: (id: string) => `/media-assets/${id}`,
     REVIEW_SHEET: (id: string) => `/media-assets/${id}/review-sheet`,
     REVIEWS: (id: string) => `/media-assets/${id}/reviews`,
     AI_LABELS: (id: string) => `/media-assets/${id}/ai-content-labels`,

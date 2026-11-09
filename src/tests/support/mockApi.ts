@@ -19,7 +19,3 @@ export function mockApi(routes: Record<string, unknown>) {
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
 }
-
-/** `METHOD url` of every call the page made, to assert on what reached the BE. */
-export const callsOf = (fetchMock: ReturnType<typeof mockApi>) =>
-  fetchMock.mock.calls.map(([url, init]) => `${init?.method ?? 'GET'} ${url}`);

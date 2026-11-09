@@ -5,7 +5,6 @@
 import { apiClient, type ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type {
-  AppNotification,
   ComplianceInput,
   CreateProjectInput,
   Episode,
@@ -87,7 +86,6 @@ export const productionService = {
     return apiClient.postForm<{ thumbnailUrl: string }>(R.EPISODE_THUMBNAIL(episodeId), form);
   },
 
-  listIdeaFiles: (movieId: string) => apiClient.get<IdeaFile[]>(R.IDEA_FILES(movieId)),
   /** IDEA travels with the studio brief; SYNOPSIS backs the summary for viewers. */
   uploadIdeaFile(movieId: string, file: File, purpose: IdeaFilePurpose = 'IDEA') {
     const form = new FormData();
@@ -105,7 +103,6 @@ export const productionService = {
 
   // ---- Media the studio delivered on Studio Web (steps 5–7, read-only here) ----
   listMedia: (episodeId: string) => apiClient.get<MediaAsset[]>(R.EPISODE_MEDIA(episodeId)),
-  getMedia: (mediaAssetId: string) => apiClient.get<MediaAsset>(R.MEDIA_ASSET(mediaAssetId)),
 
   // ---- Notes between the Creator holding an episode and the lead (BR-67) ----
   listEpisodeNotes: (episodeId: string) => apiClient.get<EpisodeNote[]>(R.EPISODE_NOTES(episodeId)),
@@ -156,10 +153,4 @@ export const productionService = {
   getPlatformSettings: () => apiClient.get<PlatformSettings>(API_ROUTES.PLATFORM_SETTINGS),
   updatePlatformSettings: (input: Partial<PlatformSettings>) =>
     apiClient.patch<PlatformSettings>(API_ROUTES.PLATFORM_SETTINGS, input),
-
-  // ---- Notifications (BR-53: internal alerts are in-app) ----
-  listNotifications: () => apiClient.get<Page<AppNotification>>(`${API_ROUTES.NOTIFICATIONS.LIST}?limit=15`),
-  unreadCount: () => apiClient.get<{ unread: number }>(API_ROUTES.NOTIFICATIONS.UNREAD_COUNT),
-  markRead: (id: string) => apiClient.patch<unknown>(API_ROUTES.NOTIFICATIONS.READ(id)),
-  markAllRead: () => apiClient.patch<unknown>(API_ROUTES.NOTIFICATIONS.READ_ALL),
 };

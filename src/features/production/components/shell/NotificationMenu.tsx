@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bell } from 'lucide-react';
-import { productionService } from '@/services/productionService';
+import { notificationService } from '@/services/notificationService';
 import { useAppStore } from '@/store/useAppStore';
 import type { AppNotification } from '@/types/production';
 import { formatDateTime } from '@/lib/format';
 import { notificationHref } from '../../lib/routes';
 
 const POLL_MS = 60_000;
+/** Notifications the bell lists; the full list is on the notifications page. */
+const LATEST_COUNT = 15;
 
 /** In-app notifications of internal accounts (BR-53): unread badge, latest list, open the linked screen. */
 export function NotificationMenu() {
@@ -21,7 +23,7 @@ export function NotificationMenu() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const refreshCount = useCallback(async () => {
-    const res = await productionService.unreadCount();
+    const res = await notificationService.getUnreadCount();
     if (res.success) setUnread(res.data.unread);
   }, []);
 
@@ -48,7 +50,7 @@ export function NotificationMenu() {
     const next = !open;
     setOpen(next);
     if (next) {
-      const res = await productionService.listNotifications();
+      const res = await notificationService.listNotifications(1, LATEST_COUNT);
       setItems(res.success ? res.data.data : []);
     }
   };
@@ -56,7 +58,7 @@ export function NotificationMenu() {
   const openItem = async (item: AppNotification) => {
     setOpen(false);
     if (!item.readAt) {
-      await productionService.markRead(item.id);
+      await notificationService.markRead(item.id);
       void refreshCount();
     }
     const href = notificationHref(item.link, role);
@@ -64,7 +66,7 @@ export function NotificationMenu() {
   };
 
   const readAll = async () => {
-    await productionService.markAllRead();
+    await notificationService.markAllRead();
     setUnread(0);
     setItems((list) => list?.map((n) => ({ ...n, readAt: n.readAt ?? new Date().toISOString() })) ?? null);
   };
