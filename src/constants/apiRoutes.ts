@@ -28,11 +28,6 @@ export const API_ROUTES = {
   GENRES: {
     LIST: '/genres',
   },
-  // Wallet & Coin (MF-2)
-  WALLET: {
-    BALANCE: '/wallet',
-    STATEMENTS: '/wallet/statements',
-  },
   // Accounts & permissions (Admin), member list (Staff)
   ADMIN: {
     USERS: '/users',

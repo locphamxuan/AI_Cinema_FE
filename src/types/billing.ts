@@ -208,3 +208,19 @@ export interface RewardRuleInput {
   grantsSpin?: boolean;
   isActive?: boolean;
 }
+
+/** GET /admin/reward-prizes - a prize of the reward wheel. */
+export type RewardPrizeType = 'BONUS_COIN' | 'PLAN_DAYS';
+
+export interface RewardPrize {
+  id: string;
+  code: string;
+  name: string;
+  type: RewardPrizeType;
+  bonusCoins: number | null;
+  planDays: number | null;
+  weight?: number;
+  chancePercent?: number;
+  isActive?: boolean;
+  createdAt?: string;
+}

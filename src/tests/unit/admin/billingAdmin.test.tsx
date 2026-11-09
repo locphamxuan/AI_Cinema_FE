@@ -11,7 +11,7 @@ import { SubscriptionsPanel } from '@/features/billing-admin/components/Subscrip
 import { useAppStore } from '@/store/useAppStore';
 import { mockApi } from '@/tests/support/mockApi';
 import { signInAs } from '@/tests/support/signIn';
-import type { RewardPrize } from '@/types/episodeAccess';
+import type { RewardPrize } from '@/types/billing';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),

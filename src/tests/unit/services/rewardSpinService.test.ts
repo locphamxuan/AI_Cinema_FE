@@ -10,53 +10,8 @@ function mockFetch(...responses: { body: unknown; status?: number }[]) {
   return fetchMock;
 }
 
-const headerOf = (init: RequestInit, name: string) => (init.headers as Record<string, string>)[name];
-
 describe('rewardSpinService', () => {
   afterEach(() => vi.unstubAllGlobals());
-
-  it('retrieves wheel status including available spins, prizes, and history', async () => {
-    const mockStatus = {
-      availableSpins: 2,
-      prizes: [
-        { id: 'p1', code: 'coin_50', name: '50 Coin', type: 'BONUS_COIN', bonusCoins: 50, planDays: null },
-      ],
-      history: [],
-    };
-    const fetchMock = mockFetch({ body: mockStatus });
-
-    const res = await rewardSpinService.getWheelStatus();
-
-    expect(res.success).toBe(true);
-    expect(res.data.availableSpins).toBe(2);
-    expect(res.data.prizes[0].code).toBe('coin_50');
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    const [url] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toMatch(/\/rewards\/spins$/);
-  });
-
-  it('spins the wheel with idempotency key header', async () => {
-    const mockResult = {
-      id: 'spin-1',
-      status: 'USED',
-      prize: { id: 'p1', code: 'coin_50', name: '50 Coin', type: 'BONUS_COIN' },
-      bonusCoins: 50,
-      planDays: null,
-      bonusBalance: 150,
-      mainBalance: 20,
-      availableSpins: 1,
-    };
-    const fetchMock = mockFetch({ body: mockResult, status: 200 });
-
-    const res = await rewardSpinService.spin('custom-key-123');
-
-    expect(res.success).toBe(true);
-    expect(res.data.bonusCoins).toBe(50);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toMatch(/\/rewards\/spins$/);
-    expect(init.method).toBe('POST');
-    expect(headerOf(init, 'Idempotency-Key')).toBe('custom-key-123');
-  });
 
   it('supports listing fixed reward prizes and editing a Coin amount', async () => {
     const fetchMock = mockFetch({ body: [{ id: 'p1', name: '50 Coin', weight: 11 }] }, { body: { id: 'p1', bonusCoins: 60 } });

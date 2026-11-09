@@ -244,23 +244,6 @@ class ApiClient {
     }
   }
 
-  /** Plain-text resource behind auth, e.g. a WebVTT subtitle track; null when it cannot be read. */
-  async getText(endpoint: string): Promise<string | null> {
-    try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, { headers: this.getAuthHeader() });
-      if (response.status === 401) {
-        const refreshed = await this.tryRefreshToken();
-        if (refreshed) {
-          const retryRes = await fetch(`${this.baseUrl}${endpoint}`, { headers: this.getAuthHeader() });
-          return retryRes.ok ? await retryRes.text() : null;
-        }
-      }
-      return response.ok ? await response.text() : null;
-    } catch {
-      return null;
-    }
-  }
-
   delete<T>(endpoint: string, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' }, mockFallbackFn);
   }

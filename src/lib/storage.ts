@@ -7,12 +7,6 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: 'ai_cinema_auth_token',
   REFRESH_TOKEN: 'ai_cinema_refresh_token',
   USER_DATA: 'ai_cinema_user_data',
-  WALLET_DATA: 'ai_cinema_wallet_data',
-  SUBSCRIPTION_DATA: 'ai_cinema_subscription_data',
-  /** UUID v4 that owns a guest's playback session (X-Guest-Key). */
-  GUEST_KEY: 'ai_cinema_guest_key',
-  /** UUID v4 of this browser, sent as X-Device-Id when a member plays (MF-4). */
-  DEVICE_ID: 'ai_cinema_device_id',
 } as const;
 
 export const storage = {
@@ -54,15 +48,6 @@ export const storage = {
       localStorage.removeItem(key);
     } catch (e) {
       console.error(`Error removing localStorage key "${key}":`, e);
-    }
-  },
-
-  clear(): void {
-    if (typeof window === 'undefined') return;
-    try {
-      localStorage.clear();
-    } catch (e) {
-      console.error('Error clearing localStorage:', e);
     }
   },
 };

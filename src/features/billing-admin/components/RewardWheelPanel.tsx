@@ -9,7 +9,7 @@ import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { rewardSpinService } from '@/services/rewardSpinService';
-import type { RewardPrize } from '@/types/episodeAccess';
+import type { RewardPrize } from '@/types/billing';
 
 /** Chance of a prize: its weight over the weights of every active prize. */
 export function chanceOf(prize: RewardPrize, prizes: RewardPrize[]): number {
