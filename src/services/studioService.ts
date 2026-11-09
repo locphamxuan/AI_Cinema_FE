@@ -1,6 +1,6 @@
 /**
  * Partner studios (BR-59), their STUDIO login accounts, and the hand-offs (BR-58): the catalog the Admin keeps,
- * the hand-off the signed contract opens, a studio change with its brief and material, and the milestones.
+ * the hand-off the signed contract opens, and a studio change with its brief. The system moves the milestones.
  */
 import { apiClient } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
@@ -10,7 +10,6 @@ import type {
   StudioHandoff,
   Studio,
   StudioInput,
-  StudioMilestoneStatus,
 } from '@/types/production';
 
 const S = API_ROUTES.STUDIOS;
@@ -42,7 +41,7 @@ export const studioService = {
   createAccount: (studioId: string, input: { email: string; fullName: string; password: string }) =>
     apiClient.post<StudioAccount>(S.ACCOUNTS(studioId), input),
 
-  // ---- Hand-off: opened by the signed contract; the lead Creator changes studio and moves milestones ----
+  // ---- Hand-off: opened by the signed contract; the Admin changes studio ----
   changeStudio: (movieId: string, input: ChangeStudioInput) =>
     apiClient.postForm<StudioHandoff[]>(R.STUDIO_CHANGE(movieId), handoffForm(input)),
   /** Studio timeline: every hand-off with its materials and milestone events, newest first. */
@@ -50,10 +49,4 @@ export const studioService = {
   downloadBrief: (movieId: string, handoffId: string) => apiClient.getBlob(R.BRIEF(movieId, handoffId)),
   downloadMaterial: (movieId: string, handoffId: string, materialId: string) =>
     apiClient.getBlob(R.MATERIAL(movieId, handoffId, materialId)),
-  /** DELIVERED needs the Submission (mediaAssetId) the Creator uploaded from the studio's delivery. */
-  updateMilestone: (
-    movieId: string,
-    handoffId: string,
-    input: { status: Exclude<StudioMilestoneStatus, 'BRIEF_SENT' | 'SUPERSEDED'>; note?: string; mediaAssetId?: string },
-  ) => apiClient.patch<StudioHandoff>(R.MILESTONE(movieId, handoffId), input),
 };

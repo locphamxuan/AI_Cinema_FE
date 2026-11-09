@@ -8,7 +8,6 @@ import { seasonLabel } from '@/lib/seasonLabel';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
 import { MATERIAL_KIND, MILESTONE_STATUS } from '../../lib/labels';
 import { formatBytes, formatDateTime, formatVnd } from '@/lib/format';
-import { canMove } from '../../lib/milestones';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
 import { StatusPill } from '@/components/data/ui';
 
@@ -29,7 +28,6 @@ export function HandoffCard({
   base,
   onBrief,
   onMaterial,
-  onMilestone,
 }: {
   handoff: StudioHandoff;
   movieId: string;
@@ -38,8 +36,6 @@ export function HandoffCard({
   base: ProductionBase;
   onBrief: () => void;
   onMaterial: (material: HandoffMaterial) => void;
-  /** Present when the viewer may move the milestone. */
-  onMilestone?: () => void;
 }) {
   const status = MILESTONE_STATUS[h.milestoneStatus];
   return (
@@ -57,11 +53,6 @@ export function HandoffCard({
         <div className="flex flex-wrap items-center gap-2">
           <StatusPill {...status} />
           {h.emailMessage && <Badge tone={EMAIL_STATUS[h.emailMessage.status].tone}>{EMAIL_STATUS[h.emailMessage.status].label}</Badge>}
-          {onMilestone && canMove(h) && (
-            <Button size="sm" variant="secondary" onClick={onMilestone}>
-              Cập nhật mốc
-            </Button>
-          )}
         </div>
       </div>
 

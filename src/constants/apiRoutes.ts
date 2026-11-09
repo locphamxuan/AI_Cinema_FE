@@ -94,7 +94,6 @@ export const API_ROUTES = {
     STUDIO_CHANGE: (movieId: string) => `/projects/${movieId}/studio-change`,
     HANDOFFS: (movieId: string) => `/projects/${movieId}/handoffs`,
     BRIEF: (movieId: string, handoffId: string) => `/projects/${movieId}/handoffs/${handoffId}/brief`,
-    MILESTONE: (movieId: string, handoffId: string) => `/projects/${movieId}/handoffs/${handoffId}/milestone`,
     MATERIAL: (movieId: string, handoffId: string, materialId: string) =>
       `/projects/${movieId}/handoffs/${handoffId}/materials/${materialId}/content`,
     EPISODE_MEDIA: (episodeId: string) => `/episodes/${episodeId}/media`,
