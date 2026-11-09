@@ -1,5 +1,5 @@
 /**
- * AI Cinema - Centralized API Client with Mock Fallback & Interceptors
+ * AI Cinema - the one API client: same-origin /api, bearer token, refresh on 401, error messages in Vietnamese.
  */
 
 import { API_BASE_URL } from '@/constants/apiRoutes';
@@ -16,7 +16,6 @@ export interface ApiResponse<T> {
 }
 
 export interface RequestOptions extends RequestInit {
-  useMockFallback?: boolean;
   _isRetry?: boolean;
 }
 
@@ -74,11 +73,7 @@ class ApiClient {
     return this.refreshPromise;
   }
 
-  async request<T>(
-    endpoint: string,
-    options: RequestOptions = {},
-    mockFallbackFn?: () => Promise<T> | T
-  ): Promise<ApiResponse<T>> {
+  async request<T>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
     let url = `${this.baseUrl}${endpoint}`;
     // Never make direct calls to port 3001 from the browser - route to same-origin /api
     if (url.includes('3001')) {
@@ -102,11 +97,6 @@ class ApiClient {
       ...(options._isRetry ? authHeaders : {}),
     };
 
-    // Use real database by default in development and production environments.
-    // In vitest unit tests (where no local server is listening), fallback allows offline testing.
-    const isTest = typeof process !== 'undefined' && process.env.NODE_ENV === 'test';
-    const shouldFallback = options.useMockFallback ?? isTest;
-
     try {
       const response = await fetch(url, {
         ...options,
@@ -123,19 +113,7 @@ class ApiClient {
         ) {
           const refreshed = await this.tryRefreshToken();
           if (refreshed) {
-            return this.request<T>(endpoint, { ...options, _isRetry: true }, mockFallbackFn);
-          }
-        }
-        if (shouldFallback && mockFallbackFn) {
-          try {
-            const fallbackData = await mockFallbackFn();
-            return { success: true, data: fallbackData, statusCode: 200, message: 'Fallback to mock' };
-          } catch (fallbackErr) {
-            return {
-              success: false,
-              data: null as unknown as T,
-              message: fallbackErr instanceof Error ? fallbackErr.message : 'Mock execution error',
-            };
+            return this.request<T>(endpoint, { ...options, _isRetry: true });
           }
         }
         let rawMessage: unknown;
@@ -167,18 +145,6 @@ class ApiClient {
       const data = (empty ? null : await response.json()) as T;
       return { success: true, data, statusCode: response.status };
     } catch (error) {
-      if (shouldFallback && mockFallbackFn) {
-        try {
-          const fallbackData = await mockFallbackFn();
-          return { success: true, data: fallbackData, statusCode: 200, message: 'Fallback to mock' };
-        } catch (fallbackErr) {
-          return {
-            success: false,
-            data: null as unknown as T,
-            message: fallbackErr instanceof Error ? fallbackErr.message : 'Mock execution error',
-          };
-        }
-      }
       return {
         success: false,
         data: null as unknown as T,
@@ -187,44 +153,25 @@ class ApiClient {
     }
   }
 
-  get<T>(endpoint: string, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
-    return this.request<T>(endpoint, { ...options, method: 'GET' }, mockFallbackFn);
+  get<T>(endpoint: string, options?: RequestOptions) {
+    return this.request<T>(endpoint, { ...options, method: 'GET' });
   }
 
-  post<T>(endpoint: string, body?: unknown, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
-    return this.request<T>(
-      endpoint,
-      {
-        ...options,
-        method: 'POST',
-        body: body ? JSON.stringify(body) : undefined,
-      },
-      mockFallbackFn
-    );
+  /** A request with a JSON body. */
+  private send<T>(method: 'POST' | 'PUT' | 'PATCH', endpoint: string, body?: unknown, options?: RequestOptions) {
+    return this.request<T>(endpoint, { ...options, method, body: body ? JSON.stringify(body) : undefined });
   }
 
-  put<T>(endpoint: string, body?: unknown, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
-    return this.request<T>(
-      endpoint,
-      {
-        ...options,
-        method: 'PUT',
-        body: body ? JSON.stringify(body) : undefined,
-      },
-      mockFallbackFn
-    );
+  post<T>(endpoint: string, body?: unknown, options?: RequestOptions) {
+    return this.send<T>('POST', endpoint, body, options);
   }
 
-  patch<T>(endpoint: string, body?: unknown, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
-    return this.request<T>(
-      endpoint,
-      {
-        ...options,
-        method: 'PATCH',
-        body: body ? JSON.stringify(body) : undefined,
-      },
-      mockFallbackFn
-    );
+  put<T>(endpoint: string, body?: unknown, options?: RequestOptions) {
+    return this.send<T>('PUT', endpoint, body, options);
+  }
+
+  patch<T>(endpoint: string, body?: unknown, options?: RequestOptions) {
+    return this.send<T>('PATCH', endpoint, body, options);
   }
 
   /** Multipart upload, e.g. an idea file or an episode video. */
@@ -244,8 +191,8 @@ class ApiClient {
     }
   }
 
-  delete<T>(endpoint: string, options?: RequestOptions, mockFallbackFn?: () => Promise<T> | T) {
-    return this.request<T>(endpoint, { ...options, method: 'DELETE' }, mockFallbackFn);
+  delete<T>(endpoint: string, options?: RequestOptions) {
+    return this.request<T>(endpoint, { ...options, method: 'DELETE' });
   }
 }
 
