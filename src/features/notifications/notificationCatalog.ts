@@ -17,30 +17,27 @@ export interface NotificationTab {
 const section = (key: string, label: string, ...types: string[]): NotificationSection => ({ key, label, types });
 
 /**
- * Reviewer: what the Creator did, what the Studio answered (recorded by the Creator or reported by Studio Web),
- * what the Admin decided about the budget and requests, and releases.
+ * Reviewer: what the Creator did, what the Studio delivered on Studio Web (and its late episodes or failed emails),
+ * what the Admin decided about the studio, the budget and requests, and releases. The studio no longer answers a brief
+ * or mails films: the milestones move on their own, so there is nothing to notify for them.
  */
 const REVIEWER_TABS: NotificationTab[] = [
   {
     key: 'creator',
     label: 'Creator',
-    description: 'Kịch bản Creator nộp, trao đổi ý tưởng, phim nộp lên và đề xuất.',
+    description: 'Kịch bản Creator nộp, trao đổi ý tưởng và đề xuất.',
     sections: [
       section('script', 'Kịch bản', 'SCRIPT_UPDATED'),
       section('notes', 'Trao đổi ý tưởng', 'PROJECT_NOTE'),
-      section('delivery', 'Nộp tập', 'MEDIA_SUBMITTED', 'MEDIA_READY'),
-      section('handoff', 'Bàn giao Studio', 'STUDIO_HANDOFF_SENT'),
       section('change', 'Đề xuất', 'PROJECT_CHANGE_REQUESTED'),
     ],
   },
   {
     key: 'studio',
     label: 'Studio',
-    description: 'Studio nhận / từ chối, đổi mốc tiến độ, gửi phim, trễ hạn và lỗi gửi email.',
+    description: 'Tập Studio nộp trên Studio Web, trễ hạn và lỗi gửi email.',
     sections: [
-      section('answer', 'Nhận / từ chối', 'STUDIO_ACCEPTED', 'STUDIO_DECLINED'),
-      section('milestone', 'Mốc tiến độ', 'STUDIO_MILESTONE_CHANGED'),
-      section('film', 'Studio gửi phim', 'STUDIO_FILM_SENT'),
+      section('delivery', 'Nộp tập', 'MEDIA_SUBMITTED', 'MEDIA_READY'),
       section('late', 'Trễ hạn', 'EPISODE_OVERDUE'),
       section('mail', 'Lỗi gửi email', 'BRIEF_EMAIL_FAILED'),
     ],
@@ -48,9 +45,10 @@ const REVIEWER_TABS: NotificationTab[] = [
   {
     key: 'admin',
     label: 'Admin & chi phí',
-    description: 'Giao dự án, Phim Final bị trả lại, ngân sách, yêu cầu thêm chi phí, đề xuất và cảnh báo giá.',
+    description: 'Giao dự án, đổi Studio, Phim Final bị trả lại, ngân sách, yêu cầu thêm chi phí, đề xuất và cảnh báo giá.',
     sections: [
       section('assign', 'Dự án được giao', 'PROJECT_ASSIGNED'),
+      section('handoff', 'Đổi Studio', 'STUDIO_HANDOFF_SENT'),
       section('final', 'Phim Final bị trả lại', 'FINAL_FILM_REJECTED'),
       section('budget', 'Ngân sách sản xuất', 'COST_BUDGET_CHANGED'),
       section('cost', 'Yêu cầu thêm chi phí', 'COST_REQUEST_APPROVED', 'COST_REQUEST_REJECTED'),
@@ -74,10 +72,8 @@ const CREATOR_TABS: NotificationTab[] = [
   {
     key: 'studio',
     label: 'Studio',
-    description: 'Studio gửi phim, nhận / từ chối, mốc tiến độ, trễ hạn và lỗi gửi brief.',
+    description: 'Tập trễ hạn và lỗi gửi brief.',
     sections: [
-      section('film', 'Studio gửi phim', 'STUDIO_FILM_SENT'),
-      section('answer', 'Nhận / từ chối', 'STUDIO_ACCEPTED', 'STUDIO_DECLINED'),
       section('late', 'Trễ hạn', 'EPISODE_OVERDUE'),
       section('mail', 'Lỗi gửi email', 'BRIEF_EMAIL_FAILED'),
     ],

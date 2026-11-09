@@ -66,12 +66,21 @@ describe('notification tabs', () => {
   it('splits the Creator inbox into Studio, Reviewer and episodes, and the Reviewer one into Creator, Studio, Admin', () => {
     expect(notificationTabsFor('creator').map((t) => t.label)).toEqual(['Studio', 'Reviewer', 'Tập phim']);
     expect(notificationTabsFor('reviewer').map((t) => t.key)).toEqual(['creator', 'studio', 'admin', 'release']);
-    const creatorTab = notificationTabsFor('reviewer')[0];
-    expect(typesOf(creatorTab)).toEqual(expect.arrayContaining(['MEDIA_SUBMITTED', 'STUDIO_HANDOFF_SENT']));
-    expect(typesOf(notificationTabsFor('reviewer')[2])).toEqual(
-      expect.arrayContaining(['COST_BUDGET_CHANGED', 'COST_REQUEST_APPROVED', 'COST_REQUEST_REJECTED']),
+    const [creatorTab, studioTab, adminTab] = notificationTabsFor('reviewer');
+    expect(typesOf(creatorTab)).not.toContain('MEDIA_SUBMITTED');
+    expect(typesOf(studioTab)).toEqual(expect.arrayContaining(['MEDIA_SUBMITTED', 'MEDIA_READY', 'EPISODE_OVERDUE']));
+    expect(typesOf(adminTab)).toEqual(
+      expect.arrayContaining(['STUDIO_HANDOFF_SENT', 'COST_BUDGET_CHANGED', 'COST_REQUEST_APPROVED', 'COST_REQUEST_REJECTED']),
     );
     expect(typesOf(notificationTabsFor('admin')[1])).toContain('COST_REQUESTED');
+  });
+
+  it('files none of the studio answer, milestone or mailed-film notifications the backend no longer sends', () => {
+    const gone = ['STUDIO_ACCEPTED', 'STUDIO_DECLINED', 'STUDIO_MILESTONE_CHANGED', 'STUDIO_FILM_SENT'];
+    for (const role of ['creator', 'reviewer', 'admin'] as const) {
+      const types = notificationTabsFor(role).flatMap(typesOf);
+      for (const type of gone) expect(types).not.toContain(type);
+    }
   });
 
   it('files the MF-1 script, idea note, contract and Final Film notifications for each role', () => {
