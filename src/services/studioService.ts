@@ -16,7 +16,7 @@ const S = API_ROUTES.STUDIOS;
 const R = API_ROUTES.PRODUCTION;
 
 /** Multipart body of a studio change: the new studio and season. */
-export function handoffForm(input: ChangeStudioInput): FormData {
+function handoffForm(input: ChangeStudioInput): FormData {
   const form = new FormData();
   if (input.studioId) form.append('studioId', input.studioId);
   if (input.studioEmail) form.append('studioEmail', input.studioEmail);

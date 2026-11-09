@@ -12,7 +12,7 @@ function query(page: number, limit: number, status?: CostRequestStatus): string 
 }
 
 /** Multipart body: the amounts and reason as text, the quote as `proof`. */
-export function costRequestForm(input: CostRequestInput): FormData {
+function costRequestForm(input: CostRequestInput): FormData {
   const form = new FormData();
   form.append('requestedVnd', String(input.requestedVnd));
   if (input.studioQuoteVnd) form.append('studioQuoteVnd', String(input.studioQuoteVnd));
