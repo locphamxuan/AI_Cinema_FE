@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AdminExecutivePortal } from '@/features/admin/components/AdminExecutivePortal';
 import { CreatorStudioPortal } from '@/features/production/components/creator/CreatorStudioPortal';
-import { toScriptItem } from '@/features/production/components/creator/types';
+import { toScriptItem } from '@/features/production/components/creator/scriptItems';
 import { ReviewerAuditWorkspace } from '@/features/reviewer/components/ReviewerAuditWorkspace';
 import { ReviewerProjectQueuePage } from '@/features/reviewer/components/ReviewerProjectQueuePage';
 import { filterQueue, toQueueItems } from '@/features/reviewer/reviewQueue';

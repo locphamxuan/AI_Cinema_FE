@@ -1,7 +1,7 @@
 'use client';
 
 import { Search, LayoutGrid, List } from 'lucide-react';
-import type { ScriptFilterKey } from './types';
+import type { ScriptFilterKey } from './scriptItems';
 
 interface StudioFilterBarProps {
   searchQuery: string;

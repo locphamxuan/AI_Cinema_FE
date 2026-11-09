@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { ArrowRight, Building2, Image as ImageIcon } from 'lucide-react';
-import { SCRIPT_STEPS, type ScriptProjectItem } from './types';
+import { SCRIPT_STEPS, type ScriptProjectItem } from './scriptItems';
 
 export const STAGE_BADGE: Record<ScriptProjectItem['stage'], string> = {
   HANDED_OFF: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30',

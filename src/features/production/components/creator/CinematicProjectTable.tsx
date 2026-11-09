@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, Building2 } from 'lucide-react';
 import { STAGE_BADGE, needsWriting } from './CinematicProjectCard';
-import type { ScriptProjectItem } from './types';
+import type { ScriptProjectItem } from './scriptItems';
 
 export function CinematicProjectTable({ projects, getHref }: { projects: ScriptProjectItem[]; getHref: (p: ScriptProjectItem) => string }) {
   return (

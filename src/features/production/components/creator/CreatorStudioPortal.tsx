@@ -12,7 +12,7 @@ import { useAppStore } from '@/store/useAppStore';
 import { CinematicProjectCard, needsWriting } from './CinematicProjectCard';
 import { CinematicProjectTable } from './CinematicProjectTable';
 import { StudioFilterBar } from './StudioFilterBar';
-import { matchesFilter, toScriptItem, type ScriptFilterKey, type ScriptProjectItem } from './types';
+import { matchesFilter, toScriptItem, type ScriptFilterKey, type ScriptProjectItem } from './scriptItems';
 
 const CARD = 'rounded-3xl bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 shadow-xs';
 const hrefOf = (p: ScriptProjectItem) => `/creator/projects/${p.id}${needsWriting(p) ? '?tab=script' : ''}`;
