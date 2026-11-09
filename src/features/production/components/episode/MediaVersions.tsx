@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
 import type { MediaAsset } from '@/types/production';
 import { INGEST_STATUS, LABEL_TYPE, SOURCE_METHOD } from '../../lib/labels';
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format';
@@ -14,22 +13,17 @@ export function MediaVersions({
   selectedId,
   approvedId,
   onSelect,
-  onRetry,
-  busy,
 }: {
   versions: MediaAsset[];
   selectedId: string | null;
   approvedId: string | null;
   onSelect: (id: string) => void;
-  /** Present when the viewer may process a failed latest version again. */
-  onRetry?: (id: string) => void;
-  busy?: boolean;
 }) {
   if (versions.length === 0) return <Empty>Studio chưa giao bản nào.</Empty>;
 
   return (
     <ul className="space-y-2">
-      {versions.map((v, i) => {
+      {versions.map((v) => {
         const running = v.ingestJobs.find((j) => j.status === 'RUNNING' || j.status === 'QUEUED');
         const selected = v.id === selectedId;
         return (
@@ -70,25 +64,10 @@ export function MediaVersions({
               )}
               {v.failureReason && <p className="text-rose-600">{v.failureReason}</p>}
               {v.submissionNote && <p className="text-slate-600 dark:text-slate-300">Ghi chú: {v.submissionNote}</p>}
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-slate-400">
-                  Creator {v.submittedBy.fullName} tải lên{v.studioHandoff ? `, bản Studio ${v.studioHandoff.studio.name} giao` : ''} ·{' '}
-                  {formatDateTime(v.createdAt)}
-                </p>
-                {onRetry && i === 0 && v.ingestStatus === 'FAILED' && (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    disabled={busy}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRetry(v.id);
-                    }}
-                  >
-                    Xử lý lại
-                  </Button>
-                )}
-              </div>
+              <p className="text-slate-400">
+                Nộp bởi {v.submittedBy.fullName}
+                {v.studioHandoff ? ` · Studio ${v.studioHandoff.studio.name}` : ''} · {formatDateTime(v.createdAt)}
+              </p>
             </div>
           </li>
         );

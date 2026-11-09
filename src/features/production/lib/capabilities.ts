@@ -9,7 +9,6 @@ export const RELEASING_PROJECT: MovieStatus[] = [...DELIVERY_PROJECT, 'COMPLETED
 /** The team of Creators can change while the project is open or being fixed (BR-13). */
 export const TEAM_EDITABLE_PROJECT: MovieStatus[] = [...OPEN_PROJECT, 'UNDER_REVISION'];
 
-export const SUBMITTABLE_EPISODE: EpisodeStatus[] = ['AWAITING_MEDIA', 'IN_REVIEW', 'CHANGES_REQUESTED'];
 export const BEFORE_APPROVAL_EPISODE: EpisodeStatus[] = ['DRAFT', 'AWAITING_MEDIA', 'PROCESSING', 'IN_REVIEW', 'CHANGES_REQUESTED'];
 export const REVIEWED_EPISODE: EpisodeStatus[] = ['APPROVED', 'LABELED', 'COMPLIANCE_PASSED'];
 export const RELEASABLE_EPISODE: EpisodeStatus[] = ['COMPLIANCE_PASSED', 'UNPUBLISHED', 'SCHEDULED'];
@@ -93,11 +92,6 @@ export function projectCapabilities(
     delegate: creator && can(PERMISSION.MEDIA_INGEST),
     status: project.status,
   };
-}
-
-/** An episode is worked on by the Creator it was given to or the lead; one given to nobody is the lead's. */
-export function holdsEpisode(caps: ProjectCapabilities, episode: { assignedCreatorId: string | null }, userId: string | undefined): boolean {
-  return caps.lead || (caps.creator && !!userId && episode.assignedCreatorId === userId);
 }
 
 export function isIn<T>(value: T, list: readonly T[]): boolean {

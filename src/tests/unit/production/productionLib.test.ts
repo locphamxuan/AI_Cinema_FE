@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { notificationHref, productionBaseFor, productionPaths } from '@/features/production/lib/routes';
-import { holdsEpisode, projectCapabilities } from '@/features/production/lib/capabilities';
+import { projectCapabilities } from '@/features/production/lib/capabilities';
 import { addDays, formatDay, formatDuration } from '@/lib/format';
 import {
   deadlineValid,
@@ -78,18 +78,6 @@ describe('projectCapabilities', () => {
     expect(projectCapabilities(team, 'cre', creatorKeys)).toMatchObject({ creator: true, lead: true, handoff: true, costRequest: false, ingest: true, manage: false });
     expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, handoff: false, ingest: true, delegate: true });
     expect(projectCapabilities(team, 'someone', creatorKeys)).toMatchObject({ creator: false, handoff: false, ingest: false, suggest: false });
-  });
-
-  it("keeps an episode for the Creator it was given to, and one given to nobody for the lead", () => {
-    const creatorKeys = grant(PERMISSION.MEDIA_INGEST);
-    const team = { ...project, creatorAssignments: [{ creatorId: 'second' }] };
-    const lead = projectCapabilities(team, 'cre', creatorKeys);
-    const second = projectCapabilities(team, 'second', creatorKeys);
-    expect(holdsEpisode(lead, { assignedCreatorId: null }, 'cre')).toBe(true);
-    expect(holdsEpisode(lead, { assignedCreatorId: 'second' }, 'cre')).toBe(true);
-    expect(holdsEpisode(second, { assignedCreatorId: 'second' }, 'second')).toBe(true);
-    expect(holdsEpisode(second, { assignedCreatorId: null }, 'second')).toBe(false);
-    expect(holdsEpisode(second, { assignedCreatorId: 'cre' }, 'second')).toBe(false);
   });
 
   it('lets the Reviewer in charge and the Creators of the team ask the Admin (BR-55)', () => {

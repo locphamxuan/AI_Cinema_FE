@@ -1,6 +1,5 @@
 /** Request bodies of the MF-1 API (the backend DTOs). */
-import type { AgeRating, ChangeRequestType, LabelType } from './production-enums';
-import type { AiDisclosure } from './production-media';
+import type { AgeRating, ChangeRequestType } from './production-enums';
 
 export interface NewEpisodeInput {
   title: string;
@@ -101,12 +100,6 @@ export interface ChangeRequestInput {
   seasonId?: string;
   episodeId?: string;
   proof?: File;
-}
-
-export interface MediaMetadataInput {
-  proposedLabelType: LabelType;
-  submissionNote?: string;
-  aiDisclosure: AiDisclosure;
 }
 
 export interface ComplianceInput {

@@ -13,7 +13,6 @@ import type {
   CostLedger,
   Genre,
   MediaAsset,
-  MediaMetadataInput,
   MovieStatus,
   NewEpisodeInput,
   NewSeasonInput,
@@ -63,16 +62,6 @@ export function projectsUrl({ page = 1, limit = 12, search, status }: ProjectQue
   return `${R.PROJECTS}?${params.toString()}`;
 }
 
-/** Multipart body of an episode delivery: the video plus the AI Disclosure as JSON. */
-function mediaForm(file: File, input: MediaMetadataInput): FormData {
-  const form = new FormData();
-  form.append('file', file);
-  form.append('proposedLabelType', input.proposedLabelType);
-  if (input.submissionNote) form.append('submissionNote', input.submissionNote);
-  form.append('aiDisclosure', JSON.stringify(input.aiDisclosure));
-  return form;
-}
-
 export const productionService = {
   // ---- Projects (MF-1 step 1: the Admin creates them and assigns the lead Creator) ----
   listProjects: (query?: ProjectQuery) => apiClient.get<Page<ProjectSummary>>(projectsUrl(query)),
@@ -114,16 +103,9 @@ export const productionService = {
   addCostEntry: (movieId: string, entry: { entryType: 'BUDGET' | 'CORRECTION'; amountVnd: number; reason?: string }) =>
     apiClient.post<CostLedger>(R.COST_ENTRIES(movieId), entry),
 
-  // ---- Media delivery (steps 5–7) ----
+  // ---- Media the studio delivered on Studio Web (steps 5–7, read-only here) ----
   listMedia: (episodeId: string) => apiClient.get<MediaAsset[]>(R.EPISODE_MEDIA(episodeId)),
   getMedia: (mediaAssetId: string) => apiClient.get<MediaAsset>(R.MEDIA_ASSET(mediaAssetId)),
-  submitMediaLink: (
-    episodeId: string,
-    input: MediaMetadataInput & { sourceMethod: 'HLS_URL' | 'REMOTE_FILE'; sourceUrl: string },
-  ) => apiClient.post<MediaAsset>(R.EPISODE_MEDIA(episodeId), input),
-  uploadMedia: (episodeId: string, file: File, input: MediaMetadataInput) =>
-    apiClient.postForm<MediaAsset>(R.EPISODE_MEDIA_UPLOAD(episodeId), mediaForm(file, input)),
-  retryMedia: (mediaAssetId: string) => apiClient.post<MediaAsset>(R.MEDIA_RETRY(mediaAssetId)),
 
   // ---- Notes between the Creator holding an episode and the lead (BR-67) ----
   listEpisodeNotes: (episodeId: string) => apiClient.get<EpisodeNote[]>(R.EPISODE_NOTES(episodeId)),
