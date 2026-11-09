@@ -17,7 +17,6 @@ export const PERMISSION = {
   SCRIPT_WRITE: 'script:write',
   SCRIPT_APPROVE: 'script:approve',
   STUDIO_PORTAL: 'studio:portal',
-  STUDIO_HANDOFF: 'studio:handoff',
   STUDIO_MANAGE: 'studio:manage',
   MEDIA_INGEST: 'media:ingest',
   CONTENT_REVIEW: 'content:review',

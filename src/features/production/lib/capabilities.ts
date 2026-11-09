@@ -35,8 +35,6 @@ export interface ProjectCapabilities {
   costRequest: boolean;
   /** Send, sign or counter-propose a hand-off's contract: the Admin. */
   contractManage: boolean;
-  /** Follow the hand-off the signed contract opened: change studio, move milestones. Only the lead (BE `lead` role). */
-  handoff: boolean;
   /** Write and submit the script: the lead Creator. */
   scriptWrite: boolean;
   /** Approve the Final Script or send it back: the Admin. */
@@ -80,7 +78,6 @@ export function projectCapabilities(
     costAdjust: can(PERMISSION.COST_ADJUST),
     costRequest: owner && can(PERMISSION.COST_REQUEST),
     contractManage: can(PERMISSION.CONTRACT_MANAGE),
-    handoff: lead && can(PERMISSION.STUDIO_HANDOFF),
     scriptWrite: lead && can(PERMISSION.SCRIPT_WRITE),
     scriptApprove: can(PERMISSION.SCRIPT_APPROVE),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),

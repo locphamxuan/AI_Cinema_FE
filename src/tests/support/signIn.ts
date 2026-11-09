@@ -4,7 +4,7 @@ import type { WebRole } from '@/lib/permissions';
 
 /** The permissions the backend seeds for each role (AI_Cinema_BE DEFAULT_ROLE_PERMISSIONS). */
 const DEFAULTS: Partial<Record<WebRole, string[]>> = {
-  creator: [PERMISSION.PROJECT_SUGGEST, PERMISSION.SCRIPT_WRITE, PERMISSION.STUDIO_HANDOFF, PERMISSION.MEDIA_INGEST],
+  creator: [PERMISSION.PROJECT_SUGGEST, PERMISSION.SCRIPT_WRITE, PERMISSION.MEDIA_INGEST],
   reviewer: [
     PERMISSION.PROJECT_MANAGE,
     PERMISSION.PROJECT_SUGGEST,

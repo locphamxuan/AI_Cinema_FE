@@ -59,7 +59,6 @@ describe('projectCapabilities', () => {
       scriptApprove: false,
       note: true,
       costRequest: true,
-      handoff: false,
     });
     // Another Reviewer holds the same permissions but does not own the project.
     expect(projectCapabilities(project, 'other', reviewerKeys)).toMatchObject({ manage: false, review: false, price: false, note: false, costRequest: false });
@@ -72,12 +71,16 @@ describe('projectCapabilities', () => {
     expect(projectCapabilities(team, 'second', keys)).toMatchObject({ scriptWrite: false, note: false });
   });
 
-  it('lets only the lead Creator speak to the studio; the other Creators deliver their own episodes', () => {
-    const creatorKeys = grant(PERMISSION.STUDIO_HANDOFF, PERMISSION.MEDIA_INGEST, PERMISSION.PROJECT_SUGGEST);
+  it('lets the Creators of the team work on its episodes, and nobody move the studio hand-off by hand', () => {
+    const creatorKeys = grant(PERMISSION.MEDIA_INGEST, PERMISSION.PROJECT_SUGGEST);
     const team = { ...project, creatorAssignments: [{ creatorId: 'cre' }, { creatorId: 'second' }] };
-    expect(projectCapabilities(team, 'cre', creatorKeys)).toMatchObject({ creator: true, lead: true, handoff: true, costRequest: false, ingest: true, manage: false });
-    expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, handoff: false, ingest: true, delegate: true });
-    expect(projectCapabilities(team, 'someone', creatorKeys)).toMatchObject({ creator: false, handoff: false, ingest: false, suggest: false });
+    const lead = projectCapabilities(team, 'cre', creatorKeys);
+    expect(lead).toMatchObject({ creator: true, lead: true, costRequest: false, ingest: true, manage: false });
+    expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, ingest: true, delegate: true });
+    expect(projectCapabilities(team, 'someone', creatorKeys)).toMatchObject({ creator: false, ingest: false, suggest: false });
+    // The milestones move on their own (contract signed, film delivered, changes requested): no capability for it.
+    expect(lead).not.toHaveProperty('handoff');
+    expect(projectCapabilities(team, 'rev', grant(PERMISSION.CONTENT_REVIEW))).not.toHaveProperty('handoff');
   });
 
   it('lets the Reviewer in charge and the Creators of the team ask the Admin (BR-55)', () => {

@@ -107,10 +107,6 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
 
   // Studio
-  'studio:handoff': {
-    title: 'Theo dõi bàn giao Studio',
-    desc: 'Cập nhật các mốc tiến độ; bàn giao đầu tiên tự mở khi hợp đồng có đủ hai chữ ký.',
-  },
   'studio:manage': {
     title: 'Quản lý danh sách Studio đối tác',
     desc: 'Quản trị danh bạ các xưởng phim & studio liên kết: thêm mới, cập nhật hồ sơ và tạm dừng.',
@@ -118,8 +114,8 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
 
   // Media
   'media:ingest': {
-    title: 'Tải lên tập phim & Media Ingest',
-    desc: 'Tải lên video master, phụ đề đa ngôn ngữ và hình ảnh poster do studio bàn giao.',
+    title: 'Làm việc trên các tập của dự án được giao',
+    desc: 'Nhóm Creator, uỷ quyền tập và ghi chú tập; phim do Studio nộp trên Studio Web.',
   },
 
   // Review
