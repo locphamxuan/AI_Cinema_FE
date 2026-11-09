@@ -7,7 +7,7 @@ import { ArrowRight, Clapperboard, LayoutGrid, List, Search } from 'lucide-react
 import { InitialsAvatar } from '@/components/data/InitialsAvatar';
 import { ErrorNote, Loading } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
-import { loadPipelines, scriptInProgress } from '@/services/pipelineService';
+import { loadPipelines } from '@/services/pipelineService';
 import { useAppStore } from '@/store/useAppStore';
 import { FILTER_STAGE, filterQueue, toQueueItems, type QueueFilter, type QueueItem } from '../reviewQueue';
 import { ReviewerQueueCard, STAGE_STYLE, episodeText } from './ReviewerQueueCard';
@@ -70,7 +70,7 @@ export function ReviewerProjectQueuePage() {
   const [filter, setFilter] = useState<QueueFilter>(isFilter(requested) ? requested : 'all');
   const [search, setSearch] = useState(params.get('q') ?? '');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
-  const pipelines = useResource('reviewer-pipelines', () => loadPipelines({ readScript: scriptInProgress }));
+  const pipelines = useResource('reviewer-pipelines', () => loadPipelines());
 
   const items = useMemo(() => toQueueItems(pipelines.data ?? []), [pipelines.data]);
   const shown = filterQueue(items, filter, search);

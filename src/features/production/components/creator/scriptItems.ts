@@ -32,8 +32,8 @@ export interface ScriptProjectItem {
   studioName: string | null;
 }
 
-export function scriptStageOf({ project, script }: ProjectPipeline): ScriptStage {
-  if (project.status !== 'DRAFT' && project.status !== 'ASSIGNED' && project.status !== 'CANCELLED') return 'HANDED_OFF';
+export function scriptStageOf({ status, script }: ProjectPipeline): ScriptStage {
+  if (status !== 'DRAFT' && status !== 'ASSIGNED' && status !== 'CANCELLED') return 'HANDED_OFF';
   switch (script?.status) {
     case 'SUBMITTED':
       return 'IN_REVIEW';
@@ -48,9 +48,8 @@ export function scriptStageOf({ project, script }: ProjectPipeline): ScriptStage
   }
 }
 
-export function toScriptItem(row: ProjectPipeline): ScriptProjectItem {
-  const { project, script } = row;
-  const stage = scriptStageOf(row);
+export function toScriptItem(project: ProjectPipeline): ScriptProjectItem {
+  const stage = scriptStageOf(project);
   return {
     id: project.id,
     title: project.title,
@@ -59,8 +58,8 @@ export function toScriptItem(row: ProjectPipeline): ScriptProjectItem {
     stageLabel: STAGE_LABEL[stage],
     step: STAGE_STEP[stage],
     genreTags: project.genres.map((g) => g.name),
-    totalEpisodes: project.seasons.reduce((n, s) => n + s.episodes.length, 0),
-    currentVersion: script?.currentVersion ?? 0,
+    totalEpisodes: project.episodes.length,
+    currentVersion: project.script?.currentVersion ?? 0,
     reviewerName: project.reviewer.fullName,
     studioName: project.studio?.name ?? null,
   };

@@ -54,11 +54,11 @@ export interface ProjectQuery {
   status?: MovieStatus[];
 }
 
-export function projectsUrl({ page = 1, limit = 12, search, status }: ProjectQuery = {}): string {
+export function projectsUrl({ page = 1, limit = 12, search, status }: ProjectQuery = {}, path: string = R.PROJECTS): string {
   const params = new URLSearchParams({ page: String(page), limit: String(limit), sortBy: 'updatedAt:DESC' });
   if (search?.trim()) params.set('search', search.trim());
   if (status?.length) params.set('filter.status', status.length === 1 ? `$eq:${status[0]}` : `$in:${status.join(',')}`);
-  return `${R.PROJECTS}?${params.toString()}`;
+  return `${path}?${params.toString()}`;
 }
 
 export const productionService = {

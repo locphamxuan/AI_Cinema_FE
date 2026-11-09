@@ -50,6 +50,7 @@ export const API_ROUTES = {
   // MF-1: movie projects ordered from outside studios, steps 1–16
   PRODUCTION: {
     PROJECTS: '/projects',
+    PROJECT_PIPELINE: '/projects/pipeline',
     PROJECT: (movieId: string) => `/projects/${movieId}`,
     ASSIGN: (movieId: string) => `/projects/${movieId}/assign`,
     CANCEL: (movieId: string) => `/projects/${movieId}/cancel`,

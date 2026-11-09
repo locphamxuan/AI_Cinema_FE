@@ -1,6 +1,5 @@
 /** The Reviewer's work, derived from the real projects: scripts to review, films to check, and everything else. */
-import type { ProjectPipeline } from '@/services/pipelineService';
-import type { Episode } from '@/types/production';
+import type { PipelineEpisode, ProjectPipeline } from '@/services/pipelineService';
 
 export type QueueStage = 'SCRIPT_PENDING' | 'MASTER_AUDIT' | 'STUDIO_REVISING' | 'FINAL_CONFIRMED' | 'PROJECT';
 export type QueueFilter = 'all' | 'script' | 'master' | 'revising' | 'approved';
@@ -30,14 +29,14 @@ export const FILTER_STAGE: Record<Exclude<QueueFilter, 'all'>, QueueStage> = {
   approved: 'FINAL_CONFIRMED',
 };
 
-const AUDIT_LABEL: Partial<Record<Episode['status'], string>> = {
+const AUDIT_LABEL: Partial<Record<PipelineEpisode['status'], string>> = {
   IN_REVIEW: 'Bản phim chờ duyệt',
   APPROVED: 'Đã duyệt, chờ gắn nhãn AI',
   LABELED: 'Đã gắn nhãn, chờ kiểm tra tuân thủ',
   COMPLIANCE_PASSED: 'Đạt tuân thủ, chờ xác nhận Phim Final',
 };
 
-function episodeStage(episode: Episode): { stage: QueueStage; label: string } | null {
+function episodeStage(episode: PipelineEpisode): { stage: QueueStage; label: string } | null {
   if (episode.status === 'CHANGES_REQUESTED') return { stage: 'STUDIO_REVISING', label: 'Studio đang sửa' };
   if (episode.status === 'COMPLIANCE_PASSED' && episode.finalConfirmedAt) return { stage: 'FINAL_CONFIRMED', label: 'Phim Final chờ Admin publish' };
   const label = AUDIT_LABEL[episode.status];
@@ -46,8 +45,8 @@ function episodeStage(episode: Episode): { stage: QueueStage; label: string } | 
 
 /** Every item the Reviewer can act on; a project with none still gets one, so each project stays reachable. */
 export function toQueueItems(rows: ProjectPipeline[]): QueueItem[] {
-  return rows.flatMap(({ project, script }) => {
-    const episodes = project.seasons.flatMap((s) => s.episodes);
+  return rows.flatMap((project) => {
+    const { script, episodes } = project;
     const base = {
       projectId: project.id,
       title: project.title,
@@ -67,7 +66,7 @@ export function toQueueItems(rows: ProjectPipeline[]): QueueItem[] {
         episodeNumber: null,
         stage: 'SCRIPT_PENDING',
         stageLabel: `Kịch bản bản ${script.currentVersion} chờ duyệt`,
-        updatedAt: script.versions[0]?.createdAt ?? project.updatedAt,
+        updatedAt: script.latestVersionAt ?? project.updatedAt,
         href: `${projectHref}?tab=script`,
       });
     }

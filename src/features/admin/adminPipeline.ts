@@ -1,19 +1,18 @@
 /** What the Admin has to act on in MF-1, read from the real API for the executive portal. */
 import type { ApiResponse } from '@/services/apiClient';
-import { contractService } from '@/services/contractService';
-import { loadPipelines, scriptInProgress, type ProjectPipeline } from '@/services/pipelineService';
+import { loadPipelines, type PipelineEpisode, type ProjectPipeline } from '@/services/pipelineService';
 import { productionService } from '@/services/productionService';
 import type { Contract } from '@/types/contract';
-import type { Episode, MovieStatus, ProjectDetail } from '@/types/production';
+import type { MovieStatus } from '@/types/production';
 
 export interface ContractToSign {
   contract: Contract;
-  project: ProjectDetail;
+  project: ProjectPipeline;
 }
 
 export interface ReadyFilm {
-  project: ProjectDetail;
-  episode: Episode;
+  project: ProjectPipeline;
+  episode: PipelineEpisode;
 }
 
 export interface AdminPipeline {
@@ -39,11 +38,19 @@ const EMPTY: AdminPipeline = {
 
 /** Episodes confirmed as Final Films and not released yet. */
 export function readyFilmsOf(rows: ProjectPipeline[]): ReadyFilm[] {
-  return rows.flatMap(({ project }) =>
-    project.seasons
-      .flatMap((s) => s.episodes)
+  return rows.flatMap((project) =>
+    project.episodes
       .filter((e) => e.status === 'COMPLIANCE_PASSED' && !!e.finalConfirmedAt)
       .map((episode) => ({ project, episode })),
+  );
+}
+
+/** Rounds the studio signed, on projects still negotiating. */
+function contractsToSignOf(rows: ProjectPipeline[]): ContractToSign[] {
+  return rows.flatMap((project) =>
+    project.status === 'ASSIGNED' && project.script?.status === 'FINAL' && project.contract?.status === 'STUDIO_SIGNED'
+      ? [{ contract: project.contract, project }]
+      : [],
   );
 }
 
@@ -58,15 +65,10 @@ export async function loadAdminPipeline(): Promise<ApiResponse<AdminPipeline>> {
     countOf(),
     countOf(['COMPLETED']),
     countOf(['IN_PRODUCTION', 'UNDER_REVISION']),
-    loadPipelines({ status: ['ASSIGNED', 'IN_PRODUCTION', 'UNDER_REVISION'], readScript: scriptInProgress }),
+    loadPipelines(['ASSIGNED', 'IN_PRODUCTION', 'UNDER_REVISION']),
   ]);
   const failed = [total, completed, producing, rows].find((res) => !res.success);
   if (failed) return { ...failed, data: EMPTY };
-
-  const negotiating = rows.data.filter(({ project, script }) => project.status === 'ASSIGNED' && script?.status === 'FINAL');
-  const rounds = await Promise.all(negotiating.map(({ project }) => contractService.forProject(project.id)));
-  const roundFailed = rounds.find((res) => !res.success);
-  if (roundFailed) return { ...roundFailed, data: EMPTY };
 
   return {
     success: true,
@@ -75,9 +77,7 @@ export async function loadAdminPipeline(): Promise<ApiResponse<AdminPipeline>> {
       completedProjects: completed.data,
       producingProjects: producing.data,
       finalScripts: rows.data.filter(({ script }) => script?.status === 'REVIEWER_APPROVED'),
-      contractsToSign: negotiating.flatMap(({ project }, i) =>
-        rounds[i].data.filter((c) => c.status === 'STUDIO_SIGNED').map((contract) => ({ contract, project })),
-      ),
+      contractsToSign: contractsToSignOf(rows.data),
       readyFilms: readyFilmsOf(rows.data),
     },
   };

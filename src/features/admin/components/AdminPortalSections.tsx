@@ -37,7 +37,7 @@ export function PortalMetrics({ data }: { data: AdminPipeline }) {
       </div>
       {data.finalScripts.length > 0 && (
         <ul aria-label="Kịch bản chờ duyệt Final" className="flex flex-wrap gap-2 pt-1 text-xs">
-          {data.finalScripts.map(({ project }) => (
+          {data.finalScripts.map((project) => (
             <li key={project.id}>
               <Link href={`/admin/projects/${project.id}?tab=script`} className="inline-block px-3 py-1.5 rounded-xl border border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 font-semibold">
                 Duyệt kịch bản: {project.title}
