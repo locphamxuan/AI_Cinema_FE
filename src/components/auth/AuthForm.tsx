@@ -9,7 +9,7 @@ import { PasswordField } from './AuthFields';
 
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
-const STUDIO_WEB_LOGIN_URL = process.env.NEXT_PUBLIC_STUDIO_WEB_URL?.trim() || 'http://localhost:3002/login';
+const STUDIO_WEB_LOGIN_URL = process.env.NEXT_PUBLIC_STUDIO_WEB_URL?.trim() || 'http://localhost:3100/login';
 
 const INPUT =
   'w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-slate-900 focus:bg-white focus:ring-2 focus:ring-slate-900/10 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-white dark:focus:bg-white/[0.06] dark:focus:ring-white/15';
