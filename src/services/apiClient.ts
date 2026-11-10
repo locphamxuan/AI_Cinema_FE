@@ -1,4 +1,4 @@
-/**
+﻿/**
  * AI Cinema - Centralized API Client with Mock Fallback & Interceptors
  */
 
@@ -126,7 +126,7 @@ class ApiClient {
             return this.request<T>(endpoint, { ...options, _isRetry: true }, mockFallbackFn);
           }
         }
-        if (shouldFallback && mockFallbackFn) {
+        if ((shouldFallback || response.status === 404) && mockFallbackFn) {
           try {
             const fallbackData = await mockFallbackFn();
             return { success: true, data: fallbackData, statusCode: 200, message: 'Fallback to mock' };
@@ -167,7 +167,7 @@ class ApiClient {
       const data = (empty ? null : await response.json()) as T;
       return { success: true, data, statusCode: response.status };
     } catch (error) {
-      if (shouldFallback && mockFallbackFn) {
+      if (mockFallbackFn) {
         try {
           const fallbackData = await mockFallbackFn();
           return { success: true, data: fallbackData, statusCode: 200, message: 'Fallback to mock' };
