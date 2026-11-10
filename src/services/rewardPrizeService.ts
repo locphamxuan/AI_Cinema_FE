@@ -6,7 +6,7 @@ export interface UpdateRewardPrizeDto {
   bonusCoins?: number;
 }
 
-export const rewardSpinService = {
+export const rewardPrizeService = {
   /** GET /admin/reward-prizes - admin lists all prizes and weights */
   getAdminPrizes(): Promise<ApiResponse<RewardPrize[]>> {
     return apiClient.get<RewardPrize[]>('/admin/reward-prizes');

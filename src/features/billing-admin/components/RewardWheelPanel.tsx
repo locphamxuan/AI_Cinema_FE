@@ -8,7 +8,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { Empty, ErrorNote, Loading } from '@/components/data/ui';
-import { rewardSpinService } from '@/services/rewardSpinService';
+import { rewardPrizeService } from '@/services/rewardPrizeService';
 import type { RewardPrize } from '@/types/billing';
 
 /** Chance of a prize: its weight over the weights of every active prize. */
@@ -20,7 +20,7 @@ export function chanceOf(prize: RewardPrize, prizes: RewardPrize[]): number {
 
 /** BR-09: nine Coin slots and one 30-day plan slot with a 2% chance. */
 export function RewardWheelPanel() {
-  const prizes = useResource('admin:reward-prizes', rewardSpinService.getAdminPrizes);
+  const prizes = useResource('admin:reward-prizes', rewardPrizeService.getAdminPrizes);
   const [editing, setEditing] = useState<RewardPrize | null>(null);
   const list = prizes.data ?? [];
 
@@ -226,7 +226,7 @@ function PrizeModal({ prize, onClose, onDone }: { prize: RewardPrize; onClose: (
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const done = await run(
-      () => rewardSpinService.updatePrize(prize.id, { name: form.name.trim(), ...(prize.type === 'BONUS_COIN' ? { bonusCoins: amount } : {}) }),
+      () => rewardPrizeService.updatePrize(prize.id, { name: form.name.trim(), ...(prize.type === 'BONUS_COIN' ? { bonusCoins: amount } : {}) }),
       'Đã lưu giải',
     );
     if (done) {
