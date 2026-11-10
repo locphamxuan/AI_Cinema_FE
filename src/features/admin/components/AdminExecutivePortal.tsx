@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 import { CreateB2BProjectModal } from './CreateB2BProjectModal';
+import { CreateContractModal } from './CreateContractModal';
 import { SignContractModal } from './SignContractModal';
 import { AdminOverviewDashboard } from './AdminOverviewDashboard';
 
@@ -60,6 +61,7 @@ export function AdminExecutivePortal() {
   const [activeTab, setActiveTab] = useState<'b2b_projects' | 'analytics_charts'>('b2b_projects');
   const [timeRange, setTimeRange] = useState('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateContractOpen, setIsCreateContractOpen] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [contractSigned, setContractSigned] = useState(false);
   const [readyMovies, setReadyMovies] = useState<PublishReadyMovie[]>(INITIAL_READY_MOVIES);
@@ -269,7 +271,15 @@ export function AdminExecutivePortal() {
                 </div>
               </div>
 
-              <div className="shrink-0 self-start lg:self-center">
+              <div className="shrink-0 self-start lg:self-center flex flex-wrap items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateContractOpen(true)}
+                  className="inline-flex items-center gap-1.5 bg-[#121212] dark:bg-white text-white dark:text-[#121212] hover:bg-black dark:hover:bg-slate-100 rounded-full px-5 py-2.5 text-xs sm:text-sm font-semibold transition-all shadow-sm cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tạo Hợp Đồng Mẫu</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => setIsContractModalOpen(true)}
@@ -383,6 +393,14 @@ export function AdminExecutivePortal() {
         isOpen={isContractModalOpen}
         onClose={() => setIsContractModalOpen(false)}
         onContractSigned={handleContractSigned}
+      />
+
+      <CreateContractModal
+        isOpen={isCreateContractOpen}
+        onClose={() => setIsCreateContractOpen(false)}
+        onCreated={() => {
+          setContractSigned(false);
+        }}
       />
     </div>
   );
