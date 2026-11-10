@@ -91,17 +91,6 @@ export const APPLICATION_MESSAGES = {
   },
 } as const;
 
-/** Main Flow 3 refusals the viewer can act on, keyed by the BE `details.reason`. */
-const PLAYBACK_REASONS: Record<string, string> = {
-  CONCURRENT_LIMIT_REACHED: 'Tài khoản đang xem trên quá nhiều thiết bị cùng lúc. Hãy dừng xem ở thiết bị khác rồi thử lại.',
-  DEVICE_LIMIT_REACHED: 'Tài khoản đã đăng ký đủ số thiết bị của gói. Hãy gỡ bớt một thiết bị trong ứng dụng AI Cinema rồi thử lại.',
-  DEVICE_ID_REQUIRED: 'Không nhận diện được trình duyệt. Hãy tải lại trang rồi thử lại.',
-  MEDIA_NOT_READY: 'Tập phim chưa sẵn sàng để phát. Vui lòng quay lại sau.',
-  EPISODE_UNDER_REVISION: 'Tập phim đang được chỉnh sửa, vui lòng quay lại sau.',
-  PLAYBACK_ACCESS_REQUIRED: 'Bạn chưa có quyền xem tập này. Hãy mở khóa tập hoặc đăng ký gói.',
-  PLAYBACK_ACCESS_REVOKED: 'Quyền xem tập này đã hết hiệu lực.',
-};
-
 export function localizeApiError(
   rawMessage: unknown,
   status: number,
@@ -127,8 +116,6 @@ export function localizeApiError(
   ) {
     return APPLICATION_MESSAGES.MSG13.message;
   }
-  const playback = PLAYBACK_REASONS[String(reason)];
-  if (playback) return playback;
   if (normalized.includes('cannot be released yet')) return APPLICATION_MESSAGES.MSG14.message;
   if (normalized.includes('account with this email already exists')) return APPLICATION_MESSAGES.MSG06.message;
   if (normalized === 'incorrect email or password') return APPLICATION_MESSAGES.MSG05.message;
