@@ -31,8 +31,8 @@ export function ChangeRequestsTab() {
         title={caps.creator ? 'Đề xuất cho Reviewer & Admin' : 'Đề xuất cho Admin'}
         description={
           caps.creator
-            ? 'Đề xuất chỉnh sửa dự án hoặc gia hạn tiến độ gửi Admin (Reviewer được thông báo và đồng hành).'
-            : 'Đề xuất chỉnh sửa dự án, xin thêm kinh phí hoặc gia hạn, kèm lý do và giấy tờ minh hoạ. Chỉ Admin duyệt hoặc từ chối.'
+            ? 'Đề xuất chỉnh sửa dự án hoặc gia hạn gửi Admin (Reviewer được báo).'
+            : 'Đề xuất chỉnh sửa dự án hoặc gia hạn, kèm lý do và giấy tờ minh hoạ. Chỉ Admin duyệt hoặc từ chối. Chi phí sản xuất được xin ở tab Chi phí sản xuất.'
         }
       >
         {requests.error && <ErrorNote message={requests.error} onRetry={requests.reload} />}
@@ -55,15 +55,12 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
   const [requestType, setRequestType] = useState<ChangeRequestType>('PROJECT_UPDATE');
   const [content, setContent] = useState('');
   const [reason, setReason] = useState('');
-  const [tokens, setTokens] = useState('');
   const [seasonId, setSeasonId] = useState('');
   const [episodeId, setEpisodeId] = useState('');
   const [proof, setProof] = useState<File[]>([]);
   const { busy, run } = useAction();
-  const budget = requestType === 'BUDGET_SUPPLEMENT';
   const episodes = project.seasons.filter((s) => !seasonId || s.id === seasonId).flatMap((s) => s.episodes);
-  const tokensValid = Number.isInteger(Number(tokens)) && Number(tokens) > 0;
-  const valid = content.trim().length >= 5 && reason.trim().length >= 5 && (!budget || (tokensValid && proof.length > 0));
+  const valid = content.trim().length >= 5 && reason.trim().length >= 5;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +70,6 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
           requestType,
           content: content.trim(),
           reason: reason.trim(),
-          ...(budget ? { requestedTokens: Number(tokens) } : {}),
           ...(seasonId ? { seasonId } : {}),
           ...(episodeId ? { episodeId } : {}),
           ...(proof[0] ? { proof: proof[0] } : {}),
@@ -83,7 +79,6 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
     if (done) {
       setContent('');
       setReason('');
-      setTokens('');
       setProof([]);
       await onDone();
     }
@@ -137,18 +132,13 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
         <FormField label="Lý do">
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={5000} required className={fieldTextareaClass} />
         </FormField>
-        {budget && (
-          <FormField label="Kinh phí bổ sung dự kiến (VNĐ)">
-            <input type="number" min={1} step={1} value={tokens} onChange={(e) => setTokens(e.target.value)} required className={fieldInputClass} />
-          </FormField>
-        )}
         <FilePicker
-          label={budget ? 'Giấy tờ minh hoạ (bắt buộc)' : 'Giấy tờ minh hoạ lý do (không bắt buộc)'}
+          label="Giấy tờ minh hoạ lý do (không bắt buộc)"
           accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp"
           files={proof}
           onChange={setProof}
           multiple={false}
-          hint="PDF, DOCX, TXT hoặc ảnh, tối đa 10 MB - ví dụ báo giá của Studio."
+          hint="PDF, DOCX, TXT hoặc ảnh, tối đa 10 MB."
         />
         <Button type="submit" className="w-full" disabled={busy || !valid}>
           Gửi đề xuất

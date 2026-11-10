@@ -58,4 +58,12 @@ describe('application messages', () => {
     expect(localizeApiError(undefined, 429, undefined, '/movies')).toBe(APPLICATION_MESSAGES.MSG19.message);
     expect(localizeApiError(undefined, 500, undefined, '/movies')).toBe(APPLICATION_MESSAGES.MSG18.message);
   });
+  it('names what a release still misses (BR-19) instead of a generic refusal', () => {
+    expect(
+      localizeApiError('The episode cannot be released yet (BR-19)', 409, ['the movie synopsis', 'the movie age rating'], '/episodes/e1/publications'),
+    ).toBe('Chưa thể phát hành tập này. Còn thiếu: tóm tắt phim (Reviewer điền ở tab Tổng quan); độ tuổi phim (Reviewer điền ở tab Tổng quan).');
+    expect(localizeApiError('The episode cannot be released yet (BR-19)', 409, undefined, '/episodes/e1/publications')).toBe(
+      APPLICATION_MESSAGES.MSG14.message,
+    );
+  });
 });

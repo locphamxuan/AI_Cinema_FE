@@ -1,6 +1,5 @@
 /** Request bodies of the MF-1 API (the backend DTOs). */
-import type { AgeRating, ChangeRequestType, LabelType } from './production-enums';
-import type { AiDisclosure } from './production-media';
+import type { AgeRating, ChangeRequestType } from './production-enums';
 
 export interface NewEpisodeInput {
   title: string;
@@ -14,8 +13,6 @@ export interface NewEpisodeInput {
 
 export interface NewSeasonInput {
   title?: string;
-  /** Token the studio is paid for one episode (BR-37). */
-  episodeProductionCost: number;
   releaseStartDate?: string;
   releaseEndDate?: string;
   episodes: NewEpisodeInput[];
@@ -23,7 +20,6 @@ export interface NewSeasonInput {
 
 export interface UpdateSeasonInput {
   title?: string;
-  episodeProductionCost?: number;
   /** null clears the date. */
   releaseStartDate?: string | null;
   releaseEndDate?: string | null;
@@ -49,9 +45,14 @@ export interface CreateProjectInput {
   ageRating?: AgeRating;
   releaseYear?: number;
   defaultLanguage?: string;
-  /** Active studio of the catalog (BR-59). */
+  /** Active studio of the catalog (BR-59); the Admin may also pick it on the Final Script. */
   studioId?: string;
-  seasons: NewSeasonInput[];
+  /** Content Reviewer in charge of the project. */
+  reviewerId: string;
+  /** Lead Content Creator; with one the project starts ASSIGNED. */
+  creatorId?: string;
+  /** Seasons and episodes; usually the Reviewer adds them later. */
+  seasons?: NewSeasonInput[];
 }
 
 export interface UpdateProjectInput {
@@ -77,37 +78,28 @@ export interface StudioInput {
   isActive?: boolean;
 }
 
-/** A hand-off: the studio (default: the project's), the season (default: everything left) and the files. */
-export interface HandOffInput {
+/** A studio change: the new studio, the season (default: the whole project) and its fee. */
+export interface ChangeStudioInput {
   /** Studio typed by hand: a known email reuses that studio, a new one needs `studioName`. */
   studioName?: string;
   studioEmail?: string;
   studioPhone?: string;
-  /** Falls back to the project's current studio (first hand-off only). */
   studioId?: string;
   seasonId?: string;
-  scripts?: File[];
-  references?: File[];
-}
-
-export interface ChangeStudioInput extends HandOffInput {
+  /** Fixed fee (VND) the brief offers the studio, at most the budget left. */
+  offeredFeeVnd: number;
   reason: string;
+  /** VND the replaced studio keeps; the rest of its fee returns to the budget. */
+  forfeitedVnd?: number;
 }
 
 export interface ChangeRequestInput {
   requestType: ChangeRequestType;
   content: string;
   reason: string;
-  requestedTokens?: number;
   seasonId?: string;
   episodeId?: string;
   proof?: File;
-}
-
-export interface MediaMetadataInput {
-  proposedLabelType: LabelType;
-  submissionNote?: string;
-  aiDisclosure: AiDisclosure;
 }
 
 export interface ComplianceInput {

@@ -1,11 +1,11 @@
 /** Studio catalog, hand-offs, the Creator team and change requests of a project, as the API returns them. */
+import type { ContractStatus } from './contract';
 import type {
   ChangeRequestStatus,
   ChangeRequestType,
   HandoffMaterialKind,
   MediaIngestStatus,
   StudioMilestoneStatus,
-  TokenEntryType,
 } from './production-enums';
 
 /** A note between the Creator holding an episode and the lead Creator (BR-67). */
@@ -14,6 +14,25 @@ export interface EpisodeNote {
   message: string;
   createdAt: string;
   author: { id: string; fullName: string } | null;
+}
+
+/** A note on the idea and direction of a project, between the Admin, the lead Creator and the Reviewer (MF-1 §1). */
+export interface ProjectNote {
+  id: string;
+  message: string;
+  createdAt: string;
+  author: { id: string; fullName: string; role: string } | null;
+}
+
+/** A STUDIO login the Admin opened for a partner studio; it signs in to Studio Web only. */
+export interface StudioAccount {
+  id: string;
+  email: string;
+  fullName: string;
+  role: 'STUDIO';
+  isActive: boolean;
+  studioId: string;
+  createdAt?: string;
 }
 
 export interface Person {
@@ -30,7 +49,7 @@ export interface ProjectRef {
   movie: { title: string };
 }
 
-/** A partner studio: third party, no account (BR-15, BR-59). */
+/** A partner studio (BR-59); since MF-1 07/11/2026 it signs in to Studio Web with STUDIO accounts. */
 export interface Studio {
   id: string;
   name: string;
@@ -63,15 +82,12 @@ export interface MilestoneEvent {
   mediaAsset: { id: string; version: number; episodeId: string; ingestStatus: MediaIngestStatus } | null;
 }
 
-/** The link the studio last mailed for one episode of a hand-off: downloaded, or imported as the Submission. */
-export interface StudioFilmLink {
+/** A contract round of a hand-off, as the hand-off list carries it. */
+export interface HandoffContract {
   id: string;
-  episodeId: string;
-  version: string;
-  fileName: string;
-  url: string;
-  sentAt: string;
-  episode: { episodeNumber: number };
+  round: number;
+  status: ContractStatus;
+  costVnd: number | null;
 }
 
 /** One hand-off: which studio, which season (null = the whole project), when and with what (BR-58, BR-59). */
@@ -80,24 +96,26 @@ export interface StudioHandoff {
   studio: { id: string; name: string; email: string };
   season: { id: string; seasonNumber: number; title: string | null } | null;
   seasonId: string | null;
-  productionFeeTokens: number | string;
-  /** Token this hand-off cost when its studio was replaced (BR-59); 0 otherwise. */
-  lostTokens: number | string;
+  /**
+   * Fee (VND) of the hand-off: on a studio change the Admin's proposal from the brief until the new studio's
+   * contract is signed, then the signed cost.
+   */
+  offeredFeeVnd: number | string;
+  /** VND the studio kept when it was replaced (BR-59); 0 otherwise. */
+  forfeitedVnd: number | string;
   changeReason: string | null;
   briefFileKey: string | null;
   milestoneStatus: StudioMilestoneStatus;
   statusNote: string | null;
   respondedAt: string | null;
   declineReason: string | null;
-  /** When the studio last mailed a film back to the Creator, and what it said. */
-  filmSentAt: string | null;
-  filmSentNote: string | null;
   createdAt: string;
   createdBy: Person;
   emailMessage: { status: 'QUEUED' | 'SENT' | 'FAILED'; sentAt: string | null; errorMessage: string | null } | null;
   materials: HandoffMaterial[];
-  filmLinks: StudioFilmLink[];
   milestoneEvents: MilestoneEvent[];
+  /** Rounds of the contract tied to this hand-off, oldest first; a studio change waits in BRIEF_SENT for its signature. */
+  contracts: HandoffContract[];
 }
 
 /** A seat of a Creator on a project (BR-13). */
@@ -116,51 +134,12 @@ export interface CreatorSeat {
   episodes: { id: string; episodeNumber: number; title: string; assignedCreatorId: string | null }[];
 }
 
-/** Production fee of one season: what it costs against what was paid out (BR-37, BR-46). */
-export interface SeasonFee {
-  seasonId: string;
-  seasonNumber: number;
-  title: string | null;
-  episodeProductionCost: number;
-  episodeCount: number;
-  baselineTokens: number;
-  allocatedTokens: number;
-  supplementTokens: number;
-  correctionTokens: number;
-  totalTokens: number;
-  missingTokens: number;
-  /** Spent on studios that were replaced: gone, never refunded (BR-59). */
-  lostTokens: number;
-  /** What a new brief of the season may still promise. */
-  availableTokens: number;
-  hasInitial: boolean;
-}
-
-export interface FeeEntry {
-  id: string;
-  entryType: TokenEntryType;
-  amountTokens: number | string;
-  rateVnd: number;
-  reason: string | null;
-  createdAt: string;
-  createdBy: Person;
-  season: { id: string; seasonNumber: number; title: string | null } | null;
-}
-
-export interface FeeLedger {
-  totalTokens: number;
-  totalVnd: number;
-  seasons: SeasonFee[];
-  entries: FeeEntry[];
-}
-
 export interface ChangeRequest {
   id: string;
   projectId: string;
   requestType: ChangeRequestType;
   content: string;
   reason: string;
-  requestedTokens: number | string | null;
   attachmentName: string | null;
   status: ChangeRequestStatus;
   adminResponse: string | null;

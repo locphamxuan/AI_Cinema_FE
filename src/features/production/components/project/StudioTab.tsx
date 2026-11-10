@@ -11,36 +11,38 @@ import { downloadFile } from '../../lib/download';
 import { Pager, pageOf } from '@/components/data/Pager';
 import { Empty, ErrorNote, Facts, Loading, Panel } from '@/components/data/ui';
 import { HandoffCard } from './HandoffCard';
-import { ChangeStudioModal, HandOffModal } from './HandoffModals';
-import { MilestoneModal } from './MilestoneModal';
+import { ChangeStudioModal } from './HandoffModals';
 import { useProject } from './ProjectContext';
 import { episodeCountsBySeason } from '@/lib/seasonLabel';
 
 const PAGE_SIZE = 5;
 
-/** Sub-tabs of the Studio timeline: each hand-off sits under its milestone, a failed brief email under "Lỗi". */
+/**
+ * Sub-tabs of the Studio timeline: each hand-off sits under its milestone, a failed brief email under "Lỗi". The system moves
+ * the milestones (contract signed, film delivered, changes requested); older hand-offs may still read accepted or declined.
+ */
 const FILTERS: { key: string; label: string; match: (h: StudioHandoff) => boolean }[] = [
   { key: 'all', label: 'Tất cả', match: () => true },
   { key: 'sent', label: 'Đã gửi brief', match: (h) => h.milestoneStatus === 'BRIEF_SENT' },
-  { key: 'accepted', label: 'Studio đã nhận', match: (h) => h.milestoneStatus === 'STUDIO_ACCEPTED' },
   { key: 'progress', label: 'Studio đang làm', match: (h) => h.milestoneStatus === 'IN_PROGRESS' },
   { key: 'delivered', label: 'Studio đã giao', match: (h) => h.milestoneStatus === 'DELIVERED' },
-  { key: 'declined', label: 'Studio từ chối', match: (h) => h.milestoneStatus === 'STUDIO_DECLINED' },
   { key: 'failed', label: 'Lỗi gửi email', match: (h) => h.emailMessage?.status === 'FAILED' },
   { key: 'superseded', label: 'Đã đổi Studio', match: (h) => h.milestoneStatus === 'SUPERSEDED' },
 ];
 
-/** The studio timeline: what went to which Studio and when, every milestone and Submission. */
+/**
+ * The studio timeline (BR-58, BR-59): the hand-off the signed contract opened, every milestone and Submission, and
+ * studio changes, read-only. Since MF-1 07/11/2026 nobody hands off or moves a milestone by hand: signing the contract
+ * opens the hand-off, the studio's delivery on Studio Web marks it delivered, a Reviewer's change request reopens it.
+ */
 export function StudioTab() {
   const { project, caps, base } = useProject();
   const episodeCounts = episodeCountsBySeason(project.seasons);
-  const [mode, setMode] = useState<'handoff' | 'change' | null>(null);
-  const [moving, setMoving] = useState<StudioHandoff | null>(null);
+  const [changing, setChanging] = useState(false);
   const [filter, setFilter] = useState('all');
   const [page, setPage] = useState(1);
   const history = useResource(`handoffs:${project.id}:${project.updatedAt}`, () => studioService.listHandoffs(project.id));
   const delivering = isIn(project.status, DELIVERY_PROJECT);
-  const canHandOff = caps.handoff && (project.status === 'ASSIGNED' || delivering);
   const all = history.data ?? [];
   const matching = all.filter(FILTERS.find((f) => f.key === filter)!.match);
   const { rows, totalPages } = pageOf(matching, page, PAGE_SIZE);
@@ -55,7 +57,7 @@ export function StudioTab() {
       <div className="lg:col-span-2 space-y-5">
         <Panel
           title="Dòng thời gian Studio"
-          description="Gửi brief PDF và tài liệu cho Studio đối tác qua email. Sau đó Creator cập nhật tiến độ của Studio và nộp bản phim Studio giao."
+          description="Hợp đồng ký đủ hai bên thì hệ thống tự bàn giao cho Studio (brief PDF và tài liệu). Studio nộp phim từng tập trên Studio Web để Reviewer duyệt."
         >
           <div role="group" aria-label="Lọc theo trạng thái" className="flex flex-wrap gap-1.5 mb-4">
             {FILTERS.map((f) => {
@@ -86,9 +88,9 @@ export function StudioTab() {
                 movieId={project.id}
                 episodeCount={handoff.seasonId ? episodeCounts.get(handoff.seasonId) : undefined}
                 base={base}
+                canDecide={caps.contractManage}
                 onBrief={() => void downloadBrief(handoff)}
                 onMaterial={(material) => void downloadMaterial(handoff, material)}
-                onMilestone={caps.handoff && delivering ? () => setMoving(handoff) : undefined}
               />
             ))}
           </ol>
@@ -112,40 +114,26 @@ export function StudioTab() {
             <Empty>Chưa chọn Studio.</Empty>
           )}
           <div className="mt-4 space-y-2">
-            {canHandOff && (
-              <Button size="sm" className="w-full" onClick={() => setMode('handoff')}>
-                Bàn giao cho Studio
-              </Button>
-            )}
-            {caps.handoff && delivering && all.length > 0 && (
-              <Button size="sm" variant="secondary" className="w-full" onClick={() => setMode('change')}>
+            {caps.contractManage && delivering && all.length > 0 && (
+              <Button size="sm" variant="secondary" className="w-full" onClick={() => setChanging(true)}>
                 Đổi Studio
               </Button>
             )}
-            {caps.creator && project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Reviewer hoàn tất kế hoạch.</p>}
-            {project.status === 'ASSIGNED' && !caps.handoff && <p className="text-xs text-slate-500">Chờ Creator chính bàn giao cho Studio.</p>}
+            {project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Admin giao Creator chính.</p>}
+            {project.status === 'ASSIGNED' && (
+              <p className="text-xs text-slate-500">Bàn giao tự động khi hợp đồng với Studio có đủ chữ ký Admin và Studio (tab Hợp đồng).</p>
+            )}
             {caps.creator && !caps.lead && (
               <p className="rounded-xl border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 p-3 text-xs text-sky-800 dark:text-sky-300">
-                Bạn là Creator phụ: Creator chính {project.creator?.fullName ?? ''} là người duy nhất làm việc với Studio (bàn giao, đổi Studio, cập nhật mốc,
-                bàn giao, đổi Studio, cập nhật mốc tiến độ). Bạn chịu trách nhiệm các tập được giao: kiểm tra phim Studio gửi ở trang tập, nộp thẩm định, và ghi phần cần sửa ở mục
-                Trao đổi về tập để Creator chính báo Studio.
+                Bạn là Creator phụ của dự án. Studio nộp phim từng tập trên Studio Web, Reviewer duyệt; các mốc bàn giao do hệ thống tự
+                cập nhật. Bạn theo dõi các tập được giao và trao đổi với Creator chính {project.creator?.fullName ?? ''} ở mục Trao đổi về tập.
               </p>
             )}
           </div>
         </Panel>
       </div>
 
-      {mode === 'handoff' && <HandOffModal onClose={() => setMode(null)} />}
-      {mode === 'change' && <ChangeStudioModal onClose={() => setMode(null)} />}
-      {moving && (
-        <MilestoneModal
-          handoff={moving}
-          onClose={() => {
-            setMoving(null);
-            void history.reload();
-          }}
-        />
-      )}
+      {changing && <ChangeStudioModal onClose={() => setChanging(false)} />}
     </div>
   );
 }

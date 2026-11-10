@@ -35,9 +35,9 @@ type ViewMode = (typeof VIEWS)[number]['key'];
 
 /** What each role does with its projects, under the page title. */
 const INTRO: Record<ProductionBase, string> = {
-  '/creator': 'Các dự án bạn được giao: gửi brief cho Studio, cập nhật tiến độ và nộp bản phim Studio giao.',
-  '/reviewer': 'Các dự án bạn phụ trách: đặt hàng Studio, duyệt từng tập, gắn nhãn AI và phát hành.',
-  '/admin': 'Mọi dự án trên nền tảng. Admin theo dõi và duyệt đề xuất của Reviewer, Creator, không sửa trực tiếp dự án.',
+  '/creator': 'Các dự án bạn được giao: trao đổi ý tưởng với Admin, viết kịch bản và theo dõi Studio sản xuất.',
+  '/reviewer': 'Các dự án bạn phụ trách: lên mùa/tập, duyệt kịch bản và phim Studio nộp, gắn nhãn AI, đặt giá và xác nhận Phim Final.',
+  '/admin': 'Mọi dự án trên nền tảng. Admin tạo dự án, giao Creator, duyệt Kịch bản Final, ký hợp đồng với Studio và phát hành Phim Final.',
 };
 
 /** Projects the account may see (own projects of a Reviewer, assigned ones of a Creator, all for the Admin). */
@@ -56,7 +56,7 @@ export function ProjectListPage() {
   const projects = useResource(`projects:${filter}:${search}:${page}`, () =>
     productionService.listProjects({ page, search, status }),
   );
-  const canCreate = can(PERMISSION.PROJECT_MANAGE);
+  const canCreate = can(PERMISSION.PROJECT_CREATE);
   const isCreator = base === '/creator';
   const totalCount = projects.data?.meta.totalItems ?? 0;
 

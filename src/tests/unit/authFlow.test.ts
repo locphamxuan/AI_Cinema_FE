@@ -1,17 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAppStore } from '@/store/useAppStore';
 import { authService } from '@/services/authService';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 function backendAnswers(role: string) {
-  return vi.fn().mockResolvedValue({
-    ok: true,
-    status: 200,
-    json: async () => ({
+  return vi.fn().mockResolvedValue(
+    fakeResponse({
       accessToken: 'jwt-access',
       refreshToken: 'jwt-refresh',
       user: { id: 'u-1', fullName: 'Alice', email: 'alice@example.com', role, isActive: true },
     }),
-  });
+  );
 }
 
 describe('auth flow', () => {
@@ -39,6 +38,17 @@ describe('auth flow', () => {
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('ứng dụng di động');
+    expect(useAppStore.getState().isAuthenticated).toBe(false);
+    expect(authService.hasSession()).toBe(false);
+  });
+
+  it('refuses a studio account like a member: studios sign in to Studio Web', async () => {
+    vi.stubGlobal('fetch', backendAnswers('STUDIO'));
+
+    const result = await useAppStore.getState().login('studio@aicinema.com', 'Aicinema@123');
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('Studio Web');
     expect(useAppStore.getState().isAuthenticated).toBe(false);
     expect(authService.hasSession()).toBe(false);
   });

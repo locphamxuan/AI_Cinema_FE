@@ -1,6 +1,7 @@
 'use client';
 
-import { AlertTriangle, ArrowRight, Bell, Clapperboard, Coins, FileText, Film } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Bell, Clapperboard, Coins, FileText, Film, ScrollText } from 'lucide-react';
+import { NOTIFICATION_TYPE_LABEL } from '@/features/production/lib/labels';
 import { formatDateTime } from '@/lib/format';
 import type { AppNotification } from '@/types/production';
 
@@ -14,11 +15,22 @@ function getNotificationMeta(item: AppNotification): {
   const type = item.type?.toUpperCase() ?? '';
   const text = `${item.title} ${item.body ?? ''}`.toLowerCase();
 
-  if (type.includes('TOKEN') || text.includes('token') || text.includes('cấp phí') || text.includes('ngân sách')) {
+  // MF-1 (07/11/2026): idea notes, script, contract and Final Film have their own badge.
+  const mf1 = NOTIFICATION_TYPE_LABEL[type];
+  if (mf1) {
+    return {
+      icon: type.startsWith('FINAL_FILM') ? Film : ScrollText,
+      colorClass: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
+      badgeLabel: mf1,
+      badgeTone: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20',
+    };
+  }
+
+  if (type.startsWith('COST_') || text.includes('chi phí') || text.includes('ngân sách')) {
     return {
       icon: Coins,
       colorClass: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25',
-      badgeLabel: 'Ngân sách Token',
+      badgeLabel: 'Chi phí sản xuất',
       badgeTone: 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/25',
     };
   }

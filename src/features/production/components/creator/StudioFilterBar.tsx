@@ -1,7 +1,7 @@
 'use client';
 
 import { Search, LayoutGrid, List } from 'lucide-react';
-import type { ScriptFilterKey } from './types';
+import type { ScriptFilterKey } from './scriptItems';
 
 interface StudioFilterBarProps {
   searchQuery: string;
@@ -15,10 +15,10 @@ interface StudioFilterBarProps {
 
 const FILTER_OPTIONS: { key: ScriptFilterKey; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
-  { key: 'draft', label: 'Bản nháp' },
-  { key: 'review', label: 'Chờ Reviewer duyệt' },
+  { key: 'draft', label: 'Chưa nộp' },
+  { key: 'review', label: 'Reviewer & cần sửa' },
   { key: 'admin_approval', label: 'Chờ Admin chốt' },
-  { key: 'handed_off', label: 'Đã chuyển giao Studio' },
+  { key: 'handed_off', label: 'Kịch bản Final' },
 ];
 
 export function StudioFilterBar({
@@ -76,7 +76,7 @@ export function StudioFilterBar({
             type="search"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Tìm theo tên kịch bản, thể loại..."
+            placeholder="Tìm theo tên phim, thể loại, Studio..."
             className="w-full pl-10 pr-4 py-2 rounded-full bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-900 dark:focus:border-white transition-all shadow-xs"
           />
         </div>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { notificationHref, productionBaseFor, productionPaths } from '@/features/production/lib/routes';
-import { holdsEpisode, projectCapabilities } from '@/features/production/lib/capabilities';
+import { projectCapabilities } from '@/features/production/lib/capabilities';
 import { addDays, formatDay, formatDuration } from '@/lib/format';
 import {
   deadlineValid,
@@ -29,6 +29,10 @@ describe('production routes', () => {
     ['/projects/m1/change-requests', 'reviewer', '/reviewer/projects/m1?tab=changes'],
     ['/projects/m1/studio', 'creator', '/creator/projects/m1?tab=studio'],
     ['/projects/m1', 'admin', '/admin/projects/m1'],
+    ['/projects/m1/script', 'creator', '/creator/projects/m1?tab=script'],
+    ['/projects/m1/script', 'admin', '/admin/projects/m1?tab=script'],
+    ['/projects/m1/contract', 'admin', '/admin/projects/m1?tab=contract'],
+    ['/projects/m1/episodes/e1', 'admin', '/admin/projects/m1/episodes/e1'],
     ['/admin/price-alerts', 'admin', '/admin/settings?tab=price-alerts'],
   ] as const)('opens the notification link %s for a %s at %s', (link, role, href) => {
     expect(notificationHref(link, role)).toBe(href);
@@ -42,32 +46,41 @@ describe('production routes', () => {
 
 describe('projectCapabilities', () => {
   const project = { status: 'IN_PRODUCTION' as const, reviewerId: 'rev', creatorId: 'cre' };
-  const reviewerKeys = grant(PERMISSION.PROJECT_MANAGE, PERMISSION.PROJECT_FEE_ALLOCATE, PERMISSION.CONTENT_REVIEW, PERMISSION.EPISODE_PUBLISH);
+  const reviewerKeys = grant(PERMISSION.PROJECT_MANAGE, PERMISSION.COST_REQUEST, PERMISSION.CONTENT_REVIEW, PERMISSION.EPISODE_PRICE);
 
-  it('lets only the Reviewer in charge manage, review and publish', () => {
-    expect(projectCapabilities(project, 'rev', reviewerKeys)).toMatchObject({ manage: true, review: true, publish: true, handoff: false });
+  it('lets only the Reviewer in charge manage, review scripts and films and price, never publish', () => {
+    expect(projectCapabilities(project, 'rev', reviewerKeys)).toMatchObject({
+      owner: true,
+      manage: true,
+      review: true,
+      price: true,
+      publish: false,
+      create: false,
+      scriptApprove: false,
+      note: true,
+      costRequest: true,
+    });
     // Another Reviewer holds the same permissions but does not own the project.
-    expect(projectCapabilities(project, 'other', reviewerKeys)).toMatchObject({ manage: false, review: false, publish: false });
+    expect(projectCapabilities(project, 'other', reviewerKeys)).toMatchObject({ manage: false, review: false, price: false, note: false, costRequest: false });
   });
 
-  it('lets only the lead Creator speak to the studio; the other Creators deliver their own episodes', () => {
-    const creatorKeys = grant(PERMISSION.STUDIO_HANDOFF, PERMISSION.MEDIA_INGEST, PERMISSION.PROJECT_SUGGEST);
-    const team = { ...project, creatorAssignments: [{ creatorId: 'cre' }, { creatorId: 'second' }] };
-    expect(projectCapabilities(team, 'cre', creatorKeys)).toMatchObject({ creator: true, lead: true, handoff: true, askTokens: true, ingest: true, manage: false });
-    expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, handoff: false, askTokens: false, ingest: true, delegate: true });
-    expect(projectCapabilities(team, 'someone', creatorKeys)).toMatchObject({ creator: false, handoff: false, ingest: false, suggest: false });
-  });
-
-  it("keeps an episode for the Creator it was given to, and one given to nobody for the lead", () => {
-    const creatorKeys = grant(PERMISSION.MEDIA_INGEST);
+  it('lets the lead Creator write the script, not the other Creators', () => {
+    const keys = grant(PERMISSION.SCRIPT_WRITE, PERMISSION.MEDIA_INGEST);
     const team = { ...project, creatorAssignments: [{ creatorId: 'second' }] };
+    expect(projectCapabilities(team, 'cre', keys)).toMatchObject({ scriptWrite: true, note: true });
+    expect(projectCapabilities(team, 'second', keys)).toMatchObject({ scriptWrite: false, note: false });
+  });
+
+  it('lets the Creators of the team work on its episodes, and nobody move the studio hand-off by hand', () => {
+    const creatorKeys = grant(PERMISSION.MEDIA_INGEST, PERMISSION.PROJECT_SUGGEST);
+    const team = { ...project, creatorAssignments: [{ creatorId: 'cre' }, { creatorId: 'second' }] };
     const lead = projectCapabilities(team, 'cre', creatorKeys);
-    const second = projectCapabilities(team, 'second', creatorKeys);
-    expect(holdsEpisode(lead, { assignedCreatorId: null }, 'cre')).toBe(true);
-    expect(holdsEpisode(lead, { assignedCreatorId: 'second' }, 'cre')).toBe(true);
-    expect(holdsEpisode(second, { assignedCreatorId: 'second' }, 'second')).toBe(true);
-    expect(holdsEpisode(second, { assignedCreatorId: null }, 'second')).toBe(false);
-    expect(holdsEpisode(second, { assignedCreatorId: 'cre' }, 'second')).toBe(false);
+    expect(lead).toMatchObject({ creator: true, lead: true, costRequest: false, ingest: true, manage: false });
+    expect(projectCapabilities(team, 'second', creatorKeys)).toMatchObject({ creator: true, lead: false, ingest: true, delegate: true });
+    expect(projectCapabilities(team, 'someone', creatorKeys)).toMatchObject({ creator: false, ingest: false, suggest: false });
+    // The milestones move on their own (contract signed, film delivered, changes requested): no capability for it.
+    expect(lead).not.toHaveProperty('handoff');
+    expect(projectCapabilities(team, 'rev', grant(PERMISSION.CONTENT_REVIEW))).not.toHaveProperty('handoff');
   });
 
   it('lets the Reviewer in charge and the Creators of the team ask the Admin (BR-55)', () => {
@@ -77,9 +90,26 @@ describe('projectCapabilities', () => {
     expect(projectCapabilities(project, 'other', suggestKeys).suggest).toBe(false);
   });
 
-  it('gives the Admin no edit and no request of their own: they only decide', () => {
-    const adminKeys = grant(PERMISSION.PROJECT_READ_ALL, PERMISSION.PROJECT_CHANGE_REVIEW);
-    expect(projectCapabilities(project, 'admin', adminKeys)).toMatchObject({ suggest: false, manage: false, publish: false });
+  it('lets the Admin create, assign, approve the Final Script, sign and publish, but not edit the structure', () => {
+    const adminKeys = grant(
+      PERMISSION.PROJECT_CREATE,
+      PERMISSION.PROJECT_READ_ALL,
+      PERMISSION.PROJECT_CHANGE_REVIEW,
+      PERMISSION.SCRIPT_APPROVE,
+      PERMISSION.CONTRACT_MANAGE,
+      PERMISSION.EPISODE_PUBLISH,
+    );
+    expect(projectCapabilities(project, 'admin', adminKeys)).toMatchObject({
+      create: true,
+      scriptApprove: true,
+      contractManage: true,
+      publish: true,
+      note: true,
+      suggest: false,
+      manage: false,
+      review: false,
+      price: false,
+    });
   });
 });
 

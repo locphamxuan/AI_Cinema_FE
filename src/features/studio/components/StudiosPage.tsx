@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Trash2 } from 'lucide-react';
+import { KeyRound, Pencil, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { useCan } from '@/hooks/useCan';
@@ -11,12 +11,18 @@ import type { Studio } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { CARD, Empty, ErrorNote, Loading } from '@/components/data/ui';
+import { StudioAccountsModal } from './StudioAccountsModal';
 import { StudioModal } from './StudioModal';
 
-/** Catalog of partner studios (BR-59): the Reviewer adds, edits, deactivates and removes the studios a project can be ordered from. */
+/**
+ * Catalog of partner studios (BR-59): add, edit, deactivate and remove the studios a project can be ordered from;
+ * the Admin also opens each studio's STUDIO login accounts for Studio Web.
+ */
 export function StudiosPage() {
   const can = useCan();
   const manage = can(PERMISSION.STUDIO_MANAGE);
+  const manageAccounts = can(PERMISSION.USER_MANAGE);
+  const [accountsOf, setAccountsOf] = useState<Studio | null>(null);
   const studios = useResource('studios:all', () => studioService.list());
   const [editing, setEditing] = useState<Studio | 'new' | null>(null);
   const { busy, run } = useAction();
@@ -36,7 +42,8 @@ export function StudiosPage() {
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Studio đối tác</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Studio là đối tác bên thứ 3, không có tài khoản: brief và material được gửi qua email. Mỗi dự án đặt hàng một Studio đang hoạt động.
+            Studio là đối tác bên thứ 3, đăng nhập Studio Web bằng tài khoản Admin cấp để ký hợp đồng và nộp phim. Mỗi dự án đặt hàng một
+            Studio đang hoạt động.
           </p>
         </div>
         {manage && (
@@ -61,7 +68,7 @@ export function StudiosPage() {
                   <th className="px-4 py-2.5 font-medium hidden md:table-cell">Liên hệ</th>
                   <th className="px-4 py-2.5 font-medium hidden sm:table-cell text-right">Dự án</th>
                   <th className="px-4 py-2.5 font-medium">Trạng thái</th>
-                  <th className="px-4 py-2.5 w-28" />
+                  <th className="px-4 py-2.5 w-40" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -85,6 +92,11 @@ export function StudiosPage() {
                         <Badge tone={studio.isActive ? 'emerald' : 'neutral'}>{studio.isActive ? 'Đang hoạt động' : 'Ngừng dùng'}</Badge>
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
+                        {manageAccounts && (
+                          <Button size="sm" variant="ghost" onClick={() => setAccountsOf(studio)} aria-label={`Tài khoản của ${studio.name}`}>
+                            <KeyRound className="w-3.5 h-3.5" /> Tài khoản
+                          </Button>
+                        )}
                         {manage && (
                           <>
                             <Button size="sm" variant="ghost" onClick={() => setEditing(studio)} aria-label={`Sửa ${studio.name}`}>
@@ -110,6 +122,7 @@ export function StudiosPage() {
         </div>
       )}
 
+      {accountsOf && <StudioAccountsModal studio={accountsOf} onClose={() => setAccountsOf(null)} />}
       {editing && <StudioModal studio={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSaved={studios.reload} />}
     </main>
   );

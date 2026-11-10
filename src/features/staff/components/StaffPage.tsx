@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import { BarChart3, Headphones, Megaphone, Users, type LucideIcon } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
-import { movieService } from '@/services/movieService';
+import { movieService, type CatalogMovie } from '@/services/movieService';
 import { adminService, type AccountRow } from '@/services/adminService';
-import type { Movie } from '@/types/movie';
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 import { SubscriptionsPanel } from '@/features/billing-admin/components/SubscriptionsPanel';
 
@@ -68,7 +67,7 @@ export function StaffPage() {
 }
 
 function FilmsSection() {
-  const [movies, setMovies] = useState<Movie[] | null>(null);
+  const [movies, setMovies] = useState<CatalogMovie[] | null>(null);
   useEffect(() => {
     void movieService.getMovies().then((res) => setMovies(res.success ? res.data : []));
   }, []);
@@ -83,7 +82,7 @@ function FilmsSection() {
           <li key={movie.id} className="px-5 py-2.5 flex items-center justify-between gap-3">
             <span className="font-medium text-slate-800 dark:text-slate-200">{movie.title}</span>
             <span className="text-slate-500 dark:text-slate-400">
-              {movie.totalEpisodes} tập · {movie.genre.join(', ') || 'Chưa có thể loại'}
+              {movie.episodeCount} tập · {movie.genres.join(', ') || 'Chưa có thể loại'}
             </span>
           </li>
         ))}

@@ -6,6 +6,7 @@ import { AdminMoviesPanel } from '@/features/admin/components/AdminMoviesPanel';
 import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
 import { signInAs } from '@/tests/support/signIn';
 import { useAppStore } from '@/store/useAppStore';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
@@ -29,7 +30,7 @@ function routeFetch(routes: Record<string, { status?: number; body: unknown }>) 
     const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
     const hit = routes[`${init?.method ?? 'GET'} ${path}`] ?? { body: [] };
     const status = hit.status ?? 200;
-    return { ok: status < 400, status, json: async () => hit.body, headers: new Headers() };
+    return fakeResponse(hit.body, status);
   });
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
@@ -51,10 +52,18 @@ describe('AdminSidebar', () => {
     for (const label of ['Tài khoản & Phân quyền', 'Dự án phim', 'Duyệt yêu cầu', 'Quản lý phim', 'Cài đặt nền tảng']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }
-    for (const merged of ['Token Reviewer', 'Cảnh báo giá', 'Đề xuất chờ duyệt', 'Yêu cầu cấp thêm Token']) {
+    for (const merged of ['Cảnh báo giá', 'Đề xuất chờ duyệt', 'Yêu cầu thêm chi phí']) {
       expect(within(nav).queryByRole('link', { name: merged })).toBeNull();
     }
     expect(within(nav).getByRole('link', { name: 'Tài khoản & Phân quyền' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('shows the signed-in Admin, not a placeholder account', () => {
+    signInAs('admin');
+    render(<AdminSidebar />);
+    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
+    expect(within(nav).getByText('admin@test.vn')).toBeInTheDocument();
+    expect(within(nav).getByText('Test admin')).toBeInTheDocument();
   });
 });
 

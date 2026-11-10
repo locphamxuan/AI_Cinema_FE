@@ -1,6 +1,6 @@
 'use client';
 
-import { Film, Users, ShieldCheck, UserCog, Crown } from 'lucide-react';
+import { Building2, Film, Users, ShieldCheck, UserCog, Crown } from 'lucide-react';
 import type { PermissionRow } from '@/services/adminService';
 import type { UserRole } from '@/types/production';
 import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_SHORT_LABEL } from '../roles';
@@ -11,6 +11,7 @@ const ROLE_ICONS: Record<UserRole, React.ComponentType<{ className?: string }>> 
   MEMBER: Users,
   CONTENT_CREATOR: Film,
   CONTENT_REVIEWER: ShieldCheck,
+  STUDIO: Building2,
   STAFF: UserCog,
   ADMIN: Crown,
 };
@@ -19,6 +20,7 @@ const ROLE_COLORS: Record<UserRole, { badge: string; text: string; bg: string }>
   MEMBER: { badge: 'bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-300', text: 'text-slate-600', bg: 'bg-slate-500' },
   CONTENT_CREATOR: { badge: 'bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300', text: 'text-sky-600', bg: 'bg-sky-500' },
   CONTENT_REVIEWER: { badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300', text: 'text-emerald-600', bg: 'bg-emerald-500' },
+  STUDIO: { badge: 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-300', text: 'text-rose-600', bg: 'bg-rose-500' },
   STAFF: { badge: 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300', text: 'text-amber-600', bg: 'bg-amber-500' },
   ADMIN: { badge: 'bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300', text: 'text-purple-600', bg: 'bg-purple-500' },
 };
@@ -26,7 +28,7 @@ const ROLE_COLORS: Record<UserRole, { badge: string; text: string; bg: string }>
 /** One card per role with how many permissions it holds in the draft; edited roles are flagged. */
 export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; changedRoles: UserRole[] }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
       {BACKEND_ROLES.map((role) => {
         const Icon = ROLE_ICONS[role];
         const color = ROLE_COLORS[role];

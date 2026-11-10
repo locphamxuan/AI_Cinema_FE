@@ -1,37 +1,39 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { notificationTabsFor, typesOf } from '@/features/notifications/notificationCatalog';
 import { pageOf } from '@/components/data/Pager';
 import { downloadFile } from '@/features/production/lib/download';
-import { TokenRequestList } from '@/features/token-request/TokenRequestList';
+import { CostRequestInbox } from '@/features/admin/components/CostRequestInbox';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
-import type { TokenRequest } from '@/types/token-request';
+import type { CostRequest } from '@/types/cost';
 
 const toastError = vi.hoisted(() => vi.fn());
 vi.mock('@/components/ui/Toast', () => ({ toast: { error: toastError, success: vi.fn() } }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
-  usePathname: () => '/reviewer/tokens',
+  usePathname: () => '/admin/requests',
   useParams: () => ({}),
   useSearchParams: () => new URLSearchParams(),
 }));
 
-const REQUEST: TokenRequest = {
+const REQUEST: CostRequest = {
   id: 'req-1',
   projectId: 'm1',
-  seasonId: 's1',
-  requestedTokens: 4000,
-  grantedTokens: null,
-  reason: 'Studio từ chối mức 3000 Token/tập',
+  handoffId: 'h1',
+  requestedVnd: 20_000_000,
+  studioQuoteVnd: 170_000_000,
+  grantedVnd: null,
+  reason: 'Studio đòi 170 triệu vì thêm cảnh VFX',
+  attachmentName: 'bao-gia.pdf',
   status: 'OPEN',
-  reviewerResponse: null,
+  adminResponse: null,
   resolvedAt: null,
   createdAt: '2026-10-15T08:00:00.000Z',
-  project: { id: 'm1', reviewerId: 'r1', creatorId: 'c1', movie: { title: 'Vùng dịch 704' } },
-  season: { id: 's1', seasonNumber: 1, title: null },
-  requestedBy: { id: 'c1', fullName: 'Creator Một', email: 'c1@x.vn' },
+  project: { id: 'm1', reviewerId: 'r1', movie: { title: 'Vùng dịch 704' } },
+  handoff: { id: 'h1', offeredFeeVnd: 150_000_000, milestoneStatus: 'NEGOTIATING', studio: { id: 's1', name: 'Studio Ánh Trăng' } },
+  requestedBy: { id: 'r1', fullName: 'Reviewer Một' },
   resolvedBy: null,
 };
 
@@ -64,9 +66,30 @@ describe('notification tabs', () => {
   it('splits the Creator inbox into Studio, Reviewer and episodes, and the Reviewer one into Creator, Studio, Admin', () => {
     expect(notificationTabsFor('creator').map((t) => t.label)).toEqual(['Studio', 'Reviewer', 'Tập phim']);
     expect(notificationTabsFor('reviewer').map((t) => t.key)).toEqual(['creator', 'studio', 'admin', 'release']);
-    const creatorTab = notificationTabsFor('reviewer')[0];
-    expect(typesOf(creatorTab)).toEqual(expect.arrayContaining(['MEDIA_SUBMITTED', 'STUDIO_HANDOFF_SENT', 'TOKEN_REQUESTED']));
-    expect(typesOf(notificationTabsFor('creator')[1])).toEqual(expect.arrayContaining(['TOKEN_REQUEST_APPROVED', 'TOKEN_REQUEST_REJECTED']));
+    const [creatorTab, studioTab, adminTab] = notificationTabsFor('reviewer');
+    expect(typesOf(creatorTab)).not.toContain('MEDIA_SUBMITTED');
+    expect(typesOf(studioTab)).toEqual(expect.arrayContaining(['MEDIA_SUBMITTED', 'MEDIA_READY', 'EPISODE_OVERDUE']));
+    expect(typesOf(adminTab)).toEqual(
+      expect.arrayContaining(['STUDIO_HANDOFF_SENT', 'COST_BUDGET_CHANGED', 'COST_REQUEST_APPROVED', 'COST_REQUEST_REJECTED']),
+    );
+    expect(typesOf(notificationTabsFor('admin')[1])).toContain('COST_REQUESTED');
+  });
+
+  it('files none of the studio answer, milestone or mailed-film notifications the backend no longer sends', () => {
+    const gone = ['STUDIO_ACCEPTED', 'STUDIO_DECLINED', 'STUDIO_MILESTONE_CHANGED', 'STUDIO_FILM_SENT'];
+    for (const role of ['creator', 'reviewer', 'admin'] as const) {
+      const types = notificationTabsFor(role).flatMap(typesOf);
+      for (const type of gone) expect(types).not.toContain(type);
+    }
+  });
+
+  it('files the MF-1 script, idea note, contract and Final Film notifications for each role', () => {
+    const all = (role: 'creator' | 'reviewer' | 'admin') => notificationTabsFor(role).flatMap(typesOf);
+    expect(all('creator')).toEqual(expect.arrayContaining(['SCRIPT_UPDATED', 'PROJECT_NOTE']));
+    expect(all('reviewer')).toEqual(expect.arrayContaining(['SCRIPT_UPDATED', 'PROJECT_NOTE', 'FINAL_FILM_REJECTED']));
+    expect(typesOf(notificationTabsFor('admin')[0])).toEqual(
+      expect.arrayContaining(['SCRIPT_UPDATED', 'PROJECT_NOTE', 'CONTRACT_UPDATED', 'FINAL_FILM_CONFIRMED']),
+    );
   });
 });
 
@@ -75,36 +98,36 @@ it('pages a list the API returns whole', () => {
   expect(pageOf([], 1, 3)).toEqual({ rows: [], totalPages: 1 });
 });
 
-describe('TokenRequestList', () => {
-  it('lets the Reviewer grant part of what a Creator asked for', async () => {
-    signInAs('reviewer');
+describe('CostRequestInbox', () => {
+  const page = (data: CostRequest[]) => ({ data, meta: { page: 1, limit: 50, total: data.length, totalPages: 1 } });
+
+  it('lets the Admin grant part of what a Reviewer asked for, in VND', async () => {
+    signInAs('admin');
     const calls = routeFetch({
-      '/token-requests': { data: [REQUEST], meta: { page: 1, limit: 10, total: 1, totalPages: 1 } },
-      '/token-requests/req-1/approve': { ...REQUEST, status: 'APPROVED', grantedTokens: 3500 },
+      '/cost-requests': page([REQUEST]),
+      '/cost-requests/req-1/approve': { ...REQUEST, status: 'APPROVED', grantedVnd: 15_000_000 },
     });
-    render(<TokenRequestList canAnswer />);
+    render(<CostRequestInbox />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /Cấp Token/ }));
-    const dialog = await screen.findByRole('dialog');
-    const amount = within(dialog).getByLabelText('Số Token cấp');
+    expect(await screen.findByText('Vùng dịch 704')).toBeInTheDocument();
+    expect(screen.getByText('170.000.000 ₫')).toBeInTheDocument();
+    const amount = screen.getByLabelText('Số tiền cấp');
     await userEvent.clear(amount);
-    await userEvent.type(amount, '3500');
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Cấp Token' }));
+    await userEvent.type(amount, '15000500');
+    expect(screen.getByRole('button', { name: 'Cấp' })).toBeDisabled();
+    await userEvent.clear(amount);
+    await userEvent.type(amount, '15000000');
+    await userEvent.click(screen.getByRole('button', { name: 'Cấp' }));
 
-    const approve = calls.find((c) => c.path === '/token-requests/req-1/approve');
-    expect(JSON.parse(approve!.body as string)).toEqual({ grantedTokens: 3500 });
+    const approve = calls.find((c) => c.path === '/cost-requests/req-1/approve');
+    expect(JSON.parse(approve!.body as string)).toEqual({ grantedVnd: 15_000_000 });
   });
 
-  it('shows a Creator the answer without the Reviewer buttons', async () => {
-    signInAs('creator');
-    routeFetch({
-      '/token-requests': {
-        data: [{ ...REQUEST, status: 'REJECTED', reviewerResponse: 'Hết ngân sách quý này' }],
-        meta: { page: 1, limit: 10, total: 1, totalPages: 1 },
-      },
-    });
-    render(<TokenRequestList />);
+  it('shows an answered request without the decision buttons', async () => {
+    signInAs('admin');
+    routeFetch({ '/cost-requests': page([{ ...REQUEST, status: 'REJECTED', adminResponse: 'Hết ngân sách quý này' }]) });
+    render(<CostRequestInbox />);
     expect(await screen.findByText(/Hết ngân sách quý này/)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Cấp Token/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cấp' })).not.toBeInTheDocument();
   });
 });

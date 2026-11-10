@@ -26,5 +26,5 @@ export interface LoginCredentials {
   rememberMe?: boolean;
 }
 
-export type AuthRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
+export type AuthRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STUDIO' | 'STAFF' | 'ADMIN';
 

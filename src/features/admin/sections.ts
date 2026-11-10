@@ -11,10 +11,11 @@ export interface AdminSection {
 export const ADMIN_SECTIONS: AdminSection[] = [
   { href: '/admin', label: 'Tổng quan', permissions: [PERMISSION.PROJECT_READ_ALL] },
   { href: '/admin/projects', label: 'Dự án phim', permissions: [PERMISSION.PROJECT_READ_ALL] },
+  { href: '/admin/studios', label: 'Studio đối tác', permissions: [PERMISSION.STUDIO_MANAGE] },
   {
     href: '/admin/requests',
     label: 'Duyệt yêu cầu',
-    permissions: [PERMISSION.PROJECT_CHANGE_REVIEW, PERMISSION.TOKEN_BUDGET_MANAGE],
+    permissions: [PERMISSION.PROJECT_CHANGE_REVIEW, PERMISSION.COST_APPROVE],
   },
   { href: '/admin/movies', label: 'Quản lý phim', permissions: [PERMISSION.PROJECT_READ_ALL] },
   { href: '/admin/ads', label: 'Quảng cáo', permissions: [PERMISSION.AD_MANAGE] },

@@ -17,6 +17,7 @@ const ROLE_LABEL: Record<AuthRole, string> = {
   MEMBER: 'Thành viên',
   CONTENT_CREATOR: 'Content Creator',
   CONTENT_REVIEWER: 'Content Reviewer',
+  STUDIO: 'Studio',
   STAFF: 'Nhân viên',
   ADMIN: 'Quản trị viên',
 };

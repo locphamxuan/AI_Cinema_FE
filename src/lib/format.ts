@@ -17,6 +17,11 @@ export function formatNumber(n: number | null | undefined): string {
   return n === null || n === undefined ? '-' : NUMBER.format(n);
 }
 
+/** 150.000.000 ₫ - production cost and fees are whole VND. */
+export function formatVnd(n: number | string | null | undefined): string {
+  return n === null || n === undefined ? '-' : `${NUMBER.format(Number(n))} ₫`;
+}
+
 /** 1:05:09 / 12:30 */
 export function formatDuration(seconds: number | null | undefined): string {
   if (seconds === null || seconds === undefined) return '-';

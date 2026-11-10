@@ -48,7 +48,7 @@ type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards';
 const TABS: { key: SettingsTab; label: string; Icon?: typeof Coins }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'coin', label: 'COIN & Nạp tiền', Icon: Coins },
-  { key: 'production', label: 'Sản xuất & Token', Icon: Clapperboard },
+  { key: 'production', label: 'Giá tập', Icon: Clapperboard },
   { key: 'streaming', label: 'Phát sóng & Gói', Icon: Radio },
   { key: 'rewards', label: 'Điểm danh & Vòng quay', Icon: Gift },
 ];
@@ -187,7 +187,7 @@ export function PlatformSettingsPanel() {
 
             <div>
               <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
-                Phân khúc Sản xuất & Token
+                Khoảng giá tập
               </h3>
               {renderFieldGroup(PRODUCTION_FIELDS)}
             </div>

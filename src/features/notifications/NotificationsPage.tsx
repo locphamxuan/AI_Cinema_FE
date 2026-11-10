@@ -106,7 +106,7 @@ export function NotificationsPage() {
               Thông báo hệ thống
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-              Theo dõi kịp thời mọi biến động về cấp ngân sách Token, phê duyệt đề xuất, tiến độ gửi phim từ Studio và cảnh báo nền tảng.
+              Theo dõi kịp thời mọi biến động về ngân sách và chi phí sản xuất, phê duyệt đề xuất, tiến độ gửi phim từ Studio và cảnh báo nền tảng.
             </p>
           </div>
 

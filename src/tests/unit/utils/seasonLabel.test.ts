@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { episodeCountsBySeason, episodeLabel, seasonLabel, seasonName } from '@/lib/seasonLabel';
+import { episodeCountsBySeason, seasonLabel, seasonName } from '@/lib/seasonLabel';
 
 describe('season labels', () => {
   it('names a one-episode season as a whole film', () => {
@@ -24,15 +24,5 @@ describe('season labels', () => {
     ]);
     expect(counts.get('s1')).toBe(1);
     expect(counts.get('s2')).toBe(3);
-  });
-
-  it('labels an episode as the part when it is alone in its season', () => {
-    const episodes = [
-      { seasonNumber: 1, episodeNumber: 1 },
-      { seasonNumber: 2, episodeNumber: 2 },
-      { seasonNumber: 2, episodeNumber: 3 },
-    ];
-    expect(episodeLabel(episodes[0], episodes)).toBe('Phần 1 (trọn bộ)');
-    expect(episodeLabel(episodes[1], episodes)).toBe('Tập 2');
   });
 });

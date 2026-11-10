@@ -7,17 +7,15 @@ import { useParams, usePathname } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { productionService } from '@/services/productionService';
-import { studioService } from '@/services/studioService';
-import type { MediaAsset, StudioHandoff } from '@/types/production';
-import { useAction } from '@/hooks/useAction';
+import type { MediaAsset } from '@/types/production';
 import { useResource } from '@/hooks/useResource';
-import { DELIVERY_PROJECT, SUBMITTABLE_EPISODE, holdsEpisode, isIn, projectCapabilities } from '../../lib/capabilities';
+import { DELIVERY_PROJECT, isIn, projectCapabilities } from '../../lib/capabilities';
 import { EPISODE_STATUS } from '../../lib/labels';
 import { formatDay, formatDuration, formatNumber } from '@/lib/format';
 import { baseFromPath, productionPaths } from '../../lib/routes';
 import { ErrorNote, Facts, Loading, Panel, StatusPill } from '@/components/data/ui';
-import { DeliverMediaPanel, deliverAsCreator } from './DeliverMediaPanel';
 import { EpisodeNotesPanel } from './EpisodeNotesPanel';
+import { FinalFilmPanel } from './FinalFilmPanel';
 import { HlsPreview } from './HlsPreview';
 import { MediaVersions } from './MediaVersions';
 import { PublishPanel } from './PublishPanel';
@@ -28,14 +26,10 @@ const IN_PROGRESS = ['PENDING', 'DOWNLOADING', 'TRANSCODING', 'VALIDATING'];
 
 const inProgress = (versions: MediaAsset[] | null) => !!versions?.some((v) => IN_PROGRESS.includes(v.ingestStatus));
 
-/** The newest link the studio mailed for the episode, across every hand-off of the project. */
-const latestFilmLink = (handoffs: StudioHandoff[] | null, episodeId: string) =>
-  handoffs
-    ?.flatMap((h) => h.filmLinks)
-    .filter((link) => link.episodeId === episodeId)
-    .sort((a, b) => b.sentAt.localeCompare(a.sentAt))[0];
-
-/** One episode end to end: deliveries, review sheet, label, compliance and release. */
+/**
+ * One episode end to end: the versions the studio delivered on Studio Web, review sheet, label, compliance, Final Film and
+ * release. Nobody delivers or reprocesses a film here: only the studio does, from its portal.
+ */
 export function EpisodePage() {
   const { projectId, episodeId } = useParams<{ projectId: string; episodeId: string }>();
   const base = baseFromPath(usePathname());
@@ -44,9 +38,7 @@ export function EpisodePage() {
 
   const project = useResource(`project:${projectId}`, () => productionService.getProject(projectId));
   const media = useResource(`media:${episodeId}`, () => productionService.listMedia(episodeId));
-  const handoffs = useResource(`handoffs:${projectId}`, () => studioService.listHandoffs(projectId));
   const [picked, setPicked] = useState<string | null>(null);
-  const { busy, run } = useAction();
 
   const episode = project.data?.seasons.flatMap((s) => s.episodes).find((e) => e.id === episodeId) ?? null;
   const versions = media.data;
@@ -81,15 +73,10 @@ export function EpisodePage() {
 
   const caps = projectCapabilities(project.data, userId, can);
   const delivering = isIn(project.data.status, DELIVERY_PROJECT);
-  const mine = caps.ingest && holdsEpisode(caps, episode, userId);
-  const canDeliver = mine && delivering && isIn(episode.status, SUBMITTABLE_EPISODE);
   // BR-67: an episode given to a co-Creator carries the notes between them and the lead.
   const heldByCoCreator = !!episode.assignedCreatorId && episode.assignedCreatorId !== project.data.creatorId;
   const refreshAll = async () => {
     await Promise.all([project.reload(), media.reload(), sheet.reload()]);
-  };
-  const retry = async (id: string) => {
-    if (await run(() => productionService.retryMedia(id), 'Đang xử lý lại')) await refreshAll();
   };
 
   return (
@@ -108,7 +95,7 @@ export function EpisodePage() {
 
       {episode.revisionStartedAt && (
         <p className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300">
-          Tập đã bị gỡ để sửa: người xem thấy thông báo bảo trì, người đã mua vẫn giữ quyền xem. Giao bản sửa rồi phát hành lại.
+          Tập đã bị gỡ để sửa: người xem thấy thông báo bảo trì, người đã mua vẫn giữ quyền xem. Studio nộp bản sửa trên Studio Web rồi phát hành lại.
         </p>
       )}
 
@@ -124,12 +111,19 @@ export function EpisodePage() {
             <Panel title={`Bản ${selected.version}`}>
               <p className="text-xs text-slate-500">
                 {selected.ingestStatus === 'FAILED'
-                  ? 'Bản này xử lý lỗi; Creator có thể xử lý lại hoặc giao bản mới.'
+                  ? 'Bản này xử lý lỗi; Studio xử lý lại hoặc nộp bản mới trên Studio Web.'
                   : 'Hệ thống đang xử lý bản này, trang tự cập nhật.'}
               </p>
             </Panel>
           )}
-          <PublishPanel episode={episode} projectStatus={project.data.status} canAct={caps.publish} onChanged={refreshAll} />
+          <FinalFilmPanel episode={episode} canConfirm={caps.review && delivering} canSendBack={caps.publish} onChanged={refreshAll} />
+          <PublishPanel
+            episode={episode}
+            projectStatus={project.data.status}
+            canPrice={caps.price}
+            canPublish={caps.publish}
+            onChanged={refreshAll}
+          />
         </div>
 
         <div className="lg:col-span-2 space-y-5">
@@ -148,15 +142,6 @@ export function EpisodePage() {
             {episode.synopsis && <p className="mt-3 text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">{episode.synopsis}</p>}
           </Panel>
 
-          {canDeliver && (
-            <DeliverMediaPanel
-              title={caps.lead ? 'Nộp bản phim Studio giao' : 'Gửi bản phim cho Creator chính'}
-              deliver={deliverAsCreator(episode.id)}
-              onDelivered={refreshAll}
-              studioFilm={latestFilmLink(handoffs.data, episode.id)}
-            />
-          )}
-
           {heldByCoCreator && (
             <EpisodeNotesPanel
               episodeId={episode.id}
@@ -166,14 +151,15 @@ export function EpisodePage() {
             />
           )}
 
-          <Panel title="Các bản studio đã giao" description={processing ? 'Đang xử lý video…' : undefined}>
+          <Panel
+            title="Các bản Studio đã nộp"
+            description={processing ? 'Đang xử lý video…' : 'Studio nộp từng tập trên Studio Web; Reviewer duyệt bản ở đây.'}
+          >
             <MediaVersions
               versions={versions ?? []}
               selectedId={selectedId}
               approvedId={episode.approvedMediaAssetId}
               onSelect={setPicked}
-              onRetry={mine && delivering ? retry : undefined}
-              busy={busy}
             />
           </Panel>
         </div>

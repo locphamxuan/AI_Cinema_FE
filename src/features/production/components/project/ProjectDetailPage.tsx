@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { AlertTriangle, Ban, Film, Clapperboard, ShieldCheck, History, Layers, Users } from 'lucide-react';
+import { AlertTriangle, Ban, Film, Clapperboard, ShieldCheck, History, CalendarClock, Layers, Users, ScrollText, FileSignature } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { seasonName } from '@/lib/seasonLabel';
@@ -17,15 +17,21 @@ import { ProjectProvider } from './ProjectContext';
 import { OverviewTab } from './OverviewTab';
 import { EpisodesTab } from './EpisodesTab';
 import { StudioTab } from './StudioTab';
+import { CostTab } from './CostTab';
+import { ContractTab } from './ContractTab';
+import { ScriptTab } from './ScriptTab';
 import { TeamTab } from './TeamTab';
 import { ChangeRequestsTab } from './ChangeRequestsTab';
 import { ActivityTab } from './ActivityTab';
 
 const TABS = [
   { key: 'overview', label: 'Tổng quan & Ý tưởng', icon: Film },
-  { key: 'episodes', label: 'Kịch bản & Tập phim', icon: Clapperboard },
+  { key: 'script', label: 'Kịch bản', icon: ScrollText },
+  { key: 'episodes', label: 'Mùa & Tập phim', icon: Clapperboard },
   { key: 'team', label: 'Biên kịch Creator', icon: Users },
-  { key: 'studio', label: 'Studio & Hợp đồng B2B', icon: Layers },
+  { key: 'studio', label: 'Studio', icon: Layers },
+  { key: 'fee', label: 'Chi phí sản xuất', icon: CalendarClock },
+  { key: 'contract', label: 'Hợp đồng', icon: FileSignature },
   { key: 'changes', label: 'Đề xuất cho Admin', icon: ShieldCheck },
   { key: 'activity', label: 'Lịch sử', icon: History },
 ] as const;
@@ -174,9 +180,12 @@ export function ProjectDetailPage() {
         {/* ── Tab panel ── */}
         <div role="tabpanel" className="px-6 lg:px-8 py-6">
           {tab === 'overview' && <OverviewTab />}
+          {tab === 'script' && <ScriptTab />}
           {tab === 'episodes' && <EpisodesTab />}
           {tab === 'team' && <TeamTab />}
           {tab === 'studio' && <StudioTab />}
+          {tab === 'fee' && <CostTab />}
+          {tab === 'contract' && <ContractTab />}
           {tab === 'changes' && <ChangeRequestsTab />}
           {tab === 'activity' && <ActivityTab />}
         </div>

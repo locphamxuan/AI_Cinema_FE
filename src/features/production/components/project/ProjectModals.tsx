@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
-import { teamService } from '@/services/teamService';
 import type { AgeRating, Person } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
@@ -102,10 +101,10 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-/** The Reviewer gives the project to its main Content Creator, or changes them. */
+/** The Admin gives the project to its lead Content Creator, or changes them (MF-1 step 1). */
 export function AssignCreatorModal({ current, onClose }: { current: Person | null; onClose: () => void }) {
   const { project, reload } = useProject();
-  const creators = useResource('creator-directory', () => teamService.directory());
+  const creators = useResource('people:creators', () => productionService.listCreators());
   const [creatorId, setCreatorId] = useState(current?.id ?? '');
   const { busy, run } = useAction();
 
@@ -118,7 +117,7 @@ export function AssignCreatorModal({ current, onClose }: { current: Person | nul
   };
 
   return (
-    <Modal open onClose={onClose} title="Giao cho Creator" subtitle="Creator sẽ bàn giao dự án cho studio và giao các tập.">
+    <Modal open onClose={onClose} title="Giao cho Creator" subtitle="Creator chính trao đổi ý tưởng với Admin, viết kịch bản và giao các tập cho Creator khác.">
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Creator">
           <select value={creatorId} onChange={(e) => setCreatorId(e.target.value)} required className={fieldInputClass}>

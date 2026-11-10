@@ -1,18 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { productionService, projectsUrl } from '@/services/productionService';
-import type { AiDisclosure } from '@/types/production';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 function mockFetch(body: unknown, status = 200) {
-  const fetchMock = vi.fn().mockResolvedValue({ ok: status < 400, status, json: async () => body });
+  const fetchMock = vi.fn().mockResolvedValue(fakeResponse(body, status));
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
 }
-
-const disclosure: AiDisclosure = {
-  aiGeneratedParts: ['video'],
-  noRealPersonLikeness: true,
-  noCopyrightedMaterial: true,
-};
 
 describe('productionService', () => {
   afterEach(() => vi.unstubAllGlobals());
@@ -25,35 +19,6 @@ describe('productionService', () => {
     expect(params.get('search')).toBe('Mưa');
     expect(params.get('filter.status')).toBe('$in:IN_PRODUCTION,UNDER_REVISION');
     expect(new URL(projectsUrl({ status: ['COMPLETED'] }), 'http://x').searchParams.get('filter.status')).toBe('$eq:COMPLETED');
-  });
-
-  it('uploads an episode as multipart, with the AI disclosure as JSON and no JSON content type', async () => {
-    const fetchMock = mockFetch({ id: 'asset-1' }, 201);
-    const file = new File(['video'], 'ep1.mp4', { type: 'video/mp4' });
-
-    const res = await productionService.uploadMedia('ep-1', file, { proposedLabelType: 'AI_GENERATED', aiDisclosure: disclosure });
-
-    expect(res.success).toBe(true);
-    const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toContain('/episodes/ep-1/media/upload');
-    expect(init.headers['Content-Type']).toBeUndefined();
-    const form = init.body as FormData;
-    expect(form.get('file')).toBeInstanceOf(File);
-    expect(form.get('proposedLabelType')).toBe('AI_GENERATED');
-    expect(JSON.parse(String(form.get('aiDisclosure')))).toEqual(disclosure);
-  });
-
-  it('sends a delivery link as JSON', async () => {
-    const fetchMock = mockFetch({ id: 'asset-2' }, 201);
-    await productionService.submitMediaLink('ep-1', {
-      proposedLabelType: 'AI_ASSISTED',
-      aiDisclosure: disclosure,
-      sourceMethod: 'HLS_URL',
-      sourceUrl: 'https://cdn.studio.vn/ep1/master.m3u8',
-    });
-    const [, init] = fetchMock.mock.calls[0];
-    expect(init.headers['Content-Type']).toBe('application/json');
-    expect(JSON.parse(init.body)).toMatchObject({ sourceMethod: 'HLS_URL', aiDisclosure: disclosure });
   });
 
   it('keeps the unpublish mode only when it is given', async () => {
@@ -73,15 +38,16 @@ describe('productionService', () => {
   });
 
   it('treats a 204 No Content write as a success without reading a body', async () => {
-    const json = vi.fn().mockRejectedValue(new SyntaxError('Unexpected end of JSON input'));
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 204, json }));
+    const answer = fakeResponse(undefined, 204);
+    const text = vi.spyOn(answer, 'text');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(answer));
     const res = await productionService.assignCreator('m1', 'c1');
     expect(res).toMatchObject({ success: true, data: null });
-    expect(json).not.toHaveBeenCalled();
+    expect(text).not.toHaveBeenCalled();
   });
 
   it('deletes an idea file by id', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 204, json: vi.fn() });
+    const fetchMock = vi.fn().mockResolvedValue(fakeResponse(undefined, 204));
     vi.stubGlobal('fetch', fetchMock);
     const res = await productionService.deleteIdeaFile('m1', 'f1');
     expect(res.success).toBe(true);

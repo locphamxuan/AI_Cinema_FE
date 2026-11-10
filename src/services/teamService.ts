@@ -11,7 +11,6 @@ function changeRequestForm(input: ChangeRequestInput): FormData {
   form.append('requestType', input.requestType);
   form.append('content', input.content);
   form.append('reason', input.reason);
-  if (input.requestedTokens !== undefined) form.append('requestedTokens', String(input.requestedTokens));
   if (input.seasonId) form.append('seasonId', input.seasonId);
   if (input.episodeId) form.append('episodeId', input.episodeId);
   if (input.proof) form.append('proof', input.proof);

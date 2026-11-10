@@ -10,11 +10,12 @@ import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import type { UserRole } from '@/types/production';
-import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_TONE } from '../roles';
+import { ASSIGNABLE_ROLES, BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_TONE } from '../roles';
 import { Select } from '@/components/ui/Select';
 import { AccountFormModal, DeleteAccountModal } from './AccountFormModal';
 import { DataPagination } from '@/components/data/DataPagination';
 import { InitialsAvatar } from '@/components/data/InitialsAvatar';
+import { Badge } from '@/components/ui/Badge';
 
 const ROLE_FILTER_OPTIONS = [
   { value: '', label: 'Mọi vai trò' },
@@ -25,7 +26,8 @@ const ROLE_FILTER_OPTIONS = [
   })),
 ];
 
-const ROLE_OPTIONS = BACKEND_ROLES.map((r) => ({
+/** A STUDIO login belongs to its studio: it is opened there and never picked here (BE refuses it). */
+const ROLE_OPTIONS = ASSIGNABLE_ROLES.map((r) => ({
   value: r,
   label: BACKEND_ROLE_LABEL[r],
   tone: ROLE_TONE[r],
@@ -158,21 +160,27 @@ export function AccountsPanel() {
                     </div>
                   </td>
                   <td className="py-3 px-4">
-                    <Select
-                      aria-label={`Vai trò của ${account.fullName}`}
-                      value={account.role}
-                      disabled={locked}
-                      onChange={(newRole) =>
-                        void update(
-                          account,
-                          { role: newRole as UserRole },
-                          `Đã đổi vai trò thành ${BACKEND_ROLE_LABEL[newRole as UserRole]}`
-                        )
-                      }
-                      options={ROLE_OPTIONS}
-                      size="sm"
-                      className="w-44"
-                    />
+                    {account.role === 'STUDIO' ? (
+                      <span title="Tài khoản Studio được mở và quản lý ở trang Studio đối tác; chỉ đăng nhập Studio Web.">
+                        <Badge tone={ROLE_TONE.STUDIO}>{BACKEND_ROLE_LABEL.STUDIO}</Badge>
+                      </span>
+                    ) : (
+                      <Select
+                        aria-label={`Vai trò của ${account.fullName}`}
+                        value={account.role}
+                        disabled={locked}
+                        onChange={(newRole) =>
+                          void update(
+                            account,
+                            { role: newRole as UserRole },
+                            `Đã đổi vai trò thành ${BACKEND_ROLE_LABEL[newRole as UserRole]}`
+                          )
+                        }
+                        options={ROLE_OPTIONS}
+                        size="sm"
+                        className="w-44"
+                      />
+                    )}
                   </td>
                   <td className="py-3 px-4">
                     <span

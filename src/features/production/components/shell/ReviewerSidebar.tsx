@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Search,
   Clapperboard,
@@ -13,7 +13,6 @@ import {
   Bell,
   UserRound,
   ShieldCheck,
-  BarChart3,
 } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
@@ -22,6 +21,11 @@ export function ReviewerSidebar() {
   const pathname = usePathname();
   const can = useCan();
   const [searchVal, setSearchVal] = useState('');
+  const router = useRouter();
+  const search = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchVal.trim()) router.push(`/reviewer/projects?q=${encodeURIComponent(searchVal.trim())}`);
+  };
 
   const isAuditWorkspace = pathname === '/reviewer';
   const isProjectQueue = pathname === '/reviewer/projects' || pathname.startsWith('/reviewer/projects/');
@@ -67,7 +71,7 @@ export function ReviewerSidebar() {
 
         {/* [ 🔍 Tìm kiếm dự án ] (Search bar phím tắt Ctrl + K) */}
         <div className="px-1">
-          <div className="relative flex items-center rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] px-2.5 py-1.5 focus-within:border-slate-400 dark:focus-within:border-white/20 transition-all">
+          <form onSubmit={search} className="relative flex items-center rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.08] px-2.5 py-1.5 focus-within:border-slate-400 dark:focus-within:border-white/20 transition-all">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0 mr-2" />
             <input
               type="text"
@@ -77,10 +81,7 @@ export function ReviewerSidebar() {
               aria-label="Tìm kiếm dự án"
               className="w-full bg-transparent text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none"
             />
-            <kbd className="hidden sm:inline-flex items-center text-[10px] text-slate-500 dark:text-slate-400 font-mono bg-white dark:bg-white/[0.06] px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10">
-              Ctrl+K
-            </kbd>
-          </div>
+          </form>
         </div>
 
         {/* Nhóm 1: THẨM ĐỊNH VIDEO & KỊCH BẢN */}
@@ -105,12 +106,9 @@ export function ReviewerSidebar() {
               <Clapperboard className={iconClass(isAuditWorkspace)} />
               <span className="truncate">Thẩm định video Master</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-red-500/20 text-[#E50914] text-[10px] font-mono font-bold">
-              Active
-            </span>
           </Link>
 
-          {/* [ 📑 Hàng đợi kịch bản ] (Dự án phim - Queue kịch bản từ Creator) */}
+          {/* [ 📑 Hàng đợi dự án ] (Dự án phim - Queue kịch bản từ Creator) */}
           <Link
             href="/reviewer/projects"
             aria-label="Dự án phim"
@@ -125,43 +123,34 @@ export function ReviewerSidebar() {
             )}
             <div className="flex items-center gap-2.5 min-w-0">
               <FileCheck2 className={iconClass(isProjectQueue)} />
-              <span className="truncate">Hàng đợi kịch bản</span>
+              <span className="truncate">Hàng đợi dự án</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-mono font-bold">
-              4
-            </span>
           </Link>
 
-          {/* [ ⚖️ Kho lưu trữ Điều 44 ] */}
+          {/* [ ⚖️ Phim Final ] */}
           <Link
-            href="/reviewer"
+            href="/reviewer/projects?filter=approved"
             className={linkClass(false)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <ShieldCheck className={iconClass(false)} />
-              <span className="truncate">Kho lưu trữ Điều 44</span>
+              <span className="truncate">Phim Final</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono font-bold">
-              12
-            </span>
           </Link>
 
           {/* [ 🔔 Yêu cầu chỉnh sửa ] */}
           <Link
-            href="/reviewer"
+            href="/reviewer/projects?filter=revising"
             className={linkClass(false)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <ShieldAlert className={iconClass(false)} />
               <span className="truncate">Yêu cầu chỉnh sửa</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-mono font-bold">
-              3
-            </span>
           </Link>
         </div>
 
-        {/* Nhóm 2: QUẢN LÝ ĐỐI TÁC (Tuyệt đối không có Token) */}
+        {/* Nhóm 2: QUẢN LÝ ĐỐI TÁC */}
         <div className="space-y-1 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
             Quản Lý Đối Tác & Hồ Sơ
@@ -180,17 +169,6 @@ export function ReviewerSidebar() {
               </div>
             </Link>
           )}
-
-          {/* Thống kê thẩm định */}
-          <Link
-            href="/reviewer/projects"
-            className={linkClass(false)}
-          >
-            <div className="flex items-center gap-2.5 min-w-0">
-              <BarChart3 className={iconClass(false)} />
-              <span className="truncate">Thống kê thẩm định</span>
-            </div>
-          </Link>
 
           {/* Thông báo */}
           <Link

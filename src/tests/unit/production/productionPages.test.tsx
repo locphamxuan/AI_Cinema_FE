@@ -6,6 +6,7 @@ import { ProjectDetailPage } from '@/features/production/components/project/Proj
 import { signInAs } from '@/tests/support/signIn';
 import { useAppStore } from '@/store/useAppStore';
 import type { ProjectDetail } from '@/types/production';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 const nav = vi.hoisted(() => ({ pathname: '/reviewer/projects', params: {} as Record<string, string>, search: '' }));
 
@@ -59,7 +60,6 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
         seasonNumber: 1,
         title: 'Mùa 1',
         status: 'DRAFT',
-        episodeProductionCost: 500,
         releaseStartDate: '2027-01-01T00:00:00.000Z',
         releaseEndDate: '2027-03-31T00:00:00.000Z',
         episodes: [
@@ -80,6 +80,9 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
             expectedReleaseDate: '2027-01-15T00:00:00.000Z',
             approvedMediaAssetId: null,
             coinPrice: null,
+            finalConfirmedAt: null,
+            finalConfirmedById: null,
+            finalRejectionNote: null,
             revisionStartedAt: null,
             createdAt: '2026-10-01T00:00:00.000Z',
             updatedAt: '2026-10-01T00:00:00.000Z',
@@ -91,8 +94,7 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
     ideaFiles: [],
     studioHandoffs: [],
     creatorAssignments: [],
-    productionFeeTokens: 500,
-    seasonFees: [],
+    cost: { budgetVnd: 100_000_000, committedVnd: 0, remainingVnd: 100_000_000 },
     openChangeRequests: 0,
     revision: { episodeCount: 0, bySeason: [] },
     ...overrides,
@@ -106,7 +108,7 @@ function routeFetch(routes: Record<string, unknown>) {
     vi.fn(async (url: string) => {
       const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
       const body = path in routes ? routes[path] : [];
-      return { ok: true, status: 200, json: async () => body };
+      return fakeResponse(body);
     }),
   );
 }
@@ -138,9 +140,9 @@ describe('ProjectListPage', () => {
     meta: { totalItems: 1, currentPage: 1, totalPages: 1, itemsPerPage: 12 },
   };
 
-  it('shows the projects and lets a Reviewer create one', async () => {
-    nav.pathname = '/reviewer/projects';
-    signInAs('reviewer');
+  it('shows the projects and lets the Admin create one', async () => {
+    nav.pathname = '/admin/projects';
+    signInAs('admin');
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
 
@@ -168,13 +170,14 @@ describe('ProjectListPage', () => {
     expect(screen.queryByRole('columnheader', { name: 'Cập nhật' })).not.toBeInTheDocument();
   });
 
-  it('gives a Creator no create button', async () => {
-    nav.pathname = '/creator/projects';
-    signInAs('creator');
+  it.each([
+    ['/creator/projects', 'creator'],
+    ['/reviewer/projects', 'reviewer'],
+  ] as const)('gives %s no create button: only the Admin creates projects', async (path, role) => {
+    nav.pathname = path;
+    signInAs(role);
     routeFetch({ '/projects': page });
     render(<ProjectListPage />);
-
-    await screen.findAllByText('Mưa Sài Gòn');
 
     await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
     expect(screen.queryByRole('button', { name: /Tạo dự án/ })).not.toBeInTheDocument();
@@ -182,28 +185,17 @@ describe('ProjectListPage', () => {
 });
 
 describe('ProjectDetailPage', () => {
-  it('offers the assigned Creator the studio hand-off, with the studio typed by hand', async () => {
+  it('gives the lead Creator no manual hand-off: signing the contract hands off', async () => {
     nav.pathname = '/creator/projects/m1';
     nav.params = { projectId: 'm1' };
     nav.search = 'tab=studio';
     signInAs('creator');
     useAppStore.setState((s) => ({ user: { ...s.user!, id: 'creator-id' } }));
-    routeFetch({ '/projects/m1': project(), '/studios': [STUDIO], '/projects/m1/handoffs': [] });
+    routeFetch({ '/projects/m1': project(), '/projects/m1/handoffs': [] });
     render(<ProjectDetailPage />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /Bàn giao cho Studio/ }));
-    const dialog = await screen.findByRole('dialog');
-    // Each episode is due on the Reviewer's deadline; the Creator only picks the studio, the scope and the files.
-    expect(dialog).toHaveTextContent('Hạn giao của các tập sẽ bàn giao');
-    expect(dialog).toHaveTextContent('31/12/2026');
-    expect(within(dialog).queryByLabelText(/Hạn giao tập/)).not.toBeInTheDocument();
-    const send = screen.getByRole('button', { name: 'Gửi brief' });
-    expect(send).toBeDisabled();
-    expect(within(dialog).queryByRole('combobox', { name: /Studio nhận brief/ })).not.toBeInTheDocument();
-    await userEvent.type(await within(dialog).findByLabelText('Tên Studio'), 'Studio Ánh Trăng');
-    expect(send).toBeDisabled();
-    await userEvent.type(within(dialog).getByLabelText('Email Studio'), 'contact@anhtrang.studio');
-    expect(send).toBeEnabled();
+    expect(await screen.findByText(/Bàn giao tự động khi hợp đồng với Studio có đủ chữ ký/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Bàn giao cho Studio/ })).not.toBeInTheDocument();
   });
 
   it('explains the studio timeline and the three states of project, season and episode', async () => {
@@ -214,7 +206,7 @@ describe('ProjectDetailPage', () => {
     routeFetch({ '/projects/m1': project(), '/projects/m1/handoffs': [] });
     render(<ProjectDetailPage />);
 
-    expect(await screen.findByText(/Gửi brief PDF và tài liệu cho Studio đối tác qua email/)).toBeInTheDocument();
+    expect(await screen.findByText(/Hợp đồng ký đủ hai bên thì hệ thống tự bàn giao cho Studio/)).toBeInTheDocument();
     const tiers = screen.getByLabelText('Trạng thái dự án, mùa và tập');
     expect(tiers).toHaveTextContent('Dự án');
     // The sample season has a single episode: it reads as a whole film.
@@ -232,16 +224,15 @@ describe('ProjectDetailPage', () => {
 
     const season = await screen.findByRole('region', { name: 'Phần 1 (trọn bộ)' });
     expect(season).toHaveTextContent('01/01/2027 → 31/03/2027');
-    expect(season).toHaveTextContent('đơn giá 500 Token/tập');
+    expect(season).not.toHaveTextContent('Token');
     expect(within(season).getByRole('columnheader', { name: 'Creator phụ trách' })).toBeInTheDocument();
-    expect(within(season).getByRole('columnheader', { name: 'Giá sản xuất' })).toBeInTheDocument();
     expect(within(season).getByRole('columnheader', { name: 'Giá bán (Coin)' })).toBeInTheDocument();
     expect(within(season).getByRole('columnheader', { name: 'Ngày dự kiến phát hành' })).toBeInTheDocument();
     expect(within(season).queryByRole('columnheader', { name: 'Thời hạn' })).not.toBeInTheDocument();
     expect(within(season).getByText('15/01/2027')).toBeInTheDocument();
   });
 
-  it('gives the Admin the decision on requests but no edit, cancel or reassign (BR-55)', async () => {
+  it('lets the Admin reassign the Creator and decide requests, but not edit or cancel (BR-55)', async () => {
     nav.pathname = '/reviewer/projects/m1';
     nav.params = { projectId: 'm1' };
     nav.search = '';
@@ -251,7 +242,7 @@ describe('ProjectDetailPage', () => {
 
     await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
     expect(screen.queryByRole('button', { name: /Huỷ dự án/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Đổi Creator/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Đổi Creator/ })).toBeEnabled();
 
     await userEvent.click(screen.getByRole('tab', { name: /Đề xuất cho Admin/ }));
     expect(await screen.findByText('Chưa có đề xuất nào.')).toBeInTheDocument();
@@ -281,7 +272,7 @@ describe('ProjectDetailPage', () => {
     expect(await screen.findByRole('button', { name: /Gửi đề xuất/ })).toBeInTheDocument();
   });
 
-  it('lets the Reviewer in charge cancel and reassign', async () => {
+  it('lets the Reviewer in charge cancel, but leaves assigning the Creator to the Admin', async () => {
     nav.pathname = '/reviewer/projects/m1';
     nav.params = { projectId: 'm1' };
     nav.search = '';
@@ -290,7 +281,7 @@ describe('ProjectDetailPage', () => {
     routeFetch({ '/projects/m1': project() });
     render(<ProjectDetailPage />);
 
-    expect(await screen.findByRole('button', { name: /Đổi Creator/ })).toBeEnabled();
-    expect(screen.getByRole('button', { name: /Huỷ dự án/ })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /Huỷ dự án/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Đổi Creator/ })).not.toBeInTheDocument();
   });
 });

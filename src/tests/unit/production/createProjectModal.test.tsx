@@ -1,14 +1,13 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateProjectModal } from '@/features/production/components/list/CreateProjectModal';
-import { getTodayDateString } from '@/lib/dateUtils';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
-  usePathname: () => '/reviewer/projects',
+  usePathname: () => '/admin/projects',
   useParams: () => ({}),
   useSearchParams: () => new URLSearchParams(),
 }));
@@ -16,39 +15,45 @@ vi.mock('next/navigation', () => ({
 beforeEach(() => localStorage.clear());
 afterEach(() => vi.unstubAllGlobals());
 
-it('sends the viewer information with the project and uploads idea and synopsis files with their purpose', async () => {
-  signInAs('reviewer');
+const page = <T,>(data: T[]) => ({ data, meta: { totalItems: data.length, currentPage: 1, totalPages: 1, itemsPerPage: 50 } });
+
+it('lets the Admin create a project with its Reviewer, lead Creator and studio, without seasons', async () => {
+  signInAs('admin');
   const calls = routeFetch({
-    '/genres': { data: [{ id: 'g1', name: 'Kinh dị' }], meta: { totalItems: 1, currentPage: 1, totalPages: 1, itemsPerPage: 100 } },
+    '/genres': page([{ id: 'g1', name: 'Kinh dị' }]),
+    '/users': page([
+      { id: 'r1', fullName: 'Reviewer Một', email: 'r1@x.vn' },
+      { id: 'c1', fullName: 'Creator Một', email: 'c1@x.vn' },
+    ]),
+    '/studios': [{ id: 'st1', name: 'Lumen Studio', email: 'lumen@x.vn', isActive: true }],
     '/projects': { id: 'm-new' },
-    '/projects/m-new/idea-files': { id: 'f1' },
   });
   const onCreated = vi.fn();
   render(<CreateProjectModal onClose={vi.fn()} onCreated={onCreated} />);
 
   await userEvent.type(screen.getByLabelText('Tên phim'), 'Vùng dịch 704');
-  await userEvent.type(screen.getByLabelText(/Ý tưởng \/ mô tả cho studio/), 'Một thị trấn bị phong toả sau dịch bệnh lạ.');
+  await userEvent.type(screen.getByLabelText(/Ý tưởng phim/), 'Một thị trấn bị phong toả sau dịch bệnh lạ.');
   await userEvent.click(await screen.findByRole('button', { name: 'Kinh dị' }));
-  await userEvent.type(screen.getByLabelText('Tóm tắt cho người xem'), 'Bốn người sống sót tìm đường ra.');
+  // The Reviewer in charge is required.
+  expect(screen.getByRole('button', { name: 'Tạo dự án' })).toBeDisabled();
+  expect(screen.getByRole('status')).toHaveTextContent('chọn Reviewer phụ trách');
+
+  await screen.findAllByRole('option', { name: 'Reviewer Một' });
+  await userEvent.selectOptions(screen.getByLabelText('Reviewer phụ trách'), 'r1');
+  await userEvent.selectOptions(screen.getByLabelText('Creator chính'), 'c1');
+  await userEvent.selectOptions(screen.getByLabelText('Studio (tuỳ chọn)'), await screen.findByRole('option', { name: 'Lumen Studio' }));
   await userEvent.selectOptions(screen.getByLabelText('Độ tuổi'), 'T18');
-  fireEvent.change(screen.getByLabelText('Năm phát hành'), { target: { value: '2026' } });
-  const files = screen.getAllByLabelText(/Tệp (ý tưởng gửi Studio|tóm tắt cho người xem)/) as HTMLInputElement[];
-  await userEvent.upload(files[0], new File(['idea'], 'y-tuong.docx'));
-  await userEvent.upload(files[1], new File(['video'], 'teaser.mp4', { type: 'video/mp4' }));
-  fireEvent.change(screen.getByLabelText('Đơn giá 1 tập của mùa 1'), { target: { value: '3000' } });
-  fireEvent.change(screen.getByLabelText('Hạn giao tập 1'), { target: { value: getTodayDateString() } });
-  fireEvent.change(screen.getByLabelText('Hạn giao tập 2'), { target: { value: getTodayDateString() } });
+  // Seasons and episodes are the Reviewer's job afterwards; idea files are added on the Overview tab.
+  expect(screen.queryByText(/Mùa và tập/)).not.toBeInTheDocument();
+  expect(screen.queryByLabelText(/Tệp ý tưởng/)).not.toBeInTheDocument();
 
   await userEvent.click(screen.getByRole('button', { name: 'Tạo dự án' }));
   await waitFor(() => expect(onCreated).toHaveBeenCalledWith('m-new'));
 
   const created = calls.find((c) => c.path === '/projects' && c.method === 'POST');
-  expect(JSON.parse(created!.body as string)).toMatchObject({
-    synopsis: 'Bốn người sống sót tìm đường ra.',
-    ageRating: 'T18',
-    releaseYear: 2026,
-    genreIds: ['g1'],
-  });
-  const uploads = calls.filter((c) => c.path === '/projects/m-new/idea-files');
-  expect(uploads).toHaveLength(2);
+  const body = JSON.parse(created!.body as string);
+  expect(body).toMatchObject({ reviewerId: 'r1', creatorId: 'c1', studioId: 'st1', genreIds: ['g1'], ageRating: 'T18' });
+  expect(body).not.toHaveProperty('seasons');
+  const people = calls.filter((c) => c.path === '/users');
+  expect(people.length).toBeGreaterThanOrEqual(2);
 });

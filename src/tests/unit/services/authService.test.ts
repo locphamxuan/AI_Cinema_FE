@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authService, redirectUrlFor, toUserProfile } from '@/services/authService';
 import { STORAGE_KEYS } from '@/lib/storage';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 
 const session = {
   accessToken: 'access-token',
@@ -15,11 +16,7 @@ const session = {
 };
 
 function mockFetch(body: unknown, ok = true, status = 200) {
-  const fetchMock = vi.fn().mockResolvedValue({
-    ok,
-    status,
-    json: async () => body,
-  });
+  const fetchMock = vi.fn().mockResolvedValue({ ...fakeResponse(body, status), ok });
   vi.stubGlobal('fetch', fetchMock);
   return fetchMock;
 }

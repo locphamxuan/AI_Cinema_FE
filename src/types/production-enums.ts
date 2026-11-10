@@ -1,6 +1,7 @@
 /** Enums of the MF-1 API, spelled as the Prisma schema spells them. */
 
-export type UserRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STAFF' | 'ADMIN';
+/** STUDIO (MF-1, 07/11/2026): a partner studio's login, used on Studio Web only. */
+export type UserRole = 'MEMBER' | 'CONTENT_CREATOR' | 'CONTENT_REVIEWER' | 'STUDIO' | 'STAFF' | 'ADMIN';
 
 export type MovieStatus = 'DRAFT' | 'ASSIGNED' | 'IN_PRODUCTION' | 'COMPLETED' | 'UNDER_REVISION' | 'CANCELLED';
 
@@ -28,10 +29,9 @@ export type LabelLocation = 'TOP_RIGHT' | 'TOP_LEFT' | 'BOTTOM_RIGHT' | 'BOTTOM_
 export type ReviewDecision = 'APPROVED' | 'CHANGES_REQUESTED';
 export type ComplianceCheckType = 'AI_LABEL_PRESENCE' | 'DECREE_142_NOTICE' | 'CONTENT_SAFETY' | 'REAL_PERSON_LIKENESS';
 export type ComplianceResult = 'PENDING' | 'PASS' | 'FAIL';
-export type TokenEntryType = 'INITIAL' | 'TOP_UP' | 'CORRECTION';
 /** Requests go from a Reviewer or Creator to the Admin (BR-55). */
 export type ChangeRequestStatus = 'OPEN' | 'APPROVED' | 'REJECTED';
-export type ChangeRequestType = 'PROJECT_UPDATE' | 'BUDGET_SUPPLEMENT' | 'DEADLINE_EXTENSION' | 'OTHER';
+export type ChangeRequestType = 'PROJECT_UPDATE' | 'DEADLINE_EXTENSION' | 'OTHER';
 export type StudioMilestoneStatus =
   | 'BRIEF_SENT'
   | 'STUDIO_ACCEPTED'

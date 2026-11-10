@@ -1,33 +1,23 @@
 import type { ProjectDetail, StudioHandoff } from '@/types/production';
 
-type SwapHandoff = Pick<StudioHandoff, 'seasonId' | 'milestoneStatus' | 'productionFeeTokens' | 'lostTokens'> & {
-  emailMessage: { status: 'QUEUED' | 'SENT' | 'FAILED' } | null;
-};
+type SwapHandoff = Pick<StudioHandoff, 'seasonId' | 'milestoneStatus' | 'offeredFeeVnd'>;
 
-/** What a studio change of one scope costs and what the new studio's brief may still promise (BR-59). */
+/** What a studio change of one scope frees and what the new studio's brief may offer at most (BR-59). */
 export interface SwapPreview {
-  /** Fee of the hand-offs being replaced, spent on the old studio. */
-  lostTokens: number;
-  /** What the new brief would carry; 0 = the Creator must ask the Reviewer for Token first. */
-  availableTokens: number;
+  /** Fee of the hand-offs being replaced: it returns to the budget, minus what the old studio keeps. */
+  replacedFeeVnd: number;
+  /** Highest fee the new brief may offer once the old studio kept `forfeitedVnd`. */
+  maxOfferVnd: number;
 }
 
-/** Mirrors the API: a studio that declined, or a brief that never left, costs nothing. */
-export function lostOnReplace(handoff: SwapHandoff): number {
-  if (handoff.milestoneStatus === 'STUDIO_DECLINED') return 0;
-  if (handoff.emailMessage?.status === 'FAILED') return 0;
-  return Number(handoff.productionFeeTokens);
-}
-
+/** Mirrors the API: a replaced hand-off keeps only what was forfeited; the rest of its fee is free again. */
 export function swapPreview(
-  project: Pick<ProjectDetail, 'productionFeeTokens' | 'seasonFees'> & { studioHandoffs: SwapHandoff[] },
+  project: Pick<ProjectDetail, 'cost'> & { studioHandoffs: SwapHandoff[] },
   seasonId: string | null,
+  forfeitedVnd = 0,
 ): SwapPreview {
   const replaced = project.studioHandoffs.filter((h) => h.seasonId === seasonId && h.milestoneStatus !== 'SUPERSEDED');
-  const lostTokens = replaced.reduce((sum, h) => sum + lostOnReplace(h), 0);
-  const lostSoFar = project.studioHandoffs.reduce((sum, h) => sum + Number(h.lostTokens ?? 0), 0);
-  const projectLeft = project.productionFeeTokens - lostSoFar - lostTokens;
-  const season = seasonId ? project.seasonFees.find((fee) => fee.seasonId === seasonId) : undefined;
-  const left = season ? Math.min(season.availableTokens - lostTokens, projectLeft) : projectLeft;
-  return { lostTokens, availableTokens: Math.max(0, left) };
+  const replacedFeeVnd = replaced.reduce((sum, h) => sum + Number(h.offeredFeeVnd), 0);
+  const kept = Math.min(Math.max(0, forfeitedVnd), replacedFeeVnd);
+  return { replacedFeeVnd, maxOfferVnd: Math.max(0, project.cost.remainingVnd + replacedFeeVnd - kept) };
 }

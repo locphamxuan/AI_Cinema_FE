@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { teamService } from '@/services/teamService';
 import type { Episode, Season } from '@/types/production';
 import { useResource } from '@/hooks/useResource';
+import { Empty } from '@/components/data/ui';
 import { OPEN_PROJECT, isIn } from '../../lib/capabilities';
 import { AddEpisodeModal, AddSeasonModal, EditEpisodeModal, EditSeasonModal } from './EpisodeModals';
 import { useProject } from './ProjectContext';
@@ -30,6 +31,10 @@ export function EpisodesTab() {
             Thêm mùa
           </Button>
         </div>
+      )}
+
+      {project.seasons.length === 0 && (
+        <Empty>{plan ? 'Chưa có mùa nào. Thêm mùa, tập và hạn giao trước khi Admin duyệt Kịch bản Final.' : 'Reviewer chưa lên mùa và tập cho dự án.'}</Empty>
       )}
 
       {project.seasons.map((season) => (

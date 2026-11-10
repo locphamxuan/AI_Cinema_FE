@@ -5,15 +5,13 @@
 import { apiClient, type ApiResponse } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type {
-  AppNotification,
   ComplianceInput,
   CreateProjectInput,
   Episode,
   EpisodeNote,
-  FeeLedger,
+  CostLedger,
   Genre,
   MediaAsset,
-  MediaMetadataInput,
   MovieStatus,
   NewEpisodeInput,
   NewSeasonInput,
@@ -30,7 +28,6 @@ import type {
   Publication,
   ReviewDecision,
   ReviewSheet,
-  TokenEntryType,
   UnpublishMode,
   UnpublishReason,
   UpdateProjectInput,
@@ -42,6 +39,14 @@ import type {
 
 const R = API_ROUTES.PRODUCTION;
 
+/** Active accounts of one role, read from the user list. */
+async function listActive(role: 'CONTENT_CREATOR' | 'CONTENT_REVIEWER', search?: string): Promise<ApiResponse<Person[]>> {
+  const params = new URLSearchParams({ limit: '50', 'filter.role': `$eq:${role}`, 'filter.isActive': '$eq:true' });
+  if (search?.trim()) params.set('search', search.trim());
+  const res = await apiClient.get<Page<Person>>(`${API_ROUTES.ADMIN.USERS}?${params.toString()}`);
+  return { ...res, data: res.success ? res.data.data : [] };
+}
+
 export interface ProjectQuery {
   page?: number;
   limit?: number;
@@ -49,25 +54,15 @@ export interface ProjectQuery {
   status?: MovieStatus[];
 }
 
-export function projectsUrl({ page = 1, limit = 12, search, status }: ProjectQuery = {}): string {
+export function projectsUrl({ page = 1, limit = 12, search, status }: ProjectQuery = {}, path: string = R.PROJECTS): string {
   const params = new URLSearchParams({ page: String(page), limit: String(limit), sortBy: 'updatedAt:DESC' });
   if (search?.trim()) params.set('search', search.trim());
   if (status?.length) params.set('filter.status', status.length === 1 ? `$eq:${status[0]}` : `$in:${status.join(',')}`);
-  return `${R.PROJECTS}?${params.toString()}`;
-}
-
-/** Multipart body of an episode delivery: the video plus the AI Disclosure as JSON. */
-function mediaForm(file: File, input: MediaMetadataInput): FormData {
-  const form = new FormData();
-  form.append('file', file);
-  form.append('proposedLabelType', input.proposedLabelType);
-  if (input.submissionNote) form.append('submissionNote', input.submissionNote);
-  form.append('aiDisclosure', JSON.stringify(input.aiDisclosure));
-  return form;
+  return `${path}?${params.toString()}`;
 }
 
 export const productionService = {
-  // ---- Projects (steps 1–2) ----
+  // ---- Projects (MF-1 step 1: the Admin creates them and assigns the lead Creator) ----
   listProjects: (query?: ProjectQuery) => apiClient.get<Page<ProjectSummary>>(projectsUrl(query)),
   getProject: (movieId: string) => apiClient.get<ProjectDetail>(R.PROJECT(movieId)),
   createProject: (input: CreateProjectInput) => apiClient.post<ProjectDetail>(R.PROJECTS, input),
@@ -91,7 +86,6 @@ export const productionService = {
     return apiClient.postForm<{ thumbnailUrl: string }>(R.EPISODE_THUMBNAIL(episodeId), form);
   },
 
-  listIdeaFiles: (movieId: string) => apiClient.get<IdeaFile[]>(R.IDEA_FILES(movieId)),
   /** IDEA travels with the studio brief; SYNOPSIS backs the summary for viewers. */
   uploadIdeaFile(movieId: string, file: File, purpose: IdeaFilePurpose = 'IDEA') {
     const form = new FormData();
@@ -101,25 +95,14 @@ export const productionService = {
   deleteIdeaFile: (movieId: string, fileId: string) => apiClient.delete<null>(R.IDEA_FILE(movieId, fileId)),
   downloadIdeaFile: (movieId: string, fileId: string) => apiClient.getBlob(R.IDEA_FILE_CONTENT(movieId, fileId)),
 
-  // ---- Production fee (Token, BR-45/46/50) ----
-  getFee: (movieId: string) => apiClient.get<FeeLedger>(R.FEE(movieId)),
-  /** INITIAL names the season (its amount is price × episodes); a top-up or correction may too. */
-  addFeeEntry: (
-    movieId: string,
-    entry: { entryType: TokenEntryType; seasonId?: string; amountTokens?: number; reason?: string },
-  ) =>
-    apiClient.post<FeeLedger>(R.FEE_ENTRIES(movieId), entry),
+  // ---- Production cost (VND, BR-45/46) ----
+  getCosts: (movieId: string) => apiClient.get<CostLedger>(R.COSTS(movieId)),
+  /** Admin: BUDGET once, then CORRECTION with a reason; ADDITIONAL only comes from an approved cost request. */
+  addCostEntry: (movieId: string, entry: { entryType: 'BUDGET' | 'CORRECTION'; amountVnd: number; reason?: string }) =>
+    apiClient.post<CostLedger>(R.COST_ENTRIES(movieId), entry),
 
-  // ---- Media delivery (steps 5–7) ----
+  // ---- Media the studio delivered on Studio Web (steps 5–7, read-only here) ----
   listMedia: (episodeId: string) => apiClient.get<MediaAsset[]>(R.EPISODE_MEDIA(episodeId)),
-  getMedia: (mediaAssetId: string) => apiClient.get<MediaAsset>(R.MEDIA_ASSET(mediaAssetId)),
-  submitMediaLink: (
-    episodeId: string,
-    input: MediaMetadataInput & { sourceMethod: 'HLS_URL' | 'REMOTE_FILE'; sourceUrl: string },
-  ) => apiClient.post<MediaAsset>(R.EPISODE_MEDIA(episodeId), input),
-  uploadMedia: (episodeId: string, file: File, input: MediaMetadataInput) =>
-    apiClient.postForm<MediaAsset>(R.EPISODE_MEDIA_UPLOAD(episodeId), mediaForm(file, input)),
-  retryMedia: (mediaAssetId: string) => apiClient.post<MediaAsset>(R.MEDIA_RETRY(mediaAssetId)),
 
   // ---- Notes between the Creator holding an episode and the lead (BR-67) ----
   listEpisodeNotes: (episodeId: string) => apiClient.get<EpisodeNote[]>(R.EPISODE_NOTES(episodeId)),
@@ -133,6 +116,11 @@ export const productionService = {
   applyLabel: (mediaAssetId: string, label: { labelType: LabelType; labelText: string; displayLocation?: LabelLocation }) =>
     apiClient.post<ReviewSheet>(R.AI_LABELS(mediaAssetId), label),
   runCompliance: (mediaAssetId: string, input: ComplianceInput) => apiClient.post<ReviewSheet>(R.COMPLIANCE(mediaAssetId), input),
+
+  // ---- Final Film (MF-1 §5–6): the Reviewer confirms, the Admin publishes or sends it back ----
+  confirmFinalFilm: (episodeId: string) => apiClient.post<Episode>(R.FINAL_CONFIRMATION(episodeId), {}),
+  rejectFinalFilm: (episodeId: string, reason: string) =>
+    apiClient.post<Episode>(R.FINAL_REJECTION(episodeId), { reason: reason.trim() }),
 
   // ---- Publishing (steps 12–16) ----
   setCoinPrice: (episodeId: string, coinPrice: number) => apiClient.patch<unknown>(R.COIN_PRICE(episodeId), { coinPrice }),
@@ -158,20 +146,11 @@ export const productionService = {
   },
   /** An existing name (ignoring case) answers with that genre instead of a duplicate. */
   createGenre: (name: string) => apiClient.post<Genre>(API_ROUTES.GENRES.LIST, { name }),
-  /** Active Content Creators a Reviewer can assign (the Reviewer holds user:read). */
-  async listCreators(search?: string): Promise<ApiResponse<Person[]>> {
-    const params = new URLSearchParams({ limit: '50', 'filter.role': '$eq:CONTENT_CREATOR', 'filter.isActive': '$eq:true' });
-    if (search?.trim()) params.set('search', search.trim());
-    const res = await apiClient.get<Page<Person>>(`${API_ROUTES.ADMIN.USERS}?${params.toString()}`);
-    return { ...res, data: res.success ? res.data.data : [] };
-  },
+  /** Active Content Creators the Admin can assign as lead (needs user:read). */
+  listCreators: (search?: string) => listActive('CONTENT_CREATOR', search),
+  /** Active Content Reviewers the Admin can put in charge of a project (needs user:read). */
+  listReviewers: (search?: string) => listActive('CONTENT_REVIEWER', search),
   getPlatformSettings: () => apiClient.get<PlatformSettings>(API_ROUTES.PLATFORM_SETTINGS),
   updatePlatformSettings: (input: Partial<PlatformSettings>) =>
     apiClient.patch<PlatformSettings>(API_ROUTES.PLATFORM_SETTINGS, input),
-
-  // ---- Notifications (BR-53: internal alerts are in-app) ----
-  listNotifications: () => apiClient.get<Page<AppNotification>>(`${API_ROUTES.NOTIFICATIONS.LIST}?limit=15`),
-  unreadCount: () => apiClient.get<{ unread: number }>(API_ROUTES.NOTIFICATIONS.UNREAD_COUNT),
-  markRead: (id: string) => apiClient.patch<unknown>(API_ROUTES.NOTIFICATIONS.READ(id)),
-  markAllRead: () => apiClient.patch<unknown>(API_ROUTES.NOTIFICATIONS.READ_ALL),
 };

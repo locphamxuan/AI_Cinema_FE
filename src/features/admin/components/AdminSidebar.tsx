@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Clapperboard,
   Inbox,
+  Building2,
   Rocket,
   CreditCard,
   Receipt,
@@ -17,14 +18,17 @@ import {
   Settings,
 } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
+import { useAppStore } from '@/store/useAppStore';
 import { PERMISSION } from '@/lib/permissions';
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const can = useCan();
+  const user = useAppStore((state) => state.user);
 
   const isOverview = pathname === '/admin';
   const isProjects = pathname === '/admin/projects' || pathname.startsWith('/admin/projects/');
+  const isStudios = pathname.startsWith('/admin/studios');
   const isRequests = pathname.startsWith('/admin/requests');
   const isMovies = pathname.startsWith('/admin/movies');
   const isBilling = pathname.startsWith('/admin/membership-plans');
@@ -112,10 +116,16 @@ export function AdminSidebar() {
               <Clapperboard className={iconClass(isProjects)} />
               <span className="truncate">Dự án phim</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-mono font-bold">
-              2
-            </span>
           </Link>
+          {can(PERMISSION.STUDIO_MANAGE) && (
+            <Link href="/admin/studios" aria-current={isStudios ? 'page' : undefined} className={linkClass(isStudios)}>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Building2 className={iconClass(isStudios)} />
+                <span className="truncate">Studio đối tác</span>
+              </div>
+            </Link>
+          )}
+
 
           {/* [ 🤝 Hợp đồng & Studio ] (Duyệt yêu cầu) */}
           <Link
@@ -134,9 +144,6 @@ export function AdminSidebar() {
               <Inbox className={iconClass(isRequests)} />
               <span className="truncate">Duyệt yêu cầu</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-mono font-bold">
-              3
-            </span>
           </Link>
 
           {/* [ 🚀 Kho phim chờ Publish ] (Quản lý phim) */}
@@ -156,9 +163,6 @@ export function AdminSidebar() {
               <Rocket className={iconClass(isMovies)} />
               <span className="truncate">Quản lý phim</span>
             </div>
-            <span className="px-1.5 py-0.2 rounded-full bg-red-500/20 text-[#E50914] text-[10px] font-mono font-bold">
-              2
-            </span>
           </Link>
         </div>
 
@@ -270,15 +274,15 @@ export function AdminSidebar() {
         </div>
       </div>
 
-      {/* Footer Profile: Executive Admin */}
+      {/* Footer: the signed-in Admin, never a placeholder account */}
       <div className="pt-3 border-t border-slate-200 dark:border-white/[0.06] px-2 text-xs">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center text-[#E50914] font-black text-xs">
-            A
+            {(user?.name ?? 'A').trim().charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">Quản Trị Viên</p>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">admin@aicinema.vn</p>
+            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{user?.name ?? 'Quản Trị Viên'}</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{user?.email ?? ''}</p>
           </div>
         </div>
       </div>

@@ -2,22 +2,19 @@
 
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import type { AgeRating } from '@/types/production';
-import { ATTACHMENT_ACCEPT, ATTACHMENT_HINT } from '../../lib/attachments';
-import { FilePicker } from './FilePicker';
 
-/** What viewers see of the movie, filled in when the project is created: summary (text + files), age, year. */
+/**
+ * What viewers see of the movie, filled in when the Admin creates the project: summary, age, year. Idea and
+ * synopsis files are added afterwards on the Overview tab by the Reviewer in charge.
+ */
 export interface ProjectInfoDraft {
   synopsis: string;
-  synopsisFiles: File[];
-  ideaFiles: File[];
   ageRating: AgeRating | '';
   releaseYear: string;
 }
 
 export const emptyProjectInfo = (): ProjectInfoDraft => ({
   synopsis: '',
-  synopsisFiles: [],
-  ideaFiles: [],
   ageRating: '',
   releaseYear: String(new Date().getFullYear()),
 });
@@ -32,13 +29,6 @@ export function ProjectInfoFields({ value, onChange }: { value: ProjectInfoDraft
   const patch = (changes: Partial<ProjectInfoDraft>) => onChange({ ...value, ...changes });
   return (
     <div className="space-y-4">
-      <FilePicker
-        label="Tệp ý tưởng gửi Studio"
-        accept={ATTACHMENT_ACCEPT}
-        files={value.ideaFiles}
-        onChange={(ideaFiles) => patch({ ideaFiles })}
-        hint={`Đi kèm brief khi bàn giao. ${ATTACHMENT_HINT}`}
-      />
       <FormField label="Tóm tắt cho người xem">
         <textarea
           rows={3}
@@ -49,13 +39,6 @@ export function ProjectInfoFields({ value, onChange }: { value: ProjectInfoDraft
           className={fieldTextareaClass}
         />
       </FormField>
-      <FilePicker
-        label="Tệp tóm tắt cho người xem"
-        accept={ATTACHMENT_ACCEPT}
-        files={value.synopsisFiles}
-        onChange={(synopsisFiles) => patch({ synopsisFiles })}
-        hint={ATTACHMENT_HINT}
-      />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <FormField label="Độ tuổi">
           <select value={value.ageRating} onChange={(e) => patch({ ageRating: e.target.value as AgeRating | '' })} className={fieldInputClass}>

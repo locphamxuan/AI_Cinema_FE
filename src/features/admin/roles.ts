@@ -1,14 +1,18 @@
 import type { UserRole } from '@/types/production';
 
-export const BACKEND_ROLES: UserRole[] = ['MEMBER', 'CONTENT_CREATOR', 'CONTENT_REVIEWER', 'STAFF', 'ADMIN'];
+export const BACKEND_ROLES: UserRole[] = ['MEMBER', 'CONTENT_CREATOR', 'CONTENT_REVIEWER', 'STUDIO', 'STAFF', 'ADMIN'];
 
-/** Roles the Admin can create accounts for; members sign up themselves. */
+/** Roles the Admin can create accounts for here; members sign up themselves, studio logins open from the studio. */
 export const STAFF_ROLES: UserRole[] = ['CONTENT_CREATOR', 'CONTENT_REVIEWER', 'STAFF', 'ADMIN'];
+
+/** Roles an account can be moved to: never STUDIO, which needs its studio (Studio page → Tài khoản đăng nhập). */
+export const ASSIGNABLE_ROLES: UserRole[] = BACKEND_ROLES.filter((role) => role !== 'STUDIO');
 
 export const BACKEND_ROLE_LABEL: Record<UserRole, string> = {
   MEMBER: 'Thành viên (Khán giả)',
   CONTENT_CREATOR: 'Nhà sáng tạo nội dung',
   CONTENT_REVIEWER: 'Kiểm duyệt viên',
+  STUDIO: 'Studio đối tác',
   STAFF: 'Nhân viên vận hành',
   ADMIN: 'Quản trị viên cấp cao',
 };
@@ -17,6 +21,7 @@ export const ROLE_SHORT_LABEL: Record<UserRole, string> = {
   MEMBER: 'Thành viên',
   CONTENT_CREATOR: 'Creator',
   CONTENT_REVIEWER: 'Reviewer',
+  STUDIO: 'Studio',
   STAFF: 'Vận hành',
   ADMIN: 'Quản trị',
 };
@@ -25,6 +30,7 @@ export const ROLE_TONE: Record<UserRole, 'purple' | 'emerald' | 'blue' | 'amber'
   ADMIN: 'purple',
   CONTENT_REVIEWER: 'emerald',
   CONTENT_CREATOR: 'blue',
+  STUDIO: 'neutral',
   STAFF: 'amber',
   MEMBER: 'neutral',
 };
@@ -51,13 +57,41 @@ export const PERMISSION_AREA_LABEL: Record<string, string> = {
  */
 const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Movie project
-  'project:manage': {
-    title: 'Khởi tạo & Quản trị dự án phim',
-    desc: 'Tạo dự án phim, chỉnh sửa các mùa, tập phim, ý tưởng, gán Creator và hủy dự án.',
+  'project:create': {
+    title: 'Tạo dự án phim & giao Creator',
+    desc: 'Tạo dự án phim, chọn Reviewer phụ trách, giao (hoặc đổi) Creator chính và chọn Studio.',
   },
-  'project:fee.allocate': {
-    title: 'Phân bổ ngân sách sản xuất (Token)',
-    desc: 'Phân bổ, nạp thêm và điều chỉnh ngân sách Token sản xuất cho từng dự án phim.',
+  'project:manage': {
+    title: 'Quản trị dự án phim được giao',
+    desc: 'Chỉnh sửa thông tin, mùa, tập phim, hạn giao và hủy dự án mình phụ trách.',
+  },
+  'script:write': {
+    title: 'Viết & nộp kịch bản',
+    desc: 'Creator chính soạn kịch bản của dự án được giao và nộp cho Reviewer duyệt.',
+  },
+  'script:approve': {
+    title: 'Duyệt Kịch bản Final',
+    desc: 'Đồng ý Kịch bản Final (hệ thống gửi hợp đồng mẫu cho Studio) hoặc yêu cầu Creator sửa.',
+  },
+  'studio:portal': {
+    title: 'Cổng Studio (Studio Web)',
+    desc: 'Tài khoản Studio thương lượng, ký hợp đồng và nộp phim từng tập trên Studio Web.',
+  },
+  'episode:price': {
+    title: 'Đặt giá Coin cho tập phim',
+    desc: 'Đặt giá Coin của tập trước khi xác nhận Phim Final; giá ngoài khung được báo Admin.',
+  },
+  'cost:request': {
+    title: 'Yêu cầu thêm chi phí sản xuất',
+    desc: 'Gửi Admin yêu cầu thêm chi phí (VND) cho dự án mình phụ trách, kèm báo giá của Studio.',
+  },
+  'cost:approve': {
+    title: 'Duyệt yêu cầu thêm chi phí sản xuất',
+    desc: 'Cấp đủ, cấp một phần hoặc từ chối yêu cầu thêm chi phí sản xuất của Reviewer.',
+  },
+  'cost:adjust': {
+    title: 'Đặt và điều chỉnh ngân sách sản xuất',
+    desc: 'Đặt ngân sách sản xuất (VND) cho dự án phim và điều chỉnh khi cần, kèm lý do.',
   },
   'project:read.all': {
     title: 'Xem toàn bộ dự án phim trên sàn',
@@ -73,10 +107,6 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
 
   // Studio
-  'studio:handoff': {
-    title: 'Bàn giao dự án cho Studio',
-    desc: 'Chuyển giao dự án cho studio sản xuất, đổi đơn vị gia công và nghiệm thu các mốc bàn giao.',
-  },
   'studio:manage': {
     title: 'Quản lý danh sách Studio đối tác',
     desc: 'Quản trị danh bạ các xưởng phim & studio liên kết: thêm mới, cập nhật hồ sơ và tạm dừng.',
@@ -84,8 +114,8 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
 
   // Media
   'media:ingest': {
-    title: 'Tải lên tập phim & Media Ingest',
-    desc: 'Tải lên video master, phụ đề đa ngôn ngữ và hình ảnh poster do studio bàn giao.',
+    title: 'Làm việc trên các tập của dự án được giao',
+    desc: 'Nhóm Creator, uỷ quyền tập và ghi chú tập; phim do Studio nộp trên Studio Web.',
   },
 
   // Review
@@ -96,8 +126,8 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
 
   // Publishing
   'episode:publish': {
-    title: 'Định giá & Xuất bản tập phim',
-    desc: 'Thiết lập giá Coin, lên lịch phát sóng, phát hành chính thức hoặc gỡ tập phim.',
+    title: 'Xuất bản & gỡ tập phim',
+    desc: 'Xem Phim Final Reviewer đã xác nhận, phát hành ngay hoặc hẹn giờ, trả lại qua Reviewer hoặc gỡ tập.',
   },
   'price-alert:manage': {
     title: 'Theo dõi & Cảnh báo giá tập phim',
@@ -202,10 +232,6 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   'platform:settings.manage': {
     title: 'Cài đặt chính sách nền tảng',
     desc: 'Điều chỉnh tỷ giá Coin, khung giá gói cước, số tập xem thử miễn phí và thông số hệ thống.',
-  },
-  'token-budget:manage': {
-    title: 'Quản lý hạn mức ngân sách Token',
-    desc: 'Cấp hạn mức Token sản xuất cho Kiểm duyệt viên và thu hồi lượng Token chưa phân bổ.',
   },
 };
 
