@@ -1,5 +1,6 @@
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
-import type { EpisodeStatus, MovieStatus } from '@/types/production';
+import type { ContractStatus } from '@/types/contract';
+import type { EpisodeStatus, MovieStatus, StudioHandoff } from '@/types/production';
 
 /** Same groups as the backend's project-rules.ts, so buttons only show when the API would accept them. */
 export const OPEN_PROJECT: MovieStatus[] = ['DRAFT', 'ASSIGNED', 'IN_PRODUCTION'];
@@ -12,6 +13,18 @@ export const TEAM_EDITABLE_PROJECT: MovieStatus[] = [...OPEN_PROJECT, 'UNDER_REV
 export const BEFORE_APPROVAL_EPISODE: EpisodeStatus[] = ['DRAFT', 'AWAITING_MEDIA', 'PROCESSING', 'IN_REVIEW', 'CHANGES_REQUESTED'];
 export const REVIEWED_EPISODE: EpisodeStatus[] = ['APPROVED', 'LABELED', 'COMPLIANCE_PASSED'];
 export const RELEASABLE_EPISODE: EpisodeStatus[] = ['COMPLIANCE_PASSED', 'UNPUBLISHED', 'SCHEDULED'];
+
+/** Contract rounds still being negotiated (BE OPEN_CONTRACT_STATUSES); a project has at most one at a time. */
+export const OPEN_CONTRACT: ContractStatus[] = ['SENT', 'STUDIO_SIGNED', 'ADMIN_COUNTERED'];
+
+/**
+ * The round a hand-off waits on: after a studio change the new hand-off stays BRIEF_SENT until its contract is
+ * signed (BE contract-handoff.service). Null once it started, or for a hand-off with no open round.
+ */
+export function waitingRound(handoff: Pick<StudioHandoff, 'milestoneStatus' | 'contracts'>) {
+  if (handoff.milestoneStatus !== 'BRIEF_SENT') return null;
+  return [...(handoff.contracts ?? [])].reverse().find((c) => isIn(c.status, OPEN_CONTRACT)) ?? null;
+}
 
 /** Notes on the idea are written while the project is open or being fixed (BE project-note.service). */
 export const NOTE_PROJECT: MovieStatus[] = [...OPEN_PROJECT, 'UNDER_REVISION'];

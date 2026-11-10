@@ -88,6 +88,7 @@ export function StudioTab() {
                 movieId={project.id}
                 episodeCount={handoff.seasonId ? episodeCounts.get(handoff.seasonId) : undefined}
                 base={base}
+                canDecide={caps.contractManage}
                 onBrief={() => void downloadBrief(handoff)}
                 onMaterial={(material) => void downloadMaterial(handoff, material)}
               />

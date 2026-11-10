@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { HandoffCard } from '@/features/production/components/project/HandoffCard';
+import { waitingRound } from '@/features/production/lib/capabilities';
 import type { StudioHandoff } from '@/types/production';
 
 vi.mock('next/link', () => ({ default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a> }));
@@ -30,11 +31,23 @@ const handoff = (over: Partial<StudioHandoff> = {}) =>
     ],
     briefFileKey: null,
     changeReason: null,
+    contracts: [{ id: 'c0', round: 1, status: 'SIGNED', costVnd: 150_000_000 }],
     ...over,
   }) as unknown as StudioHandoff;
 
-const renderCard = (h: StudioHandoff) =>
-  render(<HandoffCard handoff={h} movieId="m1" base="/creator" onBrief={vi.fn()} onMaterial={vi.fn()} />);
+const renderCard = (h: StudioHandoff, base: '/creator' | '/admin' = '/creator', canDecide = false) =>
+  render(<HandoffCard handoff={h} movieId="m1" base={base} canDecide={canDecide} onBrief={vi.fn()} onMaterial={vi.fn()} />);
+
+/** The hand-off a studio change opened: it waits in BRIEF_SENT for the new studio's contract. */
+const waiting = (status: 'SENT' | 'STUDIO_SIGNED' | 'ADMIN_COUNTERED', costVnd: number | null = null) =>
+  handoff({
+    studio: { id: 'st-c', name: 'Studio C', email: 'c@studio.vn' },
+    milestoneStatus: 'BRIEF_SENT',
+    offeredFeeVnd: '45000000',
+    changeReason: 'Studio cũ trễ hạn',
+    milestoneEvents: [],
+    contracts: [{ id: 'c1', round: 1, status, costVnd }],
+  } as Partial<StudioHandoff>);
 
 describe('HandoffCard (read-only timeline)', () => {
   it('lists the milestones the system moved, linking the Submission the studio delivered', () => {
@@ -52,5 +65,49 @@ describe('HandoffCard (read-only timeline)', () => {
   it('still labels the milestones of older hand-offs the studio accepted or declined', () => {
     renderCard(handoff({ milestoneStatus: 'STUDIO_DECLINED', milestoneEvents: [] }));
     expect(screen.getByText('Studio từ chối')).toBeTruthy();
+  });
+});
+
+describe('HandoffCard - a studio change waiting for its contract', () => {
+  it('says the new studio has to quote and sign, with the round status, and links the contract tab', () => {
+    renderCard(waiting('SENT'));
+    const note = screen.getByRole('status');
+    expect(note).toHaveTextContent('Đang chờ Studio mới báo giá và ký hợp đồng');
+    expect(note).toHaveTextContent('Vòng 1: Đã gửi studio, chờ báo giá');
+    expect(screen.getByRole('link', { name: 'Xem hợp đồng' }).getAttribute('href')).toBe('/creator/projects/m1?tab=contract');
+    expect(screen.getByText(/phí đề xuất trong brief: 45\.000\.000/)).toBeTruthy();
+  });
+
+  it('sends the Admin to sign once the new studio signed its quote', () => {
+    renderCard(waiting('STUDIO_SIGNED', 44_000_000), '/admin', true);
+    expect(screen.getByRole('status')).toHaveTextContent('Studio đã ký, chờ Admin · 44.000.000');
+    expect(screen.getByRole('link', { name: 'Xem báo giá và ký hợp đồng' }).getAttribute('href')).toBe('/admin/projects/m1?tab=contract');
+  });
+
+  it('offers the Reviewer only the way to read it', () => {
+    renderCard(waiting('STUDIO_SIGNED', 44_000_000), '/creator', false);
+    expect(screen.queryByRole('link', { name: 'Xem báo giá và ký hợp đồng' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Xem hợp đồng' })).toBeTruthy();
+  });
+
+  it('shows no waiting note once production started, and calls the fee the signed one', () => {
+    renderCard(handoff({ milestoneStatus: 'IN_PROGRESS' }));
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(screen.getByText(/phí theo hợp đồng đã ký: 150\.000\.000/)).toBeTruthy();
+  });
+});
+
+describe('waitingRound', () => {
+  const rounds = (...statuses: string[]) => statuses.map((status, i) => ({ id: `c${i}`, round: i + 1, status, costVnd: null })) as never;
+
+  it('is the newest open round of a hand-off still at BRIEF_SENT', () => {
+    expect(waitingRound({ milestoneStatus: 'BRIEF_SENT', contracts: rounds('STUDIO_SIGNED', 'ADMIN_COUNTERED') })).toMatchObject({ round: 2 });
+  });
+
+  it('is none once the hand-off started, superseded, or with no open round', () => {
+    expect(waitingRound({ milestoneStatus: 'IN_PROGRESS', contracts: rounds('SENT') })).toBeNull();
+    expect(waitingRound({ milestoneStatus: 'SUPERSEDED', contracts: rounds('SUPERSEDED') })).toBeNull();
+    expect(waitingRound({ milestoneStatus: 'BRIEF_SENT', contracts: rounds('SUPERSEDED') })).toBeNull();
+    expect(waitingRound({ milestoneStatus: 'BRIEF_SENT', contracts: [] })).toBeNull();
   });
 });

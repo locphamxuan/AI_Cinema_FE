@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { seasonLabel } from '@/lib/seasonLabel';
 import type { HandoffMaterial, StudioHandoff } from '@/types/production';
-import { MATERIAL_KIND, MILESTONE_STATUS } from '../../lib/labels';
+import { waitingRound } from '../../lib/capabilities';
+import { CONTRACT_STATUS, MATERIAL_KIND, MILESTONE_STATUS } from '../../lib/labels';
 import { formatBytes, formatDateTime, formatVnd } from '@/lib/format';
 import { productionPaths, type ProductionBase } from '../../lib/routes';
 import { StatusPill } from '@/components/data/ui';
@@ -26,6 +27,7 @@ export function HandoffCard({
   movieId,
   episodeCount,
   base,
+  canDecide = false,
   onBrief,
   onMaterial,
 }: {
@@ -34,10 +36,14 @@ export function HandoffCard({
   /** Episodes of the handed-off season: one episode reads as a whole film. */
   episodeCount?: number;
   base: ProductionBase;
+  /** The Admin, who signs or counter-proposes the round the new studio signed (contract:manage). */
+  canDecide?: boolean;
   onBrief: () => void;
   onMaterial: (material: HandoffMaterial) => void;
 }) {
   const status = MILESTONE_STATUS[h.milestoneStatus];
+  const waiting = waitingRound(h);
+  const signed = h.contracts?.some((c) => c.status === 'SIGNED');
   return (
     <li className="rounded-xl border border-sky-100 dark:border-white/10 p-4 text-xs space-y-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -46,8 +52,8 @@ export function HandoffCard({
             {h.studio.name} <Badge tone="blue">{scopeLabel(h, episodeCount)}</Badge>
           </p>
           <p className="text-slate-500 dark:text-slate-400">
-            Giao ngày {formatDateTime(h.createdAt)} bởi {h.createdBy.fullName} · {h.studio.email} · phí đề xuất trong brief:{' '}
-            {formatVnd(h.offeredFeeVnd)}
+            Giao ngày {formatDateTime(h.createdAt)} bởi {h.createdBy.fullName} · {h.studio.email} ·{' '}
+            {signed ? 'phí theo hợp đồng đã ký' : 'phí đề xuất trong brief'}: {formatVnd(h.offeredFeeVnd)}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -56,6 +62,18 @@ export function HandoffCard({
         </div>
       </div>
 
+      {waiting && (
+        <div role="status" className="rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 space-y-1">
+          <p className="font-semibold text-amber-800 dark:text-amber-300">Đang chờ Studio mới báo giá và ký hợp đồng</p>
+          <p className="text-amber-800/90 dark:text-amber-200/90">
+            Vòng {waiting.round}: {CONTRACT_STATUS[waiting.status].label}
+            {waiting.costVnd !== null && ` · ${formatVnd(waiting.costVnd)}`}. Studio bắt đầu sản xuất khi hợp đồng đủ chữ ký hai bên.
+          </p>
+          <Link href={productionPaths.project(base, movieId, 'contract')} className="inline-block font-semibold text-sky-700 dark:text-sky-300 hover:underline">
+            {canDecide && waiting.status === 'STUDIO_SIGNED' ? 'Xem báo giá và ký hợp đồng' : 'Xem hợp đồng'}
+          </Link>
+        </div>
+      )}
       {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi Studio: {h.changeReason}</p>}
       {Number(h.forfeitedVnd) > 0 && (
         <p className="text-rose-600">

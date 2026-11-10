@@ -1,4 +1,5 @@
 /** Studio catalog, hand-offs, the Creator team and change requests of a project, as the API returns them. */
+import type { ContractStatus } from './contract';
 import type {
   ChangeRequestStatus,
   ChangeRequestType,
@@ -81,13 +82,24 @@ export interface MilestoneEvent {
   mediaAsset: { id: string; version: number; episodeId: string; ingestStatus: MediaIngestStatus } | null;
 }
 
+/** A contract round of a hand-off, as the hand-off list carries it. */
+export interface HandoffContract {
+  id: string;
+  round: number;
+  status: ContractStatus;
+  costVnd: number | null;
+}
+
 /** One hand-off: which studio, which season (null = the whole project), when and with what (BR-58, BR-59). */
 export interface StudioHandoff {
   id: string;
   studio: { id: string; name: string; email: string };
   season: { id: string; seasonNumber: number; title: string | null } | null;
   seasonId: string | null;
-  /** Fixed fee (VND) the brief offered the studio. */
+  /**
+   * Fee (VND) of the hand-off: on a studio change the Admin's proposal from the brief until the new studio's
+   * contract is signed, then the signed cost.
+   */
   offeredFeeVnd: number | string;
   /** VND the studio kept when it was replaced (BR-59); 0 otherwise. */
   forfeitedVnd: number | string;
@@ -102,6 +114,8 @@ export interface StudioHandoff {
   emailMessage: { status: 'QUEUED' | 'SENT' | 'FAILED'; sentAt: string | null; errorMessage: string | null } | null;
   materials: HandoffMaterial[];
   milestoneEvents: MilestoneEvent[];
+  /** Rounds of the contract tied to this hand-off, oldest first; a studio change waits in BRIEF_SENT for its signature. */
+  contracts: HandoffContract[];
 }
 
 /** A seat of a Creator on a project (BR-13). */
