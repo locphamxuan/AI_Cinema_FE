@@ -60,6 +60,17 @@ describe('ChangeStudioModal', () => {
       forfeitedVnd: '20000000',
     });
     expect(reload).toHaveBeenCalled();
+    expect(toast.success).toHaveBeenCalledWith('Đã đổi Studio, gửi brief và hợp đồng mẫu cho Studio mới');
+  });
+
+  it('calls the fee a proposal and says the new studio gets a contract to quote and sign', () => {
+    routeFetch({});
+    render(withProject(producing(), <ChangeStudioModal onClose={vi.fn()} />));
+
+    expect(screen.getByLabelText('Phí đề xuất')).toBeInTheDocument();
+    expect(screen.getByText('Phí sản xuất đề xuất cho Studio mới (₫)')).toBeInTheDocument();
+    expect(screen.getByText(/phí chính thức là giá ký trong hợp đồng/)).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveTextContent('Studio mới nhận brief kèm hợp đồng mẫu để báo giá và ký trên Studio Web');
   });
 
   it('blocks a fee above what the budget allows and says the Reviewer must ask for more', async () => {

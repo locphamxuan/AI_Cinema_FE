@@ -70,10 +70,10 @@ function FeeField({ value, maxVnd, onChange }: { value: string; maxVnd: number; 
   const fee = parseVnd(value);
   const over = fee > maxVnd;
   return (
-    <FormField label="Phí sản xuất đề xuất cho Studio (₫)">
+    <FormField label="Phí sản xuất đề xuất cho Studio mới (₫)">
       <input inputMode="numeric" value={value} onChange={(e) => onChange(e.target.value)} required className={fieldInputClass} aria-label="Phí đề xuất" />
       <span className={`block mt-1 text-[11px] ${over ? 'text-rose-600' : 'text-slate-500'}`}>
-        Phí trọn gói, không chia doanh thu. Tối đa {formatVnd(maxVnd)} (ngân sách còn lại).
+        Mức đề xuất ghi trong brief, trọn gói, không chia doanh thu; phí chính thức là giá ký trong hợp đồng. Tối đa {formatVnd(maxVnd)} (ngân sách còn lại).
         {over && ' Vượt ngân sách: Reviewer cần gửi Admin yêu cầu thêm chi phí sản xuất.'}
       </span>
     </FormField>
@@ -115,7 +115,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
           offeredFeeVnd: parseVnd(form.fee),
           ...(keptVnd > 0 ? { forfeitedVnd: keptVnd } : {}),
         }),
-      'Đã đổi Studio và gửi brief mới',
+      'Đã đổi Studio, gửi brief và hợp đồng mẫu cho Studio mới',
     );
     if (done) {
       await reload();
@@ -124,7 +124,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief mới." icon={<Repeat className="w-4 h-4 text-[#E50914]" />} maxWidth="max-w-lg">
+    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief kèm hợp đồng mẫu để báo giá và ký trên Studio Web, rồi mới bắt đầu sản xuất." icon={<Repeat className="w-4 h-4 text-[#E50914]" />} maxWidth="max-w-lg">
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} onChange={(patch) => setForm({ ...form, ...patch })} />
         <FormField label="Studio cũ giữ lại (₫, đã chi hoặc đền bù)">
