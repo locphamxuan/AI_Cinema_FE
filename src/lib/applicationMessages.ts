@@ -91,6 +91,25 @@ export const APPLICATION_MESSAGES = {
   },
 } as const;
 
+/** BR-19: what the backend still misses before a release, named in Vietnamese so the Admin knows who to ask. */
+const RELEASE_BLOCKERS: Record<string, string> = {
+  'an approved media version': 'bản phim được Reviewer duyệt',
+  'the Final Film confirmation of the Reviewer': 'xác nhận Phim Final của Reviewer',
+  'a Coin price (BR-29)': 'giá Coin do Reviewer đặt',
+  'the movie synopsis': 'tóm tắt phim (Reviewer điền ở tab Tổng quan)',
+  'the movie age rating': 'độ tuổi phim (Reviewer điền ở tab Tổng quan)',
+  'an AI label (BR-40)': 'nhãn AI của bản phim',
+  'a passed compliance check (BR-42)': 'kết quả kiểm tra tuân thủ pháp lý',
+};
+
+export function releaseBlockedMessage(rawDetails: unknown): string {
+  const missing = Array.isArray(rawDetails)
+    ? rawDetails.map((item) => RELEASE_BLOCKERS[String(item)]).filter((label): label is string => !!label)
+    : [];
+  if (!missing.length) return APPLICATION_MESSAGES.MSG14.message;
+  return `Chưa thể phát hành tập này. Còn thiếu: ${missing.join('; ')}.`;
+}
+
 export function localizeApiError(
   rawMessage: unknown,
   status: number,
@@ -116,7 +135,7 @@ export function localizeApiError(
   ) {
     return APPLICATION_MESSAGES.MSG13.message;
   }
-  if (normalized.includes('cannot be released yet')) return APPLICATION_MESSAGES.MSG14.message;
+  if (normalized.includes('cannot be released yet')) return releaseBlockedMessage(rawDetails);
   if (normalized.includes('account with this email already exists')) return APPLICATION_MESSAGES.MSG06.message;
   if (normalized === 'incorrect email or password') return APPLICATION_MESSAGES.MSG05.message;
   if (normalized.includes('account has been deactivated')) return APPLICATION_MESSAGES.MSG08.message;
