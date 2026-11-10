@@ -41,7 +41,7 @@ export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth
       >
         <DialogHeader className="flex-row items-start gap-3.5 border-b border-slate-100 dark:border-white/[0.06] px-6 pt-5 pb-4 pr-12 text-left">
           {icon && (
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-red-500/10 text-[#E50914] shadow-xs">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-900 dark:bg-white/[0.08] dark:text-white shadow-xs">
               {icon}
             </div>
           )}

@@ -8,7 +8,7 @@ import { formatVnd } from '@/lib/format';
 import { productionService } from '@/services/productionService';
 import type { AdminPipeline, ContractToSign, ReadyFilm } from '../adminPipeline';
 
-const CARD = 'rounded-2xl bg-white dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-6 sm:p-7 shadow-sm dark:shadow-xl';
+const CARD = 'rounded-3xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] p-6 sm:p-7 shadow-xs';
 
 function Dot({ tone, value, label }: { tone: string; value: number; label: string }) {
   return (
@@ -33,7 +33,7 @@ export function PortalMetrics({ data }: { data: AdminPipeline }) {
         <Dot tone="bg-emerald-500" value={data.completedProjects} label="Dự án đã hoàn tất" />
         <Dot tone="bg-purple-500" value={data.producingProjects} label="Dự án đã ký hợp đồng, đang sản xuất" />
         <Dot tone="bg-amber-500" value={data.finalScripts.length} label="Kịch bản chờ Admin duyệt Final" />
-        <Dot tone="bg-[#E50914]" value={data.readyFilms.length} label="Phim Final chờ Publish" />
+        <Dot tone="bg-slate-900 dark:bg-white" value={data.readyFilms.length} label="Phim Final chờ Publish" />
       </div>
       {data.finalScripts.length > 0 && (
         <ul aria-label="Kịch bản chờ duyệt Final" className="flex flex-wrap gap-2 pt-1 text-xs">
@@ -77,8 +77,8 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
         </div>
       </div>
       {first && (
-        <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center px-4 py-2.5 rounded-xl bg-white dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/[0.1] text-slate-800 dark:text-white border border-[#E50914]/40 text-xs font-bold cursor-pointer">
-          Xem Báo Giá & Ký ➔
+        <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center px-5 py-2.5 rounded-full bg-white dark:bg-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.1] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 text-xs font-semibold cursor-pointer transition-all">
+          Xem Báo Giá &amp; Ký ➔
         </button>
       )}
     </section>
@@ -116,10 +116,10 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
         <Building2 className="w-3.5 h-3.5 text-slate-400" /> {project.studio?.name ?? '-'}
       </span>
       <div className="shrink-0 flex flex-wrap gap-2">
-        <Link href={`/admin/projects/${project.id}/episodes/${episode.id}`} className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/15 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5">
+        <Link href={`/admin/projects/${project.id}/episodes/${episode.id}`} className="px-4 py-2.5 rounded-full border border-slate-300 dark:border-white/15 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
           Xem Phim Final
         </Link>
-        <button type="button" disabled={busy} onClick={publish} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#E50914] hover:bg-[#B81D24] text-white text-xs font-bold shadow-lg cursor-pointer disabled:opacity-50">
+        <button type="button" disabled={busy} onClick={publish} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-semibold shadow-xs cursor-pointer disabled:opacity-50 transition-all">
           <Rocket className="w-4 h-4" /> Phát Hành Ngay
         </button>
       </div>
@@ -135,11 +135,11 @@ export function PortalReadyFilms({ films, onPublished }: { films: ReadyFilm[]; o
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <Rocket className="w-5 h-5 text-[#E50914]" /> Phim Final — Sẵn Sàng Phát Hành
+            <Rocket className="w-5 h-5 text-slate-900 dark:text-white" /> Phim Final — Sẵn Sàng Phát Hành
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Reviewer đã duyệt, gắn nhãn AI, đạt tuân thủ, đặt giá Coin và xác nhận Phim Final.</p>
         </div>
-        <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/[0.04] px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/[0.08]">
+        <span className="text-xs font-mono font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-white/[0.04] px-3 py-1 rounded-full border border-slate-200 dark:border-white/[0.08]">
           {films.length} tập chờ lên sóng
         </span>
       </div>
@@ -150,7 +150,7 @@ export function PortalReadyFilms({ films, onPublished }: { films: ReadyFilm[]; o
         ))}
       </ul>
       {films.length > shown.length && (
-        <button type="button" onClick={() => setShowAll(true)} className="text-xs font-semibold text-[#E50914] hover:underline cursor-pointer">
+        <button type="button" onClick={() => setShowAll(true)} className="text-xs font-semibold text-slate-900 dark:text-white hover:underline cursor-pointer">
           Xem thêm {films.length - shown.length} tập
         </button>
       )}

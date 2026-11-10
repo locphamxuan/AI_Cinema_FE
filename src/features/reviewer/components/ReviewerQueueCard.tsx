@@ -6,11 +6,11 @@ import { formatDateTime } from '@/lib/format';
 import type { QueueItem, QueueStage } from '../reviewQueue';
 
 export const STAGE_STYLE: Record<QueueStage, { badge: string; icon: LucideIcon; action: string; button: string }> = {
-  MASTER_AUDIT: { badge: 'bg-red-500/10 text-[#E50914] border-red-500/20', icon: Clapperboard, action: 'Mở Bàn Thẩm Định', button: 'bg-[#E50914] hover:bg-[#B81D24] text-white' },
-  SCRIPT_PENDING: { badge: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20', icon: FileCheck2, action: 'Thẩm Định Kịch Bản', button: 'bg-amber-500 hover:bg-amber-600 text-white' },
-  STUDIO_REVISING: { badge: 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20', icon: AlertTriangle, action: 'Xem Yêu Cầu Sửa', button: 'border border-sky-500/30 hover:bg-sky-500/10 text-sky-600 dark:text-sky-400' },
-  FINAL_CONFIRMED: { badge: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20', icon: CheckCircle2, action: 'Xem Tập Phim', button: 'border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' },
-  PROJECT: { badge: 'bg-slate-500/10 text-slate-600 dark:text-slate-300 border-slate-500/20', icon: FolderOpen, action: 'Mở Dự Án', button: 'border border-slate-300 dark:border-white/15 hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200' },
+  MASTER_AUDIT: { badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30', icon: Clapperboard, action: 'Mở Bàn Thẩm Định', button: 'bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200' },
+  SCRIPT_PENDING: { badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30', icon: FileCheck2, action: 'Thẩm Định Kịch Bản', button: 'bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200' },
+  STUDIO_REVISING: { badge: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700', icon: AlertTriangle, action: 'Xem Yêu Cầu Sửa', button: 'border border-slate-300 dark:border-white/15 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-800 dark:text-slate-200' },
+  FINAL_CONFIRMED: { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30', icon: CheckCircle2, action: 'Xem Tập Phim', button: 'border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
+  PROJECT: { badge: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700', icon: FolderOpen, action: 'Mở Dự Án', button: 'border border-slate-300 dark:border-white/15 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200' },
 };
 
 export const episodeText = (item: QueueItem) => (item.episodeNumber === null ? `${item.totalEpisodes} tập` : `Tập ${item.episodeNumber} / ${item.totalEpisodes}`);
@@ -32,7 +32,7 @@ export function ReviewerQueueCard({ item }: { item: QueueItem }) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
         <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-white/90 dark:bg-black/75 backdrop-blur-md text-slate-800 dark:text-white">
-          <Building2 className="w-3 h-3 text-[#E50914]" />
+          <Building2 className="w-3 h-3 text-slate-700 dark:text-slate-200" />
           <span className="truncate max-w-[130px]">{item.studioName}</span>
         </span>
         <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-black/75 backdrop-blur-md text-white border border-white/15">{episodeText(item)}</span>
@@ -54,7 +54,7 @@ export function ReviewerQueueCard({ item }: { item: QueueItem }) {
             Biên kịch: <strong className="text-slate-800 dark:text-slate-200">{item.creatorName}</strong>
           </p>
         </div>
-        <Link href={item.href} className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold ${style.button}`}>
+        <Link href={item.href} className={`w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-xs font-semibold transition-all ${style.button}`}>
           {style.action} <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>

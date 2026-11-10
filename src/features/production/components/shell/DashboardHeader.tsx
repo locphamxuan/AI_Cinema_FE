@@ -49,13 +49,13 @@ export function DashboardHeader() {
           {user && (
             <span
               aria-label="Vai trò của tài khoản"
-              className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-red-500/30 bg-slate-100/80 dark:bg-red-500/10 text-xs font-semibold text-slate-700 dark:text-red-200"
+              className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-white/[0.06] text-xs font-semibold text-slate-700 dark:text-slate-200"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#E50914] animate-pulse" aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
               <span>{ROLE_LABEL[user.role ?? 'user']}</span>
               {area === 'creator' && (
-                <span className="text-[10px] font-bold text-red-500 dark:text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded-md">
-                  In-house Screenwriter
+                <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-white/10 px-2 py-0.5 rounded-full border border-slate-200/80 dark:border-white/10">
+                  Biên kịch nội bộ
                 </span>
               )}
             </span>

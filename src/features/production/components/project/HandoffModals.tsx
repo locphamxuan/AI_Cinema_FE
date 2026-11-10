@@ -124,7 +124,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief kèm hợp đồng mẫu để báo giá và ký trên Studio Web, rồi mới bắt đầu sản xuất." icon={<Repeat className="w-4 h-4 text-[#E50914]" />} maxWidth="max-w-lg">
+    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief kèm hợp đồng mẫu để báo giá và ký trên Studio Web, rồi mới bắt đầu sản xuất." icon={<Repeat className="w-4 h-4" />} maxWidth="max-w-lg">
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} onChange={(patch) => setForm({ ...form, ...patch })} />
         <FormField label="Studio cũ giữ lại (₫, đã chi hoặc đền bù)">
@@ -138,10 +138,10 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} minLength={5} maxLength={2000} required className={fieldTextareaClass} />
         </FormField>
         <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose} className="rounded-full">
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !keptValid || !feeValid(form.fee, preview.maxOfferVnd) || !studioTyped(form) || reason.trim().length < 5} className="bg-[#E50914] hover:bg-[#B81D24] text-white">
+          <Button type="submit" disabled={busy || !keptValid || !feeValid(form.fee, preview.maxOfferVnd) || !studioTyped(form) || reason.trim().length < 5} className="rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
             Đổi Studio
           </Button>
         </div>

@@ -1,18 +1,23 @@
 import AuthForm from '@/components/auth/AuthForm';
 import AuthBrand from '@/components/auth/AuthBrand';
+import ThemeToggle from '@/components/theme/ThemeToggle';
 
-/** Sign-in for the back office: Reviewer, Creator, Staff and Admin accounts, created by the Admin. */
+/** Sign-in for the internal back office: Reviewer, Creator, Staff and Admin accounts. */
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 relative bg-gradient-to-b from-slate-50 via-white to-slate-100 dark:from-background dark:via-[#0A0C12] dark:to-background">
-      {/* Ambient background glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-ruby/10 dark:bg-ruby/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="max-w-md w-full bg-white dark:bg-card border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-xl">
-        {/* Top subtle ambient accent line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-ruby via-rose-500 to-amber-500" />
+    <main className="relative flex min-h-screen flex-col items-center justify-center bg-[#F9FAFB] px-4 py-12 text-slate-900 dark:bg-[#090B10] dark:text-slate-100 sm:px-6">
+      <div className="absolute top-5 right-5">
+        <ThemeToggle />
+      </div>
+
+      <div className="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white p-7 shadow-sm dark:border-white/[0.08] dark:bg-[#111420] sm:p-9">
         <AuthBrand />
         <AuthForm />
       </div>
-    </div>
+
+      <p className="mt-6 text-center text-[11px] text-slate-500 dark:text-slate-400">
+        Tài khoản nội bộ do Admin cấp · Mọi thao tác tuân thủ quy trình sản xuất MF-1 &amp; Điều 44
+      </p>
+    </main>
   );
 }

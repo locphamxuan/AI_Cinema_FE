@@ -27,7 +27,7 @@ const MODULES: Module[] = [
   { key: 'marketing', title: 'Marketing', description: 'Chiến dịch cho phim sắp và đã phát hành.', icon: Megaphone, comingSoon: true },
 ];
 
-const CARD = 'bg-white dark:bg-card rounded-xl border border-sky-100 dark:border-white/10';
+const CARD = 'bg-white dark:bg-[#111420] rounded-3xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs';
 
 /** Staff operations dashboard (MF-5): only the modules this role holds a permission for (BR-21). */
 export function StaffPage() {
@@ -49,7 +49,7 @@ export function StaffPage() {
           .map(({ key, title, description, icon: Icon }) => (
             <div key={key} className={`${CARD} p-4 space-y-1.5`}>
               <p className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                <Icon className="w-4 h-4 text-sky-700 dark:text-sky-500" aria-hidden="true" /> {title}
+                <Icon className="w-4 h-4 text-slate-700 dark:text-slate-300" aria-hidden="true" /> {title}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
               <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Đang xây dựng</p>

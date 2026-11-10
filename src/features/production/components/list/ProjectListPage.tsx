@@ -61,26 +61,25 @@ export function ProjectListPage() {
   const totalCount = projects.data?.meta.totalItems ?? 0;
 
   return (
-    <main className="w-full">
-      <div className="bg-white dark:bg-card">
-        <div className="h-1 bg-gradient-to-r from-sky-500 via-cyan-400 to-coral-400" aria-hidden="true" />
+    <main className="w-full bg-[#F9FAFB] dark:bg-[#090B10] min-h-[calc(100vh-3.5rem)]">
+      <div className="bg-white dark:bg-[#111420]">
         <div className="px-6 lg:px-8 pt-6 pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
-            <h1 className="font-heading text-2xl font-semibold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="font-heading text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
               Dự án phim
               {totalCount > 0 && <span className="ml-3 text-base font-medium text-slate-400 tabular-nums">{totalCount}</span>}
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{INTRO[base]}</p>
           </div>
           {canCreate && (
-            <Button onClick={() => setCreating(true)} className="shrink-0">
+            <Button onClick={() => setCreating(true)} className="shrink-0 rounded-full bg-[#121212] text-white hover:bg-black dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
               Tạo dự án
             </Button>
           )}
         </div>
       </div>
 
-      <div className="px-6 lg:px-8 py-3 border-y border-sky-100 dark:border-white/5 bg-white dark:bg-card flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="px-6 lg:px-8 py-3 border-y border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#111420] flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div role="tablist" aria-label="Lọc theo trạng thái" className="flex flex-wrap items-center gap-1.5">
           {FILTERS.map(({ key, label, icon: Icon }) => (
             <button
@@ -92,10 +91,10 @@ export function ProjectListPage() {
                 setFilter(key);
                 setPage(1);
               }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/40 ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 ${
                 filter === key
-                  ? 'bg-sky-600 text-white font-semibold'
-                  : 'text-slate-600 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-white/10'
+                  ? 'bg-[#121212] text-white font-semibold dark:bg-white dark:text-slate-900'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
               }`}
             >
               <Icon className="w-3.5 h-3.5" aria-hidden="true" />
@@ -136,7 +135,7 @@ export function ProjectListPage() {
                 title={label}
                 className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                   viewMode === key
-                    ? 'bg-white dark:bg-white/15 text-sky-700 dark:text-white shadow-xs'
+                    ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-xs'
                     : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'
                 }`}
               >
@@ -161,8 +160,8 @@ export function ProjectListPage() {
             )}
 
             {projects.data.data.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-sky-200 dark:border-white/10 p-12 text-center bg-white dark:bg-white/[0.02]">
-                <Film className="w-10 h-10 mx-auto text-sky-300 dark:text-slate-600 mb-3" aria-hidden="true" />
+              <div className="rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 text-center bg-white dark:bg-white/[0.02]">
+                <Film className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" aria-hidden="true" />
                 <p className="text-base font-semibold text-slate-800 dark:text-slate-100">
                   {isCreator ? 'Bạn chưa được giao dự án nào' : 'Không có dự án nào khớp bộ lọc'}
                 </p>

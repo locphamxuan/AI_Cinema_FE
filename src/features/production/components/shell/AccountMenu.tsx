@@ -43,7 +43,7 @@ export function AccountMenu({ name, roleLabel, onLogout, profileHref }: AccountM
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Tài khoản ${name}`}
-        className="w-8 h-8 rounded-full bg-sky-600 text-white text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-sky-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-card"
+        className="w-8 h-8 rounded-full bg-[#121212] dark:bg-white text-white dark:text-slate-900 text-xs font-bold flex items-center justify-center cursor-pointer hover:bg-black dark:hover:bg-slate-200 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/30 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-card"
       >
         {name.charAt(0).toUpperCase()}
       </button>
