@@ -15,10 +15,10 @@ import { ReviewerQueueCard, STAGE_STYLE, episodeText } from './ReviewerQueueCard
 const CARD = 'rounded-3xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] shadow-xs dark:shadow-xl';
 
 const FILTERS: { key: QueueFilter; label: string; active: string }[] = [
-  { key: 'all', label: 'Tất cả', active: 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' },
-  { key: 'script', label: 'Kịch bản chờ duyệt', active: 'bg-amber-500 text-white' },
-  { key: 'master', label: 'Phim cần kiểm', active: 'bg-[#E50914] text-white' },
-  { key: 'revising', label: 'Studio đang sửa', active: 'bg-sky-500 text-white' },
+  { key: 'all', label: 'Tất cả', active: 'bg-[#121212] text-white dark:bg-white dark:text-slate-900' },
+  { key: 'script', label: 'Kịch bản chờ duyệt', active: 'bg-amber-600 text-white' },
+  { key: 'master', label: 'Phim cần kiểm', active: 'bg-[#121212] text-white dark:bg-white dark:text-slate-900' },
+  { key: 'revising', label: 'Studio đang sửa', active: 'bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900' },
   { key: 'approved', label: 'Phim Final', active: 'bg-emerald-600 text-white' },
 ];
 
@@ -50,7 +50,7 @@ function QueueTable({ items }: { items: QueueItem[] }) {
                 <span className={`inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${STAGE_STYLE[item.stage].badge}`}>{item.stageLabel}</span>
               </td>
               <td className="py-3.5 px-4 text-right">
-                <Link href={item.href} className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-[#E50914] hover:bg-[#B81D24] text-white text-xs font-bold">
+                <Link href={item.href} className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-semibold">
                   {STAGE_STYLE[item.stage].action} <ArrowRight className="w-3 h-3" />
                 </Link>
               </td>
@@ -78,17 +78,17 @@ export function ReviewerProjectQueuePage() {
   const pending = countOf('script') + countOf('master');
 
   return (
-    <div className="min-h-screen w-full bg-[#F8FAFC] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen w-full bg-[#F9FAFB] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         <section aria-label="Hồ sơ thẩm định viên" className={`${CARD} p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-5`}>
           <div className="flex items-center gap-4">
             <InitialsAvatar name={user?.name ?? 'Reviewer'} />
             <div className="space-y-1">
-              <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Xin chào, {user?.name}</h1>
+              <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">Xin chào, {user?.name}</h1>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">{user?.email}</p>
             </div>
           </div>
-          <Link href="/reviewer" className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#E50914] hover:bg-[#B81D24] text-white text-xs sm:text-sm font-bold shadow-lg">
+          <Link href="/reviewer" className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs sm:text-sm font-semibold shadow-xs transition-all">
             <Clapperboard className="w-4 h-4" aria-hidden="true" /> Bàn Thẩm Định Phim ➔
           </Link>
         </section>

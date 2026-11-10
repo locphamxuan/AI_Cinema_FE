@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AuthForm from '@/components/auth/AuthForm';
+import AuthBrand from '@/components/auth/AuthBrand';
 import { useToastStore } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -51,5 +52,26 @@ describe('AuthForm sign-in', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent('ứng dụng di động');
     expect(push).not.toHaveBeenCalled();
+  });
+
+  it('offers a direct Studio Web link when a studio account signs in', async () => {
+    login.mockResolvedValue({
+      success: false,
+      error: 'Tài khoản Studio đăng nhập tại Studio Web dành cho đối tác, không dùng trang quản trị nội bộ.',
+    });
+    render(<AuthForm />);
+
+    await userEvent.type(screen.getByLabelText('Email'), 'studio@example.com');
+    await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+
+    expect(screen.getByRole('link', { name: /Mở cổng đăng nhập Studio Web/ })).toBeInTheDocument();
+  });
+
+  it('displays back-office internal branding instead of viewer platform copy', () => {
+    render(<AuthBrand />);
+
+    expect(screen.getByText('Cổng Quản Trị & Sản Xuất Nội Bộ')).toBeInTheDocument();
+    expect(screen.queryByText(/Nền tảng xem phim/)).not.toBeInTheDocument();
   });
 });

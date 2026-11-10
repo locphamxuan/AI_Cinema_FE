@@ -173,7 +173,7 @@ export function OverviewTab() {
             </div>
 
             {caps.create && open && (
-              <Button size="sm" className="w-full mt-1 bg-[#E50914] hover:bg-[#B81D24] text-white rounded-xl" onClick={() => setAssigning(true)}>
+              <Button size="sm" className="w-full mt-1 bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 rounded-full" onClick={() => setAssigning(true)}>
                 {project.creator ? 'Đổi Creator' : 'Giao cho Creator'}
               </Button>
             )}

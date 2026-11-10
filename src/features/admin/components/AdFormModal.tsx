@@ -66,7 +66,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
       onClose={onClose}
       title={ad ? 'Sửa quảng cáo' : 'Tạo quảng cáo'}
       subtitle="Quảng cáo chèn giữa tập cho gói có quảng cáo."
-      icon={<Megaphone className="w-5 h-5 text-[#E50914]" />}
+      icon={<Megaphone className="w-5 h-5" />}
       maxWidth="max-w-lg"
     >
       <form
@@ -151,13 +151,13 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
         </FormField>
         {problem && title && mediaUrl && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400 font-medium">{problem}</p>}
         <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
-          <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 py-2 text-xs">
+          <Button type="button" variant="secondary" onClick={onClose} className="rounded-full px-4 py-2 text-xs">
             Huỷ
           </Button>
           <Button
             type="submit"
             disabled={busy || uploading || !!problem}
-            className="rounded-xl px-5 py-2 text-xs font-semibold bg-[#E50914] hover:bg-[#B81D24] text-white shadow-xs transition-colors"
+            className="rounded-full px-5 py-2 text-xs font-semibold bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 shadow-xs transition-colors"
           >
             {ad ? 'Lưu' : 'Tạo quảng cáo'}
           </Button>

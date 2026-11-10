@@ -8,9 +8,9 @@ import { HlsPreview } from '@/features/production/components/episode/HlsPreview'
 import { AI_PARTS, EPISODE_STATUS, INGEST_STATUS, LABEL_TYPE, SCRIPT_STATUS } from '@/features/production/lib/labels';
 import type { Episode, MediaAsset, ProjectDetail, ProjectScript } from '@/types/production';
 
-const TAB = 'px-3.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer transition-all';
-const tabClass = (active: boolean) => `${TAB} ${active ? 'bg-[#E50914] text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05]'}`;
-const NAV = 'w-8 h-8 rounded-lg border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5';
+const TAB = 'px-4 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-all';
+const tabClass = (active: boolean) => `${TAB} ${active ? 'bg-[#121212] text-white dark:bg-white dark:text-slate-900' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05]'}`;
+const NAV = 'w-8 h-8 rounded-full border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5';
 
 /** Centre of the audit desk: the delivered version on the player, its versions, the script and the AI disclosure. */
 export function ReviewerAuditCanvas({
@@ -36,10 +36,10 @@ export function ReviewerAuditCanvas({
   const latestScript = script?.versions[0];
 
   return (
-    <div className="flex-1 min-w-0 bg-[#F8FAFC] dark:bg-[#090B10] p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
-      <header className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-white/[0.08]">
+    <div className="flex-1 min-w-0 bg-[#F9FAFB] dark:bg-[#090B10] p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
+      <header className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-white/[0.08]">
         <div className="min-w-0">
-          <Link href={`/reviewer/projects/${project.id}`} className="text-xs text-slate-500 hover:text-[#E50914]">
+          <Link href={`/reviewer/projects/${project.id}`} className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white">
             {project.title}
           </Link>
           <h1 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight flex flex-wrap items-center gap-2">

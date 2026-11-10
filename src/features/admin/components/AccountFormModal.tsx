@@ -68,7 +68,7 @@ export function AccountFormModal({
       maxWidth="max-w-md"
       title={creating ? 'Tạo tài khoản' : 'Sửa tài khoản'}
       subtitle={creating ? 'Tài khoản nội bộ: Creator, Reviewer, Staff hoặc Admin.' : account.email}
-      icon={creating ? <UserPlus className="w-5 h-5 text-[#E50914]" /> : <UserCog className="w-5 h-5 text-[#E50914]" />}
+      icon={creating ? <UserPlus className="w-5 h-5" /> : <UserCog className="w-5 h-5" />}
     >
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Họ tên">
@@ -131,13 +131,13 @@ export function AccountFormModal({
           </p>
         </div>
         <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
-          <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 py-2 text-xs">
+          <Button type="button" variant="secondary" onClick={onClose} className="rounded-full px-4 py-2 text-xs">
             Huỷ
           </Button>
           <Button
             type="submit"
             disabled={!valid || busy}
-            className="rounded-xl px-5 py-2 text-xs font-semibold bg-[#E50914] hover:bg-[#B81D24] text-white shadow-xs transition-colors"
+            className="rounded-full px-5 py-2 text-xs font-semibold bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 shadow-xs transition-colors"
           >
             {creating ? 'Tạo tài khoản' : 'Lưu'}
           </Button>

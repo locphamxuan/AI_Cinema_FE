@@ -40,38 +40,37 @@ export function AdminSidebar() {
   const isSettings = pathname.startsWith('/admin/settings');
 
   const linkClass = (active: boolean) =>
-    `group relative flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-medium transition-all duration-200 cursor-pointer ${
+    `group relative flex items-center justify-between rounded-xl px-3 py-2.5 text-xs transition-all duration-200 cursor-pointer ${
       active
-        ? 'bg-red-500/10 text-[#E50914] font-bold border border-red-500/20 shadow-xs'
-        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white border border-transparent'
+        ? 'bg-[#121212] text-white font-semibold shadow-xs dark:bg-white dark:text-slate-900'
+        : 'text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white'
     }`;
 
   const iconClass = (active: boolean) =>
-    `w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
-      active ? 'text-[#E50914]' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
+    `w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+      active ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
     }`;
 
   return (
     <nav
       aria-label="Khu quản trị"
-      className="md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0D1017] text-slate-800 dark:text-slate-100 md:min-h-[calc(100vh-3.5rem)] p-3 flex flex-col justify-between transition-colors duration-200"
+      className="md:w-64 shrink-0 border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#0D1017] text-slate-800 dark:text-slate-100 md:min-h-[calc(100vh-3.5rem)] p-3 flex flex-col justify-between transition-colors duration-200"
     >
       <div className="space-y-4">
-        {/* Phần Đầu: Logo "AI CINEMA" đỏ #E50914 kèm icon cuộn phim & Badge phân quyền */}
-        <div className="px-2 pt-1 pb-2 border-b border-slate-200 dark:border-white/[0.06] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#E50914] flex items-center justify-center text-white shadow-md font-black">
+        <div className="px-2 pt-1 pb-2.5 border-b border-slate-200/80 dark:border-white/[0.06] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-[#121212] dark:bg-white flex items-center justify-center text-white dark:text-slate-900 shadow-xs shrink-0">
               <Film className="w-4 h-4" />
             </div>
-            <div>
-              <p className="text-sm font-black text-slate-900 dark:text-white tracking-wider">AI CINEMA</p>
-              <p className="text-[10px] font-bold text-[#E50914] tracking-wide uppercase">
-                ADMIN CONSOLE
+            <div className="min-w-0">
+              <p className="text-sm font-extrabold text-slate-900 dark:text-white tracking-tight truncate">AI CINEMA</p>
+              <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
+                Admin Console
               </p>
             </div>
           </div>
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20">
-            Executive Admin
+          <span className="shrink-0 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-white/10">
+            Quản trị
           </span>
         </div>
 
@@ -87,12 +86,6 @@ export function AdminSidebar() {
             aria-current={isOverview ? 'page' : undefined}
             className={linkClass(isOverview)}
           >
-            {isOverview && (
-              <span
-                className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[#E50914] shadow-[0_0_8px_rgba(229,9,20,0.5)]"
-                aria-hidden="true"
-              />
-            )}
             <div className="flex items-center gap-2.5 min-w-0">
               <LayoutDashboard className={iconClass(isOverview)} />
               <span className="truncate">Tổng quan dự án</span>
@@ -106,12 +99,6 @@ export function AdminSidebar() {
             aria-current={isProjects ? 'page' : undefined}
             className={linkClass(isProjects)}
           >
-            {isProjects && (
-              <span
-                className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[#E50914] shadow-[0_0_8px_rgba(229,9,20,0.5)]"
-                aria-hidden="true"
-              />
-            )}
             <div className="flex items-center gap-2.5 min-w-0">
               <Clapperboard className={iconClass(isProjects)} />
               <span className="truncate">Dự án phim</span>
@@ -126,7 +113,6 @@ export function AdminSidebar() {
             </Link>
           )}
 
-
           {/* [ 🤝 Hợp đồng & Studio ] (Duyệt yêu cầu) */}
           <Link
             href="/admin/requests"
@@ -134,12 +120,6 @@ export function AdminSidebar() {
             aria-current={isRequests ? 'page' : undefined}
             className={linkClass(isRequests)}
           >
-            {isRequests && (
-              <span
-                className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[#E50914] shadow-[0_0_8px_rgba(229,9,20,0.5)]"
-                aria-hidden="true"
-              />
-            )}
             <div className="flex items-center gap-2.5 min-w-0">
               <Inbox className={iconClass(isRequests)} />
               <span className="truncate">Duyệt yêu cầu</span>
@@ -153,12 +133,6 @@ export function AdminSidebar() {
             aria-current={isMovies ? 'page' : undefined}
             className={linkClass(isMovies)}
           >
-            {isMovies && (
-              <span
-                className="absolute left-1 top-2 bottom-2 w-1 rounded-full bg-[#E50914] shadow-[0_0_8px_rgba(229,9,20,0.5)]"
-                aria-hidden="true"
-              />
-            )}
             <div className="flex items-center gap-2.5 min-w-0">
               <Rocket className={iconClass(isMovies)} />
               <span className="truncate">Quản lý phim</span>
@@ -277,7 +251,7 @@ export function AdminSidebar() {
       {/* Footer: the signed-in Admin, never a placeholder account */}
       <div className="pt-3 border-t border-slate-200 dark:border-white/[0.06] px-2 text-xs">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center text-[#E50914] font-black text-xs">
+          <div className="w-7 h-7 rounded-full bg-[#121212] dark:bg-white flex items-center justify-center text-white dark:text-slate-900 font-bold text-xs">
             {(user?.name ?? 'A').trim().charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">

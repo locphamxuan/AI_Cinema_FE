@@ -55,7 +55,7 @@ export function CinematicProjectCard({ project, href }: { project: ScriptProject
               <span className="font-semibold text-slate-900 dark:text-white font-mono">{project.currentVersion > 0 ? `Bản ${project.currentVersion}` : 'Chưa có bản nào'}</span>
             </div>
             <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-white/[0.08] overflow-hidden">
-              <div className="h-full rounded-full bg-[#FFDD00] dark:bg-amber-400 transition-all duration-500" style={{ width: `${percent}%` }} />
+              <div className="h-full rounded-full bg-[#121212] dark:bg-white transition-all duration-500" style={{ width: `${percent}%` }} />
             </div>
           </div>
         </div>

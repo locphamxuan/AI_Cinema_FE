@@ -39,9 +39,9 @@ export function ChangeRequestInbox() {
               setFilter(key);
               setPage(1);
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
               filter === key
-                ? 'bg-[#E50914] text-white shadow-xs'
+                ? 'bg-[#121212] text-white dark:bg-white dark:text-slate-900 shadow-xs'
                 : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10'
             }`}
           >
