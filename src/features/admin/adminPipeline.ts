@@ -45,13 +45,13 @@ export function readyFilmsOf(rows: ProjectPipeline[]): ReadyFilm[] {
   );
 }
 
-/** Rounds the studio signed, on projects still negotiating. */
-function contractsToSignOf(rows: ProjectPipeline[]): ContractToSign[] {
-  return rows.flatMap((project) =>
-    project.status === 'ASSIGNED' && project.script?.status === 'FINAL' && project.contract?.status === 'STUDIO_SIGNED'
-      ? [{ contract: project.contract, project }]
-      : [],
-  );
+/**
+ * Rounds the studio signed and the Admin has to answer: the first contract of an ASSIGNED project, or the new
+ * studio's contract after a studio change in production. The row carries only the open round, so an older
+ * SIGNED contract of the same project never hides it.
+ */
+export function contractsToSignOf(rows: ProjectPipeline[]): ContractToSign[] {
+  return rows.flatMap((project) => (project.contract?.status === 'STUDIO_SIGNED' ? [{ contract: project.contract, project }] : []));
 }
 
 /** Projects counted across every page: the API's total for a status filter. */
