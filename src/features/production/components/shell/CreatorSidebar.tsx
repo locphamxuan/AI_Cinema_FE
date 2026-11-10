@@ -8,7 +8,7 @@ import {
   Handshake,
   Bell,
   Settings,
-  Sparkles,
+  Film,
   ChevronRight,
 } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
@@ -48,7 +48,7 @@ export function CreatorSidebar() {
         <div className="px-1 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[#121212] dark:bg-white text-white dark:text-[#121212]">
-              <Sparkles className="w-4 h-4" />
+              <Film className="w-4 h-4" />
             </span>
             <span className="text-[15px] font-bold tracking-tight text-[#111827] dark:text-white">
               AI CINEMA

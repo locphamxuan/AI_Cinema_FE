@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
-import { MessageSquare, Send, Sparkles, UserRound } from 'lucide-react';
+import { MessageSquare, Send, UserRound } from 'lucide-react';
 import { useResource } from '@/hooks/useResource';
 import { useAction } from '@/hooks/useAction';
 import { projectNoteService } from '@/services/projectNoteService';
@@ -64,7 +64,7 @@ export function ProjectNotesSection({ projectId }: ProjectNotesSectionProps) {
             <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
               Thống Nhất Ý Tưởng & Định Hướng (Bước 1)
               <span className="flex items-center gap-1 text-[11px] font-normal text-slate-400">
-                <Sparkles className="w-3 h-3 text-amber-500" /> Admin & Creator
+                Admin & Creator
               </span>
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400">

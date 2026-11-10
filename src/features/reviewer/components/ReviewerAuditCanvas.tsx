@@ -267,8 +267,8 @@ export function ReviewerAuditCanvas({
           onClick={() => setActiveReportTab('ai_prompts')}
           className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 font-semibold cursor-pointer transition-colors"
         >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>✨ Tóm tắt vi phạm AI ({episode.promptsCount} prompts)</span>
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Tóm tắt vi phạm AI ({episode.promptsCount} prompts)</span>
         </button>
       </section>
 

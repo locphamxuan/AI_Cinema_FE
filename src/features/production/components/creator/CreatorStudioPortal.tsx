@@ -381,7 +381,7 @@ export function CreatorStudioPortal() {
         <section aria-label="Tiện ích và công cụ biên kịch" className="space-y-4 pt-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-500" />
+              <Layers className="w-4 h-4 text-slate-600 dark:text-slate-300" />
               <span>Tiện ích & Hỗ trợ biên kịch</span>
             </h3>
 

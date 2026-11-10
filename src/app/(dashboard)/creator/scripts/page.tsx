@@ -6,7 +6,8 @@ import {
   X,
   ArrowUpRight,
   ArrowRight,
-  Sparkles,
+  Film,
+  Plus,
   Search,
   Download,
   Edit3,
@@ -245,7 +246,7 @@ export default function ScreenplayLibraryPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#111420] border border-slate-200/70 dark:border-white/[0.08] rounded-3xl p-5 sm:p-6 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-[#121212] dark:bg-white text-white dark:text-[#121212] flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
-                <Sparkles className="w-5 h-5" />
+                <Film className="w-5 h-5" />
               </div>
               <div className="space-y-0.5">
                 <h1 className="text-lg sm:text-xl font-bold tracking-tight text-[#111827] dark:text-white">
@@ -273,8 +274,8 @@ export default function ScreenplayLibraryPage() {
                 onClick={() => setComposeOpen(true)}
                 className="inline-flex items-center gap-1.5 bg-[#121212] dark:bg-white text-white dark:text-[#121212] rounded-full px-5 py-2.5 text-sm font-semibold hover:bg-black dark:hover:bg-slate-100 transition-all cursor-pointer shadow-xs"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>+ Soạn kịch bản mới</span>
+                <Plus className="w-4 h-4" />
+                <span>Soạn kịch bản mới</span>
               </button>
             </div>
           </div>
@@ -322,7 +323,7 @@ export default function ScreenplayLibraryPage() {
 
           <div className="relative z-10 max-w-2xl space-y-5">
             <span className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-[11px] font-semibold tracking-wider uppercase bg-white/10 text-slate-200 border border-white/15">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <Film className="w-3.5 h-3.5 text-slate-300" />
               DỰ ÁN TRỌNG ĐIỂM SẮP CHUYỂN GIAO STUDIO
             </span>
 
