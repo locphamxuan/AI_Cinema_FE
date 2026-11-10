@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { productionService } from '@/services/productionService';
 import Link from 'next/link';
 import {
   BookOpen,
@@ -99,8 +100,39 @@ const SCRIPTS_DATA: ScriptLibraryItem[] = [
 export default function ScreenplayLibraryPage() {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'ALL' | 'APPROVED' | 'IN_REVIEW' | 'DRAFT'>('ALL');
+  const [realScripts, setRealScripts] = useState<ScriptLibraryItem[]>([]);
 
-  const filtered = SCRIPTS_DATA.filter((item) => {
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        const res = await productionService.listProjects();
+        if (mounted && res?.data?.data && res.data.data.length > 0) {
+          const mapped: ScriptLibraryItem[] = res.data.data.map((p) => ({
+            id: 'script-' + p.id,
+            projectTitle: p.title,
+            episodeNumber: 1,
+            episodeTitle: 'Táº­p 1: Khá»Ÿi nguá»“n',
+            scenesCount: 20,
+            pagesCount: 35,
+            acts: ['Há»“i 1: Khá»Ÿi Ä‘áº§u', 'Há»“i 2: Thá»­ thÃ¡ch', 'Há»“i 3: BÆ°á»›c ngoáº·t'],
+            status: p.status === 'COMPLETED' ? 'APPROVED' : p.status === 'UNDER_REVISION' ? 'IN_REVIEW' : 'DRAFT',
+            version: 'v1.0 Final Draft',
+            lastEdited: new Date(p.updatedAt).toLocaleDateString('vi-VN'),
+            logline: 'Dá»± Ã¡n phim Ä‘iá»‡n áº£nh AI Cinema OTT.',
+          }));
+          setRealScripts(mapped);
+        }
+      } catch (e) {
+        console.warn('Real scripts fetch note:', e);
+      }
+    }
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  const activeScripts = realScripts.length > 0 ? realScripts : SCRIPTS_DATA;
+  const filtered = activeScripts.filter((item) => {
     if (filter !== 'ALL' && item.status !== filter) return false;
     if (search.trim()) {
       const q = search.toLowerCase();

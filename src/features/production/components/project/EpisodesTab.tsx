@@ -10,6 +10,7 @@ import { OPEN_PROJECT, isIn } from '../../lib/capabilities';
 import { AddEpisodeModal, AddSeasonModal, EditEpisodeModal, EditSeasonModal } from './EpisodeModals';
 import { useProject } from './ProjectContext';
 import { SeasonSection } from './SeasonSection';
+import { ScriptWorkflowCard } from './ScriptWorkflowCard';
 
 /** Seasons with their release window, price and status, and the episodes of each with their Creator, prices and dates. */
 export function EpisodesTab() {
@@ -24,6 +25,9 @@ export function EpisodesTab() {
 
   return (
     <div className="space-y-4">
+      {/* MF-1 Script Workflow Card (Creator -> Reviewer -> Admin) */}
+      <ScriptWorkflowCard projectId={project.id} />
+
       {plan && (
         <div className="flex justify-end">
           <Button size="sm" variant="secondary" onClick={() => setAddingSeason(true)}>

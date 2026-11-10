@@ -1,4 +1,7 @@
-'use client';
+﻿'use client';
+
+import { finalFilmService } from '@/services/finalFilmService';
+
 
 import { useState } from 'react';
 import { toast } from '@/components/ui/Toast';

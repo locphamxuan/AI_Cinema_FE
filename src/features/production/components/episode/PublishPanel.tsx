@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 
@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
+import { finalFilmService } from '@/services/finalFilmService';
 import type { Episode, MovieStatus, Publication, UnpublishMode, UnpublishReason } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
@@ -31,6 +32,8 @@ export function PublishPanel({
   const [price, setPrice] = useState(episode.coinPrice !== null ? String(episode.coinPrice) : '');
   const [scheduleAt, setScheduleAt] = useState('');
   const [takingDown, setTakingDown] = useState<Publication | null>(null);
+  const [rejecting, setRejecting] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
   const { busy, run } = useAction();
 
   const min = settings.data?.episodeCoinPriceMin;
@@ -134,6 +137,51 @@ export function PublishPanel({
           </ul>
         </div>
       </div>
+
+            {rejecting && (
+        <Modal
+          open
+          onClose={() => setRejecting(false)}
+          title="YÃªu cáº§u sá»­a Ä‘á»•i Phim Final"
+          subtitle="Gá»­i yÃªu cáº§u chá»‰nh sá»­a thÃ´ng qua Reviewer Ä‘á»ƒ Reviewer phá»‘i há»£p cÃ¹ng Studio."
+          maxWidth="max-w-md"
+        >
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const done = await run(
+                () => finalFilmService.rejectFinalFilm(episode.id, rejectReason.trim()),
+                'ÄÃ£ gá»­i yÃªu cáº§u chá»‰nh sá»­a qua Reviewer',
+              );
+              if (done) {
+                setRejecting(false);
+                setRejectReason('');
+                await refresh();
+              }
+            }}
+            className="space-y-4 text-xs"
+          >
+            <FormField label="LÃ½ do & yÃªu cáº§u chá»‰nh sá»­a">
+              <textarea
+                rows={4}
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="Cáº§n chá»‰nh sá»­a láº¡i mÃ u sáº¯c á»Ÿ phÃ¢n Ä‘oáº¡n káº¿t thÃºc..."
+                required
+                className={fieldTextareaClass}
+              />
+            </FormField>
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+              <Button type="button" variant="secondary" onClick={() => setRejecting(false)}>
+                Há»§y
+              </Button>
+              <Button type="submit" disabled={busy || !rejectReason.trim()} variant="danger">
+                {busy ? 'Äang gá»­i...' : 'Gá»­i cho Reviewer'}
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      )}
 
       {takingDown && (
         <UnpublishModal

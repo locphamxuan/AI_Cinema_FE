@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { productionService } from '@/services/productionService';
 import Link from 'next/link';
 import {
   FileCheck2,
@@ -152,8 +153,43 @@ export function ReviewerProjectQueuePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [search, setSearch] = useState('');
   const [timeRange, setTimeRange] = useState('30d');
+  const [realItems, setRealItems] = useState<QueueItem[]>([]);
 
-  const filteredItems = MOCK_QUEUE_ITEMS.filter((item) => {
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      try {
+        const res = await productionService.listProjects();
+        if (mounted && res?.data?.data && res.data.data.length > 0) {
+          const mapped: QueueItem[] = res.data.data.map((p, idx) => ({
+            id: p.id,
+            projectId: p.id,
+            title: p.title,
+            episodeNumber: 1,
+            totalEpisodes: p._count?.episodes || 1,
+            genre: 'Sci-Fi / AI Cinema',
+            creatorName: p.creator?.fullName || 'In-house Screenwriter',
+            creatorAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
+            studioName: p.studio?.name || 'Studio Äá»‘i TÃ¡c',
+            stage: p.status === 'UNDER_REVISION' ? 'STUDIO_REVISING' : p.status === 'COMPLETED' ? 'ARTICLE_44_APPROVED' : 'SCRIPT_PENDING',
+            stageLabel: p.status === 'COMPLETED' ? 'ÄÃ£ Cáº¥p PhÃ©p Äiá»u 44' : p.status === 'UNDER_REVISION' ? 'Studio Äang Sá»­a Lá»—i' : 'Ká»‹ch Báº£n Chá» Tháº©m Äá»‹nh',
+            thumbnailUrl: p.posterUrl || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
+            submittedAt: 'HÃ´m nay',
+            promptsCount: 120,
+            openTicketsCount: 0,
+          }));
+          setRealItems(mapped);
+        }
+      } catch (e) {
+        console.warn('Real projects fetch note:', e);
+      }
+    }
+    load();
+    return () => { mounted = false; };
+  }, []);
+
+  const activeList = realItems.length > 0 ? realItems : MOCK_QUEUE_ITEMS;
+  const filteredItems = activeList.filter((item) => {
     const matchesSearch =
       item.title.toLowerCase().includes(search.toLowerCase()) ||
       item.creatorName.toLowerCase().includes(search.toLowerCase()) ||
@@ -311,7 +347,7 @@ export function ReviewerProjectQueuePage() {
                   : 'bg-white dark:bg-[#111420] text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08]'
               }`}
             >
-              ✨ Tất cả ({MOCK_QUEUE_ITEMS.length})
+              ✨ Tất cả ({activeList.length})
             </button>
 
             <button
