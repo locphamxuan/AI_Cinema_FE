@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { finalFilmService } from '@/services/finalFilmService';
 
@@ -85,7 +85,7 @@ export function ReviewerAuditWorkspace() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row flex-1 w-full min-h-[calc(100vh-3.5rem)] bg-[#F8FAFC] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 transition-colors duration-200 overflow-hidden">
+    <div className="flex flex-col lg:flex-row flex-1 w-full min-h-[calc(100vh-3.5rem)] bg-[#F9FAFB] dark:bg-[#090B10] text-[#0F172A] dark:text-slate-100 transition-colors duration-200 overflow-hidden">
       {/* ── CỘT 2: KHÔNG GIAN THẨM ĐỊNH CHÍNH (Canvas Giữa) ── */}
       <ReviewerAuditCanvas
         episode={episode}

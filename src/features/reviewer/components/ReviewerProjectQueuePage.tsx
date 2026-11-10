@@ -211,7 +211,7 @@ export function ReviewerProjectQueuePage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#FAF9F6] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 font-sans p-4 sm:p-6 lg:p-8 space-y-6 transition-colors duration-200">
+    <div className="relative min-h-screen w-full bg-[#F9FAFB] dark:bg-[#090B10] text-[#0F172A] dark:text-slate-100 font-sans p-4 sm:p-6 lg:p-8 space-y-6 transition-colors duration-200">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* ── 1. Top Profile Greeting Card (Buy Me a Coffee / Playful Persona style) ── */}
         <section
@@ -347,7 +347,7 @@ export function ReviewerProjectQueuePage() {
                   : 'bg-white dark:bg-[#111420] text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08]'
               }`}
             >
-              ✨ Tất cả ({activeList.length})
+              Tất cả ({activeList.length})
             </button>
 
             <button
