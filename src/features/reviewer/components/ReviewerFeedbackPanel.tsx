@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import {
   MessageSquare,
-  Sparkles,
   History,
   Send,
   AlertTriangle,
@@ -92,53 +91,44 @@ export function ReviewerFeedbackPanel({
   return (
     <aside
       aria-label="Bảng Thẩm Định & Góp Ý Lỗi"
-      className="w-full lg:w-96 xl:w-104 shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0D1017] flex flex-col justify-between h-auto lg:h-[calc(100vh-3.5rem)] text-slate-800 dark:text-slate-200 transition-colors duration-200"
+      className="w-full lg:w-96 xl:w-[26rem] shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200/70 dark:border-white/[0.08] bg-[#FFFFFF] dark:bg-[#0D1017] flex flex-col justify-between h-auto lg:h-[calc(100vh-3.5rem)] text-[#0F172A] dark:text-slate-200 transition-colors duration-200 font-sans"
     >
-      {/* ── 1. Tabs Đầu Bảng (Refero Comments / Insights / Activity Style) ── */}
-      <div className="shrink-0 border-b border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0D1017]">
-        <div className="flex items-center px-4 pt-3 gap-1">
-          {/* Tab 1: Comments / Feedback */}
+      {/* ── 1. Header Tabs Dạng Pill (Contra Pill Navigation) ── */}
+      <div className="shrink-0 border-b border-slate-200/70 dark:border-white/[0.08] bg-[#FFFFFF] dark:bg-[#0D1017] p-3.5 space-y-3">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
             onClick={() => setActiveTab('feedback')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'feedback'
-                ? 'border-[#E50914] text-slate-900 dark:text-white'
-                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                ? 'bg-[#121212] dark:bg-white text-white dark:text-[#121212] shadow-xs'
+                : 'text-[#64748B] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#0F172A]'
             }`}
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>Feedback Lỗi</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-red-500/20 text-[#E50914] text-[10px] font-mono">
-              {tickets.length}
-            </span>
+            <span>Feedback Lỗi ({tickets.length})</span>
           </button>
 
-          {/* Tab 2: Khai báo AI / Insights */}
           <button
             type="button"
             onClick={() => setActiveTab('ai_declare')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'ai_declare'
-                ? 'border-[#E50914] text-slate-900 dark:text-white'
-                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                ? 'bg-[#121212] dark:bg-white text-white dark:text-[#121212] shadow-xs'
+                : 'text-[#64748B] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#0F172A]'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <ShieldCheck className="w-3.5 h-3.5" />
             <span>Khai Báo AI</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-mono">
-              {episode.promptsCount}
-            </span>
           </button>
 
-          {/* Tab 3: Lịch sử / Activity */}
           <button
             type="button"
             onClick={() => setActiveTab('history')}
-            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold border-b-2 transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               activeTab === 'history'
-                ? 'border-[#E50914] text-slate-900 dark:text-white'
-                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                ? 'bg-[#121212] dark:bg-white text-white dark:text-[#121212] shadow-xs'
+                : 'text-[#64748B] dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-[#0F172A]'
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -146,36 +136,36 @@ export function ReviewerFeedbackPanel({
           </button>
         </div>
 
-        {/* Dropdown Filter: Open threads ⌵ / Toàn bộ lỗi ⌵ */}
+        {/* Filter Status Bar */}
         {activeTab === 'feedback' && (
-          <div className="flex items-center justify-between px-4 py-2 bg-slate-50 dark:bg-black/20 text-xs border-t border-slate-200 dark:border-white/[0.04]">
-            <span className="text-slate-500 dark:text-slate-400 font-medium">Lọc danh sách sự cố:</span>
+          <div className="flex items-center justify-between text-xs pt-1">
+            <span className="text-[#64748B] dark:text-slate-400 font-medium">Lọc sự cố:</span>
             <div className="relative">
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
                 aria-label="Lọc trạng thái lỗi"
-                className="appearance-none bg-white dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-300 font-medium pl-2.5 pr-6 py-1 rounded-md text-[11px] focus:outline-none cursor-pointer border border-slate-200 dark:border-transparent shadow-xs"
+                className="appearance-none rounded-full bg-slate-50 dark:bg-white/[0.05] hover:bg-slate-100 dark:hover:bg-white/[0.08] text-[#0F172A] dark:text-slate-200 font-medium pl-3 pr-7 py-1 text-xs focus:outline-none cursor-pointer border border-slate-200 dark:border-white/10"
               >
                 <option value="all">Toàn bộ lỗi ({tickets.length})</option>
                 <option value="pending">Chờ Studio phản hồi</option>
                 <option value="in_progress">Studio đang khắc phục</option>
                 <option value="resolved">Đã giải quyết xong</option>
               </select>
-              <ChevronDown className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <ChevronDown className="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
         )}
       </div>
 
-      {/* ── 2. Nội Dung Cuộn (Scrollable Thread List) ── */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      {/* ── 2. Danh Sách Lỗi (Ticket Items - Contra Minimalist Cards) ── */}
+      <div className="flex-1 overflow-y-auto p-4 bg-[#F9FAFB]/60 dark:bg-transparent">
         {activeTab === 'feedback' ? (
           filteredTickets.length === 0 ? (
             <div className="py-12 text-center space-y-2">
-              <CheckCircle2 className="w-10 h-10 text-emerald-500 dark:text-emerald-400 mx-auto" />
-              <p className="text-sm font-bold text-slate-900 dark:text-white">Chưa có góp ý lỗi nào</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xs mx-auto">
+              <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
+              <p className="text-sm font-bold text-[#0F172A] dark:text-white">Chưa có góp ý lỗi nào</p>
+              <p className="text-xs text-[#64748B] dark:text-slate-400 max-w-xs mx-auto">
                 Tập phim chưa có lỗi nào cần sửa hoặc đã giải quyết xong toàn bộ.
               </p>
             </div>
@@ -183,27 +173,27 @@ export function ReviewerFeedbackPanel({
             filteredTickets.map((tkt) => (
               <div
                 key={tkt.id}
-                className="rounded-xl bg-slate-50 dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-3.5 space-y-2.5 hover:border-slate-300 dark:hover:border-white/20 transition-all shadow-xs"
+                className="bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] rounded-2xl p-4 mb-3 hover:border-slate-400 dark:hover:border-white/25 transition-all shadow-xs space-y-2.5"
               >
-                {/* Header: Timestamp pill + Status badge */}
+                {/* Header: Timestamp Pill + Status Badge */}
                 <div className="flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => onTimeJump(tkt.timestampSeconds)}
-                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#E50914]/15 hover:bg-[#E50914]/25 text-[#E50914] text-xs font-mono font-bold transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs bg-slate-100 hover:bg-slate-200 dark:bg-white/10 dark:hover:bg-white/15 text-slate-800 dark:text-white font-mono font-semibold transition-colors cursor-pointer"
                     title="Bấm để tua video tới mốc thời gian này"
                   >
-                    <Clock className="w-3 h-3" />
+                    <Clock className="w-3 h-3 text-[#64748B] dark:text-slate-300" />
                     <span>{tkt.timestampText}</span>
                   </button>
 
                   <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
-                      tkt.status === 'PENDING_STUDIO'
-                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
-                        : tkt.status === 'IN_PROGRESS'
-                        ? 'bg-sky-500/10 text-sky-700 dark:text-sky-400 border-sky-500/20'
-                        : 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20'
+                    className={`rounded-full px-3 py-1 text-xs font-medium border ${
+                      tkt.status === 'RESOLVED'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30'
+                        : tkt.status === 'PENDING_STUDIO'
+                        ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30'
+                        : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30'
                     }`}
                   >
                     {tkt.statusLabel}
@@ -212,25 +202,29 @@ export function ReviewerFeedbackPanel({
 
                 {/* Title & Description */}
                 <div className="space-y-1">
-                  <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <h4 className="text-sm font-semibold text-[#0F172A] dark:text-white flex items-center gap-1.5">
                     {tkt.severity === 'CRITICAL' && (
-                      <AlertTriangle className="w-3.5 h-3.5 text-rose-500 shrink-0" />
+                      <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
                     )}
                     <span>{tkt.title}</span>
                   </h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{tkt.description}</p>
+                  <p className="text-xs text-[#64748B] dark:text-slate-300 leading-relaxed">
+                    {tkt.description}
+                  </p>
                 </div>
 
-                {/* Studio Response note if available */}
+                {/* Studio Response */}
                 {tkt.studioResponse && (
-                  <div className="rounded-lg bg-sky-500/10 border border-sky-500/20 p-2 text-[11px] text-sky-900 dark:text-sky-200 space-y-0.5">
-                    <span className="font-bold text-sky-700 dark:text-sky-400">Phản hồi từ {episode.studioName}:</span>
-                    <p>{tkt.studioResponse}</p>
+                  <div className="rounded-xl bg-slate-50 dark:bg-white/[0.04] border border-slate-200/70 dark:border-white/10 p-2.5 text-xs text-slate-700 dark:text-slate-200 space-y-0.5">
+                    <span className="font-semibold text-[#0F172A] dark:text-white">
+                      Phản hồi từ {episode.studioName}:
+                    </span>
+                    <p className="text-[#64748B] dark:text-slate-300">{tkt.studioResponse}</p>
                   </div>
                 )}
 
-                {/* Footer: Author & Time ago */}
-                <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 pt-1 border-t border-slate-200 dark:border-white/[0.04]">
+                {/* Footer */}
+                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-1.5 border-t border-slate-100 dark:border-white/[0.05]">
                   <span>Người gắn: {tkt.author.name}</span>
                   <span>{tkt.createdAt}</span>
                 </div>
@@ -238,31 +232,35 @@ export function ReviewerFeedbackPanel({
             ))
           )
         ) : activeTab === 'ai_declare' ? (
-          /* Tab Khai Báo AI Details */
           <div className="space-y-3 text-xs">
-            <div className="rounded-xl bg-slate-50 dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-3 space-y-2">
-              <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 text-xs">
+            <div className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] p-4 space-y-2.5 shadow-xs">
+              <h4 className="font-bold text-[#0F172A] dark:text-white flex items-center gap-2 text-sm">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>Tiêu Chuẩn Tuân Thủ AI (Điều 44 Luật AI)</span>
+                <span>Tiêu Chuẩn Tuân Thủ AI (Điều 44)</span>
               </h4>
-              <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
-                Tác phẩm do AI tham gia tạo lập bắt buộc phải gắn nhãn hiển thị nhận biết và lưu trữ nhật ký prompt
-                đầy đủ nhằm bảo đảm quyền tác giả và minh bạch dữ liệu.
+              <p className="text-[#64748B] dark:text-slate-300 leading-relaxed">
+                Tác phẩm do AI tham gia tạo lập bắt buộc phải gắn nhãn hiển thị nhận biết và lưu trữ nhật ký prompt đầy đủ nhằm bảo đảm minh bạch dữ liệu.
               </p>
-              <div className="pt-2 border-t border-slate-200 dark:border-white/[0.06] flex items-center justify-between text-[11px]">
-                <span className="text-slate-500 dark:text-slate-400">Trạng thái hồ sơ:</span>
-                <span className={isComplianceActive ? 'text-emerald-600 dark:text-emerald-400 font-bold' : 'text-amber-600 dark:text-amber-400 font-bold'}>
+              <div className="pt-2 border-t border-slate-100 dark:border-white/[0.06] flex items-center justify-between">
+                <span className="text-[#64748B]">Trạng thái hồ sơ:</span>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-medium border ${
+                    isComplianceActive
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      : 'bg-amber-50 text-amber-700 border-amber-200'
+                  }`}
+                >
                   {isComplianceActive ? 'ĐÃ ĐẠT TIÊU CHUẨN' : 'CHỜ THẨM ĐỊNH'}
                 </span>
               </div>
             </div>
 
-            <div className="rounded-xl bg-slate-50 dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-3 space-y-2">
-              <h5 className="font-bold text-slate-800 dark:text-slate-200">Danh Mục Công Nghệ Studio Sử Dụng:</h5>
-              <ul className="space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300">
+            <div className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] p-4 space-y-2.5 shadow-xs">
+              <h5 className="font-bold text-[#0F172A] dark:text-white">Công Nghệ Studio Sử Dụng:</h5>
+              <ul className="space-y-1.5 text-xs text-[#64748B] dark:text-slate-300">
                 {episode.aiTechStack.map((tech) => (
                   <li key={tech} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#E50914]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#121212] dark:bg-white" />
                     <span>{tech}</span>
                   </li>
                 ))}
@@ -270,31 +268,33 @@ export function ReviewerFeedbackPanel({
             </div>
           </div>
         ) : (
-          /* Tab Lịch Sử Activity */
           <div className="space-y-3 text-xs">
-            <div className="rounded-xl bg-slate-50 dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-3 space-y-2">
-              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                <span className="font-bold text-slate-900 dark:text-white">Bản Dựng Version 2 Tải Lên</span>
+            <div className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] p-4 space-y-1.5 shadow-xs">
+              <div className="flex items-center justify-between text-[#64748B]">
+                <span className="font-semibold text-[#0F172A] dark:text-white">Bản Dựng Version 2 Tải Lên</span>
                 <span>Hôm nay 10:15</span>
               </div>
-              <p className="text-slate-600 dark:text-slate-300 text-[11px]">Studio Saigon VFX Lab đã bàn giao bản Master Render 4K.</p>
+              <p className="text-[#64748B] dark:text-slate-300">
+                Studio Saigon VFX Lab đã bàn giao bản Master Render 4K.
+              </p>
             </div>
-            <div className="rounded-xl bg-slate-50 dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-3 space-y-2">
-              <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
-                <span className="font-bold text-slate-900 dark:text-white">Reviewer Bắt Đầu Kiểm Duyệt</span>
+            <div className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] p-4 space-y-1.5 shadow-xs">
+              <div className="flex items-center justify-between text-[#64748B]">
+                <span className="font-semibold text-[#0F172A] dark:text-white">Reviewer Bắt Đầu Kiểm Duyệt</span>
                 <span>Hôm nay 11:30</span>
               </div>
-              <p className="text-slate-600 dark:text-slate-300 text-[11px]">Trần Gia Huy đã nhận phân công thẩm định tập 02.</p>
+              <p className="text-[#64748B] dark:text-slate-300">
+                Trần Gia Huy đã nhận phân công thẩm định tập 02.
+              </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* ── 3. Khung Nhập Lỗi Gửi Thẳng Cho Studio (Comment Input Area) ── */}
-      <div className="shrink-0 p-4 border-t border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-[#090B10] space-y-3 transition-colors">
+      {/* ── 3. Khung Tạo Ticket Lỗi & Footer Phê Duyệt (Contra Bottom Dock) ── */}
+      <div className="shrink-0 p-4 border-t border-slate-200/70 dark:border-white/[0.08] bg-[#FFFFFF] dark:bg-[#0D1017] space-y-3">
         {/* Quick Tag Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-[11px]">
-          <span className="text-slate-500 dark:text-slate-400 shrink-0 font-medium text-[10px]">Nhãn lỗi:</span>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
           {[
             'Biến dạng AI (Artifact)',
             'Lệch khẩu hình (Lip-sync)',
@@ -305,70 +305,64 @@ export function ReviewerFeedbackPanel({
               key={tag}
               type="button"
               onClick={() => setSelectedTag(tag)}
-              className={`shrink-0 px-2 py-0.5 rounded-md text-[10px] font-semibold transition-all cursor-pointer ${
+              className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-medium transition-all cursor-pointer ${
                 selectedTag === tag
-                  ? 'bg-[#E50914] text-white shadow-xs'
-                  : 'bg-white dark:bg-white/[0.05] hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-transparent'
+                  ? 'bg-[#121212] dark:bg-white text-white dark:text-[#121212]'
+                  : 'bg-slate-100 dark:bg-white/[0.06] text-[#64748B] dark:text-slate-300 hover:bg-slate-200/70'
               }`}
             >
-              #{tag}
+              {tag}
             </button>
           ))}
         </div>
 
-        {/* Input Form with Current Timestamp attached */}
-        <form onSubmit={handleSendTicket} className="space-y-2">
-          <div className="relative rounded-xl border border-slate-300 dark:border-white/[0.1] bg-white dark:bg-[#111420] focus-within:border-[#E50914] transition-all overflow-hidden p-2.5 shadow-xs">
-            {/* Timestamp Badge inside input */}
-            <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-100 dark:border-white/[0.06] text-[10px]">
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#E50914]/15 text-[#E50914] font-mono font-bold">
-                <Clock className="w-2.5 h-2.5" />
-                <span>Mốc hiện tại: {formatSeconds(currentTime)}</span>
+        {/* Box nhập liệu Contra */}
+        <form onSubmit={handleSendTicket} className="space-y-2.5">
+          <div className="bg-slate-50 dark:bg-white/[0.04] border border-slate-200 dark:border-white/[0.1] rounded-2xl p-3 focus-within:bg-white dark:focus-within:bg-[#111420] focus-within:border-slate-400 transition-all">
+            <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-200/60 dark:border-white/[0.06] text-[11px]">
+              <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 bg-slate-200/80 dark:bg-white/10 text-slate-800 dark:text-white font-mono font-semibold">
+                <Clock className="w-3 h-3" />
+                <span>Mốc: {formatSeconds(currentTime)}</span>
               </span>
-              <span className="text-slate-500 dark:text-slate-400 font-mono">#{selectedTag}</span>
+              <span className="text-[#64748B] truncate max-w-[140px]">{selectedTag}</span>
             </div>
 
             <textarea
               rows={2}
               value={newFeedbackText}
               onChange={(e) => setNewFeedbackText(e.target.value)}
-              placeholder="Nhập nội dung yêu cầu Studio sửa đổi (gõ @ để tag Studio)..."
-              className="w-full bg-transparent text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none resize-none"
+              placeholder="Nhập yêu cầu Studio chỉnh sửa tại mốc này..."
+              className="w-full bg-transparent text-xs text-[#0F172A] dark:text-white placeholder-slate-400 focus:outline-none resize-none"
             />
-
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-[10px] text-slate-500">Gửi trực tiếp cho Studio {episode.studioName}</span>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#E50914] hover:bg-[#B81D24] text-white text-xs font-bold transition-all shadow-md cursor-pointer"
-              >
-                <Send className="w-3 h-3" />
-                <span>Gửi Ticket</span>
-              </button>
-            </div>
           </div>
+
+          <button
+            type="submit"
+            className="w-full inline-flex items-center justify-center gap-2 bg-[#121212] dark:bg-white hover:bg-black dark:hover:bg-slate-100 text-white dark:text-[#121212] rounded-full py-2.5 px-5 text-xs font-semibold transition-all shadow-sm cursor-pointer"
+          >
+            <Send className="w-3.5 h-3.5" />
+            <span>Gửi Ticket Cho Studio</span>
+          </button>
         </form>
 
-        {/* ── 4. Footer Phê Duyệt Cuối Bảng (Decision Buttons) ── */}
-        <div className="pt-2 border-t border-slate-200 dark:border-white/[0.08] grid grid-cols-2 gap-2">
-          {/* Nút 1: [ ❌ Từ Chối & Gửi Lại Studio ] */}
+        {/* ── 4. Footer Phê Duyệt Cuối Bảng (Contra Pill Actions) ── */}
+        <div className="pt-3 border-t border-slate-200/70 dark:border-white/[0.08] flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <button
             type="button"
             onClick={onRejectToStudio}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 dark:border-white/20 bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-xs font-semibold transition-all cursor-pointer shadow-xs"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-white dark:bg-transparent border border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 rounded-full px-4 py-2.5 text-xs font-medium transition-all cursor-pointer"
           >
-            <XCircle className="w-3.5 h-3.5 text-rose-500 dark:text-rose-400" />
-            <span>Từ Chối & Gửi Lại</span>
+            <XCircle className="w-3.5 h-3.5 text-rose-500" />
+            <span>Từ Chối & Yêu Cầu Sửa</span>
           </button>
 
-          {/* Nút 2: [ ✅ Phê Duyệt & Chuyển Admin Publish ] */}
           <button
             type="button"
             onClick={onApproveForPublish}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-[#E50914] hover:bg-[#B81D24] text-white text-xs font-bold shadow-lg hover:shadow-[0_0_15px_rgba(229,9,20,0.5)] transition-all cursor-pointer"
+            className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#121212] dark:bg-white text-white dark:text-[#121212] hover:bg-black dark:hover:bg-slate-100 rounded-full px-4 py-2.5 text-xs font-semibold transition-all shadow-sm cursor-pointer"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Phê Duyệt Publish</span>
+            <span>Phê Duyệt & Chuyển Admin</span>
           </button>
         </div>
       </div>

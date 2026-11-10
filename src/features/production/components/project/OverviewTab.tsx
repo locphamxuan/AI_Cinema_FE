@@ -1,4 +1,7 @@
-'use client';
+﻿'use client';
+
+import { ProjectNotesSection } from './ProjectNotesSection';
+
 
 import { useState } from 'react';
 import { XCircle, Globe, Calendar, Clock, CheckCircle2, Tag, ShieldCheck, Clapperboard, Gift, Building2 } from 'lucide-react';
@@ -122,7 +125,9 @@ export function OverviewTab() {
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ý tưởng & Brief kịch bản</p>
               <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">{project.ideaDescription}</p>
             </div>
-            {project.synopsis && (
+    <ProjectNotesSection projectId={project.id} />
+
+                {project.synopsis && (
               <div className="rounded-xl bg-sky-50/50 dark:bg-sky-500/[0.05] border border-sky-100 dark:border-sky-500/10 p-4">
                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Tóm tắt cho người xem</p>
                 <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">{project.synopsis}</p>

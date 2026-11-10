@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
+import { finalFilmService } from '@/services/finalFilmService';
 import type { Episode, MovieStatus, Publication, UnpublishMode, UnpublishReason } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
@@ -31,6 +32,8 @@ export function PublishPanel({
   const [price, setPrice] = useState(episode.coinPrice !== null ? String(episode.coinPrice) : '');
   const [scheduleAt, setScheduleAt] = useState('');
   const [takingDown, setTakingDown] = useState<Publication | null>(null);
+  const [rejecting, setRejecting] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
   const { busy, run } = useAction();
 
   const min = settings.data?.episodeCoinPriceMin;
@@ -134,6 +137,51 @@ export function PublishPanel({
           </ul>
         </div>
       </div>
+
+            {rejecting && (
+        <Modal
+          open
+          onClose={() => setRejecting(false)}
+          title="Yêu cầu sửa đổi Phim Final"
+          subtitle="Gửi yêu cầu chỉnh sửa thông qua Reviewer để Reviewer phối hợp cùng Studio."
+          maxWidth="max-w-md"
+        >
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const done = await run(
+                () => finalFilmService.rejectFinalFilm(episode.id, rejectReason.trim()),
+                'Đã gửi yêu cầu chỉnh sửa qua Reviewer',
+              );
+              if (done) {
+                setRejecting(false);
+                setRejectReason('');
+                await refresh();
+              }
+            }}
+            className="space-y-4 text-xs"
+          >
+            <FormField label="Lý do & yêu cầu chỉnh sửa">
+              <textarea
+                rows={4}
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="Cần chỉnh sửa lại màu sắc ở phân đoạn kết thúc..."
+                required
+                className={fieldTextareaClass}
+              />
+            </FormField>
+            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+              <Button type="button" variant="secondary" onClick={() => setRejecting(false)}>
+                Hủy
+              </Button>
+              <Button type="submit" disabled={busy || !rejectReason.trim()} variant="danger">
+                {busy ? 'Đang gửi...' : 'Gửi cho Reviewer'}
+              </Button>
+            </div>
+          </form>
+        </Modal>
+      )}
 
       {takingDown && (
         <UnpublishModal

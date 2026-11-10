@@ -1,4 +1,7 @@
-'use client';
+﻿'use client';
+
+import { B2BContractCard } from './B2BContractCard';
+
 
 import { useState } from 'react';
 
@@ -53,6 +56,7 @@ export function StudioTab() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <div className="lg:col-span-2 space-y-5">
+        <B2BContractCard projectId={project.id} />
         <Panel
           title="Dòng thời gian Studio"
           description="Gửi brief PDF và tài liệu cho Studio đối tác qua email. Sau đó Creator cập nhật tiến độ của Studio và nộp bản phim Studio giao."

@@ -52,6 +52,11 @@ export const API_ROUTES = {
     READ_ALL: '/notifications/read-all',
     READ: (id: string) => `/notifications/${id}/read`,
   },
+  ADS: {
+    LIST: '/ads',
+    DETAIL: (id: string) => `/ads/${id}`,
+    EPISODE_SLOTS: (episodeId: string) => `/episodes/${episodeId}/ad-slots`,
+  },
   // MF-1: movie projects ordered from outside studios, steps 1–16
   PRODUCTION: {
     PROJECTS: '/projects',
@@ -59,6 +64,7 @@ export const API_ROUTES = {
     ASSIGN: (movieId: string) => `/projects/${movieId}/assign`,
     CANCEL: (movieId: string) => `/projects/${movieId}/cancel`,
     EVENTS: (movieId: string) => `/projects/${movieId}/events`,
+    PROJECT_NOTES: (projectId: string) => `/projects/${projectId}/notes`,
     SEASONS: (movieId: string) => `/projects/${movieId}/seasons`,
     SEASON: (seasonId: string) => `/seasons/${seasonId}`,
     SEASON_EPISODES: (seasonId: string) => `/seasons/${seasonId}/episodes`,
@@ -106,6 +112,23 @@ export const API_ROUTES = {
     PRICE_ALERTS: '/admin/price-alerts',
     PRICE_ALERT_REQUEST_CHANGE: (id: string) => `/admin/price-alerts/${id}/request-change`,
     PRICE_ALERT_RESOLVE: (id: string) => `/admin/price-alerts/${id}/resolve`,
+    // MF-1 Script Workflow
+    SCRIPT: (projectId: string) => `/projects/${projectId}/script`,
+    SCRIPT_SUBMIT: (projectId: string) => `/projects/${projectId}/script/versions`,
+    SCRIPT_REVIEW: (projectId: string) => `/projects/${projectId}/script/review`,
+    SCRIPT_FINAL_REVIEW: (projectId: string) => `/projects/${projectId}/script/final-review`,
+    // MF-1 B2B Contract Negotiation
+    CONTRACTS: (projectId: string) => `/projects/${projectId}/contracts`,
+    CONTRACT_SIGN: (contractId: string) => `/contracts/${contractId}/sign`,
+    CONTRACT_COUNTER: (contractId: string) => `/contracts/${contractId}/counter`,
+    // MF-1 Studio Portal
+    STUDIO_PORTAL_CONTRACTS: '/studio-portal/contracts',
+    STUDIO_PORTAL_PROPOSE: (contractId: string) => `/studio-portal/contracts/${contractId}/propose`,
+    STUDIO_PORTAL_SIGN: (contractId: string) => `/studio-portal/contracts/${contractId}/sign`,
+    STUDIO_PORTAL_COUNTER: (contractId: string) => `/studio-portal/contracts/${contractId}/counter`,
+    // MF-1 Final Film Confirmation & Publishing Rejection
+    FINAL_CONFIRMATION: (episodeId: string) => `/episodes/${episodeId}/final-confirmation`,
+    FINAL_REJECTION: (episodeId: string) => `/episodes/${episodeId}/final-rejection`,
   },
   // Token budget: the Reviewer's own wallet, and the Admin's grants
   REVIEWER_TOKENS: {
@@ -115,4 +138,3 @@ export const API_ROUTES = {
     ADMIN_ENTRIES: (reviewerId: string) => `/admin/reviewer-tokens/${reviewerId}/entries`,
   },
 } as const;
-
