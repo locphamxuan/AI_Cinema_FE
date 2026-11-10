@@ -18,11 +18,13 @@ import {
   Settings,
 } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
+import { useAppStore } from '@/store/useAppStore';
 import { PERMISSION } from '@/lib/permissions';
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const can = useCan();
+  const user = useAppStore((state) => state.user);
 
   const isOverview = pathname === '/admin';
   const isProjects = pathname === '/admin/projects' || pathname.startsWith('/admin/projects/');
@@ -272,15 +274,15 @@ export function AdminSidebar() {
         </div>
       </div>
 
-      {/* Footer Profile: Executive Admin */}
+      {/* Footer: the signed-in Admin, never a placeholder account */}
       <div className="pt-3 border-t border-slate-200 dark:border-white/[0.06] px-2 text-xs">
         <div className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-full bg-red-500/20 border border-red-500/30 flex items-center justify-center text-[#E50914] font-black text-xs">
-            A
+            {(user?.name ?? 'A').trim().charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">Quản Trị Viên</p>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">admin@aicinema.vn</p>
+            <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{user?.name ?? 'Quản Trị Viên'}</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{user?.email ?? ''}</p>
           </div>
         </div>
       </div>

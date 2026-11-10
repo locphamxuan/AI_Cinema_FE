@@ -57,6 +57,14 @@ describe('AdminSidebar', () => {
     }
     expect(within(nav).getByRole('link', { name: 'Tài khoản & Phân quyền' })).toHaveAttribute('aria-current', 'page');
   });
+
+  it('shows the signed-in Admin, not a placeholder account', () => {
+    signInAs('admin');
+    render(<AdminSidebar />);
+    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
+    expect(within(nav).getByText('admin@test.vn')).toBeInTheDocument();
+    expect(within(nav).getByText('Test admin')).toBeInTheDocument();
+  });
 });
 
 describe('AccountsPanel', () => {
