@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { resolveApiBaseUrl } from '@/constants/apiRoutes';
 import { apiClient } from '@/services/apiClient';
 import { scriptService } from '@/services/scriptService';
 import { STORAGE_KEYS } from '@/lib/storage';
@@ -124,5 +125,15 @@ describe('apiClient', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce({ ok: true, status: 200, blob: async () => blob }).mockResolvedValueOnce({ ok: false, status: 404 }));
     await expect(apiClient.getBlob('/files/1')).resolves.toBe(blob);
     await expect(apiClient.getBlob('/files/2')).resolves.toBeNull();
+  });
+});
+
+describe('resolveApiBaseUrl', () => {
+  it('routes an empty or :3001 backend through the same-origin /api, and roots a relative one', () => {
+    expect(resolveApiBaseUrl(undefined)).toBe('/api');
+    expect(resolveApiBaseUrl('http://localhost:3001/api')).toBe('/api');
+    expect(resolveApiBaseUrl('api')).toBe('/api');
+    expect(resolveApiBaseUrl('/backend')).toBe('/backend');
+    expect(resolveApiBaseUrl('https://api.aicinema.vn')).toBe('https://api.aicinema.vn');
   });
 });

@@ -85,11 +85,8 @@ class ApiClient {
   }
 
   async request<T>(endpoint: string, options: RequestOptions = {}): Promise<ApiResponse<T>> {
+    // API_BASE_URL already routes a configured :3001 backend through the same-origin /api (resolveApiBaseUrl).
     let url = `${this.baseUrl}${endpoint}`;
-    // Never make direct calls to port 3001 from the browser - route to same-origin /api
-    if (url.includes('3001')) {
-      url = url.replace(/https?:\/\/[^/]+:3001(\/api)?/, '/api');
-    }
     if (!url.startsWith('http://') && !url.startsWith('https://')) {
       if (typeof window !== 'undefined') {
         url = `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`;
