@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { productionService } from '@/services/productionService';
@@ -170,11 +170,11 @@ export function ReviewerProjectQueuePage() {
             genre: 'Sci-Fi / AI Cinema',
             creatorName: p.creator?.fullName || 'In-house Screenwriter',
             creatorAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80',
-            studioName: p.studio?.name || 'Studio Äá»‘i TÃ¡c',
+            studioName: p.studio?.name || 'Studio Đối Tác',
             stage: p.status === 'UNDER_REVISION' ? 'STUDIO_REVISING' : p.status === 'COMPLETED' ? 'ARTICLE_44_APPROVED' : 'SCRIPT_PENDING',
-            stageLabel: p.status === 'COMPLETED' ? 'ÄÃ£ Cáº¥p PhÃ©p Äiá»u 44' : p.status === 'UNDER_REVISION' ? 'Studio Äang Sá»­a Lá»—i' : 'Ká»‹ch Báº£n Chá» Tháº©m Äá»‹nh',
+            stageLabel: p.status === 'COMPLETED' ? 'Đã Cấp Phép Điều 44' : p.status === 'UNDER_REVISION' ? 'Studio Đang Sửa Lỗi' : 'Kịch Bản Chờ Thẩm Định',
             thumbnailUrl: p.posterUrl || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=800&q=80',
-            submittedAt: 'HÃ´m nay',
+            submittedAt: 'Hôm nay',
             promptsCount: 120,
             openTicketsCount: 0,
           }));

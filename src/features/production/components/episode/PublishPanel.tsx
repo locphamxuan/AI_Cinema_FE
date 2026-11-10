@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 
@@ -142,8 +142,8 @@ export function PublishPanel({
         <Modal
           open
           onClose={() => setRejecting(false)}
-          title="YÃªu cáº§u sá»­a Ä‘á»•i Phim Final"
-          subtitle="Gá»­i yÃªu cáº§u chá»‰nh sá»­a thÃ´ng qua Reviewer Ä‘á»ƒ Reviewer phá»‘i há»£p cÃ¹ng Studio."
+          title="Yêu cầu sửa đổi Phim Final"
+          subtitle="Gửi yêu cầu chỉnh sửa thông qua Reviewer để Reviewer phối hợp cùng Studio."
           maxWidth="max-w-md"
         >
           <form
@@ -151,7 +151,7 @@ export function PublishPanel({
               e.preventDefault();
               const done = await run(
                 () => finalFilmService.rejectFinalFilm(episode.id, rejectReason.trim()),
-                'ÄÃ£ gá»­i yÃªu cáº§u chá»‰nh sá»­a qua Reviewer',
+                'Đã gửi yêu cầu chỉnh sửa qua Reviewer',
               );
               if (done) {
                 setRejecting(false);
@@ -161,22 +161,22 @@ export function PublishPanel({
             }}
             className="space-y-4 text-xs"
           >
-            <FormField label="LÃ½ do & yÃªu cáº§u chá»‰nh sá»­a">
+            <FormField label="Lý do & yêu cầu chỉnh sửa">
               <textarea
                 rows={4}
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Cáº§n chá»‰nh sá»­a láº¡i mÃ u sáº¯c á»Ÿ phÃ¢n Ä‘oáº¡n káº¿t thÃºc..."
+                placeholder="Cần chỉnh sửa lại màu sắc ở phân đoạn kết thúc..."
                 required
                 className={fieldTextareaClass}
               />
             </FormField>
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
               <Button type="button" variant="secondary" onClick={() => setRejecting(false)}>
-                Há»§y
+                Hủy
               </Button>
               <Button type="submit" disabled={busy || !rejectReason.trim()} variant="danger">
-                {busy ? 'Äang gá»­i...' : 'Gá»­i cho Reviewer'}
+                {busy ? 'Đang gửi...' : 'Gửi cho Reviewer'}
               </Button>
             </div>
           </form>

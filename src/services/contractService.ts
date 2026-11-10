@@ -1,4 +1,4 @@
-﻿/**
+/**
  * MF-1 B2B Contract Negotiation Service (Admin & Studio Partner)
  */
 import { apiClient, type ApiResponse } from './apiClient';
@@ -31,7 +31,7 @@ function getLocalContracts(projectId: string): Contract[] {
           name: 'Saigon VFX Studio Lab',
           email: 'contact@saigonvfx.example',
           phone: '0909123456',
-          contactName: 'LÃª Tuáº¥n Anh',
+          contactName: 'Lê Tuấn Anh',
           note: null,
           isActive: true,
           createdAt: new Date().toISOString(),

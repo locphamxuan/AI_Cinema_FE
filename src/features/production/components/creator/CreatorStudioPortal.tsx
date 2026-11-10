@@ -179,7 +179,7 @@ export function CreatorStudioPortal() {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#FAF9F6] dark:bg-[#0D0F17] text-slate-900 dark:text-slate-100 font-sans p-4 sm:p-6 lg:p-8 space-y-6 transition-colors duration-200">
+    <div className="relative min-h-screen w-full bg-[#F9FAFB] dark:bg-[#0D0F17] text-[#111827] dark:text-slate-100 font-sans p-4 sm:p-6 lg:p-8 space-y-6 transition-colors duration-200">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* ── 1. Top Profile Greeting Card (Buy Me a Coffee style) ── */}
         <section
@@ -222,7 +222,7 @@ export function CreatorStudioPortal() {
             <button
               type="button"
               onClick={() => setIsRegisterModalOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 text-xs sm:text-sm font-bold shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-[#121212] dark:hover:bg-slate-100 text-sm font-semibold shadow-sm transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>+ Soạn Kịch Bản Mới</span>
