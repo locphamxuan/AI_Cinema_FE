@@ -78,6 +78,30 @@ describe('SignContractModal', () => {
     expect(JSON.parse(sent.body as string)).toEqual({ costVnd: 130_000_000 });
   });
 
+  it('counts the fee a studio change hand-off holds as available, since the signed cost replaces it', async () => {
+    const calls = routeFetch({
+      '/projects/m1/costs': { ...COSTS, remainingVnd: 10_000_000 },
+      '/projects/m1/handoffs': [{ id: 'h2', milestoneStatus: 'BRIEF_SENT', offeredFeeVnd: 45_000_000 }],
+      '/contracts/c1/counter': { id: 'c2', round: 2 },
+    });
+    const { dialog, onClose } = open(item({ handoffId: 'h2', handoff: { id: 'h2', milestoneStatus: 'BRIEF_SENT' } }));
+
+    // 10 M left + the 45 M the waiting hand-off holds.
+    expect(await within(dialog).findByText(/ngân sách còn lại 55\.000\.000/)).toBeInTheDocument();
+    await userEvent.type(offerInput(dialog), '50000000');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Gửi giá đề xuất' }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(JSON.parse(calls.find((c) => c.path === '/contracts/c1/counter')!.body as string)).toEqual({ costVnd: 50_000_000 });
+  });
+
+  it('does not read the hand-offs for a first contract', async () => {
+    const calls = routeFetch({ '/projects/m1/costs': COSTS });
+    const { dialog } = open(item({ handoffId: null, handoff: null }));
+    await within(dialog).findByText(/ngân sách còn lại 150\.000\.000/);
+    expect(calls.some((c) => c.path === '/projects/m1/handoffs')).toBe(false);
+  });
+
   it('cannot sign a round the studio left without a cost', () => {
     routeFetch({ '/projects/m1/costs': COSTS });
     const { dialog } = open(item({ costVnd: null }));
