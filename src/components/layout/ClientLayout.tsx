@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { AREAS, homeAreaOf } from '@/lib/permissions';
 import { ToastContainer } from '@/components/ui/Toast';
+import { AiSupportChatWidget } from '@/components/chat/AiSupportChatWidget';
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -25,6 +26,7 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <main className="flex-1 w-full p-0 m-0 bg-background">{children}</main>
+      <AiSupportChatWidget />
       <ToastContainer />
     </>
   );

@@ -108,5 +108,15 @@ export const API_ROUTES = {
     CONTRACT_SIGN: (id: string) => `/contracts/${id}/sign`,
     CONTRACT_COUNTER: (id: string) => `/contracts/${id}/counter`,
   },
+  // AI Support Chatbox
+  SUPPORT: {
+    CONVERSATIONS: '/support/conversations',
+    CONVERSATION: (id: string) => `/support/conversations/${id}`,
+    MESSAGES: (id: string) => `/support/conversations/${id}/messages`,
+    CONFIRM_RESOLVED: (id: string) => `/support/conversations/${id}/confirm-resolved`,
+    REQUEST_STAFF: (id: string) => `/support/conversations/${id}/request-staff`,
+    CLOSE: (id: string) => `/support/conversations/${id}/close`,
+    READ: (id: string) => `/support/conversations/${id}/read`,
+  },
 } as const;
 
