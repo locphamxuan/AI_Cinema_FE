@@ -94,7 +94,7 @@ export function OverviewTab() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       {/* ── Left: main info ── */}
       <div className="lg:col-span-2 space-y-5">
-        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-card overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#111420] overflow-hidden shadow-xs">
           <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5">
             <div className="flex items-center gap-2.5">
               <h2 className="text-base font-semibold text-slate-900 dark:text-white">Thông tin phim</h2>
@@ -109,7 +109,7 @@ export function OverviewTab() {
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {infoItems.map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex items-start gap-3">
-                <Icon className="w-4 h-4 mt-0.5 shrink-0 text-sky-500" aria-hidden="true" />
+                <Icon className="w-4 h-4 mt-0.5 shrink-0 text-slate-500 dark:text-slate-400" aria-hidden="true" />
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{label}</p>
                   <div className="text-sm text-slate-900 dark:text-slate-100 font-medium">{value}</div>
@@ -119,12 +119,12 @@ export function OverviewTab() {
           </div>
 
           <div className="px-5 pb-5 space-y-4 text-sm">
-            <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5 p-4">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ý tưởng & Brief kịch bản</p>
+            <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/70 dark:border-white/5 p-4">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ý tưởng &amp; Brief kịch bản</p>
               <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">{project.ideaDescription}</p>
             </div>
             {project.synopsis && (
-              <div className="rounded-xl bg-sky-50/50 dark:bg-sky-500/[0.05] border border-sky-100 dark:border-sky-500/10 p-4">
+              <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/70 dark:border-white/5 p-4">
                 <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Tóm tắt cho người xem</p>
                 <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">{project.synopsis}</p>
               </div>
@@ -141,13 +141,13 @@ export function OverviewTab() {
       <div className="space-y-5">
         <PosterPanel canManage={canEdit} />
 
-        <div className="rounded-2xl border border-sky-100 dark:border-white/10 bg-white dark:bg-card overflow-hidden">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#111420] overflow-hidden shadow-xs">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100 dark:border-white/5">
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">Phân công nhân sự</h2>
           </div>
           <div className="p-5 space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-sky-50/60 dark:bg-white/[0.03]">
-              <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-500/20 flex items-center justify-center text-sky-800 dark:text-sky-200 text-sm font-semibold shrink-0">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06]">
+              <div className="w-8 h-8 rounded-full bg-[#121212] dark:bg-white flex items-center justify-center text-white dark:text-slate-900 text-xs font-bold shrink-0">
                 {project.reviewer.fullName.charAt(0)}
               </div>
               <div>
@@ -158,11 +158,11 @@ export function OverviewTab() {
 
             <div className={`flex items-center gap-3 p-3 rounded-xl border ${
               project.creator
-                ? 'bg-sky-50/60 dark:bg-white/[0.03] border-transparent'
-                : 'bg-slate-50 dark:bg-white/[0.02] border-slate-100 dark:border-white/5 border-dashed'
+                ? 'bg-slate-50 dark:bg-white/[0.03] border-slate-200/60 dark:border-white/[0.06]'
+                : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 border-dashed'
             }`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-                project.creator ? 'bg-sky-100 dark:bg-sky-500/20 text-sky-800 dark:text-sky-200' : 'bg-slate-200 dark:bg-white/10 text-slate-500'
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                project.creator ? 'bg-[#121212] dark:bg-white text-white dark:text-slate-900' : 'bg-slate-200 dark:bg-white/10 text-slate-500'
               }`}>
                 {project.creator ? project.creator.fullName.charAt(0) : '?'}
               </div>

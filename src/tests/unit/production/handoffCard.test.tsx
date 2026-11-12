@@ -35,7 +35,7 @@ const handoff = (over: Partial<StudioHandoff> = {}) =>
     ...over,
   }) as unknown as StudioHandoff;
 
-const renderCard = (h: StudioHandoff, base: '/creator' | '/admin' = '/creator', canDecide = false) =>
+const renderCard = (h: StudioHandoff, base: '/creator' | '/admin' | '/reviewer' = '/creator', canDecide = false) =>
   render(<HandoffCard handoff={h} movieId="m1" base={base} canDecide={canDecide} onBrief={vi.fn()} onMaterial={vi.fn()} />);
 
 /** The hand-off a studio change opened: it waits in BRIEF_SENT for the new studio's contract. */

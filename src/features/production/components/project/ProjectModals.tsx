@@ -117,7 +117,7 @@ export function AssignCreatorModal({ current, onClose }: { current: Person | nul
   };
 
   return (
-    <Modal open onClose={onClose} title="Giao cho Creator" subtitle="Creator chính trao đổi ý tưởng với Admin, viết kịch bản và giao các tập cho Creator khác.">
+    <Modal open onClose={onClose} title="Giao cho Creator" subtitle="Creator chính trao đổi ý tưởng và viết kịch bản cho dự án.">
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Creator">
           <select value={creatorId} onChange={(e) => setCreatorId(e.target.value)} required className={fieldInputClass}>
