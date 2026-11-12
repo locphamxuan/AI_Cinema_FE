@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAiSupportChat } from '@/hooks/useAiSupportChat';
+import { useAppStore } from '@/store/useAppStore';
 import { AiChatBody } from './AiChatBody';
 import { AiChatHeader } from './AiChatHeader';
 import { AiOrb } from './AiOrb';
@@ -33,9 +35,15 @@ function readInitialChatDark(): boolean {
  * Supports dragging up/down/left/right and switching chatbox color between Black (dark) & White (light).
  */
 export function AiSupportChatWidget() {
+  const pathname = usePathname();
+  const userRole = useAppStore((s) => s.user?.role);
+  const isMemberOnly = userRole === 'user' || userRole === 'vip';
+  const isBackofficeRoute = Boolean(pathname && /^\/(creator|reviewer|admin|staff)(\/|$)/.test(pathname));
+  const allowed = isMemberOnly && !isBackofficeRoute;
+
   const [isOpen, setIsOpen] = useState(false);
   const [chatDark, setChatDark] = useState<boolean>(readInitialChatDark);
-  const chat = useAiSupportChat(isOpen);
+  const chat = useAiSupportChat(isOpen && allowed);
 
   const [viewport, setViewport] = useState({ width: 1280, height: 800 });
   const [fabDragged, setFabDragged] = useState<{ x: number; y: number } | null>(null);
@@ -81,6 +89,8 @@ export function AiSupportChatWidget() {
   const isWaitingStaff = conv?.status === 'WAITING_FOR_STAFF' || conv?.status === 'STAFF_HANDLING';
   const isClosed = conv?.status === 'RESOLVED' || conv?.status === 'CLOSED';
   const showHero = chat.messages.length <= 1 && !chat.loading && !isClosed;
+
+  if (!allowed) return null;
 
   return (
     <>

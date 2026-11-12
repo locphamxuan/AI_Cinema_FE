@@ -6,7 +6,7 @@ import { useAppStore } from '@/store/useAppStore';
 import type { SupportConversation, SupportMessage, SupportQuickReply } from '@/types/support';
 
 export function useAiSupportChat(isOpen: boolean) {
-  const { isAuthenticated } = useAppStore();
+  const { isAuthenticated, user } = useAppStore();
   const [conversation, setConversation] = useState<SupportConversation | null>(null);
   const [messages, setMessages] = useState<SupportMessage[]>([]);
   const [quickReplies, setQuickReplies] = useState<SupportQuickReply[]>([]);
@@ -132,6 +132,7 @@ export function useAiSupportChat(isOpen: boolean) {
 
   return {
     isAuthenticated,
+    user,
     conversation,
     messages,
     quickReplies,

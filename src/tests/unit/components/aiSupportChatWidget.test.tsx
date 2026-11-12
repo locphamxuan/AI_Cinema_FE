@@ -5,11 +5,26 @@ import { apiClient } from '@/services/apiClient';
 import { supportService } from '@/services/supportService';
 import { useAppStore } from '@/store/useAppStore';
 
+let mockPathname = '/';
+vi.mock('next/navigation', () => ({
+  usePathname: () => mockPathname,
+}));
+
+const memberUser = {
+  id: 'u1',
+  name: 'Huy',
+  email: 'huy@mail.com',
+  avatarUrl: '',
+  role: 'user' as const,
+  isVIP: false,
+};
+
 describe('AiSupportChatWidget (Web FE)', () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
     localStorage.clear();
-    useAppStore.setState({ isAuthenticated: false, user: null });
+    mockPathname = '/';
+    useAppStore.setState({ isAuthenticated: true, user: memberUser });
     await supportService.resetLocalConversation();
     vi.spyOn(apiClient, 'post').mockResolvedValue({
       success: false,
@@ -19,7 +34,27 @@ describe('AiSupportChatWidget (Web FE)', () => {
     });
   });
 
-  it('opens the draggable AI chatbox, toggles dark/light color, sends a question, and resets with Hội thoại mới', async () => {
+  it('hides the AI chatbox for creator, reviewer, admin, staff, and unauthenticated backoffice screens', () => {
+    useAppStore.setState({ isAuthenticated: false, user: null });
+    const { rerender } = render(<AiSupportChatWidget />);
+    expect(screen.queryByRole('button', { name: /Mở Trợ lý AI/i })).not.toBeInTheDocument();
+
+    for (const role of ['creator', 'reviewer', 'admin', 'staff'] as const) {
+      useAppStore.setState({
+        isAuthenticated: true,
+        user: { ...memberUser, role },
+      });
+      rerender(<AiSupportChatWidget />);
+      expect(screen.queryByRole('button', { name: /Mở Trợ lý AI/i })).not.toBeInTheDocument();
+    }
+
+    mockPathname = '/creator/projects';
+    useAppStore.setState({ isAuthenticated: true, user: memberUser });
+    rerender(<AiSupportChatWidget />);
+    expect(screen.queryByRole('button', { name: /Mở Trợ lý AI/i })).not.toBeInTheDocument();
+  });
+
+  it('opens the draggable AI chatbox for user/member, toggles dark/light color, sends a question, and resets with Hội thoại mới', async () => {
     render(<AiSupportChatWidget />);
 
     const launcher = screen.getByRole('button', { name: /Mở Trợ lý AI/i });
@@ -31,11 +66,9 @@ describe('AiSupportChatWidget (Web FE)', () => {
     expect(dialog).toHaveAttribute('data-chat-theme', 'light');
     expect(screen.getByText('Tôi có thể giúp gì cho bạn?')).toBeInTheDocument();
 
-    // Toggle chatbox color from White (light) to Black (dark) inside the chat window
     fireEvent.click(screen.getByRole('button', { name: /Chuyển khung chat sang màu đen/i }));
     expect(dialog).toHaveAttribute('data-chat-theme', 'dark');
 
-    // Toggle back to White (light)
     fireEvent.click(screen.getByRole('button', { name: /Chuyển khung chat sang màu trắng/i }));
     expect(dialog).toHaveAttribute('data-chat-theme', 'light');
 
