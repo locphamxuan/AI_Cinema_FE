@@ -8,7 +8,7 @@ import { AiOrb } from './AiOrb';
 
 const CHAT_THEME_KEY = 'ai_cinema_chatbox_theme';
 const FAB_SIZE = 58;
-const PANEL_WIDTH = 432;
+const PANEL_WIDTH = 468;
 const PANEL_HEIGHT = 600;
 const MARGIN = 16;
 

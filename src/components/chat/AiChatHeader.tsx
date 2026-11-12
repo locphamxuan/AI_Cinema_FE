@@ -58,11 +58,11 @@ export function AiChatHeader({
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
-      className={`flex cursor-grab active:cursor-grabbing select-none items-center justify-between gap-2 border-b px-4 py-3 touch-none ${
+      className={`flex cursor-grab active:cursor-grabbing select-none items-center justify-between gap-4 border-b px-4 py-3 touch-none ${
         dark ? 'border-white/10' : 'border-slate-200/80'
       }`}
     >
-      <div className="flex min-w-0 items-center gap-2.5">
+      <div className="flex min-w-0 flex-1 items-center gap-2.5 pr-1">
         <AiOrb size="sm" />
         <div className="min-w-0">
           <h2 className={`truncate text-sm font-bold ${dark ? 'text-white' : 'text-slate-900'}`}>
@@ -83,7 +83,7 @@ export function AiChatHeader({
         </div>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1.5">
+      <div className="ml-2 flex shrink-0 items-center gap-2">
         <button
           type="button"
           onClick={onToggleTheme}
