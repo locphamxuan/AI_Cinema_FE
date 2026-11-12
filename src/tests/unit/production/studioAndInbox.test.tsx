@@ -114,17 +114,18 @@ describe('ChangeRequestInbox (BR-55)', () => {
 
 describe('DashboardHeader', () => {
   it.each([
-    ['reviewer', '/reviewer/projects', 'Content Reviewer'],
-    ['creator', '/creator/projects', 'Content Creator'],
-    ['admin', '/admin/accounts', 'Admin'],
-    ['staff', '/staff', 'Staff'],
-  ] as const)('shows the role of the %s account', (role, pathname, label) => {
+    ['reviewer', '/reviewer/projects', 'Kiểm duyệt nội dung'],
+    ['creator', '/creator/projects', 'Sản xuất nội dung'],
+    ['admin', '/admin/accounts', 'Quản trị'],
+    ['staff', '/staff', 'Vận hành'],
+  ] as const)('shows the area label without the removed role pill for %s', (role, pathname, areaLabel) => {
     nav.pathname = pathname;
     signInAs(role);
     routeFetch({});
     render(<DashboardHeader />);
 
-    expect(screen.getByLabelText('Vai trò của tài khoản')).toHaveTextContent(label);
+    expect(screen.getByText(areaLabel)).toBeInTheDocument();
+    expect(screen.queryByLabelText('Vai trò của tài khoản')).not.toBeInTheDocument();
   });
 
   it('keeps only the profile of the current area and sign out in the account menu', async () => {
