@@ -185,20 +185,23 @@ describe('ProjectListPage', () => {
 });
 
 describe('ProjectDetailPage', () => {
-  it('gives the lead Creator no manual hand-off: signing the contract hands off', async () => {
+  it('hides Studio, Cost, and Contract tabs from Creator per MF-1 and BE role matrix', async () => {
     nav.pathname = '/creator/projects/m1';
     nav.params = { projectId: 'm1' };
     nav.search = 'tab=studio';
     signInAs('creator');
     useAppStore.setState((s) => ({ user: { ...s.user!, id: 'creator-id' } }));
-    routeFetch({ '/projects/m1': project(), '/projects/m1/handoffs': [] });
+    routeFetch({ '/projects/m1': project(), '/projects/m1/idea-files': [], '/projects/m1/notes': [] });
     render(<ProjectDetailPage />);
 
-    expect(await screen.findByText(/Bàn giao tự động khi hợp đồng với Studio có đủ chữ ký/)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Bàn giao cho Studio/ })).not.toBeInTheDocument();
+    await screen.findByRole('tab', { name: 'Kịch bản' });
+    expect(screen.queryByRole('tab', { name: 'Studio' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Chi phí sản xuất' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Hợp đồng' })).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Tổng quan & Ý tưởng' })).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('explains the studio timeline and the three states of project, season and episode', async () => {
+  it('shows Studio and Cost to Reviewer without exposing Admin-only Contract negotiation', async () => {
     nav.pathname = '/reviewer/projects/m1';
     nav.params = { projectId: 'm1' };
     nav.search = 'tab=studio';
@@ -207,6 +210,9 @@ describe('ProjectDetailPage', () => {
     render(<ProjectDetailPage />);
 
     expect(await screen.findByText(/Hợp đồng ký đủ hai bên thì hệ thống tự bàn giao cho Studio/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Bàn giao cho Studio/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Chi phí sản xuất' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Hợp đồng' })).not.toBeInTheDocument();
     const tiers = screen.getByLabelText('Trạng thái dự án, mùa và tập');
     expect(tiers).toHaveTextContent('Dự án');
     // The sample season has a single episode: it reads as a whole film.
@@ -244,7 +250,11 @@ describe('ProjectDetailPage', () => {
     expect(screen.queryByRole('button', { name: /Huỷ dự án/ })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Đổi Creator/ })).toBeEnabled();
 
-    await userEvent.click(screen.getByRole('tab', { name: /Đề xuất cho Admin/ }));
+    expect(screen.getByRole('tab', { name: 'Studio' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Chi phí sản xuất' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Hợp đồng' })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('tab', { name: /Đề xuất chỉnh sửa/ }));
     expect(await screen.findByText('Chưa có đề xuất nào.')).toBeInTheDocument();
     // The Admin decides requests; the form to send one is for the Reviewer and the Creators.
     expect(screen.queryByRole('button', { name: /Gửi đề xuất/ })).not.toBeInTheDocument();

@@ -9,7 +9,7 @@ import { useCan } from '@/hooks/useCan';
 import { seasonName } from '@/lib/seasonLabel';
 import { productionService } from '@/services/productionService';
 import { useResource } from '@/hooks/useResource';
-import { projectCapabilities } from '../../lib/capabilities';
+import { isProjectTabVisible, projectCapabilities, type ProjectTabKey } from '../../lib/capabilities';
 import { MOVIE_STATUS, SEASON_STATUS } from '../../lib/labels';
 import { baseFromPath, productionPaths } from '../../lib/routes';
 import { ErrorNote, Loading, StatusPill } from '@/components/data/ui';
@@ -24,19 +24,17 @@ import { TeamTab } from './TeamTab';
 import { ChangeRequestsTab } from './ChangeRequestsTab';
 import { ActivityTab } from './ActivityTab';
 
-const TABS = [
+const TABS: readonly { key: ProjectTabKey; label: string; icon: React.ElementType }[] = [
   { key: 'overview', label: 'Tổng quan & Ý tưởng', icon: Film },
   { key: 'script', label: 'Kịch bản', icon: ScrollText },
   { key: 'episodes', label: 'Mùa & Tập phim', icon: Clapperboard },
-  { key: 'team', label: 'Biên kịch Creator', icon: Users },
+  { key: 'team', label: 'Nhóm Creator', icon: Users },
   { key: 'studio', label: 'Studio', icon: Layers },
   { key: 'fee', label: 'Chi phí sản xuất', icon: CalendarClock },
   { key: 'contract', label: 'Hợp đồng', icon: FileSignature },
-  { key: 'changes', label: 'Đề xuất cho Admin', icon: ShieldCheck },
+  { key: 'changes', label: 'Đề xuất chỉnh sửa', icon: ShieldCheck },
   { key: 'activity', label: 'Lịch sử', icon: History },
-] as const;
-
-type TabKey = (typeof TABS)[number]['key'];
+];
 
 /** Who and what the project involves, read at a glance under its title. */
 function Fact({ label, value }: { label: string; value: string }) {
@@ -58,12 +56,14 @@ export function ProjectDetailPage() {
   const userId = useAppStore((s) => s.user?.id);
   const can = useCan();
 
-  const tabs = TABS;
+  const tabs = TABS.filter((item) => isProjectTabVisible(item.key, can));
   const requested = searchParams.get('tab');
-  const [tab, setTab] = useState<TabKey>(tabs.some((t) => t.key === requested) ? (requested as TabKey) : 'overview');
+  const [tab, setTab] = useState<ProjectTabKey>(
+    tabs.some((t) => t.key === requested) ? (requested as ProjectTabKey) : 'overview',
+  );
   const project = useResource(`project:${projectId}`, () => productionService.getProject(projectId));
 
-  const selectTab = (key: TabKey) => {
+  const selectTab = (key: ProjectTabKey) => {
     setTab(key);
     router.replace(productionPaths.project(base, projectId, key === 'overview' ? undefined : key), { scroll: false });
   };
@@ -122,7 +122,7 @@ export function ProjectDetailPage() {
               {/* Facts strip */}
               <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50/60 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
                 <Fact label="Reviewer thẩm định" value={data.reviewer.fullName} />
-                <Fact label="Biên kịch Creator" value={data.creator?.fullName ?? 'Chưa giao'} />
+                <Fact label="Creator chính" value={data.creator?.fullName ?? 'Chưa giao'} />
                 <Fact label="Studio đối tác" value={data.studio?.name ?? 'Chưa chọn'} />
                 <Fact label="Cấu trúc" value={`${data.seasons.length} mùa · ${totalEpisodes} tập`} />
               </dl>

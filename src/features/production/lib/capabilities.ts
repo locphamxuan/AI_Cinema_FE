@@ -104,6 +104,47 @@ export function projectCapabilities(
   };
 }
 
+export type ProjectTabKey =
+  | 'overview'
+  | 'script'
+  | 'episodes'
+  | 'team'
+  | 'studio'
+  | 'fee'
+  | 'contract'
+  | 'changes'
+  | 'activity';
+
+/**
+ * MF-1 & BE role matrix: hide tabs whose workflow belongs strictly to other roles
+ * (e.g. Creator never sees Studio handoffs, Cost, or Contracts; Reviewer never negotiates Contracts).
+ */
+export function isProjectTabVisible(key: ProjectTabKey, can: (p: PermissionKey) => boolean): boolean {
+  switch (key) {
+    case 'team':
+      return (
+        can(PERMISSION.PROJECT_MANAGE) ||
+        can(PERMISSION.PROJECT_CREATE) ||
+        can(PERMISSION.PROJECT_READ_ALL) ||
+        can(PERMISSION.MEDIA_INGEST)
+      );
+    case 'studio':
+      return can(PERMISSION.PROJECT_MANAGE) || can(PERMISSION.PROJECT_READ_ALL) || can(PERMISSION.CONTRACT_MANAGE);
+    case 'fee':
+      return can(PERMISSION.COST_ADJUST) || can(PERMISSION.COST_REQUEST) || can(PERMISSION.COST_APPROVE);
+    case 'contract':
+      return can(PERMISSION.CONTRACT_MANAGE);
+    case 'changes':
+      return (
+        can(PERMISSION.PROJECT_SUGGEST) ||
+        can(PERMISSION.PROJECT_CHANGE_REVIEW) ||
+        can(PERMISSION.PROJECT_READ_ALL)
+      );
+    default:
+      return true;
+  }
+}
+
 export function isIn<T>(value: T, list: readonly T[]): boolean {
   return list.includes(value);
 }

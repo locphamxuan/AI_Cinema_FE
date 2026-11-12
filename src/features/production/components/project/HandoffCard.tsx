@@ -69,9 +69,15 @@ export function HandoffCard({
             Vòng {waiting.round}: {CONTRACT_STATUS[waiting.status].label}
             {waiting.costVnd !== null && ` · ${formatVnd(waiting.costVnd)}`}. Studio bắt đầu sản xuất khi hợp đồng đủ chữ ký hai bên.
           </p>
-          <Link href={productionPaths.project(base, movieId, 'contract')} className="inline-block font-semibold text-sky-700 dark:text-sky-300 hover:underline">
-            {canDecide && waiting.status === 'STUDIO_SIGNED' ? 'Xem báo giá và ký hợp đồng' : 'Xem hợp đồng'}
-          </Link>
+          {canDecide ? (
+            <Link href={productionPaths.project(base, movieId, 'contract')} className="inline-block font-semibold text-sky-700 dark:text-sky-300 hover:underline">
+              {waiting.status === 'STUDIO_SIGNED' ? 'Xem báo giá và ký hợp đồng' : 'Xem hợp đồng'}
+            </Link>
+          ) : (
+            <span className="inline-block font-medium text-amber-700 dark:text-amber-300">
+              Hợp đồng đang chờ Admin xử lý.
+            </span>
+          )}
         </div>
       )}
       {h.changeReason && <p className="text-slate-600 dark:text-slate-300">Lý do đổi Studio: {h.changeReason}</p>}
