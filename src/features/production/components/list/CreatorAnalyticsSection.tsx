@@ -12,10 +12,11 @@ import type { ProjectSummary } from '@/types/production';
 interface CreatorAnalyticsSectionProps {
   projects: ProjectSummary[];
   roleTitle?: string;
+  defaultCollapsed?: boolean;
 }
 
-export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator' }: CreatorAnalyticsSectionProps) {
-  const [collapsed, setCollapsed] = useState(false);
+export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defaultCollapsed = false }: CreatorAnalyticsSectionProps) {
+  const [collapsed, setCollapsed] = useState(defaultCollapsed);
 
   // Status breakdown
   const statusCounts = {

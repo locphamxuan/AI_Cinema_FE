@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Search,
   Clapperboard,
@@ -19,6 +19,7 @@ import { PERMISSION } from '@/lib/permissions';
 
 export function ReviewerSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const can = useCan();
   const [searchVal, setSearchVal] = useState('');
   const router = useRouter();
@@ -27,8 +28,13 @@ export function ReviewerSidebar() {
     if (searchVal.trim()) router.push(`/reviewer/projects?q=${encodeURIComponent(searchVal.trim())}`);
   };
 
+  const activeFilter = searchParams?.get('filter');
   const isAuditWorkspace = pathname === '/reviewer';
-  const isProjectQueue = pathname === '/reviewer/projects' || pathname.startsWith('/reviewer/projects/');
+  const isApprovedFilter = pathname === '/reviewer/projects' && activeFilter === 'approved';
+  const isRevisingFilter = pathname === '/reviewer/projects' && activeFilter === 'revising';
+  const isProjectQueue =
+    (pathname === '/reviewer/projects' && !isApprovedFilter && !isRevisingFilter) ||
+    pathname.startsWith('/reviewer/projects/');
   const isStudios = pathname.startsWith('/reviewer/studios');
   const isNotifications = pathname.startsWith('/reviewer/notifications');
   const isProfile = pathname.startsWith('/reviewer/profile');
@@ -82,13 +88,11 @@ export function ReviewerSidebar() {
           </form>
         </div>
 
-        {/* Nhóm 1: THẨM ĐỊNH VIDEO & KỊCH BẢN */}
         <div className="space-y-1">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
-            Thẩm Định Video & Kịch Bản
+            Thẩm định nội dung
           </p>
 
-          {/* [ 🎬 Thẩm định video Master ] */}
           <Link
             href="/reviewer"
             aria-current={isAuditWorkspace ? 'page' : undefined}
@@ -100,7 +104,6 @@ export function ReviewerSidebar() {
             </div>
           </Link>
 
-          {/* [ 📑 Hàng đợi dự án ] */}
           <Link
             href="/reviewer/projects"
             aria-label="Dự án phim"
@@ -113,33 +116,32 @@ export function ReviewerSidebar() {
             </div>
           </Link>
 
-          {/* [ ⚖️ Phim Final ] */}
           <Link
             href="/reviewer/projects?filter=approved"
-            className={linkClass(false)}
+            aria-current={isApprovedFilter ? 'page' : undefined}
+            className={linkClass(isApprovedFilter)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <ShieldCheck className={iconClass(false)} />
+              <ShieldCheck className={iconClass(isApprovedFilter)} />
               <span className="truncate">Phim Final</span>
             </div>
           </Link>
 
-          {/* [ 🔔 Yêu cầu chỉnh sửa ] */}
           <Link
             href="/reviewer/projects?filter=revising"
-            className={linkClass(false)}
+            aria-current={isRevisingFilter ? 'page' : undefined}
+            className={linkClass(isRevisingFilter)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <ShieldAlert className={iconClass(false)} />
+              <ShieldAlert className={iconClass(isRevisingFilter)} />
               <span className="truncate">Yêu cầu chỉnh sửa</span>
             </div>
           </Link>
         </div>
 
-        {/* Nhóm 2: QUẢN LÝ ĐỐI TÁC */}
         <div className="space-y-1 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
-            Quản Lý Đối Tác & Hồ Sơ
+            Đối tác &amp; Tài khoản
           </p>
 
           {/* Studio Manage */}
@@ -182,13 +184,11 @@ export function ReviewerSidebar() {
         </div>
       </div>
 
-      {/* Footer Status */}
       <div className="pt-3 border-t border-slate-200 dark:border-white/[0.06] px-2 text-xs">
         <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Trực Thẩm Định OTT</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Content Review · Điều 44</span>
         </div>
-        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Tuân thủ Pháp lý Điều 44</p>
       </div>
     </nav>
   );

@@ -73,10 +73,9 @@ export function CreatorSidebar() {
           </form>
         </div>
 
-        {/* Nhóm chức năng chính của In-house Screenwriter */}
         <div className="space-y-1">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
-            Quản Lý Biên Kịch
+            Công việc
           </p>
 
           <Link
@@ -92,13 +91,11 @@ export function CreatorSidebar() {
           </Link>
         </div>
 
-        {/* Nhóm Hồ Sơ & Thông Báo */}
         <div className="space-y-1 pt-2 border-t border-slate-200 dark:border-white/[0.06]">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 px-2 pb-0.5">
-            Cá Nhân & Thẩm Định
+            Tài khoản
           </p>
 
-          {/* Thông báo thẩm định */}
           <Link
             href="/creator/notifications"
             aria-current={isNotifications ? 'page' : undefined}
@@ -106,11 +103,10 @@ export function CreatorSidebar() {
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <Bell className={iconClass(isNotifications)} />
-              <span className="truncate">Thông Báo Thẩm Định</span>
+              <span className="truncate">Thông báo</span>
             </div>
           </Link>
 
-          {/* Hồ sơ tác giả */}
           <Link
             href="/creator/profile"
             aria-current={isProfile ? 'page' : undefined}
@@ -118,19 +114,17 @@ export function CreatorSidebar() {
           >
             <div className="flex items-center gap-2.5 min-w-0">
               <UserRound className={iconClass(isProfile)} />
-              <span className="truncate">Hồ Sơ Tác Giả</span>
+              <span className="truncate">Hồ sơ cá nhân</span>
             </div>
           </Link>
         </div>
       </div>
 
-      {/* Footer Status */}
       <div className="pt-3 border-t border-slate-200 dark:border-white/[0.06] px-2 text-xs">
         <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Biên Kịch Nội Bộ</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Biên kịch nội bộ</span>
         </div>
-        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Phòng Biên Tập AI Cinema</p>
       </div>
     </nav>
   );
