@@ -8,6 +8,7 @@ import { useAppStore } from '@/store/useAppStore';
 describe('AiSupportChatWidget (Web FE)', () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
+    localStorage.clear();
     useAppStore.setState({ isAuthenticated: false, user: null });
     await supportService.resetLocalConversation();
     vi.spyOn(apiClient, 'post').mockResolvedValue({
@@ -18,7 +19,7 @@ describe('AiSupportChatWidget (Web FE)', () => {
     });
   });
 
-  it('opens the draggable AI chatbox, sends a question, and resets with Hội thoại mới', async () => {
+  it('opens the draggable AI chatbox, toggles dark/light color, sends a question, and resets with Hội thoại mới', async () => {
     render(<AiSupportChatWidget />);
 
     const launcher = screen.getByRole('button', { name: /Mở Trợ lý AI/i });
@@ -26,10 +27,17 @@ describe('AiSupportChatWidget (Web FE)', () => {
 
     fireEvent.pointerUp(launcher);
 
-    await waitFor(() => {
-      expect(screen.getByRole('region', { name: 'Chatbox Trợ lý AI' })).toBeInTheDocument();
-    });
+    const dialog = await screen.findByRole('region', { name: 'Chatbox Trợ lý AI' });
+    expect(dialog).toHaveAttribute('data-chat-theme', 'light');
     expect(screen.getByText('Tôi có thể giúp gì cho bạn?')).toBeInTheDocument();
+
+    // Toggle chatbox color from White (light) to Black (dark) inside the chat window
+    fireEvent.click(screen.getByRole('button', { name: /Chuyển khung chat sang màu đen/i }));
+    expect(dialog).toHaveAttribute('data-chat-theme', 'dark');
+
+    // Toggle back to White (light)
+    fireEvent.click(screen.getByRole('button', { name: /Chuyển khung chat sang màu trắng/i }));
+    expect(dialog).toHaveAttribute('data-chat-theme', 'light');
 
     const input = screen.getByPlaceholderText('Hỏi Trợ lý AI bất kỳ điều gì...');
     fireEvent.change(input, { target: { value: 'Làm sao để nạp Coin qua VNPay?' } });
