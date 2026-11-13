@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight, Clapperboard, LayoutGrid, List, Search } from 'lucide-react';
 import { InitialsAvatar } from '@/components/data/InitialsAvatar';
+import { Pager, pageOf } from '@/components/data/Pager';
 import { ErrorNote, Loading } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
 import { loadPipelines } from '@/services/pipelineService';
@@ -69,13 +70,24 @@ export function ReviewerProjectQueuePage() {
   const requested = params.get('filter');
   const [filter, setFilter] = useState<QueueFilter>(isFilter(requested) ? requested : 'all');
   const [search, setSearch] = useState(params.get('q') ?? '');
+  const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const pipelines = useResource('reviewer-pipelines', () => loadPipelines());
 
   const items = useMemo(() => toQueueItems(pipelines.data ?? []), [pipelines.data]);
   const shown = filterQueue(items, filter, search);
+  const { rows, totalPages } = pageOf(shown, page, viewMode === 'grid' ? 6 : 10);
   const countOf = (key: QueueFilter) => (key === 'all' ? items.length : items.filter((i) => i.stage === FILTER_STAGE[key]).length);
   const pending = countOf('script') + countOf('master');
+
+  const handleFilter = (f: QueueFilter) => {
+    setFilter(f);
+    setPage(1);
+  };
+  const handleSearch = (q: string) => {
+    setSearch(q);
+    setPage(1);
+  };
 
   return (
     <div className="min-h-screen w-full bg-[#F9FAFB] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8">
@@ -122,7 +134,7 @@ export function ReviewerProjectQueuePage() {
                     key={f.key}
                     type="button"
                     aria-pressed={filter === f.key}
-                    onClick={() => setFilter(f.key)}
+                    onClick={() => handleFilter(f.key)}
                     className={`px-3.5 py-2 rounded-2xl whitespace-nowrap transition-all cursor-pointer ${filter === f.key ? f.active : 'bg-white dark:bg-[#111420] text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/[0.05] border border-slate-200/80 dark:border-white/[0.08]'}`}
                   >
                     {f.label} ({countOf(f.key)})
@@ -132,11 +144,11 @@ export function ReviewerProjectQueuePage() {
               <div className="flex items-center gap-2">
                 <div className="relative w-full sm:w-64">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" aria-hidden="true" />
-                  <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm phim, Studio, Creator..." aria-label="Tìm trong hàng đợi" className="w-full pl-9 pr-3 py-2 rounded-2xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] text-xs text-slate-900 dark:text-white focus:outline-none" />
+                  <input type="search" value={search} onChange={(e) => handleSearch(e.target.value)} placeholder="Tìm phim, Studio, Creator..." aria-label="Tìm trong hàng đợi" className="w-full pl-9 pr-3 py-2 rounded-2xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] text-xs text-slate-900 dark:text-white focus:outline-none" />
                 </div>
                 <div className="flex items-center rounded-2xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] p-1">
                   {([['grid', LayoutGrid, 'Xem dạng thẻ'], ['table', List, 'Xem dạng bảng']] as const).map(([mode, Icon, label]) => (
-                    <button key={mode} type="button" aria-label={label} aria-pressed={viewMode === mode} onClick={() => setViewMode(mode)} className={`p-1.5 rounded-xl cursor-pointer ${viewMode === mode ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
+                    <button key={mode} type="button" aria-label={label} aria-pressed={viewMode === mode} onClick={() => { setViewMode(mode); setPage(1); }} className={`p-1.5 rounded-xl cursor-pointer ${viewMode === mode ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'}`}>
                       <Icon className="w-3.5 h-3.5" />
                     </button>
                   ))}
@@ -147,13 +159,27 @@ export function ReviewerProjectQueuePage() {
             {shown.length === 0 ? (
               <p className={`${CARD} p-10 text-center text-sm text-slate-500 dark:text-slate-400`}>{items.length ? 'Không có mục nào khớp bộ lọc.' : 'Bạn chưa phụ trách dự án nào.'}</p>
             ) : viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {shown.map((item) => (
-                  <ReviewerQueueCard key={item.id} item={item} />
-                ))}
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {rows.map((item) => (
+                    <ReviewerQueueCard key={item.id} item={item} />
+                  ))}
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex justify-center pt-2">
+                    <Pager page={Math.min(page, totalPages)} totalPages={totalPages} onChange={setPage} />
+                  </div>
+                )}
               </div>
             ) : (
-              <QueueTable items={shown} />
+              <div className="space-y-6">
+                <QueueTable items={rows} />
+                {totalPages > 1 && (
+                  <div className="flex justify-center pt-2">
+                    <Pager page={Math.min(page, totalPages)} totalPages={totalPages} onChange={setPage} />
+                  </div>
+                )}
+              </div>
             )}
           </>
         )}
