@@ -60,12 +60,20 @@ export function localAiReply(content: string): string {
 }
 
 function isFallbackStatus(statusCode?: number): boolean {
-  return statusCode === 404 || statusCode === 401 || statusCode === 403;
+  return (
+    statusCode === undefined ||
+    statusCode === 404 ||
+    statusCode === 401 ||
+    statusCode === 403 ||
+    statusCode === 408 ||
+    statusCode === 504 ||
+    statusCode === 502
+  );
 }
 
 export const supportService = {
   async startOrGetOpen(): Promise<ApiResponse<SupportConversation>> {
-    const res = await apiClient.post<SupportConversation>(S.CONVERSATIONS, {});
+    const res = await apiClient.post<SupportConversation>(S.CONVERSATIONS, {}, { timeoutMs: 30_000 });
     if (res.success && res.data) return res;
     if (isFallbackStatus(res.statusCode)) {
       return { success: true, data: localConv, statusCode: 200 };
@@ -81,7 +89,7 @@ export const supportService = {
         statusCode: 200,
       };
     }
-    const res = await apiClient.get<SupportConversationDetail | SupportConversation>(S.CONVERSATION(id));
+    const res = await apiClient.get<SupportConversationDetail | SupportConversation>(S.CONVERSATION(id), { timeoutMs: 30_000 });
     if (res.success && res.data) {
       const payload = res.data as SupportConversationDetail;
       if (payload.conversation) return { ...res, data: payload };
@@ -107,7 +115,7 @@ export const supportService = {
   async sendMessage(id: string, content: string, clientMessageId?: string): Promise<ApiResponse<SupportSendResult>> {
     const body = { content: content.trim(), ...(clientMessageId ? { clientMessageId } : {}) };
     if (id !== localConv.id) {
-      const res = await apiClient.post<SupportSendResult>(S.MESSAGES(id), body);
+      const res = await apiClient.post<SupportSendResult>(S.MESSAGES(id), body, { timeoutMs: 60_000 });
       if (res.success && res.data) return res;
       if (!isFallbackStatus(res.statusCode)) return res;
     }

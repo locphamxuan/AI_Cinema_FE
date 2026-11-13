@@ -91,7 +91,7 @@ export function useAiSupportChat(isOpen: boolean) {
         if (res.data.quickReplies?.length) setQuickReplies(res.data.quickReplies);
       } else {
         setDraft(clean);
-        setErrorMsg(res.message || 'Không gửi được tin nhắn. Hãy bấm "Hội thoại mới".');
+        setErrorMsg(res.message || 'Hệ thống đang xử lý nhiều yêu cầu hoặc phản hồi chậm. Vui lòng thử lại hoặc bấm "Hội thoại mới".');
       }
     } finally {
       setSending(false);

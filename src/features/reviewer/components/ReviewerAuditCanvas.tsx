@@ -36,7 +36,7 @@ export function ReviewerAuditCanvas({
   const latestScript = script?.versions[0];
 
   return (
-    <div className="flex-1 min-w-0 bg-[#F9FAFB] dark:bg-[#090B10] p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
+    <div className="flex-1 min-w-0 h-full bg-[#F9FAFB] dark:bg-[#090B10] p-4 sm:p-6 lg:p-8 space-y-6 overflow-y-auto">
       <header className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-white/[0.08]">
         <div className="min-w-0">
           <Link href={`/reviewer/projects/${project.id}`} className="text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white">

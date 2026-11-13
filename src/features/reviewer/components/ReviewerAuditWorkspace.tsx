@@ -73,7 +73,7 @@ export function ReviewerAuditWorkspace() {
   const target = pickEpisode(queue, params.get('project'), params.get('episode'));
 
   return (
-    <div className="flex flex-col lg:flex-row flex-1 w-full min-h-[calc(100vh-3.5rem)] bg-[#F9FAFB] dark:bg-[#090B10] text-slate-900 dark:text-slate-100">
+    <div className="flex flex-col lg:flex-row flex-1 w-full h-[calc(100vh-3.5rem)] max-h-[calc(100vh-3.5rem)] overflow-hidden bg-[#F9FAFB] dark:bg-[#090B10] text-slate-900 dark:text-slate-100">
       {pipelines.loading && !pipelines.data && !target && <Loading label="Đang tìm phim cần thẩm định…" />}
       {pipelines.error && <ErrorNote message={pipelines.error} onRetry={pipelines.reload} />}
       {target && <AuditDesk key={target.episodeId} projectId={target.projectId} episodeId={target.episodeId} queue={queue} />}
