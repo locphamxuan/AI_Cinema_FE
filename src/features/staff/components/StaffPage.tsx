@@ -8,6 +8,7 @@ import { movieService, type CatalogMovie } from '@/services/movieService';
 import { adminService, type AccountRow } from '@/services/adminService';
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 import { SubscriptionsPanel } from '@/features/billing-admin/components/SubscriptionsPanel';
+import { StaffSupportWorkspace } from './StaffSupportWorkspace';
 
 interface Module {
   key: string;
@@ -21,9 +22,9 @@ interface Module {
 }
 
 const MODULES: Module[] = [
+  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones },
   { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).', icon: BarChart3 },
   { key: 'members', title: 'Thông tin member', description: 'Tài khoản member (chỉ đọc).', icon: Users, permission: PERMISSION.MEMBER_OPS_READ },
-  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones, comingSoon: true },
   { key: 'marketing', title: 'Marketing', description: 'Chiến dịch cho phim sắp và đã phát hành.', icon: Megaphone, comingSoon: true },
 ];
 
@@ -32,36 +33,73 @@ const CARD = 'bg-white dark:bg-[#111420] rounded-3xl border border-slate-200/80 
 /** Staff operations dashboard (MF-5): only the modules this role holds a permission for (BR-21). */
 export function StaffPage() {
   const can = useCan();
+  const [activeTab, setActiveTab] = useState<'support' | 'operations'>('support');
   const modules = MODULES.filter((m) => !m.permission || can(m.permission));
 
   return (
     <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-      <div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Vận hành</h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Các mục bạn được cấp quyền. Dữ liệu ở đây chỉ để xem, không sửa được.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Vận hành CSKH</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Xử lý yêu cầu hỗ trợ khách hàng và tra cứu dữ liệu vận hành.</p>
+        </div>
+
+        <div className="flex gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-white/5 text-xs font-semibold">
+          <button
+            type="button"
+            onClick={() => setActiveTab('support')}
+            className={`px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors ${
+              activeTab === 'support'
+                ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            Hỗ trợ CSKH
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('operations')}
+            className={`px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors ${
+              activeTab === 'operations'
+                ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-400'
+            }`}
+          >
+            Tra cứu vận hành
+          </button>
+        </div>
       </div>
 
-      {modules.length === 0 && <p className={`${CARD} p-5 text-xs text-slate-500 dark:text-slate-400`}>Vai trò của bạn chưa được cấp mục vận hành nào. Liên hệ Admin để được cấp quyền.</p>}
+      {modules.length === 0 && (
+        <p className={`${CARD} p-5 text-xs text-slate-500 dark:text-slate-400`}>
+          Vai trò của bạn chưa được cấp mục vận hành nào. Liên hệ Admin để được cấp quyền.
+        </p>
+      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {modules
-          .filter((m) => m.comingSoon)
-          .map(({ key, title, description, icon: Icon }) => (
-            <div key={key} className={`${CARD} p-4 space-y-1.5`}>
-              <p className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                <Icon className="w-4 h-4 text-slate-700 dark:text-slate-300" aria-hidden="true" /> {title}
-              </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
-              <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Đang xây dựng</p>
-            </div>
-          ))}
-      </div>
+      {activeTab === 'support' && <StaffSupportWorkspace />}
 
-      <FilmsSection />
-      {can(PERMISSION.MEMBER_OPS_READ) && <MembersSection />}
-      {/* MF-2, read only: the panels hide the cancel and adjust actions Staff does not hold. */}
-      {can(PERMISSION.BILLING_SUBSCRIPTION_READ) && <SubscriptionsPanel />}
-      {can(PERMISSION.COIN_TRANSACTION_READ) && <CoinLedgerPanel />}
+      {activeTab === 'operations' && (
+        <div className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {modules
+              .filter((m) => m.comingSoon)
+              .map(({ key, title, description, icon: Icon }) => (
+                <div key={key} className={`${CARD} p-4 space-y-1.5`}>
+                  <p className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+                    <Icon className="w-4 h-4 text-slate-700 dark:text-slate-300" aria-hidden="true" /> {title}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
+                  <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Đang xây dựng</p>
+                </div>
+              ))}
+          </div>
+
+          <FilmsSection />
+          {can(PERMISSION.MEMBER_OPS_READ) && <MembersSection />}
+          {can(PERMISSION.BILLING_SUBSCRIPTION_READ) && <SubscriptionsPanel />}
+          {can(PERMISSION.COIN_TRANSACTION_READ) && <CoinLedgerPanel />}
+        </div>
+      )}
     </main>
   );
 }

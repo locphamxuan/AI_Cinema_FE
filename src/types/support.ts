@@ -10,10 +10,16 @@ export type SupportSenderType = 'MEMBER' | 'AI' | 'STAFF' | 'SYSTEM';
 export interface SupportConversation {
   id: string;
   status: SupportStatus;
+  aiSummary?: string | null;
+  assignedStaffId?: string | null;
+  assignedStaff?: { id: string; fullName: string; email: string } | null;
+  memberId?: string;
+  member?: { id: string; fullName: string; email: string } | null;
   escalationReason?: string | null;
   rating?: number | null;
   lastMessageAt?: string | null;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface SupportMessage {
@@ -21,6 +27,7 @@ export interface SupportMessage {
   senderType: SupportSenderType;
   senderId?: string | null;
   content: string;
+  isInternal?: boolean;
   createdAt: string;
 }
 
@@ -41,4 +48,29 @@ export interface SupportSendResult {
   aiMessage: SupportMessage | null;
   systemMessage?: SupportMessage | null;
   quickReplies?: SupportQuickReply[];
+}
+
+export interface StaffAiSuggestion {
+  draft: string;
+  confidence: number;
+  grounded: boolean;
+  sources?: string[];
+}
+
+export interface SupportQueueStats {
+  waitingCount: number;
+  handlingCount: number;
+  resolvedTodayCount: number;
+  aiResolvedRate?: number;
+}
+
+export interface KnowledgeArticle {
+  id: string;
+  slug: string;
+  title: string;
+  content: string;
+  category?: string | null;
+  isPublished: boolean;
+  updatedAt: string;
+  createdAt: string;
 }

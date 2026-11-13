@@ -24,7 +24,7 @@ import { StudioModal } from './StudioModal';
  */
 export function StudiosPage() {
   const pathname = usePathname();
-  const isReviewer = pathname.startsWith('/reviewer');
+  const isReviewer = Boolean(pathname?.startsWith('/reviewer'));
   const can = useCan();
   const manage = !isReviewer && can(PERMISSION.STUDIO_MANAGE);
   const manageAccounts = !isReviewer && can(PERMISSION.USER_MANAGE);

@@ -183,4 +183,5 @@ export interface AppNotification {
   link: string | null;
   readAt: string | null;
   createdAt: string;
+  payload?: Record<string, unknown> | null;
 }

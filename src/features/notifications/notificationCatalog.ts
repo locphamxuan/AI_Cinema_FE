@@ -112,8 +112,9 @@ const ADMIN_TABS: NotificationTab[] = [
     sections: [
       section('script', 'Kịch bản', 'SCRIPT_UPDATED'),
       section('notes', 'Trao đổi ý tưởng', 'PROJECT_NOTE'),
-      section('contract', 'Hợp đồng', 'CONTRACT_UPDATED'),
-      section('final', 'Phim Final', 'FINAL_FILM_CONFIRMED'),
+      section('contract', 'Hợp đồng', 'CONTRACT_UPDATED', 'STUDIO_SELECTED'),
+      section('final', 'Kiểm duyệt & Phim Final', 'FINAL_FILM_CONFIRMED', 'AI_LABEL_APPLIED', 'COMPLIANCE_PASSED'),
+      section('status', 'Tiến độ & sự cố', 'PROJECT_CANCELLED', 'EPISODE_OVERDUE', 'HLS_LINK_DEAD'),
     ],
   },
   {

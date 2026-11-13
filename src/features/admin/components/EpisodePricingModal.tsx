@@ -38,9 +38,9 @@ export function EpisodePricingModal({
     if (!priceValid) return;
 
     const done = await run(async () => {
-      await productionService.setCoinPrice(episode.id, priceValue);
-      await productionService.setAccessFlags(episode.id, { isFreeForGuest, isFreeForMember });
-      return true;
+      const pRes = await productionService.setCoinPrice(episode.id, priceValue);
+      if (!pRes.success) return pRes;
+      return productionService.setAccessFlags(episode.id, { isFreeForGuest, isFreeForMember });
     }, 'Đã cập nhật giá Coin và quyền xem tập');
 
     if (done) {

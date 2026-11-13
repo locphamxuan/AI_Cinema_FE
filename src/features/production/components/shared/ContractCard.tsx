@@ -80,7 +80,7 @@ export function ContractCard({
             <Button
               key={doc.id}
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
               className="h-6 text-[11px] px-2 flex items-center gap-1"
               onClick={() => contractService.downloadDocument(c.id, doc.side, doc.fileName)}

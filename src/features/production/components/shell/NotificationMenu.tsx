@@ -61,7 +61,7 @@ export function NotificationMenu() {
       await notificationService.markRead(item.id);
       void refreshCount();
     }
-    const href = notificationHref(item.link, role);
+    const href = notificationHref(item.link, role, item.payload as { projectId?: string; episodeId?: string });
     if (href) router.push(href);
   };
 

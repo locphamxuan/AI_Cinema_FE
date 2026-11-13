@@ -24,13 +24,27 @@ export const productionPaths = {
  * Turns the link a backend notification carries (`/projects/:id/episodes/:id`, `/projects/:id/studio`,
  * `/admin/price-alerts`, …) into a page of this web app for the signed-in role.
  */
-export function notificationHref(link: string | null, role: WebRole | undefined): string | null {
-  if (!link) return null;
+export function notificationHref(
+  link: string | null,
+  role: WebRole | undefined,
+  payload?: { projectId?: string; episodeId?: string },
+): string | null {
+  const base = productionBaseFor(role);
+  if (!link) {
+    if (payload?.projectId) {
+      return payload.episodeId
+        ? productionPaths.episode(base, payload.projectId, payload.episodeId)
+        : productionPaths.project(base, payload.projectId);
+    }
+    return null;
+  }
   if (link.startsWith('/admin/price-alerts')) return '/admin/settings?tab=price-alerts';
+  if (link === '/contracts' || link.startsWith('/contracts')) {
+    return payload?.projectId ? productionPaths.project(base, payload.projectId, 'contract') : `${base}/projects`;
+  }
   const match = /^\/projects\/([^/?#]+)(?:\/(episodes)\/([^/?#]+)|\/([a-z-]+))?/.exec(link);
   if (!match) return link.startsWith('/') ? link : null;
   const [, movieId, , episodeId, section] = match;
-  const base = productionBaseFor(role);
   if (episodeId) return productionPaths.episode(base, movieId, episodeId);
   const tab = section === 'change-requests' ? 'changes' : section;
   return productionPaths.project(base, movieId, tab);

@@ -16,6 +16,8 @@ import {
   Megaphone,
   Bell,
   Settings,
+  Headphones,
+  BookOpen,
 } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { useAppStore } from '@/store/useAppStore';
@@ -36,6 +38,8 @@ export function AdminSidebar() {
   const isRewards = pathname.startsWith('/admin/rewards');
   const isPermissions = pathname.startsWith('/admin/permissions');
   const isAds = pathname.startsWith('/admin/ads');
+  const isSupport = pathname.startsWith('/admin/support') && !pathname.startsWith('/admin/support/knowledge');
+  const isKnowledge = pathname.startsWith('/admin/support/knowledge');
   const isNotifications = pathname.startsWith('/admin/notifications');
   const isSettings = pathname.startsWith('/admin/settings');
 
@@ -195,6 +199,32 @@ export function AdminSidebar() {
             <div className="flex items-center gap-2.5 min-w-0">
               <KeyRound className={iconClass(isPermissions)} />
               <span className="truncate">Tài khoản & Phân quyền</span>
+            </div>
+          </Link>
+
+          {/* Hỗ trợ CSKH */}
+          <Link
+            href="/admin/support"
+            aria-label="Hỗ trợ CSKH"
+            aria-current={isSupport ? 'page' : undefined}
+            className={linkClass(isSupport)}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Headphones className={iconClass(isSupport)} />
+              <span className="truncate">Hỗ trợ CSKH</span>
+            </div>
+          </Link>
+
+          {/* Knowledge Base */}
+          <Link
+            href="/admin/support/knowledge"
+            aria-label="Knowledge Base"
+            aria-current={isKnowledge ? 'page' : undefined}
+            className={linkClass(isKnowledge)}
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <BookOpen className={iconClass(isKnowledge)} />
+              <span className="truncate">Knowledge Base</span>
             </div>
           </Link>
 

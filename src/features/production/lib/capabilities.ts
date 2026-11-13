@@ -97,7 +97,7 @@ export function projectCapabilities(
     scriptApprove: can(PERMISSION.SCRIPT_APPROVE),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),
     review: owner && can(PERMISSION.CONTENT_REVIEW),
-    price: can(PERMISSION.EPISODE_PRICE),
+    price: can(PERMISSION.EPISODE_PRICE) && (create || owner),
     publish: can(PERMISSION.EPISODE_PUBLISH),
     canCancel: create,
     note: create || lead || owner,
@@ -136,7 +136,7 @@ export function isProjectTabVisible(key: ProjectTabKey, can: (p: PermissionKey) 
     case 'fee':
       return can(PERMISSION.COST_ADJUST) || can(PERMISSION.COST_REQUEST) || can(PERMISSION.COST_APPROVE);
     case 'contract':
-      return can(PERMISSION.CONTRACT_MANAGE) || can(PERMISSION.PROJECT_MANAGE);
+      return can(PERMISSION.CONTRACT_MANAGE);
     case 'changes':
       return (
         can(PERMISSION.PROJECT_SUGGEST) ||

@@ -261,6 +261,12 @@ export const NOTIFICATION_TYPE_LABEL: Record<string, string> = {
   PROJECT_NOTE: 'Trao đổi ý tưởng',
   SCRIPT_UPDATED: 'Kịch bản',
   CONTRACT_UPDATED: 'Hợp đồng',
+  STUDIO_SELECTED: 'Chọn Studio',
   FINAL_FILM_CONFIRMED: 'Phim Final chờ duyệt',
   FINAL_FILM_REJECTED: 'Phim Final bị trả lại',
+  AI_LABEL_APPLIED: 'Đã gắn nhãn AI',
+  COMPLIANCE_PASSED: 'Đạt kiểm tra tuân thủ',
+  EPISODE_OVERDUE: 'Tập trễ hạn',
+  HLS_LINK_DEAD: 'Link HLS lỗi',
+  PROJECT_CANCELLED: 'Dự án đã huỷ',
 };
