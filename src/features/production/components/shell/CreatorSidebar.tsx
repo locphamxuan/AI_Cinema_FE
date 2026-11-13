@@ -123,7 +123,7 @@ export function CreatorSidebar() {
       <div className="pt-3 border-t border-slate-200 dark:border-white/[0.06] px-2 text-xs">
         <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
           <span className="w-2 h-2 rounded-full bg-emerald-500" />
-          <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Biên kịch nội bộ</span>
+          <span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">Trực tuyến</span>
         </div>
       </div>
     </nav>
