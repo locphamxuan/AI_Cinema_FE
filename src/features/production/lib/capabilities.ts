@@ -136,7 +136,7 @@ export function isProjectTabVisible(key: ProjectTabKey, can: (p: PermissionKey) 
     case 'fee':
       return can(PERMISSION.COST_ADJUST) || can(PERMISSION.COST_REQUEST) || can(PERMISSION.COST_APPROVE);
     case 'contract':
-      return can(PERMISSION.CONTRACT_MANAGE);
+      return can(PERMISSION.CONTRACT_MANAGE) || can(PERMISSION.PROJECT_MANAGE);
     case 'changes':
       return (
         can(PERMISSION.PROJECT_SUGGEST) ||

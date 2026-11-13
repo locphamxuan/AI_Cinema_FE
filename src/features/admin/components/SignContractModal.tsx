@@ -18,6 +18,7 @@ import type { ContractToSign } from '../adminPipeline';
 export function SignContractModal({ item, onClose, onChanged }: { item: ContractToSign; onClose: () => void; onChanged: () => Promise<void> }) {
   const { contract: c, project } = item;
   const [counter, setCounter] = useState('');
+  const [signFile, setSignFile] = useState<File | null>(null);
   const { busy, run } = useAction();
   const offer = parseVnd(counter);
   const costs = useResource(`costs:${project.id}`, () => productionService.getCosts(project.id));
@@ -34,8 +35,14 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
     await onChanged();
     onClose();
   };
-  const sign = async () => finish(await run(() => contractService.sign(c.id), waitsOnHandoff ? 'Đã ký, Studio mới bắt đầu sản xuất' : 'Đã ký, hợp đồng hoàn tất và dự án vào sản xuất'));
-  const propose = async () => finish(await run(() => contractService.counter(c.id, offer), 'Đã gửi mức giá mới cho Studio'));
+  const sign = async () =>
+    finish(
+      await run(
+        () => contractService.sign(c.id, signFile || undefined),
+        waitsOnHandoff ? 'Đã ký, Studio mới bắt đầu sản xuất' : 'Đã ký, hợp đồng hoàn tất và dự án vào sản xuất',
+      ),
+    );
+  const propose = async () => finish(await run(() => contractService.counter(c.id, offer, signFile || undefined), 'Đã gửi mức giá mới cho Studio'));
 
   return (
     <Modal
@@ -74,6 +81,26 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
           className={fieldInputClass}
         />
       </FormField>
+
+      <div className="space-y-1.5 pt-2 border-t border-slate-200/80 dark:border-white/[0.06] text-xs">
+        <div className="flex items-center justify-between">
+          <label className="font-semibold text-slate-800 dark:text-slate-200">File PDF hợp đồng đã ký của AI Cinema</label>
+          <button
+            type="button"
+            className="text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+            onClick={() => contractService.downloadDocument(c.id, 'STUDIO')}
+          >
+            Tải bản Studio đã ký (PDF)
+          </button>
+        </div>
+        <input
+          type="file"
+          accept=".pdf,application/pdf"
+          aria-label="File PDF đã ký"
+          onChange={(e) => setSignFile(e.target.files?.[0] || null)}
+          className="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100"
+        />
+      </div>
 
       <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-white/[0.06]">
         <Button type="button" variant="secondary" onClick={onClose} className="rounded-full">
