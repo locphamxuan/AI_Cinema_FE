@@ -27,19 +27,20 @@ export function finalScriptBlockers(project: Pick<ProjectDetail, 'seasons'>): st
  */
 export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectScript) => void }) {
   const { project } = useProject();
-  const studios = useResource(project.studio ? null : 'studios:active', () => studioService.list(true));
-  const [studioId, setStudioId] = useState('');
+  const studios = useResource('studios:active', () => studioService.list(true));
+  const [studioId, setStudioId] = useState(project.studio?.id || '');
   const [terms, setTerms] = useState('');
   const [sendingBack, setSendingBack] = useState(false);
   const { busy, run } = useAction();
   const blockers = finalScriptBlockers(project);
-  const studioReady = !!project.studio || !!studioId;
+  const studioReady = !!studioId || !!project.studio;
   const episodes = project.seasons.flatMap((s) => s.episodes);
 
   const approve = async (e: React.FormEvent) => {
     e.preventDefault();
+    const targetStudioId = studioId || project.studio?.id;
     const next = await run(
-      () => scriptService.finalReview(project.id, { approve: true, studioId: project.studio ? undefined : studioId, terms }),
+      () => scriptService.finalReview(project.id, { approve: true, studioId: targetStudioId, terms }),
       'Đã duyệt Kịch bản Final, hợp đồng mẫu đã gửi Studio',
     );
     if (next) onDecided(next);
@@ -58,22 +59,16 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
       description="Đồng ý: kịch bản khoá lại và hệ thống tự gửi hợp đồng mẫu (chưa có giá) cho Studio. Không đồng ý: Creator sửa rồi nộp lại cho Reviewer."
     >
       <form onSubmit={approve} className="space-y-3 text-xs">
-        {project.studio ? (
-          <p className="text-slate-600 dark:text-slate-300">
-            Studio nhận hợp đồng: <span className="font-semibold">{project.studio.name}</span>
-          </p>
-        ) : (
-          <FormField label="Studio nhận hợp đồng">
-            <select value={studioId} onChange={(e) => setStudioId(e.target.value)} required className={fieldInputClass}>
-              <option value="">{studios.loading && !studios.data ? 'Đang tải…' : 'Chọn Studio'}</option>
-              {studios.data?.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-          </FormField>
-        )}
+        <FormField label="Studio nhận hợp đồng">
+          <select value={studioId} onChange={(e) => setStudioId(e.target.value)} required className={fieldInputClass}>
+            <option value="">{studios.loading && !studios.data ? 'Đang tải…' : 'Chọn Studio'}</option>
+            {studios.data?.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+        </FormField>
         <FormField label="Điều khoản hợp đồng (tuỳ chọn)">
           <textarea
             rows={3}

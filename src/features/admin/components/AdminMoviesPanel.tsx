@@ -12,6 +12,7 @@ import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import type { FilmFigures } from '@/types/film-report';
 import { EpisodeAdSlotsModal } from './EpisodeAdSlotsModal';
+import { EpisodePricingModal, type EpisodePricingTarget } from './EpisodePricingModal';
 import { Pager, pageOf } from '@/components/data/Pager';
 
 const STAT = 'inline-flex items-center gap-1 tabular-nums';
@@ -27,6 +28,7 @@ export function AdminMoviesPanel() {
   const films = useResource(genreId ? `admin:films:${genreId}` : null, () => filmReportService.movies(genreId!));
   const [open, setOpen] = useState<string | null>(null);
   const [adsOf, setAdsOf] = useState<{ id: string; label: string } | null>(null);
+  const [pricingOf, setPricingOf] = useState<EpisodePricingTarget | null>(null);
   const can = useCan();
   const rows = films.data ?? [];
   const [page, setPage] = useState(1);
@@ -90,6 +92,7 @@ export function AdminMoviesPanel() {
                       expanded={open === film.id}
                       onToggle={() => setOpen(open === film.id ? null : film.id)}
                       onAds={can(PERMISSION.AD_MANAGE) ? setAdsOf : undefined}
+                      onPricing={can(PERMISSION.EPISODE_PRICE) ? setPricingOf : undefined}
                     />
                   ))}
                 </tbody>
@@ -100,6 +103,15 @@ export function AdminMoviesPanel() {
         </Panel>
       )}
       {adsOf && <EpisodeAdSlotsModal episode={adsOf} onClose={() => setAdsOf(null)} />}
+      {pricingOf && (
+        <EpisodePricingModal
+          episode={pricingOf}
+          onClose={() => setPricingOf(null)}
+          onChanged={async () => {
+            await films.reload();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -110,9 +122,11 @@ interface FilmRowProps {
   onToggle: () => void;
   /** Present for an account allowed to place the episode's ads (BR-32). */
   onAds?: (episode: { id: string; label: string }) => void;
+  /** Present for an account allowed to set episode coin price and access flags (Admin). */
+  onPricing?: (target: EpisodePricingTarget) => void;
 }
 
-function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
+function FilmRow({ film, expanded, onToggle, onAds, onPricing }: FilmRowProps) {
   const many = film.episodes.length > 1;
   return (
     <Fragment>
@@ -165,6 +179,7 @@ function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
                   <th className="py-1.5 text-right">Lượt mua</th>
                   <th className="py-1.5 pr-0 text-right">Coin nhận được</th>
                   {onAds && <th className="py-1.5 pl-3 text-right">Quảng cáo</th>}
+                  {onPricing && <th className="py-1.5 pl-3 text-right">Quyền xem & Giá</th>}
                 </tr>
               </thead>
               <tbody>
@@ -186,6 +201,17 @@ function FilmRow({ film, expanded, onToggle, onAds }: FilmRowProps) {
                           className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-800 font-semibold cursor-pointer"
                         >
                           <Megaphone className="w-3 h-3" /> Đặt vị trí
+                        </button>
+                      </td>
+                    )}
+                    {onPricing && (
+                      <td className="py-1.5 pl-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => onPricing({ id: e.id, label: `${film.title} - Tập ${e.episodeNumber}`, coinPrice: e.coinPrice })}
+                          className="inline-flex items-center gap-1 text-amber-600 hover:text-amber-700 font-semibold cursor-pointer"
+                        >
+                          <Coins className="w-3 h-3" /> Đặt giá
                         </button>
                       </td>
                     )}

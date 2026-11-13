@@ -73,7 +73,7 @@ describe('PublishPanel - release (Admin)', () => {
   it('needs a Coin price before release', async () => {
     routeFetch({ '/episodes/e1/publications': [] });
     show(episode({ coinPrice: null }), { canPublish: true });
-    expect(await screen.findByText(/Reviewer cần đặt giá Coin trước khi phát hành/)).toBeInTheDocument();
+    expect(await screen.findByText(/cần đặt giá Coin trước khi phát hành/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Phát hành ngay' })).toBeDisabled();
   });
 

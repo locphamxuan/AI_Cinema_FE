@@ -73,6 +73,8 @@ export interface Episode {
   expectedReleaseDate: string | null;
   approvedMediaAssetId: string | null;
   coinPrice: number | null;
+  isFreeForGuest?: boolean;
+  isFreeForMember?: boolean;
   /** The Reviewer confirmed this version as the Final Film; only then may the Admin publish it. */
   finalConfirmedAt: string | null;
   finalConfirmedById: string | null;

@@ -11,11 +11,10 @@ import { Panel, TextPromptModal } from '@/components/data/ui';
 /** Where the episode stands on the way to the Final Film, in words. */
 function stateOf(episode: Episode): string {
   if (episode.status !== 'COMPLIANCE_PASSED') {
-    return 'Phim Final được xác nhận sau khi Reviewer duyệt bản Studio nộp, gắn nhãn AI, đạt 4 mục kiểm tra tuân thủ và đặt giá Coin.';
+    return 'Phim Final được xác nhận sau khi Reviewer duyệt bản Studio nộp, gắn nhãn AI và đạt 4 mục kiểm tra tuân thủ.';
   }
-  if (episode.finalConfirmedAt) return `Reviewer đã xác nhận Phim Final lúc ${formatDateTime(episode.finalConfirmedAt)}; chờ Admin publish.`;
-  if (episode.coinPrice === null) return 'Đã đạt kiểm tra tuân thủ; Reviewer đặt giá Coin rồi xác nhận Phim Final.';
-  return 'Đã đạt kiểm tra tuân thủ và có giá Coin; Reviewer xác nhận Phim Final để Admin publish.';
+  if (episode.finalConfirmedAt) return `Reviewer đã xác nhận Phim Final lúc ${formatDateTime(episode.finalConfirmedAt)}; chờ Admin đặt giá & publish.`;
+  return 'Đã đạt kiểm tra tuân thủ; Reviewer xác nhận Phim Final để chuyển sang Admin.';
 }
 
 /**
@@ -39,7 +38,7 @@ export function FinalFilmPanel({
   const [sendingBack, setSendingBack] = useState(false);
   const { busy, run } = useAction();
   const checked = episode.status === 'COMPLIANCE_PASSED';
-  const confirmable = canConfirm && checked && episode.coinPrice !== null && !episode.finalConfirmedAt;
+  const confirmable = canConfirm && checked && !episode.finalConfirmedAt;
   const returnable = canSendBack && checked && !!episode.finalConfirmedAt;
 
   const confirm = async () => {

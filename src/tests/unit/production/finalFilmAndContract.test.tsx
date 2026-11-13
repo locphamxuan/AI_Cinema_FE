@@ -31,10 +31,14 @@ describe('FinalFilmPanel', () => {
     expect(calls.some((c) => c.path === '/episodes/e1/final-confirmation' && c.method === 'POST')).toBe(true);
   });
 
-  it('offers no confirmation before the Coin price is set', () => {
+  it('offers confirmation once compliance passed even if Coin price is not set yet', () => {
     render(panel(episode({ coinPrice: null }), { canConfirm: true }));
+    expect(screen.getByRole('button', { name: 'Xác nhận Phim Final' })).toBeInTheDocument();
+  });
+
+  it('offers no confirmation before compliance checks pass', () => {
+    render(panel(episode({ status: 'IN_REVIEW' }), { canConfirm: true }));
     expect(screen.queryByRole('button', { name: 'Xác nhận Phim Final' })).not.toBeInTheDocument();
-    expect(screen.getByText(/Reviewer đặt giá Coin rồi xác nhận/)).toBeInTheDocument();
   });
 
   it('shows the Reviewer why the Admin sent the film back', () => {

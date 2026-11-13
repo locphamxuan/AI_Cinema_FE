@@ -36,6 +36,8 @@ export function PublishPanel({
   const publications = useResource(`publications:${episode.id}:${episode.status}`, () => productionService.listPublications(episode.id));
   const settings = useResource(mayPrice ? 'settings' : null, productionService.getPlatformSettings);
   const [price, setPrice] = useState(episode.coinPrice !== null ? String(episode.coinPrice) : '');
+  const [isFreeForGuest, setIsFreeForGuest] = useState(!!episode.isFreeForGuest);
+  const [isFreeForMember, setIsFreeForMember] = useState(!!episode.isFreeForMember);
   const [scheduleAt, setScheduleAt] = useState('');
   const [takingDown, setTakingDown] = useState<Publication | null>(null);
   const { busy, run } = useAction();
@@ -53,6 +55,16 @@ export function PublishPanel({
   const active = publications.data?.find((p) => !p.unpublishedAt);
 
   const refresh = () => Promise.all([publications.reload(), onChanged()]).then(() => undefined);
+
+  const saveFlags = async (guest: boolean, member: boolean) => {
+    setIsFreeForGuest(guest);
+    setIsFreeForMember(member);
+    const done = await run(
+      () => productionService.setAccessFlags(episode.id, { isFreeForGuest: guest, isFreeForMember: member }),
+      'Đã cập nhật quyền truy cập tập',
+    );
+    if (done) await onChanged();
+  };
 
   const savePrice = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,26 +89,57 @@ export function PublishPanel({
   return (
     <Panel
       title="Định giá & phát hành"
-      description="Reviewer đặt giá Coin; Admin phát hành Phim Final sau khi Reviewer xác nhận (đạt kiểm tra tuân thủ và có giá Coin)."
+      description="Admin đặt giá Coin và cờ xem miễn phí; Admin phát hành Phim Final sau khi Reviewer xác nhận và tập có giá Coin."
     >
       <div className="space-y-5 text-xs">
         {canPrice ? (
-          <form onSubmit={savePrice} className="flex flex-wrap items-end gap-2">
-            <FormField label={`Giá Coin${min !== undefined ? ` (khoảng hợp lệ ${min}–${max})` : ''}`} className="w-48">
-              <input type="number" min={0} step={1} value={price} onChange={(e) => setPrice(e.target.value)} className={fieldInputClass} />
-            </FormField>
-            <Button type="submit" variant="secondary" disabled={busy || !priceValid || priceValue === episode.coinPrice}>
-              Lưu giá
-            </Button>
-            {outOfRange && <p className="w-full text-amber-600">Giá ngoài khoảng: vẫn lưu được nhưng Admin sẽ nhận cảnh báo.</p>}
-          </form>
+          <div className="space-y-3">
+            <form onSubmit={savePrice} className="flex flex-wrap items-end gap-2">
+              <FormField label={`Giá Coin${min !== undefined ? ` (khoảng hợp lệ ${min}–${max})` : ''}`} className="w-48">
+                <input type="number" min={0} step={1} value={price} onChange={(e) => setPrice(e.target.value)} className={fieldInputClass} />
+              </FormField>
+              <Button type="submit" variant="secondary" disabled={busy || !priceValid || priceValue === episode.coinPrice}>
+                Lưu giá
+              </Button>
+              {outOfRange && <p className="w-full text-amber-600">Giá ngoài khoảng: vẫn lưu được nhưng Admin sẽ nhận cảnh báo.</p>}
+            </form>
+            <div className="flex flex-wrap items-center gap-4 pt-1">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={isFreeForGuest}
+                  disabled={busy}
+                  onChange={(e) => saveFlags(e.target.checked, isFreeForMember)}
+                  className="rounded border-slate-300 dark:border-white/20 text-sky-600 focus:ring-sky-500"
+                />
+                <span className="text-slate-700 dark:text-slate-200">Miễn phí cho khách (Guest)</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={isFreeForMember}
+                  disabled={busy}
+                  onChange={(e) => saveFlags(isFreeForGuest, e.target.checked)}
+                  className="rounded border-slate-300 dark:border-white/20 text-sky-600 focus:ring-sky-500"
+                />
+                <span className="text-slate-700 dark:text-slate-200">Miễn phí cho thành viên (Member)</span>
+              </label>
+            </div>
+          </div>
         ) : (
-          <p className="text-slate-600 dark:text-slate-300">Giá Coin: {formatNumber(episode.coinPrice)}</p>
+          <div className="space-y-1 text-slate-600 dark:text-slate-300">
+            <p>Giá Coin: {formatNumber(episode.coinPrice)}</p>
+            {(episode.isFreeForGuest || episode.isFreeForMember) && (
+              <p className="text-slate-500">
+                Miễn phí: {episode.isFreeForGuest ? 'Khách (Guest)' : ''}{episode.isFreeForGuest && episode.isFreeForMember ? ', ' : ''}{episode.isFreeForMember ? 'Thành viên (Member)' : ''}
+              </p>
+            )}
+          </div>
         )}
 
         {canRelease && (
           <div className="space-y-2 rounded-xl border border-sky-100 dark:border-white/10 p-3">
-            {episode.coinPrice === null && <p className="text-amber-600">Reviewer cần đặt giá Coin trước khi phát hành.</p>}
+            {episode.coinPrice === null && <p className="text-amber-600">Admin cần đặt giá Coin trước khi phát hành.</p>}
             {awaitingFinal && <p className="text-amber-600">Chờ Reviewer xác nhận Phim Final trước khi phát hành.</p>}
             <div className="flex flex-wrap items-end gap-2">
               <Button disabled={busy || releaseBlocked} onClick={() => publish(false)}>

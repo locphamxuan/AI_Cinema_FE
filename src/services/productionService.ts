@@ -124,6 +124,8 @@ export const productionService = {
 
   // ---- Publishing (steps 12–16) ----
   setCoinPrice: (episodeId: string, coinPrice: number) => apiClient.patch<unknown>(R.COIN_PRICE(episodeId), { coinPrice }),
+  setAccessFlags: (episodeId: string, flags: { isFreeForGuest?: boolean; isFreeForMember?: boolean }) =>
+    apiClient.patch<unknown>(R.ACCESS_FLAGS(episodeId), flags),
   listPublications: (episodeId: string) => apiClient.get<Publication[]>(R.PUBLICATIONS(episodeId)),
   publish: (episodeId: string, scheduledAt?: string) =>
     apiClient.post<Publication>(R.PUBLICATIONS(episodeId), scheduledAt ? { scheduledAt } : {}),

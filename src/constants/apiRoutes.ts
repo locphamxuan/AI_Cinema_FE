@@ -97,6 +97,7 @@ export const API_ROUTES = {
     AI_LABELS: (id: string) => `/media-assets/${id}/ai-content-labels`,
     COMPLIANCE: (id: string) => `/media-assets/${id}/compliance-checks`,
     COIN_PRICE: (episodeId: string) => `/episodes/${episodeId}/coin-price`,
+    ACCESS_FLAGS: (episodeId: string) => `/episodes/${episodeId}/access-flags`,
     FINAL_CONFIRMATION: (episodeId: string) => `/episodes/${episodeId}/final-confirmation`,
     FINAL_REJECTION: (episodeId: string) => `/episodes/${episodeId}/final-rejection`,
     PUBLICATIONS: (episodeId: string) => `/episodes/${episodeId}/publications`,
@@ -107,8 +108,10 @@ export const API_ROUTES = {
     CONTRACTS: (movieId: string) => `/projects/${movieId}/contracts`,
     CONTRACT_SIGN: (id: string) => `/contracts/${id}/sign`,
     CONTRACT_COUNTER: (id: string) => `/contracts/${id}/counter`,
+    CONTRACT_DOCUMENTS: (id: string) => `/contracts/${id}/documents`,
+    CONTRACT_DOCUMENT_CONTENT: (id: string, side: string) => `/contracts/${id}/documents/${side}/content`,
   },
-  // AI Support Chatbox
+  // AI Support Chatbox (Member) & Staff/Admin Desk
   SUPPORT: {
     CONVERSATIONS: '/support/conversations',
     CONVERSATION: (id: string) => `/support/conversations/${id}`,
@@ -117,6 +120,21 @@ export const API_ROUTES = {
     REQUEST_STAFF: (id: string) => `/support/conversations/${id}/request-staff`,
     CLOSE: (id: string) => `/support/conversations/${id}/close`,
     READ: (id: string) => `/support/conversations/${id}/read`,
+  },
+  ADMIN_SUPPORT: {
+    CONVERSATIONS: '/admin/support/conversations',
+    STATS: '/admin/support/stats',
+    CONVERSATION: (id: string) => `/admin/support/conversations/${id}`,
+    MEMBER_CONTEXT: (id: string) => `/admin/support/conversations/${id}/member-context`,
+    CLAIM: (id: string) => `/admin/support/conversations/${id}/claim`,
+    RELEASE: (id: string) => `/admin/support/conversations/${id}/release`,
+    AI_SUGGESTION: (id: string) => `/admin/support/conversations/${id}/ai-suggestion`,
+    MESSAGES: (id: string) => `/admin/support/conversations/${id}/messages`,
+    RESOLVE: (id: string) => `/admin/support/conversations/${id}/resolve`,
+    CLOSE: (id: string) => `/admin/support/conversations/${id}/close`,
+    ASSIGN: (id: string) => `/admin/support/conversations/${id}/assign`,
+    KNOWLEDGE: '/admin/support/knowledge',
+    KNOWLEDGE_DETAIL: (id: string) => `/admin/support/knowledge/${id}`,
   },
 } as const;
 
