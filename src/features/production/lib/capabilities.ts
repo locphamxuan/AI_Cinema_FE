@@ -55,10 +55,12 @@ export interface ProjectCapabilities {
   ingest: boolean;
   /** Review scripts and films, then confirm the Final Film: the Reviewer in charge. */
   review: boolean;
-  /** Set the Coin price of an episode: the Reviewer in charge. */
+  /** Set the Coin price and access flags of an episode: the Admin only (MF-1 / BE 12/11/2026). */
   price: boolean;
   /** Publish, schedule, take down or send back the Final Film: the Admin only (MF-1, 07/11/2026). */
   publish: boolean;
+  /** Cancel the project while no episode was published: the Admin only (BR-39). */
+  canCancel: boolean;
   /** Write in the idea notes: the Admin, the lead Creator and the Reviewer in charge. */
   note: boolean;
   /** Send the Admin a change request: the Reviewer in charge or a Creator of the team. */
@@ -95,8 +97,9 @@ export function projectCapabilities(
     scriptApprove: can(PERMISSION.SCRIPT_APPROVE),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),
     review: owner && can(PERMISSION.CONTENT_REVIEW),
-    price: owner && can(PERMISSION.EPISODE_PRICE),
+    price: can(PERMISSION.EPISODE_PRICE),
     publish: can(PERMISSION.EPISODE_PUBLISH),
+    canCancel: create,
     note: create || lead || owner,
     suggest: (owner || creator) && can(PERMISSION.PROJECT_SUGGEST),
     delegate: creator && can(PERMISSION.MEDIA_INGEST),

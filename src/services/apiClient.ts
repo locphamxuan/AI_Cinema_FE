@@ -13,6 +13,8 @@ export interface ApiResponse<T> {
   statusCode?: number;
   /** The backend `details.reason` of a refusal, for screens that react to a specific one. */
   reason?: string;
+  /** Unparsed or rich error details from backend (e.g. { code, projects, reason }). */
+  rawDetails?: unknown;
 }
 
 export interface RequestOptions extends RequestInit {
@@ -126,17 +128,19 @@ class ApiClient {
         }
         let rawMessage: unknown;
         let rawDetails: unknown;
+        let rawBody: unknown;
         try {
           const errBody = await response.json();
+          rawBody = errBody;
           rawMessage = errBody?.error?.message ?? errBody?.message ?? (typeof errBody?.error === 'string' ? errBody.error : undefined);
-          rawDetails = errBody?.error?.details ?? errBody?.details;
+          rawDetails = errBody?.error?.details ?? errBody?.details ?? errBody?.error ?? errBody;
         } catch {
           // Use the HTTP status fallback when the server returned an empty or non-JSON error body.
         }
         const errorMessage = localizeApiError(rawMessage, response.status, rawDetails, endpoint);
         const reason =
           typeof rawDetails === 'object' && rawDetails !== null && 'reason' in rawDetails
-            ? String(rawDetails.reason)
+            ? String((rawDetails as Record<string, unknown>).reason)
             : undefined;
 
         return {
@@ -145,6 +149,7 @@ class ApiClient {
           message: errorMessage,
           statusCode: response.status,
           reason,
+          rawDetails: rawBody ?? rawDetails,
         };
       }
 

@@ -22,6 +22,8 @@ export function OverviewTab() {
   const { busy, run } = useAction();
   const canEdit = caps.manage && isIn(project.status, EDITABLE_PROJECT);
   const open = isIn(project.status, OPEN_PROJECT);
+  const hasPublished = project.seasons.some((s) => s.episodes.some((e) => e.status === 'PUBLISHED'));
+  const canCancel = caps.canCancel && open && !hasPublished;
 
   const cancel = async (reason: string) => {
     if (await run(() => productionService.cancelProject(project.id, reason), 'Đã huỷ dự án')) {
@@ -180,7 +182,7 @@ export function OverviewTab() {
           </div>
         </div>
 
-        {caps.manage && open && (
+        {canCancel && (
           <div className="rounded-2xl border border-rose-200/60 dark:border-rose-500/20 bg-rose-50/40 dark:bg-rose-500/[0.04] overflow-hidden">
             <div className="px-5 py-4">
               <div className="flex items-center gap-2 mb-1.5">

@@ -1,9 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { KeyRound, Pencil, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Modal } from '@/components/ui/Modal';
+import { toast } from '@/components/ui/Toast';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { studioService } from '@/services/studioService';
@@ -19,18 +23,31 @@ import { StudioModal } from './StudioModal';
  * the Admin also opens each studio's STUDIO login accounts for Studio Web.
  */
 export function StudiosPage() {
+  const pathname = usePathname();
+  const isReviewer = pathname.startsWith('/reviewer');
   const can = useCan();
-  const manage = can(PERMISSION.STUDIO_MANAGE);
-  const manageAccounts = can(PERMISSION.USER_MANAGE);
+  const manage = !isReviewer && can(PERMISSION.STUDIO_MANAGE);
+  const manageAccounts = !isReviewer && can(PERMISSION.USER_MANAGE);
   const [accountsOf, setAccountsOf] = useState<Studio | null>(null);
   const studios = useResource('studios:all', () => studioService.list());
   const [editing, setEditing] = useState<Studio | 'new' | null>(null);
+  const [busyProjects, setBusyProjects] = useState<{ studioName: string; projects: { id: string; title: string }[] } | null>(null);
   const { busy, run } = useAction();
 
   const toggle = async (studio: Studio) => {
-    if (await run(() => studioService.update(studio.id, { isActive: !studio.isActive }), studio.isActive ? 'Đã ngừng dùng Studio' : 'Đã dùng lại Studio')) {
+    const nextActive = !studio.isActive;
+    const res = await studioService.update(studio.id, { isActive: nextActive });
+    if (res.success) {
+      toast.success(nextActive ? 'Đã dùng lại Studio' : 'Đã ngừng dùng Studio');
       await studios.reload();
+      return;
     }
+    const raw = res.rawDetails as { code?: string; projects?: { id: string; title: string }[] } | undefined;
+    if (res.statusCode === 409 && (raw?.code === 'STUDIO_HAS_ACTIVE_PROJECTS' || raw?.projects?.length)) {
+      setBusyProjects({ studioName: studio.name, projects: raw?.projects ?? [] });
+      return;
+    }
+    toast.error('Không cập nhật được trạng thái Studio', res.message || 'Lỗi hệ thống');
   };
   const remove = async (studio: Studio) => {
     if (await run(() => studioService.remove(studio.id), 'Đã xoá Studio')) await studios.reload();
@@ -124,6 +141,38 @@ export function StudiosPage() {
 
       {accountsOf && <StudioAccountsModal studio={accountsOf} onClose={() => setAccountsOf(null)} />}
       {editing && <StudioModal studio={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSaved={studios.reload} />}
+      {busyProjects && (
+        <Modal
+          open
+          onClose={() => setBusyProjects(null)}
+          title="Không thể ngừng dùng Studio"
+          subtitle={`Studio ${busyProjects.studioName} đang có ${busyProjects.projects.length} dự án sản xuất chưa hoàn tất`}
+        >
+          <div className="space-y-4 text-xs">
+            <p className="text-slate-600 dark:text-slate-300">
+              Vui lòng đổi Studio cho các dự án sau trước khi ngừng dùng Studio này:
+            </p>
+            <ul className="divide-y divide-slate-100 dark:divide-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden bg-slate-50/50 dark:bg-white/[0.02]">
+              {busyProjects.projects.map((p) => (
+                <li key={p.id} className="p-3 flex items-center justify-between gap-3">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{p.title}</span>
+                  <Link
+                    href={`/admin/projects/${p.id}?tab=studio`}
+                    className="text-xs font-semibold text-sky-600 hover:underline shrink-0"
+                  >
+                    Đổi Studio &rarr;
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="flex justify-end pt-2">
+              <Button variant="secondary" onClick={() => setBusyProjects(null)}>
+                Đóng
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </main>
   );
 }

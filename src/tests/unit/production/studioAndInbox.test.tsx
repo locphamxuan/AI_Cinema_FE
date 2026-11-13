@@ -35,8 +35,9 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('StudiosPage (BR-59)', () => {
-  it('lets the Reviewer add a studio and delete only one nobody used', async () => {
-    signInAs('reviewer');
+  it('lets the Admin add a studio and delete only one nobody used', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
     const calls = routeFetch({ '/studios': [studio(), studio({ id: 'st2', name: 'Studio Đã Dùng', email: 'used@x.vn', _count: { projects: 2, handoffs: 3 } })] });
     render(<StudiosPage />);
 
@@ -55,13 +56,15 @@ describe('StudiosPage (BR-59)', () => {
     expect(calls.some((c) => c.method === 'POST' && c.path === '/studios')).toBe(true);
   });
 
-  it('shows the catalog read-only to an account that cannot manage it', async () => {
-    signInAs('creator', []);
+  it('shows the catalog read-only to Reviewer or an account that cannot manage it', async () => {
+    nav.pathname = '/reviewer/studios';
+    signInAs('reviewer');
     routeFetch({ '/studios': [studio()] });
     render(<StudiosPage />);
 
     expect(await screen.findByText('Studio Ánh Trăng')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Thêm Studio/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Xoá Studio/ })).not.toBeInTheDocument();
   });
 });
 

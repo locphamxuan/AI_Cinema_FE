@@ -238,7 +238,7 @@ describe('ProjectDetailPage', () => {
     expect(within(season).getByText('15/01/2027')).toBeInTheDocument();
   });
 
-  it('lets the Admin reassign the Creator and decide requests, but not edit or cancel (BR-55)', async () => {
+  it('lets the Admin reassign the Creator and decide requests, cancel before publish, but not edit directly (BR-55)', async () => {
     nav.pathname = '/reviewer/projects/m1';
     nav.params = { projectId: 'm1' };
     nav.search = '';
@@ -247,7 +247,7 @@ describe('ProjectDetailPage', () => {
     render(<ProjectDetailPage />);
 
     await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
-    expect(screen.queryByRole('button', { name: /Huỷ dự án/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Huỷ dự án/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Đổi Creator/ })).toBeEnabled();
 
     expect(screen.getByRole('tab', { name: 'Studio' })).toBeInTheDocument();
@@ -282,7 +282,7 @@ describe('ProjectDetailPage', () => {
     expect(await screen.findByRole('button', { name: /Gửi đề xuất/ })).toBeInTheDocument();
   });
 
-  it('lets the Reviewer in charge cancel, but leaves assigning the Creator to the Admin', async () => {
+  it('prevents the Reviewer in charge from cancelling, leaving cancel to the Admin', async () => {
     nav.pathname = '/reviewer/projects/m1';
     nav.params = { projectId: 'm1' };
     nav.search = '';
@@ -291,7 +291,7 @@ describe('ProjectDetailPage', () => {
     routeFetch({ '/projects/m1': project() });
     render(<ProjectDetailPage />);
 
-    expect(await screen.findByRole('button', { name: /Huỷ dự án/ })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Huỷ dự án/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Đổi Creator/ })).not.toBeInTheDocument();
   });
 });
