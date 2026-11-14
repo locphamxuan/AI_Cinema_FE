@@ -199,14 +199,18 @@ export function KnowledgeBasePanel() {
                       </span>
                     </div>
 
-                    <p className="text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed text-xs sm:text-sm">
-                      {displayContent}
-                    </p>
+                    {displayContent ? (
+                      <p className="text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed text-xs sm:text-sm">
+                        {displayContent}
+                      </p>
+                    ) : null}
 
-                    <div className="flex items-center gap-3 text-[11px] text-slate-400 pt-1">
-                      <span>{displayContent.length} ký tự</span>
+                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400 pt-0.5">
+                      <span className="inline-flex items-center gap-1">
+                        Slug: <code className="text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-md font-mono text-[11px]">{art.slug || 'chưa-tạo'}</code>
+                      </span>
                       <span>·</span>
-                      <span>Slug: <code className="text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-white/5 px-1 py-0.5 rounded">{art.slug || 'chưa tạo'}</code></span>
+                      <span>v{art.version ?? 1}</span>
                       <span>·</span>
                       <span>Cập nhật: {formatDateTime(art.updatedAt)}</span>
                     </div>
