@@ -1,6 +1,6 @@
 'use client';
 
-import { Headphones, Sparkles, CheckCircle2, MessageSquare } from 'lucide-react';
+import { Headphones, Bot, CheckCircle2, MessageSquare } from 'lucide-react';
 
 export function SupportDeskPlaceholder() {
   return (
@@ -10,7 +10,7 @@ export function SupportDeskPlaceholder() {
           <Headphones className="w-8 h-8" />
         </div>
         <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-xs">
-          <Sparkles className="w-3.5 h-3.5" />
+          <Bot className="w-3.5 h-3.5" />
         </span>
       </div>
 
@@ -35,7 +35,7 @@ export function SupportDeskPlaceholder() {
 
         <div className="p-3.5 rounded-xl border border-slate-200/70 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02] space-y-1">
           <div className="flex items-center gap-1.5 text-purple-600 dark:text-purple-400 font-semibold text-xs">
-            <Sparkles className="w-3.5 h-3.5" /> 2. Gợi ý AI
+            <Bot className="w-3.5 h-3.5" /> 2. Gợi ý AI
           </div>
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
             Bấm "AI gợi ý" để tạo bản nháp câu trả lời chuẩn xác.

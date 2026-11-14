@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Sparkles, Layers } from 'lucide-react';
+import { BookOpen, CheckCircle2, Layers } from 'lucide-react';
 
 interface KnowledgeMetricsProps {
   totalCount: number;
@@ -31,7 +31,7 @@ export function KnowledgeMetrics({
 
       <div className="p-5 rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#111420] shadow-xs flex items-center gap-4 transition-all hover:border-slate-300 dark:hover:border-white/20">
         <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-          <Sparkles className="w-5 h-5" />
+          <CheckCircle2 className="w-5 h-5" />
         </div>
         <div className="space-y-0.5 min-w-0">
           <div className="flex items-center gap-1.5">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Headphones, Clock, CheckCircle2, Search, RotateCw, Sparkles, User, AlertCircle, X } from 'lucide-react';
+import { Headphones, Clock, CheckCircle2, Search, RotateCw, AlertCircle, X } from 'lucide-react';
 import { useResource } from '@/hooks/useResource';
 import { useAppStore } from '@/store/useAppStore';
 import { formatDateTime } from '@/lib/format';

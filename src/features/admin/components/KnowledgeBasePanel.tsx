@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Plus, Trash2, Edit3, Search, Sparkles, Tag, X } from 'lucide-react';
+import { Plus, Trash2, Edit3, Search, BookOpen, Tag, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
@@ -149,7 +149,7 @@ export function KnowledgeBasePanel() {
         {filtered.length === 0 && !articles.loading && (
           <div className="p-12 rounded-3xl border border-dashed border-slate-200 dark:border-white/10 bg-white/50 dark:bg-[#111420]/50 text-center space-y-3">
             <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto">
-              <Sparkles className="w-6 h-6" />
+              <BookOpen className="w-6 h-6" />
             </div>
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
               {search || selectedCategory !== 'ALL'

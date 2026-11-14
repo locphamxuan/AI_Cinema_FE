@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Bot, Lock, Send, Sparkles, UserCheck, UserX, CheckCircle, XCircle } from 'lucide-react';
+import { Bot, Lock, Send, UserCheck, UserX, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAction } from '@/hooks/useAction';
 import { formatDateTime } from '@/lib/format';
@@ -172,7 +172,7 @@ export function StaffCaseChat({
                 onClick={getAiSuggestion}
                 className="h-6 text-[11px] gap-1 text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-500/10"
               >
-                <Sparkles className="w-3 h-3" />
+                <Bot className="w-3 h-3" />
                 {loadingSuggestion ? 'Đang lấy gợi ý…' : 'Gợi ý trả lời AI'}
               </Button>
             </div>

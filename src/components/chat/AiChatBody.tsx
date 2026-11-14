@@ -1,7 +1,7 @@
 'use client';
 
 import type { RefObject } from 'react';
-import { Film, Send, ShieldCheck, Sparkles, Wallet } from 'lucide-react';
+import { Film, Send, ShieldCheck, Crown, Plus, Wallet } from 'lucide-react';
 import type { SupportMessage, SupportQuickReply } from '@/types/support';
 import { AiOrb } from './AiOrb';
 
@@ -17,7 +17,7 @@ const HERO_CARDS = [
   {
     title: 'Gói Tháng VIP',
     desc: 'Quyền lợi & cấu hình gói thành viên',
-    icon: Sparkles,
+    icon: Crown,
     tintLight: 'bg-pink-500/15 text-pink-600',
     tintDark: 'bg-pink-500/20 text-pink-300',
     message: 'Quyền lợi và cách đăng ký Gói Tháng?',
@@ -231,7 +231,7 @@ export function AiChatBody({
                 dark ? 'bg-pink-600 hover:bg-pink-500' : 'bg-[#121212] hover:bg-black'
               }`}
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5" />
               Cuộc hội thoại mới
             </button>
           </div>
