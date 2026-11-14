@@ -73,15 +73,35 @@ export const staffSupportService = {
     return apiClient.get<Page<KnowledgeArticle>>(`${S.KNOWLEDGE}?page=${page}&limit=${limit}`);
   },
 
-  createKnowledge(data: { title: string; content: string; slug?: string; category?: string; isPublished?: boolean }): Promise<ApiResponse<KnowledgeArticle>> {
+  getKnowledgeDetail(id: string): Promise<ApiResponse<KnowledgeArticle>> {
+    return apiClient.get<KnowledgeArticle>(S.KNOWLEDGE_DETAIL(id));
+  },
+
+  createKnowledge(data: {
+    title: string;
+    contentMarkdown: string;
+    slug: string;
+    category: string;
+    status?: 'PUBLISHED' | 'DRAFT';
+    locale?: string;
+  }): Promise<ApiResponse<KnowledgeArticle>> {
     return apiClient.post<KnowledgeArticle>(S.KNOWLEDGE, data);
   },
 
-  updateKnowledge(id: string, data: Partial<KnowledgeArticle>): Promise<ApiResponse<KnowledgeArticle>> {
-    return apiClient.put<KnowledgeArticle>(S.KNOWLEDGE_DETAIL(id), data);
+  updateKnowledge(
+    id: string,
+    data: {
+      title?: string;
+      contentMarkdown?: string;
+      slug?: string;
+      category?: string;
+      status?: 'PUBLISHED' | 'DRAFT' | 'ARCHIVED';
+    },
+  ): Promise<ApiResponse<KnowledgeArticle>> {
+    return apiClient.patch<KnowledgeArticle>(S.KNOWLEDGE_DETAIL(id), data);
   },
 
   deleteKnowledge(id: string): Promise<ApiResponse<unknown>> {
-    return apiClient.delete<unknown>(S.KNOWLEDGE_DETAIL(id));
+    return apiClient.post<unknown>(`${S.KNOWLEDGE_DETAIL(id)}/archive`);
   },
 };

@@ -64,13 +64,19 @@ export interface SupportQueueStats {
   aiResolvedRate?: number;
 }
 
+export type KnowledgeArticleStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+
 export interface KnowledgeArticle {
   id: string;
   slug: string;
   title: string;
-  content: string;
+  contentMarkdown?: string;
+  content?: string;
   category?: string | null;
-  isPublished: boolean;
+  status?: KnowledgeArticleStatus;
+  isPublished?: boolean;
+  version?: number;
+  indexedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
