@@ -111,16 +111,7 @@ export const API_ROUTES = {
     CONTRACT_DOCUMENTS: (id: string) => `/contracts/${id}/documents`,
     CONTRACT_DOCUMENT_CONTENT: (id: string, side: string) => `/contracts/${id}/documents/${side}/content`,
   },
-  // AI Support Chatbox (Member) & Staff/Admin Desk
-  SUPPORT: {
-    CONVERSATIONS: '/support/conversations',
-    CONVERSATION: (id: string) => `/support/conversations/${id}`,
-    MESSAGES: (id: string) => `/support/conversations/${id}/messages`,
-    CONFIRM_RESOLVED: (id: string) => `/support/conversations/${id}/confirm-resolved`,
-    REQUEST_STAFF: (id: string) => `/support/conversations/${id}/request-staff`,
-    CLOSE: (id: string) => `/support/conversations/${id}/close`,
-    READ: (id: string) => `/support/conversations/${id}/read`,
-  },
+  // MF-5: the support desk of Staff / Admin and the AI Chatbox console of the Admin
   ADMIN_SUPPORT: {
     CONVERSATIONS: '/admin/support/conversations',
     STATS: '/admin/support/stats',
@@ -135,6 +126,28 @@ export const API_ROUTES = {
     ASSIGN: (id: string) => `/admin/support/conversations/${id}/assign`,
     KNOWLEDGE: '/admin/support/knowledge',
     KNOWLEDGE_DETAIL: (id: string) => `/admin/support/knowledge/${id}`,
+    KNOWLEDGE_ARCHIVE: (id: string) => `/admin/support/knowledge/${id}/archive`,
+    KNOWLEDGE_REINDEX: (id: string) => `/admin/support/knowledge/${id}/reindex`,
+    KNOWLEDGE_REINDEX_ALL: '/admin/support/knowledge/reindex-all',
+    KNOWLEDGE_PREVIEW: '/admin/support/knowledge/preview',
+    AI_HEALTH: '/admin/support/ai/health',
+    AI_PREVIEW_CHAT: '/admin/support/ai/preview-chat',
+    AI_ANSWERS: '/admin/support/ai/answers',
+    AI_ANSWERS_SUMMARY: '/admin/support/ai/answers/summary',
+    AI_ANSWER_FEEDBACK: (messageId: string) => `/admin/support/ai/answers/${messageId}/feedback`,
+  },
+  // MF-5: the Financial Dashboard of the Admin (BR-48 monthly-plan revenue share, risk flags)
+  FINANCE: {
+    FILMS: '/admin/finance/films',
+    ALLOCATIONS: '/admin/finance/revenue-allocations',
+    ALLOCATION_RUN: (period: string) => `/admin/finance/revenue-allocations/${period}/run`,
+    RISK_RULES: '/admin/finance/risk/rules',
+    RISK_FLAGS: '/admin/finance/risk/flags',
+    RISK_SCAN: '/admin/finance/risk/scan',
+    RISK_REVIEW: (flagId: string) => `/admin/finance/risk/flags/${flagId}/review`,
+  },
+  OAUTH: {
+    AUTHORIZE: '/oauth/authorize',
   },
 } as const;
 
