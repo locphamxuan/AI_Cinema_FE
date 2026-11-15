@@ -22,7 +22,7 @@ interface Module {
 }
 
 const MODULES: Module[] = [
-  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones },
+  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones, permission: PERMISSION.SUPPORT_CASE_READ },
   { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).', icon: BarChart3 },
   { key: 'members', title: 'Thông tin member', description: 'Tài khoản member (chỉ đọc).', icon: Users, permission: PERMISSION.MEMBER_OPS_READ },
   { key: 'marketing', title: 'Marketing', description: 'Chiến dịch cho phim sắp và đã phát hành.', icon: Megaphone, comingSoon: true },
@@ -40,33 +40,23 @@ export function StaffPage() {
     <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Vận hành CSKH</h1>
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Vận hành</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Xử lý yêu cầu hỗ trợ khách hàng và tra cứu dữ liệu vận hành.</p>
         </div>
 
-        <div className="flex gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-white/5 text-xs font-semibold">
-          <button
-            type="button"
-            onClick={() => setActiveTab('support')}
-            className={`px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors ${
-              activeTab === 'support'
-                ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-400'
-            }`}
-          >
-            Hỗ trợ CSKH
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('operations')}
-            className={`px-3.5 py-1.5 rounded-xl cursor-pointer transition-colors ${
-              activeTab === 'operations'
-                ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs'
-                : 'text-slate-600 dark:text-slate-400'
-            }`}
-          >
-            Tra cứu vận hành
-          </button>
+        <div role="tablist" aria-label="Khu vận hành" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 text-sm">
+          {(['support', 'operations'] as const).map((key) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === key}
+              onClick={() => setActiveTab(key)}
+              className={`cursor-pointer rounded-md px-4 py-1.5 ${activeTab === key ? 'bg-background font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              {key === 'support' ? 'Hỗ trợ khách hàng' : 'Tra cứu vận hành'}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -76,7 +66,7 @@ export function StaffPage() {
         </p>
       )}
 
-      {activeTab === 'support' && <StaffSupportWorkspace />}
+      {activeTab === 'support' && can(PERMISSION.SUPPORT_CASE_READ) && <StaffSupportWorkspace />}
 
       {activeTab === 'operations' && (
         <div className="space-y-5">

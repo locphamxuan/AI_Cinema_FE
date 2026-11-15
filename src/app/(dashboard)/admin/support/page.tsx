@@ -1,13 +1,20 @@
+import { Suspense } from 'react';
+import { PermissionGate } from '@/components/auth/PermissionGate';
+import { PERMISSION } from '@/lib/permissions';
 import { AdminPageFrame } from '@/features/admin/components/AdminPageFrame';
 import { StaffSupportWorkspace } from '@/features/staff/components/StaffSupportWorkspace';
 
 export default function AdminSupportPage() {
   return (
     <AdminPageFrame
-      title="Hỗ trợ khách hàng (CSKH)"
-      description="Theo dõi hàng đợi ca hỗ trợ của thành viên, can thiệp hoặc xử lý ca."
+      title="Hỗ trợ khách hàng"
+      description="Case AI chuyển cho nhân viên: theo dõi hàng chờ, giao case cho Staff hoặc tự xử lý."
     >
-      <StaffSupportWorkspace isAdmin />
+      <PermissionGate permission={PERMISSION.SUPPORT_CASE_READ}>
+        <Suspense>
+          <StaffSupportWorkspace isAdmin />
+        </Suspense>
+      </PermissionGate>
     </AdminPageFrame>
   );
 }
