@@ -7,8 +7,10 @@ import { useToastStore } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 
 const push = vi.fn();
+let search = new URLSearchParams();
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push, replace: vi.fn() }),
+  useRouter: () => ({ push, replace: push }),
+  useSearchParams: () => search,
 }));
 
 describe('AuthForm sign-in', () => {
@@ -16,6 +18,7 @@ describe('AuthForm sign-in', () => {
 
   beforeEach(() => {
     push.mockReset();
+    search = new URLSearchParams();
     login.mockReset().mockResolvedValue({ success: true, redirectUrl: '/reviewer' });
     localStorage.clear();
     useToastStore.setState({ toasts: [] });
@@ -38,7 +41,33 @@ describe('AuthForm sign-in', () => {
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
     await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
 
-    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123');
+    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123', false);
+    expect(push).toHaveBeenCalledWith('/reviewer');
+  });
+
+  it('lets a studio sign in from the OAuth consent page and goes back to it with the whole query', async () => {
+    const next = '/oauth/authorize?response_type=code&client_id=studio-web&state=s1';
+    search = new URLSearchParams({ next });
+    login.mockResolvedValue({ success: true, redirectUrl: undefined });
+    render(<AuthForm />);
+
+    await userEvent.type(screen.getByLabelText('Email'), 'studio@aicinema.com');
+    await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+
+    expect(login).toHaveBeenCalledWith('studio@aicinema.com', 'matkhau123', true);
+    expect(push).toHaveBeenCalledWith(next);
+  });
+
+  it('ignores a next that leaves the site (no open redirect)', async () => {
+    search = new URLSearchParams({ next: '//evil.example/steal' });
+    render(<AuthForm />);
+
+    await userEvent.type(screen.getByLabelText('Email'), 'reviewer@example.com');
+    await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+
+    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123', false);
     expect(push).toHaveBeenCalledWith('/reviewer');
   });
 

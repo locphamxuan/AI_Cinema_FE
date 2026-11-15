@@ -6,10 +6,13 @@ import type { AppState, AuthSlice, UserProfile } from './types';
 const MEMBER_REFUSED = 'Tài khoản thành viên chỉ dùng được trên ứng dụng di động AI Cinema.';
 const STUDIO_REFUSED = 'Tài khoản Studio đăng nhập tại Studio Web dành cho đối tác, không dùng trang quản trị nội bộ.';
 
-/** Why this web refuses the account, or null when it is an internal role. */
-export function refusalOf(role: UserProfile['role'] | undefined): string | null {
+/**
+ * Why this web refuses the account, or null when it is an internal role. A Studio account is let in only
+ * to approve Studio Web on the OAuth consent page (`allowStudio`); every dashboard still refuses it.
+ */
+export function refusalOf(role: UserProfile['role'] | undefined, allowStudio = false): string | null {
   if (role === 'user' || role === 'vip') return MEMBER_REFUSED;
-  if (role === 'studio') return STUDIO_REFUSED;
+  if (role === 'studio' && !allowStudio) return STUDIO_REFUSED;
   return null;
 }
 
@@ -21,11 +24,11 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
   isAuthenticated: false,
   user: null,
 
-  restoreSession: () => {
+  restoreSession: (allowStudio = false) => {
     if (!authService.hasSession()) return;
     const user = authService.getStoredUser();
     if (!user) return;
-    if (refusalOf(user.role)) {
+    if (refusalOf(user.role, allowStudio)) {
       authService.logout();
       return;
     }
@@ -34,7 +37,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
     // The Admin may have changed this role's permissions or the account's role since the last visit.
     void authService.me().then((res) => {
       if (!res.success || !res.data) return;
-      if (refusalOf(res.data.role)) {
+      if (refusalOf(res.data.role, allowStudio)) {
         authService.logout();
         set({ isAuthenticated: false, user: null });
         return;
@@ -43,7 +46,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
     });
   },
 
-  login: async (email, password) => {
+  login: async (email, password, allowStudio = false) => {
     const res = await authService.login({ email, password });
     if (!res.success || !res.data) {
       let errorMsg = res.message ?? 'Email hoặc mật khẩu không chính xác.';
@@ -53,7 +56,7 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
       return { success: false, error: errorMsg };
     }
 
-    const refused = refusalOf(res.data.role);
+    const refused = refusalOf(res.data.role, allowStudio);
     if (refused) {
       authService.logout();
       return { success: false, error: refused };
