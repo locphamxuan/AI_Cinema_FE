@@ -13,6 +13,7 @@ import {
   Bell,
   UserRound,
   ShieldCheck,
+  Scale,
 } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
@@ -37,6 +38,7 @@ export function ReviewerSidebar() {
     pathname.startsWith('/reviewer/projects/');
   const isStudios = pathname.startsWith('/reviewer/studios');
   const isNotifications = pathname.startsWith('/reviewer/notifications');
+  const isPolicies = pathname.startsWith('/reviewer/policies');
   const isProfile = pathname.startsWith('/reviewer/profile');
 
   const linkClass = (active: boolean) =>
@@ -154,6 +156,16 @@ export function ReviewerSidebar() {
               <div className="flex items-center gap-2.5 min-w-0">
                 <Building2 className={iconClass(isStudios)} />
                 <span className="truncate">Studio đối tác</span>
+              </div>
+            </Link>
+          )}
+
+          {/* Chính sách (21.7): what labels and compliance checks follow */}
+          {can(PERMISSION.CONTENT_REVIEW) && (
+            <Link href="/reviewer/policies" aria-current={isPolicies ? 'page' : undefined} className={linkClass(isPolicies)}>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Scale className={iconClass(isPolicies)} />
+                <span className="truncate">Chính sách</span>
               </div>
             </Link>
           )}

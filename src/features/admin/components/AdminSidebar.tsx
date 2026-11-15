@@ -18,6 +18,7 @@ import {
   Megaphone,
   Receipt,
   Rocket,
+  Scale,
   Settings,
   type LucideIcon,
 } from 'lucide-react';
@@ -62,6 +63,7 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
       { href: '/admin/support', label: 'Hỗ trợ khách hàng', icon: Headphones, permission: PERMISSION.SUPPORT_CASE_READ },
       { href: '/admin/support/ai', label: 'Chatbox AI', icon: Bot, permission: PERMISSION.SUPPORT_KNOWLEDGE_MANAGE },
       { href: '/admin/ads', label: 'Quảng cáo', icon: Megaphone, permission: PERMISSION.AD_MANAGE },
+      { href: '/admin/policies', label: 'Chính sách', icon: Scale, permission: PERMISSION.PLATFORM_SETTINGS_MANAGE },
       { href: '/admin/notifications', label: 'Thông báo', icon: Bell },
       { href: '/admin/settings', label: 'Cài đặt nền tảng', icon: Settings },
     ],
