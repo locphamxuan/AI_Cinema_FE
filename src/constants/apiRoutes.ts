@@ -40,6 +40,7 @@ export const API_ROUTES = {
     ACCOUNTS: (studioId: string) => `/studios/${studioId}/accounts`,
   },
   PLATFORM_SETTINGS: '/platform-settings',
+  POLICIES: '/policies',
   NOTIFICATIONS: {
     LIST: '/notifications',
     UNREAD_COUNT: '/notifications/unread-count',
