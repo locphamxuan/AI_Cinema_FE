@@ -46,20 +46,6 @@ export function DashboardHeader() {
 
         {/* Right controls */}
         <div className="flex items-center gap-2 shrink-0 ml-auto">
-          {user && (
-            <span
-              aria-label="Vai trò của tài khoản"
-              className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full border border-slate-200 dark:border-white/10 bg-slate-100/80 dark:bg-white/[0.06] text-xs font-semibold text-slate-700 dark:text-slate-200"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              <span>{ROLE_LABEL[user.role ?? 'user']}</span>
-              {area === 'creator' && (
-                <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300 bg-white dark:bg-white/10 px-2 py-0.5 rounded-full border border-slate-200/80 dark:border-white/10">
-                  Biên kịch nội bộ
-                </span>
-              )}
-            </span>
-          )}
           {user && <NotificationMenu />}
           <ThemeToggle />
           <AccountMenu

@@ -35,8 +35,9 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('StudiosPage (BR-59)', () => {
-  it('lets the Reviewer add a studio and delete only one nobody used', async () => {
-    signInAs('reviewer');
+  it('lets the Admin add a studio and delete only one nobody used', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
     const calls = routeFetch({ '/studios': [studio(), studio({ id: 'st2', name: 'Studio Đã Dùng', email: 'used@x.vn', _count: { projects: 2, handoffs: 3 } })] });
     render(<StudiosPage />);
 
@@ -55,13 +56,15 @@ describe('StudiosPage (BR-59)', () => {
     expect(calls.some((c) => c.method === 'POST' && c.path === '/studios')).toBe(true);
   });
 
-  it('shows the catalog read-only to an account that cannot manage it', async () => {
-    signInAs('creator', []);
+  it('shows the catalog read-only to Reviewer or an account that cannot manage it', async () => {
+    nav.pathname = '/reviewer/studios';
+    signInAs('reviewer');
     routeFetch({ '/studios': [studio()] });
     render(<StudiosPage />);
 
     expect(await screen.findByText('Studio Ánh Trăng')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Thêm Studio/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Xoá Studio/ })).not.toBeInTheDocument();
   });
 });
 
@@ -114,17 +117,18 @@ describe('ChangeRequestInbox (BR-55)', () => {
 
 describe('DashboardHeader', () => {
   it.each([
-    ['reviewer', '/reviewer/projects', 'Content Reviewer'],
-    ['creator', '/creator/projects', 'Content Creator'],
-    ['admin', '/admin/accounts', 'Admin'],
-    ['staff', '/staff', 'Staff'],
-  ] as const)('shows the role of the %s account', (role, pathname, label) => {
+    ['reviewer', '/reviewer/projects', 'Kiểm duyệt nội dung'],
+    ['creator', '/creator/projects', 'Sản xuất nội dung'],
+    ['admin', '/admin/accounts', 'Quản trị'],
+    ['staff', '/staff', 'Vận hành'],
+  ] as const)('shows the area label without the removed role pill for %s', (role, pathname, areaLabel) => {
     nav.pathname = pathname;
     signInAs(role);
     routeFetch({});
     render(<DashboardHeader />);
 
-    expect(screen.getByLabelText('Vai trò của tài khoản')).toHaveTextContent(label);
+    expect(screen.getByText(areaLabel)).toBeInTheDocument();
+    expect(screen.queryByLabelText('Vai trò của tài khoản')).not.toBeInTheDocument();
   });
 
   it('keeps only the profile of the current area and sign out in the account menu', async () => {

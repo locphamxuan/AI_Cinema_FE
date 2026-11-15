@@ -1,11 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { FileDown } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
-import { contractService } from '@/services/contractService';
+import { MAX_CONTRACT_VND, contractPdfProblem, contractService } from '@/services/contractService';
+import { toast } from '@/components/ui/Toast';
+import { ContractPdfInput } from './ContractPdfInput';
 import type { Contract } from '@/types/contract';
 import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
 import { CONTRACT_STATUS } from '../../lib/labels';
 import { formatDateTime, formatVnd } from '@/lib/format';
 import { parseVnd } from './CostRequestCard';
@@ -24,17 +28,33 @@ export function ContractCard({
 }) {
   const [countering, setCountering] = useState(false);
   const [price, setPrice] = useState('');
+  const [signFile, setSignFile] = useState<File | null>(null);
+  const [counterFile, setCounterFile] = useState<File | null>(null);
   const { busy, run } = useAction();
   const priceVnd = parseVnd(price);
+  const docs = useResource(`contract-docs:${c.id}`, () => contractService.documents(c.id));
+
+  const canSign = canDecide && c.status === 'STUDIO_SIGNED';
+  // BE ADMIN_OFFER_FROM: the Admin may propose a cost before the studio filled one (SENT) or after it signed.
+  const canCounter = canDecide && (c.status === 'SENT' || c.status === 'STUDIO_SIGNED');
+  const download = async (side: 'ADMIN' | 'STUDIO' | 'FINAL', fileName: string) => {
+    if (!(await contractService.downloadDocument(c.id, side, fileName))) toast.error('Không tải được file PDF', 'Thử lại sau.');
+  };
 
   const sign = async () => {
-    if (await run(() => contractService.sign(c.id), 'Đã ký, hợp đồng hoàn tất')) await onChanged?.();
+    if (!signFile || contractPdfProblem(signFile)) return;
+    if (await run(() => contractService.sign(c.id, signFile), 'Đã ký, hợp đồng hoàn tất')) {
+      await docs.reload();
+      await onChanged?.();
+    }
   };
   const counter = async () => {
-    if (!(priceVnd > 0)) return;
-    if (await run(() => contractService.counter(c.id, priceVnd), 'Đã gửi mức giá mới cho studio')) {
+    if (!(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile || contractPdfProblem(counterFile)) return;
+    if (await run(() => contractService.counter(c.id, priceVnd, counterFile), 'Đã gửi mức giá mới cho studio')) {
       setCountering(false);
       setPrice('');
+      setCounterFile(null);
+      await docs.reload();
       await onChanged?.();
     }
   };
@@ -62,27 +82,63 @@ export function ContractCard({
       {c.status === 'SIGNED' && c.handoff && (
         <p className="text-emerald-700 dark:text-emerald-300">Đã tự bàn giao cho Studio: dự án vào sản xuất, các tập chờ Studio nộp phim.</p>
       )}
-      {canDecide && c.status === 'STUDIO_SIGNED' && !countering && (
-        <div className="flex gap-2 pt-1">
-          <Button type="button" size="sm" onClick={sign} disabled={busy}>
-            Đồng ý &amp; ký
-          </Button>
-          <Button type="button" size="sm" variant="secondary" onClick={() => setCountering(true)} disabled={busy}>
-            Đề xuất giá khác
-          </Button>
+
+      {docs.data && docs.data.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200/60 dark:border-white/5">
+          <span className="text-slate-500 font-medium">Tài liệu PDF:</span>
+          {docs.data.map((doc) => (
+            <Button
+              key={doc.id}
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-6 text-[11px] px-2 flex items-center gap-1"
+              onClick={() => void download(doc.side, doc.fileName)}
+            >
+              <FileDown className="w-3 h-3" />
+              {doc.side === 'FINAL' ? 'Bản hoàn tất (đủ 2 chữ ký)' : doc.side === 'STUDIO' ? 'Bản Studio đã ký' : 'Bản AI Cinema ký'}
+            </Button>
+          ))}
         </div>
       )}
-      {canDecide && c.status === 'STUDIO_SIGNED' && countering && (
-        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-2 items-end pt-1">
-          <FormField label="Giá mới (₫)">
-            <input inputMode="numeric" value={price} onChange={(e) => setPrice(e.target.value)} className={fieldInputClass} aria-label="Giá mới" />
-          </FormField>
-          <Button type="button" size="sm" onClick={counter} disabled={busy || !(priceVnd > 0)}>
-            Gửi studio
-          </Button>
-          <Button type="button" size="sm" variant="secondary" onClick={() => setCountering(false)} disabled={busy}>
-            Thôi
-          </Button>
+
+      {(canSign || canCounter) && !countering && (
+        <div className="space-y-2.5 border-t border-border pt-2.5">
+          {canSign && <ContractPdfInput label="Bản PDF Admin đã ký theo giá Studio" file={signFile} onChange={setSignFile} />}
+          <div className="flex flex-wrap gap-2">
+            {canSign && (
+              <Button type="button" size="sm" onClick={sign} disabled={busy || !signFile || !!contractPdfProblem(signFile)}>
+                Đồng ý &amp; ký
+              </Button>
+            )}
+            <Button type="button" size="sm" variant="secondary" onClick={() => setCountering(true)} disabled={busy}>
+              Đề xuất giá khác
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {canCounter && countering && (
+        <div className="space-y-2.5 border-t border-border pt-2.5">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <FormField label="Giá mới (₫, bội số 1.000)">
+              <input inputMode="numeric" value={price} onChange={(e) => setPrice(e.target.value)} className={fieldInputClass} aria-label="Giá mới" />
+            </FormField>
+            <ContractPdfInput label="Bản PDF đã ký cho giá mới" file={counterFile} onChange={setCounterFile} />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button type="button" size="sm" variant="secondary" onClick={() => setCountering(false)} disabled={busy}>
+              Huỷ
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={counter}
+              disabled={busy || !(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile || !!contractPdfProblem(counterFile)}
+            >
+              Gửi giá cho Studio
+            </Button>
+          </div>
         </div>
       )}
     </li>

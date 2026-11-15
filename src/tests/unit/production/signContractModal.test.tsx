@@ -5,6 +5,7 @@ import { toast } from '@/components/ui/Toast';
 import { SignContractModal } from '@/features/admin/components/SignContractModal';
 import type { ContractToSign } from '@/features/admin/adminPipeline';
 import { failWith, routeFetch } from '@/tests/support/routeFetch';
+import { attachPdf, formOf, pdfFile } from '@/tests/support/pdf';
 import type { Contract } from '@/types/contract';
 
 vi.mock('@/components/ui/Toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
@@ -52,12 +53,16 @@ describe('SignContractModal', () => {
   it('signs the round the studio signed, then refreshes and closes', async () => {
     const calls = routeFetch({ '/projects/m1/costs': COSTS, '/contracts/c1/sign': { id: 'c1', status: 'SIGNED' } });
     const { dialog, onClose, onChanged } = open();
+    const sign = within(dialog).getByRole('button', { name: /Đồng ý/ });
+    expect(sign).toBeDisabled();
+    const file = await attachPdf(dialog, /PDF AI Cinema đã ký/);
 
-    await userEvent.click(within(dialog).getByRole('button', { name: /Đồng ý/ }));
+    await userEvent.click(sign);
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(onChanged).toHaveBeenCalled();
-    expect(calls.some((c) => c.path === '/contracts/c1/sign' && c.method === 'POST')).toBe(true);
+    const sent = calls.find((c) => c.path === '/contracts/c1/sign' && c.method === 'POST')!;
+    expect(formOf(sent.body).get('file')).toBe(file);
   });
 
   it('counter-proposes a cost within the budget left, opening the next round', async () => {
@@ -71,11 +76,14 @@ describe('SignContractModal', () => {
     expect(send).toBeDisabled();
     await userEvent.clear(offerInput(dialog));
     await userEvent.type(offerInput(dialog), '130.000.000');
+    expect(send).toBeDisabled();
+    const file = await attachPdf(dialog, /PDF AI Cinema đã ký/);
     await userEvent.click(send);
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    const sent = calls.find((c) => c.path === '/contracts/c1/counter')!;
-    expect(JSON.parse(sent.body as string)).toEqual({ costVnd: 130_000_000 });
+    const sent = formOf(calls.find((c) => c.path === '/contracts/c1/counter')!.body);
+    expect(sent.get('costVnd')).toBe('130000000');
+    expect(sent.get('file')).toBe(file);
   });
 
   it('counts the fee a studio change hand-off holds as available, since the signed cost replaces it', async () => {
@@ -89,10 +97,11 @@ describe('SignContractModal', () => {
     // 10 M left + the 45 M the waiting hand-off holds.
     expect(await within(dialog).findByText(/ngân sách còn lại 55\.000\.000/)).toBeInTheDocument();
     await userEvent.type(offerInput(dialog), '50000000');
+    await attachPdf(dialog, /PDF AI Cinema đã ký/);
     await userEvent.click(within(dialog).getByRole('button', { name: 'Gửi giá đề xuất' }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(JSON.parse(calls.find((c) => c.path === '/contracts/c1/counter')!.body as string)).toEqual({ costVnd: 50_000_000 });
+    expect(formOf(calls.find((c) => c.path === '/contracts/c1/counter')!.body).get('costVnd')).toBe('50000000');
   });
 
   it('does not read the hand-offs for a first contract', async () => {
@@ -111,12 +120,24 @@ describe('SignContractModal', () => {
   it('shows the refusal and stays open when the signature is refused', async () => {
     routeFetch({ '/projects/m1/costs': COSTS, '/contracts/c1/sign': failWith(409, 'Cannot sign a contract that is SIGNED (expected STUDIO_SIGNED)') });
     const { dialog, onClose, onChanged } = open();
+    await attachPdf(dialog, /PDF AI Cinema đã ký/);
 
     await userEvent.click(within(dialog).getByRole('button', { name: /Đồng ý/ }));
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('STUDIO_SIGNED')));
     expect(onClose).not.toHaveBeenCalled();
     expect(onChanged).not.toHaveBeenCalled();
+  });
+
+  it('refuses a file that is not a PDF or is over 10 MB, before sending', async () => {
+    const calls = routeFetch({ '/projects/m1/costs': COSTS });
+    const { dialog } = open();
+    const sign = within(dialog).getByRole('button', { name: /Đồng ý/ });
+
+    await attachPdf(dialog, /PDF AI Cinema đã ký/, pdfFile('to.pdf', 'application/pdf', 11 * 1024 * 1024));
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('tối đa 10 MB');
+    expect(sign).toBeDisabled();
+    expect(calls.some((c) => c.path === '/contracts/c1/sign')).toBe(false);
   });
 
   it('closes without a call when the Admin dismisses it', async () => {

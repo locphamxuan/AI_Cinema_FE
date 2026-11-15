@@ -14,12 +14,13 @@ const isFailure = (body: unknown): body is ReturnType<typeof failWith> =>
  * so a test can check what a screen sent. `failWith(...)` makes a path answer an error.
  */
 export function routeFetch(routes: Record<string, unknown>) {
-  const calls: { path: string; method: string; body: unknown }[] = [];
+  const calls: { path: string; method: string; body: unknown; search: URLSearchParams }[] = [];
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string, init?: RequestInit) => {
-      const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
-      calls.push({ path, method: init?.method ?? 'GET', body: init?.body });
+      const parsed = new URL(url, 'http://x');
+      const path = parsed.pathname.replace(/^\/api/, '');
+      calls.push({ path, method: init?.method ?? 'GET', body: init?.body, search: parsed.searchParams });
       const body = path in routes ? routes[path] : [];
       return isFailure(body) ? fakeResponse({ message: body.message }, body.status) : fakeResponse(body);
     }),

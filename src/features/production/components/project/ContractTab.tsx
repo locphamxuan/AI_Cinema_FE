@@ -22,7 +22,7 @@ function byStudio(contracts: Contract[]): { studio: Contract['studio']; rounds: 
     group.rounds.push(c);
     groups.set(c.studioId, group);
   }
-  return [...groups.values()].map((g) => ({ ...g, rounds: [...g.rounds].sort((a, b) => a.round - b.round) }));
+  return [...groups.values()].map((g) => ({ ...g, rounds: g.rounds }));
 }
 
 /**

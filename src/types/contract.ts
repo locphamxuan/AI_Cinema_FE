@@ -3,6 +3,17 @@ import type { Person } from './production-studio';
 
 export type ContractProposedBy = 'ADMIN' | 'STUDIO';
 export type ContractStatus = 'SENT' | 'STUDIO_SIGNED' | 'ADMIN_COUNTERED' | 'SIGNED' | 'SUPERSEDED';
+export type ContractDocumentSide = 'ADMIN' | 'STUDIO' | 'FINAL';
+
+export interface ContractDocument {
+  id: string;
+  side: ContractDocumentSide;
+  fileName: string;
+  sizeBytes: number;
+  checksum: string;
+  uploadedById: string | null;
+  uploadedAt: string;
+}
 
 /**
  * One round of the negotiation: the system sends the studio a template with no cost when the Admin approves the

@@ -42,6 +42,14 @@ export const PERMISSION = {
   ANALYTICS_CHURN_READ: 'analytics.churn.read',
   // MF-3 - playback & ads
   AD_MANAGE: 'ad.manage',
+  // MF-5 - support desk, AI Chatbox console, finance
+  SUPPORT_CASE_READ: 'support:case.read',
+  SUPPORT_CASE_MANAGE: 'support:case.manage',
+  SUPPORT_CASE_ASSIGN: 'support:case.assign',
+  SUPPORT_KNOWLEDGE_MANAGE: 'support:knowledge.manage',
+  FINANCE_REPORT_READ: 'finance:report.read',
+  FINANCE_ALLOCATION_RUN: 'finance:allocation.run',
+  RISK_FLAG_MANAGE: 'risk:flag.manage',
   // Administration
   MEMBER_OPS_READ: 'member:ops.read',
   USER_READ: 'user:read',

@@ -13,10 +13,13 @@ export interface ApiResponse<T> {
   statusCode?: number;
   /** The backend `details.reason` of a refusal, for screens that react to a specific one. */
   reason?: string;
+  /** Unparsed or rich error details from backend (e.g. { code, projects, reason }). */
+  rawDetails?: unknown;
 }
 
 export interface RequestOptions extends RequestInit {
   _isRetry?: boolean;
+  timeoutMs?: number;
 }
 
 /**
@@ -105,11 +108,18 @@ class ApiClient {
       ...(options._isRetry ? authHeaders : {}),
     };
 
+    const controller = new AbortController();
+    const timeout = options.timeoutMs ?? 30_000;
+    const timer = setTimeout(() => controller.abort(), timeout);
+    const signal = options.signal ?? controller.signal;
+
     try {
       const response = await fetch(url, {
         ...options,
         headers,
+        signal,
       });
+      clearTimeout(timer);
 
       if (!response.ok) {
         // Automatically attempt token refresh on 401 Unauthorized
@@ -126,17 +136,19 @@ class ApiClient {
         }
         let rawMessage: unknown;
         let rawDetails: unknown;
+        let rawBody: unknown;
         try {
           const errBody = await response.json();
+          rawBody = errBody;
           rawMessage = errBody?.error?.message ?? errBody?.message ?? (typeof errBody?.error === 'string' ? errBody.error : undefined);
-          rawDetails = errBody?.error?.details ?? errBody?.details;
+          rawDetails = errBody?.error?.details ?? errBody?.details ?? errBody?.error ?? errBody;
         } catch {
           // Use the HTTP status fallback when the server returned an empty or non-JSON error body.
         }
         const errorMessage = localizeApiError(rawMessage, response.status, rawDetails, endpoint);
         const reason =
           typeof rawDetails === 'object' && rawDetails !== null && 'reason' in rawDetails
-            ? String(rawDetails.reason)
+            ? String((rawDetails as Record<string, unknown>).reason)
             : undefined;
 
         return {
@@ -145,16 +157,26 @@ class ApiClient {
           message: errorMessage,
           statusCode: response.status,
           reason,
+          rawDetails: rawBody ?? rawDetails,
         };
       }
 
       const data = (await bodyOf(response)) as T;
       return { success: true, data, statusCode: response.status };
     } catch (error) {
+      clearTimeout(timer);
+      const isTimeout =
+        error instanceof Error &&
+        (error.name === 'AbortError' || error.name === 'TimeoutError');
       return {
         success: false,
         data: null as unknown as T,
-        message: error instanceof Error ? error.message : 'Unknown network error',
+        statusCode: isTimeout ? 504 : undefined,
+        message: isTimeout
+          ? 'Yêu cầu phản hồi quá lâu (hết thời gian chờ). Vui lòng thử lại hoặc kết nối nhân viên hỗ trợ.'
+          : error instanceof Error
+            ? error.message
+            : 'Unknown network error',
       };
     }
   }

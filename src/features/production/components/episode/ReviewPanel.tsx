@@ -57,6 +57,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
         }
       >
         <Facts
+          stacked
           items={[
             [
               'Thời lượng',

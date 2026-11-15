@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowUpRight, AlertTriangle } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 import { PasswordField } from './AuthFields';
+import { isOAuthPath, safeNext } from '@/lib/safeNext';
 
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
@@ -34,6 +35,9 @@ function rememberEmail(email: string, remember: boolean) {
 export default function AuthForm() {
   const router = useRouter();
   const { login } = useAppStore();
+  // `?next=` brings the browser back where it came from, e.g. the OAuth consent page of Studio Web.
+  const next = safeNext(useSearchParams().get('next'));
+  const forStudioWeb = isOAuthPath(next);
 
   const [email, setEmail] = useState(() => savedEmail() || '');
   const [password, setPassword] = useState('');
@@ -53,7 +57,7 @@ export default function AuthForm() {
     setError(null);
 
     setLoading(true);
-    const res = await login(email, password);
+    const res = await login(email, password, forStudioWeb);
     setLoading(false);
 
     if (!res.success) {
@@ -63,10 +67,11 @@ export default function AuthForm() {
 
     toast.success('Đăng nhập thành công!', 'Chào mừng bạn quay trở lại cổng nội bộ AI Cinema.');
     rememberEmail(email, rememberMe);
-    if (res.redirectUrl) router.push(res.redirectUrl);
+    const target = next ?? res.redirectUrl;
+    if (target) router.replace(target);
   };
 
-  const isStudioRefusal = Boolean(error?.includes('Studio Web'));
+  const isStudioRefusal = !forStudioWeb && Boolean(error?.includes('Studio Web'));
 
   return (
     <>

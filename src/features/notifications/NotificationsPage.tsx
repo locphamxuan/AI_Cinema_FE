@@ -78,7 +78,7 @@ export function NotificationsPage() {
 
   const open = async (item: AppNotification) => {
     if (!item.readAt) await notificationService.markRead(item.id);
-    const href = notificationHref(item.link, role);
+    const href = notificationHref(item.link, role, item.payload as { projectId?: string; episodeId?: string });
     if (href) router.push(href);
     else setVersion((v) => v + 1);
   };
@@ -254,7 +254,7 @@ export function NotificationsPage() {
                 <NotificationCard
                   key={item.id}
                   item={item}
-                  href={notificationHref(item.link, role)}
+                  href={notificationHref(item.link, role, item.payload as { projectId?: string; episodeId?: string })}
                   onOpen={() => open(item)}
                 />
               ))}

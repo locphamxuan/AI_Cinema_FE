@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import AuthForm from '@/components/auth/AuthForm';
 import AuthBrand from '@/components/auth/AuthBrand';
 import ThemeToggle from '@/components/theme/ThemeToggle';
@@ -12,7 +13,9 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white p-7 shadow-sm dark:border-white/[0.08] dark:bg-[#111420] sm:p-9">
         <AuthBrand />
-        <AuthForm />
+        <Suspense>
+          <AuthForm />
+        </Suspense>
       </div>
 
       <p className="mt-6 text-center text-[11px] text-slate-500 dark:text-slate-400">

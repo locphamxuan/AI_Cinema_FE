@@ -35,7 +35,7 @@ const handoff = (over: Partial<StudioHandoff> = {}) =>
     ...over,
   }) as unknown as StudioHandoff;
 
-const renderCard = (h: StudioHandoff, base: '/creator' | '/admin' = '/creator', canDecide = false) =>
+const renderCard = (h: StudioHandoff, base: '/creator' | '/admin' | '/reviewer' = '/creator', canDecide = false) =>
   render(<HandoffCard handoff={h} movieId="m1" base={base} canDecide={canDecide} onBrief={vi.fn()} onMaterial={vi.fn()} />);
 
 /** The hand-off a studio change opened: it waits in BRIEF_SENT for the new studio's contract. */
@@ -69,12 +69,13 @@ describe('HandoffCard (read-only timeline)', () => {
 });
 
 describe('HandoffCard - a studio change waiting for its contract', () => {
-  it('says the new studio has to quote and sign, with the round status, and links the contract tab', () => {
+  it('tells a non-Admin reader the contract is waiting on Admin without linking a hidden tab', () => {
     renderCard(waiting('SENT'));
     const note = screen.getByRole('status');
     expect(note).toHaveTextContent('Đang chờ Studio mới báo giá và ký hợp đồng');
     expect(note).toHaveTextContent('Vòng 1: Đã gửi studio, chờ báo giá');
-    expect(screen.getByRole('link', { name: 'Xem hợp đồng' }).getAttribute('href')).toBe('/creator/projects/m1?tab=contract');
+    expect(screen.getByText('Hợp đồng đang chờ Admin xử lý.')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /hợp đồng/i })).toBeNull();
     expect(screen.getByText(/phí đề xuất trong brief: 45\.000\.000/)).toBeTruthy();
   });
 
@@ -84,10 +85,15 @@ describe('HandoffCard - a studio change waiting for its contract', () => {
     expect(screen.getByRole('link', { name: 'Xem báo giá và ký hợp đồng' }).getAttribute('href')).toBe('/admin/projects/m1?tab=contract');
   });
 
-  it('offers the Reviewer only the way to read it', () => {
-    renderCard(waiting('STUDIO_SIGNED', 44_000_000), '/creator', false);
+  it('gives the Admin the read link even before the studio signs', () => {
+    renderCard(waiting('SENT'), '/admin', true);
+    expect(screen.getByRole('link', { name: 'Xem hợp đồng' }).getAttribute('href')).toBe('/admin/projects/m1?tab=contract');
+  });
+
+  it('offers the Reviewer no contract decision link once the studio signs', () => {
+    renderCard(waiting('STUDIO_SIGNED', 44_000_000), '/reviewer', false);
     expect(screen.queryByRole('link', { name: 'Xem báo giá và ký hợp đồng' })).toBeNull();
-    expect(screen.getByRole('link', { name: 'Xem hợp đồng' })).toBeTruthy();
+    expect(screen.getByText('Hợp đồng đang chờ Admin xử lý.')).toBeTruthy();
   });
 
   it('shows no waiting note once production started, and calls the fee the signed one', () => {

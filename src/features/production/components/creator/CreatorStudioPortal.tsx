@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight, ArrowUpRight, FileText } from 'lucide-react';
 import { InitialsAvatar } from '@/components/data/InitialsAvatar';
+import { Pager, pageOf } from '@/components/data/Pager';
 import { ErrorNote, Loading } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
 import { loadPipelines } from '@/services/pipelineService';
@@ -16,6 +17,7 @@ import { matchesFilter, toScriptItem, type ScriptFilterKey, type ScriptProjectIt
 
 const CARD = 'rounded-3xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] shadow-xs';
 const hrefOf = (p: ScriptProjectItem) => `/creator/projects/${p.id}${needsWriting(p) ? '?tab=script' : ''}`;
+const PAGE_SIZE = 6;
 
 function Dot({ tone, value, label }: { tone: string; value: number; label: string }) {
   return (
@@ -34,6 +36,7 @@ export function CreatorStudioPortal() {
   const initialSearch = useSearchParams().get('q') ?? '';
   const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [activeFilter, setActiveFilter] = useState<ScriptFilterKey>('all');
+  const [page, setPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const pipelines = useResource('creator-pipelines', () => loadPipelines());
 
@@ -43,26 +46,32 @@ export function CreatorStudioPortal() {
     const matchesSearch = !query || p.title.toLowerCase().includes(query) || p.genreTags.some((g) => g.toLowerCase().includes(query)) || !!p.studioName?.toLowerCase().includes(query);
     return matchesFilter(p, activeFilter) && matchesSearch;
   });
+  const { rows, totalPages } = pageOf(filtered, page, PAGE_SIZE);
   const count = (...stages: ScriptProjectItem['stage'][]) => items.filter((p) => stages.includes(p.stage)).length;
   const toWrite = items.find(needsWriting);
+
+  const handleSearchChange = (q: string) => {
+    setSearchQuery(q);
+    setPage(1);
+  };
+
+  const handleFilterChange = (f: ScriptFilterKey) => {
+    setActiveFilter(f);
+    setPage(1);
+  };
 
   return (
     <div className="relative min-h-screen w-full bg-[#F9FAFB] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
-        <section aria-label="Hồ sơ biên kịch" className={`${CARD} p-6 sm:p-7 flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+        <section aria-label="Hồ sơ biên kịch" className={`${CARD} p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
           <div className="flex items-center gap-4">
             <InitialsAvatar name={user?.name ?? 'Creator'} />
             <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                  Xin chào, {user?.name ?? 'Creator'}
-                </h1>
-                <span className="rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-700 dark:border-white/10 dark:bg-white/10 dark:text-slate-300">
-                  Biên kịch nội bộ
-                </span>
-              </div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Xin chào, {user?.name ?? 'Creator'}
+              </h1>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">
-                {user?.email} · Theo dõi &amp; biên soạn kịch bản phân cảnh
+                {user?.email} · Quản lý kịch bản &amp; dự án được giao
               </p>
             </div>
           </div>
@@ -70,7 +79,7 @@ export function CreatorStudioPortal() {
             href="/creator/profile"
             className="inline-flex items-center gap-1.5 self-start sm:self-center rounded-full border border-slate-300 dark:border-white/15 bg-white dark:bg-white/[0.04] px-4 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/10 transition-all"
           >
-            Hồ sơ tác giả <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
+            Hồ sơ cá nhân <ArrowUpRight className="w-3.5 h-3.5" aria-hidden="true" />
           </Link>
         </section>
 
@@ -126,15 +135,15 @@ export function CreatorStudioPortal() {
 
             <StudioFilterBar
               searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
+              onSearchChange={handleSearchChange}
               activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
+              onFilterChange={handleFilterChange}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
               totalFilteredCount={filtered.length}
             />
 
-            <section aria-label="Danh sách dự án">
+            <section aria-label="Danh sách dự án" className="space-y-6">
               {filtered.length === 0 ? (
                 <div className="rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 text-center bg-white dark:bg-[#141724]">
                   <FileText className="w-12 h-12 mx-auto text-slate-400 mb-3" aria-hidden="true" />
@@ -142,12 +151,17 @@ export function CreatorStudioPortal() {
                 </div>
               ) : viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {filtered.map((project) => (
+                  {rows.map((project) => (
                     <CinematicProjectCard key={project.id} project={project} href={hrefOf(project)} />
                   ))}
                 </div>
               ) : (
-                <CinematicProjectTable projects={filtered} getHref={hrefOf} />
+                <CinematicProjectTable projects={rows} getHref={hrefOf} />
+              )}
+              {totalPages > 1 && (
+                <div className="pt-2 flex justify-center">
+                  <Pager page={Math.min(page, totalPages)} totalPages={totalPages} onChange={setPage} />
+                </div>
               )}
             </section>
           </>

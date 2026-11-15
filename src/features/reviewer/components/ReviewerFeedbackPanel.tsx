@@ -26,7 +26,7 @@ export function ReviewerFeedbackPanel({
 }) {
   const delivering = isIn(projectStatus, DELIVERY_PROJECT);
   return (
-    <aside aria-label="Phiếu thẩm định" className="w-full lg:w-[420px] shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0D1017] p-4 sm:p-5 space-y-5 overflow-y-auto">
+    <aside aria-label="Phiếu thẩm định" className="w-full lg:w-[460px] xl:w-[480px] shrink-0 h-full border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-white/[0.08] bg-white dark:bg-[#0D1017] p-4 sm:p-5 space-y-5 overflow-y-auto">
       {sheet ? (
         <ReviewPanel sheet={sheet} canAct={caps.review && delivering} onChanged={onChanged} />
       ) : (

@@ -156,6 +156,7 @@ export function ProjectListPage() {
               <CreatorAnalyticsSection
                 projects={projects.data.data}
                 roleTitle={isCreator ? 'Creator' : base === '/reviewer' ? 'Reviewer' : 'Admin'}
+                defaultCollapsed
               />
             )}
 

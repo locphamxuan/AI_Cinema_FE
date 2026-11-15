@@ -96,7 +96,7 @@ export function CoinLedgerPanel() {
   );
 }
 
-function WalletModal({
+export function WalletModal({
   userId,
   canAdjust,
   onClose,

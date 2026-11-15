@@ -7,7 +7,7 @@ import { useResource } from '@/hooks/useResource';
 import { ChangeRequestCard } from '@/features/production/components/shared/ChangeRequestCard';
 import { productionPaths } from '@/features/production/lib/routes';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
-import { pageOf } from '@/components/data/Pager';
+import { Pager, pageOf } from '@/components/data/Pager';
 
 const FILTERS: { key: ChangeRequestStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Chờ duyệt' },
@@ -63,6 +63,11 @@ export function ChangeRequestInbox() {
           />
         ))}
       </ul>
+      {paged.totalPages > 1 && (
+        <div className="pt-4 flex justify-center">
+          <Pager page={Math.min(page, paged.totalPages)} totalPages={paged.totalPages} onChange={setPage} />
+        </div>
+      )}
     </Panel>
   );
 }

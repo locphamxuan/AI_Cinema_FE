@@ -131,7 +131,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'price-alert:manage': {
     title: 'Theo dõi & Cảnh báo giá tập phim',
-    desc: 'Giám sát các tập phim định giá ngoài khung quy định sàn và gửi yêu cầu điều chỉnh giá.',
+    desc: 'Giám sát các tập phim định giá ngoài khung quy định sàn hỏi ý kiến Reviewer rồi tự đặt lại giá.',
   },
 
   // Catalog

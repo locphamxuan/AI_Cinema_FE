@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Building2, FileSignature, Film, Rocket, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Building2, FileSignature, Film, Rocket, ShieldCheck } from 'lucide-react';
 import { useAction } from '@/hooks/useAction';
 import { formatVnd } from '@/lib/format';
 import { productionService } from '@/services/productionService';
@@ -77,8 +77,8 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
         </div>
       </div>
       {first && (
-        <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center px-5 py-2.5 rounded-full bg-white dark:bg-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.1] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 text-xs font-semibold cursor-pointer transition-all">
-          Xem Báo Giá &amp; Ký ➔
+        <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white dark:bg-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.1] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 text-xs font-semibold cursor-pointer transition-all">
+          Xem Báo Giá &amp; Ký <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
         </button>
       )}
     </section>

@@ -75,6 +75,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
       {label && !form && (
         <div className="space-y-3">
           <Facts
+            stacked
             items={[
               ['Creator đề xuất', LABEL_TYPE[sheet.proposedLabelType]],
               ['Loại nhãn đã gắn', LABEL_TYPE[label.labelType]],
