@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BarChart3, Headphones, Megaphone, Users, type LucideIcon } from 'lucide-react';
+import { BarChart3, Headphones, Users, type LucideIcon } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
 import { movieService, type CatalogMovie } from '@/services/movieService';
@@ -17,15 +17,12 @@ interface Module {
   icon: LucideIcon;
   /** None: open to every Staff account (public data). */
   permission?: PermissionKey;
-  /** Built in MF-5; shown as a placeholder until then, the backend has no permission for it yet. */
-  comingSoon?: boolean;
 }
 
 const MODULES: Module[] = [
   { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones, permission: PERMISSION.SUPPORT_CASE_READ },
   { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).', icon: BarChart3 },
   { key: 'members', title: 'Thông tin member', description: 'Tài khoản member (chỉ đọc).', icon: Users, permission: PERMISSION.MEMBER_OPS_READ },
-  { key: 'marketing', title: 'Marketing', description: 'Chiến dịch cho phim sắp và đã phát hành.', icon: Megaphone, comingSoon: true },
 ];
 
 const CARD = 'bg-white dark:bg-[#111420] rounded-3xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs';
@@ -70,20 +67,6 @@ export function StaffPage() {
 
       {activeTab === 'operations' && (
         <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {modules
-              .filter((m) => m.comingSoon)
-              .map(({ key, title, description, icon: Icon }) => (
-                <div key={key} className={`${CARD} p-4 space-y-1.5`}>
-                  <p className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
-                    <Icon className="w-4 h-4 text-slate-700 dark:text-slate-300" aria-hidden="true" /> {title}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
-                  <p className="text-[11px] font-medium text-amber-600 dark:text-amber-400">Đang xây dựng</p>
-                </div>
-              ))}
-          </div>
-
           <FilmsSection />
           {can(PERMISSION.MEMBER_OPS_READ) && <MembersSection />}
           {can(PERMISSION.BILLING_SUBSCRIPTION_READ) && <SubscriptionsPanel />}
