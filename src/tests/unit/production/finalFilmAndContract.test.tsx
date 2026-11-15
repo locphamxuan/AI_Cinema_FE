@@ -6,6 +6,7 @@ import { PublishPanel } from '@/features/production/components/episode/PublishPa
 import { ContractTab } from '@/features/production/components/project/ContractTab';
 import { assignedProject, withProject } from '@/tests/support/projectContext';
 import { routeFetch } from '@/tests/support/routeFetch';
+import { attachPdf, formOf } from '@/tests/support/pdf';
 import { signInAs } from '@/tests/support/signIn';
 import type { Episode } from '@/types/production';
 
@@ -115,8 +116,14 @@ describe('ContractTab', () => {
     render(withProject(assignedProject(), <ContractTab />));
 
     expect(await screen.findByText(/Hợp đồng với Studio Lumen Studio/)).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: /Đồng ý/ }));
-    await waitFor(() => expect(calls.some((c) => c.path === '/contracts/c1/sign' && c.method === 'POST')).toBe(true));
+    const sign = screen.getByRole('button', { name: /Đồng ý/ });
+    expect(sign).toBeDisabled();
+    const file = await attachPdf(document.body, /PDF Admin đã ký/);
+    await userEvent.click(sign);
+    await waitFor(() => {
+      const sent = calls.find((c) => c.path === '/contracts/c1/sign' && c.method === 'POST');
+      expect(formOf(sent!.body).get('file')).toBe(file);
+    });
   });
 
   it('lets the Admin counter-propose a cost in whole thousands', async () => {
@@ -126,10 +133,14 @@ describe('ContractTab', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Đề xuất giá khác' }));
     await userEvent.type(screen.getByLabelText('Giá mới'), '120000000');
-    await userEvent.click(screen.getByRole('button', { name: 'Gửi studio' }));
+    const send = screen.getByRole('button', { name: 'Gửi giá cho Studio' });
+    expect(send).toBeDisabled();
+    await attachPdf(document.body, /PDF đã ký cho giá mới/);
+    await userEvent.click(send);
     await waitFor(() => {
-      const sent = calls.find((c) => c.path === '/contracts/c1/counter');
-      expect(JSON.parse(sent!.body as string)).toEqual({ costVnd: 120_000_000 });
+      const sent = formOf(calls.find((c) => c.path === '/contracts/c1/counter')!.body);
+      expect(sent.get('costVnd')).toBe('120000000');
+      expect(sent.get('file')).toBeInstanceOf(File);
     });
   });
 

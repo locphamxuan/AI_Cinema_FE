@@ -9,7 +9,9 @@ import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { formatDateTime, formatVnd } from '@/lib/format';
 import { parseVnd } from '@/features/production/components/shared/CostRequestCard';
-import { contractService } from '@/services/contractService';
+import { MAX_CONTRACT_VND, contractPdfProblem, contractService } from '@/services/contractService';
+import { toast } from '@/components/ui/Toast';
+import { ContractPdfInput } from '@/features/production/components/shared/ContractPdfInput';
 import { productionService } from '@/services/productionService';
 import { studioService } from '@/services/studioService';
 import type { ContractToSign } from '../adminPipeline';
@@ -27,7 +29,8 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
   const heldVnd = waitsOnHandoff ? Number(handoffs.data?.find((h) => h.id === c.handoffId)?.offeredFeeVnd ?? Number.NaN) : 0;
   const left = costs.data ? costs.data.remainingVnd + heldVnd : null;
   const remainingVnd = left !== null && !Number.isNaN(left) ? left : null;
-  const offerValid = remainingVnd !== null && offer > 0 && offer <= remainingVnd;
+  const offerValid = remainingVnd !== null && offer > 0 && offer <= Math.min(remainingVnd, MAX_CONTRACT_VND);
+  const fileOk = !!signFile && !contractPdfProblem(signFile);
   const readError = costs.error ?? handoffs.error;
 
   const finish = async (done: unknown) => {
@@ -36,13 +39,18 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
     onClose();
   };
   const sign = async () =>
+    fileOk &&
     finish(
       await run(
-        () => contractService.sign(c.id, signFile || undefined),
+        () => contractService.sign(c.id, signFile!),
         waitsOnHandoff ? 'Đã ký, Studio mới bắt đầu sản xuất' : 'Đã ký, hợp đồng hoàn tất và dự án vào sản xuất',
       ),
     );
-  const propose = async () => finish(await run(() => contractService.counter(c.id, offer, signFile || undefined), 'Đã gửi mức giá mới cho Studio'));
+  const propose = async () =>
+    fileOk && finish(await run(() => contractService.counter(c.id, offer, signFile!), 'Đã gửi mức giá mới cho Studio'));
+  const downloadStudio = async () => {
+    if (!(await contractService.downloadDocument(c.id, 'STUDIO'))) toast.error('Không tải được bản Studio đã ký', 'Thử lại sau.');
+  };
 
   return (
     <Modal
@@ -82,23 +90,17 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
         />
       </FormField>
 
-      <div className="space-y-1.5 pt-2 border-t border-slate-200/80 dark:border-white/[0.06] text-xs">
-        <div className="flex items-center justify-between">
-          <label className="font-semibold text-slate-800 dark:text-slate-200">File PDF hợp đồng đã ký của AI Cinema</label>
-          <button
-            type="button"
-            className="text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
-            onClick={() => contractService.downloadDocument(c.id, 'STUDIO')}
-          >
-            Tải bản Studio đã ký (PDF)
-          </button>
+      <div className="space-y-2 border-t border-border pt-3">
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <span className="text-muted-foreground">Đọc bản Studio đã ký trước khi ký hoặc đề xuất giá.</span>
+          <Button type="button" size="sm" variant="ghost" onClick={() => void downloadStudio()}>
+            Tải bản Studio ký
+          </Button>
         </div>
-        <input
-          type="file"
-          accept=".pdf,application/pdf"
-          aria-label="File PDF đã ký"
-          onChange={(e) => setSignFile(e.target.files?.[0] || null)}
-          className="text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100"
+        <ContractPdfInput
+          label="Bản PDF AI Cinema đã ký (cho giá Studio, hoặc cho giá mới bạn đề xuất)"
+          file={signFile}
+          onChange={setSignFile}
         />
       </div>
 
@@ -106,10 +108,10 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
         <Button type="button" variant="secondary" onClick={onClose} className="rounded-full">
           Đóng
         </Button>
-        <Button type="button" variant="secondary" disabled={busy || !offerValid} onClick={propose} className="rounded-full">
+        <Button type="button" variant="secondary" disabled={busy || !offerValid || !fileOk} onClick={propose} className="rounded-full">
           Gửi giá đề xuất
         </Button>
-        <Button type="button" disabled={busy || c.costVnd === null} onClick={sign} className="rounded-full bg-[#121212] text-white hover:bg-black dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
+        <Button type="button" disabled={busy || c.costVnd === null || !fileOk} onClick={sign} className="rounded-full bg-[#121212] text-white hover:bg-black dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
           <FileSignature className="w-4 h-4" /> Đồng ý &amp; ký
         </Button>
       </div>
