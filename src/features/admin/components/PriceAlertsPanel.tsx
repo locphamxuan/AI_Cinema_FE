@@ -16,12 +16,15 @@ import { MetaPager } from '@/components/data/MetaPager';
 
 const FILTERS: { key: PriceAlertStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Mới' },
-  { key: 'CHANGE_REQUESTED', label: 'Đã yêu cầu đổi' },
+  { key: 'CHANGE_REQUESTED', label: 'Đã hỏi Reviewer' },
   { key: 'RESOLVED', label: 'Đã xử lý' },
   { key: 'ALL', label: 'Tất cả' },
 ];
 
-/** BR-47: episode prices outside the valid range. The Admin asks the Reviewer to change them, never edits them. */
+/**
+ * BR-47: episode prices outside the valid range. The Admin may ask the Reviewer's opinion (the Reviewer answers in
+ * a project note), then sets the price again itself (PATCH /episodes/:id/coin-price), or accepts the price as is.
+ */
 export function PriceAlertsPanel() {
   const [filter, setFilter] = useState<PriceAlertStatus | 'ALL'>('OPEN');
   const [page, setPage] = useState(1);
@@ -33,7 +36,7 @@ export function PriceAlertsPanel() {
 
   const requestChange = async (note: string) => {
     if (!asking) return;
-    if (await run(() => productionService.requestPriceChange(asking.id, note), 'Đã gửi yêu cầu đổi giá cho Reviewer')) {
+    if (await run(() => productionService.requestPriceChange(asking.id, note), 'Đã gửi câu hỏi cho Reviewer')) {
       setAsking(null);
       await alerts.reload();
     }
@@ -91,13 +94,13 @@ export function PriceAlertsPanel() {
                 <p className="text-slate-400">
                   {a.setBy.fullName} · {formatDateTime(a.createdAt)}
                 </p>
-                {a.adminNote && <p className="text-slate-600 dark:text-slate-300">Đã nhắn Reviewer: {a.adminNote}</p>}
+                {a.adminNote && <p className="text-slate-600 dark:text-slate-300">Đã hỏi Reviewer: {a.adminNote}</p>}
               </div>
               <div className="flex items-center gap-2">
                 <StatusPill {...PRICE_ALERT_STATUS[a.status]} />
                 {a.status === 'OPEN' && (
                   <Button size="sm" variant="secondary" disabled={busy} onClick={() => setAsking(a)}>
-                    Yêu cầu đổi giá
+                    Hỏi ý kiến Reviewer
                   </Button>
                 )}
                 {a.status !== 'RESOLVED' && (
@@ -113,9 +116,10 @@ export function PriceAlertsPanel() {
       </div>
       <TextPromptModal
         open={!!asking}
-        title="Yêu cầu Reviewer đổi giá"
-        label="Lời nhắn cho Reviewer"
-        confirmLabel="Gửi"
+        title="Hỏi ý kiến Reviewer về giá"
+        subtitle="Reviewer góp ý bằng ghi chú dự án; sau đó bạn tự đặt lại giá Coin của tập."
+        label="Câu hỏi cho Reviewer"
+        confirmLabel="Gửi câu hỏi"
         busy={busy}
         onClose={() => setAsking(null)}
         onConfirm={requestChange}
