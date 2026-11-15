@@ -1,0 +1,29 @@
+import type { WebRole } from '@/lib/permissions';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatarUrl: string;
+  role?: WebRole;
+  isVIP: boolean;
+  /** Permission keys the backend grants this account's role. */
+  permissions?: string[];
+}
+
+export interface AuthSlice {
+  isAuthenticated: boolean;
+  user: UserProfile | null;
+  login: (email: string, password: string, allowStudio?: boolean) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
+  logout: () => void;
+  /** `allowStudio`: keep a Studio session (the OAuth consent page only). */
+  restoreSession: (allowStudio?: boolean) => void;
+}
+
+export interface ThemeSlice {
+  theme: 'light' | 'dark';
+  setTheme: (theme: 'light' | 'dark') => void;
+  toggleTheme: () => void;
+}
+
+export type AppState = AuthSlice & ThemeSlice;

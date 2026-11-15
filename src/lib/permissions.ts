@@ -1,0 +1,105 @@
+/**
+ * Permission keys the backend checks (AI_Cinema_BE src/common/auth/permissions.ts).
+ * Which role holds which key is edited by the Admin; the web only reads the list
+ * the backend returns for the signed-in account.
+ */
+export const PERMISSION = {
+  // MF-1 - movie projects
+  PROJECT_CREATE: 'project:create',
+  PROJECT_MANAGE: 'project:manage',
+  PROJECT_READ_ALL: 'project:read.all',
+  PROJECT_SUGGEST: 'project:suggest',
+  PROJECT_CHANGE_REVIEW: 'project:change.review',
+  COST_REQUEST: 'cost:request',
+  COST_APPROVE: 'cost:approve',
+  COST_ADJUST: 'cost:adjust',
+  CONTRACT_MANAGE: 'contract:manage',
+  SCRIPT_WRITE: 'script:write',
+  SCRIPT_APPROVE: 'script:approve',
+  STUDIO_PORTAL: 'studio:portal',
+  STUDIO_MANAGE: 'studio:manage',
+  MEDIA_INGEST: 'media:ingest',
+  CONTENT_REVIEW: 'content:review',
+  EPISODE_PRICE: 'episode:price',
+  EPISODE_PUBLISH: 'episode:publish',
+  PRICE_ALERT_MANAGE: 'price-alert:manage',
+  GENRE_MANAGE: 'genre:manage',
+  // MF-2 - episode access, Coin, monthly plan, rewards
+  ACCESS_EPISODE_READ: 'access.episode.read',
+  WALLET_READ: 'wallet.read',
+  WALLET_TOPUP: 'wallet.topup',
+  REWARD_CHECKIN: 'reward.checkin',
+  SUBSCRIPTION_SELF_MANAGE: 'subscription.self.manage',
+  BILLING_PLAN_MANAGE: 'billing.plan.manage',
+  BILLING_PRICE_MANAGE: 'billing.price.manage',
+  BILLING_SUBSCRIPTION_READ: 'billing.subscription.read',
+  BILLING_SUBSCRIPTION_CANCEL: 'billing.subscription.cancel',
+  COIN_WALLET_READ: 'coin.wallet.read',
+  COIN_ADJUST: 'coin.adjust',
+  COIN_TRANSACTION_READ: 'coin.transaction.read',
+  REWARD_RULE_MANAGE: 'reward.rule.manage',
+  ANALYTICS_REVENUE_READ: 'analytics.revenue.read',
+  ANALYTICS_CHURN_READ: 'analytics.churn.read',
+  // MF-3 - playback & ads
+  AD_MANAGE: 'ad.manage',
+  // MF-5 - support desk, AI Chatbox console, finance
+  SUPPORT_CASE_READ: 'support:case.read',
+  SUPPORT_CASE_MANAGE: 'support:case.manage',
+  SUPPORT_CASE_ASSIGN: 'support:case.assign',
+  SUPPORT_KNOWLEDGE_MANAGE: 'support:knowledge.manage',
+  FINANCE_REPORT_READ: 'finance:report.read',
+  FINANCE_ALLOCATION_RUN: 'finance:allocation.run',
+  RISK_FLAG_MANAGE: 'risk:flag.manage',
+  // Administration
+  MEMBER_OPS_READ: 'member:ops.read',
+  USER_READ: 'user:read',
+  USER_MANAGE: 'user:manage',
+  ROLE_MANAGE: 'role:manage',
+  PLATFORM_SETTINGS_MANAGE: 'platform:settings.manage',
+} as const;
+
+export type PermissionKey = (typeof PERMISSION)[keyof typeof PERMISSION];
+
+/** Web roles (the backend's UserRole, as the web spells it). A studio signs in to Studio Web, not here. */
+export type WebRole = 'user' | 'vip' | 'creator' | 'reviewer' | 'studio' | 'staff' | 'admin';
+
+/** Internal areas of the web portal and which roles may enter each. */
+export type Area = 'creator' | 'reviewer' | 'staff' | 'admin';
+
+export const AREAS: Record<Area, { label: string; path: string; roles: WebRole[] }> = {
+  creator: { label: 'Sản xuất nội dung', path: '/creator/projects', roles: ['creator'] },
+  // The Admin oversees every project and decides the change requests sent to them (BR-55); actions follow permissions.
+  reviewer: { label: 'Kiểm duyệt nội dung', path: '/reviewer', roles: ['reviewer', 'admin'] },
+  staff: { label: 'Vận hành', path: '/staff', roles: ['staff', 'admin'] },
+  admin: { label: 'Quản trị', path: '/admin', roles: ['admin'] },
+};
+
+export const ROLE_LABEL: Record<WebRole, string> = {
+  user: 'Member',
+  vip: 'Member',
+  creator: 'Content Creator',
+  reviewer: 'Content Reviewer',
+  studio: 'Studio',
+  staff: 'Staff',
+  admin: 'Admin',
+};
+
+/** Where an account lands after signing in; members stay on the viewer site. */
+export function homeAreaOf(role: WebRole | undefined): Area | null {
+  switch (role) {
+    case 'creator':
+      return 'creator';
+    case 'reviewer':
+      return 'reviewer';
+    case 'staff':
+      return 'staff';
+    case 'admin':
+      return 'admin';
+    default:
+      return null;
+  }
+}
+
+export function canEnter(area: Area, role: WebRole | undefined): boolean {
+  return role !== undefined && AREAS[area].roles.includes(role);
+}

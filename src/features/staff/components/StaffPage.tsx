@@ -1,0 +1,137 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { BarChart3, Headphones, Users, type LucideIcon } from 'lucide-react';
+import { useCan } from '@/hooks/useCan';
+import { PERMISSION, type PermissionKey } from '@/lib/permissions';
+import { movieService, type CatalogMovie } from '@/services/movieService';
+import { adminService, type AccountRow } from '@/services/adminService';
+import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
+import { SubscriptionsPanel } from '@/features/billing-admin/components/SubscriptionsPanel';
+import { StaffSupportWorkspace } from './StaffSupportWorkspace';
+
+interface Module {
+  key: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  /** None: open to every Staff account (public data). */
+  permission?: PermissionKey;
+}
+
+const MODULES: Module[] = [
+  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones, permission: PERMISSION.SUPPORT_CASE_READ },
+  { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).', icon: BarChart3 },
+  { key: 'members', title: 'Thông tin member', description: 'Tài khoản member (chỉ đọc).', icon: Users, permission: PERMISSION.MEMBER_OPS_READ },
+];
+
+const CARD = 'bg-white dark:bg-[#111420] rounded-3xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs';
+
+/** Staff operations dashboard (MF-5): only the modules this role holds a permission for (BR-21). */
+export function StaffPage() {
+  const can = useCan();
+  const [activeTab, setActiveTab] = useState<'support' | 'operations'>('support');
+  const modules = MODULES.filter((m) => !m.permission || can(m.permission));
+
+  return (
+    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Vận hành</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Xử lý yêu cầu hỗ trợ khách hàng và tra cứu dữ liệu vận hành.</p>
+        </div>
+
+        <div role="tablist" aria-label="Khu vận hành" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 text-sm">
+          {(['support', 'operations'] as const).map((key) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === key}
+              onClick={() => setActiveTab(key)}
+              className={`cursor-pointer rounded-md px-4 py-1.5 ${activeTab === key ? 'bg-background font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              {key === 'support' ? 'Hỗ trợ khách hàng' : 'Tra cứu vận hành'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {modules.length === 0 && (
+        <p className={`${CARD} p-5 text-xs text-slate-500 dark:text-slate-400`}>
+          Vai trò của bạn chưa được cấp mục vận hành nào. Liên hệ Admin để được cấp quyền.
+        </p>
+      )}
+
+      {activeTab === 'support' && can(PERMISSION.SUPPORT_CASE_READ) && <StaffSupportWorkspace />}
+
+      {activeTab === 'operations' && (
+        <div className="space-y-5">
+          <FilmsSection />
+          {can(PERMISSION.MEMBER_OPS_READ) && <MembersSection />}
+          {can(PERMISSION.BILLING_SUBSCRIPTION_READ) && <SubscriptionsPanel />}
+          {can(PERMISSION.COIN_TRANSACTION_READ) && <CoinLedgerPanel />}
+        </div>
+      )}
+    </main>
+  );
+}
+
+function FilmsSection() {
+  const [movies, setMovies] = useState<CatalogMovie[] | null>(null);
+  useEffect(() => {
+    void movieService.getMovies().then((res) => setMovies(res.success ? res.data : []));
+  }, []);
+
+  return (
+    <section className={`${CARD} overflow-hidden`} aria-label="Theo dõi phim">
+      <h2 className="px-5 py-3 text-sm font-semibold text-slate-900 dark:text-white border-b border-slate-100 dark:border-white/5">Theo dõi phim</h2>
+      {movies === null && <p className="p-5 text-xs text-slate-500">Đang tải…</p>}
+      {movies?.length === 0 && <p className="p-5 text-xs text-slate-500 dark:text-slate-400">Chưa có phim nào phát hành.</p>}
+      <ul className="divide-y divide-slate-100 dark:divide-white/5 text-xs">
+        {movies?.map((movie) => (
+          <li key={movie.id} className="px-5 py-2.5 flex items-center justify-between gap-3">
+            <span className="font-medium text-slate-800 dark:text-slate-200">{movie.title}</span>
+            <span className="text-slate-500 dark:text-slate-400">
+              {movie.episodeCount} tập · {movie.genres.join(', ') || 'Chưa có thể loại'}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function MembersSection() {
+  const [members, setMembers] = useState<AccountRow[] | null>(null);
+  const [total, setTotal] = useState(0);
+  useEffect(() => {
+    void adminService.listAccounts({ role: 'MEMBER', limit: 50 }).then((res) => {
+      setMembers(res.success ? res.data.data : []);
+      setTotal(res.success ? res.data.meta.totalItems : 0);
+    });
+  }, []);
+
+  return (
+    <section className={`${CARD} overflow-hidden`} aria-label="Thông tin member">
+      <h2 className="px-5 py-3 text-sm font-semibold text-slate-900 dark:text-white border-b border-slate-100 dark:border-white/5">
+        Thông tin member <span className="text-slate-400 font-normal">({total})</span>
+      </h2>
+      {members === null && <p className="p-5 text-xs text-slate-500">Đang tải…</p>}
+      {members?.length === 0 && <p className="p-5 text-xs text-slate-500 dark:text-slate-400">Chưa có member nào.</p>}
+      <ul className="divide-y divide-slate-100 dark:divide-white/5 text-xs">
+        {members?.map((member) => (
+          <li key={member.id} className="px-5 py-2.5 flex items-center justify-between gap-3">
+            <span>
+              <span className="font-medium text-slate-800 dark:text-slate-200">{member.fullName}</span>
+              <span className="text-slate-500 dark:text-slate-400"> · {member.email}</span>
+            </span>
+            <span className={member.isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
+              {member.isActive ? 'Đang hoạt động' : 'Đã khoá'}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}

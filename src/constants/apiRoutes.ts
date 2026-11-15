@@ -1,0 +1,154 @@
+/**
+ * AI Cinema - API Endpoints Registry
+ */
+
+// Same-origin by default so the Next.js rewrite or route handlers proxy to the backend
+// and the browser never makes a cross-origin call or fails if port 3001 is offline.
+// A relative value ("api") is rooted, or pages like /watch/:id would call /watch/api/...
+export function resolveApiBaseUrl(configured: string | undefined): string {
+  if (!configured || configured.includes('3001')) return '/api';
+  return /^https?:\/\//.test(configured) || configured.startsWith('/') ? configured : `/${configured}`;
+}
+
+export const API_BASE_URL = resolveApiBaseUrl(process.env.NEXT_PUBLIC_API_URL);
+
+export const API_ROUTES = {
+  // Auth
+  AUTH: {
+    LOGIN: '/auth/login',
+    PROFILE: '/auth/me',
+    CHANGE_PASSWORD: '/auth/me/password',
+  },
+  // Movies & Video
+  MOVIES: {
+    LIST: '/movies',
+  },
+  GENRES: {
+    LIST: '/genres',
+  },
+  // Accounts & permissions (Admin), member list (Staff)
+  ADMIN: {
+    USERS: '/users',
+    USER_DETAIL: (userId: string) => `/users/${userId}`,
+    PERMISSIONS: '/permissions',
+    ROLES: '/roles',
+    ROLE_PERMISSIONS: (role: string) => `/roles/${role}/permissions`,
+  },
+  STUDIOS: {
+    LIST: '/studios',
+    DETAIL: (studioId: string) => `/studios/${studioId}`,
+    ACCOUNTS: (studioId: string) => `/studios/${studioId}/accounts`,
+  },
+  PLATFORM_SETTINGS: '/platform-settings',
+  POLICIES: '/policies',
+  NOTIFICATIONS: {
+    LIST: '/notifications',
+    UNREAD_COUNT: '/notifications/unread-count',
+    READ_ALL: '/notifications/read-all',
+    READ: (id: string) => `/notifications/${id}/read`,
+  },
+  // MF-1: movie projects ordered from outside studios, steps 1–16
+  PRODUCTION: {
+    PROJECTS: '/projects',
+    PROJECT_PIPELINE: '/projects/pipeline',
+    PROJECT: (movieId: string) => `/projects/${movieId}`,
+    ASSIGN: (movieId: string) => `/projects/${movieId}/assign`,
+    CANCEL: (movieId: string) => `/projects/${movieId}/cancel`,
+    EVENTS: (movieId: string) => `/projects/${movieId}/events`,
+    NOTES: (movieId: string) => `/projects/${movieId}/notes`,
+    SCRIPT: (movieId: string) => `/projects/${movieId}/script`,
+    SCRIPT_VERSIONS: (movieId: string) => `/projects/${movieId}/script/versions`,
+    SCRIPT_REVIEW: (movieId: string) => `/projects/${movieId}/script/review`,
+    SCRIPT_FINAL_REVIEW: (movieId: string) => `/projects/${movieId}/script/final-review`,
+    SEASONS: (movieId: string) => `/projects/${movieId}/seasons`,
+    SEASON: (seasonId: string) => `/seasons/${seasonId}`,
+    SEASON_EPISODES: (seasonId: string) => `/seasons/${seasonId}/episodes`,
+    POSTER: (movieId: string) => `/projects/${movieId}/poster`,
+    EPISODE_THUMBNAIL: (episodeId: string) => `/episodes/${episodeId}/thumbnail`,
+    EPISODE_ASSIGNEE: (episodeId: string) => `/episodes/${episodeId}/assignee`,
+    CREATOR_DIRECTORY: '/creators',
+    CREATORS: (movieId: string) => `/projects/${movieId}/creators`,
+    CREATOR: (movieId: string, creatorId: string) => `/projects/${movieId}/creators/${creatorId}`,
+    DELEGATIONS: (movieId: string) => `/projects/${movieId}/delegations`,
+    EPISODE: (episodeId: string) => `/episodes/${episodeId}`,
+    IDEA_FILES: (movieId: string) => `/projects/${movieId}/idea-files`,
+    IDEA_FILE: (movieId: string, fileId: string) => `/projects/${movieId}/idea-files/${fileId}`,
+    IDEA_FILE_CONTENT: (movieId: string, fileId: string) => `/projects/${movieId}/idea-files/${fileId}/content`,
+    COSTS: (movieId: string) => `/projects/${movieId}/costs`,
+    COST_ENTRIES: (movieId: string) => `/projects/${movieId}/costs/entries`,
+    CHANGE_REQUESTS: (movieId: string) => `/projects/${movieId}/change-requests`,
+    CHANGE_REQUEST_INBOX: '/change-requests',
+    CHANGE_REQUEST_PROOF: (id: string) => `/change-requests/${id}/proof`,
+    CHANGE_REQUEST_APPROVE: (id: string) => `/change-requests/${id}/approve`,
+    CHANGE_REQUEST_REJECT: (id: string) => `/change-requests/${id}/reject`,
+    COST_REQUESTS: (movieId: string) => `/projects/${movieId}/cost-requests`,
+    COST_REQUEST_INBOX: '/cost-requests',
+    COST_REQUEST_PROOF: (id: string) => `/cost-requests/${id}/proof`,
+    COST_REQUEST_APPROVE: (id: string) => `/cost-requests/${id}/approve`,
+    COST_REQUEST_REJECT: (id: string) => `/cost-requests/${id}/reject`,
+    STUDIO_CHANGE: (movieId: string) => `/projects/${movieId}/studio-change`,
+    HANDOFFS: (movieId: string) => `/projects/${movieId}/handoffs`,
+    BRIEF: (movieId: string, handoffId: string) => `/projects/${movieId}/handoffs/${handoffId}/brief`,
+    MATERIAL: (movieId: string, handoffId: string, materialId: string) =>
+      `/projects/${movieId}/handoffs/${handoffId}/materials/${materialId}/content`,
+    EPISODE_MEDIA: (episodeId: string) => `/episodes/${episodeId}/media`,
+    EPISODE_NOTES: (episodeId: string) => `/episodes/${episodeId}/notes`,
+    REVIEW_SHEET: (id: string) => `/media-assets/${id}/review-sheet`,
+    REVIEWS: (id: string) => `/media-assets/${id}/reviews`,
+    AI_LABELS: (id: string) => `/media-assets/${id}/ai-content-labels`,
+    COMPLIANCE: (id: string) => `/media-assets/${id}/compliance-checks`,
+    COIN_PRICE: (episodeId: string) => `/episodes/${episodeId}/coin-price`,
+    ACCESS_FLAGS: (episodeId: string) => `/episodes/${episodeId}/access-flags`,
+    FINAL_CONFIRMATION: (episodeId: string) => `/episodes/${episodeId}/final-confirmation`,
+    FINAL_REJECTION: (episodeId: string) => `/episodes/${episodeId}/final-rejection`,
+    PUBLICATIONS: (episodeId: string) => `/episodes/${episodeId}/publications`,
+    UNPUBLISH: (publicationId: string) => `/publications/${publicationId}/unpublish`,
+    PRICE_ALERTS: '/admin/price-alerts',
+    PRICE_ALERT_REQUEST_CHANGE: (id: string) => `/admin/price-alerts/${id}/request-change`,
+    PRICE_ALERT_RESOLVE: (id: string) => `/admin/price-alerts/${id}/resolve`,
+    CONTRACTS: (movieId: string) => `/projects/${movieId}/contracts`,
+    CONTRACT_SIGN: (id: string) => `/contracts/${id}/sign`,
+    CONTRACT_COUNTER: (id: string) => `/contracts/${id}/counter`,
+    CONTRACT_DOCUMENTS: (id: string) => `/contracts/${id}/documents`,
+    CONTRACT_DOCUMENT_CONTENT: (id: string, side: string) => `/contracts/${id}/documents/${side}/content`,
+  },
+  // MF-5: the support desk of Staff / Admin and the AI Chatbox console of the Admin
+  ADMIN_SUPPORT: {
+    CONVERSATIONS: '/admin/support/conversations',
+    STATS: '/admin/support/stats',
+    CONVERSATION: (id: string) => `/admin/support/conversations/${id}`,
+    MEMBER_CONTEXT: (id: string) => `/admin/support/conversations/${id}/member-context`,
+    CLAIM: (id: string) => `/admin/support/conversations/${id}/claim`,
+    RELEASE: (id: string) => `/admin/support/conversations/${id}/release`,
+    AI_SUGGESTION: (id: string) => `/admin/support/conversations/${id}/ai-suggestion`,
+    MESSAGES: (id: string) => `/admin/support/conversations/${id}/messages`,
+    RESOLVE: (id: string) => `/admin/support/conversations/${id}/resolve`,
+    CLOSE: (id: string) => `/admin/support/conversations/${id}/close`,
+    ASSIGN: (id: string) => `/admin/support/conversations/${id}/assign`,
+    KNOWLEDGE: '/admin/support/knowledge',
+    KNOWLEDGE_DETAIL: (id: string) => `/admin/support/knowledge/${id}`,
+    KNOWLEDGE_ARCHIVE: (id: string) => `/admin/support/knowledge/${id}/archive`,
+    KNOWLEDGE_REINDEX: (id: string) => `/admin/support/knowledge/${id}/reindex`,
+    KNOWLEDGE_REINDEX_ALL: '/admin/support/knowledge/reindex-all',
+    KNOWLEDGE_PREVIEW: '/admin/support/knowledge/preview',
+    AI_HEALTH: '/admin/support/ai/health',
+    AI_PREVIEW_CHAT: '/admin/support/ai/preview-chat',
+    AI_ANSWERS: '/admin/support/ai/answers',
+    AI_ANSWERS_SUMMARY: '/admin/support/ai/answers/summary',
+    AI_ANSWER_FEEDBACK: (messageId: string) => `/admin/support/ai/answers/${messageId}/feedback`,
+  },
+  // MF-5: the Financial Dashboard of the Admin (BR-48 monthly-plan revenue share, risk flags)
+  FINANCE: {
+    FILMS: '/admin/finance/films',
+    ALLOCATIONS: '/admin/finance/revenue-allocations',
+    ALLOCATION_RUN: (period: string) => `/admin/finance/revenue-allocations/${period}/run`,
+    RISK_RULES: '/admin/finance/risk/rules',
+    RISK_FLAGS: '/admin/finance/risk/flags',
+    RISK_SCAN: '/admin/finance/risk/scan',
+    RISK_REVIEW: (flagId: string) => `/admin/finance/risk/flags/${flagId}/review`,
+  },
+  OAUTH: {
+    AUTHORIZE: '/oauth/authorize',
+  },
+} as const;
+

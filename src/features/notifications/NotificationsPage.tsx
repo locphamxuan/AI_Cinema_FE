@@ -1,0 +1,272 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
+import { ErrorNote, Loading } from '@/components/data/ui';
+import { useResource } from '@/hooks/useResource';
+import { notificationHref } from '@/features/production/lib/routes';
+import { notificationService } from '@/services/notificationService';
+import { useAppStore } from '@/store/useAppStore';
+import type { AppNotification } from '@/types/production';
+import { notificationTabsFor, typesOf, type NotificationTab } from './notificationCatalog';
+import { NotificationCard } from './NotificationCard';
+import { NotificationPager } from './NotificationPager';
+
+// 6 items per page so user has clean paging and doesn't have to scroll/slide through long list
+const PAGE_SIZE = 6;
+
+const ALL: NotificationTab = {
+  key: 'all',
+  label: 'Tất cả thông báo',
+  description: 'Toàn bộ sự kiện hệ thống, sắp xếp theo thời gian mới nhất.',
+  sections: [],
+};
+
+/** Unread count of each tab, read from the API */
+function useUnreadCounts(tabs: NotificationTab[], version: number) {
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  useEffect(() => {
+    let active = true;
+    void Promise.all(
+      tabs.map(async (tab) => {
+        const res = await notificationService.listByTypes(typesOf(tab), 1, 1, true);
+        return [tab.key, res.success ? res.data.meta.totalItems : 0] as const;
+      }),
+    ).then((pairs) => active && setCounts(Object.fromEntries(pairs)));
+    return () => {
+      active = false;
+    };
+  }, [tabs, version]);
+  return counts;
+}
+
+/**
+ * Modern High-Fidelity Notification Center
+ * Redesigned into responsive cards with distinct color accents, category tags, action shortcuts, and full numbered pagination.
+ */
+export function NotificationsPage() {
+  const router = useRouter();
+  const role = useAppStore((s) => s.user?.role);
+  const [tabs] = useState(() => [ALL, ...notificationTabsFor(role)]);
+  const [tabKey, setTabKey] = useState('all');
+  const [sectionKey, setSectionKey] = useState<string | null>(null);
+  const [unreadOnly, setUnreadOnly] = useState(false);
+  const [page, setPage] = useState(1);
+  const [version, setVersion] = useState(0);
+  const [markingAll, setMarkingAll] = useState(false);
+
+  const tab = tabs.find((t) => t.key === tabKey) ?? ALL;
+  const section = tab.sections.find((s) => s.key === sectionKey);
+  const types = section ? section.types : typesOf(tab);
+  const counts = useUnreadCounts(tabs, version);
+
+  const list = useResource(`notifications:${tabKey}:${sectionKey}:${unreadOnly}:${page}:${version}`, () =>
+    notificationService.listByTypes(types, page, PAGE_SIZE, unreadOnly),
+  );
+
+  const rows = list.data?.data ?? [];
+  const totalItems = list.data?.meta?.totalItems ?? 0;
+  const totalPages = Math.max(1, list.data?.meta?.totalPages ?? Math.ceil(totalItems / PAGE_SIZE) ?? 1);
+  const totalUnreadAll = counts['all'] ?? 0;
+
+  const choose = (next: string, nextSection: string | null = null) => {
+    setTabKey(next);
+    setSectionKey(nextSection);
+    setPage(1);
+  };
+
+  const open = async (item: AppNotification) => {
+    if (!item.readAt) await notificationService.markRead(item.id);
+    const href = notificationHref(item.link, role, item.payload as { projectId?: string; episodeId?: string });
+    if (href) router.push(href);
+    else setVersion((v) => v + 1);
+  };
+
+  const readAll = async () => {
+    setMarkingAll(true);
+    await notificationService.markAllRead();
+    setMarkingAll(false);
+    setVersion((v) => v + 1);
+  };
+
+  return (
+    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      {/* ── Header Hero Bar ── */}
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card p-6 sm:p-8 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-1.5 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-bold">
+              <span>Trung tâm thông báo</span>
+              {totalUnreadAll > 0 && (
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+              )}
+            </div>
+            <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
+              Thông báo hệ thống
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              Theo dõi kịp thời mọi biến động về ngân sách và chi phí sản xuất, phê duyệt đề xuất, tiến độ gửi phim từ Studio và cảnh báo nền tảng.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <Button
+              size="sm"
+              variant="secondary"
+              disabled={markingAll || totalUnreadAll === 0}
+              onClick={readAll}
+              className="px-4 py-2.5 rounded-2xl text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer border border-slate-200 dark:border-white/10"
+            >
+              <span>{markingAll ? 'Đang cập nhật…' : 'Đánh dấu đã đọc hết'}</span>
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main Filter Bar & Tabs (Clean wrap without horizontal slide) ── */}
+      <div className="space-y-3">
+        {/* Category Tabs: flex-wrap to prevent horizontal sliding */}
+        <div
+          role="tablist"
+          aria-label="Nhóm thông báo"
+          className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/5"
+        >
+          {tabs.map((t) => {
+            const isActive = t.key === tabKey;
+            const unreadCount = counts[t.key] ?? 0;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => choose(t.key)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? 'bg-white dark:bg-sky-500 text-slate-900 dark:text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-transparent'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
+                }`}
+              >
+                <span>{t.label}</span>
+                {unreadCount > 0 && (
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                      isActive
+                        ? 'bg-rose-500 text-white shadow-xs'
+                        : 'bg-rose-500/20 text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Sub-sections Pills (If current tab has multiple sections) */}
+        {tab.sections.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 px-1 pt-1">
+            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mr-1">
+              Lọc theo mục:
+            </span>
+            <button
+              type="button"
+              onClick={() => choose(tab.key, null)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+                sectionKey === null
+                  ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400'
+                  : 'bg-white dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+              }`}
+            >
+              Tất cả mục
+            </button>
+            {tab.sections.map((s) => (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => choose(tab.key, s.key)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
+                  sectionKey === s.key
+                    ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400'
+                    : 'bg-white dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Notification Content Container ── */}
+      <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card shadow-sm overflow-hidden">
+        {/* Table Top Status Bar */}
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-white/[0.01]">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+              {section ? `${tab.label} · ${section.label}` : tab.label}
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              {tab.description} {totalItems > 0 && `(Tổng cộng ${totalItems} thông báo)`}
+            </p>
+          </div>
+
+          <label className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none bg-white dark:bg-white/5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 hover:border-slate-300 transition-colors">
+            <input
+              type="checkbox"
+              checked={unreadOnly}
+              onChange={(e) => {
+                setUnreadOnly(e.target.checked);
+                setPage(1);
+              }}
+              className="w-4 h-4 rounded border-slate-300 dark:border-white/20 accent-sky-500 cursor-pointer"
+            />
+            <span>Chỉ xem chưa đọc</span>
+          </label>
+        </div>
+
+        {/* Body Items List */}
+        <div className="p-4 sm:p-6">
+          {list.error && <ErrorNote message={list.error} onRetry={list.reload} />}
+
+          {list.loading && !list.data && (
+            <div className="py-16 text-center">
+              <Loading />
+            </div>
+          )}
+
+          {list.data && rows.length === 0 && (
+            <div className="py-16 text-center space-y-3">
+              <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                Không có thông báo nào ở mục này
+              </p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
+                Khi có hoạt động mới phát sinh về dự án hoặc giao dịch, các sự kiện sẽ hiển thị ngay tại đây.
+              </p>
+            </div>
+          )}
+
+          {rows.length > 0 && (
+            <div className="space-y-3">
+              {rows.map((item) => (
+                <NotificationCard
+                  key={item.id}
+                  item={item}
+                  href={notificationHref(item.link, role, item.payload as { projectId?: string; episodeId?: string })}
+                  onOpen={() => open(item)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* ── Discrete Paging Controls (Always visible when items exist) ── */}
+          {totalItems > 0 && (
+            <NotificationPager page={page} totalPages={totalPages} totalItems={totalItems} pageSize={PAGE_SIZE} onPage={setPage} />
+          )}
+        </div>
+      </div>
+    </main>
+  );
+}

@@ -1,0 +1,297 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ProjectListPage } from '@/features/production/components/list/ProjectListPage';
+import { ProjectDetailPage } from '@/features/production/components/project/ProjectDetailPage';
+import { signInAs } from '@/tests/support/signIn';
+import { useAppStore } from '@/store/useAppStore';
+import type { ProjectDetail } from '@/types/production';
+import { fakeResponse } from '@/tests/support/fakeResponse';
+
+const nav = vi.hoisted(() => ({ pathname: '/reviewer/projects', params: {} as Record<string, string>, search: '' }));
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  usePathname: () => nav.pathname,
+  useParams: () => nav.params,
+  useSearchParams: () => new URLSearchParams(nav.search),
+}));
+
+const person = (id: string, fullName: string) => ({ id, fullName, email: `${id}@x.vn` });
+
+const STUDIO = {
+  id: 'st1',
+  name: 'Studio Sao Mai',
+  email: 'saomai@studio.vn',
+  contactName: null,
+  phone: null,
+  note: null,
+  isActive: true,
+  createdAt: '2026-10-01T00:00:00.000Z',
+};
+
+function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
+  return {
+    id: 'm1',
+    title: 'Mưa Sài Gòn',
+    ideaDescription: 'Một câu chuyện tình cảm giữa mùa mưa Sài Gòn.',
+    synopsis: null,
+    defaultLanguage: 'vi',
+    ageRating: null,
+    releaseYear: null,
+    freeEpisodeCount: null,
+    status: 'ASSIGNED',
+    posterUrl: null,
+    reviewerId: 'reviewer-id',
+    creatorId: 'creator-id',
+    reviewer: person('reviewer-id', 'Reviewer Một'),
+    creator: person('creator-id', 'Creator Một'),
+    studio: null,
+    cancelReason: null,
+    handedOffAt: null,
+    completedAt: null,
+    cancelledAt: null,
+    createdAt: '2026-10-01T00:00:00.000Z',
+    updatedAt: '2026-10-01T00:00:00.000Z',
+    genres: [{ id: 'g1', name: 'Tình cảm' }],
+    seasons: [
+      {
+        id: 's1',
+        seasonNumber: 1,
+        title: 'Mùa 1',
+        status: 'DRAFT',
+        releaseStartDate: '2027-01-01T00:00:00.000Z',
+        releaseEndDate: '2027-03-31T00:00:00.000Z',
+        episodes: [
+          {
+            id: 'e1',
+            movieId: 'm1',
+            seasonId: 's1',
+            assignedCreatorId: null,
+            assignedCreator: null,
+            episodeNumber: 1,
+            title: 'Cơn mưa đầu',
+            synopsis: null,
+            thumbnailUrl: null,
+            status: 'DRAFT',
+            targetDurationSeconds: 1200,
+            deliveryDeadline: '2026-12-31T00:00:00.000Z',
+            dueDate: null,
+            expectedReleaseDate: '2027-01-15T00:00:00.000Z',
+            approvedMediaAssetId: null,
+            coinPrice: null,
+            finalConfirmedAt: null,
+            finalConfirmedById: null,
+            finalRejectionNote: null,
+            revisionStartedAt: null,
+            createdAt: '2026-10-01T00:00:00.000Z',
+            updatedAt: '2026-10-01T00:00:00.000Z',
+            mediaAssets: [],
+          },
+        ],
+      },
+    ],
+    ideaFiles: [],
+    studioHandoffs: [],
+    creatorAssignments: [],
+    cost: { budgetVnd: 100_000_000, committedVnd: 0, remainingVnd: 100_000_000 },
+    openChangeRequests: 0,
+    revision: { episodeCount: 0, bySeason: [] },
+    ...overrides,
+  };
+}
+
+/** Answers each API path with the given body; anything else is an empty list. */
+function routeFetch(routes: Record<string, unknown>) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string) => {
+      const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
+      const body = path in routes ? routes[path] : [];
+      return fakeResponse(body);
+    }),
+  );
+}
+
+beforeEach(() => {
+  localStorage.clear();
+  useAppStore.setState({ isAuthenticated: false, user: null });
+});
+afterEach(() => vi.unstubAllGlobals());
+
+describe('ProjectListPage', () => {
+  const page = {
+    data: [
+      {
+        id: 'm1',
+        title: 'Mưa Sài Gòn',
+        status: 'IN_PRODUCTION',
+        studio: STUDIO,
+        reviewerId: 'reviewer-id',
+        creatorId: 'creator-id',
+        reviewer: person('reviewer-id', 'Reviewer Một'),
+        creator: person('creator-id', 'Creator Một'),
+        createdAt: '2026-10-01T00:00:00.000Z',
+        updatedAt: '2026-10-01T00:00:00.000Z',
+        lastActivityAt: '2026-10-14T08:30:00.000Z',
+        _count: { episodes: 8 },
+      },
+    ],
+    meta: { totalItems: 1, currentPage: 1, totalPages: 1, itemsPerPage: 12 },
+  };
+
+  it('shows the projects and lets the Admin create one', async () => {
+    nav.pathname = '/admin/projects';
+    signInAs('admin');
+    routeFetch({ '/projects': page });
+    render(<ProjectListPage />);
+
+    // The analytics chart names the project too; the card is the one in the list.
+    const titles = await screen.findAllByText('Mưa Sài Gòn');
+    const card = titles.map((title) => title.closest('li')).find(Boolean)!;
+    expect(within(card).getByText('Studio đang sản xuất')).toBeInTheDocument();
+    expect(within(card).getByText('Studio Sao Mai')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Tạo dự án/ })).toBeInTheDocument();
+  });
+
+  it('shows when each project last changed, with a tooltip explaining the column', async () => {
+    nav.pathname = '/reviewer/projects';
+    signInAs('reviewer');
+    routeFetch({ '/projects': page });
+    render(<ProjectListPage />);
+
+    await screen.findAllByText('Mưa Sài Gòn');
+    await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
+    await userEvent.click(screen.getByRole('button', { name: 'Xem dạng bảng' }));
+    const header = screen.getByRole('columnheader', { name: 'Cập nhật lần cuối' });
+    expect(header).toHaveAttribute('title', expect.stringContaining('thay đổi gần nhất'));
+    // The newest content event (14/10), not the project's own update time (01/10).
+    expect(screen.getByText(/14\/10\/26/)).toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: 'Cập nhật' })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['/creator/projects', 'creator'],
+    ['/reviewer/projects', 'reviewer'],
+  ] as const)('gives %s no create button: only the Admin creates projects', async (path, role) => {
+    nav.pathname = path;
+    signInAs(role);
+    routeFetch({ '/projects': page });
+    render(<ProjectListPage />);
+
+    await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
+    expect(screen.queryByRole('button', { name: /Tạo dự án/ })).not.toBeInTheDocument();
+  });
+});
+
+describe('ProjectDetailPage', () => {
+  it('hides Studio, Cost, and Contract tabs from Creator per MF-1 and BE role matrix', async () => {
+    nav.pathname = '/creator/projects/m1';
+    nav.params = { projectId: 'm1' };
+    nav.search = 'tab=studio';
+    signInAs('creator');
+    useAppStore.setState((s) => ({ user: { ...s.user!, id: 'creator-id' } }));
+    routeFetch({ '/projects/m1': project(), '/projects/m1/idea-files': [], '/projects/m1/notes': [] });
+    render(<ProjectDetailPage />);
+
+    await screen.findByRole('tab', { name: 'Kịch bản' });
+    expect(screen.queryByRole('tab', { name: 'Studio' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Chi phí sản xuất' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Hợp đồng' })).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Tổng quan & Ý tưởng' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('shows Studio and Cost to Reviewer without exposing Admin-only Contract negotiation', async () => {
+    nav.pathname = '/reviewer/projects/m1';
+    nav.params = { projectId: 'm1' };
+    nav.search = 'tab=studio';
+    signInAs('reviewer');
+    routeFetch({ '/projects/m1': project(), '/projects/m1/handoffs': [] });
+    render(<ProjectDetailPage />);
+
+    expect(await screen.findByText(/Hợp đồng ký đủ hai bên thì hệ thống tự bàn giao cho Studio/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Bàn giao cho Studio/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Chi phí sản xuất' })).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Hợp đồng' })).not.toBeInTheDocument();
+    const tiers = screen.getByLabelText('Trạng thái dự án, mùa và tập');
+    expect(tiers).toHaveTextContent('Dự án');
+    // The sample season has a single episode: it reads as a whole film.
+    expect(tiers).toHaveTextContent('Phần 1 (trọn bộ)');
+  });
+
+  it('shows the season window, price and, per episode, Creator, prices and expected release date', async () => {
+    nav.pathname = '/reviewer/projects/m1';
+    nav.params = { projectId: 'm1' };
+    nav.search = 'tab=episodes';
+    signInAs('reviewer');
+    useAppStore.setState((s) => ({ user: { ...s.user!, id: 'reviewer-id' } }));
+    routeFetch({ '/projects/m1': project(), '/projects/m1/creators': [] });
+    render(<ProjectDetailPage />);
+
+    const season = await screen.findByRole('region', { name: 'Phần 1 (trọn bộ)' });
+    expect(season).toHaveTextContent('01/01/2027 → 31/03/2027');
+    expect(season).not.toHaveTextContent('Token');
+    expect(within(season).getByRole('columnheader', { name: 'Creator phụ trách' })).toBeInTheDocument();
+    expect(within(season).getByRole('columnheader', { name: 'Giá bán (Coin)' })).toBeInTheDocument();
+    expect(within(season).getByRole('columnheader', { name: 'Ngày dự kiến phát hành' })).toBeInTheDocument();
+    expect(within(season).queryByRole('columnheader', { name: 'Thời hạn' })).not.toBeInTheDocument();
+    expect(within(season).getByText('15/01/2027')).toBeInTheDocument();
+  });
+
+  it('lets the Admin reassign the Creator and decide requests, cancel before publish, but not edit directly (BR-55)', async () => {
+    nav.pathname = '/reviewer/projects/m1';
+    nav.params = { projectId: 'm1' };
+    nav.search = '';
+    signInAs('admin');
+    routeFetch({ '/projects/m1': project(), '/projects/m1/change-requests': [] });
+    render(<ProjectDetailPage />);
+
+    await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
+    expect(screen.getByRole('button', { name: /Huỷ dự án/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Đổi Creator/ })).toBeEnabled();
+
+    expect(screen.getByRole('tab', { name: 'Studio' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Chi phí sản xuất' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Hợp đồng' })).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('tab', { name: /Đề xuất chỉnh sửa/ }));
+    expect(await screen.findByText('Chưa có đề xuất nào.')).toBeInTheDocument();
+    // The Admin decides requests; the form to send one is for the Reviewer and the Creators.
+    expect(screen.queryByRole('button', { name: /Gửi đề xuất/ })).not.toBeInTheDocument();
+  });
+
+  it('lets the Reviewer in charge and a Creator of the team send the Admin a request', async () => {
+    nav.pathname = '/reviewer/projects/m1';
+    nav.params = { projectId: 'm1' };
+    nav.search = 'tab=changes';
+    signInAs('reviewer');
+    useAppStore.setState((s) => ({ user: { ...s.user!, id: 'reviewer-id' } }));
+    routeFetch({ '/projects/m1': project(), '/projects/m1/change-requests': [] });
+    const { unmount } = render(<ProjectDetailPage />);
+    expect(await screen.findByRole('button', { name: /Gửi đề xuất/ })).toBeDisabled();
+    unmount();
+
+    nav.pathname = '/creator/projects/m1';
+    signInAs('creator');
+    useAppStore.setState((s) => ({ user: { ...s.user!, id: 'second-id' } }));
+    routeFetch({
+      '/projects/m1': project({ creatorAssignments: [{ creatorId: 'second-id' } as never] }),
+      '/projects/m1/change-requests': [],
+    });
+    render(<ProjectDetailPage />);
+    expect(await screen.findByRole('button', { name: /Gửi đề xuất/ })).toBeInTheDocument();
+  });
+
+  it('prevents the Reviewer in charge from cancelling, leaving cancel to the Admin', async () => {
+    nav.pathname = '/reviewer/projects/m1';
+    nav.params = { projectId: 'm1' };
+    nav.search = '';
+    signInAs('reviewer');
+    useAppStore.setState((s) => ({ user: { ...s.user!, id: 'reviewer-id' } }));
+    routeFetch({ '/projects/m1': project() });
+    render(<ProjectDetailPage />);
+
+    expect(screen.queryByRole('button', { name: /Huỷ dự án/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Đổi Creator/ })).not.toBeInTheDocument();
+  });
+});
