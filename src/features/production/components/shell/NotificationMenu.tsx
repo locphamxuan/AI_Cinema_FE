@@ -8,6 +8,7 @@ import { useAppStore } from '@/store/useAppStore';
 import type { AppNotification } from '@/types/production';
 import { formatDateTime } from '@/lib/format';
 import { notificationHref } from '../../lib/routes';
+import { homeAreaOf } from '@/lib/permissions';
 
 const POLL_MS = 60_000;
 /** Notifications the bell lists; the full list is on the notifications page. */
@@ -96,7 +97,7 @@ export function NotificationMenu() {
               type="button"
               onClick={() => {
                 setOpen(false);
-                router.push(`/${role === 'creator' ? 'creator' : role === 'admin' ? 'admin' : 'reviewer'}/notifications`);
+                router.push(`/${homeAreaOf(role) ?? 'reviewer'}/notifications`);
               }}
               className="text-[11px] font-medium text-slate-500 hover:text-sky-700 hover:underline cursor-pointer"
             >

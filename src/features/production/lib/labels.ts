@@ -167,7 +167,7 @@ export const MATERIAL_KIND: Record<HandoffMaterialKind, string> = {
 
 export const PRICE_ALERT_STATUS: Record<PriceAlertStatus, Label> = {
   OPEN: { label: 'Mới', tone: 'amber' },
-  CHANGE_REQUESTED: { label: 'Đã yêu cầu đổi giá', tone: 'blue' },
+  CHANGE_REQUESTED: { label: 'Đã hỏi ý kiến Reviewer', tone: 'blue' },
   RESOLVED: { label: 'Đã xử lý', tone: 'emerald' },
 };
 
@@ -262,6 +262,12 @@ export const NOTIFICATION_TYPE_LABEL: Record<string, string> = {
   SCRIPT_UPDATED: 'Kịch bản',
   CONTRACT_UPDATED: 'Hợp đồng',
   STUDIO_SELECTED: 'Chọn Studio',
+  CHANGE_REQUESTED: 'Đề xuất mới',
+  CHANGE_RESOLVED: 'Trả lời đề xuất',
+  EPISODE_RELEASE_FAILED: 'Phát hành lỗi',
+  SUPPORT_CASE_ESCALATED: 'AI chuyển nhân viên',
+  SUPPORT_CASE_ASSIGNED: 'Case được giao',
+  SUPPORT_MEMBER_REPLIED: 'Member trả lời',
   FINAL_FILM_CONFIRMED: 'Phim Final chờ duyệt',
   FINAL_FILM_REJECTED: 'Phim Final bị trả lại',
   AI_LABEL_APPLIED: 'Đã gắn nhãn AI',

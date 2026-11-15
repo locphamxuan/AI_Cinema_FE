@@ -39,6 +39,9 @@ export function notificationHref(
     return null;
   }
   if (link.startsWith('/admin/price-alerts')) return '/admin/settings?tab=price-alerts';
+  // MF-5: a support case opens in the support desk of the account's own area.
+  const supportCase = /^\/admin\/support\/conversations\/([^/?#]+)/.exec(link);
+  if (supportCase) return `${role === 'admin' ? '/admin/support' : '/staff'}?case=${supportCase[1]}`;
   if (link === '/contracts' || link.startsWith('/contracts')) {
     return payload?.projectId ? productionPaths.project(base, payload.projectId, 'contract') : `${base}/projects`;
   }
