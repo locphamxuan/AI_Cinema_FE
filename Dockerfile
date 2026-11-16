@@ -32,7 +32,7 @@ ENV NODE_ENV=production \
     NEXT_OUTPUT=standalone
 
 # Defaults mirror .env.example; override them for the environment being built.
-ARG BACKEND_URL=http://api:3001
+ARG BACKEND_URL=http://localhost:3001
 ARG NEXT_PUBLIC_API_URL=/api
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=
 ARG NEXT_PUBLIC_STUDIO_WEB_URL=http://localhost:3100/login
