@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ChangeRequestInbox } from '@/features/admin/components/ChangeRequestInbox';
 import { DashboardHeader } from '@/features/production/components/shell/DashboardHeader';
@@ -56,6 +56,30 @@ describe('StudiosPage (BR-59)', () => {
     expect(calls.some((c) => c.method === 'POST' && c.path === '/studios')).toBe(true);
   });
 
+  it('asks before deleting or deactivating a studio, and pages a long catalog', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
+    const many = Array.from({ length: 16 }, (_, i) => studio({ id: `s${i}`, name: `Studio ${String(i).padStart(2, '0')}`, email: `s${i}@x.vn` }));
+    const calls = routeFetch({ '/studios': many, '/studios/s0': {} });
+    render(<StudiosPage />);
+
+    await screen.findByText('Studio 00');
+    expect(screen.queryByText('Studio 15')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Xoá Studio 00' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(calls.some((c) => c.method === 'DELETE')).toBe(false);
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Xoá Studio' }));
+    await waitFor(() => expect(calls.some((c) => c.method === 'DELETE' && c.path === '/studios/s0')).toBe(true));
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Ngừng dùng' })[0]);
+    expect(calls.some((c) => c.method === 'PATCH')).toBe(false);
+    expect(await screen.findByRole('dialog')).toHaveTextContent('không được chọn cho dự án mới');
+
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Huỷ' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Trang 2' }));
+    expect(await screen.findByText('Studio 15')).toBeInTheDocument();
+  });
+
   it('shows the catalog read-only to Reviewer or an account that cannot manage it', async () => {
     nav.pathname = '/reviewer/studios';
     signInAs('reviewer');
@@ -99,7 +123,9 @@ describe('ChangeRequestInbox (BR-55)', () => {
     expect(calls[0]).toMatchObject({ path: '/change-requests', method: 'GET' });
 
     await userEvent.click(screen.getByRole('button', { name: /Duyệt/ }));
-    expect(calls.some((c) => c.method === 'POST' && c.path === '/change-requests/cr1/approve')).toBe(true);
+    expect(calls.some((c) => c.path === '/change-requests/cr1/approve')).toBe(false);
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Duyệt đề xuất' }));
+    await waitFor(() => expect(calls.some((c) => c.method === 'POST' && c.path === '/change-requests/cr1/approve')).toBe(true));
   });
 
   it('asks for a reason before rejecting', async () => {

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { KeyRound, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -14,6 +14,10 @@ import { studioService } from '@/services/studioService';
 import type { Studio } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
+import { Pager, pageOf } from '@/components/data/Pager';
+
+const PAGE_SIZE = 15;
 import { CARD, Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { StudioAccountsModal } from './StudioAccountsModal';
 import { StudioModal } from './StudioModal';
@@ -32,11 +36,15 @@ export function StudiosPage() {
   const studios = useResource('studios:all', () => studioService.list());
   const [editing, setEditing] = useState<Studio | 'new' | null>(null);
   const [busyProjects, setBusyProjects] = useState<{ studioName: string; projects: { id: string; title: string }[] } | null>(null);
+  const [asking, setAsking] = useState<{ studio: Studio; action: 'deactivate' | 'remove' } | null>(null);
+  const [page, setPage] = useState(1);
   const { busy, run } = useAction();
+  const { rows, totalPages } = pageOf(studios.data ?? [], page, PAGE_SIZE);
 
   const toggle = async (studio: Studio) => {
     const nextActive = !studio.isActive;
     const res = await studioService.update(studio.id, { isActive: nextActive });
+    setAsking(null);
     if (res.success) {
       toast.success(nextActive ? 'Đã dùng lại Studio' : 'Đã ngừng dùng Studio');
       await studios.reload();
@@ -50,7 +58,10 @@ export function StudiosPage() {
     toast.error('Không cập nhật được trạng thái Studio', res.message || 'Lỗi hệ thống');
   };
   const remove = async (studio: Studio) => {
-    if (await run(() => studioService.remove(studio.id), 'Đã xoá Studio')) await studios.reload();
+    if (await run(() => studioService.remove(studio.id), 'Đã xoá Studio')) {
+      setAsking(null);
+      await studios.reload();
+    }
   };
 
   return (
@@ -89,7 +100,7 @@ export function StudiosPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-                {studios.data.map((studio) => {
+                {rows.map((studio) => {
                   const used = (studio._count?.projects ?? 0) + (studio._count?.handoffs ?? 0) > 0;
                   return (
                     <tr key={studio.id}>
@@ -111,7 +122,7 @@ export function StudiosPage() {
                       <td className="px-4 py-3 text-right whitespace-nowrap">
                         {manageAccounts && (
                           <Button size="sm" variant="ghost" onClick={() => setAccountsOf(studio)} aria-label={`Tài khoản của ${studio.name}`}>
-                            <KeyRound className="w-3.5 h-3.5" /> Tài khoản
+                            Tài khoản
                           </Button>
                         )}
                         {manage && (
@@ -119,11 +130,11 @@ export function StudiosPage() {
                             <Button size="sm" variant="ghost" onClick={() => setEditing(studio)} aria-label={`Sửa ${studio.name}`}>
                               <Pencil className="w-3.5 h-3.5" />
                             </Button>
-                            <Button size="sm" variant="ghost" disabled={busy} onClick={() => toggle(studio)}>
+                            <Button size="sm" variant="ghost" disabled={busy} onClick={() => (studio.isActive ? setAsking({ studio, action: 'deactivate' }) : void toggle(studio))}>
                               {studio.isActive ? 'Ngừng dùng' : 'Dùng lại'}
                             </Button>
                             {!used && (
-                              <Button size="sm" variant="ghost" disabled={busy} onClick={() => remove(studio)} aria-label={`Xoá ${studio.name}`}>
+                              <Button size="sm" variant="ghost" disabled={busy} onClick={() => setAsking({ studio, action: 'remove' })} aria-label={`Xoá ${studio.name}`}>
                                 <Trash2 className="w-3.5 h-3.5 text-red-500" />
                               </Button>
                             )}
@@ -138,6 +149,22 @@ export function StudiosPage() {
           )}
         </div>
       )}
+      <Pager page={page} totalPages={totalPages} onChange={setPage} />
+
+      <ConfirmModal
+        open={!!asking}
+        title={asking?.action === 'remove' ? 'Xoá Studio' : 'Ngừng dùng Studio'}
+        description={
+          asking?.action === 'remove'
+            ? `Xoá ${asking.studio.name} khỏi danh mục. Chỉ xoá được Studio chưa từng nhận dự án; không hoàn tác được.`
+            : `${asking?.studio.name ?? ''} không được chọn cho dự án mới nữa. Có thể dùng lại sau.`
+        }
+        confirmLabel={asking?.action === 'remove' ? 'Xoá Studio' : 'Ngừng dùng'}
+        danger
+        busy={busy}
+        onClose={() => setAsking(null)}
+        onConfirm={() => asking && void (asking.action === 'remove' ? remove(asking.studio) : toggle(asking.studio))}
+      />
 
       {accountsOf && <StudioAccountsModal studio={accountsOf} onClose={() => setAccountsOf(null)} />}
       {editing && <StudioModal studio={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSaved={studios.reload} />}
@@ -160,7 +187,7 @@ export function StudiosPage() {
                     href={`/admin/projects/${p.id}?tab=studio`}
                     className="text-xs font-semibold text-sky-600 hover:underline shrink-0"
                   >
-                    Đổi Studio &rarr;
+                    Đổi Studio
                   </Link>
                 </li>
               ))}

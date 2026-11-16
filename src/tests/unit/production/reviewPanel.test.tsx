@@ -53,6 +53,7 @@ describe('ReviewPanel - the review sheet', () => {
     const onChanged = renderPanel(sheet('IN_REVIEW'));
 
     await userEvent.click(screen.getByRole('button', { name: 'Duyệt' }));
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Duyệt bản này' }));
 
     await waitFor(() => expect(onChanged).toHaveBeenCalled());
     expect(bodyOf(calls, '/media-assets/a1/reviews')).toMatchObject({ decision: 'APPROVED' });
@@ -103,6 +104,7 @@ describe('ReviewPanel - the review sheet', () => {
     const onChanged = renderPanel(sheet('IN_REVIEW'));
 
     await userEvent.click(screen.getByRole('button', { name: 'Duyệt' }));
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Duyệt bản này' }));
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('IN_REVIEW')));
     expect(onChanged).not.toHaveBeenCalled();
