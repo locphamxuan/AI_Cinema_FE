@@ -161,6 +161,7 @@ describe('ContractTab', () => {
     expect(await screen.findByRole('button', { name: 'Bản Studio đã ký' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Đồng ý/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/Ngân sách còn lại/)).not.toBeInTheDocument();
+    expect(screen.getByText('150.000.000 ₫')).toBeInTheDocument();
   });
 
   it('shows a Creator the rounds only: no PDF request, which the backend refuses them', async () => {
@@ -171,6 +172,9 @@ describe('ContractTab', () => {
     await screen.findByText(/Hợp đồng với Studio Lumen Studio/);
     expect(calls.some((c) => c.path === '/contracts/c1/documents')).toBe(false);
     expect(screen.queryByRole('button', { name: 'Bản Studio đã ký' })).not.toBeInTheDocument();
+    // A Creator never sees production costs, so the round shows no price.
+    expect(screen.queryByText(/Studio báo giá/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/150\.000\.000/)).not.toBeInTheDocument();
   });
 
   it('explains an invalid counter-offer under the price field', async () => {

@@ -20,6 +20,7 @@ export function ContractCard({
   contract: c,
   canDecide = false,
   canDownload = false,
+  showCost = true,
   onChanged,
 }: {
   contract: Contract;
@@ -27,6 +28,8 @@ export function ContractCard({
   canDecide?: boolean;
   /** Admin and Reviewer may download the signed PDFs (BE CONTRACT_DOCUMENT_READ). */
   canDownload?: boolean;
+  /** The cost of a round; hidden from Creators, who never see production costs. */
+  showCost?: boolean;
   onChanged?: () => Promise<unknown>;
 }) {
   const [countering, setCountering] = useState(false);
@@ -79,7 +82,7 @@ export function ContractCard({
         </p>
         <StatusPill {...CONTRACT_STATUS[c.status]} />
       </div>
-      {c.costVnd !== null && (
+      {showCost && c.costVnd !== null && (
         <p>
           Chi phí {c.proposedBy === 'ADMIN' ? 'Admin đề xuất' : 'Studio báo giá'}:{' '}
           <span className="font-semibold text-slate-800 dark:text-slate-100">{formatVnd(c.costVnd)}</span>

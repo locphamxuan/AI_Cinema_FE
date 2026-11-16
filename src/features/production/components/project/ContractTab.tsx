@@ -62,6 +62,7 @@ export function ContractTab() {
                 contract={c}
                 canDecide={caps.contractManage}
                 canDownload={caps.contractDocuments}
+                showCost={caps.contractManage || caps.costRequest || caps.contractDocuments}
                 onChanged={changed}
               />
             ))}
