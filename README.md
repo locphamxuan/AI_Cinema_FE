@@ -16,6 +16,30 @@ npm run dev                  # http://localhost:3000
 
 Sign in as an Admin, Reviewer, Creator or Staff account to reach `/admin`, `/reviewer`, `/creator` or `/staff`.
 
+## Docker
+
+`Dockerfile` builds the app with `output: "standalone"` and serves it with `node server.js` — no npm,
+no devDependencies. `docker-compose.yml` runs that image and points it at the backend on the host
+(`host.docker.internal:3001`, plus `host-gateway` so Linux works too).
+
+```bash
+docker compose up -d --build   # http://localhost:3000
+docker compose down
+```
+
+Start `AI_Cinema_BE` first (`docker compose up -d --build` there publishes port 3001). Without the
+backend the pages load, but `/api/*` answers 500. To use the backend's Docker network instead, set
+`DOCKER_BACKEND_URL=http://api:3001` and attach the service to `ai-cinema_default`.
+
+`BACKEND_URL` (the `/api` rewrite in `next.config.ts`) and every `NEXT_PUBLIC_*` value are inlined by
+`next build`, so they are build args, not runtime env: after changing them, rebuild the image — a
+restart keeps the old values. Without compose:
+
+```bash
+docker build --build-arg BACKEND_URL=http://host.docker.internal:3001 -t ai-cinema-web .
+docker run --rm -p 3000:3000 --add-host=host.docker.internal:host-gateway ai-cinema-web
+```
+
 ## Tests
 
 ```bash

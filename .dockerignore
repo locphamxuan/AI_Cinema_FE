@@ -1,0 +1,43 @@
+# Build context for the Next.js image (Dockerfile). Keep only what `next build` reads.
+node_modules
+.next
+out
+build
+coverage
+
+# Secrets and machine-specific env. Next loads .env* automatically, and the compose file passes the
+# needed values as build args instead; compose still reads .env from the host for those args.
+.env
+.env.*
+!.env.example
+
+# Local media/uploads if any, and logs.
+*.log
+npm-debug.log*
+
+# Repo metadata, docs and agent tooling.
+.git
+.github
+.claude
+.claude-tools
+.claude-mem
+.agents
+.agent
+.codegraph
+.vercel
+TESTING.md
+CLAUDE.md
+AGENTS.md
+README.md
+vitest.config.mts
+
+# Editor and OS noise.
+.vscode
+.idea
+.DS_Store
+*.pem
+
+# Docker files are read by the daemon, not copied into the image.
+Dockerfile*
+docker-compose*.yml
+.dockerignore
