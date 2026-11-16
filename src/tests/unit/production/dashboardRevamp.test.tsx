@@ -135,6 +135,13 @@ describe('CostRequestInbox', () => {
     expect(screen.queryByRole('button', { name: 'Cấp' })).not.toBeInTheDocument();
   });
 
+  it('steps back to the last page that still has requests', async () => {
+    signInAs('admin');
+    const calls = routeFetch({ '/cost-requests': { data: [], meta: { page: 3, limit: 20, total: 40, totalPages: 2 } } });
+    render(<CostRequestInbox />);
+    await waitFor(() => expect(calls.some((c) => c.path === '/cost-requests' && c.search.get('page') === '2')).toBe(true));
+  });
+
   it('pages through the inbox 20 requests at a time', async () => {
     signInAs('admin');
     const calls = routeFetch({

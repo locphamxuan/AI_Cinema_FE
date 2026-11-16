@@ -26,6 +26,8 @@ export function CostRequestInbox() {
     costRequestService.list(page, PAGE_SIZE, filter === 'ALL' ? undefined : filter),
   );
   const meta = requests.data?.meta;
+  // Deciding the last request of the last page leaves it empty: step back to the page that still exists.
+  if (meta && meta.totalPages >= 1 && meta.page > meta.totalPages && page !== meta.totalPages) setPage(meta.totalPages);
 
   return (
     <Panel
