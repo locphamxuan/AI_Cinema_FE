@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -79,6 +80,7 @@ export function CoinLedgerPanel() {
                   <td className="py-2 text-right">
                     {canWallet && (
                       <Button size="sm" variant="ghost" aria-label="Xem ví của tài khoản này" onClick={() => setWalletOf(line.userId)}>
+                        <Wallet className="w-3.5 h-3.5" aria-hidden="true" />
                       </Button>
                     )}
                   </td>

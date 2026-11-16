@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { BadgeDollarSign, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -82,6 +82,7 @@ export function PlansPanel() {
                     </Button>
                     {canPrice && !plan.isFree && (
                       <Button size="sm" variant="ghost" aria-label={`Đặt giá ${plan.name}`} onClick={() => setDialog({ mode: 'price', plan })}>
+                        <BadgeDollarSign className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" />
                       </Button>
                     )}
                   </td>
