@@ -109,6 +109,8 @@ describe('Risk flags tab', () => {
 
     expect(await screen.findByText('Nguyễn An')).toBeInTheDocument();
     expect(screen.getByText('6.000.000 VND')).toBeInTheDocument();
+    // An icon-only control keeps its icon, so it is never an empty box.
+    expect(screen.getByRole('button', { name: 'Mở ví của Nguyễn An' }).querySelector('svg')).not.toBeNull();
     const list = calls.find((c) => c.path === '/admin/finance/risk/flags')!;
     expect(list.search.get('filter.status')).toBe('$eq:OPEN');
     expect(list.search.get('sortBy')).toBe('createdAt:DESC');

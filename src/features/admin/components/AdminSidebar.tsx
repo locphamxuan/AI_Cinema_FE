@@ -2,26 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Bell,
-  Bot,
-  Building2,
-  Clapperboard,
-  CreditCard,
-  Film,
-  Gift,
-  Headphones,
-  Inbox,
-  KeyRound,
-  Landmark,
-  LayoutDashboard,
-  Megaphone,
-  Receipt,
-  Rocket,
-  Scale,
-  Settings,
-  type LucideIcon,
-} from 'lucide-react';
+import { Film } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { useAppStore } from '@/store/useAppStore';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
@@ -29,7 +10,6 @@ import { PERMISSION, type PermissionKey } from '@/lib/permissions';
 interface NavItem {
   href: string;
   label: string;
-  icon: LucideIcon;
   /** Shown only to accounts holding it; none = every Admin. */
   permission?: PermissionKey;
   /** Active on this exact path only (the overview), not on its sub-pages. */
@@ -40,32 +20,32 @@ const GROUPS: { label: string; items: NavItem[] }[] = [
   {
     label: 'Dự án & sản xuất',
     items: [
-      { href: '/admin', label: 'Tổng quan dự án', icon: LayoutDashboard, exact: true },
-      { href: '/admin/projects', label: 'Dự án phim', icon: Clapperboard },
-      { href: '/admin/studios', label: 'Studio đối tác', icon: Building2, permission: PERMISSION.STUDIO_MANAGE },
-      { href: '/admin/requests', label: 'Duyệt yêu cầu', icon: Inbox },
-      { href: '/admin/movies', label: 'Quản lý phim', icon: Rocket },
+      { href: '/admin', label: 'Tổng quan dự án', exact: true },
+      { href: '/admin/projects', label: 'Dự án phim' },
+      { href: '/admin/studios', label: 'Studio đối tác', permission: PERMISSION.STUDIO_MANAGE },
+      { href: '/admin/requests', label: 'Duyệt yêu cầu' },
+      { href: '/admin/movies', label: 'Quản lý phim' },
     ],
   },
   {
     label: 'Tài chính & người dùng',
     items: [
-      { href: '/admin/finance', label: 'Tài chính', icon: Landmark, permission: PERMISSION.FINANCE_REPORT_READ },
-      { href: '/admin/membership-plans', label: 'Gói thành viên & Doanh thu', icon: CreditCard },
-      { href: '/admin/coin-transactions', label: 'Giao dịch Coin', icon: Receipt },
-      { href: '/admin/rewards', label: 'Điểm danh & vòng quay', icon: Gift },
-      { href: '/admin/permissions', label: 'Tài khoản & Phân quyền', icon: KeyRound },
+      { href: '/admin/finance', label: 'Tài chính', permission: PERMISSION.FINANCE_REPORT_READ },
+      { href: '/admin/membership-plans', label: 'Gói thành viên & Doanh thu' },
+      { href: '/admin/coin-transactions', label: 'Giao dịch Coin' },
+      { href: '/admin/rewards', label: 'Điểm danh & vòng quay' },
+      { href: '/admin/permissions', label: 'Tài khoản & Phân quyền' },
     ],
   },
   {
     label: 'Vận hành',
     items: [
-      { href: '/admin/support', label: 'Hỗ trợ khách hàng', icon: Headphones, permission: PERMISSION.SUPPORT_CASE_READ },
-      { href: '/admin/support/ai', label: 'Chatbox AI', icon: Bot, permission: PERMISSION.SUPPORT_KNOWLEDGE_MANAGE },
-      { href: '/admin/ads', label: 'Quảng cáo', icon: Megaphone, permission: PERMISSION.AD_MANAGE },
-      { href: '/admin/policies', label: 'Chính sách', icon: Scale, permission: PERMISSION.PLATFORM_SETTINGS_MANAGE },
-      { href: '/admin/notifications', label: 'Thông báo', icon: Bell },
-      { href: '/admin/settings', label: 'Cài đặt nền tảng', icon: Settings },
+      { href: '/admin/support', label: 'Hỗ trợ khách hàng', permission: PERMISSION.SUPPORT_CASE_READ },
+      { href: '/admin/support/ai', label: 'Chatbox AI', permission: PERMISSION.SUPPORT_KNOWLEDGE_MANAGE },
+      { href: '/admin/ads', label: 'Quảng cáo', permission: PERMISSION.AD_MANAGE },
+      { href: '/admin/policies', label: 'Chính sách', permission: PERMISSION.PLATFORM_SETTINGS_MANAGE },
+      { href: '/admin/notifications', label: 'Thông báo' },
+      { href: '/admin/settings', label: 'Cài đặt nền tảng' },
     ],
   },
 ];
@@ -107,7 +87,7 @@ export function AdminSidebar() {
           return (
             <div key={group.label} className={`space-y-1 ${index ? 'border-t border-slate-200 pt-2 dark:border-white/[0.06]' : ''}`}>
               <p className="px-2 pb-0.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">{group.label}</p>
-              {items.map(({ href, label, icon: Icon }) => {
+              {items.map(({ href, label }) => {
                 const isActive = active === href;
                 return (
                   <Link
@@ -120,7 +100,6 @@ export function AdminSidebar() {
                         : 'font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/[0.05] dark:hover:text-white'
                     }`}
                   >
-                    <Icon className={`size-4 shrink-0 ${isActive ? '' : 'text-slate-500 dark:text-slate-400'}`} aria-hidden="true" />
                     <span className="truncate">{label}</span>
                   </Link>
                 );

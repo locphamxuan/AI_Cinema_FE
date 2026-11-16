@@ -28,6 +28,8 @@ describe('FinalFilmPanel', () => {
     render(panel(episode(), { canConfirm: true }, onChanged));
 
     await userEvent.click(screen.getByRole('button', { name: 'Xác nhận Phim Final' }));
+    expect(calls).toHaveLength(0);
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xác nhận Phim Final' }));
     await waitFor(() => expect(onChanged).toHaveBeenCalled());
     expect(calls.some((c) => c.path === '/episodes/e1/final-confirmation' && c.method === 'POST')).toBe(true);
   });
@@ -120,6 +122,10 @@ describe('ContractTab', () => {
     expect(sign).toBeDisabled();
     const file = await attachPdf(document.body, /PDF Admin đã ký/);
     await userEvent.click(sign);
+    // Signing completes the contract and hands the project off: it asks once first.
+    const dialog = await screen.findByRole('dialog');
+    expect(calls.some((c) => c.path === '/contracts/c1/sign')).toBe(false);
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Đồng ý & ký' }));
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/contracts/c1/sign' && c.method === 'POST');
       expect(formOf(sent!.body).get('file')).toBe(file);
@@ -144,13 +150,41 @@ describe('ContractTab', () => {
     });
   });
 
-  it('shows the Reviewer the negotiation without any decision', async () => {
+  const doc = { id: 'd1', side: 'STUDIO', fileName: 'studio.pdf', sizeBytes: 10, checksum: 'x', uploadedAt: '2026-11-04T00:00:00.000Z' };
+
+  it('shows the Reviewer the negotiation and the signed PDFs, without any decision', async () => {
     signInAs('reviewer');
-    routeFetch({ '/projects/m1/contracts': [round] });
+    routeFetch({ '/projects/m1/contracts': [round], '/contracts/c1/documents': [doc] });
     render(withProject(assignedProject(), <ContractTab />));
 
     await screen.findByText(/Hợp đồng với Studio Lumen Studio/);
+    expect(await screen.findByRole('button', { name: 'Bản Studio đã ký' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Đồng ý/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Ngân sách còn lại/)).not.toBeInTheDocument();
+    expect(screen.getByText('150.000.000 ₫')).toBeInTheDocument();
+  });
+
+  it('shows a Creator the rounds only: no PDF request, which the backend refuses them', async () => {
+    signInAs('creator');
+    const calls = routeFetch({ '/projects/m1/contracts': [round], '/contracts/c1/documents': [doc] });
+    render(withProject(assignedProject(), <ContractTab />));
+
+    await screen.findByText(/Hợp đồng với Studio Lumen Studio/);
+    expect(calls.some((c) => c.path === '/contracts/c1/documents')).toBe(false);
+    expect(screen.queryByRole('button', { name: 'Bản Studio đã ký' })).not.toBeInTheDocument();
+    // A Creator never sees production costs, so the round shows no price.
+    expect(screen.queryByText(/Studio báo giá/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/150\.000\.000/)).not.toBeInTheDocument();
+  });
+
+  it('explains an invalid counter-offer under the price field', async () => {
+    signInAs('admin');
+    routeFetch({ '/projects/m1/contracts': [round] });
+    render(withProject(assignedProject(), <ContractTab />));
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Đề xuất giá khác' }));
+    await userEvent.type(screen.getByLabelText('Giá mới'), '1500');
+    expect(screen.getByRole('alert')).toHaveTextContent(/số tiền dương/);
   });
 
   it('explains that the template goes out with the Final Script, and resends it only then', async () => {

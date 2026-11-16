@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Building2, FileSignature, Film, Rocket, ShieldCheck } from 'lucide-react';
 import { useAction } from '@/hooks/useAction';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { formatVnd } from '@/lib/format';
 import { productionService } from '@/services/productionService';
 import type { AdminPipeline, ContractToSign, ReadyFilm } from '../adminPipeline';
@@ -55,9 +55,6 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
   return (
     <section aria-label="Ký duyệt hợp đồng Studio" className={`${CARD} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-600 dark:text-purple-400 shrink-0">
-          <FileSignature className="w-6 h-6" />
-        </div>
         <div className="space-y-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
             Ký Duyệt Hợp Đồng Studio {items.length > 1 && `(${items.length} hợp đồng chờ)`}
@@ -78,7 +75,7 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
       </div>
       {first && (
         <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white dark:bg-white/[0.06] hover:bg-slate-50 dark:hover:bg-white/[0.1] text-slate-900 dark:text-white border border-slate-300 dark:border-white/15 text-xs font-semibold cursor-pointer transition-all">
-          Xem Báo Giá &amp; Ký <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+          Xem Báo Giá &amp; Ký
         </button>
       )}
     </section>
@@ -87,8 +84,12 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
 
 function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: ReadyFilm; onPublished: () => Promise<void> }) {
   const { busy, run } = useAction();
+  const [confirming, setConfirming] = useState(false);
   const publish = async () => {
-    if (await run(() => productionService.publish(episode.id), `Đã phát hành tập ${episode.episodeNumber}`)) await onPublished();
+    if (await run(() => productionService.publish(episode.id), `Đã phát hành tập ${episode.episodeNumber}`)) {
+      setConfirming(false);
+      await onPublished();
+    }
   };
   return (
     <li className="rounded-2xl bg-white dark:bg-[#111420] border border-slate-200 dark:border-white/[0.08] p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -98,7 +99,7 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
             // eslint-disable-next-line @next/next/no-img-element
             <img src={project.posterUrl} alt={project.title} className="w-full h-full object-cover" />
           ) : (
-            <Film className="w-6 h-6 text-slate-400" aria-hidden="true" />
+            <span className="text-[11px] text-slate-400">Chưa có ảnh</span>
           )}
         </div>
         <div className="space-y-1 min-w-0">
@@ -110,19 +111,28 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
         </div>
       </div>
       <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 text-xs font-bold">
-        <ShieldCheck className="w-3.5 h-3.5" /> Đã gắn nhãn AI & đạt tuân thủ
+        Đã gắn nhãn AI & đạt tuân thủ
       </span>
       <span className="shrink-0 text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-        <Building2 className="w-3.5 h-3.5 text-slate-400" /> {project.studio?.name ?? '-'}
+        {project.studio?.name ?? '-'}
       </span>
       <div className="shrink-0 flex flex-wrap gap-2">
         <Link href={`/admin/projects/${project.id}/episodes/${episode.id}`} className="px-4 py-2.5 rounded-full border border-slate-300 dark:border-white/15 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
           Xem Phim Final
         </Link>
-        <button type="button" disabled={busy} onClick={publish} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-semibold shadow-xs cursor-pointer disabled:opacity-50 transition-all">
-          <Rocket className="w-4 h-4" /> Phát Hành Ngay
+        <button type="button" disabled={busy} onClick={() => setConfirming(true)} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-semibold shadow-xs cursor-pointer disabled:opacity-50 transition-all">
+          Phát Hành Ngay
         </button>
       </div>
+      <ConfirmModal
+        open={confirming}
+        title="Phát hành ngay"
+        description={`${project.title} - Tập ${episode.episodeNumber}: ${episode.title} lên kệ ngay cho Member. Muốn hẹn giờ thì mở Phim Final.`}
+        confirmLabel="Phát hành"
+        busy={busy}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => void publish()}
+      />
     </li>
   );
 }
@@ -135,7 +145,7 @@ export function PortalReadyFilms({ films, onPublished }: { films: ReadyFilm[]; o
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-            <Rocket className="w-5 h-5 text-slate-900 dark:text-white" /> Phim Final — Sẵn Sàng Phát Hành
+            Phim Final — Sẵn Sàng Phát Hành
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Reviewer đã duyệt, gắn nhãn AI, đạt tuân thủ, đặt giá Coin và xác nhận Phim Final.</p>
         </div>

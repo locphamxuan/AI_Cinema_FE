@@ -1,6 +1,5 @@
 'use client';
 
-import { TriangleAlert } from 'lucide-react';
 import { ErrorNote } from '@/components/data/ui';
 import { Badge } from '@/components/ui/Badge';
 import { useResource } from '@/hooks/useResource';
@@ -58,7 +57,7 @@ export function AiHealthCard() {
       </div>
       {warning && (
         <p role="alert" className="mt-3 flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-xs text-warning">
-          <TriangleAlert className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" /> {warning}
+          {warning}
         </p>
       )}
     </section>

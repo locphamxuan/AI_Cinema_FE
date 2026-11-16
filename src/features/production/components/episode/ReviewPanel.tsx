@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertTriangle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
@@ -11,6 +10,7 @@ import { REVIEWED_EPISODE, isIn } from '../../lib/capabilities';
 import { AI_PARTS, COMPLIANCE_CHECK, COMPLIANCE_RESULT, LABEL_TYPE } from '../../lib/labels';
 import { formatDateTime, formatDuration } from '@/lib/format';
 import { Facts, Panel, StatusPill, TextPromptModal } from '@/components/data/ui';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { LabelPanel } from './LabelPanel';
 
 /**
@@ -19,13 +19,17 @@ import { LabelPanel } from './LabelPanel';
  */
 export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; canAct: boolean; onChanged: () => Promise<void> }) {
   const [requesting, setRequesting] = useState(false);
+  const [approving, setApproving] = useState(false);
   const { busy, run } = useAction();
   const status = sheet.episode.status;
   const underReview = status === 'IN_REVIEW' && sheet.ingestStatus === 'READY';
   const reviewed = isIn(status, REVIEWED_EPISODE) && sheet.isApprovedVersion;
 
   const approve = async () => {
-    if (await run(() => productionService.review(sheet.id, 'APPROVED'), 'Đã duyệt bản này')) await onChanged();
+    if (await run(() => productionService.review(sheet.id, 'APPROVED'), 'Đã duyệt bản này')) {
+      setApproving(false);
+      await onChanged();
+    }
   };
   const requestChanges = async (comments: string) => {
     if (await run(() => productionService.review(sheet.id, 'CHANGES_REQUESTED', comments), 'Đã gửi yêu cầu sửa cho Studio')) {
@@ -48,7 +52,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
                 Yêu cầu sửa
               </Button>
               {underReview && (
-                <Button size="sm" variant="success" disabled={busy} onClick={approve}>
+                <Button size="sm" variant="success" disabled={busy} onClick={() => setApproving(true)}>
                   Duyệt
                 </Button>
               )}
@@ -62,7 +66,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
             [
               'Thời lượng',
               <span key="d" className={d.warning ? 'text-amber-600 font-semibold' : undefined}>
-                {d.warning && <AlertTriangle className="inline w-3 h-3 mr-1" aria-hidden="true" />}
+                {d.warning && 'Lệch mục tiêu: '}
                 {formatDuration(d.actualSeconds)} / mục tiêu {formatDuration(d.targetSeconds)}
                 {d.deviationSeconds !== null && ` (${d.deviationSeconds > 0 ? '+' : ''}${formatDuration(d.deviationSeconds)})`}
               </span>,
@@ -93,6 +97,15 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
         <CompliancePanel sheet={sheet} canAct={canAct && sheet.isApprovedVersion && status === 'LABELED'} onChanged={onChanged} />
       )}
 
+      <ConfirmModal
+        open={approving}
+        title={`Duyệt bản ${sheet.version}`}
+        description="Bản này thành bản được duyệt của tập; bước tiếp theo là gắn nhãn AI và kiểm tra tuân thủ pháp lý."
+        confirmLabel="Duyệt bản này"
+        busy={busy}
+        onClose={() => setApproving(false)}
+        onConfirm={() => void approve()}
+      />
       <TextPromptModal
         open={requesting}
         title="Yêu cầu studio sửa"
@@ -197,7 +210,7 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
           )}
           <p className="text-slate-500">Hệ thống tự kiểm tra mục “Có nhãn AI” dựa trên nhãn đã gắn ở bước trước. Chọn kết quả cho từng mục; nếu không đạt, hãy ghi lý do.</p>
           <Button type="submit" variant={fails ? 'danger' : 'success'} disabled={busy || !valid}>
-            <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" /> {!valid ? 'Hoàn tất các mục kiểm tra' : fails ? 'Ghi nhận không đạt' : 'Xác nhận đã kiểm tra và đạt'}
+            {!valid ? 'Hoàn tất các mục kiểm tra' : fails ? 'Ghi nhận không đạt' : 'Xác nhận đã kiểm tra và đạt'}
           </Button>
         </form>
       )}

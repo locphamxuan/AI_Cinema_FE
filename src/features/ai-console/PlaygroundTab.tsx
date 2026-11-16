@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Eraser, Send } from 'lucide-react';
 import { Panel } from '@/components/data/ui';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
@@ -69,7 +68,7 @@ export function PlaygroundTab({ onOpenArticle }: { onOpenArticle: (articleId: st
             ))}
           </select>
           <Button size="sm" variant="secondary" onClick={reset} disabled={!exchanges.length || asking}>
-            <Eraser className="size-3.5" aria-hidden="true" /> Cuộc thử mới
+            Cuộc thử mới
           </Button>
         </>
       }
@@ -111,7 +110,7 @@ export function PlaygroundTab({ onOpenArticle }: { onOpenArticle: (articleId: st
             className={fieldTextareaClass}
           />
           <Button type="submit" disabled={!valid || asking}>
-            <Send className="size-4" aria-hidden="true" /> {asking ? 'Đang hỏi…' : 'Hỏi'}
+            {asking ? 'Đang hỏi…' : 'Hỏi'}
           </Button>
         </form>
         <p className="text-xs text-muted-foreground">

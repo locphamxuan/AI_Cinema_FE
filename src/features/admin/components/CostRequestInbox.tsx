@@ -7,6 +7,9 @@ import { useResource } from '@/hooks/useResource';
 import { CostRequestCard } from '@/features/production/components/shared/CostRequestCard';
 import { productionPaths } from '@/features/production/lib/routes';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
+import { DataPagination } from '@/components/data/DataPagination';
+
+const PAGE_SIZE = 20;
 
 const FILTERS: { key: CostRequestStatus | 'ALL'; label: string }[] = [
   { key: 'OPEN', label: 'Chờ duyệt' },
@@ -18,9 +21,13 @@ const FILTERS: { key: CostRequestStatus | 'ALL'; label: string }[] = [
 /** The Admin's inbox of "yêu cầu thêm chi phí sản xuất" sent by Reviewers, across every project. */
 export function CostRequestInbox() {
   const [filter, setFilter] = useState<CostRequestStatus | 'ALL'>('OPEN');
-  const requests = useResource(`cost-requests:${filter}`, () =>
-    costRequestService.list(1, 50, filter === 'ALL' ? undefined : filter),
+  const [page, setPage] = useState(1);
+  const requests = useResource(`cost-requests:${filter}:${page}`, () =>
+    costRequestService.list(page, PAGE_SIZE, filter === 'ALL' ? undefined : filter),
   );
+  const meta = requests.data?.meta;
+  // Deciding the last request of the last page leaves it empty: step back to the page that still exists.
+  if (meta && meta.totalPages >= 1 && meta.page > meta.totalPages && page !== meta.totalPages) setPage(meta.totalPages);
 
   return (
     <Panel
@@ -34,7 +41,10 @@ export function CostRequestInbox() {
             type="button"
             role="tab"
             aria-selected={filter === key}
-            onClick={() => setFilter(key)}
+            onClick={() => {
+              setFilter(key);
+              setPage(1);
+            }}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
               filter === key
                 ? 'bg-[#121212] text-white dark:bg-white dark:text-slate-900 shadow-xs'
@@ -59,6 +69,9 @@ export function CostRequestInbox() {
           />
         ))}
       </ul>
+      {meta && (
+        <DataPagination page={meta.page} totalPages={meta.totalPages} totalItems={meta.total} pageSize={meta.limit} onChange={setPage} />
+      )}
     </Panel>
   );
 }

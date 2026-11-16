@@ -80,7 +80,7 @@ export function CoinLedgerPanel() {
                   <td className="py-2 text-right">
                     {canWallet && (
                       <Button size="sm" variant="ghost" aria-label="Xem ví của tài khoản này" onClick={() => setWalletOf(line.userId)}>
-                        <Wallet className="w-3.5 h-3.5" />
+                        <Wallet className="w-3.5 h-3.5" aria-hidden="true" />
                       </Button>
                     )}
                   </td>

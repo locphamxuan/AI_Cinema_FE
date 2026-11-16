@@ -1,34 +1,20 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Shield } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { adminService, type PermissionRow, type RolePermissions } from '@/services/adminService';
 import { Button } from '@/components/ui/Button';
 import { toast } from '@/components/ui/Toast';
 import type { UserRole } from '@/types/production';
-import {
-  BACKEND_ROLE_LABEL,
-  BACKEND_ROLES,
-  PERMISSION_AREA_LABEL,
-  getPermissionMeta,
-} from '../roles';
-import { PermissionCell, RoleColumnHeaders, RoleSummaryCards, type Matrix } from './RolePermissionParts';
-
-/** Every web-known role gets a set, so a role the backend has not listed yet (e.g. a new STUDIO) reads as empty. */
-const toMatrix = (roles: RolePermissions[]) =>
-  ({
-    ...Object.fromEntries(BACKEND_ROLES.map((role) => [role, new Set<string>()])),
-    ...Object.fromEntries(roles.map((r) => [r.role, new Set(r.permissions)])),
-  }) as Matrix;
-
-const sameSet = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((x) => b.has(x));
+import { ConfirmModal } from '@/components/data/ConfirmModal';
+import { ErrorNote, Loading } from '@/components/data/ui';
+import { BACKEND_ROLE_LABEL, BACKEND_ROLES, PERMISSION_AREA_LABEL } from '../roles';
+import { filterPermissions, sameSet, toMatrix } from '../rolePermissionMatrix';
+import { PermissionRowView, RoleColumnHeaders, RoleSummaryCards, type Matrix } from './RolePermissionParts';
 
 /**
- * Modern High-Fidelity Role Permissions Matrix:
- * - 100% Vietnamese labels and descriptions with detailed contextual explanations.
- * - Non-tick pill badges with distinct status: "Được phép" (Active Emerald), "Chưa cấp" (Subtle hoverable), "Cố định" (System Locked Amber).
- * - Instant search and category filter for convenient navigation.
- * - Role overview cards showing allocated permission totals.
+ * The role/permission matrix: the Admin toggles cells into a draft, then saves the changed roles after confirming
+ * (the change reaches every account of those roles). Locked cells are core permissions the backend keeps fixed.
  */
 export function RolePermissionsPanel() {
   const [permissions, setPermissions] = useState<PermissionRow[]>([]);
@@ -36,6 +22,7 @@ export function RolePermissionsPanel() {
   const [draft, setDraft] = useState<Matrix | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   // Search and Area filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,22 +45,10 @@ export function RolePermissionsPanel() {
   const changedRoles = draft ? BACKEND_ROLES.filter((role) => !sameSet(draft[role], saved[role] ?? new Set())) : [];
   const allAreas = useMemo(() => [...new Set(permissions.map((p) => p.area))], [permissions]);
 
-  // Filtered permissions based on search query and selected area
-  const filteredPermissions = useMemo(() => {
-    return permissions.filter((p) => {
-      if (selectedArea !== 'all' && p.area !== selectedArea) return false;
-      if (!searchQuery.trim()) return true;
-
-      const q = searchQuery.toLowerCase().trim();
-      const meta = getPermissionMeta(p.key, p.description);
-      return (
-        p.key.toLowerCase().includes(q) ||
-        meta.title.toLowerCase().includes(q) ||
-        meta.desc.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q)
-      );
-    });
-  }, [permissions, selectedArea, searchQuery]);
+  const filteredPermissions = useMemo(
+    () => filterPermissions(permissions, selectedArea, searchQuery),
+    [permissions, selectedArea, searchQuery],
+  );
 
   const activeAreas = useMemo(
     () => [...new Set(filteredPermissions.map((p) => p.area))],
@@ -96,6 +71,7 @@ export function RolePermissionsPanel() {
       changedRoles.map((role) => adminService.setRolePermissions(role, [...draft[role]]))
     );
     setIsSaving(false);
+    setConfirming(false);
     const failed = results.find((r) => !r.success);
     setRoles(
       roles.map((r) => {
@@ -113,8 +89,8 @@ export function RolePermissionsPanel() {
     );
   };
 
-  if (error) return <p className="text-xs text-rose-600 dark:text-rose-400 p-4">{error}</p>;
-  if (!draft) return <p className="text-xs text-slate-500 dark:text-slate-400 p-6">Đang tải bảng phân quyền vai trò…</p>;
+  if (error) return <ErrorNote message={error} />;
+  if (!draft) return <Loading label="Đang tải bảng phân quyền vai trò…" />;
 
   return (
     <div className="space-y-6">
@@ -128,7 +104,6 @@ export function RolePermissionsPanel() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <Shield className="w-5 h-5 text-sky-500" />
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">
                   Phân quyền theo vai trò
                 </h2>
@@ -156,7 +131,7 @@ export function RolePermissionsPanel() {
               <Button
                 type="button"
                 disabled={changedRoles.length === 0 || isSaving}
-                onClick={save}
+                onClick={() => setConfirming(true)}
                 className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   changedRoles.length > 0
                     ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/20 hover:shadow-lg'
@@ -187,6 +162,7 @@ export function RolePermissionsPanel() {
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
+                  aria-label="Xoá từ khoá tìm kiếm"
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   ✕
@@ -247,50 +223,30 @@ export function RolePermissionsPanel() {
                   {/* Permission Rows */}
                   {filteredPermissions
                     .filter((p) => p.area === area)
-                    .map((permission) => {
-                      const meta = getPermissionMeta(permission.key, permission.description);
-
-                      return (
-                        <tr
-                          key={permission.key}
-                          className="hover:bg-slate-50/80 dark:hover:bg-white/[0.025] transition-colors"
-                        >
-                          {/* Permission Title & Info */}
-                          <th scope="row" className="py-3.5 px-6 text-left font-normal align-middle">
-                            <p className="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm">
-                              {meta.title}
-                            </p>
-                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
-                              {meta.desc}
-                            </p>
-                            <div className="mt-1 flex items-center gap-2">
-                              <span className="text-[10px] tabular-nums text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/50 dark:border-white/5">
-                                {permission.key}
-                              </span>
-                            </div>
-                          </th>
-
-                          {/* Role Status Cells */}
-                          {BACKEND_ROLES.map((role) => (
-                            <PermissionCell
-                              key={role}
-                              role={role}
-                              permission={permission}
-                              title={meta.title}
-                              isLocked={locked.get(role)?.has(permission.key) ?? false}
-                              isGranted={draft[role].has(permission.key)}
-                              onToggle={() => toggle(role, permission.key)}
-                            />
-                          ))}
-                        </tr>
-                      );
-                    })}
+                    .map((permission) => (
+                      <PermissionRowView
+                        key={permission.key}
+                        permission={permission}
+                        locked={locked}
+                        draft={draft}
+                        onToggle={toggle}
+                      />
+                    ))}
                 </tbody>
               ))
             )}
           </table>
         </div>
       </section>
+      <ConfirmModal
+        open={confirming}
+        title="Lưu phân quyền"
+        description={`Áp dụng thay đổi cho ${changedRoles.map((r) => BACKEND_ROLE_LABEL[r]).join(', ')}. Mọi tài khoản thuộc các vai trò này nhận quyền mới trong vòng 30 giây.`}
+        confirmLabel="Lưu phân quyền"
+        busy={isSaving}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => void save()}
+      />
     </div>
   );
 }

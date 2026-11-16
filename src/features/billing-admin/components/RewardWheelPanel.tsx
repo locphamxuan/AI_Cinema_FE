@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Coins } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -145,7 +145,6 @@ export function RewardWheelPanel() {
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 font-bold tabular-nums text-xs">
-                          <Coins className="w-3.5 h-3.5 text-amber-500" />
                           +{prize.bonusCoins} Coin
                         </span>
                       )}

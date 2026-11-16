@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ChangeRequestInbox } from '@/features/admin/components/ChangeRequestInbox';
 import { DashboardHeader } from '@/features/production/components/shell/DashboardHeader';
 import { StudiosPage } from '@/features/studio/components/StudiosPage';
 import { routeFetch } from '@/tests/support/routeFetch';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 import { signInAs } from '@/tests/support/signIn';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -56,6 +57,74 @@ describe('StudiosPage (BR-59)', () => {
     expect(calls.some((c) => c.method === 'POST' && c.path === '/studios')).toBe(true);
   });
 
+  it('asks before deleting or deactivating a studio, and pages a long catalog', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
+    const many = Array.from({ length: 16 }, (_, i) => studio({ id: `s${i}`, name: `Studio ${String(i).padStart(2, '0')}`, email: `s${i}@x.vn` }));
+    const calls = routeFetch({ '/studios': many, '/studios/s0': {} });
+    render(<StudiosPage />);
+
+    await screen.findByText('Studio 00');
+    expect(screen.queryByText('Studio 15')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Xoá Studio 00' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(calls.some((c) => c.method === 'DELETE')).toBe(false);
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Xoá Studio' }));
+    await waitFor(() => expect(calls.some((c) => c.method === 'DELETE' && c.path === '/studios/s0')).toBe(true));
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Ngừng dùng' })[0]);
+    expect(calls.some((c) => c.method === 'PATCH')).toBe(false);
+    expect(await screen.findByRole('dialog')).toHaveTextContent('không được chọn cho dự án mới');
+
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Huỷ' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Trang 2' }));
+    expect(await screen.findByText('Studio 15')).toBeInTheDocument();
+  });
+
+  it('steps back a page when the last studio of the last page is deleted', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
+    const many = Array.from({ length: 16 }, (_, i) => studio({ id: `s${i}`, name: `Studio ${String(i).padStart(2, '0')}`, email: `s${i}@x.vn` }));
+    const routes: Record<string, unknown> = { '/studios': many, '/studios/s15': {} };
+    routeFetch(routes);
+    render(<StudiosPage />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Trang 2' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Xoá Studio 15' }));
+    routes['/studios'] = many.slice(0, 15);
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xoá Studio' }));
+
+    expect(await screen.findByText('Studio 00')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Trang 2' })).not.toBeInTheDocument();
+  });
+
+  it('sends one change while deactivating, however often the button is pressed', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
+    let answer: (value: unknown) => void = () => undefined;
+    const patches: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (init?.method === 'PATCH') {
+          patches.push(url);
+          return new Promise((resolve) => (answer = resolve));
+        }
+        return fakeResponse([studio()]);
+      }),
+    );
+    render(<StudiosPage />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Ngừng dùng' }));
+    const confirm = within(await screen.findByRole('dialog')).getByRole('button', { name: 'Ngừng dùng' });
+    await userEvent.click(confirm);
+    await userEvent.click(confirm);
+    expect(patches).toHaveLength(1);
+    expect(confirm).toBeDisabled();
+    answer(fakeResponse({ ...studio(), isActive: false }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
   it('shows the catalog read-only to Reviewer or an account that cannot manage it', async () => {
     nav.pathname = '/reviewer/studios';
     signInAs('reviewer');
@@ -99,7 +168,9 @@ describe('ChangeRequestInbox (BR-55)', () => {
     expect(calls[0]).toMatchObject({ path: '/change-requests', method: 'GET' });
 
     await userEvent.click(screen.getByRole('button', { name: /Duyệt/ }));
-    expect(calls.some((c) => c.method === 'POST' && c.path === '/change-requests/cr1/approve')).toBe(true);
+    expect(calls.some((c) => c.path === '/change-requests/cr1/approve')).toBe(false);
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Duyệt đề xuất' }));
+    await waitFor(() => expect(calls.some((c) => c.method === 'POST' && c.path === '/change-requests/cr1/approve')).toBe(true));
   });
 
   it('asks for a reason before rejecting', async () => {

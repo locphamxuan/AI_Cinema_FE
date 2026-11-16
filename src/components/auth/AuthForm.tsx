@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowUpRight, AlertTriangle } from 'lucide-react';
 import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 import { PasswordField } from './AuthFields';
@@ -81,7 +80,6 @@ export default function AuthForm() {
           className="mb-5 space-y-2 rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-xs text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
         >
           <div className="flex items-start gap-2.5">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
             <span className="font-medium leading-relaxed">{error}</span>
           </div>
           {isStudioRefusal && (
@@ -91,7 +89,7 @@ export default function AuthForm() {
               rel="noreferrer"
               className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-black dark:bg-white dark:text-slate-900"
             >
-              Mở cổng đăng nhập Studio Web <ArrowUpRight className="h-3.5 w-3.5" />
+              Mở cổng đăng nhập Studio Web
             </a>
           )}
         </div>
@@ -167,7 +165,7 @@ export default function AuthForm() {
           rel="noreferrer"
           className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:underline dark:text-white"
         >
-          Đăng nhập Studio Web <ArrowUpRight className="h-3.5 w-3.5" />
+          Đăng nhập Studio Web
         </a>
       </div>
     </>

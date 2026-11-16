@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, Coins, Eye, Film, Heart, Megaphone, ShoppingCart } from 'lucide-react';
+import { ChevronDown, ChevronRight, Film } from 'lucide-react';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
 import { formatNumber } from '@/lib/format';
@@ -158,11 +158,11 @@ function FilmRow({ film, expanded, onToggle, onAds, onPricing }: FilmRowProps) {
             </div>
           </div>
         </td>
-        <td className="py-3 px-3 text-right"><span className={`${STAT} text-rose-600`}><Heart className="w-3 h-3" />{formatNumber(film.likeCount)}</span></td>
-        <td className="py-3 px-3 text-right"><span className={STAT}><Eye className="w-3 h-3" />{formatNumber(film.viewCount)}</span></td>
-        <td className="py-3 px-3 text-right"><span className={STAT}><ShoppingCart className="w-3 h-3" />{formatNumber(film.purchases)}</span></td>
+        <td className="py-3 px-3 text-right"><span className={`${STAT} text-rose-600`}>{formatNumber(film.likeCount)}</span></td>
+        <td className="py-3 px-3 text-right"><span className={STAT}>{formatNumber(film.viewCount)}</span></td>
+        <td className="py-3 px-3 text-right"><span className={STAT}>{formatNumber(film.purchases)}</span></td>
         <td className="py-3 px-4 text-right">
-          <span className={`${STAT} text-amber-600 font-bold`}><Coins className="w-3 h-3" />{formatNumber(film.coinsEarned)}</span>
+          <span className={`${STAT} text-amber-600 font-bold`}>{formatNumber(film.coinsEarned)}</span>
           {film.refundedCoins > 0 && <span className="block text-xs text-rose-500">đã hoàn {formatNumber(film.refundedCoins)}</span>}
         </td>
       </tr>
@@ -200,7 +200,7 @@ function FilmRow({ film, expanded, onToggle, onAds, onPricing }: FilmRowProps) {
                           onClick={() => onAds({ id: e.id, label: `${film.title} - Tập ${e.episodeNumber}` })}
                           className="inline-flex items-center gap-1 text-sky-700 hover:text-sky-800 font-semibold cursor-pointer"
                         >
-                          <Megaphone className="w-3 h-3" /> Đặt vị trí
+                          Đặt vị trí
                         </button>
                       </td>
                     )}
@@ -211,7 +211,7 @@ function FilmRow({ film, expanded, onToggle, onAds, onPricing }: FilmRowProps) {
                           onClick={() => onPricing({ id: e.id, label: `${film.title} - Tập ${e.episodeNumber}`, coinPrice: e.coinPrice })}
                           className="inline-flex items-center gap-1 text-amber-600 hover:text-amber-700 font-semibold cursor-pointer"
                         >
-                          <Coins className="w-3 h-3" /> Đặt giá
+                          Đặt giá
                         </button>
                       </td>
                     )}

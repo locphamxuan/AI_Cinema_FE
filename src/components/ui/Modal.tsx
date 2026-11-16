@@ -9,7 +9,6 @@ export interface ModalProps {
   onClose: () => void;
   title: string;
   subtitle?: string;
-  icon?: ReactNode;
   children: ReactNode;
   maxWidth?: string;
 }
@@ -26,7 +25,7 @@ const SM_MAX_WIDTH: Record<string, string> = {
 };
 
 /** A dialog with a title bar; focus stays inside while it is open and returns to the trigger after. */
-export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth = 'max-w-lg' }: ModalProps) {
+export function Modal({ open, onClose, title, subtitle, children, maxWidth = 'max-w-lg' }: ModalProps) {
   const smClass = SM_MAX_WIDTH[maxWidth] ?? (maxWidth.startsWith('sm:') ? maxWidth : `sm:${maxWidth}`);
 
   return (
@@ -39,12 +38,7 @@ export function Modal({ open, onClose, title, subtitle, icon, children, maxWidth
         )}
         {...(subtitle ? {} : { 'aria-describedby': undefined })}
       >
-        <DialogHeader className="flex-row items-start gap-3.5 border-b border-slate-100 dark:border-white/[0.06] px-6 pt-5 pb-4 pr-12 text-left">
-          {icon && (
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-slate-100 text-slate-900 dark:bg-white/[0.08] dark:text-white shadow-xs">
-              {icon}
-            </div>
-          )}
+        <DialogHeader className="flex-row items-start border-b border-slate-100 dark:border-white/[0.06] px-6 pt-5 pb-4 pr-12 text-left">
           <div className="space-y-0.5 min-w-0">
             <DialogTitle className="font-heading text-lg font-bold text-slate-900 dark:text-white tracking-tight">
               {title}

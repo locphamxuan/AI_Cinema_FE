@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -66,7 +65,6 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
       onClose={onClose}
       title={ad ? 'Sửa quảng cáo' : 'Tạo quảng cáo'}
       subtitle="Quảng cáo chèn giữa tập cho gói có quảng cáo."
-      icon={<Megaphone className="w-5 h-5" />}
       maxWidth="max-w-lg"
     >
       <form

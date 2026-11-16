@@ -1,14 +1,11 @@
 'use client';
 
-import { AlertTriangle, ArrowRight, Bell, Clapperboard, Coins, FileText, Film, ScrollText } from 'lucide-react';
 import { NOTIFICATION_TYPE_LABEL } from '@/features/production/lib/labels';
 import { formatDateTime } from '@/lib/format';
 import type { AppNotification } from '@/types/production';
 
-/** Get modern icon and color accent for notification by type / keywords */
+/** The category badge of a notification, by its type or, for older types, by keywords. */
 function getNotificationMeta(item: AppNotification): {
-  icon: React.ElementType;
-  colorClass: string;
   badgeLabel: string;
   badgeTone: string;
 } {
@@ -19,8 +16,6 @@ function getNotificationMeta(item: AppNotification): {
   const mf1 = NOTIFICATION_TYPE_LABEL[type];
   if (mf1) {
     return {
-      icon: type.startsWith('FINAL_FILM') ? Film : ScrollText,
-      colorClass: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
       badgeLabel: mf1,
       badgeTone: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-300 dark:border-indigo-500/20',
     };
@@ -28,8 +23,6 @@ function getNotificationMeta(item: AppNotification): {
 
   if (type.startsWith('COST_') || text.includes('chi phí') || text.includes('ngân sách')) {
     return {
-      icon: Coins,
-      colorClass: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/25',
       badgeLabel: 'Chi phí sản xuất',
       badgeTone: 'bg-emerald-50 text-emerald-700 border-emerald-200/80 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/25',
     };
@@ -37,8 +30,6 @@ function getNotificationMeta(item: AppNotification): {
 
   if (type.includes('CHANGE') || type.includes('REQUEST') || text.includes('đề xuất') || text.includes('yêu cầu')) {
     return {
-      icon: FileText,
-      colorClass: 'text-purple-500 bg-purple-500/10 border-purple-500/20',
       badgeLabel: 'Yêu cầu & Đề xuất',
       badgeTone: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-300 dark:border-purple-500/20',
     };
@@ -46,8 +37,6 @@ function getNotificationMeta(item: AppNotification): {
 
   if (type.includes('PRICE') || text.includes('giá coin') || text.includes('cảnh báo giá')) {
     return {
-      icon: AlertTriangle,
-      colorClass: 'text-rose-500 bg-rose-500/10 border-rose-500/20',
       badgeLabel: 'Cảnh báo giá',
       badgeTone: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/10 dark:text-rose-300 dark:border-rose-500/20',
     };
@@ -55,8 +44,6 @@ function getNotificationMeta(item: AppNotification): {
 
   if (type.includes('MEDIA') || type.includes('FILM') || type.includes('EPISODE') || text.includes('phim') || text.includes('tập')) {
     return {
-      icon: Film,
-      colorClass: 'text-sky-500 bg-sky-500/10 border-sky-500/20',
       badgeLabel: 'Tập phim & Media',
       badgeTone: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-500/10 dark:text-sky-300 dark:border-sky-500/20',
     };
@@ -64,16 +51,12 @@ function getNotificationMeta(item: AppNotification): {
 
   if (type.includes('STUDIO') || text.includes('studio')) {
     return {
-      icon: Clapperboard,
-      colorClass: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
       badgeLabel: 'Studio sản xuất',
       badgeTone: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-300 dark:border-emerald-500/20',
     };
   }
 
   return {
-    icon: Bell,
-    colorClass: 'text-slate-500 bg-slate-500/10 border-slate-500/20',
     badgeLabel: 'Hệ thống',
     badgeTone: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-300 dark:border-slate-500/20',
   };
@@ -106,12 +89,19 @@ interface NotificationCardProps {
 export function NotificationCard({ item, href, onOpen }: NotificationCardProps) {
   const isUnread = !item.readAt;
   const meta = getNotificationMeta(item);
-  const MetaIcon = meta.icon;
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={onOpen}
-      className={`group relative rounded-2xl p-4 sm:p-5 transition-all duration-200 cursor-pointer border ${
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
+      className={`group relative rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 p-4 sm:p-5 transition-all duration-200 cursor-pointer border ${
         isUnread
           ? 'bg-sky-50/40 dark:bg-sky-500/[0.05] border-sky-200/90 dark:border-sky-500/25 hover:border-sky-300 dark:hover:border-sky-500/40 shadow-xs'
           : 'bg-white dark:bg-white/[0.015] border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10 hover:bg-slate-50/70 dark:hover:bg-white/[0.03]'
@@ -123,12 +113,6 @@ export function NotificationCard({ item, href, onOpen }: NotificationCardProps) 
       )}
 
       <div className="flex items-start gap-4 ml-1">
-        {/* Icon avatar */}
-        <div
-          className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 border transition-transform group-hover:scale-105 ${meta.colorClass}`}
-        >
-          <MetaIcon className="w-5 h-5" />
-        </div>
 
         {/* Content block */}
         <div className="flex-1 min-w-0 space-y-1">
@@ -178,7 +162,6 @@ export function NotificationCard({ item, href, onOpen }: NotificationCardProps) 
             {href && (
               <span className="inline-flex items-center gap-1 text-xs font-bold text-sky-600 dark:text-sky-400 group-hover:translate-x-0.5 transition-transform">
                 <span>Xem chi tiết</span>
-                <ArrowRight className="w-3.5 h-3.5" />
               </span>
             )}
           </div>

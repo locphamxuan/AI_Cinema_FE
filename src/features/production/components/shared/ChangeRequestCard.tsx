@@ -11,6 +11,7 @@ import { CHANGE_REQUEST_STATUS, CHANGE_REQUEST_TYPE } from '../../lib/labels';
 import { downloadFile } from '../../lib/download';
 import { formatDateTime } from '@/lib/format';
 import { StatusPill, TextPromptModal } from '@/components/data/ui';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 
 /** One request to the Admin: what was asked and why, the proof, and the Admin's decision (BR-55). */
 export function ChangeRequestCard({
@@ -27,10 +28,14 @@ export function ChangeRequestCard({
   onDecided?: () => Promise<unknown>;
 }) {
   const [rejecting, setRejecting] = useState(false);
+  const [approving, setApproving] = useState(false);
   const { busy, run } = useAction();
 
   const approve = async () => {
-    if (await run(() => changeRequestService.approve(cr.id), 'Đã duyệt đề xuất')) await onDecided?.();
+    if (await run(() => changeRequestService.approve(cr.id), 'Đã duyệt đề xuất')) {
+      setApproving(false);
+      await onDecided?.();
+    }
   };
   const reject = async (response: string) => {
     if (await run(() => changeRequestService.reject(cr.id, response), 'Đã từ chối đề xuất')) {
@@ -83,11 +88,20 @@ export function ChangeRequestCard({
           <Button size="sm" variant="secondary" disabled={busy} onClick={() => setRejecting(true)}>
             Từ chối
           </Button>
-          <Button size="sm" variant="success" disabled={busy} onClick={approve}>
+          <Button size="sm" variant="success" disabled={busy} onClick={() => setApproving(true)}>
             Duyệt
           </Button>
         </div>
       )}
+      <ConfirmModal
+        open={approving}
+        title="Duyệt đề xuất chỉnh sửa"
+        description={`${CHANGE_REQUEST_TYPE[cr.requestType]} của ${cr.requestedBy.fullName}. Người gửi được báo để thực hiện thay đổi.`}
+        confirmLabel="Duyệt đề xuất"
+        busy={busy}
+        onClose={() => setApproving(false)}
+        onConfirm={() => void approve()}
+      />
       <TextPromptModal
         open={rejecting}
         title="Từ chối đề xuất"

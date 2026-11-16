@@ -48,6 +48,8 @@ export interface ProjectCapabilities {
   costRequest: boolean;
   /** Send, sign or counter-propose a hand-off's contract: the Admin. */
   contractManage: boolean;
+  /** Download the signed contract PDFs: the Admin and the Reviewer (Creators only see the rounds). */
+  contractDocuments: boolean;
   /** Write and submit the script: the lead Creator. */
   scriptWrite: boolean;
   /** Approve the Final Script or send it back: the Admin. */
@@ -93,6 +95,7 @@ export function projectCapabilities(
     costAdjust: can(PERMISSION.COST_ADJUST),
     costRequest: owner && can(PERMISSION.COST_REQUEST),
     contractManage: can(PERMISSION.CONTRACT_MANAGE),
+    contractDocuments: can(PERMISSION.CONTRACT_DOCUMENT_READ),
     scriptWrite: lead && can(PERMISSION.SCRIPT_WRITE),
     scriptApprove: can(PERMISSION.SCRIPT_APPROVE),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),
@@ -120,7 +123,8 @@ export type ProjectTabKey =
 
 /**
  * MF-1 & BE role matrix: hide tabs whose workflow belongs strictly to other roles
- * (e.g. Creator never sees Studio handoffs, Cost, or Contracts; Reviewer never negotiates Contracts).
+ * (e.g. Creator never sees Studio handoffs or Cost). Contracts are listed for anyone who reads the project
+ * (BE GET /projects/:id/contracts); only the Admin negotiates and only CONTRACT_DOCUMENT_READ downloads the PDFs.
  */
 export function isProjectTabVisible(key: ProjectTabKey, can: (p: PermissionKey) => boolean): boolean {
   switch (key) {
@@ -135,8 +139,6 @@ export function isProjectTabVisible(key: ProjectTabKey, can: (p: PermissionKey) 
       return can(PERMISSION.PROJECT_MANAGE) || can(PERMISSION.PROJECT_READ_ALL) || can(PERMISSION.CONTRACT_MANAGE);
     case 'fee':
       return can(PERMISSION.COST_ADJUST) || can(PERMISSION.COST_REQUEST) || can(PERMISSION.COST_APPROVE);
-    case 'contract':
-      return can(PERMISSION.CONTRACT_MANAGE);
     case 'changes':
       return (
         can(PERMISSION.PROJECT_SUGGEST) ||

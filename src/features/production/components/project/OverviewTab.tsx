@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { XCircle, Globe, Calendar, Clock, CheckCircle2, Tag, ShieldCheck, Clapperboard, Gift, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
 import { useAction } from '@/hooks/useAction';
@@ -32,9 +31,8 @@ export function OverviewTab() {
     }
   };
 
-  const infoItems: { icon: React.ElementType; label: string; value: React.ReactNode }[] = [
+  const infoItems: { label: string; value: React.ReactNode }[] = [
     {
-      icon: Tag,
       label: 'Thể loại',
       value: project.genres.length > 0 ? (
         <div className="flex flex-wrap gap-1 mt-0.5">
@@ -47,12 +45,10 @@ export function OverviewTab() {
       ) : <span className="text-slate-400">—</span>,
     },
     {
-      icon: Globe,
       label: 'Ngôn ngữ',
       value: project.defaultLanguage,
     },
     {
-      icon: ShieldCheck,
       label: 'Độ tuổi',
       value: project.ageRating ? (
         <span className="px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold text-xs border border-rose-100 dark:border-rose-500/20">
@@ -61,32 +57,26 @@ export function OverviewTab() {
       ) : <span className="text-slate-400">—</span>,
     },
     {
-      icon: Calendar,
       label: 'Năm phát hành',
       value: project.releaseYear ?? <span className="text-slate-400">—</span>,
     },
     {
-      icon: Gift,
       label: 'Tập xem miễn phí',
       value: project.freeEpisodeCount ?? <span className="text-slate-500">Mặc định nền tảng</span>,
     },
     {
-      icon: Building2,
       label: 'Studio',
       value: project.studio?.name ?? <span className="text-slate-400">—</span>,
     },
     {
-      icon: Clock,
       label: 'Tạo lúc',
       value: formatDateTime(project.createdAt),
     },
     {
-      icon: Clapperboard,
       label: 'Bàn giao Studio',
       value: formatDateTime(project.handedOffAt) ?? <span className="text-slate-400">—</span>,
     },
     {
-      icon: CheckCircle2,
       label: 'Hoàn tất',
       value: formatDateTime(project.completedAt) ?? <span className="text-slate-400">—</span>,
     },
@@ -109,9 +99,8 @@ export function OverviewTab() {
           </div>
 
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {infoItems.map(({ icon: Icon, label, value }) => (
+            {infoItems.map(({ label, value }) => (
               <div key={label} className="flex items-start gap-3">
-                <Icon className="w-4 h-4 mt-0.5 shrink-0 text-slate-500 dark:text-slate-400" aria-hidden="true" />
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{label}</p>
                   <div className="text-sm text-slate-900 dark:text-slate-100 font-medium">{value}</div>
@@ -186,7 +175,6 @@ export function OverviewTab() {
           <div className="rounded-2xl border border-rose-200/60 dark:border-rose-500/20 bg-rose-50/40 dark:bg-rose-500/[0.04] overflow-hidden">
             <div className="px-5 py-4">
               <div className="flex items-center gap-2 mb-1.5">
-                <XCircle className="w-4 h-4 text-rose-500" />
                 <p className="text-sm font-bold text-rose-700 dark:text-rose-400">Huỷ dự án</p>
               </div>
               <p className="text-[11px] text-rose-500/80 dark:text-rose-400/70 mb-3">Rút cả các lịch phát hành đang chờ. Không hoàn tác được.</p>

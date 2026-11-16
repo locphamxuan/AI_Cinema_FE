@@ -49,11 +49,22 @@ export function ContractTab() {
         <Panel
           key={studio.id}
           title={`Hợp đồng với Studio ${studio.name}`}
-          description={`Studio điền giá và ký trên Studio Web; Admin ký để đồng ý hoặc đề xuất giá khác. Ngân sách còn lại: ${formatVnd(project.cost.remainingVnd)}.`}
+          description={
+            caps.contractManage
+              ? `Studio điền giá và ký trên Studio Web; Admin ký để đồng ý hoặc đề xuất giá khác. Ngân sách còn lại: ${formatVnd(project.cost.remainingVnd)}.`
+              : 'Studio điền giá và ký trên Studio Web; Admin ký để đồng ý hoặc đề xuất giá khác. Bạn chỉ xem các vòng thương lượng.'
+          }
         >
           <ul className="space-y-3">
             {rounds.map((c) => (
-              <ContractCard key={c.id} contract={c} canDecide={caps.contractManage} onChanged={changed} />
+              <ContractCard
+                key={c.id}
+                contract={c}
+                canDecide={caps.contractManage}
+                canDownload={caps.contractDocuments}
+                showCost={caps.contractManage || caps.costRequest || caps.contractDocuments}
+                onChanged={changed}
+              />
             ))}
           </ul>
         </Panel>

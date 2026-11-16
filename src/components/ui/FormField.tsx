@@ -10,26 +10,25 @@ export interface FormFieldProps {
   error?: string | null;
 }
 
-/** A labelled form control with an optional help line or error under it. */
+/**
+ * A labelled form control with an optional help line or error under it. The wrapper stays the same whether or not
+ * a message shows, so an error that appears while typing does not remount the control and drop its focus.
+ */
 export function FormField({ label, children, className = '', hint, error }: FormFieldProps) {
-  const field = (
-    <label className={`block ${hint || error ? '' : className}`}>
-      <span className="mb-1.5 block text-sm font-medium text-foreground">{label}</span>
-      {children}
-    </label>
-  );
-  if (!hint && !error) return field;
-  // Outside the label, so the help text does not become part of the control's name.
   return (
     <div className={className}>
-      {field}
+      <label className="block">
+        <span className="mb-1.5 block text-sm font-medium text-foreground">{label}</span>
+        {children}
+      </label>
+      {/* Outside the label, so the help text does not become part of the control's name. */}
       {error ? (
         <p role="alert" className="mt-1.5 text-xs text-destructive">
           {error}
         </p>
-      ) : (
+      ) : hint ? (
         <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>
-      )}
+      ) : null}
     </div>
   );
 }

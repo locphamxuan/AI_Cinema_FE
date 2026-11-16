@@ -1,28 +1,19 @@
 'use client';
 
-import { Building2, Film, Users, ShieldCheck, UserCog, Crown } from 'lucide-react';
 import type { PermissionRow } from '@/services/adminService';
 import type { UserRole } from '@/types/production';
-import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_SHORT_LABEL } from '../roles';
+import { BACKEND_ROLE_LABEL, BACKEND_ROLES, ROLE_SHORT_LABEL, getPermissionMeta } from '../roles';
 
 export type Matrix = Record<UserRole, Set<string>>;
 
-const ROLE_ICONS: Record<UserRole, React.ComponentType<{ className?: string }>> = {
-  MEMBER: Users,
-  CONTENT_CREATOR: Film,
-  CONTENT_REVIEWER: ShieldCheck,
-  STUDIO: Building2,
-  STAFF: UserCog,
-  ADMIN: Crown,
-};
-
-const ROLE_COLORS: Record<UserRole, { badge: string; text: string; bg: string }> = {
-  MEMBER: { badge: 'bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-300', text: 'text-slate-600', bg: 'bg-slate-500' },
-  CONTENT_CREATOR: { badge: 'bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300', text: 'text-sky-600', bg: 'bg-sky-500' },
-  CONTENT_REVIEWER: { badge: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-300', text: 'text-emerald-600', bg: 'bg-emerald-500' },
-  STUDIO: { badge: 'bg-rose-100 text-rose-800 dark:bg-rose-500/20 dark:text-rose-300', text: 'text-rose-600', bg: 'bg-rose-500' },
-  STAFF: { badge: 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300', text: 'text-amber-600', bg: 'bg-amber-500' },
-  ADMIN: { badge: 'bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300', text: 'text-purple-600', bg: 'bg-purple-500' },
+/** A thin colour mark per role, so each summary card reads at a glance. */
+const ROLE_MARK: Record<UserRole, string> = {
+  MEMBER: 'bg-slate-500',
+  CONTENT_CREATOR: 'bg-sky-500',
+  CONTENT_REVIEWER: 'bg-emerald-500',
+  STUDIO: 'bg-rose-500',
+  STAFF: 'bg-amber-500',
+  ADMIN: 'bg-purple-500',
 };
 
 /** One card per role with how many permissions it holds in the draft; edited roles are flagged. */
@@ -30,8 +21,6 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
       {BACKEND_ROLES.map((role) => {
-        const Icon = ROLE_ICONS[role];
-        const color = ROLE_COLORS[role];
         const count = draft[role]?.size ?? 0;
         const isChanged = changedRoles.includes(role);
 
@@ -44,10 +33,8 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
                 : 'border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card'
             }`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${color.badge}`}>
-                <Icon className="w-4 h-4" />
-              </div>
+            <div className="flex items-center justify-between mb-2 min-h-5">
+              <span className={`h-1.5 w-6 rounded-full ${ROLE_MARK[role]}`} aria-hidden="true" />
               {isChanged && (
                 <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/20 px-2 py-0.5 rounded-full">
                   Đã sửa
@@ -79,12 +66,9 @@ export function RoleColumnHeaders() {
           Chức năng & Diễn giải quyền hạn
         </th>
         {BACKEND_ROLES.map((role) => {
-          const Icon = ROLE_ICONS[role];
-          const color = ROLE_COLORS[role];
           return (
             <th key={role} scope="col" className="py-3.5 px-3 font-bold text-center whitespace-nowrap min-w-[130px]">
               <div className="flex items-center justify-center gap-1.5">
-                <Icon className={`w-3.5 h-3.5 ${color.text}`} />
                 <span className="text-slate-900 dark:text-white font-semibold">
                   {ROLE_SHORT_LABEL[role]}
                 </span>
@@ -157,5 +141,42 @@ export function PermissionCell({ role, permission, title, isLocked, isGranted, o
         )}
       </button>
     </td>
+  );
+}
+
+/** One permission: its Vietnamese title, description and key, then its cell for every role. */
+export function PermissionRowView({
+  permission,
+  locked,
+  draft,
+  onToggle,
+}: {
+  permission: PermissionRow;
+  locked: Map<UserRole, Set<string>>;
+  draft: Matrix;
+  onToggle: (role: UserRole, key: string) => void;
+}) {
+  const meta = getPermissionMeta(permission.key, permission.description);
+  return (
+    <tr className="hover:bg-slate-50/80 dark:hover:bg-white/[0.025] transition-colors">
+      <th scope="row" className="py-3.5 px-6 text-left font-normal align-middle">
+        <p className="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm">{meta.title}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{meta.desc}</p>
+        <span className="mt-1 inline-block text-[10px] tabular-nums text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/50 dark:border-white/5">
+          {permission.key}
+        </span>
+      </th>
+      {BACKEND_ROLES.map((role) => (
+        <PermissionCell
+          key={role}
+          role={role}
+          permission={permission}
+          title={meta.title}
+          isLocked={locked.get(role)?.has(permission.key) ?? false}
+          isGranted={draft[role].has(permission.key)}
+          onToggle={() => onToggle(role, permission.key)}
+        />
+      ))}
+    </tr>
   );
 }

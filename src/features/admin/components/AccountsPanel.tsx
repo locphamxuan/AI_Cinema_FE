@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Lock, Pencil, Search, Trash2, Unlock, UserPlus } from 'lucide-react';
+import { Lock, Pencil, Search, Trash2, Unlock } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { adminService, type AccountPage, type AccountRow } from '@/services/adminService';
 import { toast } from '@/components/ui/Toast';
@@ -97,7 +97,6 @@ export function AccountsPanel() {
               onClick={() => setEditing('new')}
               className="shadow-xs bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 rounded-full font-semibold inline-flex items-center gap-1.5"
             >
-              <UserPlus className="w-3.5 h-3.5" />
               Tạo tài khoản
             </Button>
           )}

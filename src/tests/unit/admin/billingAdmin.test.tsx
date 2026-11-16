@@ -81,7 +81,9 @@ describe('PlansPanel', () => {
     const fetchMock = mockApi({ 'GET /admin/membership-plans': [monthly], 'POST /admin/membership-plans/plan-m/prices': {} });
     render(<PlansPanel />);
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Đặt giá Gói Tháng' }));
+    const priceButton = await screen.findByRole('button', { name: 'Đặt giá Gói Tháng' });
+    expect(priceButton.querySelector('svg')).not.toBeNull();
+    await userEvent.click(priceButton);
     const input = screen.getByLabelText('Giá mới (Coin / kỳ)');
     await userEvent.clear(input);
     await userEvent.type(input, '1200');
@@ -146,7 +148,9 @@ describe('CoinLedgerPanel', () => {
     });
     render(<CoinLedgerPanel />);
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Xem ví của tài khoản này' }));
+    const walletButton = await screen.findByRole('button', { name: 'Xem ví của tài khoản này' });
+    expect(walletButton.querySelector('svg')).not.toBeNull();
+    await userEvent.click(walletButton);
     await userEvent.click(await screen.findByRole('button', { name: /Điều chỉnh số dư/ }));
     await userEvent.type(screen.getByLabelText('Coin chính'), '20');
     await userEvent.type(screen.getByLabelText('Lý do (bắt buộc)'), 'Bù lần nạp lỗi');

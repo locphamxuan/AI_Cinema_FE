@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { ArrowRight, Clapperboard, LayoutGrid, List, Search } from 'lucide-react';
+import { LayoutGrid, List, Search } from 'lucide-react';
 import { InitialsAvatar } from '@/components/data/InitialsAvatar';
 import { Pager, pageOf } from '@/components/data/Pager';
 import { ErrorNote, Loading } from '@/components/data/ui';
@@ -52,7 +52,7 @@ function QueueTable({ items }: { items: QueueItem[] }) {
               </td>
               <td className="py-3.5 px-4 text-right">
                 <Link href={item.href} className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-semibold">
-                  {STAGE_STYLE[item.stage].action} <ArrowRight className="w-3 h-3" />
+                  {STAGE_STYLE[item.stage].action}
                 </Link>
               </td>
             </tr>
@@ -101,7 +101,7 @@ export function ReviewerProjectQueuePage() {
             </div>
           </div>
           <Link href="/reviewer" className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs sm:text-sm font-semibold shadow-xs transition-all">
-            <Clapperboard className="w-4 h-4" aria-hidden="true" /> Bàn Thẩm Định Phim <ArrowRight className="w-4 h-4" aria-hidden="true" />
+            Bàn Thẩm Định Phim
           </Link>
         </section>
 

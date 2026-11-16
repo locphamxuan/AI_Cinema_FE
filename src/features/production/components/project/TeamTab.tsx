@@ -12,6 +12,7 @@ import { useResource } from '@/hooks/useResource';
 import { TEAM_EDITABLE_PROJECT, isIn } from '../../lib/capabilities';
 import { formatDateTime } from '@/lib/format';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { AddCreatorModal, DelegateModal } from './TeamModals';
 import { useProject } from './ProjectContext';
 
@@ -21,12 +22,14 @@ export function TeamTab() {
   const userId = useAppStore((s) => s.user?.id);
   const [adding, setAdding] = useState(false);
   const [delegating, setDelegating] = useState(false);
+  const [removing, setRemoving] = useState<CreatorSeat | null>(null);
   const team = useResource(`team:${project.id}:${project.updatedAt}`, () => teamService.listCreators(project.id));
   const { busy, run } = useAction();
   const editable = isIn(project.status, TEAM_EDITABLE_PROJECT);
 
   const remove = async (seat: CreatorSeat) => {
     if (await run(() => teamService.removeCreator(project.id, seat.creatorId), `Đã gỡ ${seat.creator.fullName}`)) {
+      setRemoving(null);
       await Promise.all([team.reload(), reload()]);
     }
   };
@@ -89,7 +92,7 @@ export function TeamTab() {
                   </td>
                   <td className="px-3 py-2.5 text-right">
                     {caps.manage && editable && seat.isActive && !seat.isLead && (
-                      <Button size="sm" variant="ghost" disabled={busy} onClick={() => remove(seat)} aria-label={`Gỡ ${seat.creator.fullName}`}>
+                      <Button size="sm" variant="ghost" disabled={busy} onClick={() => setRemoving(seat)} aria-label={`Gỡ ${seat.creator.fullName}`}>
                         <UserMinus className="w-3.5 h-3.5 text-red-500" />
                       </Button>
                     )}
@@ -100,6 +103,19 @@ export function TeamTab() {
           </table>
         </div>
       )}
+      <ConfirmModal
+        open={!!removing}
+        title="Gỡ Creator khỏi dự án"
+        description={
+          removing &&
+          `Gỡ ${removing.creator.fullName} khỏi nhóm Creator. Các tập đang giao cho người này trở về cả nhóm (chưa giao riêng).`
+        }
+        confirmLabel="Gỡ Creator"
+        danger
+        busy={busy}
+        onClose={() => setRemoving(null)}
+        onConfirm={() => removing && void remove(removing)}
+      />
       {adding && (
         <AddCreatorModal
           seats={seats}

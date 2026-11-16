@@ -12,6 +12,7 @@ import { PRICE_ALERT_STATUS } from '@/features/production/lib/labels';
 import { formatDateTime } from '@/lib/format';
 import { productionPaths } from '@/features/production/lib/routes';
 import { Empty, ErrorNote, Loading, StatusPill, TextPromptModal } from '@/components/data/ui';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { MetaPager } from '@/components/data/MetaPager';
 
 const FILTERS: { key: PriceAlertStatus | 'ALL'; label: string }[] = [
@@ -32,6 +33,7 @@ export function PriceAlertsPanel() {
     productionService.listPriceAlerts(page, filter === 'ALL' ? undefined : filter),
   );
   const [asking, setAsking] = useState<PriceAlert | null>(null);
+  const [accepting, setAccepting] = useState<PriceAlert | null>(null);
   const { busy, run } = useAction();
 
   const requestChange = async (note: string) => {
@@ -42,7 +44,10 @@ export function PriceAlertsPanel() {
     }
   };
   const resolve = async (alert: PriceAlert) => {
-    if (await run(() => productionService.resolvePriceAlert(alert.id), 'Đã chấp nhận giá này')) await alerts.reload();
+    if (await run(() => productionService.resolvePriceAlert(alert.id), 'Đã chấp nhận giá này')) {
+      setAccepting(null);
+      await alerts.reload();
+    }
   };
 
   return (
@@ -104,7 +109,7 @@ export function PriceAlertsPanel() {
                   </Button>
                 )}
                 {a.status !== 'RESOLVED' && (
-                  <Button size="sm" variant="ghost" disabled={busy} onClick={() => resolve(a)}>
+                  <Button size="sm" variant="ghost" disabled={busy} onClick={() => setAccepting(a)}>
                     Chấp nhận giá
                   </Button>
                 )}
@@ -114,6 +119,18 @@ export function PriceAlertsPanel() {
         </ul>
         {alerts.data && <MetaPager meta={alerts.data.meta} onPage={setPage} />}
       </div>
+      <ConfirmModal
+        open={!!accepting}
+        title="Chấp nhận giá ngoài khoảng"
+        description={
+          accepting &&
+          `Giữ giá ${accepting.coinPrice} Coin cho ${accepting.episode.movie.title} - tập ${accepting.episode.episodeNumber} dù ngoài khoảng ${accepting.rangeMin}–${accepting.rangeMax}. Cảnh báo được đóng.`
+        }
+        confirmLabel="Chấp nhận giá"
+        busy={busy}
+        onClose={() => setAccepting(null)}
+        onConfirm={() => accepting && void resolve(accepting)}
+      />
       <TextPromptModal
         open={!!asking}
         title="Hỏi ý kiến Reviewer về giá"

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Coins } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -54,7 +53,6 @@ export function EpisodePricingModal({
       open
       onClose={onClose}
       maxWidth="max-w-md"
-      icon={<Coins className="w-5 h-5 text-amber-500" />}
       title="Đặt giá & Quyền xem tập"
       subtitle={episode.label}
     >

@@ -193,6 +193,8 @@ describe('AdminExecutivePortal', () => {
     expect(await screen.findByRole('link', { name: 'Duyệt kịch bản: Mưa Sài Gòn' })).toHaveAttribute('href', '/admin/projects/m1?tab=script');
     expect(calls.filter((c) => c.path === '/projects/pipeline')).toHaveLength(1);
     await userEvent.click(screen.getByRole('button', { name: /Phát Hành Ngay/ }));
+    expect(calls.some((c) => c.path === '/episodes/e1/publications')).toBe(false);
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Phát hành' }));
     await waitFor(() => expect(calls.some((c) => c.path === '/episodes/e1/publications' && c.method === 'POST')).toBe(true));
     expect(calls.filter((c) => isPerProjectRead(c.path))).toEqual([]);
   });
