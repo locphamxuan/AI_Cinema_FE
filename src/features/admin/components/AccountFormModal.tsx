@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { UserCog, UserPlus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -68,7 +67,6 @@ export function AccountFormModal({
       maxWidth="max-w-md"
       title={creating ? 'Tạo tài khoản' : 'Sửa tài khoản'}
       subtitle={creating ? 'Tài khoản nội bộ: Creator, Reviewer, Staff hoặc Admin.' : account.email}
-      icon={creating ? <UserPlus className="w-5 h-5" /> : <UserCog className="w-5 h-5" />}
     >
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Họ tên">
@@ -163,7 +161,6 @@ export function DeleteAccountModal({ account, onClose, onDeleted }: { account: A
       maxWidth="max-w-md"
       title="Xoá tài khoản"
       subtitle={`${account.fullName} · ${account.email}`}
-      icon={<Trash2 className="w-5 h-5 text-rose-500" />}
     >
       <div className="space-y-4">
         <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">

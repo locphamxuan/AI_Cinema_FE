@@ -1,7 +1,6 @@
 'use client';
 
 import { useId } from 'react';
-import { FileText } from 'lucide-react';
 import { contractPdfProblem } from '@/services/contractService';
 import { formatBytes } from '@/lib/format';
 
@@ -34,7 +33,7 @@ export function ContractPdfInput({
       />
       {file && !problem && (
         <p className="flex items-center gap-1.5 text-muted-foreground">
-          <FileText className="size-3.5" aria-hidden="true" /> {file.name} · {formatBytes(file.size)}
+          {file.name} · {formatBytes(file.size)}
         </p>
       )}
       {problem && (

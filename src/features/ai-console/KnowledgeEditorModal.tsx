@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BookOpen } from 'lucide-react';
 import { Loading } from '@/components/data/ui';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
@@ -86,7 +85,6 @@ export function KnowledgeEditorModal({
       open
       onClose={onClose}
       maxWidth="max-w-4xl"
-      icon={<BookOpen className="size-5" />}
       title={articleId ? 'Sửa bài tri thức' : 'Thêm bài tri thức'}
       subtitle={loaded ? `Phiên bản ${loaded.version} · ${loaded.chunks.length} đoạn đã cắt` : 'Không ghi số liệu thay đổi (tỷ giá Coin, giá gói) vào bài: AI đọc số thật từ hệ thống.'}
     >

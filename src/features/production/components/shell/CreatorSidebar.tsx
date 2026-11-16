@@ -3,13 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import {
-  Film,
-  Clapperboard,
-  Bell,
-  UserRound,
-  Search,
-} from 'lucide-react';
+import { Film, Search } from 'lucide-react';
 
 export function CreatorSidebar() {
   const pathname = usePathname();
@@ -31,10 +25,6 @@ export function CreatorSidebar() {
         : 'text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white'
     }`;
 
-  const iconClass = (active: boolean) =>
-    `w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-105 ${
-      active ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
-    }`;
 
   return (
     <nav
@@ -85,7 +75,6 @@ export function CreatorSidebar() {
             className={linkClass(isProjects)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <Clapperboard className={iconClass(isProjects)} />
               <span className="truncate">Dự án kịch bản</span>
             </div>
           </Link>
@@ -102,7 +91,6 @@ export function CreatorSidebar() {
             className={linkClass(isNotifications)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <Bell className={iconClass(isNotifications)} />
               <span className="truncate">Thông báo</span>
             </div>
           </Link>
@@ -113,7 +101,6 @@ export function CreatorSidebar() {
             className={linkClass(isProfile)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <UserRound className={iconClass(isProfile)} />
               <span className="truncate">Hồ sơ cá nhân</span>
             </div>
           </Link>

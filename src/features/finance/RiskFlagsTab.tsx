@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { ScanSearch, Wallet } from 'lucide-react';
 import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { MetaPager } from '@/components/data/MetaPager';
 import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
@@ -103,7 +102,7 @@ export function RiskFlagsTab() {
             ))}
           </select>
           <Button size="sm" onClick={() => void scan()} disabled={busy}>
-            <ScanSearch className="size-3.5" aria-hidden="true" /> Quét ngay
+            Quét ngay
           </Button>
         </>
       }
@@ -154,7 +153,6 @@ export function RiskFlagsTab() {
                     <td className="py-2.5">
                       <div className="flex justify-end gap-1.5">
                         <Button size="sm" variant="ghost" aria-label={`Mở ví của ${member.fullName}`} onClick={() => setWalletOf(member.id)}>
-                          <Wallet className="size-3.5" aria-hidden="true" />
                         </Button>
                         {f.status === 'OPEN' && (
                           <>

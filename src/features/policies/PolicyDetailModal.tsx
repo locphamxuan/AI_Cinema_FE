@@ -1,7 +1,6 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Scale } from 'lucide-react';
 import { Facts } from '@/components/data/ui';
 import { Modal } from '@/components/ui/Modal';
 import { formatDateTime } from '@/lib/format';
@@ -50,7 +49,7 @@ function ContentView({ value }: { value: unknown }): ReactNode {
 
 export function PolicyDetailModal({ policy: p, onClose }: { policy: Policy; onClose: () => void }) {
   return (
-    <Modal open onClose={onClose} maxWidth="max-w-2xl" icon={<Scale className="size-5" />} title={p.name} subtitle={`Phiên bản ${p.version}`}>
+    <Modal open onClose={onClose} maxWidth="max-w-2xl" title={p.name} subtitle={`Phiên bản ${p.version}`}>
       <div className="space-y-5">
         <Facts
           items={[

@@ -3,7 +3,6 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Clapperboard } from 'lucide-react';
 import { ErrorNote, Loading } from '@/components/data/ui';
 import { projectCapabilities } from '@/features/production/lib/capabilities';
 import { useCan } from '@/hooks/useCan';
@@ -79,7 +78,6 @@ export function ReviewerAuditWorkspace() {
       {target && <AuditDesk key={target.episodeId} projectId={target.projectId} episodeId={target.episodeId} queue={queue} />}
       {pipelines.data && !target && (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 p-10 text-center">
-          <Clapperboard className="w-12 h-12 text-slate-400" aria-hidden="true" />
           <h1 className="text-lg font-bold text-slate-900 dark:text-white">Chưa có bản phim nào chờ thẩm định</h1>
           <Link href="/reviewer/projects" className="px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-semibold transition-all">
             Xem hàng đợi dự án

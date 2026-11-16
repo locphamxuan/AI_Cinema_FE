@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { SearchCheck } from 'lucide-react';
 import { Empty } from '@/components/data/ui';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
@@ -25,7 +24,7 @@ export function RetrievalPreviewModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal open onClose={onClose} maxWidth="max-w-2xl" icon={<SearchCheck className="size-5" />} title="Kiểm tra bài nào được tìm thấy" subtitle="Chỉ thử bước tìm bài, không gọi AI và không lưu gì.">
+    <Modal open onClose={onClose} maxWidth="max-w-2xl" title="Kiểm tra bài nào được tìm thấy" subtitle="Chỉ thử bước tìm bài, không gọi AI và không lưu gì.">
       <form onSubmit={check} className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_10rem_auto] sm:items-end">
         <FormField label="Câu hỏi">
           <input required minLength={2} maxLength={1000} value={query} onChange={(e) => setQuery(e.target.value)} className={fieldInputClass} placeholder="Hủy gói Tháng có được hoàn tiền không?" />

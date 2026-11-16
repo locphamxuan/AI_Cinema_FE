@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react';
 import Link from 'next/link';
-import { AlertTriangle, ChevronDown, ChevronRight, Pencil } from 'lucide-react';
+import { ChevronDown, ChevronRight, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { getTodayDateString } from '@/lib/dateUtils';
 import { seasonLabel, seasonName } from '@/lib/seasonLabel';
@@ -162,7 +162,7 @@ export function SeasonSection({
                       <td className="px-3 py-2.5 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{formatNumber(ep.coinPrice)}</td>
                       <td className="px-3 py-2.5 hidden md:table-cell text-slate-600 dark:text-slate-300">{formatDay(ep.expectedReleaseDate)}</td>
                       <td className={`px-3 py-2.5 hidden lg:table-cell ${overdue ? 'text-rose-600 font-semibold' : 'text-slate-600 dark:text-slate-300'}`}>
-                        {overdue && <AlertTriangle className="inline w-3 h-3 mr-1" aria-label="Trễ hạn" />}
+                        {overdue && 'Quá hạn: '}
                         {ep.deliveryDeadline ? formatDay(ep.deliveryDeadline) : <span className="text-amber-600">Chưa đặt</span>}
                       </td>
                       <td className="px-2 py-2.5 text-right whitespace-nowrap">

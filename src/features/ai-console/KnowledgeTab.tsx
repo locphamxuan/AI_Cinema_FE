@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, RefreshCw, SearchCheck } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { Panel } from '@/components/data/ui';
 import { Button } from '@/components/ui/Button';
@@ -76,13 +76,13 @@ export function KnowledgeTab({ focus }: { focus: KnowledgeFocus | null }) {
       actions={
         <>
           <Button size="sm" variant="ghost" onClick={() => setPreviewing(true)}>
-            <SearchCheck className="size-3.5" aria-hidden="true" /> Kiểm tra truy hồi
+            Kiểm tra truy hồi
           </Button>
           <Button size="sm" variant="secondary" disabled={busy} onClick={() => setPending({ kind: 'reindex-all' })}>
             <RefreshCw className="size-3.5" aria-hidden="true" /> Index lại tất cả
           </Button>
           <Button size="sm" onClick={() => setEditor({ id: null })}>
-            <Plus className="size-3.5" aria-hidden="true" /> Thêm bài
+            Thêm bài
           </Button>
         </>
       }

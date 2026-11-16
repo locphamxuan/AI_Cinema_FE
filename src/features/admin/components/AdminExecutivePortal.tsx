@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { BarChart3, Clapperboard, Plus } from 'lucide-react';
 import { ErrorNote, Loading } from '@/components/data/ui';
 import { useCan } from '@/hooks/useCan';
 import { useResource } from '@/hooks/useResource';
@@ -33,10 +32,10 @@ export function AdminExecutivePortal() {
       <div className="max-w-6xl mx-auto space-y-6">
         <div role="tablist" aria-label="Khu quản trị" className="flex items-center gap-2 border-b border-slate-200/80 dark:border-white/[0.08] pb-3.5 text-xs">
           <button type="button" role="tab" aria-selected={tab === 'projects'} onClick={() => setTab('projects')} className={tabClass(tab === 'projects')}>
-            <Clapperboard className="w-3.5 h-3.5" /> Quản Trị Dự Án
+            Quản Trị Dự Án
           </button>
           <button type="button" role="tab" aria-selected={tab === 'charts'} onClick={() => setTab('charts')} className={tabClass(tab === 'charts')}>
-            <BarChart3 className="w-3.5 h-3.5" /> Biểu Đồ Doanh Thu & Vận Hành
+            Biểu Đồ Doanh Thu & Vận Hành
           </button>
         </div>
 
@@ -56,7 +55,7 @@ export function AdminExecutivePortal() {
               </div>
               {can(PERMISSION.PROJECT_CREATE) && (
                 <button type="button" onClick={() => setCreating(true)} className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs sm:text-sm font-semibold shadow-xs cursor-pointer transition-all">
-                  <Plus className="w-4 h-4" /> Khởi Tạo Dự Án Mới
+                  Khởi Tạo Dự Án Mới
                 </button>
               )}
             </section>

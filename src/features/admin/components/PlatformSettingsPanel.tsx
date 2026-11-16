@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Coins, Clapperboard, Radio, Gift, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
@@ -45,12 +44,12 @@ const ALL_FIELDS = [...COIN_FIELDS, ...PRODUCTION_FIELDS, ...STREAMING_FIELDS];
 
 type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards';
 
-const TABS: { key: SettingsTab; label: string; Icon?: typeof Coins }[] = [
+const TABS: { key: SettingsTab; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
-  { key: 'coin', label: 'COIN & Nạp tiền', Icon: Coins },
-  { key: 'production', label: 'Giá tập', Icon: Clapperboard },
-  { key: 'streaming', label: 'Phát sóng & Gói', Icon: Radio },
-  { key: 'rewards', label: 'Điểm danh & Vòng quay', Icon: Gift },
+  { key: 'coin', label: 'COIN & Nạp tiền' },
+  { key: 'production', label: 'Giá tập' },
+  { key: 'streaming', label: 'Phát sóng & Gói' },
+  { key: 'rewards', label: 'Điểm danh & Vòng quay' },
 ];
 
 /** Segmented platform policies: Coin, Production, Playback & Rewards */
@@ -156,7 +155,7 @@ export function PlatformSettingsPanel() {
 
       {/* Segmented Navigation Tabs */}
       <div className="flex flex-wrap gap-1.5 border-b border-slate-100 dark:border-white/5 pb-3">
-        {TABS.map(({ key, label, Icon }) => (
+        {TABS.map(({ key, label }) => (
           <button
             key={key}
             type="button"
@@ -167,7 +166,6 @@ export function PlatformSettingsPanel() {
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5'
             }`}
           >
-            {Icon && <Icon className="w-3.5 h-3.5" />}
             <span>{label}</span>
           </button>
         ))}
@@ -245,7 +243,6 @@ export function PlatformSettingsPanel() {
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors shadow-md shadow-amber-500/20"
               >
                 <span>Mở trang Quản lý Điểm danh & Vòng quay</span>
-                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>

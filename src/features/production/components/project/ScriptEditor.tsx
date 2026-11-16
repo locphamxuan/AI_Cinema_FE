@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { scriptService } from '@/services/scriptService';
@@ -59,7 +58,7 @@ export function ScriptEditor({ latest, onSubmitted }: { latest: ScriptVersion | 
         <div className="flex items-center justify-between gap-3">
           <p className="text-[11px] text-slate-500 tabular-nums">{content.length.toLocaleString('vi-VN')} ký tự</p>
           <Button type="submit" disabled={busy || !content.trim() || unchanged}>
-            <Send className="w-3.5 h-3.5" aria-hidden="true" /> Nộp cho Reviewer
+            Nộp cho Reviewer
           </Button>
         </div>
         {unchanged && <p className="text-[11px] text-amber-600">Sửa kịch bản theo góp ý trước khi nộp lại.</p>}

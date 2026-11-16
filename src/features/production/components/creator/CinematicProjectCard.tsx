@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Building2, Image as ImageIcon } from 'lucide-react';
+import { Image as ImageIcon } from 'lucide-react';
 import { SCRIPT_STEPS, type ScriptProjectItem } from './scriptItems';
 
 export const STAGE_BADGE: Record<ScriptProjectItem['stage'], string> = {
@@ -31,7 +31,6 @@ export function CinematicProjectCard({ project, href }: { project: ScriptProject
         )}
         <div className="absolute top-3 inset-x-3 flex items-center justify-between gap-2 pointer-events-none">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/90 dark:bg-black/75 backdrop-blur-md text-slate-800 dark:text-white">
-            <Building2 className="w-3.5 h-3.5 text-amber-500" />
             <span className="truncate max-w-[110px]">{project.studioName ?? 'Chưa có Studio'}</span>
           </span>
           <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider border backdrop-blur-md ${STAGE_BADGE[project.stage]}`}>{project.stageLabel}</span>
@@ -62,7 +61,6 @@ export function CinematicProjectCard({ project, href }: { project: ScriptProject
         <div className="pt-3 border-t border-slate-100 dark:border-white/[0.08] flex justify-end">
           <Link href={href} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-bold">
             {needsWriting(project) ? 'Soạn Kịch Bản' : 'Xem Dự Án'}
-            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

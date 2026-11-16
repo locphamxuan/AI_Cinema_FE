@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldTextareaClass } from '@/components/ui/FormField';
 import { useAction } from '@/hooks/useAction';
@@ -54,7 +53,7 @@ export function StaffCaseComposer({ caseId, canSuggest, onSent }: { caseId: stri
         </div>
         {canSuggest && (
           <Button type="button" size="sm" variant="ghost" disabled={busy} onClick={() => void suggest()}>
-            <Sparkles className="size-3.5" aria-hidden="true" /> Gợi ý bằng AI
+            Gợi ý bằng AI
           </Button>
         )}
       </div>
@@ -78,7 +77,7 @@ export function StaffCaseComposer({ caseId, canSuggest, onSent }: { caseId: stri
           className={`${fieldTextareaClass} ${mode === 'note' ? 'border-warning/50 bg-warning/5' : ''}`}
         />
         <Button type="submit" disabled={busy || !text}>
-          <Send className="size-4" aria-hidden="true" /> {mode === 'note' ? 'Lưu ghi chú' : 'Gửi'}
+          {mode === 'note' ? 'Lưu ghi chú' : 'Gửi'}
         </Button>
       </div>
     </form>

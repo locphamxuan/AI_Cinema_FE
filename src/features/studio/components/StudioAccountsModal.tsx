@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { KeyRound } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
@@ -47,7 +46,6 @@ export function StudioAccountsModal({ studio, onClose }: { studio: Studio; onClo
       onClose={onClose}
       title={`Tài khoản đăng nhập - ${studio.name}`}
       subtitle="Studio dùng các tài khoản này để đăng nhập Studio Web: ký hợp đồng và nộp phim từng tập."
-      icon={<KeyRound className="w-4 h-4" />}
       maxWidth="max-w-2xl"
     >
       <div className="space-y-5 text-xs">
