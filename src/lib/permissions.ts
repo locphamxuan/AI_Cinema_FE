@@ -14,6 +14,7 @@ export const PERMISSION = {
   COST_APPROVE: 'cost:approve',
   COST_ADJUST: 'cost:adjust',
   CONTRACT_MANAGE: 'contract:manage',
+  CONTRACT_DOCUMENT_READ: 'contract:document.read',
   SCRIPT_WRITE: 'script:write',
   SCRIPT_APPROVE: 'script:approve',
   STUDIO_PORTAL: 'studio:portal',
