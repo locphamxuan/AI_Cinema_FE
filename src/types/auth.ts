@@ -13,13 +13,6 @@ export interface UserProfile {
   createdAt?: string;
 }
 
-export interface AuthResponse {
-  user: UserProfile;
-  token: string;
-  refreshToken?: string;
-  redirectUrl?: string;
-}
-
 export interface LoginCredentials {
   email: string;
   password: string;

@@ -32,13 +32,6 @@ export const SOURCE: Record<KnowledgeSource, string> = {
 /** Suggested categories; the backend takes any text up to 100 characters. */
 export const CATEGORY_SUGGESTIONS = ['Gói cước', 'Coin & Thanh toán', 'Kỹ thuật & Sự cố', 'Bản quyền', 'Tài khoản'];
 
-export const RESOLUTION: Record<AiResolution, Label> = {
-  ANSWERED: { label: 'Đã trả lời', tone: 'emerald' },
-  RESOLVED_SUGGESTED: { label: 'Gợi ý đã giải quyết', tone: 'emerald' },
-  NEEDS_HUMAN: { label: 'Chuyển nhân viên', tone: 'amber' },
-  UNCERTAIN: { label: 'Chuyển nhân viên', tone: 'amber' },
-};
-
 /** The AI hands the case to Staff when it needs a person or is not sure. */
 export const handsOff = (r: AiResolution | null | undefined) => r === 'NEEDS_HUMAN' || r === 'UNCERTAIN';
 
