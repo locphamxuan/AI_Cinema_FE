@@ -7,7 +7,6 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { toast } from '@/components/ui/Toast';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 import { studioService } from '@/services/studioService';
@@ -16,11 +15,11 @@ import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { Pager, pageOf } from '@/components/data/Pager';
-
-const PAGE_SIZE = 15;
 import { CARD, Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { StudioAccountsModal } from './StudioAccountsModal';
 import { StudioModal } from './StudioModal';
+
+const PAGE_SIZE = 15;
 
 /**
  * Catalog of partner studios (BR-59): add, edit, deactivate and remove the studios a project can be ordered from;
@@ -40,22 +39,24 @@ export function StudiosPage() {
   const [page, setPage] = useState(1);
   const { busy, run } = useAction();
   const { rows, totalPages } = pageOf(studios.data ?? [], page, PAGE_SIZE);
+  // After the last studio of the last page goes, step back to the page that still exists.
+  if (studios.data && page > totalPages) setPage(totalPages);
 
   const toggle = async (studio: Studio) => {
     const nextActive = !studio.isActive;
-    const res = await studioService.update(studio.id, { isActive: nextActive });
+    const done = await run(
+      () => studioService.update(studio.id, { isActive: nextActive }),
+      nextActive ? 'Đã dùng lại Studio' : 'Đã ngừng dùng Studio',
+      (res) => {
+        // The studio still makes films: list those projects so the Admin can change their studio first.
+        const raw = res.rawDetails as { code?: string; projects?: { id: string; title: string }[] } | undefined;
+        if (res.statusCode !== 409 || !(raw?.code === 'STUDIO_HAS_ACTIVE_PROJECTS' || raw?.projects?.length)) return false;
+        setBusyProjects({ studioName: studio.name, projects: raw?.projects ?? [] });
+        return true;
+      },
+    );
     setAsking(null);
-    if (res.success) {
-      toast.success(nextActive ? 'Đã dùng lại Studio' : 'Đã ngừng dùng Studio');
-      await studios.reload();
-      return;
-    }
-    const raw = res.rawDetails as { code?: string; projects?: { id: string; title: string }[] } | undefined;
-    if (res.statusCode === 409 && (raw?.code === 'STUDIO_HAS_ACTIVE_PROJECTS' || raw?.projects?.length)) {
-      setBusyProjects({ studioName: studio.name, projects: raw?.projects ?? [] });
-      return;
-    }
-    toast.error('Không cập nhật được trạng thái Studio', res.message || 'Lỗi hệ thống');
+    if (done) await studios.reload();
   };
   const remove = async (studio: Studio) => {
     if (await run(() => studioService.remove(studio.id), 'Đã xoá Studio')) {

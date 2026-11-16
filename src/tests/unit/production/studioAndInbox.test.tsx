@@ -5,6 +5,7 @@ import { ChangeRequestInbox } from '@/features/admin/components/ChangeRequestInb
 import { DashboardHeader } from '@/features/production/components/shell/DashboardHeader';
 import { StudiosPage } from '@/features/studio/components/StudiosPage';
 import { routeFetch } from '@/tests/support/routeFetch';
+import { fakeResponse } from '@/tests/support/fakeResponse';
 import { signInAs } from '@/tests/support/signIn';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -78,6 +79,50 @@ describe('StudiosPage (BR-59)', () => {
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Huỷ' }));
     await userEvent.click(screen.getByRole('button', { name: 'Trang 2' }));
     expect(await screen.findByText('Studio 15')).toBeInTheDocument();
+  });
+
+  it('steps back a page when the last studio of the last page is deleted', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
+    const many = Array.from({ length: 16 }, (_, i) => studio({ id: `s${i}`, name: `Studio ${String(i).padStart(2, '0')}`, email: `s${i}@x.vn` }));
+    const routes: Record<string, unknown> = { '/studios': many, '/studios/s15': {} };
+    routeFetch(routes);
+    render(<StudiosPage />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Trang 2' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Xoá Studio 15' }));
+    routes['/studios'] = many.slice(0, 15);
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xoá Studio' }));
+
+    expect(await screen.findByText('Studio 00')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Trang 2' })).not.toBeInTheDocument();
+  });
+
+  it('sends one change while deactivating, however often the button is pressed', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
+    let answer: (value: unknown) => void = () => undefined;
+    const patches: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        if (init?.method === 'PATCH') {
+          patches.push(url);
+          return new Promise((resolve) => (answer = resolve));
+        }
+        return fakeResponse([studio()]);
+      }),
+    );
+    render(<StudiosPage />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Ngừng dùng' }));
+    const confirm = within(await screen.findByRole('dialog')).getByRole('button', { name: 'Ngừng dùng' });
+    await userEvent.click(confirm);
+    await userEvent.click(confirm);
+    expect(patches).toHaveLength(1);
+    expect(confirm).toBeDisabled();
+    answer(fakeResponse({ ...studio(), isActive: false }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('shows the catalog read-only to Reviewer or an account that cannot manage it', async () => {
