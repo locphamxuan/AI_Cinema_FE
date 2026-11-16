@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { notificationTabsFor, typesOf } from '@/features/notifications/notificationCatalog';
 import { pageOf } from '@/components/data/Pager';
@@ -118,7 +118,11 @@ describe('CostRequestInbox', () => {
     await userEvent.clear(amount);
     await userEvent.type(amount, '15000000');
     await userEvent.click(screen.getByRole('button', { name: 'Cấp' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('15.000.000 ₫');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Cấp chi phí' }));
 
+    await waitFor(() => expect(calls.some((c) => c.path === '/cost-requests/req-1/approve')).toBe(true));
     const approve = calls.find((c) => c.path === '/cost-requests/req-1/approve');
     expect(JSON.parse(approve!.body as string)).toEqual({ grantedVnd: 15_000_000 });
   });
@@ -129,5 +133,24 @@ describe('CostRequestInbox', () => {
     render(<CostRequestInbox />);
     expect(await screen.findByText(/Hết ngân sách quý này/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Cấp' })).not.toBeInTheDocument();
+  });
+
+  it('steps back to the last page that still has requests', async () => {
+    signInAs('admin');
+    const calls = routeFetch({ '/cost-requests': { data: [], meta: { page: 3, limit: 20, total: 40, totalPages: 2 } } });
+    render(<CostRequestInbox />);
+    await waitFor(() => expect(calls.some((c) => c.path === '/cost-requests' && c.search.get('page') === '2')).toBe(true));
+  });
+
+  it('pages through the inbox 20 requests at a time', async () => {
+    signInAs('admin');
+    const calls = routeFetch({
+      '/cost-requests': { data: [REQUEST], meta: { page: 1, limit: 20, total: 45, totalPages: 3 } },
+    });
+    render(<CostRequestInbox />);
+    await screen.findByText('Vùng dịch 704');
+    expect(calls[0].search.get('limit')).toBe('20');
+    await userEvent.click(screen.getByRole('button', { name: 'Trang 2' }));
+    await waitFor(() => expect(calls.some((c) => c.path === '/cost-requests' && c.search.get('page') === '2')).toBe(true));
   });
 });

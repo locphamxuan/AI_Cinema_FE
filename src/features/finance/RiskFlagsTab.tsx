@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ScanSearch, Wallet } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { MetaPager } from '@/components/data/MetaPager';
 import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
@@ -103,7 +103,7 @@ export function RiskFlagsTab() {
             ))}
           </select>
           <Button size="sm" onClick={() => void scan()} disabled={busy}>
-            <ScanSearch className="size-3.5" aria-hidden="true" /> Quét ngay
+            Quét ngay
           </Button>
         </>
       }

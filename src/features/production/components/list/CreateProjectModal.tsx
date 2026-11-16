@@ -1,7 +1,6 @@
 ﻿'use client';
 
 import { useState } from 'react';
-import { Clapperboard } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -119,7 +118,6 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
       onClose={onClose}
       title="Tạo dự án phim"
       subtitle="Bước 1 - ý tưởng, thể loại, Reviewer phụ trách và Creator chính; Reviewer lên mùa/tập sau"
-      icon={<Clapperboard className="w-4 h-4" />}
       maxWidth="max-w-3xl"
     >
       <form onSubmit={submit} className="space-y-4">

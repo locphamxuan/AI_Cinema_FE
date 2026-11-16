@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RolePermissionsPanel } from '@/features/admin/components/RolePermissionsPanel';
 import { adminService } from '@/services/adminService';
@@ -38,9 +38,20 @@ describe('RolePermissionsPanel', () => {
 
     await userEvent.click(await screen.findByRole('checkbox', { name: 'Staff: Xem thông tin member (chỉ đọc)' }));
     await userEvent.click(screen.getByRole('button', { name: 'Lưu 1 vai trò' }));
+    expect(api.setRolePermissions).not.toHaveBeenCalled();
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Lưu phân quyền' }));
 
     await waitFor(() => expect(api.setRolePermissions).toHaveBeenCalledWith('STAFF', ['member:ops.read']));
     expect(api.setRolePermissions).toHaveBeenCalledTimes(1);
+  });
+
+  it('filters the permissions by the search text', async () => {
+    render(<RolePermissionsPanel />);
+    await screen.findByRole('checkbox', { name: 'Staff: Xem thông tin member (chỉ đọc)' });
+    await userEvent.type(screen.getByPlaceholderText(/Tìm kiếm quyền hạn/), 'khongtontai');
+    expect(screen.getByText(/Không tìm thấy quyền hạn nào/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Xoá từ khoá tìm kiếm' }));
+    expect(screen.getByRole('checkbox', { name: 'Staff: Xem thông tin member (chỉ đọc)' })).toBeInTheDocument();
   });
 
   it('shows the permissions ADMIN always keeps as locked, not as a checkbox', async () => {

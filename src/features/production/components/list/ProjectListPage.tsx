@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Film, Clapperboard, Clock, CheckCircle2, XCircle, Layers, LayoutGrid, List } from 'lucide-react';
+import { Search, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { useCan } from '@/hooks/useCan';
@@ -18,12 +18,12 @@ import { ProjectTable } from './ProjectTable';
 import { CreatorAnalyticsSection } from './CreatorAnalyticsSection';
 import { DataPagination } from '@/components/data/DataPagination';
 
-const FILTERS: { key: string; label: string; status?: MovieStatus[]; icon: React.ElementType }[] = [
-  { key: 'all', label: 'Tất cả', icon: Layers },
-  { key: 'plan', label: 'Đang lên kế hoạch', status: ['DRAFT', 'ASSIGNED'], icon: Clock },
-  { key: 'production', label: 'Đang sản xuất', status: ['IN_PRODUCTION', 'UNDER_REVISION'], icon: Clapperboard },
-  { key: 'done', label: 'Hoàn tất', status: ['COMPLETED'], icon: CheckCircle2 },
-  { key: 'cancelled', label: 'Đã huỷ', status: ['CANCELLED'], icon: XCircle },
+const FILTERS: { key: string; label: string; status?: MovieStatus[] }[] = [
+  { key: 'all', label: 'Tất cả' },
+  { key: 'plan', label: 'Đang lên kế hoạch', status: ['DRAFT', 'ASSIGNED'] },
+  { key: 'production', label: 'Đang sản xuất', status: ['IN_PRODUCTION', 'UNDER_REVISION'] },
+  { key: 'done', label: 'Hoàn tất', status: ['COMPLETED'] },
+  { key: 'cancelled', label: 'Đã huỷ', status: ['CANCELLED'] },
 ];
 
 const VIEWS = [
@@ -81,7 +81,7 @@ export function ProjectListPage() {
 
       <div className="px-6 lg:px-8 py-3 border-y border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#111420] flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div role="tablist" aria-label="Lọc theo trạng thái" className="flex flex-wrap items-center gap-1.5">
-          {FILTERS.map(({ key, label, icon: Icon }) => (
+          {FILTERS.map(({ key, label }) => (
             <button
               key={key}
               type="button"
@@ -97,7 +97,6 @@ export function ProjectListPage() {
                   : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
               }`}
             >
-              <Icon className="w-3.5 h-3.5" aria-hidden="true" />
               {label}
             </button>
           ))}
@@ -162,7 +161,6 @@ export function ProjectListPage() {
 
             {projects.data.data.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 text-center bg-white dark:bg-white/[0.02]">
-                <Film className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600 mb-3" aria-hidden="true" />
                 <p className="text-base font-semibold text-slate-800 dark:text-slate-100">
                   {isCreator ? 'Bạn chưa được giao dự án nào' : 'Không có dự án nào khớp bộ lọc'}
                 </p>

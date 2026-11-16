@@ -1,6 +1,6 @@
 'use client';
 
-import { BookPlus, MessagesSquare, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { formatDateTime } from '@/lib/format';
@@ -55,11 +55,11 @@ export function AnswerRow({
           </Button>
         </div>
         <Button size="sm" variant="ghost" onClick={onView}>
-          <MessagesSquare className="size-3.5" aria-hidden="true" /> Xem cả hội thoại
+          Xem cả hội thoại
         </Button>
         {a.feedback === 'NOT_HELPFUL' && (
           <Button size="sm" variant="ghost" onClick={onDraft}>
-            <BookPlus className="size-3.5" aria-hidden="true" /> Thêm bài vào Kho tri thức
+            Thêm bài vào Kho tri thức
           </Button>
         )}
         {a.feedbackBy && <p className="text-center text-[11px] text-muted-foreground">Đánh giá bởi {a.feedbackBy.fullName}</p>}

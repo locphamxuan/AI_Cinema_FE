@@ -7,6 +7,7 @@ import type { Episode } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
 import { formatDateTime } from '@/lib/format';
 import { Panel, TextPromptModal } from '@/components/data/ui';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 
 /** Where the episode stands on the way to the Final Film, in words. */
 function stateOf(episode: Episode): string {
@@ -36,13 +37,17 @@ export function FinalFilmPanel({
   onChanged: () => Promise<void>;
 }) {
   const [sendingBack, setSendingBack] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const { busy, run } = useAction();
   const checked = episode.status === 'COMPLIANCE_PASSED';
   const confirmable = canConfirm && checked && !episode.finalConfirmedAt;
   const returnable = canSendBack && checked && !!episode.finalConfirmedAt;
 
   const confirm = async () => {
-    if (await run(() => productionService.confirmFinalFilm(episode.id), 'Đã xác nhận Phim Final, Admin được báo')) await onChanged();
+    if (await run(() => productionService.confirmFinalFilm(episode.id), 'Đã xác nhận Phim Final, Admin được báo')) {
+      setConfirming(false);
+      await onChanged();
+    }
   };
   const sendBack = async (reason: string) => {
     if (await run(() => productionService.rejectFinalFilm(episode.id, reason), 'Đã trả Phim Final lại cho Reviewer')) {
@@ -62,7 +67,7 @@ export function FinalFilmPanel({
         )}
         <div className="flex flex-wrap gap-2">
           {confirmable && (
-            <Button size="sm" variant="success" disabled={busy} onClick={confirm}>
+            <Button size="sm" variant="success" disabled={busy} onClick={() => setConfirming(true)}>
               Xác nhận Phim Final
             </Button>
           )}
@@ -73,6 +78,15 @@ export function FinalFilmPanel({
           )}
         </div>
       </div>
+      <ConfirmModal
+        open={confirming}
+        title="Xác nhận Phim Final"
+        description={`Tập ${episode.episodeNumber}: ${episode.title}. Bản đã duyệt, gắn nhãn AI và qua kiểm tra pháp lý thành Phim Final; Admin được báo để định giá và phát hành.`}
+        confirmLabel="Xác nhận Phim Final"
+        busy={busy}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => void confirm()}
+      />
       <TextPromptModal
         open={sendingBack}
         title="Trả Phim Final lại qua Reviewer"

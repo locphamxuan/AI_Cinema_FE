@@ -3,18 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import {
-  Search,
-  Clapperboard,
-  FileCheck2,
-  ShieldAlert,
-  Film,
-  Building2,
-  Bell,
-  UserRound,
-  ShieldCheck,
-  Scale,
-} from 'lucide-react';
+import { Search, Film } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
 
@@ -48,10 +37,6 @@ export function ReviewerSidebar() {
         : 'text-slate-600 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-white/[0.05] hover:text-slate-900 dark:hover:text-white'
     }`;
 
-  const iconClass = (active: boolean) =>
-    `w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-105 ${
-      active ? 'text-white dark:text-slate-900' : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
-    }`;
 
   return (
     <nav
@@ -101,7 +86,6 @@ export function ReviewerSidebar() {
             className={linkClass(isAuditWorkspace)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <Clapperboard className={iconClass(isAuditWorkspace)} />
               <span className="truncate">Thẩm định video Master</span>
             </div>
           </Link>
@@ -113,7 +97,6 @@ export function ReviewerSidebar() {
             className={linkClass(isProjectQueue)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <FileCheck2 className={iconClass(isProjectQueue)} />
               <span className="truncate">Hàng đợi dự án</span>
             </div>
           </Link>
@@ -124,7 +107,6 @@ export function ReviewerSidebar() {
             className={linkClass(isApprovedFilter)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <ShieldCheck className={iconClass(isApprovedFilter)} />
               <span className="truncate">Phim Final</span>
             </div>
           </Link>
@@ -135,7 +117,6 @@ export function ReviewerSidebar() {
             className={linkClass(isRevisingFilter)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <ShieldAlert className={iconClass(isRevisingFilter)} />
               <span className="truncate">Yêu cầu chỉnh sửa</span>
             </div>
           </Link>
@@ -154,7 +135,6 @@ export function ReviewerSidebar() {
               className={linkClass(isStudios)}
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <Building2 className={iconClass(isStudios)} />
                 <span className="truncate">Studio đối tác</span>
               </div>
             </Link>
@@ -164,7 +144,6 @@ export function ReviewerSidebar() {
           {can(PERMISSION.CONTENT_REVIEW) && (
             <Link href="/reviewer/policies" aria-current={isPolicies ? 'page' : undefined} className={linkClass(isPolicies)}>
               <div className="flex items-center gap-2.5 min-w-0">
-                <Scale className={iconClass(isPolicies)} />
                 <span className="truncate">Chính sách</span>
               </div>
             </Link>
@@ -177,7 +156,6 @@ export function ReviewerSidebar() {
             className={linkClass(isNotifications)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <Bell className={iconClass(isNotifications)} />
               <span className="truncate">Thông báo</span>
             </div>
           </Link>
@@ -189,7 +167,6 @@ export function ReviewerSidebar() {
             className={linkClass(isProfile)}
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <UserRound className={iconClass(isProfile)} />
               <span className="truncate">Hồ sơ tài khoản</span>
             </div>
           </Link>

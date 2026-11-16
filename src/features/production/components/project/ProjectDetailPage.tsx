@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { AlertTriangle, Ban, Film, Clapperboard, ShieldCheck, History, CalendarClock, Layers, Users, ScrollText, FileSignature } from 'lucide-react';
 import { useAppStore } from '@/store/useAppStore';
 import { useCan } from '@/hooks/useCan';
 import { seasonName } from '@/lib/seasonLabel';
@@ -24,16 +23,16 @@ import { TeamTab } from './TeamTab';
 import { ChangeRequestsTab } from './ChangeRequestsTab';
 import { ActivityTab } from './ActivityTab';
 
-const TABS: readonly { key: ProjectTabKey; label: string; icon: React.ElementType }[] = [
-  { key: 'overview', label: 'Tổng quan & Ý tưởng', icon: Film },
-  { key: 'script', label: 'Kịch bản', icon: ScrollText },
-  { key: 'episodes', label: 'Mùa & Tập phim', icon: Clapperboard },
-  { key: 'team', label: 'Nhóm Creator', icon: Users },
-  { key: 'studio', label: 'Studio', icon: Layers },
-  { key: 'fee', label: 'Chi phí sản xuất', icon: CalendarClock },
-  { key: 'contract', label: 'Hợp đồng', icon: FileSignature },
-  { key: 'changes', label: 'Đề xuất chỉnh sửa', icon: ShieldCheck },
-  { key: 'activity', label: 'Lịch sử', icon: History },
+const TABS: readonly { key: ProjectTabKey; label: string }[] = [
+  { key: 'overview', label: 'Tổng quan & Ý tưởng' },
+  { key: 'script', label: 'Kịch bản' },
+  { key: 'episodes', label: 'Mùa & Tập phim' },
+  { key: 'team', label: 'Nhóm Creator' },
+  { key: 'studio', label: 'Studio' },
+  { key: 'fee', label: 'Chi phí sản xuất' },
+  { key: 'contract', label: 'Hợp đồng' },
+  { key: 'changes', label: 'Đề xuất chỉnh sửa' },
+  { key: 'activity', label: 'Lịch sử' },
 ];
 
 /** Who and what the project involves, read at a glance under its title. */
@@ -131,7 +130,6 @@ export function ProjectDetailPage() {
             {/* Tab navigation */}
             <nav role="tablist" aria-label="Phần của dự án" className="flex gap-2 overflow-x-auto pt-2 -mb-5 border-b border-transparent">
               {tabs.map((item) => {
-                const Icon = item.icon;
                 const active = tab === item.key;
                 return (
                   <button
@@ -139,13 +137,12 @@ export function ProjectDetailPage() {
                     role="tab"
                     aria-selected={active}
                     onClick={() => selectTab(item.key)}
-                    className={`inline-flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl border-b-2 transition cursor-pointer whitespace-nowrap ${
+                    className={`inline-flex items-center px-4 py-2.5 text-xs font-semibold rounded-t-xl border-b-2 transition cursor-pointer whitespace-nowrap ${
                       active
                         ? 'border-slate-900 text-slate-900 bg-slate-100/80 dark:border-white dark:text-white dark:bg-white/[0.06]'
                         : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'
                     }`}
                   >
-                    <Icon className="w-3.5 h-3.5" />
                     {item.label}
                   </button>
                 );
@@ -156,7 +153,6 @@ export function ProjectDetailPage() {
           {/* Banner: project was cancelled */}
           {data.status === 'CANCELLED' && (
             <div role="status" className="flex items-start gap-2 bg-rose-50 dark:bg-rose-500/10 border-t border-rose-200 dark:border-rose-500/20 px-6 py-3 text-xs text-rose-700 dark:text-rose-400">
-              <Ban className="w-4 h-4 shrink-0 mt-0.5" />
               <span>
                 <b>Dự án đã bị huỷ</b>
                 {data.cancelReason && `: ${data.cancelReason}`}
@@ -167,7 +163,6 @@ export function ProjectDetailPage() {
           {/* Banner: episodes under revision */}
           {data.revision && (
             <div role="status" className="flex items-start gap-2 bg-amber-50 dark:bg-amber-500/10 border-t border-amber-200 dark:border-amber-500/20 px-6 py-3 text-xs text-amber-800 dark:text-amber-400">
-              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>
                 <b>Đang sửa {data.revision.episodeCount} tập:</b>{' '}
                 {data.revision.bySeason.map((s) => `mùa ${s.seasonNumber}: tập ${s.episodeNumbers.join(', ')}`).join('; ')}

@@ -82,7 +82,7 @@ export function PlansPanel() {
                     </Button>
                     {canPrice && !plan.isFree && (
                       <Button size="sm" variant="ghost" aria-label={`Đặt giá ${plan.name}`} onClick={() => setDialog({ mode: 'price', plan })}>
-                        <BadgeDollarSign className="w-3.5 h-3.5 text-amber-600" />
+                        <BadgeDollarSign className="w-3.5 h-3.5 text-amber-600" aria-hidden="true" />
                       </Button>
                     )}
                   </td>

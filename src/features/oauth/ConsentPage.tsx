@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Building2, Loader2, ShieldCheck, TriangleAlert } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { authService } from '@/services/authService';
 import { useAppStore } from '@/store/useAppStore';
@@ -77,8 +77,7 @@ export function ConsentPage() {
 
       {state.kind === 'error' && (
         <section className={CARD} aria-labelledby="oauth-error-title">
-          <TriangleAlert className="size-8 text-destructive" aria-hidden="true" />
-          <h1 id="oauth-error-title" className="mt-4 font-heading text-xl font-semibold">
+          <h1 id="oauth-error-title" className="font-heading text-xl font-semibold">
             Không thể cấp quyền
           </h1>
           <p role="alert" className="mt-2 text-sm leading-relaxed text-muted-foreground">
@@ -95,13 +94,11 @@ export function ConsentPage() {
 
       {state.kind === 'consent' && (
         <section className={CARD} aria-labelledby="oauth-title">
-          <ShieldCheck className="size-8 text-primary" aria-hidden="true" />
-          <h1 id="oauth-title" className="mt-4 font-heading text-xl font-semibold">
+          <h1 id="oauth-title" className="font-heading text-xl font-semibold">
             {state.view.client.name} muốn dùng tài khoản AI Cinema của bạn
           </h1>
 
           <div className="mt-5 flex items-center gap-3 rounded-2xl border border-border bg-muted/40 p-3.5">
-            <Building2 className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
             <div className="min-w-0 text-sm">
               <p className="truncate font-medium">{state.view.account.studioName ?? 'Tài khoản Studio'}</p>
               <p className="truncate text-xs text-muted-foreground">{email ?? 'Tài khoản đang đăng nhập'}</p>

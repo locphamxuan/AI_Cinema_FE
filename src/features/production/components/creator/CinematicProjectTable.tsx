@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Building2 } from 'lucide-react';
 import { STAGE_BADGE, needsWriting } from './CinematicProjectCard';
 import type { ScriptProjectItem } from './scriptItems';
 
@@ -36,14 +35,12 @@ export function CinematicProjectTable({ projects, getHref }: { projects: ScriptP
                 </td>
                 <td className="py-3.5 px-4">
                   <span className="flex items-center gap-1.5 text-slate-800 dark:text-slate-300 font-semibold">
-                    <Building2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                     <span className="truncate max-w-[140px]">{p.studioName ?? 'Chưa có Studio'}</span>
                   </span>
                 </td>
                 <td className="py-3.5 px-5 text-right">
                   <Link href={getHref(p)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-slate-900 hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-bold">
                     {needsWriting(p) ? 'Soạn Kịch Bản' : 'Xem Dự Án'}
-                    <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </td>
               </tr>

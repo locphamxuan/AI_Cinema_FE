@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Send } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { fieldTextareaClass } from '@/components/ui/FormField';
 import { projectNoteService } from '@/services/scriptService';
@@ -74,7 +73,7 @@ export function ProjectNotesPanel() {
             placeholder="Ví dụ: giữ tông trầm, đẩy cao trào ở tập cuối; nhân vật chính là bác sĩ trẻ."
           />
           <Button size="sm" onClick={send} disabled={busy || !message.trim()}>
-            <Send className="w-3.5 h-3.5" aria-hidden="true" /> Gửi trao đổi
+            Gửi trao đổi
           </Button>
         </div>
       )}

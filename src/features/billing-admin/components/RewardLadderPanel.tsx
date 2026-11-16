@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil, Coins, Gift } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useResource } from '@/hooks/useResource';
 import { Empty, ErrorNote, Loading } from '@/components/data/ui';
@@ -81,14 +81,13 @@ export function RewardLadderPanel() {
                   </p>
                   <div className="my-1.5">
                     <span className="inline-flex items-center gap-1 text-sm font-black tabular-nums text-amber-600 dark:text-amber-400">
-                      <Coins className="w-3.5 h-3.5 text-amber-500" />
                       +{r.bonusCoins}
                     </span>
                   </div>
                   <div className="pt-1 border-t border-slate-200/50 dark:border-white/5">
                     {isDay7 ? (
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-600 dark:text-purple-300">
-                        <Gift className="w-3 h-3 text-purple-500" /> +1 Vòng quay
+                        +1 Vòng quay
                       </span>
                     ) : (
                       <span className="text-[10px] text-slate-400 dark:text-slate-500">
@@ -142,14 +141,12 @@ export function RewardLadderPanel() {
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
                       <span className="inline-flex items-center gap-1 tabular-nums font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 text-xs">
-                        <Coins className="w-3.5 h-3.5 text-amber-500" />
                         +{rule.bonusCoins} Coin
                       </span>
                     </td>
                     <td className="py-3 px-4 text-center whitespace-nowrap">
                       {isDay7 ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/25">
-                          <Gift className="w-3.5 h-3.5 text-purple-500" />
                           <span>+1 Lượt quay</span>
                         </span>
                       ) : (

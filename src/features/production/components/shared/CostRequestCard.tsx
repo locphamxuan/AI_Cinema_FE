@@ -12,6 +12,7 @@ import { COST_REQUEST_STATUS } from '../../lib/labels';
 import { downloadFile } from '../../lib/download';
 import { formatDateTime, formatVnd } from '@/lib/format';
 import { StatusPill, TextPromptModal } from '@/components/data/ui';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 
 /** Whole thousands of VND typed in a field; NaN when it is not one. */
 export function parseVnd(text: string): number {
@@ -36,6 +37,7 @@ export function CostRequestCard({
   const [granted, setGranted] = useState(String(cr.requestedVnd));
   const [note, setNote] = useState('');
   const [rejecting, setRejecting] = useState(false);
+  const [approving, setApproving] = useState(false);
   const { busy, run } = useAction();
   const grantedVnd = parseVnd(granted);
   const grantValid = grantedVnd > 0 && grantedVnd <= Number(cr.requestedVnd);
@@ -45,7 +47,10 @@ export function CostRequestCard({
       () => costRequestService.approve(cr.id, { grantedVnd, ...(note.trim() ? { response: note.trim() } : {}) }),
       'Đã cấp thêm chi phí',
     );
-    if (done) await onDecided?.();
+    if (done) {
+      setApproving(false);
+      await onDecided?.();
+    }
   };
   const reject = async (response: string) => {
     if (await run(() => costRequestService.reject(cr.id, response), 'Đã từ chối yêu cầu')) {
@@ -109,16 +114,25 @@ export function CostRequestCard({
             <textarea rows={1} value={note} onChange={(e) => setNote(e.target.value)} maxLength={5000} className={fieldTextareaClass} />
           </FormField>
           <div className="flex gap-2">
-            <Button type="button" size="sm" onClick={approve} disabled={busy || !grantValid}>
+            <Button type="button" size="sm" onClick={() => setApproving(true)} disabled={busy || !grantValid}>
               Cấp
             </Button>
             <Button type="button" size="sm" variant="secondary" onClick={() => setRejecting(true)} disabled={busy}>
               Từ chối
             </Button>
           </div>
-          {!grantValid && <p className="text-[11px] text-rose-600 sm:col-span-3">Số tiền là bội số 1.000 ₫, lớn hơn 0 và không vượt số xin.</p>}
+          {!grantValid && <p role="alert" className="text-[11px] text-rose-600 sm:col-span-3">Số tiền là bội số 1.000 ₫, lớn hơn 0 và không vượt số xin.</p>}
         </div>
       )}
+      <ConfirmModal
+        open={approving}
+        title="Cấp thêm chi phí sản xuất"
+        description={`Cấp ${formatVnd(grantedVnd)} cho ${cr.project.movie.title}. Số tiền được cộng vào ngân sách dự án và ghi vào sổ chi phí, không thể xoá.`}
+        confirmLabel="Cấp chi phí"
+        busy={busy}
+        onClose={() => setApproving(false)}
+        onConfirm={() => void approve()}
+      />
       <TextPromptModal
         open={rejecting}
         title="Từ chối yêu cầu thêm chi phí"

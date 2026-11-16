@@ -1,6 +1,5 @@
 'use client';
 
-import { MessagesSquare } from 'lucide-react';
 import { ErrorNote, Loading } from '@/components/data/ui';
 import { Modal } from '@/components/ui/Modal';
 import { useResource } from '@/hooks/useResource';
@@ -17,7 +16,6 @@ export function ConversationModal({ conversationId, onClose }: { conversationId:
       open
       onClose={onClose}
       maxWidth="max-w-2xl"
-      icon={<MessagesSquare className="size-5" />}
       title={c ? `Hội thoại với ${c.memberFullName}` : 'Hội thoại'}
       subtitle={c ? `${CASE_STATUS[c.status].label} · chỉ đọc` : undefined}
     >

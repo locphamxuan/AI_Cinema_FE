@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { BarChart3, Headphones, Users, type LucideIcon } from 'lucide-react';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION, type PermissionKey } from '@/lib/permissions';
 import { movieService, type CatalogMovie } from '@/services/movieService';
@@ -14,15 +13,14 @@ interface Module {
   key: string;
   title: string;
   description: string;
-  icon: LucideIcon;
   /** None: open to every Staff account (public data). */
   permission?: PermissionKey;
 }
 
 const MODULES: Module[] = [
-  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', icon: Headphones, permission: PERMISSION.SUPPORT_CASE_READ },
-  { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).', icon: BarChart3 },
-  { key: 'members', title: 'Thông tin member', description: 'Tài khoản member (chỉ đọc).', icon: Users, permission: PERMISSION.MEMBER_OPS_READ },
+  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', permission: PERMISSION.SUPPORT_CASE_READ },
+  { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).' },
+  { key: 'members', title: 'Thông tin member', description: 'Tài khoản member (chỉ đọc).', permission: PERMISSION.MEMBER_OPS_READ },
 ];
 
 const CARD = 'bg-white dark:bg-[#111420] rounded-3xl border border-slate-200/80 dark:border-white/[0.08] shadow-xs';
