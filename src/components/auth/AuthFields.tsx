@@ -42,7 +42,7 @@ export function PasswordField({ id, label, autoComplete, value, onChange, placeh
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label htmlFor={id} className="block text-xs font-semibold text-slate-700 dark:text-muted-light">
+        <label htmlFor={id} className="block text-sm font-medium">
           {label}
         </label>
         <button
@@ -63,7 +63,7 @@ export function PasswordField({ id, label, autoComplete, value, onChange, placeh
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
+        className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
       />
     </div>
   );

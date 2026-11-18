@@ -3,24 +3,28 @@ import AuthForm from '@/components/auth/AuthForm';
 import AuthBrand from '@/components/auth/AuthBrand';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 
-/** Sign-in for the internal back office: Reviewer, Creator, Staff and Admin accounts. */
+/**
+ * Sign-in for the internal back office (Reviewer, Creator, Staff, Admin), after the two-column login of
+ * arhamkhnz/next-shadcn-admin-dashboard: the form on the left, the brand panel on the right from lg up.
+ */
 export default function LoginPage() {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center bg-[#F9FAFB] px-4 py-12 text-slate-900 dark:bg-[#090B10] dark:text-slate-100 sm:px-6">
-      <div className="absolute top-5 right-5">
-        <ThemeToggle />
+    <main className="grid min-h-dvh bg-background p-2 text-foreground lg:grid-cols-2">
+      <AuthBrand />
+      <div className="relative order-1 flex min-h-[calc(100dvh-1rem)] items-center justify-center px-4 py-10">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
+        <div className="w-full max-w-sm space-y-8">
+          <div className="space-y-2 text-center">
+            <h1 className="font-heading text-3xl font-semibold tracking-tight">Đăng nhập</h1>
+            <p className="text-sm text-muted-foreground">Tài khoản nội bộ do Admin cấp.</p>
+          </div>
+          <Suspense>
+            <AuthForm />
+          </Suspense>
+        </div>
       </div>
-
-      <div className="w-full max-w-md rounded-3xl border border-slate-200/80 bg-white p-7 shadow-sm dark:border-white/[0.08] dark:bg-[#111420] sm:p-9">
-        <AuthBrand />
-        <Suspense>
-          <AuthForm />
-        </Suspense>
-      </div>
-
-      <p className="mt-6 text-center text-[11px] text-slate-500 dark:text-slate-400">
-        Tài khoản nội bộ do Admin cấp · Mọi thao tác tuân thủ quy trình sản xuất MF-1 &amp; Điều 44
-      </p>
     </main>
   );
 }

@@ -1,26 +1,33 @@
 import { Clapperboard } from 'lucide-react';
 
-/** Internal back-office brand header above the sign-in form. */
+const ROLES: [string, string][] = [
+  ['Admin', 'Dự án, hợp đồng, phát hành và tài chính'],
+  ['Reviewer · Creator', 'Kịch bản, thẩm định video Master, nhãn AI'],
+  ['Staff', 'Hỗ trợ Member và tra cứu vận hành'],
+];
+
+/** The brand panel beside the sign-in form: who this back office is for, on the primary colour. */
 export default function AuthBrand() {
   return (
-    <div className="mb-7 space-y-3 text-center">
-      <div className="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#121212] text-white shadow-sm dark:bg-white dark:text-slate-900">
-        <Clapperboard className="h-5 w-5" aria-hidden="true" />
+    <aside className="relative order-2 hidden h-full overflow-hidden rounded-3xl bg-primary text-primary-foreground lg:flex">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[repeating-linear-gradient(135deg,currentColor_0_14px,transparent_14px_28px)] opacity-[0.06]"
+      />
+      <div className="absolute top-10 space-y-3 px-10">
+        <Clapperboard className="size-10" aria-hidden="true" />
+        <p className="text-sm font-semibold tracking-[0.2em] uppercase opacity-80">AI Cinema</p>
+        <h2 className="max-w-md font-heading text-3xl leading-tight font-semibold">Cổng Quản Trị &amp; Sản Xuất Nội Bộ</h2>
+        <p className="max-w-md text-sm opacity-80">Từ ý tưởng, kịch bản, hợp đồng Studio tới phát hành phim có gắn nhãn AI.</p>
       </div>
-      <div className="space-y-1">
-        <div className="inline-flex items-center gap-2">
-          <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">AI CINEMA</span>
-          <span className="rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-700 dark:border-white/15 dark:bg-white/10 dark:text-slate-200">
-            Studio Back-Office
-          </span>
-        </div>
-        <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Cổng Quản Trị &amp; Sản Xuất Nội Bộ
-        </h1>
-        <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-          Dành cho Admin, Reviewer thẩm định, Biên kịch Creator và Nhân viên vận hành.
-        </p>
-      </div>
-    </div>
+      <dl className="absolute bottom-10 grid w-full grid-cols-3 gap-6 px-10 text-sm">
+        {ROLES.map(([role, text]) => (
+          <div key={role} className="space-y-1 border-l border-primary-foreground/30 pl-3">
+            <dt className="font-semibold">{role}</dt>
+            <dd className="opacity-80">{text}</dd>
+          </div>
+        ))}
+      </dl>
+    </aside>
   );
 }

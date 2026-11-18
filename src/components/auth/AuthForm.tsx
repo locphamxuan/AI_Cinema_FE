@@ -13,8 +13,8 @@ const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
 export const STUDIO_WEB_LOGIN_URL = `${(process.env.NEXT_PUBLIC_STUDIO_WEB_URL?.trim() || 'http://localhost:3100').replace(/\/+$/, '').replace(/\/login$/, '')}/login`;
 
 const INPUT =
-  'w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-slate-900 focus:bg-white focus:ring-2 focus:ring-slate-900/10 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-white dark:focus:bg-white/[0.06] dark:focus:ring-white/15';
-const LABEL = 'mb-1.5 block text-xs font-semibold text-slate-700 dark:text-slate-300';
+  'h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30';
+const LABEL = 'mb-1.5 block text-sm font-medium';
 
 function savedEmail(): string | null {
   try {
@@ -77,7 +77,7 @@ export default function AuthForm() {
       {error && (
         <div
           role="alert"
-          className="mb-5 space-y-2 rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-xs text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300"
+          className="mb-5 space-y-2 rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive"
         >
           <div className="flex items-start gap-2.5">
             <span className="font-medium leading-relaxed">{error}</span>
@@ -85,7 +85,7 @@ export default function AuthForm() {
           {isStudioRefusal && (
             <a
               href={STUDIO_WEB_LOGIN_URL}
-              className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-black dark:bg-white dark:text-slate-900"
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               Mở cổng đăng nhập Studio Web
             </a>
@@ -121,12 +121,12 @@ export default function AuthForm() {
         />
 
         <div className="flex items-center justify-between pt-1">
-          <label className="flex cursor-pointer select-none items-center gap-2 text-xs text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">
+          <label className="flex cursor-pointer select-none items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
             <input
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-4 w-4 cursor-pointer rounded border-slate-300 accent-slate-900 dark:border-white/20 dark:accent-white"
+              className="size-4 cursor-pointer rounded accent-primary"
             />
             <span>Nhớ email trên máy này</span>
           </label>
@@ -134,14 +134,14 @@ export default function AuthForm() {
           <button
             type="button"
             onClick={() => setShowResetHelp((prev) => !prev)}
-            className="cursor-pointer text-xs font-medium text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+            className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground"
           >
             Quên mật khẩu?
           </button>
         </div>
 
         {showResetHelp && (
-          <p className="rounded-2xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-[11px] leading-relaxed text-slate-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-300">
+          <p className="rounded-lg bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
             Tài khoản nội bộ không tự đặt lại mật khẩu. Vui lòng liên hệ Quản trị viên (Admin) tại mục Tài khoản &amp; Phân quyền để cấp mật khẩu mới.
           </p>
         )}
@@ -149,17 +149,17 @@ export default function AuthForm() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 w-full cursor-pointer rounded-full bg-[#121212] py-3 text-sm font-semibold text-white shadow-xs transition-all hover:bg-black active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
+          className="mt-2 h-10 w-full cursor-pointer rounded-lg bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? 'Đang xác thực…' : 'Đăng Nhập'}
         </button>
       </form>
 
-      <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 text-xs text-slate-500 dark:border-white/[0.06] dark:text-slate-400">
+      <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm text-muted-foreground">
         <span>Bạn là Studio đối tác?</span>
         <a
           href={STUDIO_WEB_LOGIN_URL}
-          className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:underline dark:text-white"
+          className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
         >
           Đăng nhập Studio Web
         </a>
