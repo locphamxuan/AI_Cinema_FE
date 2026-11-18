@@ -11,6 +11,7 @@ import { PERMISSION } from '@/lib/permissions';
 import { staffSupportService } from '@/services/staffSupportService';
 import { CASE_STATUS, ESCALATION, PRIORITY, caseActions } from '../supportLabels';
 import { AssignCaseModal } from './AssignCaseModal';
+import { CaseMilestones } from './CaseMilestones';
 import { CaseTranscript } from './CaseTranscript';
 import { MemberContextPanel } from './MemberContextPanel';
 import { StaffCaseComposer } from './StaffCaseComposer';
@@ -64,7 +65,7 @@ export function StaffCaseChat({
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold">{c.memberFullName}</h2>
             <p className="text-xs text-muted-foreground">
-              Mở lúc {formatDateTime(c.createdAt)} · {c.assignedAgentName ? `Người nhận: ${c.assignedAgentName}` : 'Chưa ai nhận'}
+              {c.assignedAgentName ? `Người nhận: ${c.assignedAgentName}` : 'Chưa ai nhận'} · Cập nhật {formatDateTime(c.lastMessageAt ?? c.updatedAt)}
             </p>
           </div>
           <div className="flex items-center gap-1.5">
@@ -72,6 +73,7 @@ export function StaffCaseChat({
             <StatusPill {...CASE_STATUS[c.status]} />
           </div>
         </div>
+        <CaseMilestones c={c} />
         {(c.escalationReason || c.aiSummary) && (
           <div className="space-y-1 rounded-lg bg-muted/60 px-3 py-2 text-xs">
             {c.escalationReason && <p><span className="font-medium">Lý do chuyển: </span>{ESCALATION[c.escalationReason]}{c.escalationNote ? ` — ${c.escalationNote}` : ''}</p>}
@@ -100,15 +102,9 @@ export function StaffCaseChat({
       </div>
 
       {view === 'chat' && allowed.reply && <StaffCaseComposer caseId={c.id} canSuggest={allowed.suggest} onSent={() => after(true)} />}
-      {view === 'chat' && !allowed.reply && (
+      {view === 'chat' && !allowed.reply && c.status === 'STAFF_HANDLING' && (
         <p className="border-t border-border px-4 py-3 text-xs text-muted-foreground">
-          {c.status === 'AI_HANDLING'
-            ? 'AI đang xử lý case này; nhân viên trả lời được khi case được chuyển sang.'
-            : c.status === 'RESOLVED'
-              ? 'Đang chờ Member xác nhận đã giải quyết. Member chọn "Vẫn cần hỗ trợ" thì case quay lại hàng chờ; không phản hồi thì tự đóng.'
-              : c.status === 'CLOSED'
-                ? 'Case đã kết thúc, không gửi thêm tin nhắn được.'
-              : 'Case đang do nhân viên khác xử lý.'}
+          Case đang do {c.assignedAgentName ?? 'nhân viên khác'} xử lý; chỉ người nhận hoặc Admin trả lời được.
         </p>
       )}
 

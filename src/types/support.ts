@@ -8,6 +8,7 @@ export type SupportEscalationReason =
   | 'ACCOUNT_VERIFICATION'
   | 'MEMBER_REQUEST'
   | 'STAFF_NEEDED';
+export type SupportCloseReason = 'AI_RESOLVED' | 'STAFF_RESOLVED' | 'INACTIVITY' | 'MEMBER_CLOSED';
 export type SupportSenderType = 'MEMBER' | 'AI_CHATBOT' | 'SUPPORT_AGENT' | 'SYSTEM';
 export type SupportAudience = 'MEMBER' | 'STAFF' | 'ALL';
 
@@ -28,6 +29,10 @@ export interface SupportCase {
   claimedAt: string | null;
   resolvedAt: string | null;
   closedAt: string | null;
+  closeReason?: SupportCloseReason | null;
+  lastMemberMessageAt?: string | null;
+  lastStaffMessageAt?: string | null;
+  firstStaffReplyAt?: string | null;
   resolutionNote: string | null;
   satisfactionRating: number | null;
   satisfactionComment: string | null;

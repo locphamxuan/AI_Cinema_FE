@@ -12,8 +12,9 @@ import { useResource } from '@/hooks/useResource';
 import { formatDateTime } from '@/lib/format';
 import { staffSupportService, type QueueFilters } from '@/services/staffSupportService';
 import { useAppStore } from '@/store/useAppStore';
-import type { SupportPriority, SupportStatus } from '@/types/support';
+import type { SupportCase, SupportPriority, SupportStatus } from '@/types/support';
 import { CASE_STATUS, ESCALATION, PRIORITY } from '../supportLabels';
+import { queueTiming } from '../caseTiming';
 import { StaffCaseChat } from './StaffCaseChat';
 
 const SELECT = `${fieldInputClass} py-1.5 text-xs`;
@@ -51,10 +52,10 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard label="Chờ nhân viên" value={s?.waiting ?? '—'} note={s?.oldestWaiting ? `Lâu nhất ${s.oldestWaiting.waitingMinutes} phút` : 'Không có case chờ'} noteTone={s?.oldestWaiting ? 'warn' : 'muted'} />
-        <StatCard label="Đang xử lý" value={s?.byStatus.STAFF_HANDLING ?? '—'} />
-        <StatCard label="Chuyển sang hôm nay" value={s?.escalatedToday ?? '—'} note={s ? `Đã giải quyết hôm nay: ${s.resolvedToday}` : undefined} />
-        <StatCard label="AI tự giải quyết" value={s ? `${Math.round(s.aiResolvedRate * 100)}%` : '—'} note="Trên các case đã đóng gần đây" />
+        <StatCard label="Chờ người nhận" value={s?.waiting ?? '—'} note={s?.oldestWaiting ? `Lâu nhất ${s.oldestWaiting.waitingMinutes} phút` : 'Không có case chờ'} noteTone={s?.oldestWaiting ? 'warn' : 'muted'} />
+        <StatCard label="Nhân viên đang xử lý" value={s?.byStatus.STAFF_HANDLING ?? '—'} note={s ? `Chờ Member xác nhận: ${s.byStatus.RESOLVED ?? 0}` : undefined} />
+        <StatCard label="AI chuyển cho nhân viên hôm nay" value={s?.escalatedToday ?? '—'} note={s ? `Đã giải quyết hôm nay: ${s.resolvedToday}` : undefined} />
+        <StatCard label="AI tự giải quyết" value={s ? `${Math.round(s.aiResolvedRate * 100)}%` : '—'} note="Tỉ lệ trên các case đã kết thúc gần đây" />
       </div>
       {stats.error && <ErrorNote message={stats.error} onRetry={stats.reload} />}
 
@@ -138,12 +139,15 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
                     </span>
                     {c.escalationReason && <span className="block truncate text-muted-foreground">{ESCALATION[c.escalationReason]}</span>}
                     <span className="flex items-center justify-between gap-2 text-[11px] text-muted-foreground">
-                      <span>
+                      <span className="truncate">
                         {c.priority !== 'NORMAL' && <span className="mr-1.5 font-medium text-warning">Ưu tiên {PRIORITY[c.priority].label.toLowerCase()}</span>}
-                        {c.assignedAgentName ?? 'Chưa ai nhận'}
+                        {c.assignedAgentName ? `Người nhận: ${c.assignedAgentName}` : 'Chưa ai nhận'}
                       </span>
-                      <span>{formatDateTime(c.lastMessageAt ?? c.createdAt)}</span>
+                      <span className="shrink-0" title={formatDateTime(c.lastMessageAt ?? c.createdAt)}>
+                        {formatDateTime(c.lastMessageAt ?? c.createdAt)}
+                      </span>
                     </span>
+                    <QueueTiming c={c} />
                   </button>
                 </li>
               ))}
@@ -168,4 +172,9 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
       </div>
     </div>
   );
+}
+
+function QueueTiming({ c }: { c: SupportCase }) {
+  const { text, urgent } = queueTiming(c);
+  return <span className={`block truncate text-[11px] font-medium ${urgent ? 'text-warning' : 'text-muted-foreground'}`}>{text}</span>;
 }
