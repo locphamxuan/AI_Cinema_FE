@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { ErrorNote, Facts, Loading } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
-import { COIN_ENTRY_LABEL } from '@/lib/coinEntry';
+import { COIN_ENTRY_LABEL, signed } from '@/lib/coinEntry';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { staffSupportService } from '@/services/staffSupportService';
 import type { CoinEntryType } from '@/types/billing';
@@ -15,6 +15,21 @@ type Subscription = { status: string; autoRenew: boolean; currentPeriodEnd: stri
 type Wallet = { mainBalance: number; bonusBalance: number; lots?: { source: string; remainingAmount: number; grantedAt: string }[] } | null;
 type Tx = { entryType: string; mainAmount: number; bonusAmount: number; createdAt: string; description: string | null };
 type Access = { source: string; paidCoins: number; grantedAt: string; revokedAt: string | null; episode: { episodeNumber: number; title: string; movie: { title: string } } };
+const SUB_STATUS: Record<string, string> = {
+  PENDING: 'Chờ thanh toán',
+  ACTIVE: 'Đang chạy',
+  PAST_DUE: 'Gia hạn lỗi',
+  CANCELLED: 'Đã huỷ',
+  EXPIRED: 'Hết hạn',
+};
+const ACCESS_SOURCE: Record<string, string> = { EPISODE_PURCHASE: 'mua bằng Coin', FREE_STARTER: 'tập miễn phí', ADMIN_GRANT: 'Admin cấp' };
+
+/** The renewal deadline: until it the member may still turn auto-renew off; after it the next period is charged. */
+function cancelWindow(endsAt: string | null): string {
+  if (!endsAt) return 'Không tự gia hạn';
+  return new Date(endsAt).getTime() > Date.now() ? `Còn tắt được đến ${formatDateTime(endsAt)}` : 'Đã qua hạn, kỳ sau sẽ bị trừ Coin';
+}
+
 type Devices = { devices: { name: string | null; platform: string; lastSeenAt: string | null }[]; sessions: { status: string; startedAt: string }[] };
 
 const TITLES: Record<MemberContextSectionKey, string> = {
@@ -37,20 +52,20 @@ function body(key: MemberContextSectionKey, data: unknown): ReactNode {
     case 'Subscription': {
       const s = data as Subscription;
       if (!s) return 'Không có gói thành viên.';
-      return <Facts stacked items={[['Gói', s.plan.name], ['Trạng thái', s.status], ['Hết kỳ', formatDateTime(s.currentPeriodEnd)], ['Tự gia hạn', s.autoRenew ? 'Có' : 'Không'], ['Hạn huỷ hoàn tiền', formatDateTime(s.cancelWindowEndsAt)]]} />;
+      return <Facts stacked items={[['Gói', s.plan.name], ['Trạng thái', SUB_STATUS[s.status] ?? s.status], ['Hết kỳ', formatDateTime(s.currentPeriodEnd)], ['Tự gia hạn', s.autoRenew ? 'Có' : 'Không'], ['Hạn tắt tự gia hạn', cancelWindow(s.cancelWindowEndsAt)]]} />;
     }
     case 'Wallet': {
       const w = data as Wallet;
       if (!w) return 'Member chưa có ví.';
-      return <Facts stacked items={[['Coin chính', formatNumber(w.mainBalance)], ['Coin thưởng', formatNumber(w.bonusBalance)], ['Lô thưởng còn', String(w.lots?.length ?? 0)]]} />;
+      return <Facts stacked items={[['Coin chính', formatNumber(w.mainBalance)], ['Coin thưởng', formatNumber(w.bonusBalance)], ['Tổng có thể dùng', formatNumber(w.mainBalance + w.bonusBalance)], ['Thứ tự trừ', 'Coin chính trước, Coin thưởng bù phần thiếu (không hết hạn)']]} />;
     }
     case 'Transactions':
-      return rows((data as Tx[]).map((t) => [`${COIN_ENTRY_LABEL[t.entryType as CoinEntryType] ?? t.entryType}: ${t.mainAmount} chính / ${t.bonusAmount} thưởng`, formatDateTime(t.createdAt)]), 'Chưa có giao dịch.');
+      return rows((data as Tx[]).map((t) => [`${COIN_ENTRY_LABEL[t.entryType as CoinEntryType] ?? t.entryType}: ${signed(t.mainAmount)} chính · ${signed(t.bonusAmount)} thưởng`, formatDateTime(t.createdAt)]), 'Chưa có giao dịch.');
     case 'EpisodeAccess':
-      return rows((data as Access[]).map((x) => [`${x.episode.movie.title} · tập ${x.episode.episodeNumber}${x.revokedAt ? ' (đã thu hồi)' : ''}`, `${x.paidCoins} Coin`]), 'Chưa mở khoá tập nào.');
+      return rows((data as Access[]).map((x) => [`${x.episode.movie.title} · tập ${x.episode.episodeNumber}${x.revokedAt ? ' (đã thu hồi)' : ''}`, x.paidCoins ? `${x.paidCoins} Coin` : (ACCESS_SOURCE[x.source] ?? x.source)]), 'Chưa mở khoá tập nào.');
     case 'Devices': {
       const d = data as Devices;
-      return rows(d.devices.map((x) => [`${x.name ?? 'Thiết bị'} (${x.platform})`, formatDateTime(x.lastSeenAt)]), 'Chưa có thiết bị.');
+      return rows(d.devices.map((x) => [`${x.name ?? 'Thiết bị'} (${x.platform === 'ANDROID' ? 'Android' : x.platform})`, x.lastSeenAt ? `Dùng lần cuối ${formatDateTime(x.lastSeenAt)}` : 'Chưa dùng']), 'Chưa có thiết bị.');
     }
   }
 }
