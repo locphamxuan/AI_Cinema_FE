@@ -5,11 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 import { PasswordField } from './AuthFields';
-import { isOAuthPath, safeNext } from '@/lib/safeNext';
+import { safeNext } from '@/lib/safeNext';
 
 const STORAGE_KEY = 'aicinema_saved_email';
 const LEGACY_CREDENTIALS_KEY = 'aicinema_saved_credentials';
-const STUDIO_WEB_LOGIN_URL = process.env.NEXT_PUBLIC_STUDIO_WEB_URL?.trim() || 'http://localhost:3100/login';
+/** The login page of Studio Web, opened in this tab: studios sign in there with their own account. */
+export const STUDIO_WEB_LOGIN_URL = `${(process.env.NEXT_PUBLIC_STUDIO_WEB_URL?.trim() || 'http://localhost:3100').replace(/\/+$/, '').replace(/\/login$/, '')}/login`;
 
 const INPUT =
   'w-full rounded-2xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm font-medium text-slate-900 placeholder-slate-400 outline-none transition-all focus:border-slate-900 focus:bg-white focus:ring-2 focus:ring-slate-900/10 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-white dark:focus:bg-white/[0.06] dark:focus:ring-white/15';
@@ -34,9 +35,8 @@ function rememberEmail(email: string, remember: boolean) {
 export default function AuthForm() {
   const router = useRouter();
   const { login } = useAppStore();
-  // `?next=` brings the browser back where it came from, e.g. the OAuth consent page of Studio Web.
+  // `?next=` brings the browser back to the page that sent it to /login.
   const next = safeNext(useSearchParams().get('next'));
-  const forStudioWeb = isOAuthPath(next);
 
   const [email, setEmail] = useState(() => savedEmail() || '');
   const [password, setPassword] = useState('');
@@ -56,7 +56,7 @@ export default function AuthForm() {
     setError(null);
 
     setLoading(true);
-    const res = await login(email, password, forStudioWeb);
+    const res = await login(email, password);
     setLoading(false);
 
     if (!res.success) {
@@ -70,7 +70,7 @@ export default function AuthForm() {
     if (target) router.replace(target);
   };
 
-  const isStudioRefusal = !forStudioWeb && Boolean(error?.includes('Studio Web'));
+  const isStudioRefusal = Boolean(error?.includes('Studio Web'));
 
   return (
     <>
@@ -85,8 +85,6 @@ export default function AuthForm() {
           {isStudioRefusal && (
             <a
               href={STUDIO_WEB_LOGIN_URL}
-              target="_blank"
-              rel="noreferrer"
               className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-black dark:bg-white dark:text-slate-900"
             >
               Mở cổng đăng nhập Studio Web
@@ -161,8 +159,6 @@ export default function AuthForm() {
         <span>Bạn là Studio đối tác?</span>
         <a
           href={STUDIO_WEB_LOGIN_URL}
-          target="_blank"
-          rel="noreferrer"
           className="inline-flex items-center gap-1 font-semibold text-slate-900 hover:underline dark:text-white"
         >
           Đăng nhập Studio Web

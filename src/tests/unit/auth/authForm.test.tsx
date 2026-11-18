@@ -41,22 +41,8 @@ describe('AuthForm sign-in', () => {
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
     await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
 
-    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123', false);
+    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123');
     expect(push).toHaveBeenCalledWith('/reviewer');
-  });
-
-  it('lets a studio sign in from the OAuth consent page and goes back to it with the whole query', async () => {
-    const next = '/oauth/authorize?response_type=code&client_id=studio-web&state=s1';
-    search = new URLSearchParams({ next });
-    login.mockResolvedValue({ success: true, redirectUrl: undefined });
-    render(<AuthForm />);
-
-    await userEvent.type(screen.getByLabelText('Email'), 'studio@aicinema.com');
-    await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
-
-    expect(login).toHaveBeenCalledWith('studio@aicinema.com', 'matkhau123', true);
-    expect(push).toHaveBeenCalledWith(next);
   });
 
   it('ignores a next that leaves the site (no open redirect)', async () => {
@@ -67,7 +53,7 @@ describe('AuthForm sign-in', () => {
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
     await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
 
-    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123', false);
+    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123');
     expect(push).toHaveBeenCalledWith('/reviewer');
   });
 
