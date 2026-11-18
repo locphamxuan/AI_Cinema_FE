@@ -60,7 +60,7 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
       {stats.error && <ErrorNote message={stats.error} onRetry={stats.reload} />}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-        <section aria-label="Hàng chờ hỗ trợ" className="flex h-[720px] flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 lg:col-span-5">
+        <section aria-label="Hàng chờ hỗ trợ" className="flex h-[860px] flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 lg:col-span-5">
           <header className="space-y-2.5 border-b border-border p-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-semibold">Hàng chờ {meta ? `(${meta.totalItems})` : ''}</h2>
@@ -89,8 +89,8 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
                 );
               })}
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              <select aria-label="Lọc theo trạng thái" value={filters.status ?? ''} onChange={(e) => set({ status: (e.target.value || undefined) as SupportStatus | undefined })} className={SELECT}>
+            <div className="grid grid-cols-2 gap-2">
+              <select aria-label="Lọc theo trạng thái" value={filters.status ?? ''} onChange={(e) => set({ status: (e.target.value || undefined) as SupportStatus | undefined })} className={`${SELECT} col-span-2`}>
                 <option value="">Mọi trạng thái</option>
                 {(Object.keys(CASE_STATUS) as SupportStatus[]).map((k) => (
                   <option key={k} value={k}>
@@ -160,7 +160,7 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
           )}
         </section>
 
-        <section aria-label="Chi tiết case" className="flex h-[720px] flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 lg:col-span-7">
+        <section aria-label="Chi tiết case" className="flex h-[860px] flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 lg:col-span-7">
           {activeId ? (
             <StaffCaseChat key={activeId} caseId={activeId} currentUserId={me?.id} isAdmin={isAdmin} onChanged={refresh} />
           ) : (

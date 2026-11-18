@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ErrorNote, Loading, StatusPill, TextPromptModal } from '@/components/data/ui';
+import { ErrorNote, Facts, Loading, StatusPill, TextPromptModal } from '@/components/data/ui';
 import { Button } from '@/components/ui/Button';
 import { useAction } from '@/hooks/useAction';
 import { useCan } from '@/hooks/useCan';
@@ -10,6 +10,7 @@ import { formatDateTime } from '@/lib/format';
 import { PERMISSION } from '@/lib/permissions';
 import { staffSupportService } from '@/services/staffSupportService';
 import { CASE_STATUS, ESCALATION, PRIORITY, caseActions } from '../supportLabels';
+import { AUTO_CLOSE_HOURS } from '../caseTiming';
 import { AssignCaseModal } from './AssignCaseModal';
 import { CaseMilestones } from './CaseMilestones';
 import { CaseTranscript } from './CaseTranscript';
@@ -114,11 +115,21 @@ export function StaffCaseChat({
         subtitle="Member nhận thông báo và chọn Đã giải quyết (case đóng) hoặc Vẫn cần hỗ trợ (case quay lại hàng chờ). Không phản hồi thì case tự đóng."
         label="Ghi chú cách xử lý gửi Member (tuỳ chọn)"
         confirmLabel="Đã giải quyết xong"
+        tone="success"
         required={false}
         busy={busy}
         onClose={() => setResolving(false)}
         onConfirm={(note) => void resolve(note)}
-      />
+      >
+        <Facts
+          stacked
+          items={[
+            ['Member', c.memberFullName],
+            ['Vấn đề', c.escalationReason ? ESCALATION[c.escalationReason] : 'Member cần hỗ trợ'],
+            ['Tự đóng nếu im lặng', `sau ${AUTO_CLOSE_HOURS} giờ`],
+          ]}
+        />
+      </TextPromptModal>
       {assigning && (
         <AssignCaseModal
           caseId={c.id}

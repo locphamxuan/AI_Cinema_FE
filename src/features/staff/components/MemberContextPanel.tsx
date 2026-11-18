@@ -30,6 +30,8 @@ function cancelWindow(endsAt: string | null): string {
   return new Date(endsAt).getTime() > Date.now() ? `Còn tắt được đến ${formatDateTime(endsAt)}` : 'Đã qua hạn, kỳ sau sẽ bị trừ Coin';
 }
 
+const amount = (n: number) => (n === 0 ? '0' : signed(n));
+
 type Devices = { devices: { name: string | null; platform: string; lastSeenAt: string | null }[]; sessions: { status: string; startedAt: string }[] };
 
 const TITLES: Record<MemberContextSectionKey, string> = {
@@ -60,7 +62,7 @@ function body(key: MemberContextSectionKey, data: unknown): ReactNode {
       return <Facts stacked items={[['Coin chính', formatNumber(w.mainBalance)], ['Coin thưởng', formatNumber(w.bonusBalance)], ['Tổng có thể dùng', formatNumber(w.mainBalance + w.bonusBalance)], ['Thứ tự trừ', 'Coin chính trước, Coin thưởng bù phần thiếu (không hết hạn)']]} />;
     }
     case 'Transactions':
-      return rows((data as Tx[]).map((t) => [`${COIN_ENTRY_LABEL[t.entryType as CoinEntryType] ?? t.entryType}: ${signed(t.mainAmount)} chính · ${signed(t.bonusAmount)} thưởng`, formatDateTime(t.createdAt)]), 'Chưa có giao dịch.');
+      return rows((data as Tx[]).map((t) => [`${COIN_ENTRY_LABEL[t.entryType as CoinEntryType] ?? t.entryType}: ${amount(t.mainAmount)} chính · ${amount(t.bonusAmount)} thưởng`, formatDateTime(t.createdAt)]), 'Chưa có giao dịch.');
     case 'EpisodeAccess':
       return rows((data as Access[]).map((x) => [`${x.episode.movie.title} · tập ${x.episode.episodeNumber}${x.revokedAt ? ' (đã thu hồi)' : ''}`, x.paidCoins ? `${x.paidCoins} Coin` : (ACCESS_SOURCE[x.source] ?? x.source)]), 'Chưa mở khoá tập nào.');
     case 'Devices': {
@@ -91,7 +93,7 @@ export function MemberContextPanel({ caseId }: { caseId: string }) {
   if (!ctx.data) return <Loading />;
   const sections = ctx.data.sections;
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3 2xl:grid-cols-2">
       {ORDER.map((key) => {
         const section: MemberContextSection | undefined = sections[key];
         if (!section) return null;
@@ -102,7 +104,7 @@ export function MemberContextPanel({ caseId }: { caseId: string }) {
           </section>
         );
       })}
-      <p className="text-[11px] text-muted-foreground md:col-span-2">Chỉ đọc. Điều chỉnh Coin, gói hay thiết bị do Admin làm ở màn quản trị tương ứng.</p>
+      <p className="text-[11px] text-muted-foreground 2xl:col-span-2">Chỉ đọc. Điều chỉnh Coin, gói hay thiết bị do Admin làm ở màn quản trị tương ứng.</p>
     </div>
   );
 }
