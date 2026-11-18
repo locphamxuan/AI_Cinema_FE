@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp, Clapperboard, FolderKanban } from 'lucide-react';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { BarChart } from '@/components/charts/BarChart';
 import { StatCard } from '@/components/data/StatCard';
@@ -77,17 +77,20 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <StatCard
               featured
+              icon={FolderKanban}
               label="Tổng số dự án"
               value={projects.length}
               note={`${statusCounts.production} đang sản xuất`}
             />
             <StatCard
+              icon={Clapperboard}
               label="Tập đã có"
               value={totalEpisodes}
               unit="tập"
               note="Trên mọi dự án"
             />
             <StatCard
+              icon={CheckCircle2}
               label="Dự án đã hoàn tất"
               value={statusCounts.done}
               note={`${statusCounts.plan} đang lên kế hoạch`}

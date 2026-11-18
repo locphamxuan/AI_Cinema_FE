@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/shadcn/card';
 import { cn } from '@/lib/utils';
 
@@ -17,30 +18,40 @@ interface StatCardProps {
   unit?: string;
   note?: ReactNode;
   noteTone?: keyof typeof NOTE_TONE;
-  /** The figure the page leads with: filled with the brand gradient. */
+  /** A small tile above the label saying what the figure is about. */
+  icon?: LucideIcon;
+  /** The figure the page leads with: filled with the brand colour. */
   featured?: boolean;
   className?: string;
 }
 
-/** One headline figure: what it counts, the number, and a line of context under it. */
-export function StatCard({ label, value, unit, note, noteTone = 'muted', featured = false, className }: StatCardProps) {
+/**
+ * One headline figure, as the metric cards of arhamkhnz/next-shadcn-admin-dashboard: an icon tile, what it counts,
+ * the number, and a line of context under it, on a faint primary gradient.
+ */
+export function StatCard({ label, value, unit, note, noteTone = 'muted', icon: Icon, featured = false, className }: StatCardProps) {
   return (
     <Card
       className={cn(
-        'relative gap-2 px-5 py-4 transition-shadow hover:shadow-md',
-        featured &&
-          'bg-[linear-gradient(135deg,var(--primary),color-mix(in_oklab,var(--primary)_55%,var(--highlight)))] text-primary-foreground ring-0 shadow-lg shadow-primary/20',
+        'gap-2 bg-linear-to-t from-primary/5 to-card px-5 py-4 shadow-xs dark:bg-card',
+        featured && 'from-primary to-primary text-primary-foreground ring-0 shadow-lg shadow-primary/20 dark:bg-primary',
         className,
       )}
     >
+      {Icon && (
+        <span
+          className={cn(
+            'mb-1 flex size-7 items-center justify-center rounded-lg border',
+            featured ? 'border-primary-foreground/30 bg-primary-foreground/10' : 'bg-muted text-muted-foreground',
+          )}
+        >
+          <Icon className="size-4" aria-hidden="true" />
+        </span>
+      )}
       <p className={cn('text-sm', featured ? 'text-primary-foreground/80' : 'text-muted-foreground')}>{label}</p>
-      <p className="font-heading text-3xl font-semibold leading-none tabular-nums">
+      <p className="text-3xl leading-none font-medium tracking-tight tabular-nums">
         {value}
-        {unit && (
-          <span className={cn('ml-1.5 font-sans text-sm font-normal', featured ? 'text-primary-foreground/75' : 'text-muted-foreground')}>
-            {unit}
-          </span>
-        )}
+        {unit && <span className={cn('ml-1.5 text-sm font-normal', featured ? 'text-primary-foreground/75' : 'text-muted-foreground')}>{unit}</span>}
       </p>
       {note && <p className={cn('truncate text-xs', featured ? 'text-primary-foreground/85' : NOTE_TONE[noteTone])}>{note}</p>}
     </Card>

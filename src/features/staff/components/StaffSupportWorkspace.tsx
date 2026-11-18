@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { RotateCw } from 'lucide-react';
+import { Bot, Headset, Inbox, RotateCw, Sparkles } from 'lucide-react';
 import { StatCard } from '@/components/data/StatCard';
 import { DataPagination } from '@/components/data/DataPagination';
 import { Empty, ErrorNote, Loading, StatusPill } from '@/components/data/ui';
@@ -52,10 +52,10 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard label="Chờ người nhận" value={s?.waiting ?? '—'} note={s?.oldestWaiting ? `Lâu nhất ${s.oldestWaiting.waitingMinutes} phút` : 'Không có case chờ'} noteTone={s?.oldestWaiting ? 'warn' : 'muted'} />
-        <StatCard label="Nhân viên đang xử lý" value={s?.byStatus.STAFF_HANDLING ?? '—'} note={s ? `Chờ Member xác nhận: ${s.byStatus.RESOLVED ?? 0}` : undefined} />
-        <StatCard label="AI chuyển cho nhân viên hôm nay" value={s?.escalatedToday ?? '—'} note={s ? `Đã giải quyết hôm nay: ${s.resolvedToday}` : undefined} />
-        <StatCard label="AI tự giải quyết" value={s ? `${Math.round(s.aiResolvedRate * 100)}%` : '—'} note="Tỉ lệ trên các case đã kết thúc gần đây" />
+        <StatCard icon={Inbox} label="Chờ người nhận" value={s?.waiting ?? '—'} note={s?.oldestWaiting ? `Lâu nhất ${s.oldestWaiting.waitingMinutes} phút` : 'Không có case chờ'} noteTone={s?.oldestWaiting ? 'warn' : 'muted'} />
+        <StatCard icon={Headset} label="Nhân viên đang xử lý" value={s?.byStatus.STAFF_HANDLING ?? '—'} note={s ? `Chờ Member xác nhận: ${s.byStatus.RESOLVED ?? 0}` : undefined} />
+        <StatCard icon={Bot} label="AI chuyển cho nhân viên hôm nay" value={s?.escalatedToday ?? '—'} note={s ? `Đã giải quyết hôm nay: ${s.resolvedToday}` : undefined} />
+        <StatCard icon={Sparkles} label="AI tự giải quyết" value={s ? `${Math.round(s.aiResolvedRate * 100)}%` : '—'} note="Tỉ lệ trên các case đã kết thúc gần đây" />
       </div>
       {stats.error && <ErrorNote message={stats.error} onRetry={stats.reload} />}
 
