@@ -9,6 +9,7 @@ import type { PlatformSettings } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { formatDateTime } from '@/lib/format';
+import { ContractPartySettingsForm } from './ContractPartySettingsForm';
 
 type Key = { [K in keyof PlatformSettings]-?: PlatformSettings[K] extends number ? K : never }[keyof PlatformSettings];
 
@@ -42,7 +43,7 @@ const STREAMING_FIELDS: SettingField[] = [
 
 const ALL_FIELDS = [...COIN_FIELDS, ...PRODUCTION_FIELDS, ...STREAMING_FIELDS];
 
-type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards';
+type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards' | 'contract';
 
 const TABS: { key: SettingsTab; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
@@ -50,6 +51,7 @@ const TABS: { key: SettingsTab; label: string }[] = [
   { key: 'production', label: 'Giá tập' },
   { key: 'streaming', label: 'Phát sóng & Gói' },
   { key: 'rewards', label: 'Điểm danh & Vòng quay' },
+  { key: 'contract', label: 'Hợp đồng (Bên A)' },
 ];
 
 /** Segmented platform policies: Coin, Production, Playback & Rewards */
@@ -171,7 +173,9 @@ export function PlatformSettingsPanel() {
         ))}
       </div>
 
-      <form onSubmit={save} className="space-y-5 text-xs">
+      {activeTab === 'contract' && <ContractPartySettingsForm current={current} onSaved={settings.reload} />}
+
+      <form onSubmit={save} className={`space-y-5 text-xs ${activeTab === 'contract' ? 'hidden' : ''}`}>
         {/* Tab All: show all sections grouped */}
         {activeTab === 'all' && (
           <div className="space-y-6">

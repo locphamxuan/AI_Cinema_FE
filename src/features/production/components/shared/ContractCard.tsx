@@ -51,6 +51,9 @@ export function ContractCard({
   const canSign = canDecide && c.status === 'STUDIO_SIGNED';
   // BE ADMIN_OFFER_FROM: the Admin may propose a cost before the studio filled one (SENT) or after it signed.
   const canCounter = canDecide && (c.status === 'SENT' || c.status === 'STUDIO_SIGNED');
+  const downloadTemplate = async () => {
+    if (!(await contractService.downloadTemplate(c.id))) toast.error('Không tải được hợp đồng', 'Thử lại sau.');
+  };
   const download = async (side: 'ADMIN' | 'STUDIO' | 'FINAL', fileName: string) => {
     if (!(await contractService.downloadDocument(c.id, side, fileName))) toast.error('Không tải được file PDF', 'Thử lại sau.');
   };
@@ -98,10 +101,19 @@ export function ContractCard({
         <p className="text-emerald-700 dark:text-emerald-300">Đã tự bàn giao cho Studio: dự án vào sản xuất, các tập chờ Studio nộp phim.</p>
       )}
 
-      {docs.data && docs.data.length > 0 && (
+      {canDownload && (
         <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200/60 dark:border-white/5">
           <span className="text-slate-500 font-medium">Tài liệu PDF:</span>
-          {docs.data.map((doc) => (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="h-6 text-[11px] px-2 flex items-center gap-1"
+            onClick={() => void downloadTemplate()}
+          >
+            Hợp đồng chưa ký (bản Studio nhận)
+          </Button>
+          {docs.data?.map((doc) => (
             <Button
               key={doc.id}
               type="button"

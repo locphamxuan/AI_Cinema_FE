@@ -10,5 +10,6 @@ export function fakeResponse(body: unknown, status = 200) {
     headers: new Headers(),
     json: async () => JSON.parse(text),
     text: async () => text,
+    blob: async () => new Blob([text]),
   };
 }

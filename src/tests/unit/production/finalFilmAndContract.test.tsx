@@ -5,9 +5,10 @@ import { FinalFilmPanel } from '@/features/production/components/episode/FinalFi
 import { PublishPanel } from '@/features/production/components/episode/PublishPanel';
 import { ContractTab } from '@/features/production/components/project/ContractTab';
 import { assignedProject, withProject } from '@/tests/support/projectContext';
-import { routeFetch } from '@/tests/support/routeFetch';
+import { failWith, routeFetch } from '@/tests/support/routeFetch';
 import { attachPdf, formOf } from '@/tests/support/pdf';
 import { signInAs } from '@/tests/support/signIn';
+import { toast } from '@/components/ui/Toast';
 import type { Episode } from '@/types/production';
 
 vi.mock('@/components/ui/Toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
@@ -162,6 +163,22 @@ describe('ContractTab', () => {
     expect(screen.queryByRole('button', { name: /Đồng ý/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/Ngân sách còn lại/)).not.toBeInTheDocument();
     expect(screen.getByText('150.000.000 ₫')).toBeInTheDocument();
+  });
+
+  it('downloads the unsigned contract the studio received, and says when it cannot', async () => {
+    signInAs('reviewer');
+    const createObjectURL = vi.fn(() => 'blob:x');
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() }));
+    const calls = routeFetch({ '/projects/m1/contracts': [round], '/contracts/c1/documents': [doc], '/contracts/c1/template': {} });
+    render(withProject(assignedProject(), <ContractTab />));
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Hợp đồng chưa ký (bản Studio nhận)' }));
+    await waitFor(() => expect(createObjectURL).toHaveBeenCalled());
+    expect(calls.some((c) => c.path === '/contracts/c1/template')).toBe(true);
+
+    routeFetch({ '/projects/m1/contracts': [round], '/contracts/c1/documents': [doc], '/contracts/c1/template': failWith(404, 'gone') });
+    await userEvent.click(screen.getByRole('button', { name: 'Hợp đồng chưa ký (bản Studio nhận)' }));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không tải được hợp đồng', 'Thử lại sau.'));
   });
 
   it('shows a Creator the rounds only: no PDF request, which the backend refuses them', async () => {

@@ -51,10 +51,44 @@ describe('StudiosPage (BR-59)', () => {
     const save = within(dialog).getByRole('button', { name: 'Lưu' });
     expect(save).toBeDisabled();
     await userEvent.type(within(dialog).getByLabelText(/Tên Studio/), 'Studio Mới');
-    await userEvent.type(within(dialog).getByLabelText(/Email nhận brief/), 'moi@studio.vn');
+    await userEvent.type(within(dialog).getByLabelText(/Email nhận hợp đồng/), 'moi@studio.vn');
+    await userEvent.type(within(dialog).getByLabelText('Mã số thuế'), '0319876543');
     expect(save).toBeEnabled();
     await userEvent.click(save);
-    expect(calls.some((c) => c.method === 'POST' && c.path === '/studios')).toBe(true);
+    const created = calls.find((c) => c.method === 'POST' && c.path === '/studios');
+    // The legal profile is Bên B of the contract; an empty field is sent empty so it can be cleared.
+    expect(JSON.parse(created!.body as string)).toMatchObject({ name: 'Studio Mới', taxCode: '0319876543', address: '' });
+  });
+
+  it('edits the legal profile of a studio, Bên B of its contract, and refuses a malformed phone', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
+    const calls = routeFetch({ '/studios': [studio({ taxCode: '0319876543', address: '12 Nguyễn Huệ', phone: '028 1234' })] });
+    render(<StudiosPage />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Sửa Studio Ánh Trăng' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByLabelText('Mã số thuế')).toHaveValue('0319876543');
+    expect(within(dialog).getByLabelText('Người đại diện ký hợp đồng')).toHaveValue('Chị Lan');
+    const save = within(dialog).getByRole('button', { name: 'Lưu' });
+    await userEvent.clear(within(dialog).getByLabelText('Số điện thoại'));
+    await userEvent.type(within(dialog).getByLabelText('Số điện thoại'), 'abc');
+    expect(save).toBeDisabled();
+    await userEvent.clear(within(dialog).getByLabelText('Số điện thoại'));
+    await userEvent.clear(within(dialog).getByLabelText('Địa chỉ trụ sở'));
+    await userEvent.type(within(dialog).getByLabelText('Chức vụ người đại diện'), 'Giám đốc');
+    await userEvent.type(within(dialog).getByLabelText('Ghi chú'), 'Đối tác lâu năm');
+    await userEvent.click(save);
+
+    const updated = calls.find((c) => c.method === 'PATCH' && c.path === '/studios/st1');
+    expect(JSON.parse(updated!.body as string)).toMatchObject({
+      contactName: 'Chị Lan',
+      note: 'Đối tác lâu năm',
+      address: '',
+      representativeTitle: 'Giám đốc',
+      taxCode: '0319876543',
+    });
+    expect(JSON.parse(updated!.body as string)).not.toHaveProperty('phone');
   });
 
   it('asks before deleting or deactivating a studio, and pages a long catalog', async () => {

@@ -9,6 +9,8 @@ import { productionService } from '@/services/productionService';
 import { studioService } from '@/services/studioService';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
+import { formatVnd } from '@/lib/format';
+import { parseVnd } from '../shared/CostRequestCard';
 import { GenrePicker } from '../shared/GenrePicker';
 import { emptyProjectInfo, ProjectInfoFields, releaseYearValid, type ProjectInfoDraft } from '../shared/ProjectInfoFields';
 
@@ -75,6 +77,8 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
   const [language, setLanguage] = useState('vi');
   const [info, setInfo] = useState<ProjectInfoDraft>(emptyProjectInfo);
   const [people, setPeople] = useState<PeopleDraft>({ reviewerId: '', creatorId: '', studioId: '' });
+  const [budget, setBudget] = useState('');
+  const budgetVnd = parseVnd(budget);
   const { busy, run } = useAction();
 
   const validationIssues = [
@@ -82,6 +86,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
     idea.trim().length < MIN_IDEA_LENGTH ? `mô tả ý tưởng có ít nhất ${MIN_IDEA_LENGTH} ký tự` : null,
     genreIds.length === 0 ? 'chọn ít nhất một thể loại' : null,
     !people.reviewerId ? 'chọn Reviewer phụ trách' : null,
+    !(budgetVnd >= 1000) ? 'nhập ngân sách sản xuất (bội số 1.000 ₫)' : null,
     !releaseYearValid(info.releaseYear) ? 'năm phát hành từ 2000 đến 2100' : null,
   ].filter((issue): issue is string => issue !== null);
   const valid = validationIssues.length === 0;
@@ -98,6 +103,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
             genreIds,
             defaultLanguage: language,
             reviewerId: people.reviewerId,
+            budgetVnd,
             ...(people.creatorId ? { creatorId: people.creatorId } : {}),
             ...(people.studioId ? { studioId: people.studioId } : {}),
             ...(info.synopsis.trim() ? { synopsis: info.synopsis.trim() } : {}),
@@ -117,7 +123,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
       open
       onClose={onClose}
       title="Tạo dự án phim"
-      subtitle="Bước 1 - ý tưởng, thể loại, Reviewer phụ trách và Creator chính; Reviewer lên mùa/tập sau"
+      subtitle="Bước 1 - ý tưởng, thể loại, ngân sách, Reviewer phụ trách và Creator chính; Reviewer lên mùa/tập sau"
       maxWidth="max-w-3xl"
     >
       <form onSubmit={submit} className="space-y-4">
@@ -132,6 +138,20 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
           <GenrePicker value={genreIds} onChange={setGenreIds} />
         </div>
         <PeopleFields value={people} onChange={setPeople} />
+        <FormField
+          label="Ngân sách sản xuất (₫)"
+          hint={budgetVnd >= 1000 ? `= ${formatVnd(budgetVnd)}, là ngân sách trần và giá trị hợp đồng gửi Studio.` : 'Là ngân sách trần và giá trị hợp đồng hệ thống gửi Studio sau khi duyệt Kịch bản Final.'}
+          error={budget && !(budgetVnd >= 1000) ? 'Số tiền là bội số 1.000 ₫.' : null}
+        >
+          <input
+            value={budget}
+            onChange={(e) => setBudget(e.target.value)}
+            inputMode="numeric"
+            placeholder="Ví dụ: 200.000.000"
+            required
+            className={fieldInputClass}
+          />
+        </FormField>
         <ProjectInfoFields value={info} onChange={setInfo} />
         <FormField label="Ngôn ngữ chính" className="sm:w-1/2">
           <select value={language} onChange={(e) => setLanguage(e.target.value)} className={fieldInputClass}>

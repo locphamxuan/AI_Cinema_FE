@@ -219,4 +219,24 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
 
     await waitFor(() => expect(bodyOf(fetchMock, 'PATCH', '/platform-settings')).toEqual({ planRenewalGraceHours: 0 }));
   });
+
+  it('keeps Bên A of the production contract, saving only the fields changed', async () => {
+    signInAs('admin');
+    const settings = { coinRateVnd: 1000, refundOnRemoval: true, contractCompanyName: 'Công ty TNHH AI Cinema', contractTaxCode: null };
+    const fetchMock = mockApi({ 'GET /platform-settings': settings, 'PATCH /platform-settings': settings });
+    render(<PlatformSettingsPanel />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Hợp đồng (Bên A)' }));
+    expect(screen.getByLabelText('Tên công ty')).toHaveValue('Công ty TNHH AI Cinema');
+    const save = screen.getByRole('button', { name: 'Lưu Bên A' });
+    expect(save).toBeDisabled();
+    await userEvent.type(screen.getByLabelText('Mã số thuế'), ' 0312345678 ');
+    await userEvent.type(screen.getByLabelText('Email'), 'legal@aicinema.vn');
+    await userEvent.click(screen.getByRole('button', { name: 'Hủy thay đổi' }));
+    expect(screen.getByLabelText('Mã số thuế')).toHaveValue('');
+    await userEvent.type(screen.getByLabelText('Mã số thuế'), ' 0312345678 ');
+    await userEvent.click(screen.getByRole('button', { name: 'Lưu Bên A (1)' }));
+
+    await waitFor(() => expect(bodyOf(fetchMock, 'PATCH', '/platform-settings')).toEqual({ contractTaxCode: '0312345678' }));
+  });
 });
