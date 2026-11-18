@@ -199,7 +199,6 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
       coinRateVnd: 1000,
       episodeCoinPriceMin: 1,
       episodeCoinPriceMax: 50,
-      bonusCoinExpiryDays: 30,
       playbackHeartbeatTimeoutSeconds: 90,
       subscriptionCancelWindowHours: 24,
       planRenewalGraceHours: 48,

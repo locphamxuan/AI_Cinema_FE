@@ -128,7 +128,7 @@ export function WalletModal({
             </div>
           </div>
           <div>
-            <p className="font-semibold mb-1">Lô Coin thưởng còn dùng được</p>
+            <p className="font-semibold mb-1">Lô Coin thưởng còn lại (không hết hạn)</p>
             {w.lots.length === 0 ? (
               <p className="text-slate-500">Không còn lô nào.</p>
             ) : (
@@ -138,7 +138,7 @@ export function WalletModal({
                     <span>
                       {LOT_SOURCE_LABEL[lot.source] ?? lot.source}: còn {lot.remainingAmount}/{lot.originalAmount}
                     </span>
-                    <span className="text-slate-500">hết hạn {formatDay(lot.expiresAt)}</span>
+                    <span className="text-slate-500">nhận {formatDay(lot.grantedAt)}</span>
                   </li>
                 ))}
               </ul>

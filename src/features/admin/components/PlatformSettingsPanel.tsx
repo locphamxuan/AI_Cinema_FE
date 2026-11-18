@@ -25,7 +25,6 @@ const COIN_FIELDS: SettingField[] = [
   { key: 'coinRateVnd', label: 'Tỷ giá Coin', unit: '₫ / Coin', hint: 'Giá trị 1 Coin chính khi nạp tiền.', min: 1 },
   { key: 'coinTopUpMinVnd', label: 'Nạp tối thiểu mỗi lần', unit: '₫', hint: '', min: 1000 },
   { key: 'coinTopUpMaxVnd', label: 'Nạp tối đa mỗi lần', unit: '₫', hint: '', min: 1000 },
-  { key: 'bonusCoinExpiryDays', label: 'Hạn Coin thưởng', unit: 'ngày', hint: 'Coin thưởng hết hạn sau số ngày này kể từ khi nhận.', min: 1 },
   { key: 'newMemberBonusCoins', label: 'Coin thưởng tài khoản mới', unit: 'Coin', hint: '0 = không tặng.', min: 0 },
 ];
 

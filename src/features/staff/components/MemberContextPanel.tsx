@@ -12,7 +12,7 @@ import type { MemberContextSection, MemberContextSectionKey } from '@/types/supp
 /* The shapes of BE member-context.service, read only. */
 type Account = { email: string; fullName: string; phoneNumber: string | null; isActive: boolean; emailVerifiedAt: string | null; createdAt: string };
 type Subscription = { status: string; autoRenew: boolean; currentPeriodEnd: string; cancelWindowEndsAt: string | null; priceCoins: number; plan: { name: string } } | null;
-type Wallet = { mainBalance: number; bonusBalance: number; lots?: { source: string; remainingAmount: number; expiresAt: string | null }[] } | null;
+type Wallet = { mainBalance: number; bonusBalance: number; lots?: { source: string; remainingAmount: number; grantedAt: string }[] } | null;
 type Tx = { entryType: string; mainAmount: number; bonusAmount: number; createdAt: string; description: string | null };
 type Access = { source: string; paidCoins: number; grantedAt: string; revokedAt: string | null; episode: { episodeNumber: number; title: string; movie: { title: string } } };
 type Devices = { devices: { name: string | null; platform: string; lastSeenAt: string | null }[]; sessions: { status: string; startedAt: string }[] };

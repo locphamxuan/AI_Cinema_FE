@@ -164,7 +164,6 @@ export interface PlatformSettings extends Partial<ContractPartySettings> {
   coinRateVnd: number;
   episodeCoinPriceMin: number;
   episodeCoinPriceMax: number;
-  bonusCoinExpiryDays: number;
   playbackHeartbeatTimeoutSeconds: number;
   subscriptionCancelWindowHours: number;
   planRenewalGraceHours: number;
