@@ -32,7 +32,7 @@ export function StaffCaseChat({
   const can = useCan();
   const detail = useResource(`staff:support:detail:${caseId}`, () => staffSupportService.getDetail(caseId));
   const [view, setView] = useState<View>('chat');
-  const [ending, setEnding] = useState<'resolve' | 'close' | null>(null);
+  const [resolving, setResolving] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const { busy, run } = useAction();
 
@@ -52,10 +52,9 @@ export function StaffCaseChat({
   };
   const act = async (call: 'claim' | 'release') =>
     after(await run(() => staffSupportService[call](c.id), call === 'claim' ? 'Đã nhận case' : 'Đã trả case về hàng chờ'));
-  const end = async (note: string) => {
-    const kind = ending;
-    setEnding(null);
-    if (kind) await after(await run(() => staffSupportService[kind](c.id, note), kind === 'resolve' ? 'Đã đánh dấu giải quyết' : 'Đã đóng case'));
+  const resolve = async (note: string) => {
+    setResolving(false);
+    await after(await run(() => staffSupportService.resolve(c.id, note), 'Đã báo Member: chờ Member xác nhận'));
   };
 
   return (
@@ -89,10 +88,9 @@ export function StaffCaseChat({
           </div>
           <div className="flex flex-wrap gap-1.5">
             {allowed.claim && <Button size="sm" disabled={busy} onClick={() => void act('claim')}>Nhận case</Button>}
-            {allowed.release && <Button size="sm" variant="secondary" disabled={busy} onClick={() => void act('release')}>Trả case</Button>}
-            {allowed.assign && <Button size="sm" variant="secondary" disabled={busy} onClick={() => setAssigning(true)}>Giao case</Button>}
-            {allowed.resolve && <Button size="sm" variant="success" disabled={busy} onClick={() => setEnding('resolve')}>Đã giải quyết</Button>}
-            {allowed.close && <Button size="sm" variant="ghost" disabled={busy} onClick={() => setEnding('close')}>Đóng case</Button>}
+            {allowed.resolve && <Button size="sm" variant="success" disabled={busy} onClick={() => setResolving(true)}>Đã giải quyết xong</Button>}
+            {allowed.assign && <Button size="sm" variant="ghost" disabled={busy} onClick={() => setAssigning(true)}>Giao cho người khác</Button>}
+            {allowed.release && <Button size="sm" variant="ghost" disabled={busy} onClick={() => void act('release')}>Trả về hàng chờ</Button>}
           </div>
         </div>
       </header>
@@ -106,22 +104,24 @@ export function StaffCaseChat({
         <p className="border-t border-border px-4 py-3 text-xs text-muted-foreground">
           {c.status === 'AI_HANDLING'
             ? 'AI đang xử lý case này; nhân viên trả lời được khi case được chuyển sang.'
-            : c.status === 'RESOLVED' || c.status === 'CLOSED'
-              ? 'Case đã kết thúc, không gửi thêm tin nhắn được.'
+            : c.status === 'RESOLVED'
+              ? 'Đang chờ Member xác nhận đã giải quyết. Member chọn "Vẫn cần hỗ trợ" thì case quay lại hàng chờ; không phản hồi thì tự đóng.'
+              : c.status === 'CLOSED'
+                ? 'Case đã kết thúc, không gửi thêm tin nhắn được.'
               : 'Case đang do nhân viên khác xử lý.'}
         </p>
       )}
 
       <TextPromptModal
-        open={!!ending}
-        title={ending === 'resolve' ? 'Đánh dấu đã giải quyết' : 'Đóng case'}
-        subtitle={ending === 'resolve' ? 'Member nhận tin hệ thống rằng vấn đề đã được giải quyết.' : 'Hội thoại vẫn đọc lại được sau khi đóng.'}
-        label="Ghi chú cách xử lý (tuỳ chọn)"
-        confirmLabel={ending === 'resolve' ? 'Đã giải quyết' : 'Đóng case'}
+        open={resolving}
+        title="Đã giải quyết xong yêu cầu?"
+        subtitle="Member nhận thông báo và chọn Đã giải quyết (case đóng) hoặc Vẫn cần hỗ trợ (case quay lại hàng chờ). Không phản hồi thì case tự đóng."
+        label="Ghi chú cách xử lý gửi Member (tuỳ chọn)"
+        confirmLabel="Đã giải quyết xong"
         required={false}
         busy={busy}
-        onClose={() => setEnding(null)}
-        onConfirm={(note) => void end(note)}
+        onClose={() => setResolving(false)}
+        onConfirm={(note) => void resolve(note)}
       />
       {assigning && (
         <AssignCaseModal

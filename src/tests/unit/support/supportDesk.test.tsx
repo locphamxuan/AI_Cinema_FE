@@ -3,6 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StaffSupportWorkspace } from '@/features/staff/components/StaffSupportWorkspace';
 import { caseActions } from '@/features/staff/supportLabels';
+import { useAppStore } from '@/store/useAppStore';
 import { queueQuery } from '@/services/staffSupportService';
 import { notificationHref } from '@/features/production/lib/routes';
 import { notificationTabsFor, typesOf } from '@/features/notifications/notificationCatalog';
@@ -76,6 +77,32 @@ describe('Support queue', () => {
     });
   });
 
+  it('switches between the three queues and resolves a case for the member to confirm', async () => {
+    signInAs('staff');
+    const handled = { ...CASE, status: 'STAFF_HANDLING', assignedAgentId: useAppStore.getState().user?.id ?? null };
+    const calls = routeFetch({
+      '/admin/support/stats': STATS,
+      '/admin/support/conversations': page([handled]),
+      '/admin/support/conversations/c1': { conversation: handled, messages: MESSAGES },
+      '/admin/support/conversations/c1/resolve': { ...handled, status: 'RESOLVED' },
+    });
+    render(<StaffSupportWorkspace />);
+    const queue = screen.getByRole('region', { name: 'Hàng chờ hỗ trợ' });
+
+    await userEvent.click(within(queue).getByRole('button', { name: 'Chờ Member xác nhận' }));
+    await waitFor(() => expect(calls.some((c) => c.path === '/admin/support/conversations' && c.search.get('filter.status') === '$eq:RESOLVED')).toBe(true));
+    expect(within(queue).getByRole('button', { name: 'Chờ Member xác nhận' })).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(within(queue).getByRole('button', { name: 'Của tôi' }));
+    await userEvent.click(await within(queue).findByText('Nguyễn An'));
+
+    const detail = screen.getByRole('region', { name: 'Chi tiết case' });
+    expect(within(detail).queryByRole('button', { name: /Đóng case/ })).not.toBeInTheDocument();
+    await userEvent.click(await within(detail).findByRole('button', { name: 'Đã giải quyết xong' }));
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Đã giải quyết xong' }));
+    await waitFor(() => expect(calls.some((c) => c.path === '/admin/support/conversations/c1/resolve' && c.method === 'POST')).toBe(true));
+  });
+
   it('lets the Admin assign the case to an active Staff member', async () => {
     signInAs('admin');
     search = new URLSearchParams({ case: 'c1' });
@@ -89,7 +116,7 @@ describe('Support queue', () => {
     render(<StaffSupportWorkspace isAdmin />);
 
     const detail = screen.getByRole('region', { name: 'Chi tiết case' });
-    await userEvent.click(await within(detail).findByRole('button', { name: 'Giao case' }));
+    await userEvent.click(await within(detail).findByRole('button', { name: 'Giao cho người khác' }));
     const dialog = await screen.findByRole('dialog');
     await userEvent.selectOptions(await within(dialog).findByRole('combobox'), 's1');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Giao case' }));
@@ -105,9 +132,11 @@ describe('Case actions follow the backend rules', () => {
   const me = { id: 'staff-id', isAdmin: false, canManage: true, canAssign: false };
 
   it('claims only a waiting case and resolves only one being handled', () => {
-    expect(caseActions(CASE, me)).toMatchObject({ claim: true, resolve: false, close: false, release: false, reply: true });
+    expect(caseActions(CASE, me)).toMatchObject({ claim: true, resolve: false, release: false, reply: true });
     const mine = { ...CASE, status: 'STAFF_HANDLING' as const, assignedAgentId: 'staff-id' };
-    expect(caseActions(mine, me)).toMatchObject({ claim: false, resolve: true, close: true, release: true });
+    expect(caseActions(mine, me)).toMatchObject({ claim: false, resolve: true, release: true });
+    // Staff never closes a case: the member confirms it or it closes on its own.
+    expect(caseActions(mine, me)).not.toHaveProperty('close');
   });
 
   it('blocks Staff on a case another Staff holds, but not the Admin', () => {

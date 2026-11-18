@@ -17,6 +17,13 @@ import { CASE_STATUS, ESCALATION, PRIORITY } from '../supportLabels';
 import { StaffCaseChat } from './StaffCaseChat';
 
 const SELECT = `${fieldInputClass} py-1.5 text-xs`;
+
+/** The three queues a Staff member works from, one tap each; the selects below refine any of them. */
+const QUICK_VIEWS = (meId?: string): { label: string; filters: QueueFilters }[] => [
+  { label: 'Cần nhận', filters: { status: 'WAITING_FOR_STAFF' } },
+  { label: 'Của tôi', filters: { status: 'STAFF_HANDLING', assignee: meId } },
+  { label: 'Chờ Member xác nhận', filters: { status: 'RESOLVED' } },
+];
 const PAGE_SIZE = 20;
 
 /** MF-5 support desk: the queue on the left (filtered and paged by the backend), the open case on the right. */
@@ -59,6 +66,27 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
               <Button size="sm" variant="ghost" onClick={() => void refresh()} disabled={queue.loading}>
                 <RotateCw className={`size-3.5 ${queue.loading ? 'animate-spin' : ''}`} aria-hidden="true" /> Làm mới
               </Button>
+            </div>
+            <div role="group" aria-label="Hàng chờ nhanh" className="flex flex-wrap gap-1.5">
+              {QUICK_VIEWS(me?.id).map(({ label, filters: view }) => {
+                const active = filters.status === view.status && (filters.assignee ?? undefined) === view.assignee;
+                return (
+                  <button
+                    key={label}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => {
+                      setFilters(view);
+                      setPage(1);
+                    }}
+                    className={`cursor-pointer rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                      active ? 'border-primary bg-primary text-primary-foreground' : 'border-border hover:bg-muted'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
             </div>
             <div className="grid grid-cols-3 gap-2">
               <select aria-label="Lọc theo trạng thái" value={filters.status ?? ''} onChange={(e) => set({ status: (e.target.value || undefined) as SupportStatus | undefined })} className={SELECT}>

@@ -125,7 +125,6 @@ export const API_ROUTES = {
     AI_SUGGESTION: (id: string) => `/admin/support/conversations/${id}/ai-suggestion`,
     MESSAGES: (id: string) => `/admin/support/conversations/${id}/messages`,
     RESOLVE: (id: string) => `/admin/support/conversations/${id}/resolve`,
-    CLOSE: (id: string) => `/admin/support/conversations/${id}/close`,
     ASSIGN: (id: string) => `/admin/support/conversations/${id}/assign`,
     KNOWLEDGE: '/admin/support/knowledge',
     KNOWLEDGE_DETAIL: (id: string) => `/admin/support/knowledge/${id}`,
