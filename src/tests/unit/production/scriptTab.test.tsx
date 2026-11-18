@@ -94,6 +94,7 @@ describe('ScriptTab', () => {
       '/projects/m1/script': script({ status: 'REVIEWER_APPROVED' }),
       '/projects/m1/script/final-review': script({ status: 'FINAL', finalizedAt: '2026-11-03T00:00:00.000Z' }),
       '/studios': [STUDIO],
+      [`/studios/${STUDIO.id}/accounts`]: [{ id: 'login-1', isActive: true }],
     });
     const reload = vi.fn(async () => undefined);
     render(withProject(assignedProject({ studio: null }), <ScriptTab />, reload));

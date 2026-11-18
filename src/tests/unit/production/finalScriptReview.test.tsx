@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { toast } from '@/components/ui/Toast';
 import { FinalScriptReview } from '@/features/production/components/project/FinalScriptReview';
 import { ScriptTab } from '@/features/production/components/project/ScriptTab';
-import { assignedProject, withProject } from '@/tests/support/projectContext';
+import { STUDIO, assignedProject, withProject } from '@/tests/support/projectContext';
 import { failWith, routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 import type { ProjectScript } from '@/types/production';
@@ -20,6 +20,10 @@ const scriptIn = (status: ProjectScript['status'] = 'REVIEWER_APPROVED'): Projec
   reviews: [],
 });
 
+/** Every studio of these tests can sign in to Studio Web, so the contract may go out. */
+const LOGINS = Object.fromEntries(
+  [STUDIO.id, 'st2'].map((id) => [`/studios/${id}/accounts`, [{ id: `login-${id}`, isActive: true }]]),
+);
 const bodyOf = (calls: ReturnType<typeof routeFetch>) =>
   JSON.parse(calls.find((c) => c.path === '/projects/m1/script/final-review')!.body as string);
 
@@ -32,7 +36,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('FinalScriptReview', () => {
   it('sends the script back to the Creator with the reason of the Admin', async () => {
-    const calls = routeFetch({ '/projects/m1/script/final-review': scriptIn('REVISION_REQUESTED') });
+    const calls = routeFetch({ ...LOGINS, '/projects/m1/script/final-review': scriptIn('REVISION_REQUESTED') });
     const onDecided = vi.fn();
     render(withProject(assignedProject(), <FinalScriptReview onDecided={onDecided} />));
 
@@ -46,7 +50,7 @@ describe('FinalScriptReview', () => {
   });
 
   it('approves for the studio of the project with the platform terms when none are typed', async () => {
-    const calls = routeFetch({ '/projects/m1/script/final-review': scriptIn('FINAL') });
+    const calls = routeFetch({ ...LOGINS, '/projects/m1/script/final-review': scriptIn('FINAL') });
     const onDecided = vi.fn();
     render(withProject(assignedProject(), <FinalScriptReview onDecided={onDecided} />));
 
@@ -58,7 +62,7 @@ describe('FinalScriptReview', () => {
   });
 
   it('cannot approve while an episode has no delivery deadline, and says which one', () => {
-    routeFetch({});
+    routeFetch({ ...LOGINS });
     const project = assignedProject({
       seasons: [
         {
@@ -77,13 +81,13 @@ describe('FinalScriptReview', () => {
   });
 
   it('cannot approve before the Reviewer planned any episode', () => {
-    routeFetch({});
+    routeFetch({ ...LOGINS });
     render(withProject(assignedProject({ seasons: [] }), <FinalScriptReview onDecided={vi.fn()} />));
     expect(screen.getByRole('status')).toHaveTextContent('Reviewer chưa lên tập nào cho dự án');
   });
 
   it('needs a studio picked when the project has none', async () => {
-    routeFetch({ '/studios': [{ id: 'st2', name: 'Nova Studio' }] });
+    routeFetch({ ...LOGINS, '/studios': [{ id: 'st2', name: 'Nova Studio' }] });
     render(withProject(assignedProject({ studio: null }), <FinalScriptReview onDecided={vi.fn()} />));
 
     const approve = screen.getByRole('button', { name: 'Đồng ý Kịch bản Final' });
@@ -94,7 +98,7 @@ describe('FinalScriptReview', () => {
   });
 
   it('shows the refusal of the API and decides nothing', async () => {
-    routeFetch({ '/projects/m1/script/final-review': failWith(409, 'The script is SUBMITTED (expected REVIEWER_APPROVED)') });
+    routeFetch({ ...LOGINS, '/projects/m1/script/final-review': failWith(409, 'The script is SUBMITTED (expected REVIEWER_APPROVED)') });
     const onDecided = vi.fn();
     render(withProject(assignedProject(), <FinalScriptReview onDecided={onDecided} />));
 
@@ -107,21 +111,21 @@ describe('FinalScriptReview', () => {
 
 describe('ScriptTab gating of the Final Script decision', () => {
   it('is offered to the Admin once the Reviewer approved the script', async () => {
-    routeFetch({ '/projects/m1/script': scriptIn() });
+    routeFetch({ ...LOGINS, '/projects/m1/script': scriptIn() });
     render(withProject(assignedProject(), <ScriptTab />));
     expect(await screen.findByRole('button', { name: 'Đồng ý Kịch bản Final' })).toBeInTheDocument();
   });
 
   it('is not offered to the Reviewer in charge', async () => {
     signInAs('reviewer');
-    routeFetch({ '/projects/m1/script': scriptIn() });
+    routeFetch({ ...LOGINS, '/projects/m1/script': scriptIn() });
     render(withProject(assignedProject({ reviewerId: 'reviewer-id' }), <ScriptTab />));
     expect(await screen.findByText('CẢNH 1')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Đồng ý Kịch bản Final' })).not.toBeInTheDocument();
   });
 
   it('is not offered on a script still waiting for the Reviewer', async () => {
-    routeFetch({ '/projects/m1/script': scriptIn('SUBMITTED') });
+    routeFetch({ ...LOGINS, '/projects/m1/script': scriptIn('SUBMITTED') });
     render(withProject(assignedProject(), <ScriptTab />));
     expect(await screen.findByText('CẢNH 1')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Đồng ý Kịch bản Final' })).not.toBeInTheDocument();

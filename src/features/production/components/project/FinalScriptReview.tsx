@@ -11,6 +11,8 @@ import { useResource } from '@/hooks/useResource';
 import { Panel, TextPromptModal } from '@/components/data/ui';
 import { DeadlineList } from './DueDateRows';
 import { useProject } from './ProjectContext';
+import { StudioLoginWarning, useStudioLogin } from './StudioLoginCheck';
+import type { Studio } from '@/types/production';
 
 /** What still blocks the Final Script on the backend: episodes planned with a delivery deadline (BE script.service). */
 export function finalScriptBlockers(project: Pick<ProjectDetail, 'seasons'>): string[] {
@@ -33,7 +35,10 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
   const [sendingBack, setSendingBack] = useState(false);
   const { busy, run } = useAction();
   const blockers = finalScriptBlockers(project);
-  const studioReady = !!project.studio || !!studioId;
+  const targetId = studioId || project.studio?.id || '';
+  const target = (studios.data?.find((s) => s.id === targetId) ?? (project.studio?.id === targetId ? project.studio : null)) as Studio | null;
+  const login = useStudioLogin(target);
+  const studioReady = (!!project.studio || !!studioId) && login.ready !== false;
   const episodes = project.seasons.flatMap((s) => s.episodes);
 
   const approve = async (e: React.FormEvent) => {
@@ -113,6 +118,7 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
             <DeadlineList episodes={episodes} />
           </div>
         )}
+        {target && login.ready === false && <StudioLoginWarning studio={target} onCreated={() => void login.reload()} />}
         {blockers.length > 0 && (
           <p role="status" className="text-amber-600 dark:text-amber-400">
             Chưa duyệt được: {blockers.join('; ')}. Nhắc Reviewer hoàn tất mùa/tập trước.
