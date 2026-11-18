@@ -2,76 +2,50 @@
 
 import { useEffect, useState } from 'react';
 import { useCan } from '@/hooks/useCan';
-import { PERMISSION, type PermissionKey } from '@/lib/permissions';
+import { PERMISSION } from '@/lib/permissions';
 import { movieService, type CatalogMovie } from '@/services/movieService';
 import { adminService, type AccountRow } from '@/services/adminService';
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 import { SubscriptionsPanel } from '@/features/billing-admin/components/SubscriptionsPanel';
 import { StaffSupportWorkspace } from './StaffSupportWorkspace';
 
-interface Module {
-  key: string;
-  title: string;
-  description: string;
-  /** None: open to every Staff account (public data). */
-  permission?: PermissionKey;
-}
-
-const MODULES: Module[] = [
-  { key: 'support', title: 'Hỗ trợ khách hàng', description: 'Yêu cầu hỗ trợ do AI Chatbot chuyển sang.', permission: PERMISSION.SUPPORT_CASE_READ },
-  { key: 'films', title: 'Theo dõi phim', description: 'Phim đang phát và số tập (chỉ đọc).' },
-  { key: 'members', title: 'Thông tin member', description: 'Tài khoản member (chỉ đọc).', permission: PERMISSION.MEMBER_OPS_READ },
-];
-
 const CARD = 'rounded-xl bg-card ring-1 ring-foreground/10';
 
-/** Staff operations dashboard (MF-5): only the modules this role holds a permission for (BR-21). */
+/** MF-5 support desk of a Staff account; read-only lookups live on their own page (StaffLookup). */
 export function StaffPage() {
   const can = useCan();
-  const [activeTab, setActiveTab] = useState<'support' | 'operations'>('support');
-  const modules = MODULES.filter((m) => !m.permission || can(m.permission));
-
   return (
-    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Vận hành</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">Hàng chờ hỗ trợ Member và tra cứu chỉ đọc (phim, member, gói, giao dịch Coin).</p>
-        </div>
-
-        <div role="tablist" aria-label="Khu vận hành" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 text-sm">
-          {(['support', 'operations'] as const).map((key) => (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === key}
-              onClick={() => setActiveTab(key)}
-              className={`cursor-pointer rounded-md px-4 py-1.5 ${activeTab === key ? 'bg-background font-medium shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              {key === 'support' ? 'Hỗ trợ khách hàng' : 'Tra cứu (chỉ đọc)'}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {modules.length === 0 && (
-        <p className={`${CARD} p-5 text-xs text-muted-foreground`}>
-          Vai trò của bạn chưa được cấp mục vận hành nào. Liên hệ Admin để được cấp quyền.
-        </p>
-      )}
-
-      {activeTab === 'support' && can(PERMISSION.SUPPORT_CASE_READ) && <StaffSupportWorkspace />}
-
-      {activeTab === 'operations' && (
-        <div className="space-y-5">
-          <FilmsSection />
-          {can(PERMISSION.MEMBER_OPS_READ) && <MembersSection />}
-          {can(PERMISSION.BILLING_SUBSCRIPTION_READ) && <SubscriptionsPanel />}
-          {can(PERMISSION.COIN_TRANSACTION_READ) && <CoinLedgerPanel />}
-        </div>
+    <main className="mx-auto w-full max-w-7xl space-y-5 px-4 py-6 sm:px-6">
+      <PageIntro title="Hỗ trợ khách hàng" text="Case do Chatbox AI chuyển sang: nhận case, trả lời Member, báo đã giải quyết để Member xác nhận." />
+      {can(PERMISSION.SUPPORT_CASE_READ) ? (
+        <StaffSupportWorkspace />
+      ) : (
+        <p className={`${CARD} p-5 text-xs text-muted-foreground`}>Vai trò của bạn chưa được cấp quyền hỗ trợ khách hàng. Liên hệ Admin.</p>
       )}
     </main>
+  );
+}
+
+/** Read-only lookups for a Staff account: only the sections its permissions open (BR-21). */
+export function StaffLookup() {
+  const can = useCan();
+  return (
+    <main className="mx-auto w-full max-w-7xl space-y-5 px-4 py-6 sm:px-6">
+      <PageIntro title="Tra cứu (chỉ đọc)" text="Phim đang phát, member, gói thành viên và giao dịch Coin. Điều chỉnh do Admin làm ở màn quản trị." />
+      <FilmsSection />
+      {can(PERMISSION.MEMBER_OPS_READ) && <MembersSection />}
+      {can(PERMISSION.BILLING_SUBSCRIPTION_READ) && <SubscriptionsPanel />}
+      {can(PERMISSION.COIN_TRANSACTION_READ) && <CoinLedgerPanel />}
+    </main>
+  );
+}
+
+function PageIntro({ title, text }: { title: string; text: string }) {
+  return (
+    <div>
+      <h2 className="font-heading text-2xl font-semibold tracking-tight">{title}</h2>
+      <p className="mt-0.5 text-sm text-muted-foreground">{text}</p>
+    </div>
   );
 }
 
