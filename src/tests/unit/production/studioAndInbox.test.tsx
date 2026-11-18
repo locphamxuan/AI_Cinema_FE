@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ChangeRequestInbox } from '@/features/admin/components/ChangeRequestInbox';
-import { DashboardHeader } from '@/features/production/components/shell/DashboardHeader';
+import { AppShell } from '@/components/shell/AppShell';
 import { StudiosPage } from '@/features/studio/components/StudiosPage';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { fakeResponse } from '@/tests/support/fakeResponse';
@@ -14,6 +14,7 @@ const nav = vi.hoisted(() => ({ pathname: '/reviewer/studios' }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
   usePathname: () => nav.pathname,
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 const studio = (patch: object = {}) => ({
@@ -220,19 +221,20 @@ describe('ChangeRequestInbox (BR-55)', () => {
   });
 });
 
-describe('DashboardHeader', () => {
+describe('AppShell header', () => {
   it.each([
     ['reviewer', '/reviewer/projects', 'Kiểm duyệt nội dung'],
     ['creator', '/creator/projects', 'Sản xuất nội dung'],
     ['admin', '/admin/accounts', 'Quản trị'],
     ['staff', '/staff', 'Vận hành'],
   ] as const)('shows the area label without the removed role pill for %s', (role, pathname, areaLabel) => {
+    const area = role;
     nav.pathname = pathname;
     signInAs(role);
     routeFetch({});
-    render(<DashboardHeader />);
+    render(<AppShell area={area}><div /></AppShell>);
 
-    expect(screen.getByText(areaLabel)).toBeInTheDocument();
+    expect(screen.getAllByText(areaLabel).length).toBeGreaterThan(0);
     expect(screen.queryByLabelText('Vai trò của tài khoản')).not.toBeInTheDocument();
   });
 
@@ -240,7 +242,7 @@ describe('DashboardHeader', () => {
     nav.pathname = '/admin/accounts';
     signInAs('admin');
     routeFetch({});
-    render(<DashboardHeader />);
+    render(<AppShell area="admin"><div /></AppShell>);
 
     await userEvent.click(screen.getByRole('button', { name: /^Tài khoản/ }));
     const items = screen.getAllByRole('menuitem');

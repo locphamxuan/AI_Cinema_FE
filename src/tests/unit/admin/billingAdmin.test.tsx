@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
+import { AppShell } from '@/components/shell/AppShell';
 import { PlatformSettingsPanel } from '@/features/admin/components/PlatformSettingsPanel';
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 import { PlansPanel } from '@/features/billing-admin/components/PlansPanel';
@@ -67,8 +67,8 @@ afterEach(() => vi.unstubAllGlobals());
 describe('Admin MF-2 sections', () => {
   it('opens the billing and reward sections to the Admin', () => {
     signInAs('admin');
-    render(<AdminSidebar />);
-    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
+    render(<AppShell area="admin"><div /></AppShell>);
+    const nav = screen.getByRole('navigation', { name: 'Menu Quản trị' });
     for (const label of ['Gói thành viên & Doanh thu', 'Giao dịch Coin', 'Điểm danh & vòng quay']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }
