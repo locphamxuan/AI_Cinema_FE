@@ -1,9 +1,9 @@
 'use client';
 
+import { GreetingCard } from '@/components/data/GreetingCard';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { InitialsAvatar } from '@/components/data/InitialsAvatar';
 import { Pager, pageOf } from '@/components/data/Pager';
 import { ErrorNote, Loading } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
@@ -62,25 +62,16 @@ export function CreatorStudioPortal() {
   return (
     <div className="relative min-h-screen w-full bg-background text-foreground p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
-        <section aria-label="Hồ sơ biên kịch" className={`${CARD} p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
-          <div className="flex items-center gap-4">
-            <InitialsAvatar name={user?.name ?? 'Creator'} />
-            <div className="space-y-0.5">
-              <h1 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-                Xin chào, {user?.name ?? 'Creator'}
-              </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-                {user?.email} · Quản lý kịch bản &amp; dự án được giao
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/creator/profile"
-            className="inline-flex items-center gap-1.5 self-start sm:self-center rounded-full border border-input bg-white dark:bg-white/[0.04] px-4 py-2 text-xs font-semibold text-foreground hover:bg-muted/60 transition-all"
-          >
-            Hồ sơ cá nhân
-          </Link>
-        </section>
+        <GreetingCard
+          label="Hồ sơ biên kịch"
+          name={user?.name ?? 'Creator'}
+          summary="Kịch bản và dự án được giao cho bạn, với bước tiếp theo của từng dự án."
+          action={
+            <Link href="/creator/profile" className="inline-flex h-10 items-center rounded-lg border border-border bg-card px-5 text-sm font-semibold transition-colors hover:bg-muted">
+              Hồ sơ cá nhân
+            </Link>
+          }
+        />
 
         {pipelines.error && <ErrorNote message={pipelines.error} onRetry={pipelines.reload} />}
         {pipelines.loading && !pipelines.data && <Loading />}

@@ -16,7 +16,7 @@ export default function AuthBrand() {
       />
       <div className="absolute top-10 space-y-3 px-10">
         <Clapperboard className="size-10" aria-hidden="true" />
-        <p className="text-sm font-semibold tracking-[0.2em] uppercase opacity-80">AI Cinema</p>
+        <p className="text-sm font-semibold tracking-[0.2em] opacity-80">AI Cinema</p>
         <h2 className="max-w-md font-heading text-3xl leading-tight font-semibold">Cổng Quản Trị &amp; Sản Xuất Nội Bộ</h2>
         <p className="max-w-md text-sm opacity-80">Từ ý tưởng, kịch bản, hợp đồng Studio tới phát hành phim có gắn nhãn AI.</p>
       </div>

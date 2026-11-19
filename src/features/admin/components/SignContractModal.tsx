@@ -65,7 +65,7 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
           Studio: <strong className="text-foreground">{c.studio.name}</strong>
         </p>
         <p className="text-muted-foreground">
-          Giá Studio đề xuất: <strong className="text-emerald-600 dark:text-emerald-400 font-mono text-sm">{formatVnd(c.costVnd)}</strong>
+          Giá Studio đề xuất: <strong className="text-emerald-600 dark:text-emerald-400 tabular-nums text-sm">{formatVnd(c.costVnd)}</strong>
           <span className="text-muted-foreground"> · ngân sách còn lại {remainingVnd !== null ? formatVnd(remainingVnd) : readError ? 'không đọc được' : 'đang tải…'}</span>
         </p>
         <div className="pt-2.5 border-t border-border">

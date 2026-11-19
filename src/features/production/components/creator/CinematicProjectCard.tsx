@@ -51,7 +51,7 @@ export function CinematicProjectCard({ project, href }: { project: ScriptProject
           <div className="space-y-1.5 pt-1">
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">Tiến độ kịch bản</span>
-              <span className="font-semibold text-foreground font-mono">{project.currentVersion > 0 ? `Bản ${project.currentVersion}` : 'Chưa có bản nào'}</span>
+              <span className="font-semibold text-foreground tabular-nums">{project.currentVersion > 0 ? `Bản ${project.currentVersion}` : 'Chưa có bản nào'}</span>
             </div>
             <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-white/[0.08] overflow-hidden">
               <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${percent}%` }} />

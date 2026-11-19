@@ -1,10 +1,10 @@
 'use client';
 
+import { GreetingCard } from '@/components/data/GreetingCard';
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { LayoutGrid, List, Search } from 'lucide-react';
-import { InitialsAvatar } from '@/components/data/InitialsAvatar';
 import { Pager, pageOf } from '@/components/data/Pager';
 import { ErrorNote, Loading } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
@@ -30,7 +30,7 @@ function QueueTable({ items }: { items: QueueItem[] }) {
     <div className={`${CARD} overflow-x-auto`}>
       <table className="w-full text-left border-collapse text-xs">
         <thead>
-          <tr className="border-b border-border bg-muted/60 text-muted-foreground font-bold uppercase tracking-wider text-[11px]">
+          <tr className="border-b border-border bg-muted/60 text-muted-foreground font-bold text-[11px]">
             <th className="py-3.5 px-4">Dự Án & Tập Phim</th>
             <th className="py-3.5 px-4">Biên Kịch</th>
             <th className="py-3.5 px-4">Studio</th>
@@ -43,7 +43,7 @@ function QueueTable({ items }: { items: QueueItem[] }) {
             <tr key={item.id} className="hover:bg-slate-50/70 dark:hover:bg-white/[0.02] transition-colors">
               <td className="py-3.5 px-4">
                 <p className="font-extrabold text-foreground line-clamp-1">{item.title}</p>
-                <p className="text-[11px] text-muted-foreground font-mono">{episodeText(item)}</p>
+                <p className="text-[11px] text-muted-foreground tabular-nums">{episodeText(item)}</p>
               </td>
               <td className="py-3.5 px-4 font-medium text-foreground">{item.creatorName}</td>
               <td className="py-3.5 px-4 font-medium text-foreground">{item.studioName}</td>
@@ -92,18 +92,16 @@ export function ReviewerProjectQueuePage() {
   return (
     <div className="min-h-screen w-full bg-background text-foreground p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        <section aria-label="Hồ sơ thẩm định viên" className={`${CARD} p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
-          <div className="flex items-center gap-4">
-            <InitialsAvatar name={user?.name ?? 'Reviewer'} />
-            <div className="space-y-0.5">
-              <h1 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">Xin chào, {user?.name}</h1>
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium">{user?.email}</p>
-            </div>
-          </div>
-          <Link href="/reviewer" className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-semibold shadow-xs transition-all">
-            Bàn Thẩm Định Phim
-          </Link>
-        </section>
+        <GreetingCard
+          label="Hồ sơ thẩm định viên"
+          name={user?.name ?? 'Reviewer'}
+          summary="Dự án bạn phụ trách: kịch bản chờ thẩm định, bản phim Studio vừa nộp và những tập cần sửa."
+          action={
+            <Link href="/reviewer" className="inline-flex h-10 items-center rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/25 transition-colors hover:bg-primary/90">
+              Mở bàn thẩm định
+            </Link>
+          }
+        />
 
         {pipelines.error && <ErrorNote message={pipelines.error} onRetry={pipelines.reload} />}
         {pipelines.loading && !pipelines.data && <Loading />}
