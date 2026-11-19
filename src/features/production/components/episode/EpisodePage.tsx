@@ -82,11 +82,11 @@ export function EpisodePage() {
   return (
     <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       <div className="space-y-2">
-        <Link href={productionPaths.project(base, projectId, 'episodes')} className="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-sky-700">
+        <Link href={productionPaths.project(base, projectId, 'episodes')} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-sky-700">
           {project.data.title}
         </Link>
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
             Tập {episode.episodeNumber}: {episode.title}
           </h1>
           <StatusPill {...EPISODE_STATUS[episode.status]} />
@@ -109,7 +109,7 @@ export function EpisodePage() {
           {sheet.data && <ReviewPanel sheet={sheet.data} canAct={caps.review && delivering} onChanged={refreshAll} />}
           {selected && selected.ingestStatus !== 'READY' && (
             <Panel title={`Bản ${selected.version}`}>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 {selected.ingestStatus === 'FAILED'
                   ? 'Bản này xử lý lỗi; Studio xử lý lại hoặc nộp bản mới trên Studio Web.'
                   : 'Hệ thống đang xử lý bản này, trang tự cập nhật.'}
@@ -139,7 +139,7 @@ export function EpisodePage() {
                 ['Studio', project.data.studio?.name ?? '-'],
               ]}
             />
-            {episode.synopsis && <p className="mt-3 text-xs text-slate-600 dark:text-slate-300 whitespace-pre-line">{episode.synopsis}</p>}
+            {episode.synopsis && <p className="mt-3 text-xs text-muted-foreground whitespace-pre-line">{episode.synopsis}</p>}
           </Panel>
 
           {heldByCoCreator && (

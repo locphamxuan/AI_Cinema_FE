@@ -42,17 +42,17 @@ export function MediaVersions({
               className={`rounded-xl border p-3 text-xs space-y-1.5 cursor-pointer transition ${
                 selected
                   ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-500/10'
-                  : 'border-slate-200 dark:border-white/10 hover:border-sky-300'
+                  : 'border-border hover:border-sky-300'
               }`}
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-semibold text-slate-900 dark:text-white">
+                <p className="font-semibold text-foreground">
                   Bản {v.version}
                   {v.id === approvedId && <span className="ml-2 text-emerald-600">✓ bản được duyệt</span>}
                 </p>
                 <StatusPill {...INGEST_STATUS[v.ingestStatus]} />
               </div>
-              <p className="text-slate-500 dark:text-slate-400">
+              <p className="text-muted-foreground">
                 {SOURCE_METHOD[v.sourceMethod]} · {formatDuration(v.durationSeconds)} · {formatBytes(v.fileSizeBytes)}
                 {v.qualities.length > 0 && ` · ${v.qualities.join('/')}`} · Nhãn đề xuất: {LABEL_TYPE[v.proposedLabelType]}
               </p>
@@ -63,8 +63,8 @@ export function MediaVersions({
                 </p>
               )}
               {v.failureReason && <p className="text-rose-600">{v.failureReason}</p>}
-              {v.submissionNote && <p className="text-slate-600 dark:text-slate-300">Ghi chú: {v.submissionNote}</p>}
-              <p className="text-slate-400">
+              {v.submissionNote && <p className="text-muted-foreground">Ghi chú: {v.submissionNote}</p>}
+              <p className="text-muted-foreground">
                 Nộp bởi {v.submittedBy.fullName}
                 {v.studioHandoff ? ` · Studio ${v.studioHandoff.studio.name}` : ''} · {formatDateTime(v.createdAt)}
               </p>

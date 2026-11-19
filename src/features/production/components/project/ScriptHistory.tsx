@@ -23,12 +23,12 @@ export function ScriptHistory({ script }: { script: ProjectScript | null }) {
         ) : (
           <ul className="space-y-2" aria-label="Góp ý kịch bản">
             {script.reviews.map((r) => (
-              <li key={r.id} className="rounded-lg bg-slate-50 dark:bg-white/5 p-2.5 text-xs space-y-1">
+              <li key={r.id} className="rounded-lg bg-muted/60 p-2.5 text-xs space-y-1">
                 <p className={r.approved ? 'font-semibold text-emerald-600' : 'font-semibold text-rose-600'}>
                   {SCRIPT_STAGE[r.stage]} {r.approved ? 'đã duyệt' : 'yêu cầu sửa'} bản {r.version}
                 </p>
-                {r.comment && <p className="whitespace-pre-line text-slate-700 dark:text-slate-200">{r.comment}</p>}
-                <p className="text-slate-500">
+                {r.comment && <p className="whitespace-pre-line text-secondary-foreground">{r.comment}</p>}
+                <p className="text-muted-foreground">
                   {r.reviewer.fullName} · {formatDateTime(r.createdAt)}
                 </p>
               </li>
@@ -41,12 +41,12 @@ export function ScriptHistory({ script }: { script: ProjectScript | null }) {
         <ul className="space-y-2" aria-label="Phiên bản kịch bản">
           {script.versions.map((v, i) => (
             <li key={v.id}>
-              <details open={i === 0} className="rounded-lg border border-slate-200 dark:border-white/10 p-2.5 text-xs">
-                <summary className="cursor-pointer font-semibold text-slate-800 dark:text-slate-100">
+              <details open={i === 0} className="rounded-lg border border-border p-2.5 text-xs">
+                <summary className="cursor-pointer font-semibold text-foreground">
                   Bản {v.version} · {v.submittedBy.fullName} · {formatDateTime(v.createdAt)}
                 </summary>
-                {v.note && <p className="mt-2 text-slate-600 dark:text-slate-300">Thay đổi: {v.note}</p>}
-                <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded-md bg-slate-50 dark:bg-white/5 p-2.5 font-mono text-[11px] leading-relaxed text-slate-700 dark:text-slate-200">
+                {v.note && <p className="mt-2 text-muted-foreground">Thay đổi: {v.note}</p>}
+                <pre className="mt-2 max-h-96 overflow-auto whitespace-pre-wrap rounded-md bg-muted/60 p-2.5 font-mono text-[11px] leading-relaxed text-secondary-foreground">
                   {v.content}
                 </pre>
               </details>

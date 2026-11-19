@@ -66,11 +66,11 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
       <form onSubmit={approve} className="space-y-3 text-xs">
         {project.studio ? (
           <div className="space-y-1">
-            <p className="text-slate-600 dark:text-slate-300">
+            <p className="text-muted-foreground">
               Studio nhận hợp đồng: <span className="font-semibold">{project.studio.name}</span>
             </p>
-            <details className="text-[11px] text-slate-500">
-              <summary className="cursor-pointer hover:text-slate-700 dark:hover:text-slate-300 select-none">
+            <details className="text-[11px] text-muted-foreground">
+              <summary className="cursor-pointer hover:text-secondary-foreground select-none">
                 Đổi Studio khác
               </summary>
               <div className="pt-2">
@@ -114,7 +114,7 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
         </FormField>
         {episodes.length > 0 && (
           <div className="space-y-1.5">
-            <p className="font-semibold text-slate-700 dark:text-slate-200">Hạn giao Studio của các tập (Reviewer đặt)</p>
+            <p className="font-semibold text-secondary-foreground">Hạn giao Studio của các tập (Reviewer đặt)</p>
             <DeadlineList episodes={episodes} />
           </div>
         )}

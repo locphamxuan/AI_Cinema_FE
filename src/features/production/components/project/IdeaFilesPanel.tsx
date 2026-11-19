@@ -75,8 +75,8 @@ export function IdeaFilesPanel({ canManage, purpose = 'IDEA' }: { canManage: boo
         <ul className="divide-y divide-slate-100 dark:divide-white/5 text-xs">
           {files.map((f) => (
             <li key={f.id} className="flex items-center justify-between gap-3 py-2">
-              <span className="min-w-0 truncate text-slate-800 dark:text-slate-200">
-                {f.fileName} <span className="text-slate-400">· v{f.version} · {formatBytes(f.sizeBytes)}</span>
+              <span className="min-w-0 truncate text-foreground">
+                {f.fileName} <span className="text-muted-foreground">· v{f.version} · {formatBytes(f.sizeBytes)}</span>
               </span>
               <span className="flex shrink-0 gap-1">
                 <Button size="sm" variant="ghost" onClick={() => download(f.id, f.fileName)} aria-label={`Tải ${f.fileName}`}>
@@ -98,7 +98,7 @@ export function IdeaFilesPanel({ canManage, purpose = 'IDEA' }: { canManage: boo
         title={`Xoá ${copy.noun}`}
         subtitle={removing ? `${removing.fileName} · v${removing.version}` : undefined}
       >
-        <p className="text-xs text-slate-600 dark:text-slate-300">Tệp sẽ bị gỡ khỏi dự án{purpose === 'IDEA' ? ' và không còn đi kèm brief gửi Studio' : ''}.</p>
+        <p className="text-xs text-muted-foreground">Tệp sẽ bị gỡ khỏi dự án{purpose === 'IDEA' ? ' và không còn đi kèm brief gửi Studio' : ''}.</p>
         <div className="mt-4 flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={() => setRemoving(null)}>
             Huỷ

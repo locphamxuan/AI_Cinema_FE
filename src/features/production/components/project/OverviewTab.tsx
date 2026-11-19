@@ -42,7 +42,7 @@ export function OverviewTab() {
             </span>
           ))}
         </div>
-      ) : <span className="text-slate-400">—</span>,
+      ) : <span className="text-muted-foreground">—</span>,
     },
     {
       label: 'Ngôn ngữ',
@@ -54,19 +54,19 @@ export function OverviewTab() {
         <span className="px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 font-bold text-xs border border-rose-100 dark:border-rose-500/20">
           {project.ageRating}
         </span>
-      ) : <span className="text-slate-400">—</span>,
+      ) : <span className="text-muted-foreground">—</span>,
     },
     {
       label: 'Năm phát hành',
-      value: project.releaseYear ?? <span className="text-slate-400">—</span>,
+      value: project.releaseYear ?? <span className="text-muted-foreground">—</span>,
     },
     {
       label: 'Tập xem miễn phí',
-      value: project.freeEpisodeCount ?? <span className="text-slate-500">Mặc định nền tảng</span>,
+      value: project.freeEpisodeCount ?? <span className="text-muted-foreground">Mặc định nền tảng</span>,
     },
     {
       label: 'Studio',
-      value: project.studio?.name ?? <span className="text-slate-400">—</span>,
+      value: project.studio?.name ?? <span className="text-muted-foreground">—</span>,
     },
     {
       label: 'Tạo lúc',
@@ -74,11 +74,11 @@ export function OverviewTab() {
     },
     {
       label: 'Bàn giao Studio',
-      value: formatDateTime(project.handedOffAt) ?? <span className="text-slate-400">—</span>,
+      value: formatDateTime(project.handedOffAt) ?? <span className="text-muted-foreground">—</span>,
     },
     {
       label: 'Hoàn tất',
-      value: formatDateTime(project.completedAt) ?? <span className="text-slate-400">—</span>,
+      value: formatDateTime(project.completedAt) ?? <span className="text-muted-foreground">—</span>,
     },
   ];
 
@@ -86,10 +86,10 @@ export function OverviewTab() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
       {/* ── Left: main info ── */}
       <div className="lg:col-span-2 space-y-5">
-        <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#111420] overflow-hidden shadow-xs">
-          <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5">
+        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+          <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-border">
             <div className="flex items-center gap-2.5">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">Thông tin phim</h2>
+              <h2 className="text-base font-semibold text-foreground">Thông tin phim</h2>
             </div>
             {canEdit && (
               <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
@@ -102,22 +102,22 @@ export function OverviewTab() {
             {infoItems.map(({ label, value }) => (
               <div key={label} className="flex items-start gap-3">
                 <div className="min-w-0">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mb-0.5">{label}</p>
-                  <div className="text-sm text-slate-900 dark:text-slate-100 font-medium">{value}</div>
+                  <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+                  <div className="text-sm text-foreground font-medium">{value}</div>
                 </div>
               </div>
             ))}
           </div>
 
           <div className="px-5 pb-5 space-y-4 text-sm">
-            <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/70 dark:border-white/5 p-4">
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Ý tưởng &amp; Brief kịch bản</p>
-              <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">{project.ideaDescription}</p>
+            <div className="rounded-xl bg-muted/60 border border-border p-4">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Ý tưởng &amp; Brief kịch bản</p>
+              <p className="whitespace-pre-line text-secondary-foreground leading-relaxed">{project.ideaDescription}</p>
             </div>
             {project.synopsis && (
-              <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/70 dark:border-white/5 p-4">
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Tóm tắt cho người xem</p>
-                <p className="whitespace-pre-line text-slate-700 dark:text-slate-300 leading-relaxed">{project.synopsis}</p>
+              <div className="rounded-xl bg-muted/60 border border-border p-4">
+                <p className="text-xs font-medium text-muted-foreground mb-2">Tóm tắt cho người xem</p>
+                <p className="whitespace-pre-line text-secondary-foreground leading-relaxed">{project.synopsis}</p>
               </div>
             )}
           </div>
@@ -132,39 +132,39 @@ export function OverviewTab() {
       <div className="space-y-5">
         <PosterPanel canManage={canEdit} />
 
-        <div className="rounded-2xl border border-slate-200/80 dark:border-white/10 bg-white dark:bg-[#111420] overflow-hidden shadow-xs">
-          <div className="flex items-center gap-2.5 px-5 py-4 border-b border-slate-100 dark:border-white/5">
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Phân công nhân sự</h2>
+        <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
+          <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+            <h2 className="text-base font-semibold text-foreground">Phân công nhân sự</h2>
           </div>
           <div className="p-5 space-y-3">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/60 dark:border-white/[0.06]">
-              <div className="w-8 h-8 rounded-full bg-[#121212] dark:bg-white flex items-center justify-center text-white dark:text-slate-900 text-xs font-bold shrink-0">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/60 border border-border">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0">
                 {project.reviewer.fullName.charAt(0)}
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Reviewer thẩm định</p>
-                <p className="text-xs font-bold text-slate-900 dark:text-white">{project.reviewer.fullName}</p>
+                <p className="text-xs font-medium text-muted-foreground">Reviewer thẩm định</p>
+                <p className="text-xs font-bold text-foreground">{project.reviewer.fullName}</p>
               </div>
             </div>
 
             <div className={`flex items-center gap-3 p-3 rounded-xl border ${
               project.creator
-                ? 'bg-slate-50 dark:bg-white/[0.03] border-slate-200/60 dark:border-white/[0.06]'
-                : 'bg-slate-50/50 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 border-dashed'
+                ? 'bg-muted/60 border-border'
+                : 'bg-muted/60 border-border border-dashed'
             }`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                project.creator ? 'bg-[#121212] dark:bg-white text-white dark:text-slate-900' : 'bg-slate-200 dark:bg-white/10 text-slate-500'
+                project.creator ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
               }`}>
                 {project.creator ? project.creator.fullName.charAt(0) : '?'}
               </div>
               <div>
-                <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Creator chính</p>
-                <p className="text-xs font-bold text-slate-900 dark:text-white">{project.creator?.fullName ?? 'Chưa giao Creator'}</p>
+                <p className="text-xs font-medium text-muted-foreground">Creator chính</p>
+                <p className="text-xs font-bold text-foreground">{project.creator?.fullName ?? 'Chưa giao Creator'}</p>
               </div>
             </div>
 
             {caps.create && open && (
-              <Button size="sm" className="w-full mt-1 bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 rounded-full" onClick={() => setAssigning(true)}>
+              <Button size="sm" className="w-full mt-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full" onClick={() => setAssigning(true)}>
                 {project.creator ? 'Đổi Creator' : 'Giao cho Creator'}
               </Button>
             )}

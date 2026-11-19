@@ -89,7 +89,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
       )}
       {form && (
         <form onSubmit={submit} className="space-y-3">
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-muted-foreground">
             Creator đề xuất “{LABEL_TYPE[sheet.proposedLabelType]}”. Xác nhận hoặc chọn loại nhãn khác theo nội dung thực tế của bản dựng.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

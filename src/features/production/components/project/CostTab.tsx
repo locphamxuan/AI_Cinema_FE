@@ -56,14 +56,14 @@ export function CostTab() {
 
 const TONES = {
   sky: 'bg-sky-50 dark:bg-sky-500/10 text-sky-800 dark:text-sky-300',
-  slate: 'bg-slate-50 dark:bg-white/5 text-slate-800 dark:text-slate-100',
+  slate: 'bg-muted/60 text-foreground',
   emerald: 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300',
 } as const;
 
 function Figure({ label, value, tone }: { label: string; value: number; tone: keyof typeof TONES }) {
   return (
     <div className={`rounded-xl p-3 ${TONES[tone]}`}>
-      <dt className="text-[11px] text-slate-500 dark:text-slate-400">{label}</dt>
+      <dt className="text-[11px] text-muted-foreground">{label}</dt>
       <dd className="text-lg font-bold">{formatVnd(value)}</dd>
     </div>
   );
@@ -73,7 +73,7 @@ function LedgerTable({ ledger }: { ledger: CostLedger }) {
   if (ledger.entries.length === 0) return <Empty>Admin chưa đặt ngân sách. Dự án chỉ được giao cho Creator sau khi có ngân sách.</Empty>;
   return (
     <table className="w-full text-xs">
-      <thead className="text-slate-500 dark:text-slate-400 text-left">
+      <thead className="text-muted-foreground text-left">
         <tr>
           <th className="py-2 font-medium">Loại</th>
           <th className="py-2 font-medium text-right">Số tiền</th>
@@ -84,13 +84,13 @@ function LedgerTable({ ledger }: { ledger: CostLedger }) {
       <tbody className="divide-y divide-slate-100 dark:divide-white/5">
         {ledger.entries.map((e) => (
           <tr key={e.id}>
-            <td className="py-2 text-slate-700 dark:text-slate-200">{COST_ENTRY[e.entryType]}</td>
+            <td className="py-2 text-secondary-foreground">{COST_ENTRY[e.entryType]}</td>
             <td className={`py-2 text-right font-mono ${Number(e.amountVnd) < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
               {Number(e.amountVnd) > 0 ? '+' : ''}
               {formatVnd(e.amountVnd)}
             </td>
-            <td className="py-2 pl-4 text-slate-600 dark:text-slate-300">{e.reason ?? '-'}</td>
-            <td className="py-2 hidden md:table-cell text-slate-500">
+            <td className="py-2 pl-4 text-muted-foreground">{e.reason ?? '-'}</td>
+            <td className="py-2 hidden md:table-cell text-muted-foreground">
               {e.createdBy.fullName}
               <br />
               <span className="text-xs">{formatDateTime(e.createdAt)}</span>
@@ -145,7 +145,7 @@ function BudgetForm({
         <FormField label={funded ? 'Số tiền điều chỉnh (₫)' : 'Ngân sách (₫)'}>
           <input inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} required className={fieldInputClass} aria-label="Số tiền" />
         </FormField>
-        {funded && !Number.isNaN(value) && value !== 0 && <p className="text-[11px] text-slate-500">Ngân sách mới: {formatVnd(next)}</p>}
+        {funded && !Number.isNaN(value) && value !== 0 && <p className="text-[11px] text-muted-foreground">Ngân sách mới: {formatVnd(next)}</p>}
         <FormField label={funded ? 'Lý do (bắt buộc)' : 'Ghi chú (không bắt buộc)'}>
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} className={fieldTextareaClass} />
         </FormField>

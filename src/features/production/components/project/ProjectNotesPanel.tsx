@@ -41,26 +41,26 @@ export function ProjectNotesPanel() {
     >
       {notes.error && <ErrorNote message={notes.error} onRetry={notes.reload} />}
       {notes.loading && !notes.data && <Loading />}
-      {notes.data && notes.data.length === 0 && <p className="text-xs text-slate-500">Chưa có trao đổi nào.</p>}
+      {notes.data && notes.data.length === 0 && <p className="text-xs text-muted-foreground">Chưa có trao đổi nào.</p>}
       {notes.data && notes.data.length > 0 && (
         <ul className="space-y-3" aria-label="Trao đổi ý tưởng của dự án">
           {notes.data.map((note) => (
-            <li key={note.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-3 text-xs">
-              <p className="font-medium text-slate-700 dark:text-slate-200">
+            <li key={note.id} className="rounded-xl border border-border p-3 text-xs">
+              <p className="font-medium text-secondary-foreground">
                 {note.author?.fullName ?? 'Người dùng đã xoá'}
                 {note.author && (
-                  <span className="ml-1.5 font-normal text-slate-500">({BACKEND_ROLE_LABEL[note.author.role as UserRole] ?? note.author.role})</span>
+                  <span className="ml-1.5 font-normal text-muted-foreground">({BACKEND_ROLE_LABEL[note.author.role as UserRole] ?? note.author.role})</span>
                 )}
-                <span className="ml-2 font-normal text-slate-500">{formatDateTime(note.createdAt)}</span>
+                <span className="ml-2 font-normal text-muted-foreground">{formatDateTime(note.createdAt)}</span>
               </p>
-              <p className="mt-1 whitespace-pre-line text-slate-600 dark:text-slate-300">{note.message}</p>
+              <p className="mt-1 whitespace-pre-line text-muted-foreground">{note.message}</p>
             </li>
           ))}
         </ul>
       )}
       {canWrite && (
         <div className="mt-3 space-y-2">
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300" htmlFor={`project-note-${project.id}`}>
+          <label className="block text-xs font-medium text-muted-foreground" htmlFor={`project-note-${project.id}`}>
             Nội dung trao đổi
           </label>
           <textarea

@@ -39,8 +39,8 @@ const TABS: readonly { key: ProjectTabKey; label: string }[] = [
 function Fact({ label, value }: { label: string; value: string }) {
   return (
     <div className="min-w-0">
-      <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
-      <dd className="text-sm font-semibold text-slate-900 dark:text-white truncate">{value}</dd>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="text-sm font-semibold text-foreground truncate">{value}</dd>
     </div>
   );
 }
@@ -72,7 +72,7 @@ export function ProjectDetailPage() {
     return (
       <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-4">
         <ErrorNote message={project.error ?? 'Không tìm thấy dự án.'} onRetry={project.reload} />
-        <Link href={productionPaths.list(base)} className="text-xs text-slate-600 dark:text-slate-300 hover:underline">
+        <Link href={productionPaths.list(base)} className="text-xs text-muted-foreground hover:underline">
           ← Về danh sách dự án
         </Link>
       </main>
@@ -85,27 +85,27 @@ export function ProjectDetailPage() {
 
   return (
     <ProjectProvider value={{ project: data, caps, base, reload: project.reload }}>
-      <main className="w-full bg-[#F9FAFB] dark:bg-[#090B10] min-h-[calc(100vh-3.5rem)]">
-        <div className="bg-white dark:bg-[#111420] border-b border-slate-200/80 dark:border-white/10">
+      <main className="w-full bg-background min-h-[calc(100vh-3.5rem)]">
+        <div className="bg-card border-b border-border">
           <div className="px-6 lg:px-8 pt-5 pb-5 space-y-4">
             <Link
               href={productionPaths.list(base)}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
             >
               ← Danh sách dự án
             </Link>
 
             <div className="flex flex-col gap-4">
               <div className="space-y-2 min-w-0">
-                <h1 className="font-heading text-2xl font-semibold text-slate-900 dark:text-white leading-tight tracking-tight">{data.title}</h1>
-                <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
+                <h1 className="font-heading text-2xl font-semibold text-foreground leading-tight tracking-tight">{data.title}</h1>
+                <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                    <span className="font-medium text-slate-700 dark:text-slate-200">Dự án:</span>
+                    <span className="font-medium text-secondary-foreground">Dự án:</span>
                     <StatusPill {...MOVIE_STATUS[data.status]} />
                   </span>
                   {data.seasons[0] && (
                     <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-                      <span className="font-medium text-slate-700 dark:text-slate-200">
+                      <span className="font-medium text-secondary-foreground">
                         {seasonName(data.seasons[0].seasonNumber, data.seasons[0].episodes.length)}:
                       </span>
                       <StatusPill {...SEASON_STATUS[data.seasons[0].status]} />
@@ -119,7 +119,7 @@ export function ProjectDetailPage() {
               </div>
 
               {/* Facts strip */}
-              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50/60 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
+              <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-muted/60 border border-border">
                 <Fact label="Reviewer thẩm định" value={data.reviewer.fullName} />
                 <Fact label="Creator chính" value={data.creator?.fullName ?? 'Chưa giao'} />
                 <Fact label="Studio đối tác" value={data.studio?.name ?? 'Chưa chọn'} />
@@ -139,8 +139,8 @@ export function ProjectDetailPage() {
                     onClick={() => selectTab(item.key)}
                     className={`inline-flex items-center px-4 py-2.5 text-xs font-semibold rounded-t-xl border-b-2 transition cursor-pointer whitespace-nowrap ${
                       active
-                        ? 'border-slate-900 text-slate-900 bg-slate-100/80 dark:border-white dark:text-white dark:bg-white/[0.06]'
-                        : 'border-transparent text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5'
+                        ? 'border-ring text-foreground bg-muted'
+                        : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/60'
                     }`}
                   >
                     {item.label}

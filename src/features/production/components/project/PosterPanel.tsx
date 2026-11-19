@@ -41,7 +41,7 @@ export function PosterPanel({ canManage }: { canManage: boolean }) {
         // eslint-disable-next-line @next/next/no-img-element -- the poster lives in the backend's storage, not in next/image's allow-list
         <img src={project.posterUrl} alt={`Ảnh bìa phim ${project.title}`} className="w-full rounded-lg object-cover aspect-[2/3]" />
       ) : (
-        <p className="text-xs text-slate-500 dark:text-slate-400 py-6 text-center">Chưa có ảnh bìa.</p>
+        <p className="text-xs text-muted-foreground py-6 text-center">Chưa có ảnh bìa.</p>
       )}
     </Panel>
   );

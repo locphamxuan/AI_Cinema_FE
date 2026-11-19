@@ -110,9 +110,9 @@ export function PublishPanel({
                   checked={isFreeForGuest}
                   disabled={busy}
                   onChange={(e) => saveFlags(e.target.checked, isFreeForMember)}
-                  className="rounded border-slate-300 dark:border-white/20 text-sky-600 focus:ring-sky-500"
+                  className="rounded border-input text-sky-600 focus:ring-sky-500"
                 />
-                <span className="text-slate-700 dark:text-slate-200">Miễn phí cho khách (Guest)</span>
+                <span className="text-secondary-foreground">Miễn phí cho khách (Guest)</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -120,17 +120,17 @@ export function PublishPanel({
                   checked={isFreeForMember}
                   disabled={busy}
                   onChange={(e) => saveFlags(isFreeForGuest, e.target.checked)}
-                  className="rounded border-slate-300 dark:border-white/20 text-sky-600 focus:ring-sky-500"
+                  className="rounded border-input text-sky-600 focus:ring-sky-500"
                 />
-                <span className="text-slate-700 dark:text-slate-200">Miễn phí cho thành viên (Member)</span>
+                <span className="text-secondary-foreground">Miễn phí cho thành viên (Member)</span>
               </label>
             </div>
           </div>
         ) : (
-          <div className="space-y-1 text-slate-600 dark:text-slate-300">
+          <div className="space-y-1 text-muted-foreground">
             <p>Giá Coin: {formatNumber(episode.coinPrice)}</p>
             {(episode.isFreeForGuest || episode.isFreeForMember) && (
-              <p className="text-slate-500">
+              <p className="text-muted-foreground">
                 Miễn phí: {episode.isFreeForGuest ? 'Khách (Guest)' : ''}{episode.isFreeForGuest && episode.isFreeForMember ? ', ' : ''}{episode.isFreeForMember ? 'Thành viên (Member)' : ''}
               </p>
             )}
@@ -145,7 +145,7 @@ export function PublishPanel({
               <Button disabled={busy || releaseBlocked} onClick={() => publish(false)}>
                 Phát hành ngay
               </Button>
-              <span className="text-slate-400 px-1">hoặc</span>
+              <span className="text-muted-foreground px-1">hoặc</span>
               <FormField label="Lên lịch lúc" className="w-56">
                 <input type="datetime-local" value={scheduleAt} onChange={(e) => setScheduleAt(e.target.value)} className={fieldInputClass} />
               </FormField>
@@ -161,12 +161,12 @@ export function PublishPanel({
         )}
 
         <div className="space-y-2">
-          <p className="font-semibold text-slate-700 dark:text-slate-200">Lịch sử phát hành</p>
+          <p className="font-semibold text-secondary-foreground">Lịch sử phát hành</p>
           {publications.data?.length === 0 && <Empty>Chưa phát hành lần nào.</Empty>}
           <ul className="space-y-2">
             {publications.data?.map((p) => (
-              <li key={p.id} className="rounded-lg bg-slate-50 dark:bg-white/5 p-2.5 space-y-0.5">
-                <p className="text-slate-800 dark:text-slate-100">
+              <li key={p.id} className="rounded-lg bg-muted/60 p-2.5 space-y-0.5">
+                <p className="text-foreground">
                   {p.publishedAt
                     ? `Phát hành ${formatDateTime(p.publishedAt)}`
                     : p.scheduledAt

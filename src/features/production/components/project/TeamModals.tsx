@@ -104,9 +104,9 @@ export function DelegateModal({
           <CreatorSelect value={toCreatorId} onChange={setToCreatorId} exclude={[mine.creatorId]} />
         </FormField>
         <fieldset>
-          <legend className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Tập uỷ quyền</legend>
+          <legend className="text-xs font-medium text-muted-foreground mb-1">Tập uỷ quyền</legend>
           {choices.length === 0 ? (
-            <p className="text-xs text-slate-500">Bạn chưa phụ trách tập nào.</p>
+            <p className="text-xs text-muted-foreground">Bạn chưa phụ trách tập nào.</p>
           ) : (
             <ul className="space-y-1 max-h-48 overflow-y-auto text-xs">
               {choices.map((episode) => (

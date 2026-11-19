@@ -24,16 +24,16 @@ export function ActivityTab() {
       {events.error && <ErrorNote message={events.error} onRetry={events.reload} />}
       {events.loading && !events.data && <Loading />}
       {events.data?.length === 0 && <Empty>Chưa có sự kiện nào.</Empty>}
-      <ol className="relative border-l border-slate-200 dark:border-white/10 ml-2 space-y-4">
+      <ol className="relative border-l border-border ml-2 space-y-4">
         {rows.map((ev) => (
           <li key={ev.id} className="ml-4 text-xs">
             <span className="absolute -left-1.5 mt-1 w-3 h-3 rounded-full bg-sky-500 border-2 border-white dark:border-card" />
-            <p className="font-semibold text-slate-800 dark:text-slate-100">{EVENT_LABEL[ev.action] ?? ev.action}</p>
-            <p className="text-slate-500 dark:text-slate-400">
+            <p className="font-semibold text-foreground">{EVENT_LABEL[ev.action] ?? ev.action}</p>
+            <p className="text-muted-foreground">
               {actorName(ev)} · {formatDateTime(ev.createdAt)}
             </p>
-            {typeof ev.payload?.reason === 'string' && <p className="text-slate-600 dark:text-slate-300 mt-0.5">{ev.payload.reason}</p>}
-            {typeof ev.payload?.comments === 'string' && <p className="text-slate-600 dark:text-slate-300 mt-0.5">{ev.payload.comments}</p>}
+            {typeof ev.payload?.reason === 'string' && <p className="text-muted-foreground mt-0.5">{ev.payload.reason}</p>}
+            {typeof ev.payload?.comments === 'string' && <p className="text-muted-foreground mt-0.5">{ev.payload.comments}</p>}
           </li>
         ))}
       </ol>

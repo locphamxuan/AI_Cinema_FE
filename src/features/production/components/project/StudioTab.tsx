@@ -69,7 +69,7 @@ export function StudioTab() {
                   aria-pressed={filter === f.key}
                   onClick={() => { setFilter(f.key); setPage(1); }}
                   className={`px-2.5 py-1 rounded-full text-xs border cursor-pointer ${
-                    filter === f.key ? 'bg-sky-600 border-sky-600 text-white' : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300'
+                    filter === f.key ? 'bg-sky-600 border-sky-600 text-white' : 'border-border text-muted-foreground'
                   }`}
                 >
                   {f.label} <span className="opacity-70">({count})</span>
@@ -119,9 +119,9 @@ export function StudioTab() {
                 Đổi Studio
               </Button>
             )}
-            {project.status === 'DRAFT' && <p className="text-xs text-slate-500">Chờ Admin giao Creator chính.</p>}
+            {project.status === 'DRAFT' && <p className="text-xs text-muted-foreground">Chờ Admin giao Creator chính.</p>}
             {project.status === 'ASSIGNED' && (
-              <p className="text-xs text-slate-500">Bàn giao tự động khi hợp đồng với Studio có đủ chữ ký Admin và Studio (tab Hợp đồng).</p>
+              <p className="text-xs text-muted-foreground">Bàn giao tự động khi hợp đồng với Studio có đủ chữ ký Admin và Studio (tab Hợp đồng).</p>
             )}
             {caps.creator && !caps.lead && (
               <p className="rounded-xl border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 p-3 text-xs text-sky-800 dark:text-sky-300">

@@ -61,9 +61,9 @@ export function CostRequestCard({
   const proof = () => downloadFile(() => costRequestService.downloadProof(cr.id), cr.attachmentName ?? 'bao-gia');
 
   return (
-    <li className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5 text-xs space-y-2">
+    <li className="rounded-xl border border-border bg-muted/60 p-3.5 text-xs space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-slate-500 dark:text-slate-400">
+        <p className="text-muted-foreground">
           {cr.requestedBy.fullName} · {formatDateTime(cr.createdAt)}
           {cr.handoff && ` · Studio ${cr.handoff.studio.name}`}
         </p>
@@ -76,30 +76,30 @@ export function CostRequestCard({
       )}
       <dl className="grid grid-cols-2 sm:grid-cols-3 gap-2">
         <div>
-          <dt className="text-slate-500">Xin thêm</dt>
+          <dt className="text-muted-foreground">Xin thêm</dt>
           <dd className="font-semibold text-amber-700 dark:text-amber-300">{formatVnd(cr.requestedVnd)}</dd>
         </div>
         {cr.studioQuoteVnd !== null && (
           <div>
-            <dt className="text-slate-500">Studio báo giá</dt>
-            <dd className="font-semibold text-slate-800 dark:text-slate-100">{formatVnd(cr.studioQuoteVnd)}</dd>
+            <dt className="text-muted-foreground">Studio báo giá</dt>
+            <dd className="font-semibold text-foreground">{formatVnd(cr.studioQuoteVnd)}</dd>
           </div>
         )}
         {cr.handoff && (
           <div>
-            <dt className="text-slate-500">Phí đã đề xuất</dt>
-            <dd className="font-semibold text-slate-800 dark:text-slate-100">{formatVnd(cr.handoff.offeredFeeVnd)}</dd>
+            <dt className="text-muted-foreground">Phí đã đề xuất</dt>
+            <dd className="font-semibold text-foreground">{formatVnd(cr.handoff.offeredFeeVnd)}</dd>
           </div>
         )}
       </dl>
-      <p className="text-slate-700 dark:text-slate-200 whitespace-pre-line">{cr.reason}</p>
+      <p className="text-secondary-foreground whitespace-pre-line">{cr.reason}</p>
       {cr.attachmentName && (
         <button type="button" onClick={proof} className="inline-flex items-center gap-1 text-sky-700 dark:text-sky-300 hover:underline cursor-pointer">
           <Download className="w-3.5 h-3.5" aria-hidden="true" /> {cr.attachmentName}
         </button>
       )}
       {cr.status !== 'OPEN' && (
-        <p className="text-slate-600 dark:text-slate-300">
+        <p className="text-muted-foreground">
           {cr.status === 'APPROVED' ? `Đã cấp ${formatVnd(cr.grantedVnd)}` : 'Từ chối'}
           {cr.resolvedBy && ` · ${cr.resolvedBy.fullName}`}
           {cr.adminResponse && `: ${cr.adminResponse}`}

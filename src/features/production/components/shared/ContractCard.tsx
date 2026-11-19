@@ -78,9 +78,9 @@ export function ContractCard({
   };
 
   return (
-    <li className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5 text-xs space-y-2">
+    <li className="rounded-xl border border-border bg-muted/60 p-3.5 text-xs space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-slate-500 dark:text-slate-400">
+        <p className="text-muted-foreground">
           Vòng {c.round} · Studio {c.studio.name} · {formatDateTime(c.createdAt)}
         </p>
         <StatusPill {...CONTRACT_STATUS[c.status]} />
@@ -88,11 +88,11 @@ export function ContractCard({
       {showCost && c.costVnd !== null && (
         <p>
           Chi phí {c.proposedBy === 'ADMIN' ? 'Admin đề xuất' : 'Studio báo giá'}:{' '}
-          <span className="font-semibold text-slate-800 dark:text-slate-100">{formatVnd(c.costVnd)}</span>
+          <span className="font-semibold text-foreground">{formatVnd(c.costVnd)}</span>
         </p>
       )}
-      {c.terms && <p className="whitespace-pre-line text-slate-600 dark:text-slate-300">Điều khoản: {c.terms}</p>}
-      <p className="text-slate-600 dark:text-slate-300">
+      {c.terms && <p className="whitespace-pre-line text-muted-foreground">Điều khoản: {c.terms}</p>}
+      <p className="text-muted-foreground">
         {c.studioSignedAt && `Studio ký lúc ${formatDateTime(c.studioSignedAt)}. `}
         {c.adminSignedAt && c.adminSignedBy && `${c.adminSignedBy.fullName} (Admin) ký lúc ${formatDateTime(c.adminSignedAt)}.`}
         {!c.studioSignedAt && !c.adminSignedAt && 'Chưa bên nào ký; chờ Studio điền giá và ký trên Studio Web.'}
@@ -102,8 +102,8 @@ export function ContractCard({
       )}
 
       {canDownload && (
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200/60 dark:border-white/5">
-          <span className="text-slate-500 font-medium">Tài liệu PDF:</span>
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border">
+          <span className="text-muted-foreground font-medium">Tài liệu PDF:</span>
           <Button
             type="button"
             variant="secondary"

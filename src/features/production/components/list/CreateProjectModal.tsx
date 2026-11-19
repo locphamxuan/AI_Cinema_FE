@@ -134,7 +134,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
           <textarea rows={5} value={idea} onChange={(e) => setIdea(e.target.value)} maxLength={20000} required className={fieldTextareaClass} />
         </FormField>
         <div>
-          <span className="block text-slate-600 dark:text-slate-300 mb-1 text-xs font-medium">Thể loại (1–5)</span>
+          <span className="block text-muted-foreground mb-1 text-xs font-medium">Thể loại (1–5)</span>
           <GenrePicker value={genreIds} onChange={setGenreIds} />
         </div>
         <PeopleFields value={people} onChange={setPeople} />
@@ -159,7 +159,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
             <option value="en">English</option>
           </select>
         </FormField>
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-muted-foreground">
           Creator chính trao đổi ý tưởng với Admin ở mục “Trao đổi ý tưởng” rồi viết kịch bản; Reviewer lên mùa, tập và hạn giao trước khi
           Admin duyệt Kịch bản Final.
         </p>
