@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { ErrorNote, Facts, Loading } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
 import { COIN_ENTRY_LABEL, signed } from '@/lib/coinEntry';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatDateTime, formatDuration, formatNumber } from '@/lib/format';
 import { staffSupportService } from '@/services/staffSupportService';
 import type { CoinEntryType } from '@/types/billing';
 import type { MemberContextSection, MemberContextSectionKey } from '@/types/support';
@@ -32,6 +32,14 @@ function cancelWindow(endsAt: string | null): string {
 
 const amount = (n: number) => (n === 0 ? '0' : signed(n));
 
+type Watched = { positionSeconds: number; durationSeconds: number | null; completed: boolean; lastWatchedAt: string; episode: { episodeNumber: number; movie: { title: string } } };
+
+/** "Đang xem 12:34 / 45:00": where the member stopped, out of the episode length when known. */
+export function watchedAt(w: Pick<Watched, 'positionSeconds' | 'durationSeconds' | 'completed'>): string {
+  if (w.completed) return 'Đã xem hết';
+  return w.durationSeconds ? `Dừng ở ${formatDuration(w.positionSeconds)} / ${formatDuration(w.durationSeconds)}` : `Dừng ở ${formatDuration(w.positionSeconds)}`;
+}
+
 type Devices = { devices: { name: string | null; platform: string; lastSeenAt: string | null }[]; sessions: { status: string; startedAt: string }[] };
 
 const TITLES: Record<MemberContextSectionKey, string> = {
@@ -41,9 +49,10 @@ const TITLES: Record<MemberContextSectionKey, string> = {
   Transactions: 'Giao dịch Coin gần đây',
   EpisodeAccess: 'Tập đã mở khoá',
   Devices: 'Thiết bị',
+  WatchHistory: 'Lịch sử xem',
 };
 
-const ORDER: MemberContextSectionKey[] = ['Account', 'Subscription', 'Wallet', 'Transactions', 'EpisodeAccess', 'Devices'];
+const ORDER: MemberContextSectionKey[] = ['Account', 'Subscription', 'Wallet', 'Transactions', 'EpisodeAccess', 'Devices', 'WatchHistory'];
 
 function body(key: MemberContextSectionKey, data: unknown): ReactNode {
   switch (key) {
@@ -69,6 +78,8 @@ function body(key: MemberContextSectionKey, data: unknown): ReactNode {
       const d = data as Devices;
       return rows(d.devices.map((x) => [`${x.name ?? 'Thiết bị'} (${x.platform === 'ANDROID' ? 'Android' : x.platform})`, x.lastSeenAt ? `Dùng lần cuối ${formatDateTime(x.lastSeenAt)}` : 'Chưa dùng']), 'Chưa có thiết bị.');
     }
+    case 'WatchHistory':
+      return rows((data as Watched[]).map((w) => [`${w.episode.movie.title} · tập ${w.episode.episodeNumber} · ${watchedAt(w)}`, formatDateTime(w.lastWatchedAt)]), 'Chưa xem tập nào.');
   }
 }
 

@@ -79,7 +79,7 @@ export interface StaffAiSuggestion {
   sources: AiSource[];
 }
 
-export type MemberContextSectionKey = 'Account' | 'Subscription' | 'Wallet' | 'Transactions' | 'EpisodeAccess' | 'Devices';
+export type MemberContextSectionKey = 'Account' | 'Subscription' | 'Wallet' | 'Transactions' | 'EpisodeAccess' | 'Devices' | 'WatchHistory';
 
 /** A section the caller may not read comes back `{ data: null, restricted: true }`, never a 403. */
 export interface MemberContextSection {

@@ -23,6 +23,13 @@ const context = (subscription: unknown, wallet: unknown) => ({
       ],
     },
     Devices: { data: { devices: [{ name: null, platform: 'ANDROID', lastSeenAt: null }, { name: 'Pixel', platform: 'IOS', lastSeenAt: past }], sessions: [] } },
+    WatchHistory: {
+      data: [
+        { positionSeconds: 754, durationSeconds: 2700, completed: false, lastWatchedAt: past, episode: { episodeNumber: 3, movie: { title: 'Phim A' } } },
+        { positionSeconds: 95, durationSeconds: null, completed: false, lastWatchedAt: past, episode: { episodeNumber: 2, movie: { title: 'Phim A' } } },
+        { positionSeconds: 2700, durationSeconds: 2700, completed: true, lastWatchedAt: past, episode: { episodeNumber: 1, movie: { title: 'Phim A' } } },
+      ],
+    },
   },
 });
 
@@ -42,6 +49,10 @@ describe('MemberContextPanel', () => {
     expect(screen.getByText('Thiết bị (Android)')).toBeInTheDocument();
     expect(screen.getByText('Chưa dùng')).toBeInTheDocument();
     expect(screen.getByText('Pixel (IOS)')).toBeInTheDocument();
+    expect(screen.getByText('Lịch sử xem')).toBeInTheDocument();
+    expect(screen.getByText('Phim A · tập 3 · Dừng ở 12:34 / 45:00')).toBeInTheDocument();
+    expect(screen.getByText('Phim A · tập 2 · Dừng ở 1:35')).toBeInTheDocument();
+    expect(screen.getByText('Phim A · tập 1 · Đã xem hết')).toBeInTheDocument();
   });
 
   it('says when the renewal deadline passed, renewal is off, or there is no plan or wallet', async () => {
