@@ -33,7 +33,7 @@ export function AccountProfilePage() {
   return (
     <main className="w-full px-6 lg:px-8 py-6 space-y-6">
       <div className="border-b border-border pb-4">
-        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Hồ sơ tài khoản</h1>
+        <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-wide leading-none">Hồ sơ tài khoản</h1>
         <p className="text-xs text-muted-foreground mt-0.5">Thông tin cá nhân và bảo mật. Email và vai trò do Admin quản lý.</p>
       </div>
       {account.error && <ErrorNote message={account.error} onRetry={account.reload} />}

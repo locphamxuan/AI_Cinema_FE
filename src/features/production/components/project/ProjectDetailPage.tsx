@@ -97,7 +97,7 @@ export function ProjectDetailPage() {
 
             <div className="flex flex-col gap-4">
               <div className="space-y-2 min-w-0">
-                <h1 className="font-heading text-2xl font-semibold text-foreground leading-tight tracking-tight">{data.title}</h1>
+                <h1 className="text-4xl font-bold text-foreground leading-tight tracking-wide leading-none">{data.title}</h1>
                 <div aria-label="Trạng thái dự án, mùa và tập" className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">
                   <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
                     <span className="font-medium text-secondary-foreground">Dự án:</span>

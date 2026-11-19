@@ -69,7 +69,7 @@ export function StudiosPage() {
     <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Studio đối tác</h1>
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-wide leading-none">Studio đối tác</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             Studio là đối tác bên thứ 3, đăng nhập Studio Web bằng tài khoản Admin cấp để ký hợp đồng và nộp phim. Mỗi dự án đặt hàng một
             Studio đang hoạt động.
