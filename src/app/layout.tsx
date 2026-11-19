@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Be_Vietnam_Pro, Bricolage_Grotesque } from "next/font/google";
+import { Be_Vietnam_Pro, Big_Shoulders } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "@/components/layout/ClientLayout";
 import { cn } from "@/lib/utils";
@@ -13,10 +13,11 @@ const body = Be_Vietnam_Pro({
   display: "swap",
 });
 
-// Titles and big figures.
-const display = Bricolage_Grotesque({
+// Page titles and big figures: the condensed lettering of a cinema marquee.
+const display = Big_Shoulders({
   variable: "--font-face-display",
   subsets: ["latin", "vietnamese"],
+  weight: ["600", "700", "800"],
   display: "swap",
 });
 

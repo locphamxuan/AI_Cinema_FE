@@ -5,51 +5,52 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * AI Cinema design tokens: "night screening room".
- * Paper/Ink by day, Night/Velvet after dark; Reel violet acts (AI, links, primary buttons),
- * Projector amber is the lamp: Coin, the hero call to action, warnings.
+ * AI Cinema design tokens: "the screening room".
+ * Projector pink (the brand of the member app) acts: primary buttons, the active menu entry, links.
+ * Marquee amber is the lamp: Coin and warnings. Reel violet, teal and sky only colour data.
+ * The sidebar stays a dark projection booth in both themes.
  */
 :root {
-  --background: #F7F6FB;
+  --background: #F6F4FB;
   --foreground: #1C1830;
   --card: #FFFFFF;
   --card-foreground: #1C1830;
   --popover: #FFFFFF;
   --popover-foreground: #1C1830;
-  --primary: #6646F0;
+  --primary: #D4245F;
   --primary-foreground: #FFFFFF;
-  --secondary: #EFEDF5;
+  --secondary: #F1ECF6;
   --secondary-foreground: #2E2840;
-  --muted: #EFEDF5;
-  --muted-foreground: #5D5672;
-  --accent: #EAE4FF;
-  --accent-foreground: #382383;
-  --highlight: #F5B83D;
+  --muted: #F1ECF6;
+  --muted-foreground: #5E5670;
+  --accent: #FFE3EC;
+  --accent-foreground: #8E1440;
+  --highlight: #FFB547;
   --highlight-foreground: #1C1830;
   --destructive: #D93A43;
   --success: #1F9D66;
   --warning: #C98A12;
-  --border: #E0DCEA;
-  --input: #D6D1E3;
-  --ring: #7B61FF;
-  --chart-1: #6646F0;
-  --chart-2: #EBA21A;
-  --chart-3: #1FA394;
-  --chart-4: #E0587A;
-  --chart-5: #9A82FF;
+  --border: #E4DDEC;
+  --input: #D8D0E3;
+  --ring: #E0457E;
+  --chart-1: #D4245F;
+  --chart-2: #F29A1F;
+  --chart-3: #6D4AFF;
+  --chart-4: #1FA394;
+  --chart-5: #3E8EF7;
   --radius: 0.75rem;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #2E2840;
-  --sidebar-primary: #6646F0;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F4F1FF;
-  --sidebar-accent-foreground: #382383;
-  --sidebar-border: #E0DCEA;
-  --sidebar-ring: #7B61FF;
+  --sidebar: #140E1E;
+  --sidebar-foreground: #D9D1E6;
+  --sidebar-primary: #FF4F8B;
+  --sidebar-primary-foreground: #1A0E18;
+  --sidebar-accent: #251A35;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgb(255 255 255 / 0.08);
+  --sidebar-ring: #FF4F8B;
 
   /* Names the screens written before the redesign still use; they follow the tokens above. */
   --action: var(--primary);
-  --action-strong: #5535CF;
+  --action-strong: #B01A4F;
   --card-hover: #F7F6FB;
   --border-color: var(--border);
   --border-strong-color: #C7C1D6;
@@ -58,44 +59,44 @@
 }
 
 .dark {
-  --background: #15121F;
+  --background: #16111F;
   --foreground: #F2F0F8;
-  --card: #1E1A2C;
+  --card: #201929;
   --card-foreground: #F2F0F8;
-  --popover: #231D33;
+  --popover: #261D31;
   --popover-foreground: #F2F0F8;
-  --primary: #8B74FF;
-  --primary-foreground: #15121F;
-  --secondary: #2A2440;
+  --primary: #FF4F8B;
+  --primary-foreground: #1A0E18;
+  --secondary: #2B2138;
   --secondary-foreground: #F2F0F8;
-  --muted: #2A2440;
-  --muted-foreground: #A199B5;
-  --accent: #2F2752;
-  --accent-foreground: #D6CBFF;
-  --highlight: #F5B83D;
+  --muted: #2B2138;
+  --muted-foreground: #A89DB8;
+  --accent: #3A1F33;
+  --accent-foreground: #FFC2D6;
+  --highlight: #FFB547;
   --highlight-foreground: #15121F;
   --destructive: #F06A70;
   --success: #3CC48A;
   --warning: #F5B83D;
   --border: rgb(255 255 255 / 0.09);
   --input: rgb(255 255 255 / 0.14);
-  --ring: #9A82FF;
-  --chart-1: #8B74FF;
-  --chart-2: #F5B83D;
-  --chart-3: #36C2B1;
-  --chart-4: #F07A97;
-  --chart-5: #C3B4FF;
-  --sidebar: #1A1626;
-  --sidebar-foreground: #E0DCEA;
-  --sidebar-primary: #8B74FF;
-  --sidebar-primary-foreground: #15121F;
-  --sidebar-accent: #2A2440;
-  --sidebar-accent-foreground: #F2F0F8;
+  --ring: #FF6E9E;
+  --chart-1: #FF4F8B;
+  --chart-2: #FFB547;
+  --chart-3: #9B82FF;
+  --chart-4: #3CC4B0;
+  --chart-5: #62A8FF;
+  --sidebar: #0F0A17;
+  --sidebar-foreground: #D9D1E6;
+  --sidebar-primary: #FF4F8B;
+  --sidebar-primary-foreground: #1A0E18;
+  --sidebar-accent: #231831;
+  --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: rgb(255 255 255 / 0.08);
-  --sidebar-ring: #9A82FF;
+  --sidebar-ring: #FF4F8B;
 
-  --action-strong: #9A82FF;
-  --card-hover: #262036;
+  --action-strong: #FF6E9E;
+  --card-hover: #281F33;
   --border-strong-color: rgb(255 255 255 / 0.18);
   --muted-light-color: #C7C1D6;
 }
@@ -224,7 +225,6 @@
   --animate-spin-slow: spin 4s linear infinite;
   --animate-float: float 4s ease-in-out infinite;
   --animate-ambient: ambient-pulse 6s ease-in-out infinite;
-  --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -617,4 +617,94 @@ select:not(.sr-only) option {
   & :is(th, td):first-child {
     padding-left: 0;
   }
+}
+
+/* Page titles in the marquee face; it is condensed, so it is set larger and a little open. */
+@layer base {
+  h1 {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+  }
+}
+
+/*
+ * A cinema ticket: a coloured stub, a perforated tear line, and two half-moon notches cut from the edges.
+ * --ticket-accent picks the colour of the stub.
+ */
+.ticket {
+  --ticket-accent: var(--primary);
+  position: relative;
+  -webkit-mask: radial-gradient(circle 9px at 4.25rem 0, transparent 98%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle 9px at 4.25rem 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+  mask: radial-gradient(circle 9px at 4.25rem 0, transparent 98%, #000) top / 100% 51% no-repeat,
+    radial-gradient(circle 9px at 4.25rem 100%, transparent 98%, #000) bottom / 100% 51% no-repeat;
+}
+.ticket-stub {
+  background: linear-gradient(160deg, var(--ticket-accent), color-mix(in oklab, var(--ticket-accent) 70%, #000));
+}
+.ticket-tear {
+  background-image: linear-gradient(to bottom, var(--border-strong-color) 50%, transparent 0);
+  background-size: 1px 8px;
+}
+
+/* The sprocket holes of a film strip, along the top of the working area. */
+.film-strip {
+  height: 10px;
+  background:
+    radial-gradient(circle at 50% 50%, var(--background) 2.2px, transparent 2.6px) 0 0 / 18px 10px repeat-x,
+    var(--sidebar);
+}
+
+/*
+ * The marquee over a cinema door: the one loud element of a dashboard. A night panel lit by a pink projector
+ * beam and an amber lamp, with a row of bulbs along the top and bottom that chase once a few seconds.
+ */
+.marquee {
+  position: relative;
+  isolation: isolate;
+  color: #fff;
+  background:
+    radial-gradient(70% 140% at 0% 0%, color-mix(in oklab, var(--chart-1) 55%, transparent), transparent 62%),
+    radial-gradient(55% 140% at 100% 100%, color-mix(in oklab, var(--chart-2) 42%, transparent), transparent 60%),
+    radial-gradient(40% 90% at 70% 0%, color-mix(in oklab, var(--chart-3) 35%, transparent), transparent 70%),
+    #140e1e;
+}
+.marquee::before,
+.marquee::after {
+  content: '';
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  height: 8px;
+  z-index: -1;
+  background: radial-gradient(circle, #ffd98f 0 2.4px, rgb(255 217 143 / 0.25) 3px, transparent 3.6px) 0 50% / 18px 8px repeat-x;
+  animation: marquee-chase 2.4s steps(2) infinite;
+}
+.marquee::before {
+  top: 9px;
+}
+.marquee::after {
+  bottom: 9px;
+  animation-direction: reverse;
+}
+@keyframes marquee-chase {
+  to {
+    background-position: 18px 50%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee::before,
+  .marquee::after {
+    animation: none;
+  }
+}
+
+/* The menu entry of the page you are on: a pink projector beam along its left edge. */
+[data-sidebar='menu-button'][data-active='true'] {
+  background: linear-gradient(90deg, color-mix(in oklab, var(--sidebar-primary) 26%, transparent), transparent);
+  color: #fff;
+  box-shadow: inset 3px 0 0 var(--sidebar-primary);
+}
+[data-sidebar='menu-button'][data-active='true'] svg {
+  color: var(--sidebar-primary);
 }
