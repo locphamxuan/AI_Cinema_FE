@@ -35,6 +35,16 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('FinalScriptReview', () => {
+  it('warns that the studio has no Studio Web login and checks again once accounts were opened', async () => {
+    const calls = routeFetch({ [`/studios/${STUDIO.id}/accounts`]: [] });
+    render(withProject(assignedProject(), <FinalScriptReview onDecided={vi.fn()} />));
+    expect(await screen.findByRole('alert')).toHaveTextContent('chưa có tài khoản đăng nhập Studio Web');
+    await userEvent.click(screen.getByRole('button', { name: /Tạo tài khoản đăng nhập/ }));
+    await screen.findByRole('dialog');
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(calls.filter((c) => c.path === `/studios/${STUDIO.id}/accounts`).length).toBeGreaterThan(1));
+  });
+
   it('sends the script back to the Creator with the reason of the Admin', async () => {
     const calls = routeFetch({ ...LOGINS, '/projects/m1/script/final-review': scriptIn('REVISION_REQUESTED') });
     const onDecided = vi.fn();

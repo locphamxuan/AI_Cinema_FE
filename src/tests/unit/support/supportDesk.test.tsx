@@ -85,6 +85,7 @@ describe('Support queue', () => {
       '/admin/support/conversations': page([handled]),
       '/admin/support/conversations/c1': { conversation: handled, messages: MESSAGES },
       '/admin/support/conversations/c1/resolve': { ...handled, status: 'RESOLVED' },
+      '/admin/support/conversations/c1/release': { ...handled, status: 'WAITING_FOR_STAFF', assignedAgentId: null },
     });
     render(<StaffSupportWorkspace />);
     const queue = screen.getByRole('region', { name: 'Hàng chờ hỗ trợ' });
@@ -98,9 +99,30 @@ describe('Support queue', () => {
     const detail = screen.getByRole('region', { name: 'Chi tiết case' });
     expect(within(detail).queryByRole('button', { name: /Đóng case/ })).not.toBeInTheDocument();
     await userEvent.click(await within(detail).findByRole('button', { name: 'Đã giải quyết xong' }));
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Huỷ' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await userEvent.click(within(detail).getByRole('button', { name: 'Đã giải quyết xong' }));
     const dialog = await screen.findByRole('dialog');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Đã giải quyết xong' }));
     await waitFor(() => expect(calls.some((c) => c.path === '/admin/support/conversations/c1/resolve' && c.method === 'POST')).toBe(true));
+  });
+
+  it('hands a case it holds back to the queue', async () => {
+    signInAs('staff');
+    const handled = { ...CASE, status: 'STAFF_HANDLING', assignedAgentId: useAppStore.getState().user?.id ?? null };
+    const calls = routeFetch({
+      '/admin/support/stats': STATS,
+      '/admin/support/conversations': page([handled]),
+      '/admin/support/conversations/c1': { conversation: handled, messages: MESSAGES },
+      '/admin/support/conversations/c1/release': { ...handled, status: 'WAITING_FOR_STAFF', assignedAgentId: null },
+    });
+    render(<StaffSupportWorkspace />);
+    const queue = screen.getByRole('region', { name: 'Hàng chờ hỗ trợ' });
+    await userEvent.click(within(queue).getByRole('button', { name: 'Của tôi' }));
+    await userEvent.click(await within(queue).findByText('Nguyễn An'));
+    const detail = screen.getByRole('region', { name: 'Chi tiết case' });
+    await userEvent.click(await within(detail).findByRole('button', { name: 'Trả về hàng chờ' }));
+    await waitFor(() => expect(calls.some((c) => c.path === '/admin/support/conversations/c1/release' && c.method === 'POST')).toBe(true));
   });
 
   it('lets the Admin assign the case to an active Staff member', async () => {
