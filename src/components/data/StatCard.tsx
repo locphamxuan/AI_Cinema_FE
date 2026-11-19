@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react';
-import type { LucideIcon } from 'lucide-react';
-import { Card } from '@/components/shadcn/card';
+import type { CSSProperties, ReactNode } from 'react';
+import { Ticket, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const NOTE_TONE = {
@@ -11,6 +10,17 @@ const NOTE_TONE = {
   brand: 'text-primary',
 } as const;
 
+/** The stub colours, from the chart palette: projector pink, marquee amber, reel violet, teal, sky. */
+const ACCENTS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'] as const;
+export type StatAccent = 0 | 1 | 2 | 3 | 4;
+
+/** Same label, same colour on every visit, so a figure is recognised by its stub before it is read. */
+export function accentOf(label: string): StatAccent {
+  let hash = 0;
+  for (const ch of label) hash = (hash * 31 + ch.charCodeAt(0)) >>> 0;
+  return (hash % ACCENTS.length) as StatAccent;
+}
+
 interface StatCardProps {
   label: string;
   value: ReactNode;
@@ -18,42 +28,42 @@ interface StatCardProps {
   unit?: string;
   note?: ReactNode;
   noteTone?: keyof typeof NOTE_TONE;
-  /** A small tile above the label saying what the figure is about. */
+  /** The icon printed on the stub. */
   icon?: LucideIcon;
-  /** The figure the page leads with: filled with the brand colour. */
+  /** Colour of the stub; by default one fixed per label. */
+  accent?: StatAccent;
+  /** The figure the page leads with: the whole ticket takes the stub colour. */
   featured?: boolean;
   className?: string;
 }
 
 /**
- * One headline figure, as the metric cards of arhamkhnz/next-shadcn-admin-dashboard: an icon tile, what it counts,
- * the number, and a line of context under it, on a faint primary gradient.
+ * One headline figure as a cinema ticket: a coloured stub with the icon, a perforated tear line, then what it counts,
+ * the number in the marquee face and a line of context.
  */
-export function StatCard({ label, value, unit, note, noteTone = 'muted', icon: Icon, featured = false, className }: StatCardProps) {
+export function StatCard({ label, value, unit, note, noteTone = 'muted', icon: Icon = Ticket, accent, featured = false, className }: StatCardProps) {
+  const style = { '--ticket-accent': ACCENTS[accent ?? accentOf(label)] } as CSSProperties;
   return (
-    <Card
+    <div
+      style={style}
       className={cn(
-        'gap-2 bg-linear-to-t from-primary/5 to-card px-5 py-4 shadow-xs dark:bg-card',
-        featured && 'from-primary to-primary text-primary-foreground ring-0 shadow-lg shadow-primary/20 dark:bg-primary',
+        'ticket flex min-h-28 overflow-hidden rounded-xl border border-border bg-card text-card-foreground shadow-sm',
+        featured && 'ticket-stub border-transparent text-white',
         className,
       )}
     >
-      {Icon && (
-        <span
-          className={cn(
-            'mb-1 flex size-7 items-center justify-center rounded-lg border',
-            featured ? 'border-primary-foreground/30 bg-primary-foreground/10' : 'bg-muted text-muted-foreground',
-          )}
-        >
-          <Icon className="size-4" aria-hidden="true" />
-        </span>
-      )}
-      <p className={cn('text-sm', featured ? 'text-primary-foreground/80' : 'text-muted-foreground')}>{label}</p>
-      <p className="text-3xl leading-none font-medium tracking-tight tabular-nums">
-        {value}
-        {unit && <span className={cn('ml-1.5 text-sm font-normal', featured ? 'text-primary-foreground/75' : 'text-muted-foreground')}>{unit}</span>}
-      </p>
-      {note && <p className={cn('truncate text-xs', featured ? 'text-primary-foreground/85' : NOTE_TONE[noteTone])}>{note}</p>}
-    </Card>
+      <div className={cn('flex w-[4.25rem] shrink-0 items-center justify-center', !featured && 'ticket-stub')}>
+        <Icon className="size-6 text-white drop-shadow" aria-hidden="true" />
+      </div>
+      <div className={cn('ticket-tear w-px shrink-0', featured && 'opacity-40')} aria-hidden="true" />
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-4 py-3">
+        <p className={cn('text-sm', featured ? 'text-white/85' : 'text-muted-foreground')}>{label}</p>
+        <p className="font-display text-4xl leading-none font-bold tracking-tight tabular-nums">
+          {value}
+          {unit && <span className={cn('ml-1.5 font-sans text-sm font-normal', featured ? 'text-white/80' : 'text-muted-foreground')}>{unit}</span>}
+        </p>
+        {note && <p className={cn('truncate text-xs', featured ? 'text-white/90' : NOTE_TONE[noteTone])}>{note}</p>}
+      </div>
+    </div>
   );
 }

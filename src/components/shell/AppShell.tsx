@@ -47,12 +47,12 @@ function AreaSidebar({ area }: { area: Area }) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link href={AREAS[area].path}>
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-sidebar-primary to-chart-2 text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/30">
                   <Film className="size-4" aria-hidden="true" />
                 </span>
                 <span className="grid min-w-0 leading-tight">
-                  <span className="truncate font-heading text-sm font-bold tracking-tight">AI Cinema</span>
-                  <span className="truncate text-xs text-muted-foreground">{AREAS[area].label}</span>
+                  <span className="truncate font-display text-xl font-bold tracking-wide">AI Cinema</span>
+                  <span className="truncate text-xs text-sidebar-foreground/60">{AREAS[area].label}</span>
                 </span>
               </Link>
             </SidebarMenuButton>
@@ -81,7 +81,7 @@ function AreaSidebar({ area }: { area: Area }) {
       <SidebarFooter>
         <div className="grid min-w-0 px-2 text-xs leading-tight group-data-[collapsible=icon]:hidden">
           <span className="truncate font-medium">{user?.name}</span>
-          <span className="truncate text-muted-foreground">{user?.email}</span>
+          <span className="truncate text-sidebar-foreground/60">{user?.email}</span>
         </div>
       </SidebarFooter>
       <SidebarRail />
@@ -114,11 +114,12 @@ export function AppShell({ area, children }: { area: Area; children: ReactNode }
     <TooltipProvider delayDuration={0}>
     <SidebarProvider style={{ '--sidebar-width': '16rem' } as React.CSSProperties}>
       <AreaSidebar area={area} />
-      <SidebarInset className="min-w-0">
-        <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 rounded-t-[inherit] border-b border-border bg-background/80 px-4 backdrop-blur-md">
+      <SidebarInset className="min-w-0 overflow-hidden">
+        <div className="film-strip shrink-0" aria-hidden="true" />
+        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/85 px-4 backdrop-blur-md">
           <SidebarTrigger className="-ml-1" aria-label="Thu gọn hoặc mở menu" />
           <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-4" />
-          <h1 className="min-w-0 truncate text-sm font-semibold">{title}</h1>
+          <p className="min-w-0 truncate font-display text-2xl leading-none font-bold tracking-wide">{title}</p>
           {oversight && <span className="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">Chế độ giám sát</span>}
           <div className="ml-auto flex shrink-0 items-center gap-2">
             {user && <NotificationMenu />}
