@@ -64,7 +64,7 @@ export function AdminExecutivePortal() {
               }
               action={
                 can(PERMISSION.PROJECT_CREATE) && (
-                  <button type="button" onClick={() => setCreating(true)} className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground shadow-sm shadow-primary/25 transition-colors hover:bg-primary/90 cursor-pointer">
+                  <button type="button" onClick={() => setCreating(true)} className="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-[#121212] shadow-sm transition-colors hover:bg-white/90 cursor-pointer">
                     <Plus className="size-4" aria-hidden="true" />
                     Tạo dự án mới
                   </button>

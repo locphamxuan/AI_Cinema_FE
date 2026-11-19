@@ -67,7 +67,7 @@ export function CreatorStudioPortal() {
           name={user?.name ?? 'Creator'}
           summary="Kịch bản và dự án được giao cho bạn, với bước tiếp theo của từng dự án."
           action={
-            <Link href="/creator/profile" className="inline-flex h-10 items-center rounded-lg border border-border bg-card px-5 text-sm font-semibold transition-colors hover:bg-muted">
+            <Link href="/creator/profile" className="inline-flex h-10 items-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white transition-colors hover:bg-white/10">
               Hồ sơ cá nhân
             </Link>
           }
