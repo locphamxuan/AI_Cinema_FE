@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 function EyeIcon({ open }: { open: boolean }) {
   return (
-    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       {open ? (
         <>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -49,7 +49,7 @@ export function PasswordField({ id, label, autoComplete, value, onChange, placeh
           type="button"
           onClick={() => setVisible(!visible)}
           aria-label={visible ? `Ẩn ${label.toLowerCase()}` : `Hiện ${label.toLowerCase()}`}
-          className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <EyeIcon open={!visible} />
           <span>{visible ? 'Ẩn' : 'Hiện'}</span>

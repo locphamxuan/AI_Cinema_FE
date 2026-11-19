@@ -58,7 +58,7 @@ function getNotificationMeta(item: AppNotification): {
 
   return {
     badgeLabel: 'Hệ thống',
-    badgeTone: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-500/10 dark:text-slate-300 dark:border-slate-500/20',
+    badgeTone: 'bg-slate-50 text-secondary-foreground border-slate-200 dark:bg-slate-500/10 dark:border-slate-500/20',
   };
 }
 
@@ -104,7 +104,7 @@ export function NotificationCard({ item, href, onOpen }: NotificationCardProps) 
       className={`group relative rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 p-4 sm:p-5 transition-all duration-200 cursor-pointer border ${
         isUnread
           ? 'bg-sky-50/40 dark:bg-sky-500/[0.05] border-sky-200/90 dark:border-sky-500/25 hover:border-sky-300 dark:hover:border-sky-500/40 shadow-xs'
-          : 'bg-white dark:bg-white/[0.015] border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10 hover:bg-slate-50/70 dark:hover:bg-white/[0.03]'
+          : 'bg-white dark:bg-white/[0.015] border-border hover:border-border hover:bg-slate-50/70 dark:hover:bg-white/[0.03]'
       }`}
     >
       {/* Unread indicator ribbon */}
@@ -130,7 +130,7 @@ export function NotificationCard({ item, href, onOpen }: NotificationCardProps) 
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 font-medium">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground/70 font-medium">
               <span>{formatTimeAgo(item.createdAt)}</span>
             </div>
           </div>
@@ -139,8 +139,8 @@ export function NotificationCard({ item, href, onOpen }: NotificationCardProps) 
           <h3
             className={`text-sm leading-snug ${
               isUnread
-                ? 'font-bold text-slate-900 dark:text-white'
-                : 'font-semibold text-slate-700 dark:text-slate-300'
+                ? 'font-bold text-foreground'
+                : 'font-semibold text-secondary-foreground'
             }`}
           >
             {item.title}
@@ -148,14 +148,14 @@ export function NotificationCard({ item, href, onOpen }: NotificationCardProps) 
 
           {/* Body / Detail snippet */}
           {item.body && (
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
+            <p className="text-xs text-muted-foreground leading-relaxed font-normal">
               {item.body}
             </p>
           )}
 
           {/* Footer timestamp and link action */}
           <div className="flex items-center justify-between pt-1">
-            <span className="text-[11px] tabular-nums text-slate-400 dark:text-slate-500">
+            <span className="text-[11px] tabular-nums text-muted-foreground/70">
               {formatDateTime(item.createdAt)}
             </span>
 
