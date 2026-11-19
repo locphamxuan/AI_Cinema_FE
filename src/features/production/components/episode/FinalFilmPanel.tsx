@@ -81,7 +81,12 @@ export function FinalFilmPanel({
       <ConfirmModal
         open={confirming}
         title="Xác nhận Phim Final"
-        description={`Tập ${episode.episodeNumber}: ${episode.title}. Bản đã duyệt, gắn nhãn AI và qua kiểm tra pháp lý thành Phim Final; Admin được báo để định giá và phát hành.`}
+        description="Bản đã duyệt, đã gắn nhãn AI và đã qua kiểm tra pháp lý của tập này trở thành Phim Final."
+        details={[
+          ['Tập', `Tập ${episode.episodeNumber}: ${episode.title}`],
+          ['Trạng thái mới', 'Phim Final chờ phát hành'],
+        ]}
+        consequence="Admin được báo để đặt giá Coin, cấu hình tập miễn phí và phát hành."
         confirmLabel="Xác nhận Phim Final"
         busy={busy}
         onClose={() => setConfirming(false)}

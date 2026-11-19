@@ -127,7 +127,13 @@ export function CostRequestCard({
       <ConfirmModal
         open={approving}
         title="Cấp thêm chi phí sản xuất"
-        description={`Cấp ${formatVnd(grantedVnd)} cho ${cr.project.movie.title}. Số tiền được cộng vào ngân sách dự án và ghi vào sổ chi phí, không thể xoá.`}
+        description="Cấp thêm chi phí sản xuất cho dự án theo yêu cầu của Reviewer."
+        details={[
+          ['Dự án', cr.project.movie.title],
+          ['Reviewer xin', formatVnd(cr.requestedVnd)],
+          ['Cấp', formatVnd(grantedVnd)],
+        ]}
+        consequence="số tiền được cộng vào ngân sách dự án và ghi vào sổ chi phí, không thể xoá."
         confirmLabel="Cấp chi phí"
         busy={busy}
         onClose={() => setApproving(false)}

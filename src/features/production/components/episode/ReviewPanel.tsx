@@ -100,7 +100,12 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
       <ConfirmModal
         open={approving}
         title={`Duyệt bản ${sheet.version}`}
-        description="Bản này thành bản được duyệt của tập; bước tiếp theo là gắn nhãn AI và kiểm tra tuân thủ pháp lý."
+        description="Bản này thành bản được duyệt của tập."
+        details={[
+          ['Phiên bản', `Bản ${sheet.version}`],
+          ['Nhãn AI Studio đề xuất', LABEL_TYPE[sheet.proposedLabelType]],
+        ]}
+        consequence="bước tiếp theo là gắn nhãn AI và kiểm tra tuân thủ pháp lý."
         confirmLabel="Duyệt bản này"
         busy={busy}
         onClose={() => setApproving(false)}

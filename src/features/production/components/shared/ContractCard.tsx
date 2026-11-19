@@ -175,7 +175,13 @@ export function ContractCard({
       <ConfirmModal
         open={confirming}
         title="Đồng ý giá và ký hợp đồng"
-        description={`Ký theo giá Studio báo${c.costVnd !== null ? ` (${formatVnd(c.costVnd)})` : ''}. Hợp đồng hoàn tất và dự án tự bàn giao cho Studio ${c.studio.name}; không thể hoàn tác.`}
+        description="Admin ký theo giá Studio đã ký trên bản hợp đồng này."
+        details={[
+          ['Studio', c.studio.name],
+          ['Vòng', `Vòng ${c.round}`],
+          ['Giá ký', c.costVnd !== null ? formatVnd(c.costVnd) : 'Ngân sách trần'],
+        ]}
+        consequence={`hợp đồng đủ 2 chữ ký, dự án chuyển sang Đang sản xuất và tự bàn giao cho ${c.studio.name} với phí bằng giá ký. Không thể hoàn tác.`}
         confirmLabel="Đồng ý & ký"
         busy={busy}
         onClose={() => setConfirming(false)}
