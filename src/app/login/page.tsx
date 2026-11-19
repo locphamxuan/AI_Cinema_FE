@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { Film } from 'lucide-react';
 import AuthForm from '@/components/auth/AuthForm';
 import AuthBrand from '@/components/auth/AuthBrand';
 import ThemeToggle from '@/components/theme/ThemeToggle';
@@ -12,6 +13,15 @@ export default function LoginPage() {
     <main className="grid min-h-dvh bg-background p-2 text-foreground lg:grid-cols-2">
       <AuthBrand />
       <div className="relative order-1 flex min-h-[calc(100dvh-1rem)] items-center justify-center px-4 py-10">
+        <div className="absolute top-5 left-5 flex items-center gap-2.5">
+          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Film className="size-4" aria-hidden="true" />
+          </span>
+          <span className="leading-tight">
+            <span className="block font-heading text-sm font-bold">AI Cinema</span>
+            <span className="block text-xs text-muted-foreground">Quản trị nội bộ</span>
+          </span>
+        </div>
         <div className="absolute top-4 right-4">
           <ThemeToggle />
         </div>

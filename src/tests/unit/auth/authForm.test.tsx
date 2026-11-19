@@ -39,7 +39,7 @@ describe('AuthForm sign-in', () => {
 
     await userEvent.type(screen.getByLabelText('Email'), 'reviewer@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
     expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123');
     expect(push).toHaveBeenCalledWith('/reviewer');
@@ -51,7 +51,7 @@ describe('AuthForm sign-in', () => {
 
     await userEvent.type(screen.getByLabelText('Email'), 'reviewer@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
     expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123');
     expect(push).toHaveBeenCalledWith('/reviewer');
@@ -63,7 +63,7 @@ describe('AuthForm sign-in', () => {
 
     await userEvent.type(screen.getByLabelText('Email'), 'member@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
     expect(screen.getByRole('alert')).toHaveTextContent('ứng dụng di động');
     expect(push).not.toHaveBeenCalled();
@@ -78,7 +78,7 @@ describe('AuthForm sign-in', () => {
 
     await userEvent.type(screen.getByLabelText('Email'), 'studio@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
     expect(screen.getByRole('link', { name: /Mở cổng đăng nhập Studio Web/ })).toBeInTheDocument();
   });
@@ -86,7 +86,7 @@ describe('AuthForm sign-in', () => {
   it('displays back-office internal branding instead of viewer platform copy', () => {
     render(<AuthBrand />);
 
-    expect(screen.getByText('Cổng Quản Trị & Sản Xuất Nội Bộ')).toBeInTheDocument();
+    expect(screen.getByText('Cổng quản trị & sản xuất nội bộ')).toBeInTheDocument();
     expect(screen.queryByText(/Nền tảng xem phim/)).not.toBeInTheDocument();
   });
 });

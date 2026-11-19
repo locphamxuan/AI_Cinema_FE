@@ -151,7 +151,7 @@ export default function AuthForm() {
           disabled={loading}
           className="mt-2 h-10 w-full cursor-pointer rounded-lg bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? 'Đang xác thực…' : 'Đăng Nhập'}
+          {loading ? 'Đang xác thực…' : 'Đăng nhập'}
         </button>
       </form>
 
