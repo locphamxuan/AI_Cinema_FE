@@ -98,20 +98,20 @@ export function RolePermissionsPanel() {
       <RoleSummaryCards draft={draft} changedRoles={changedRoles} />
 
       {/* ── Main Panel Card ── */}
-      <section className="bg-white dark:bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
+      <section className="bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
         {/* Panel Header */}
-        <div className="p-6 border-b border-slate-100 dark:border-white/5 space-y-4">
+        <div className="p-6 border-b border-border space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                <h2 className="text-base font-bold text-foreground">
                   Phân quyền theo vai trò
                 </h2>
-                <span className="text-[11px] font-semibold text-slate-500 bg-slate-100 dark:bg-white/5 px-2.5 py-0.5 rounded-full">
+                <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full">
                   {filteredPermissions.length} quyền khả dụng
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                 Nhấp trực tiếp vào ô trạng thái để bật hoặc tắt quyền hạn. Quyền có biểu tượng ổ khóa là quyền cốt lõi hệ thống được cố định.
               </p>
             </div>
@@ -150,20 +150,20 @@ export function RolePermissionsPanel() {
           {/* Search & Area Filter Bar */}
           <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm kiếm quyền hạn theo tên, mô tả hoặc mã key..."
-                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all"
+                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-muted/60 border border-border text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
                   aria-label="Xoá từ khoá tìm kiếm"
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-muted-foreground cursor-pointer"
                 >
                   ✕
                 </button>
@@ -176,7 +176,7 @@ export function RolePermissionsPanel() {
                 aria-label="Lọc theo nhóm danh mục"
                 value={selectedArea}
                 onChange={(e) => setSelectedArea(e.target.value)}
-                className="px-3 py-2 text-xs rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/30 cursor-pointer"
+                className="px-3 py-2 text-xs rounded-xl bg-muted/60 border border-border text-secondary-foreground font-medium focus:outline-none focus:ring-2 focus:ring-sky-500/30 cursor-pointer"
               >
                 <option value="all">Tất cả danh mục ({allAreas.length})</option>
                 {allAreas.map((area) => (
@@ -198,7 +198,7 @@ export function RolePermissionsPanel() {
             {activeAreas.length === 0 ? (
               <tbody>
                 <tr>
-                  <td colSpan={BACKEND_ROLES.length + 1} className="py-12 text-center text-slate-400">
+                  <td colSpan={BACKEND_ROLES.length + 1} className="py-12 text-center text-muted-foreground">
                     Không tìm thấy quyền hạn nào khớp với từ khóa tìm kiếm.
                   </td>
                 </tr>

@@ -118,7 +118,7 @@ export function RewardRuleModal({
           </span>
         </div>
         {rule && !rule.isActive && (
-          <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-medium cursor-pointer">
+          <label className="flex items-center gap-2 text-xs text-secondary-foreground font-medium cursor-pointer">
             <input
               type="checkbox"
               checked={form.isActive}
@@ -128,7 +128,7 @@ export function RewardRuleModal({
             Kích hoạt lại ngày này
           </label>
         )}
-        <div className="flex justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/5">
+        <div className="flex justify-end gap-2.5 pt-2 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 py-2 text-xs">
             Hủy
           </Button>

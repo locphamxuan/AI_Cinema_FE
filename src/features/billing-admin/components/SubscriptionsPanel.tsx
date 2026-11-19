@@ -70,7 +70,7 @@ export function SubscriptionsPanel() {
       {list.data && list.data.data.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs table-cells">
-            <thead className="text-slate-500 dark:text-slate-400 text-left">
+            <thead className="text-muted-foreground text-left">
               <tr>
                 <th className="py-2 font-medium">Member</th>
                 <th className="py-2 font-medium">Gói</th>
@@ -84,8 +84,8 @@ export function SubscriptionsPanel() {
                 <tr key={row.id}>
                   <td className="py-2">
                     <button type="button" onClick={() => setOpenId(row.id)} className="text-left hover:underline cursor-pointer">
-                      <span className="block font-medium text-slate-900 dark:text-white">{row.user.fullName}</span>
-                      <span className="block text-[11px] text-slate-500">{row.user.email}</span>
+                      <span className="block font-medium text-foreground">{row.user.fullName}</span>
+                      <span className="block text-[11px] text-muted-foreground">{row.user.email}</span>
                     </button>
                   </td>
                   <td className="py-2">
@@ -175,8 +175,8 @@ function SubscriptionFacts({ sub }: { sub: AdminSubscription }) {
     <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
       {facts.map(([k, v]) => (
         <div key={k}>
-          <dt className="text-slate-500">{k}</dt>
-          <dd className="font-medium text-slate-900 dark:text-white">{v}</dd>
+          <dt className="text-muted-foreground">{k}</dt>
+          <dd className="font-medium text-foreground">{v}</dd>
         </div>
       ))}
     </dl>
@@ -187,7 +187,7 @@ function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
   if (cycles.length === 0) return <Empty>Chưa thu Coin kỳ nào.</Empty>;
   return (
     <table className="w-full">
-      <thead className="text-slate-500 text-left">
+      <thead className="text-muted-foreground text-left">
         <tr>
           <th className="py-1 font-medium">Kỳ</th>
           <th className="py-1 font-medium">Thời gian</th>

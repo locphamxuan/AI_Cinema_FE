@@ -95,7 +95,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
               className={`${fieldInputClass} text-xs py-2 rounded-xl`}
               required
             />
-            <label className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/10 px-3 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition ${uploading ? 'opacity-60' : 'cursor-pointer'}`}>
+            <label className={`shrink-0 inline-flex items-center gap-1.5 rounded-xl border border-border px-3 text-xs font-medium text-secondary-foreground hover:bg-muted/60 transition ${uploading ? 'opacity-60' : 'cursor-pointer'}`}>
               {uploading ? 'Đang tải lên…' : 'Tải từ máy'}
               <input
                 type="file"
@@ -112,7 +112,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
           </div>
         </FormField>
         {/^https?:\/\//i.test(mediaUrl) && (
-          <div className="space-y-1.5 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.06] p-2.5">
+          <div className="space-y-1.5 rounded-xl bg-muted/60 border border-border p-2.5">
             <video
               src={mediaUrl}
               controls
@@ -120,7 +120,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
               className="w-full max-h-44 rounded-lg bg-black"
               onLoadedMetadata={(e) => setLength({ url: mediaUrl, seconds: Math.round(e.currentTarget.duration) })}
             />
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+            <p className="text-[11px] text-muted-foreground">
               {seconds !== null
                 ? `⏱ Dài ${formatDuration(seconds)}. Người xem phải xem hết quảng cáo rồi mới bấm "Bỏ qua quảng cáo" để xem tiếp phim.`
                 : 'Hệ thống tự lấy thời lượng từ video khi lưu.'}
@@ -148,14 +148,14 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
           />
         </FormField>
         {problem && title && mediaUrl && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400 font-medium">{problem}</p>}
-        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
+        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-full px-4 py-2 text-xs">
             Huỷ
           </Button>
           <Button
             type="submit"
             disabled={busy || uploading || !!problem}
-            className="rounded-full px-5 py-2 text-xs font-semibold bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 shadow-xs transition-colors"
+            className="rounded-full px-5 py-2 text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs transition-colors"
           >
             {ad ? 'Lưu' : 'Tạo quảng cáo'}
           </Button>

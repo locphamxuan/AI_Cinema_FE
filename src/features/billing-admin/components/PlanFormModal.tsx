@@ -98,8 +98,8 @@ export function PlanFormModal({ plan, onClose, onDone }: Props) {
           </FormField>
         </div>
 
-        <fieldset className="rounded-xl border border-slate-200 dark:border-white/10 p-3 space-y-3">
-          <legend className="px-1 text-xs font-semibold text-slate-700 dark:text-slate-200">Quyền lợi của gói</legend>
+        <fieldset className="rounded-xl border border-border p-3 space-y-3">
+          <legend className="px-1 text-xs font-semibold text-secondary-foreground">Quyền lợi của gói</legend>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <FormField label="Số thiết bị được đăng ký" error={errorOf('maxRegisteredDevices')} hint={`Tối đa ${MAX_PLAN_DEVICES}.`}>
               <input
@@ -148,7 +148,7 @@ export function PlanFormModal({ plan, onClose, onDone }: Props) {
             <input type="checkbox" checked={form.isActive} onChange={(e) => set({ isActive: e.target.checked })} className="accent-sky-600 mt-0.5" />
             <span>
               Mở bán cho Member
-              <span className="block text-[11px] text-slate-500">Bỏ chọn để ẩn gói; người đang dùng vẫn giữ tới hết kỳ đã trả.</span>
+              <span className="block text-[11px] text-muted-foreground">Bỏ chọn để ẩn gói; người đang dùng vẫn giữ tới hết kỳ đã trả.</span>
             </span>
           </label>
         )}

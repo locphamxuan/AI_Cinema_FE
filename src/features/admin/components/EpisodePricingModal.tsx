@@ -70,29 +70,29 @@ export function EpisodePricingModal({
           />
         </FormField>
 
-        <div className="space-y-2 rounded-xl border border-slate-200/80 dark:border-white/10 p-3 bg-slate-50/50 dark:bg-white/[0.02]">
-          <p className="font-semibold text-slate-700 dark:text-slate-200">Khoá / Mở tập miễn phí</p>
+        <div className="space-y-2 rounded-xl border border-border p-3 bg-muted/60">
+          <p className="font-semibold text-secondary-foreground">Khoá / Mở tập miễn phí</p>
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={isFreeForGuest}
               onChange={(e) => setIsFreeForGuest(e.target.checked)}
-              className="rounded border-slate-300 dark:border-white/20 text-sky-600 focus:ring-sky-500"
+              className="rounded border-input text-sky-600 focus:ring-sky-500"
             />
-            <span className="text-slate-700 dark:text-slate-200">Miễn phí cho khách vãng lai (Guest)</span>
+            <span className="text-secondary-foreground">Miễn phí cho khách vãng lai (Guest)</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={isFreeForMember}
               onChange={(e) => setIsFreeForMember(e.target.checked)}
-              className="rounded border-slate-300 dark:border-white/20 text-sky-600 focus:ring-sky-500"
+              className="rounded border-input text-sky-600 focus:ring-sky-500"
             />
-            <span className="text-slate-700 dark:text-slate-200">Miễn phí cho thành viên thường (Member)</span>
+            <span className="text-secondary-foreground">Miễn phí cho thành viên thường (Member)</span>
           </label>
         </div>
 
-        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+        <div className="flex justify-end gap-2 pt-2 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} disabled={busy}>
             Huỷ
           </Button>

@@ -180,7 +180,7 @@ export function AdminOverviewDashboard() {
               />
             </div>
           )}
-          <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 text-[11px] text-slate-500 dark:text-slate-400">
+          <div className="p-3 rounded-xl bg-muted/60 border border-border text-[11px] text-muted-foreground">
              Coin thưởng tính vào chi phí quảng bá, chỉ có Coin chính là doanh thu thực.
           </div>
         </OverviewChartCard>
@@ -197,7 +197,7 @@ export function AdminOverviewDashboard() {
             <BarChart categories={episodeCategories} series={episodeBarSeries} valueUnit="tập" height={220} />
           </div>
         ) : (
-          <div className="py-12 text-center text-xs text-slate-400">
+          <div className="py-12 text-center text-xs text-muted-foreground">
             Chưa có dữ liệu tập phim từ các dự án hiện tại.
           </div>
         )}

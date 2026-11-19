@@ -59,7 +59,7 @@ export function CoinLedgerPanel() {
       {ledger.data && ledger.data.data.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs table-cells">
-            <thead className="text-slate-500 dark:text-slate-400 text-left">
+            <thead className="text-muted-foreground text-left">
               <tr>
                 <th className="py-2 font-medium">Thời gian</th>
                 <th className="py-2 font-medium">Loại</th>
@@ -74,7 +74,7 @@ export function CoinLedgerPanel() {
                 <tr key={line.id}>
                   <td className="py-2 whitespace-nowrap">{formatDateTime(line.createdAt)}</td>
                   <td className="py-2">{COIN_ENTRY_LABEL[line.entryType]}</td>
-                  <td className="py-2 hidden md:table-cell text-slate-600 dark:text-slate-300">{describeLine(line.description) ?? '-'}</td>
+                  <td className="py-2 hidden md:table-cell text-muted-foreground">{describeLine(line.description) ?? '-'}</td>
                   <td className="py-2 text-right tabular-nums">{signed(line.mainAmount)}</td>
                   <td className="py-2 text-right tabular-nums">{signed(line.bonusAmount)}</td>
                   <td className="py-2 text-right">
@@ -118,19 +118,19 @@ export function WalletModal({
       {w && !adjusting && (
         <div className="space-y-4 text-xs">
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
-              <p className="text-slate-500">Coin chính</p>
+            <div className="rounded-lg border border-border p-3">
+              <p className="text-muted-foreground">Coin chính</p>
               <p className="text-lg font-bold tabular-nums">{formatNumber(w.mainBalance)}</p>
             </div>
-            <div className="rounded-lg border border-slate-200 dark:border-white/10 p-3">
-              <p className="text-slate-500">Coin thưởng</p>
+            <div className="rounded-lg border border-border p-3">
+              <p className="text-muted-foreground">Coin thưởng</p>
               <p className="text-lg font-bold tabular-nums">{formatNumber(w.bonusBalance)}</p>
             </div>
           </div>
           <div>
             <p className="font-semibold mb-1">Lô Coin thưởng còn lại (không hết hạn)</p>
             {w.lots.length === 0 ? (
-              <p className="text-slate-500">Không còn lô nào.</p>
+              <p className="text-muted-foreground">Không còn lô nào.</p>
             ) : (
               <ul className="space-y-1">
                 {w.lots.map((lot) => (
@@ -138,7 +138,7 @@ export function WalletModal({
                     <span>
                       {LOT_SOURCE_LABEL[lot.source] ?? lot.source}: còn {lot.remainingAmount}/{lot.originalAmount}
                     </span>
-                    <span className="text-slate-500">nhận {formatDay(lot.grantedAt)}</span>
+                    <span className="text-muted-foreground">nhận {formatDay(lot.grantedAt)}</span>
                   </li>
                 ))}
               </ul>
@@ -194,7 +194,7 @@ function AdjustForm({ userId, onCancel, onDone }: { userId: string; onCancel: ()
 
   return (
     <form onSubmit={submit} className="space-y-3">
-      <p className="text-xs text-slate-500">Số dương cộng thêm, số âm trừ bớt. Mỗi lần điều chỉnh ghi một dòng sổ cái và nhật ký kiểm toán.</p>
+      <p className="text-xs text-muted-foreground">Số dương cộng thêm, số âm trừ bớt. Mỗi lần điều chỉnh ghi một dòng sổ cái và nhật ký kiểm toán.</p>
       <div className="grid grid-cols-2 gap-3">
         <FormField label="Coin chính">
           <input type="number" step={1} value={main} onChange={(e) => setMain(e.target.value)} className={fieldInputClass} />

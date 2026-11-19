@@ -41,8 +41,8 @@ export function ChangeRequestInbox() {
             }}
             className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition cursor-pointer ${
               filter === key
-                ? 'bg-[#121212] text-white dark:bg-white dark:text-slate-900 shadow-xs'
-                : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10'
+                ? 'bg-primary text-primary-foreground shadow-xs'
+                : 'bg-muted text-muted-foreground hover:bg-muted'
             }`}
           >
             {label}

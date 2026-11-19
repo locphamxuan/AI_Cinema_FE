@@ -30,14 +30,14 @@ export function RewardWheelPanel() {
   const totalWeight = activePrizes.reduce((sum, p) => sum + (p.weight ?? 0), 0);
 
   return (
-    <section className="bg-white dark:bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
+    <section className="bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
       {/* ── Panel Header ── */}
-      <div className="p-6 border-b border-slate-100 dark:border-white/5 space-y-4">
+      <div className="p-6 border-b border-border space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
               <div>
-                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                   Vòng quay may mắn
                   <span className="text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
                     Cơ cấu 10 ô giải
@@ -45,13 +45,13 @@ export function RewardWheelPanel() {
                 </h2>
               </div>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
               Cơ cấu chuẩn gồm 10 ô: 9 giải Coin và 1 giải Gói VIP Tháng 30 ngày (tỉ lệ trúng 2.0%). Nếu thành viên trúng giải gói VIP mà chưa kích hoạt gói, hệ thống sẽ tự động kích hoạt gói VIP không tự gia hạn.
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 border border-slate-200/50 dark:border-white/5">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-muted text-muted-foreground border border-border">
               {activePrizes.length}/10 ô đang mở
             </span>
           </div>
@@ -59,9 +59,9 @@ export function RewardWheelPanel() {
 
         {/* ── Summary Badges ── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-          <div className="p-3 rounded-2xl bg-slate-50/80 dark:bg-white/[0.02] border border-slate-200/60 dark:border-white/5">
-            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Tổng ô giải thưởng</p>
-            <p className="text-base font-black text-slate-900 dark:text-white mt-0.5">{list.length} ô</p>
+          <div className="p-3 rounded-2xl bg-muted/60 border border-border">
+            <p className="text-[11px] font-semibold text-muted-foreground">Tổng ô giải thưởng</p>
+            <p className="text-base font-black text-foreground mt-0.5">{list.length} ô</p>
           </div>
           <div className="p-3 rounded-2xl bg-amber-500/5 border border-amber-500/10">
             <p className="text-[11px] font-semibold text-amber-700 dark:text-amber-400">Giải Coin thưởng</p>
@@ -100,7 +100,7 @@ export function RewardWheelPanel() {
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead>
-              <tr className="bg-slate-50/70 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 text-slate-500 dark:text-slate-400 text-[11px] font-bold">
+              <tr className="bg-muted/60 border-b border-border text-muted-foreground text-[11px] font-bold">
                 <th className="py-3.5 px-6">Vị trí & Tên giải</th>
                 <th className="py-3.5 px-4">Mã nhận diện</th>
                 <th className="py-3.5 px-4">Phần thưởng</th>
@@ -120,12 +120,12 @@ export function RewardWheelPanel() {
                     {/* Position & Name */}
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <span className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center tabular-nums font-bold text-[11px] text-slate-500 dark:text-slate-400 shrink-0">
+                        <span className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center tabular-nums font-bold text-[11px] text-muted-foreground shrink-0">
                           {idx + 1}
                         </span>
                         <div>
-                          <p className="font-bold text-slate-900 dark:text-white text-xs">{prize.name}</p>
-                          <p className="text-[11px] text-slate-400 mt-0.5">
+                          <p className="font-bold text-foreground text-xs">{prize.name}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
                             {isVip ? 'Ô giải đặc biệt' : 'Ô thưởng thông thường'}
                           </p>
                         </div>
@@ -133,7 +133,7 @@ export function RewardWheelPanel() {
                     </td>
 
                     {/* Code */}
-                    <td className="py-4 px-4 tabular-nums text-slate-500 dark:text-slate-400 text-[11px]">
+                    <td className="py-4 px-4 tabular-nums text-muted-foreground text-[11px]">
                       {prize.code}
                     </td>
 
@@ -151,7 +151,7 @@ export function RewardWheelPanel() {
                     </td>
 
                     {/* Weight */}
-                    <td className="py-4 px-4 text-center tabular-nums font-bold text-slate-700 dark:text-slate-300">
+                    <td className="py-4 px-4 text-center tabular-nums font-bold text-secondary-foreground">
                       {prize.weight ?? 0}
                     </td>
 
@@ -159,11 +159,11 @@ export function RewardWheelPanel() {
                     <td className="py-4 px-6">
                       <div className="space-y-1.5 max-w-[140px]">
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className={`tabular-nums font-bold ${isVip ? 'text-purple-600 dark:text-purple-400' : 'text-slate-700 dark:text-slate-300'}`}>
+                          <span className={`tabular-nums font-bold ${isVip ? 'text-purple-600 dark:text-purple-400' : 'text-secondary-foreground'}`}>
                             {chance.toFixed(1)}%
                           </span>
                         </div>
-                        <div className="h-1.5 w-full bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-all duration-300 ${
                               isVip ? 'bg-purple-500' : 'bg-gradient-to-r from-amber-500 to-amber-400'
@@ -181,7 +181,7 @@ export function RewardWheelPanel() {
                           Đang dùng
                         </span>
                       ) : (
-                        <span className="text-[11px] font-semibold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded-full">
+                        <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
                           Tắt
                         </span>
                       )}
@@ -194,9 +194,9 @@ export function RewardWheelPanel() {
                         variant="ghost"
                         aria-label={`Sửa ${prize.name}`}
                         onClick={() => setEditing(prize)}
-                        className="rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 p-2"
+                        className="rounded-xl hover:bg-muted p-2"
                       >
-                        <Pencil className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />
+                        <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
                       </Button>
                     </td>
                   </tr>
@@ -272,7 +272,7 @@ function PrizeModal({ prize, onClose, onDone }: { prize: RewardPrize; onClose: (
           </div>
         )}
 
-        <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-white/5">
+        <div className="flex justify-end gap-2.5 pt-3 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 text-xs font-semibold">
             Huỷ
           </Button>

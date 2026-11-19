@@ -59,18 +59,18 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
       title="Ký duyệt hợp đồng Studio"
       subtitle={`Vòng ${c.round} · Studio ký lúc ${formatDateTime(c.studioSignedAt)}`}
     >
-      <div className="rounded-2xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/70 dark:bg-white/[0.03] p-4 text-xs space-y-3">
-        <p className="font-bold text-slate-900 dark:text-white text-sm">{project.title}</p>
-        <p className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-          Studio: <strong className="text-slate-900 dark:text-white">{c.studio.name}</strong>
+      <div className="rounded-2xl border border-border bg-muted/60 p-4 text-xs space-y-3">
+        <p className="font-bold text-foreground text-sm">{project.title}</p>
+        <p className="flex items-center gap-1.5 text-muted-foreground">
+          Studio: <strong className="text-foreground">{c.studio.name}</strong>
         </p>
-        <p className="text-slate-600 dark:text-slate-300">
+        <p className="text-muted-foreground">
           Giá Studio đề xuất: <strong className="text-emerald-600 dark:text-emerald-400 font-mono text-sm">{formatVnd(c.costVnd)}</strong>
-          <span className="text-slate-500 dark:text-slate-400"> · ngân sách còn lại {remainingVnd !== null ? formatVnd(remainingVnd) : readError ? 'không đọc được' : 'đang tải…'}</span>
+          <span className="text-muted-foreground"> · ngân sách còn lại {remainingVnd !== null ? formatVnd(remainingVnd) : readError ? 'không đọc được' : 'đang tải…'}</span>
         </p>
-        <div className="pt-2.5 border-t border-slate-200/80 dark:border-white/[0.06]">
-          <h4 className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Điều khoản</h4>
-          <p className="text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed">{c.terms}</p>
+        <div className="pt-2.5 border-t border-border">
+          <h4 className="font-semibold text-foreground mb-1">Điều khoản</h4>
+          <p className="text-muted-foreground whitespace-pre-line leading-relaxed">{c.terms}</p>
         </div>
       </div>
 
@@ -102,14 +102,14 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
         />
       </div>
 
-      <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-white/[0.06]">
+      <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-border">
         <Button type="button" variant="secondary" onClick={onClose} className="rounded-full">
           Đóng
         </Button>
         <Button type="button" variant="secondary" disabled={busy || !offerValid || !fileOk} onClick={propose} className="rounded-full">
           Gửi giá đề xuất
         </Button>
-        <Button type="button" disabled={busy || c.costVnd === null || !fileOk} onClick={sign} className="rounded-full bg-[#121212] text-white hover:bg-black dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
+        <Button type="button" disabled={busy || c.costVnd === null || !fileOk} onClick={sign} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
           Đồng ý &amp; ký
         </Button>
       </div>
