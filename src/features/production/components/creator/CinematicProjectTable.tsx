@@ -10,7 +10,7 @@ export function CinematicProjectTable({ projects, getHref }: { projects: ScriptP
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse text-xs">
           <thead>
-            <tr className="border-b border-border bg-muted/60 text-muted-foreground font-semibold text-[11px]">
+            <tr className="border-b border-border bg-muted/60 text-muted-foreground font-semibold uppercase tracking-wider text-[11px]">
               <th className="py-4 px-5">Dự Án</th>
               <th className="py-4 px-4">Thể Loại & Quy Mô</th>
               <th className="py-4 px-4">Kịch Bản</th>
@@ -27,11 +27,11 @@ export function CinematicProjectTable({ projects, getHref }: { projects: ScriptP
                 </td>
                 <td className="py-3.5 px-4 text-muted-foreground">
                   {p.genreTags.slice(0, 2).join(' / ')}
-                  <span className="block text-[11px] text-muted-foreground tabular-nums">{p.totalEpisodes} tập</span>
+                  <span className="block text-[11px] text-muted-foreground font-mono">{p.totalEpisodes} tập</span>
                 </td>
                 <td className="py-3.5 px-4">
                   <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-bold border ${STAGE_BADGE[p.stage]}`}>{p.stageLabel}</span>
-                  <span className="block mt-1 text-[11px] text-muted-foreground tabular-nums">{p.currentVersion > 0 ? `Bản ${p.currentVersion}` : 'Chưa có bản nào'}</span>
+                  <span className="block mt-1 text-[11px] text-muted-foreground font-mono">{p.currentVersion > 0 ? `Bản ${p.currentVersion}` : 'Chưa có bản nào'}</span>
                 </td>
                 <td className="py-3.5 px-4">
                   <span className="flex items-center gap-1.5 text-slate-800 dark:text-slate-300 font-semibold">

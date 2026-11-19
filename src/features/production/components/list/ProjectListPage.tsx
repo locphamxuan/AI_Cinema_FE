@@ -65,7 +65,7 @@ export function ProjectListPage() {
       <div className="bg-card">
         <div className="px-6 lg:px-8 pt-6 pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
-            <h1 className="text-4xl font-bold text-foreground tracking-wide leading-none">
+            <h1 className="font-heading text-2xl font-bold text-foreground tracking-tight">
               Dự án phim
               {totalCount > 0 && <span className="ml-3 text-base font-medium text-muted-foreground tabular-nums">{totalCount}</span>}
             </h1>

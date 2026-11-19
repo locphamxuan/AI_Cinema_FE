@@ -30,12 +30,12 @@ export function ReviewerQueueCard({ item }: { item: QueueItem }) {
         <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-card backdrop-blur-md text-foreground">
           <span className="truncate max-w-[130px]">{item.studioName}</span>
         </span>
-        <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] tabular-nums font-bold bg-black/75 backdrop-blur-md text-white border border-white/15">{episodeText(item)}</span>
+        <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-mono font-bold bg-black/75 backdrop-blur-md text-white border border-white/15">{episodeText(item)}</span>
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] text-white">
           <span className="font-semibold text-white/90 flex items-center gap-1">
             {formatDateTime(item.updatedAt)}
           </span>
-          <span className="font-bold text-amber-300 text-[10px] truncate max-w-[50%]">{item.genre}</span>
+          <span className="font-bold uppercase tracking-wider text-amber-300 text-[10px] truncate max-w-[50%]">{item.genre}</span>
         </div>
       </div>
 

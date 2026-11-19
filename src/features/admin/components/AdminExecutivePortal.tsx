@@ -1,7 +1,5 @@
 'use client';
 
-import { Clapperboard } from 'lucide-react';
-import { MarqueeHero, MarqueeFigure } from '@/components/data/MarqueeHero';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ErrorNote, Loading } from '@/components/data/ui';
@@ -45,30 +43,22 @@ export function AdminExecutivePortal() {
           <AdminOverviewDashboard />
         ) : (
           <>
-            <MarqueeHero
-              title={`Chào ${user?.name ?? 'Quản trị viên'}`}
-              subtitle={
-                pipeline.data
-                  ? `${pipeline.data.finalScripts.length} kịch bản chờ bạn duyệt Final, ${pipeline.data.contractsToSign.length} hợp đồng chờ ký, ${pipeline.data.readyFilms.length} phim chờ phát hành.`
-                  : 'Đang tải việc của hôm nay…'
-              }
-              action={
-                can(PERMISSION.PROJECT_CREATE) && (
-                  <button type="button" onClick={() => setCreating(true)} className="inline-flex h-11 items-center gap-2 rounded-full bg-highlight px-6 text-sm font-semibold text-highlight-foreground shadow-lg shadow-black/30 transition-transform hover:-translate-y-0.5 cursor-pointer">
-                    <Clapperboard className="size-4" aria-hidden="true" />
-                    Tạo dự án mới
-                  </button>
-                )
-              }
-            >
-              {pipeline.data && (
-                <>
-                  <MarqueeFigure value={pipeline.data.totalProjects} label="Dự án trên nền tảng" />
-                  <MarqueeFigure value={pipeline.data.producingProjects} label="Đang sản xuất" />
-                  <MarqueeFigure value={pipeline.data.completedProjects} label="Đã hoàn tất" />
-                </>
+            <section aria-label="Hồ sơ quản trị viên" className="rounded-3xl bg-card border border-border p-6 sm:p-7 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center font-bold text-xl text-primary-foreground shrink-0 shadow-xs">
+                  {user?.name.charAt(0).toUpperCase() ?? 'A'}
+                </div>
+                <div className="space-y-0.5">
+                  <h1 className="text-2xl font-extrabold text-foreground tracking-tight">{user?.name ?? 'Quản trị viên'}</h1>
+                  <p className="text-xs sm:text-sm text-muted-foreground font-medium">{user?.email}</p>
+                </div>
+              </div>
+              {can(PERMISSION.PROJECT_CREATE) && (
+                <button type="button" onClick={() => setCreating(true)} className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-semibold shadow-xs cursor-pointer transition-all">
+                  Khởi Tạo Dự Án Mới
+                </button>
               )}
-            </MarqueeHero>
+            </section>
 
             {pipeline.error && <ErrorNote message={pipeline.error} onRetry={pipeline.reload} />}
             {pipeline.loading && !pipeline.data && <Loading />}

@@ -78,7 +78,7 @@ export function ReviewerAuditWorkspace() {
       {target && <AuditDesk key={target.episodeId} projectId={target.projectId} episodeId={target.episodeId} queue={queue} />}
       {pipelines.data && !target && (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 p-10 text-center">
-          <h1 className="text-2xl font-bold text-foreground leading-none">Chưa có bản phim nào chờ thẩm định</h1>
+          <h1 className="text-lg font-bold text-foreground">Chưa có bản phim nào chờ thẩm định</h1>
           <Link href="/reviewer/projects" className="px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold transition-all">
             Xem hàng đợi dự án
           </Link>

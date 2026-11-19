@@ -40,7 +40,7 @@ export function AdsPanel() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-wide leading-none">Quảng cáo</h1>
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Quảng cáo</h1>
         <p className="text-xs text-muted-foreground mt-0.5">
           Quảng cáo chèn giữa tập cho gói có quảng cáo. Vị trí chèn từng tập đặt ở <b>Quản lý phim</b> → mở phim → &quot;Đặt vị trí&quot;.
         </p>

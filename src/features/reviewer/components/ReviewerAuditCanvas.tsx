@@ -42,7 +42,7 @@ export function ReviewerAuditCanvas({
           <Link href={`/reviewer/projects/${project.id}`} className="text-xs text-muted-foreground hover:text-foreground">
             {project.title}
           </Link>
-          <h1 className="text-3xl font-bold text-foreground tracking-wide flex flex-wrap items-center gap-2 leading-none">
+          <h1 className="text-xl font-extrabold text-foreground tracking-tight flex flex-wrap items-center gap-2">
             Tập {episode.episodeNumber}: {episode.title} <StatusPill {...EPISODE_STATUS[episode.status]} />
           </h1>
         </div>

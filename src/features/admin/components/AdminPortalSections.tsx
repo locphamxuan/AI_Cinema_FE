@@ -2,8 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FileSignature, Film, ScrollText } from 'lucide-react';
-import { StatCard } from '@/components/data/StatCard';
 import { useAction } from '@/hooks/useAction';
 import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { formatVnd } from '@/lib/format';
@@ -12,13 +10,30 @@ import type { AdminPipeline, ContractToSign, ReadyFilm } from '../adminPipeline'
 
 const CARD = 'rounded-3xl bg-card border border-border p-6 sm:p-7 shadow-xs';
 
+function Dot({ tone, value, label }: { tone: string; value: number; label: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${tone}`} />
+      <span>
+        <strong>{value}</strong> {label}
+      </span>
+    </div>
+  );
+}
+
 export function PortalMetrics({ data }: { data: AdminPipeline }) {
   return (
-    <section aria-label="Thống kê dự án và hợp đồng" className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Kịch bản chờ duyệt Final" value={data.finalScripts.length} icon={ScrollText} accent={1} note="Duyệt xong là hợp đồng tự gửi Studio" />
-        <StatCard label="Hợp đồng chờ Admin ký" value={data.contractsToSign.length} icon={FileSignature} accent={0} note="Studio đã ký trước" />
-        <StatCard label="Phim Final chờ phát hành" value={data.readyFilms.length} icon={Film} accent={2} note="Đã gắn nhãn AI và qua kiểm tra pháp lý" />
+    <section aria-label="Thống kê dự án và hợp đồng" className={`${CARD} space-y-5`}>
+      <h2 className="text-xl font-extrabold text-foreground tracking-tight">Dự Án & Hợp Đồng Đang Chạy</h2>
+      <div className="flex items-baseline gap-2">
+        <span className="text-4xl sm:text-5xl font-black text-foreground tracking-tight">{data.totalProjects}</span>
+        <span className="text-base font-bold text-muted-foreground">Dự án phim trong hệ thống</span>
+      </div>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-1 text-xs font-semibold text-secondary-foreground">
+        <Dot tone="bg-emerald-500" value={data.completedProjects} label="Dự án đã hoàn tất" />
+        <Dot tone="bg-purple-500" value={data.producingProjects} label="Dự án đã ký hợp đồng, đang sản xuất" />
+        <Dot tone="bg-amber-500" value={data.finalScripts.length} label="Kịch bản chờ Admin duyệt Final" />
+        <Dot tone="bg-primary" value={data.readyFilms.length} label="Phim Final chờ Publish" />
       </div>
       {data.finalScripts.length > 0 && (
         <ul aria-label="Kịch bản chờ duyệt Final" className="flex flex-wrap gap-2 pt-1 text-xs">
@@ -41,7 +56,7 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
     <section aria-label="Ký duyệt hợp đồng Studio" className={`${CARD} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
       <div className="flex items-start gap-4">
         <div className="space-y-1">
-          <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
             Ký Duyệt Hợp Đồng Studio {items.length > 1 && `(${items.length} hợp đồng chờ)`}
           </span>
           {first ? (
@@ -50,7 +65,7 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
                 Dự án: {first.project.title} • Đối tác: <span className="text-indigo-600 dark:text-indigo-300">{first.contract.studio.name}</span>
               </h3>
               <p className="text-xs text-muted-foreground">
-                Studio đề xuất <strong className="text-emerald-600 dark:text-emerald-400 tabular-nums">{formatVnd(first.contract.costVnd)}</strong> và đã ký; chờ Admin ký hoặc đề xuất giá khác.
+                Studio đề xuất <strong className="text-emerald-600 dark:text-emerald-400 font-mono">{formatVnd(first.contract.costVnd)}</strong> và đã ký; chờ Admin ký hoặc đề xuất giá khác.
               </p>
             </>
           ) : (
@@ -88,7 +103,7 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
           )}
         </div>
         <div className="space-y-1 min-w-0">
-          <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">{project.genres.map((g) => g.name).join(' / ')}</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">{project.genres.map((g) => g.name).join(' / ')}</span>
           <h4 className="text-sm sm:text-base font-bold text-foreground truncate">
             {project.title} - Tập {episode.episodeNumber}: {episode.title}
           </h4>
@@ -130,11 +145,11 @@ export function PortalReadyFilms({ films, onPublished }: { films: ReadyFilm[]; o
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-extrabold text-foreground tracking-tight flex items-center gap-2">
-            Phim Final chờ phát hành
+            Phim Final — Sẵn Sàng Phát Hành
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">Reviewer đã duyệt, gắn nhãn AI, đạt tuân thủ, đặt giá Coin và xác nhận Phim Final.</p>
         </div>
-        <span className="text-xs tabular-nums font-bold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
+        <span className="text-xs font-mono font-bold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
           {films.length} tập chờ lên sóng
         </span>
       </div>

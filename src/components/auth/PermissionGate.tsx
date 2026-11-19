@@ -10,7 +10,7 @@ export function PermissionGate({ permission, children }: { permission: Permissio
   if (can(permission)) return <>{children}</>;
   return (
     <main className="mx-auto max-w-xl px-6 py-16 text-center">
-      <h1 className="text-3xl font-bold leading-none">Bạn không có quyền mở trang này</h1>
+      <h1 className="font-heading text-xl font-semibold">Bạn không có quyền mở trang này</h1>
       <p className="mt-2 text-sm text-muted-foreground">Liên hệ Admin nếu bạn cần được cấp quyền.</p>
     </main>
   );

@@ -38,7 +38,7 @@ export function AdminMoviesPanel() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-wide leading-none">Quản lý phim</h1>
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Quản lý phim</h1>
         <p className="text-xs text-muted-foreground mt-0.5">
           Phim đang có trên nền tảng theo từng thể loại: số tim, lượt xem, lượt mua và Coin Member đã trả, chi tiết tới từng tập.
         </p>

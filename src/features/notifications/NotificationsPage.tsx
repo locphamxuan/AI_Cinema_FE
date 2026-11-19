@@ -102,7 +102,7 @@ export function NotificationsPage() {
                 <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
               )}
             </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-foreground tracking-wide leading-none">
+            <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
               Thông báo hệ thống
             </h1>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">

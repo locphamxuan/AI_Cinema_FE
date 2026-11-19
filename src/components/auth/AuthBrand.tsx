@@ -6,20 +6,25 @@ const ROLES: [string, string][] = [
   ['Staff', 'Hỗ trợ Member và tra cứu vận hành'],
 ];
 
-/** The brand panel beside the sign-in form: the lit marquee of the screening room, and who works behind it. */
+/** The brand panel beside the sign-in form: who this back office is for, on the primary colour. */
 export default function AuthBrand() {
   return (
-    <aside className="marquee relative order-2 hidden h-full overflow-hidden rounded-3xl lg:flex">
-      <div className="absolute top-14 space-y-4 px-10">
-        <Clapperboard className="size-10 text-highlight" aria-hidden="true" />
-        <h2 className="max-w-lg font-display text-6xl leading-[0.9] font-bold tracking-wide">Phòng điều hành của AI Cinema</h2>
-        <p className="max-w-md text-base text-white/80">Từ ý tưởng, kịch bản, hợp đồng Studio tới phát hành phim có gắn nhãn AI.</p>
+    <aside className="relative order-2 hidden h-full overflow-hidden rounded-3xl bg-primary text-primary-foreground lg:flex">
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[repeating-linear-gradient(135deg,currentColor_0_14px,transparent_14px_28px)] opacity-[0.06]"
+      />
+      <div className="absolute top-10 space-y-3 px-10">
+        <Clapperboard className="size-10" aria-hidden="true" />
+        <p className="text-sm font-semibold tracking-[0.2em] uppercase opacity-80">AI Cinema</p>
+        <h2 className="max-w-md font-heading text-3xl leading-tight font-semibold">Cổng Quản Trị &amp; Sản Xuất Nội Bộ</h2>
+        <p className="max-w-md text-sm opacity-80">Từ ý tưởng, kịch bản, hợp đồng Studio tới phát hành phim có gắn nhãn AI.</p>
       </div>
       <dl className="absolute bottom-10 grid w-full grid-cols-3 gap-6 px-10 text-sm">
         {ROLES.map(([role, text]) => (
-          <div key={role} className="space-y-1 border-l-2 border-highlight/70 pl-3">
-            <dt className="font-semibold text-highlight">{role}</dt>
-            <dd className="text-white/75">{text}</dd>
+          <div key={role} className="space-y-1 border-l border-primary-foreground/30 pl-3">
+            <dt className="font-semibold">{role}</dt>
+            <dd className="opacity-80">{text}</dd>
           </div>
         ))}
       </dl>

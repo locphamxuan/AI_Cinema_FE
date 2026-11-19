@@ -86,7 +86,7 @@ describe('AuthForm sign-in', () => {
   it('displays back-office internal branding instead of viewer platform copy', () => {
     render(<AuthBrand />);
 
-    expect(screen.getByText('Phòng điều hành của AI Cinema')).toBeInTheDocument();
+    expect(screen.getByText('Cổng Quản Trị & Sản Xuất Nội Bộ')).toBeInTheDocument();
     expect(screen.queryByText(/Nền tảng xem phim/)).not.toBeInTheDocument();
   });
 });

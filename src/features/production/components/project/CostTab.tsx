@@ -85,7 +85,7 @@ function LedgerTable({ ledger }: { ledger: CostLedger }) {
         {ledger.entries.map((e) => (
           <tr key={e.id}>
             <td className="py-2 text-secondary-foreground">{COST_ENTRY[e.entryType]}</td>
-            <td className={`py-2 text-right tabular-nums ${Number(e.amountVnd) < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
+            <td className={`py-2 text-right font-mono ${Number(e.amountVnd) < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
               {Number(e.amountVnd) > 0 ? '+' : ''}
               {formatVnd(e.amountVnd)}
             </td>
