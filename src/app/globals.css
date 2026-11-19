@@ -618,3 +618,10 @@ select:not(.sr-only) option {
     padding-left: 0;
   }
 }
+
+/* The menu entry of the page you are on: tinted with the brand colour, with a bar on its left edge. */
+[data-sidebar='menu-button'][data-active='true'] {
+  background: color-mix(in oklab, var(--primary) 12%, transparent);
+  color: var(--primary);
+  box-shadow: inset 3px 0 0 var(--primary);
+}
