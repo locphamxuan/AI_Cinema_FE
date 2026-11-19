@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { authService } from '@/services/authService';
 import { AREAS, ROLE_LABEL, canEnter, homeAreaOf, type Area } from '@/lib/permissions';
+import { loginUrlFor } from '@/lib/safeNext';
 
 export interface AreaGuardProps {
   /** Internal area this route subtree belongs to. */
@@ -29,15 +30,15 @@ export function AreaGuard({ area, children }: AreaGuardProps) {
   const account = user ?? authService.getStoredUser();
   const signedOut = mounted && !account;
 
-  // Without a session the internal areas have one way in: the sign-in screen.
+  // Without a session the internal areas have one way in: the sign-in screen, which brings the browser back here.
   useEffect(() => {
-    if (signedOut) router.replace('/login');
+    if (signedOut) router.replace(loginUrlFor(`${window.location.pathname}${window.location.search}`));
   }, [signedOut, router]);
 
   if (!mounted || signedOut) {
     return (
       <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center p-6">
-        <div className="w-8 h-8 rounded-full border-2 border-purple-600 border-t-transparent animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
       </div>
     );
   }
@@ -68,7 +69,7 @@ export function AreaGuard({ area, children }: AreaGuardProps) {
             <button
               type="button"
               onClick={() => router.push(AREAS[home].path)}
-              className="w-full py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold transition flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold transition flex items-center justify-center gap-2 cursor-pointer"
             >
               Đến trang {AREAS[home].label}
             </button>
