@@ -5,52 +5,52 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * AI Cinema design tokens: "night screening room".
- * Paper/Ink by day, Night/Velvet after dark; Reel violet acts (AI, links, primary buttons),
- * Projector amber is the lamp: Coin, the hero call to action, warnings.
+ * AI Cinema design tokens: the original monochrome dashboard.
+ * Ink black (#121212) acts by day and turns white after dark; slate greys carry the text.
+ * Colour is kept for meaning only: the chart palette, the icon tiles of the figures, and status.
  */
 :root {
-  --background: #F7F6FB;
-  --foreground: #1C1830;
+  --background: #F9FAFB;
+  --foreground: #0F172A;
   --card: #FFFFFF;
-  --card-foreground: #1C1830;
+  --card-foreground: #0F172A;
   --popover: #FFFFFF;
-  --popover-foreground: #1C1830;
-  --primary: #6646F0;
+  --popover-foreground: #0F172A;
+  --primary: #121212;
   --primary-foreground: #FFFFFF;
-  --secondary: #EFEDF5;
-  --secondary-foreground: #2E2840;
-  --muted: #EFEDF5;
-  --muted-foreground: #5D5672;
-  --accent: #EAE4FF;
-  --accent-foreground: #382383;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #1E293B;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --accent: #F1F5F9;
+  --accent-foreground: #0F172A;
   --highlight: #F5B83D;
   --highlight-foreground: #1C1830;
   --destructive: #D93A43;
   --success: #1F9D66;
   --warning: #C98A12;
-  --border: #E0DCEA;
-  --input: #D6D1E3;
-  --ring: #7B61FF;
+  --border: #E2E8F0;
+  --input: #CBD5E1;
+  --ring: #0F172A;
   --chart-1: #6646F0;
-  --chart-2: #EBA21A;
-  --chart-3: #1FA394;
-  --chart-4: #E0587A;
-  --chart-5: #9A82FF;
+  --chart-2: #F59E0B;
+  --chart-3: #10B981;
+  --chart-4: #F43F5E;
+  --chart-5: #0EA5E9;
   --radius: 0.75rem;
   --sidebar: #FFFFFF;
-  --sidebar-foreground: #2E2840;
-  --sidebar-primary: #6646F0;
+  --sidebar-foreground: #1E293B;
+  --sidebar-primary: #121212;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F4F1FF;
-  --sidebar-accent-foreground: #382383;
-  --sidebar-border: #E0DCEA;
-  --sidebar-ring: #7B61FF;
+  --sidebar-accent: #F1F5F9;
+  --sidebar-accent-foreground: #0F172A;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #0F172A;
 
   /* Names the screens written before the redesign still use; they follow the tokens above. */
   --action: var(--primary);
-  --action-strong: #5535CF;
-  --card-hover: #F7F6FB;
+  --action-strong: #000000;
+  --card-hover: #F8FAFC;
   --border-color: var(--border);
   --border-strong-color: #C7C1D6;
   --muted-color: var(--muted-foreground);
@@ -58,44 +58,44 @@
 }
 
 .dark {
-  --background: #15121F;
-  --foreground: #F2F0F8;
-  --card: #1E1A2C;
-  --card-foreground: #F2F0F8;
-  --popover: #231D33;
-  --popover-foreground: #F2F0F8;
-  --primary: #8B74FF;
-  --primary-foreground: #15121F;
-  --secondary: #2A2440;
-  --secondary-foreground: #F2F0F8;
-  --muted: #2A2440;
-  --muted-foreground: #A199B5;
-  --accent: #2F2752;
-  --accent-foreground: #D6CBFF;
+  --background: #090B10;
+  --foreground: #F1F5F9;
+  --card: #111420;
+  --card-foreground: #F1F5F9;
+  --popover: #141724;
+  --popover-foreground: #F1F5F9;
+  --primary: #FFFFFF;
+  --primary-foreground: #0F172A;
+  --secondary: #1A1D2B;
+  --secondary-foreground: #F1F5F9;
+  --muted: #1A1D2B;
+  --muted-foreground: #94A3B8;
+  --accent: #1A1D2B;
+  --accent-foreground: #F1F5F9;
   --highlight: #F5B83D;
   --highlight-foreground: #15121F;
   --destructive: #F06A70;
   --success: #3CC48A;
   --warning: #F5B83D;
-  --border: rgb(255 255 255 / 0.09);
+  --border: rgb(255 255 255 / 0.08);
   --input: rgb(255 255 255 / 0.14);
-  --ring: #9A82FF;
+  --ring: #E2E8F0;
   --chart-1: #8B74FF;
-  --chart-2: #F5B83D;
-  --chart-3: #36C2B1;
-  --chart-4: #F07A97;
-  --chart-5: #C3B4FF;
-  --sidebar: #1A1626;
-  --sidebar-foreground: #E0DCEA;
-  --sidebar-primary: #8B74FF;
-  --sidebar-primary-foreground: #15121F;
-  --sidebar-accent: #2A2440;
-  --sidebar-accent-foreground: #F2F0F8;
+  --chart-2: #FBBF24;
+  --chart-3: #34D399;
+  --chart-4: #FB7185;
+  --chart-5: #38BDF8;
+  --sidebar: #0D1017;
+  --sidebar-foreground: #E2E8F0;
+  --sidebar-primary: #FFFFFF;
+  --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: #1A1D2B;
+  --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: rgb(255 255 255 / 0.08);
-  --sidebar-ring: #9A82FF;
+  --sidebar-ring: #E2E8F0;
 
-  --action-strong: #9A82FF;
-  --card-hover: #262036;
+  --action-strong: #E2E8F0;
+  --card-hover: #141724;
   --border-strong-color: rgb(255 255 255 / 0.18);
   --muted-light-color: #C7C1D6;
 }
@@ -619,9 +619,19 @@ select:not(.sr-only) option {
   }
 }
 
-/* The menu entry of the page you are on: tinted with the brand colour, with a bar on its left edge. */
+/* The menu entry of the page you are on: a solid black pill (white after dark), as the original dashboard. */
 [data-sidebar='menu-button'][data-active='true'] {
-  background: color-mix(in oklab, var(--primary) 12%, transparent);
-  color: var(--primary);
-  box-shadow: inset 3px 0 0 var(--primary);
+  background: var(--sidebar-primary);
+  color: var(--sidebar-primary-foreground);
+  font-weight: 600;
+}
+
+/* The greeting of a dashboard: a black panel in both themes, with a faint grid and one soft violet light. */
+.hero-ink {
+  background:
+    radial-gradient(60% 120% at 100% 0%, rgb(102 70 240 / 0.35), transparent 60%),
+    linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px) 0 0 / 28px 28px,
+    linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px) 0 0 / 28px 28px,
+    #121212;
+  color: #fff;
 }
