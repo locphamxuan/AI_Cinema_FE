@@ -1,39 +1,33 @@
 import { Suspense } from 'react';
 import { Film } from 'lucide-react';
 import AuthForm from '@/components/auth/AuthForm';
-import AuthBrand from '@/components/auth/AuthBrand';
+import { PosterWall } from '@/components/auth/PosterWall';
 import ThemeToggle from '@/components/theme/ThemeToggle';
 
 /**
- * Sign-in for the internal back office (Reviewer, Creator, Staff, Admin), after the two-column login of
- * arhamkhnz/next-shadcn-admin-dashboard: the form on the left, the brand panel on the right from lg up.
+ * Sign-in for the internal back office (Reviewer, Creator, Staff, Admin): one card in the middle of a wall of
+ * the AI films the platform publishes.
  */
 export default function LoginPage() {
   return (
-    <main className="grid min-h-dvh bg-background p-2 text-foreground lg:grid-cols-2">
-      <AuthBrand />
-      <div className="relative order-1 flex min-h-[calc(100dvh-1rem)] items-center justify-center px-4 py-10">
-        <div className="absolute top-5 left-5 flex items-center gap-2.5">
-          <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Film className="size-4" aria-hidden="true" />
+    <main className="relative flex min-h-dvh items-center justify-center px-4 py-10 text-foreground">
+      <PosterWall />
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
+      <div className="relative z-10 w-full max-w-sm space-y-6 rounded-2xl border border-border bg-card/95 p-8 shadow-2xl shadow-black/50 backdrop-blur-md">
+        <div className="space-y-4 text-center">
+          <span className="mx-auto flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+            <Film className="size-5" aria-hidden="true" />
           </span>
-          <span className="leading-tight">
-            <span className="block font-heading text-sm font-bold">AI Cinema</span>
-            <span className="block text-xs text-muted-foreground">Quản trị nội bộ</span>
-          </span>
-        </div>
-        <div className="absolute top-4 right-4">
-          <ThemeToggle />
-        </div>
-        <div className="w-full max-w-sm space-y-8">
-          <div className="space-y-2 text-center">
-            <h1 className="font-heading text-3xl font-semibold tracking-tight">Đăng nhập</h1>
-            <p className="text-sm text-muted-foreground">Tài khoản nội bộ do Admin cấp.</p>
+          <div className="space-y-1">
+            <h1 className="font-heading text-2xl font-semibold tracking-tight">Đăng nhập AI Cinema</h1>
+            <p className="text-sm text-muted-foreground">Cổng quản trị và sản xuất nội bộ. Tài khoản do Admin cấp.</p>
           </div>
-          <Suspense>
-            <AuthForm />
-          </Suspense>
         </div>
+        <Suspense>
+          <AuthForm />
+        </Suspense>
       </div>
     </main>
   );

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AuthForm from '@/components/auth/AuthForm';
-import AuthBrand from '@/components/auth/AuthBrand';
+import LoginPage from '@/app/login/page';
 import { useToastStore } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -83,10 +83,12 @@ describe('AuthForm sign-in', () => {
     expect(screen.getByRole('link', { name: /Mở cổng đăng nhập Studio Web/ })).toBeInTheDocument();
   });
 
-  it('displays back-office internal branding instead of viewer platform copy', () => {
-    render(<AuthBrand />);
+  it('displays back-office internal branding instead of viewer platform copy, over a decorative poster wall', () => {
+    const { container } = render(<LoginPage />);
 
-    expect(screen.getByText('Cổng quản trị & sản xuất nội bộ')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Đăng nhập AI Cinema' })).toBeInTheDocument();
+    expect(screen.getByText(/Cổng quản trị và sản xuất nội bộ/)).toBeInTheDocument();
+    expect(container.querySelector('[aria-hidden="true"] img')).not.toBeNull();
     expect(screen.queryByText(/Nền tảng xem phim/)).not.toBeInTheDocument();
   });
 });
