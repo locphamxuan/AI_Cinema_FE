@@ -34,7 +34,7 @@ const PRODUCTION_FIELDS: SettingField[] = [
 ];
 
 const STREAMING_FIELDS: SettingField[] = [
-  { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Các tập đầu Guest và Member Free xem được.', min: 0 },
+  { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Số tập đầu Guest và Member gói Thường xem miễn phí.', min: 0 },
   { key: 'playbackHeartbeatTimeoutSeconds', label: 'Hết phiên phát', unit: 'giây', hint: 'Trình phát không báo tín hiệu quá số giây này thì phiên xem bị đóng.', min: 10 },
   { key: 'subscriptionCancelWindowHours', label: 'Hạn tắt gia hạn', unit: 'giờ', hint: 'Member tắt tự gia hạn trước ngày gia hạn ít nhất ngần này giờ.', min: 0 },
   { key: 'planRenewalGraceHours', label: 'Thời gian chờ gia hạn lỗi', unit: 'giờ', hint: 'Gia hạn thiếu Coin được thử lại trong ngần này giờ, không có quyền xem; 0 = gói hết hạn ngay.', min: 0 },
@@ -48,7 +48,7 @@ const TABS: { key: SettingsTab; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'coin', label: 'Coin & nạp tiền' },
   { key: 'production', label: 'Giá tập' },
-  { key: 'streaming', label: 'Phát sóng & Gói' },
+  { key: 'streaming', label: 'Trình phát & gói' },
   { key: 'rewards', label: 'Điểm danh & Vòng quay' },
   { key: 'contract', label: 'Hợp đồng (Bên A)' },
 ];
@@ -195,7 +195,7 @@ export function PlatformSettingsPanel() {
 
             <div>
               <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
-                Phân khúc Phát sóng & Gia hạn gói
+                Trình phát & gia hạn gói
               </h3>
               {renderFieldGroup(STREAMING_FIELDS)}
             </div>
@@ -231,9 +231,9 @@ export function PlatformSettingsPanel() {
           <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 space-y-4">
             <div className="flex items-center gap-3">
               <div>
-                <h3 className="text-sm font-bold text-foreground">Quy tắc thưởng & Vòng quay may mắn</h3>
+                <h3 className="text-sm font-bold text-foreground">Quy tắc thưởng & vòng quay</h3>
                 <p className="text-xs text-muted-foreground">
-                  Cấu hình phần thưởng đăng nhập chuỗi 7 ngày và danh mục giải thưởng vòng quay Coin.
+                  Cấu hình phần thưởng theo chuỗi ngày điểm danh và giải thưởng của vòng quay.
                 </p>
               </div>
             </div>
@@ -245,7 +245,7 @@ export function PlatformSettingsPanel() {
                 href="/admin/rewards"
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors shadow-md shadow-amber-500/20"
               >
-                <span>Mở trang Quản lý Điểm danh & Vòng quay</span>
+                <span>Mở trang Điểm danh & vòng quay</span>
               </Link>
             </div>
           </div>
@@ -266,7 +266,7 @@ export function PlatformSettingsPanel() {
               }}
               className="px-4 py-2 text-xs font-semibold rounded-xl"
             >
-              Hủy thay đổi
+              Huỷ thay đổi
             </Button>
           )}
           <Button

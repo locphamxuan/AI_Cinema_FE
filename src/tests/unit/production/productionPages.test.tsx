@@ -232,7 +232,7 @@ describe('ProjectDetailPage', () => {
     expect(season).toHaveTextContent('01/01/2027 → 31/03/2027');
     expect(season).not.toHaveTextContent('Token');
     expect(within(season).getByRole('columnheader', { name: 'Creator phụ trách' })).toBeInTheDocument();
-    expect(within(season).getByRole('columnheader', { name: 'Giá bán (Coin)' })).toBeInTheDocument();
+    expect(within(season).getByRole('columnheader', { name: 'Giá Coin' })).toBeInTheDocument();
     expect(within(season).getByRole('columnheader', { name: 'Ngày dự kiến phát hành' })).toBeInTheDocument();
     expect(within(season).queryByRole('columnheader', { name: 'Thời hạn' })).not.toBeInTheDocument();
     expect(within(season).getByText('15/01/2027')).toBeInTheDocument();

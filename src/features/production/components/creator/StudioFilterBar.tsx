@@ -17,7 +17,7 @@ const FILTER_OPTIONS: { key: ScriptFilterKey; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'draft', label: 'Chưa nộp' },
   { key: 'review', label: 'Reviewer & cần sửa' },
-  { key: 'admin_approval', label: 'Chờ Admin chốt' },
+  { key: 'admin_approval', label: 'Chờ Admin duyệt Final' },
   { key: 'handed_off', label: 'Kịch bản Final' },
 ];
 
@@ -35,7 +35,7 @@ export function StudioFilterBar({
       {/* Filter Tabs - Rounded Pill Buy Me a Coffee style */}
       <div
         role="tablist"
-        aria-label="Lọc trạng thái kịch bản phân cảnh"
+        aria-label="Lọc theo trạng thái kịch bản"
         className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none"
       >
         {FILTER_OPTIONS.map(({ key, label }) => {
@@ -76,7 +76,7 @@ export function StudioFilterBar({
             type="search"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Tìm theo tên phim, thể loại, Studio..."
+            placeholder="Tìm theo tên phim, thể loại, Studio…"
             className="w-full pl-10 pr-4 py-2 rounded-full bg-card border border-border text-xs text-foreground placeholder-slate-400 focus:outline-none focus:border-ring transition-all shadow-xs"
           />
         </div>
@@ -90,7 +90,7 @@ export function StudioFilterBar({
           <button
             type="button"
             onClick={() => onViewModeChange('grid')}
-            title="Dạng lưới (Grid)"
+            title="Dạng lưới"
             aria-pressed={viewMode === 'grid'}
             className={`p-1.5 rounded-full transition-colors cursor-pointer ${
               viewMode === 'grid'
@@ -103,7 +103,7 @@ export function StudioFilterBar({
           <button
             type="button"
             onClick={() => onViewModeChange('table')}
-            title="Dạng bảng (Table)"
+            title="Dạng bảng"
             aria-pressed={viewMode === 'table'}
             className={`p-1.5 rounded-full transition-colors cursor-pointer ${
               viewMode === 'table'

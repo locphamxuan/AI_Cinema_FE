@@ -44,7 +44,7 @@ function getNotificationMeta(item: AppNotification): {
 
   if (type.includes('MEDIA') || type.includes('FILM') || type.includes('EPISODE') || text.includes('phim') || text.includes('tập')) {
     return {
-      badgeLabel: 'Tập phim & Media',
+      badgeLabel: 'Tập phim & video',
       badgeTone: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-500/10 dark:text-sky-300 dark:border-sky-500/20',
     };
   }

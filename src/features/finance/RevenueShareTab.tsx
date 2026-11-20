@@ -46,7 +46,7 @@ export function RevenueShareTab() {
     <div className="space-y-5">
       <Panel
         title={`Chia doanh thu gói Tháng ${periodLabel(period)}`}
-        description="Pool là Coin chính Member trả cho gói Tháng trong tháng (giờ Việt Nam), chia cho từng phim theo thời lượng xem của Member gói Tháng. Coin thưởng không tính là doanh thu."
+        description="Quỹ chia là Coin chính Member trả cho gói Tháng trong tháng (giờ Việt Nam), chia cho từng phim theo thời lượng Member gói Tháng xem phim đó. Coin thưởng không tính là doanh thu."
         actions={
           <>
             <input
@@ -80,12 +80,12 @@ export function RevenueShareTab() {
         {data && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <StatCard label="Pool gói Tháng" value={vnd(data.monthlyPoolVnd)} />
+              <StatCard label="Quỹ gói Tháng" value={vnd(data.monthlyPoolVnd)} />
               <StatCard label="Tổng giờ xem" value={watchTime(data.totalWatchSeconds)} unit="giờ:phút" />
               <StatCard label="Thời điểm chia" value={data.allocatedAt ? formatDateTime(data.allocatedAt) : 'Chưa chia'} />
             </div>
             {!data.allocatedAt && data.movies.length === 0 ? (
-              <Empty>Tháng này chưa chia (job chạy đầu tháng, hoặc không có thanh toán gói Tháng).</Empty>
+              <Empty>Tháng này chưa chia (hệ thống tự chia vào đầu tháng sau), hoặc không có ai trả gói Tháng.</Empty>
             ) : data.movies.length === 0 ? (
               <Empty>Không có phim nào được Member gói Tháng xem trong tháng này.</Empty>
             ) : (
@@ -129,7 +129,7 @@ export function RevenueShareTab() {
       <ConfirmModal
         open={confirming}
         title={`Chia lại doanh thu tháng ${periodLabel(period)}?`}
-        description="Hệ thống tính lại pool và phần chia của từng phim từ dữ liệu thật, rồi ghi đè kết quả cũ của tháng này."
+        description="Hệ thống tính lại quỹ và phần chia của từng phim từ dữ liệu thật, rồi ghi đè kết quả cũ của tháng này."
         confirmLabel="Chia lại"
         busy={busy}
         onClose={() => setConfirming(false)}

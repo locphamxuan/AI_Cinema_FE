@@ -70,7 +70,7 @@ export function KnowledgeTable({ resource, busy, filtered, onPage, onEdit, onRei
                   <div className="flex justify-end gap-1">
                     <IconAction label="Sửa" onClick={() => onEdit(a)} icon={<Pencil className="size-3.5" />} />
                     <IconAction
-                      label="Tạo lại chỉ mục"
+                      label="Lập lại chỉ mục"
                       disabled={busy || a.status !== 'PUBLISHED'}
                       onClick={() => onReindex(a)}
                       icon={<RefreshCw className="size-3.5" />}

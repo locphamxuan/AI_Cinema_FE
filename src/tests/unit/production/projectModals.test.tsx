@@ -87,10 +87,10 @@ describe('EditProjectModal', () => {
     await screen.findByRole('button', { name: 'Kinh dị' });
     expect(save()).toBeEnabled();
 
-    await userEvent.clear(screen.getByLabelText(/Ý tưởng gửi studio/));
-    await userEvent.type(screen.getByLabelText(/Ý tưởng gửi studio/), 'Quá ngắn');
+    await userEvent.clear(screen.getByLabelText(/Ý tưởng gửi Studio/));
+    await userEvent.type(screen.getByLabelText(/Ý tưởng gửi Studio/), 'Quá ngắn');
     expect(save()).toBeDisabled();
-    await userEvent.type(screen.getByLabelText(/Ý tưởng gửi studio/), ' để gửi cho studio đâu');
+    await userEvent.type(screen.getByLabelText(/Ý tưởng gửi Studio/), ' để gửi cho studio đâu');
     expect(save()).toBeEnabled();
 
     await userEvent.click(screen.getByRole('button', { name: 'Kinh dị' }));

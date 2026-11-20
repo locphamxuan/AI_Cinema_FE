@@ -27,7 +27,7 @@ export function RetrievalPreviewModal({ onClose }: { onClose: () => void }) {
     <Modal open onClose={onClose} maxWidth="max-w-2xl" title="Kiểm tra bài nào được tìm thấy" subtitle="Chỉ thử bước tìm bài, không gọi AI và không lưu gì.">
       <form onSubmit={check} className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_10rem_auto] sm:items-end">
         <FormField label="Câu hỏi">
-          <input required minLength={2} maxLength={1000} value={query} onChange={(e) => setQuery(e.target.value)} className={fieldInputClass} placeholder="Hủy gói Tháng có được hoàn tiền không?" />
+          <input required minLength={2} maxLength={1000} value={query} onChange={(e) => setQuery(e.target.value)} className={fieldInputClass} placeholder="Huỷ gói Tháng có được hoàn tiền không?" />
         </FormField>
         <FormField label="Hỏi với vai trò">
           <select value={audience} onChange={(e) => setAudience(e.target.value as SupportAudience)} className={fieldInputClass}>

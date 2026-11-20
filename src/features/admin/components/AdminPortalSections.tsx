@@ -60,7 +60,7 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
       </div>
       {first && (
         <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white dark:bg-white/[0.06] hover:bg-muted/60 text-foreground border border-input text-xs font-semibold cursor-pointer transition-all">
-          Xem báo giá &amp; Ký
+          Xem báo giá và ký
         </button>
       )}
     </section>
@@ -132,7 +132,7 @@ export function PortalReadyFilms({ films, onPublished }: { films: ReadyFilm[]; o
           <h3 className="text-lg font-extrabold text-foreground tracking-tight flex items-center gap-2">
             Phim Final chờ phát hành
           </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Reviewer đã duyệt, gắn nhãn AI, đạt tuân thủ, đặt giá Coin và xác nhận Phim Final.</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Reviewer đã duyệt, gắn nhãn AI, kiểm tra tuân thủ và xác nhận Phim Final; Admin đặt giá Coin rồi phát hành.</p>
         </div>
         <span className="text-xs tabular-nums font-bold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
           {films.length} tập chờ lên sóng

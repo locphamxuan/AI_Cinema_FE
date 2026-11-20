@@ -55,7 +55,7 @@ export function PriceAlertsPanel() {
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-border">
         <div>
           <h2 className="text-base font-bold text-foreground">Cảnh báo giá Coin</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Giá tập ngoài khoảng cho phép · Reviewer phụ trách là người đổi giá.</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Giá tập ngoài khoảng cho phép. Admin hỏi ý kiến Reviewer rồi tự đặt lại giá, hoặc chấp nhận giá.</p>
         </div>
         <div className="flex flex-wrap gap-1.5 p-1 rounded-xl bg-muted border border-border">
           {FILTERS.map((f) => (

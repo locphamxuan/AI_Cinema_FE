@@ -112,7 +112,7 @@ export function RolePermissionsPanel() {
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Nhấp trực tiếp vào ô trạng thái để bật hoặc tắt quyền hạn. Quyền có biểu tượng ổ khóa là quyền cốt lõi hệ thống được cố định.
+                Nhấp trực tiếp vào ô trạng thái để bật hoặc tắt quyền hạn. Quyền có biểu tượng ổ khoá là quyền cốt lõi hệ thống được cố định.
               </p>
             </div>
 
@@ -155,7 +155,7 @@ export function RolePermissionsPanel() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm quyền hạn theo tên, mô tả hoặc mã key..."
+                placeholder="Tìm quyền theo tên, mô tả hoặc mã quyền…"
                 className="w-full pl-10 pr-4 py-2 text-xs rounded-xl bg-muted/60 border border-border text-foreground placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/30 transition-all"
               />
               {searchQuery && (
@@ -199,7 +199,7 @@ export function RolePermissionsPanel() {
               <tbody>
                 <tr>
                   <td colSpan={BACKEND_ROLES.length + 1} className="py-12 text-center text-muted-foreground">
-                    Không tìm thấy quyền hạn nào khớp với từ khóa tìm kiếm.
+                    Không tìm thấy quyền hạn nào khớp với từ khoá tìm kiếm.
                   </td>
                 </tr>
               </tbody>

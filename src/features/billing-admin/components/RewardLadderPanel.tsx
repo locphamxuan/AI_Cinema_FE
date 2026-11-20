@@ -87,7 +87,7 @@ export function RewardLadderPanel() {
                   <div className="pt-1 border-t border-border">
                     {isDay7 ? (
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-600 dark:text-purple-300">
-                        +1 Vòng quay
+                        +1 lượt quay
                       </span>
                     ) : (
                       <span className="text-[10px] text-muted-foreground/70">
@@ -106,7 +106,7 @@ export function RewardLadderPanel() {
       {rules.error && <ErrorNote message={rules.error} onRetry={rules.reload} />}
       {rules.loading && !rules.data && <Loading />}
       {rules.data?.length === 0 && (
-        <Empty>Chưa cấu hình ngày nào - Khán giả điểm danh sẽ không nhận được Coin thưởng.</Empty>
+        <Empty>Chưa cấu hình ngày nào: Member điểm danh sẽ không nhận được Coin thưởng.</Empty>
       )}
 
       {/* ── Detailed Table ── */}
@@ -147,7 +147,7 @@ export function RewardLadderPanel() {
                     <td className="py-3 px-4 text-center whitespace-nowrap">
                       {isDay7 ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/25">
-                          <span>+1 Lượt quay</span>
+                          <span>+1 lượt quay</span>
                         </span>
                       ) : (
                         <span className="text-muted-foreground/70 tabular-nums">—</span>

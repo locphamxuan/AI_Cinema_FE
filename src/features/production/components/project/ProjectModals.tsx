@@ -53,7 +53,7 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
         <FormField label="Tên phim">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} required className={fieldInputClass} />
         </FormField>
-        <FormField label="Ý tưởng gửi studio (tối thiểu 20 ký tự)">
+        <FormField label="Ý tưởng gửi Studio (tối thiểu 20 ký tự)">
           <textarea rows={5} value={idea} onChange={(e) => setIdea(e.target.value)} minLength={20} maxLength={20000} className={fieldTextareaClass} />
         </FormField>
         <FormField label="Tóm tắt cho người xem">

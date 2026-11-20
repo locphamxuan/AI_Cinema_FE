@@ -61,7 +61,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
   return (
     <Panel
       title="Nhãn nội dung AI"
-      description={label ? `Theo chính sách: ${label.policy.name}` : 'Bước 10 - người xem thấy nhãn này trên mọi màn hình phát video.'}
+      description={label ? `Theo chính sách: ${label.policy.name}` : 'Người xem thấy nhãn này trên mọi màn hình phát video.'}
       actions={
         canAct &&
         label &&
@@ -77,7 +77,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
           <Facts
             stacked
             items={[
-              ['Creator đề xuất', LABEL_TYPE[sheet.proposedLabelType]],
+              ['Studio đề xuất', LABEL_TYPE[sheet.proposedLabelType]],
               ['Loại nhãn đã gắn', LABEL_TYPE[label.labelType]],
               ['Nội dung', label.labelText],
               ['Vị trí', label.displayLocation ? LABEL_LOCATION[label.displayLocation] : '-'],
@@ -90,7 +90,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
       {form && (
         <form onSubmit={submit} className="space-y-3">
           <p className="text-xs text-muted-foreground">
-            Creator đề xuất “{LABEL_TYPE[sheet.proposedLabelType]}”. Xác nhận hoặc chọn loại nhãn khác theo nội dung thực tế của bản dựng.
+            Studio đề xuất “{LABEL_TYPE[sheet.proposedLabelType]}”. Xác nhận hoặc chọn loại nhãn khác theo nội dung thực tế của bản dựng.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <FormField label="Loại nhãn">

@@ -61,7 +61,7 @@ export function RewardRuleModal({
               value={form.code}
               onChange={(e) => set({ code: e.target.value })}
               maxLength={50}
-              placeholder="day_1, day_2..."
+              placeholder="day_1, day_2…"
               required
               className={fieldInputClass}
             />
@@ -99,7 +99,7 @@ export function RewardRuleModal({
               step={1}
               value={form.bonusCoins}
               onChange={(e) => set({ bonusCoins: e.target.value })}
-              placeholder="Số Coin tặng..."
+              placeholder="Số Coin tặng…"
               required
               className={fieldInputClass}
             />
@@ -113,8 +113,8 @@ export function RewardRuleModal({
         <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 text-xs text-sky-800 dark:text-sky-300 flex items-start gap-2">
           <span>
             {day === LADDER_LENGTH
-              ? 'Ngày 7 là mốc chặng cuối chuỗi: hệ thống sẽ tự động tặng thêm 1 lượt quay may mắn.'
-              : 'Lượt quay chỉ được tặng khi khán giả điểm danh đủ chuỗi 7 ngày liên tục.'}
+              ? 'Ngày 7 là mốc cuối chuỗi: hệ thống tự tặng thêm 1 lượt quay.'
+              : 'Lượt quay chỉ được tặng khi Member điểm danh đủ 7 ngày liên tục.'}
           </span>
         </div>
         {rule && !rule.isActive && (
@@ -130,7 +130,7 @@ export function RewardRuleModal({
         )}
         <div className="flex justify-end gap-2.5 pt-2 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 py-2 text-xs">
-            Hủy
+            Huỷ
           </Button>
           <Button type="submit" disabled={!valid || busy} className="rounded-xl px-5 py-2 text-xs font-bold">
             {busy ? 'Đang lưu…' : 'Lưu cấu hình'}

@@ -46,7 +46,7 @@ export function RewardWheelPanel() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-              Cơ cấu chuẩn gồm 10 ô: 9 giải Coin và 1 giải Gói VIP Tháng 30 ngày (tỉ lệ trúng 2.0%). Nếu thành viên trúng giải gói VIP mà chưa kích hoạt gói, hệ thống sẽ tự động kích hoạt gói VIP không tự gia hạn.
+              Cơ cấu chuẩn gồm 10 ô: 9 giải Coin và 1 giải 30 ngày gói Tháng (tỉ lệ trúng 2%). Member trúng giải mà đang có gói Tháng thì được cộng thêm 30 ngày; chưa có gói thì được kích hoạt gói Tháng 30 ngày, không tự gia hạn.
             </p>
           </div>
 
@@ -68,7 +68,7 @@ export function RewardWheelPanel() {
             <p className="text-base font-black text-amber-600 dark:text-amber-400 mt-0.5">{coinPrizesCount} giải</p>
           </div>
           <div className="p-3 rounded-2xl bg-purple-500/5 border border-purple-500/10">
-            <p className="text-[11px] font-semibold text-purple-700 dark:text-purple-400">Giải gói VIP 30 ngày</p>
+            <p className="text-[11px] font-semibold text-purple-700 dark:text-purple-400">Giải 30 ngày gói Tháng</p>
             <p className="text-base font-black text-purple-600 dark:text-purple-400 mt-0.5">{planPrizesCount} giải (2%)</p>
           </div>
           <div className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
@@ -91,7 +91,7 @@ export function RewardWheelPanel() {
       )}
       {prizes.data?.length === 0 && (
         <div className="p-12">
-          <Empty>Vòng quay chưa có giải nào - Thành viên có lượt cũng không quay được.</Empty>
+          <Empty>Vòng quay chưa có giải nào: Member có lượt quay cũng chưa quay được.</Empty>
         </div>
       )}
 
@@ -244,7 +244,7 @@ function PrizeModal({ prize, onClose, onDone }: { prize: RewardPrize; onClose: (
             maxLength={255}
             required
             className={fieldInputClass}
-            placeholder="Ví dụ: Ô 50 Coin..."
+            placeholder="Ví dụ: Ô 50 Coin…"
           />
         </FormField>
 
@@ -258,16 +258,16 @@ function PrizeModal({ prize, onClose, onDone }: { prize: RewardPrize; onClose: (
               onChange={(e) => set({ amount: e.target.value })}
               required
               className={fieldInputClass}
-              placeholder="Nhập số coin (vd: 50)"
+              placeholder="Nhập số Coin (vd: 50)"
             />
           </FormField>
         ) : (
           <div className="p-3.5 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-800 dark:text-purple-300">
             <p className="font-bold flex items-center gap-1.5 mb-1">
-              Giải thưởng đặc biệt (Gói VIP Tháng)
+              Giải đặc biệt (gói Tháng)
             </p>
             <p className="text-[11px] leading-relaxed opacity-90">
-              Giải gói Tháng cố định 30 ngày, tỉ lệ trúng 2.0% theo BR-09. Không cần cấu hình số Coin.
+              Giải cố định 30 ngày gói Tháng, tỉ lệ trúng 2%. Không cần nhập số Coin.
             </p>
           </div>
         )}

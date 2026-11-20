@@ -70,7 +70,7 @@ describe('ChangeStudioModal', () => {
     expect(screen.getByLabelText('Phí đề xuất')).toBeInTheDocument();
     expect(screen.getByText('Phí sản xuất đề xuất cho Studio mới (₫)')).toBeInTheDocument();
     expect(screen.getByText(/phí chính thức là giá ký trong hợp đồng/)).toBeInTheDocument();
-    expect(screen.getByRole('dialog')).toHaveTextContent('Studio mới nhận brief kèm hợp đồng mẫu để báo giá và ký trên Studio Web');
+    expect(screen.getByRole('dialog')).toHaveTextContent('Studio mới nhận brief kèm hợp đồng mẫu để ký (có thể đề xuất giá thấp hơn) trên Studio Web');
   });
 
   it('blocks a fee above what the budget allows and says the Reviewer must ask for more', async () => {

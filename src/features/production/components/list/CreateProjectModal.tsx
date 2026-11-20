@@ -123,7 +123,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
       open
       onClose={onClose}
       title="Tạo dự án phim"
-      subtitle="Bước 1 - ý tưởng, thể loại, ngân sách, Reviewer phụ trách và Creator chính; Reviewer lên mùa/tập sau"
+      subtitle="Ý tưởng, thể loại, ngân sách, Reviewer phụ trách và Creator chính; Reviewer lên mùa/tập sau"
       maxWidth="max-w-3xl"
     >
       <form onSubmit={submit} className="space-y-4">

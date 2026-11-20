@@ -129,7 +129,7 @@ export function AddEpisodeModal({ season, onClose }: { season: Season; onClose: 
   };
 
   return (
-    <Modal open onClose={onClose} title={`Thêm tập vào mùa ${season.seasonNumber}`} subtitle="Tập mới nhận số thứ tự cuối cùng của phim; cấp thêm phí cho mùa ở tab Phí sản xuất.">
+    <Modal open onClose={onClose} title={`Thêm tập vào mùa ${season.seasonNumber}`} subtitle="Tập mới nhận số thứ tự cuối cùng của phim; chi phí thêm xin ở tab Chi phí sản xuất.">
       <EpisodeForm
         values={values}
         window={windowOf(season)}
@@ -242,7 +242,7 @@ function EpisodeForm(props: {
           Khoảng phát hành của mùa: {window.start || '…'} → {window.end || '…'}.
         </p>
       )}
-      {props.handedOff && <p className="text-[11px] text-muted-foreground">Đã bàn giao: studio cũng phải giao theo hạn mới.</p>}
+      {props.handedOff && <p className="text-[11px] text-muted-foreground">Đã bàn giao: Studio cũng phải giao theo hạn mới.</p>}
       <FormField label="Tóm tắt tập">
         <textarea rows={3} value={values.synopsis} onChange={(e) => set({ synopsis: e.target.value })} maxLength={5000} className={fieldTextareaClass} />
       </FormField>

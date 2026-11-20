@@ -31,7 +31,7 @@ export function StaffLookup() {
   const can = useCan();
   return (
     <main className="mx-auto w-full max-w-7xl space-y-5 px-4 py-6 sm:px-6">
-      <PageIntro title="Tra cứu (chỉ đọc)" text="Phim đang phát, member, gói thành viên và giao dịch Coin. Điều chỉnh do Admin làm ở màn quản trị." />
+      <PageIntro title="Tra cứu (chỉ đọc)" text="Phim đang phát, Member, gói thành viên và giao dịch Coin. Điều chỉnh do Admin làm ở màn quản trị." />
       <FilmsSection />
       {can(PERMISSION.MEMBER_OPS_READ) && <MembersSection />}
       {can(PERMISSION.BILLING_SUBSCRIPTION_READ) && <SubscriptionsPanel />}
@@ -85,12 +85,12 @@ function MembersSection() {
   }, []);
 
   return (
-    <section className={`${CARD} overflow-hidden`} aria-label="Thông tin member">
+    <section className={`${CARD} overflow-hidden`} aria-label="Thông tin Member">
       <h2 className="px-5 py-3 text-sm font-semibold text-foreground border-b border-border">
-        Thông tin member <span className="text-muted-foreground font-normal">({total})</span>
+        Thông tin Member <span className="text-muted-foreground font-normal">({total})</span>
       </h2>
       {members === null && <p className="p-5 text-xs text-muted-foreground">Đang tải…</p>}
-      {members?.length === 0 && <p className="p-5 text-xs text-muted-foreground">Chưa có member nào.</p>}
+      {members?.length === 0 && <p className="p-5 text-xs text-muted-foreground">Chưa có Member nào.</p>}
       <ul className="divide-y divide-border text-xs">
         {members?.map((member) => (
           <li key={member.id} className="px-5 py-2.5 flex items-center justify-between gap-3">

@@ -113,7 +113,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
       />
       <TextPromptModal
         open={requesting}
-        title="Yêu cầu studio sửa"
+        title="Yêu cầu Studio sửa"
         subtitle="Tài khoản Studio nhận thông báo kèm nhận xét này trên Studio Web và nộp bản mới. Phim Final đã xác nhận (nếu có) sẽ bị huỷ xác nhận."
         label="Nhận xét (ví dụ: phút 03:10 nhân vật bị méo mặt…)"
         confirmLabel="Gửi yêu cầu sửa"
@@ -162,15 +162,15 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
     };
     const done = await run(
       () => productionService.runCompliance(sheet.id, input),
-      fails ? 'Không đạt - tập được trả về để studio sửa' : 'Tập đạt kiểm tra tuân thủ',
+      fails ? 'Không đạt - tập được trả về để Studio sửa' : 'Tập đạt kiểm tra tuân thủ',
     );
     if (done) await onChanged();
   };
 
   return (
     <Panel
-      title="Bước 11 - Kiểm tra pháp lý và an toàn nội dung"
-      description="Rà soát nhãn AI, thông báo theo Nghị định 142, an toàn nội dung và nguy cơ gây nhầm lẫn với người hoặc sự kiện có thật. Nếu có mục không đạt, tập sẽ được gửi lại để studio sửa."
+      title="Kiểm tra pháp lý và an toàn nội dung"
+      description="Rà soát nhãn AI, thông báo theo Nghị định 142, an toàn nội dung và nguy cơ gây nhầm lẫn với người hoặc sự kiện có thật. Nếu có mục không đạt, tập sẽ được gửi lại để Studio sửa."
     >
       {sheet.complianceChecks.length > 0 && (
         <ul className="space-y-1.5 text-xs mb-4">
@@ -201,7 +201,7 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
             </div>
           </fieldset>
           {!sheet.aiDisclosure.noRealPersonLikeness && (
-            <p className="text-amber-600">Studio chưa cam kết không dùng hình ảnh giống người thật. Mục này chưa thể đạt cho tới khi studio bổ sung cam kết trong bản giao.</p>
+            <p className="text-amber-600">Studio chưa cam kết không dùng hình ảnh giống người thật. Mục này chưa thể đạt cho tới khi Studio bổ sung cam kết trong bản giao.</p>
           )}
           {realPerson === true && (
             <textarea

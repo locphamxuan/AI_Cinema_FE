@@ -117,7 +117,7 @@ export function ProjectListPage() {
               type="search"
               value={searchDraft}
               onChange={(e) => setSearchDraft(e.target.value)}
-              placeholder="Tìm phim, studio…"
+              placeholder="Tìm phim, Studio…"
               aria-label="Tìm dự án"
               className={`${fieldInputClass} pl-9 py-2`}
             />
@@ -165,7 +165,7 @@ export function ProjectListPage() {
                   {isCreator ? 'Bạn chưa được giao dự án nào' : 'Không có dự án nào khớp bộ lọc'}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  {isCreator ? 'Dự án sẽ hiện ở đây khi Reviewer giao cho bạn.' : 'Đổi từ khoá hoặc chọn trạng thái khác.'}
+                  {isCreator ? 'Dự án sẽ hiện ở đây khi bạn được giao dự án.' : 'Đổi từ khoá hoặc chọn trạng thái khác.'}
                 </p>
               </div>
             ) : viewMode === 'grid' ? (

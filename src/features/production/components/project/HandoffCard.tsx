@@ -64,7 +64,7 @@ export function HandoffCard({
 
       {waiting && (
         <div role="status" className="rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-3 space-y-1">
-          <p className="font-semibold text-amber-800 dark:text-amber-300">Đang chờ Studio mới báo giá và ký hợp đồng</p>
+          <p className="font-semibold text-amber-800 dark:text-amber-300">Đang chờ Studio mới ký hợp đồng</p>
           <p className="text-amber-800/90 dark:text-amber-200/90">
             Vòng {waiting.round}: {CONTRACT_STATUS[waiting.status].label}
             {waiting.costVnd !== null && ` · ${formatVnd(waiting.costVnd)}`}. Studio bắt đầu sản xuất khi hợp đồng đủ chữ ký hai bên.

@@ -79,7 +79,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={255}
-            placeholder="Ví dụ: Giới thiệu gói AI Cinema Premium"
+            placeholder="Ví dụ: Giới thiệu gói Tháng"
             className={`${fieldInputClass} text-xs py-2 rounded-xl`}
             required
           />
@@ -122,7 +122,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
             />
             <p className="text-[11px] text-muted-foreground">
               {seconds !== null
-                ? `⏱ Dài ${formatDuration(seconds)}. Người xem phải xem hết quảng cáo rồi mới bấm "Bỏ qua quảng cáo" để xem tiếp phim.`
+                ? `⏱ Dài ${formatDuration(seconds)}. Người xem phải xem hết quảng cáo mới xem tiếp phim được.`
                 : 'Hệ thống tự lấy thời lượng từ video khi lưu.'}
             </p>
           </div>

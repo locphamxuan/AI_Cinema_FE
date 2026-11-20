@@ -126,7 +126,7 @@ export function AdminOverviewDashboard() {
     <div className="mx-auto w-full max-w-7xl space-y-6 p-6 lg:p-8">
       <PageHeader
         title="Tổng quan hệ thống"
-        description="Doanh thu gói hội viên, tiến độ sản xuất phim và tài khoản trên toàn nền tảng."
+        description="Doanh thu gói thành viên, tiến độ sản xuất phim và tài khoản trên toàn nền tảng."
         actions={
           <Tabs value={selectedRange} onValueChange={(v) => setSelectedRange(v as typeof selectedRange)}>
             <TabsList>
@@ -151,8 +151,8 @@ export function AdminOverviewDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <OverviewChartCard
           className="lg:col-span-2"
-          title="Doanh thu phân bổ theo gói hội viên"
-          description="Thống kê số Coin thu được từ từng gói hội viên trong khoảng thời gian đã chọn"
+          title="Doanh thu theo gói thành viên"
+          description="Số Coin thu được từ từng gói thành viên trong khoảng thời gian đã chọn"
           link={{ href: '/admin/membership-plans?tab=reports', label: 'Chi tiết báo cáo', className: PURPLE_LINK }}
         >
           {revenueRes.loading && !revenue && <Loading />}
@@ -167,7 +167,7 @@ export function AdminOverviewDashboard() {
         <OverviewChartCard
           className="flex flex-col justify-between"
           title="Cơ cấu Coin thu được"
-          description="Tỷ trọng giữa tiền nạp thật (Coin chính) và khuyến mãi (Coin thưởng)"
+          description="Tỉ trọng giữa Coin chính (nạp tiền) và Coin thưởng (khuyến mãi)"
         >
           {revenue && (
             <div className="py-2 flex items-center justify-center">
@@ -188,8 +188,8 @@ export function AdminOverviewDashboard() {
 
       {/* ── Real-time Episode Output Chart ── */}
       <OverviewChartCard
-        title="Số tập phim theo dự án (Real-time)"
-        description="Dữ liệu số lượng tập phim thực tế đang được sản xuất hoặc hoàn tất từ các dự án tiêu biểu"
+        title="Số tập phim theo dự án"
+        description="Số tập đang sản xuất hoặc đã hoàn tất của các dự án gần đây"
         link={{ href: '/admin/projects', label: 'Quản lý dự án phim', className: EMERALD_LINK }}
       >
         {episodeCategories.length > 0 ? (
@@ -206,7 +206,7 @@ export function AdminOverviewDashboard() {
       {/* ── Secondary Charts Grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <OverviewChartCard
-          title="Trạng thái dự án phim toàn sàn"
+          title="Trạng thái dự án phim trên nền tảng"
           description="Tỷ lệ các dự án đang sản xuất, đã hoàn tất và đang lên kế hoạch"
           link={{ href: '/admin/projects', label: 'Xem danh sách', className: PURPLE_LINK }}
         >

@@ -85,7 +85,7 @@ export function AccountsPanel() {
     <section className="bg-card rounded-2xl border border-border overflow-hidden shadow-xs">
       <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border">
         <div>
-          <h2 className="text-base font-bold text-foreground">Quản lý Tài khoản</h2>
+          <h2 className="text-base font-bold text-foreground">Quản lý tài khoản</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
             {result ? `${result.meta.totalItems} tài khoản trong hệ thống` : 'Đang tải…'} · Đổi vai trò hoặc trạng thái có hiệu lực tức thì.
           </p>

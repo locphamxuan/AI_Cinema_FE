@@ -64,7 +64,7 @@ export function ContractPartySettingsForm({ current, onSaved }: { current: Platf
       <div className="flex items-center justify-end gap-3 border-t border-border pt-4">
         {changed.length > 0 && (
           <Button type="button" variant="secondary" onClick={() => setDraft({})}>
-            Hủy thay đổi
+            Huỷ thay đổi
           </Button>
         )}
         <Button type="submit" disabled={busy || changed.length === 0}>

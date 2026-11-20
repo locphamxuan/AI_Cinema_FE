@@ -14,7 +14,7 @@ export const BACKEND_ROLE_LABEL: Record<UserRole, string> = {
   CONTENT_REVIEWER: 'Kiểm duyệt viên',
   STUDIO: 'Studio đối tác',
   STAFF: 'Nhân viên vận hành',
-  ADMIN: 'Quản trị viên cấp cao',
+  ADMIN: 'Quản trị viên',
 };
 
 export const ROLE_SHORT_LABEL: Record<UserRole, string> = {
@@ -37,16 +37,16 @@ export const ROLE_TONE: Record<UserRole, 'purple' | 'emerald' | 'blue' | 'amber'
 
 /** Groups of the permission catalog (AI_Cinema_BE PERMISSION_CATALOG `area`). */
 export const PERMISSION_AREA_LABEL: Record<string, string> = {
-  'movie-project': 'Dự án phim điện ảnh',
+  'movie-project': 'Dự án phim',
   studio: 'Studio & Đơn vị sản xuất',
-  media: 'Tập phim & Media Ingest',
+  media: 'Tập phim & nộp phim',
   review: 'Kiểm duyệt nội dung',
   publishing: 'Phát hành & Bản quyền',
   catalog: 'Danh mục & Thể loại',
-  'episode-access': 'Truy cập tập phim & Ví hội viên',
+  'episode-access': 'Quyền xem tập & ví Member',
   billing: 'Gói thành viên & Doanh thu',
   coin: 'Coin & thưởng điểm danh',
-  advertising: 'Quảng cáo & Ad Break',
+  advertising: 'Quảng cáo & lần chèn',
   administration: 'Hệ thống & Quản trị',
   operations: 'Vận hành & Hỗ trợ',
   admin: 'Quản trị hệ thống',
@@ -63,7 +63,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'project:manage': {
     title: 'Quản trị dự án phim được giao',
-    desc: 'Chỉnh sửa thông tin, mùa, tập phim, hạn giao và hủy dự án mình phụ trách.',
+    desc: 'Chỉnh sửa thông tin, mùa, tập phim, hạn giao và huỷ dự án mình phụ trách.',
   },
   'script:write': {
     title: 'Viết & nộp kịch bản',
@@ -79,7 +79,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'episode:price': {
     title: 'Đặt giá Coin cho tập phim',
-    desc: 'Đặt giá Coin của tập trước khi xác nhận Phim Final; giá ngoài khung được báo Admin.',
+    desc: 'Admin đặt giá Coin và quyền xem của tập trước khi phát hành; giá ngoài khoảng cho phép được ghi cảnh báo.',
   },
   'cost:request': {
     title: 'Yêu cầu thêm chi phí sản xuất',
@@ -94,7 +94,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
     desc: 'Đặt ngân sách sản xuất (VND) cho dự án phim và điều chỉnh khi cần, kèm lý do.',
   },
   'project:read.all': {
-    title: 'Xem toàn bộ dự án phim trên sàn',
+    title: 'Xem toàn bộ dự án phim trên nền tảng',
     desc: 'Xem danh sách và tiến độ sản xuất tất cả các dự án phim trên hệ thống (không chỉ dự án của mình).',
   },
   'project:suggest': {
@@ -109,7 +109,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Studio
   'studio:manage': {
     title: 'Quản lý danh sách Studio đối tác',
-    desc: 'Quản trị danh bạ các xưởng phim & studio liên kết: thêm mới, cập nhật hồ sơ và tạm dừng.',
+    desc: 'Thêm, sửa hồ sơ và tạm dừng Studio đối tác.',
   },
 
   // Media
@@ -120,8 +120,8 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
 
   // Review
   'content:review': {
-    title: 'Kiểm duyệt nội dung & Gán nhãn AI',
-    desc: 'Thẩm định nội dung tập phim, kiểm tra tuân thủ chính sách phát sóng và gán nhãn AI công khai.',
+    title: 'Kiểm duyệt nội dung & gắn nhãn AI',
+    desc: 'Thẩm định nội dung tập phim, kiểm tra tuân thủ pháp lý và gắn nhãn AI.',
   },
 
   // Publishing
@@ -131,7 +131,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'price-alert:manage': {
     title: 'Theo dõi & Cảnh báo giá tập phim',
-    desc: 'Giám sát các tập phim định giá ngoài khung quy định sàn hỏi ý kiến Reviewer rồi tự đặt lại giá.',
+    desc: 'Theo dõi tập có giá ngoài khoảng cho phép, hỏi ý kiến Reviewer rồi tự đặt lại giá.',
   },
 
   // Catalog
@@ -143,7 +143,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Episode Access & Member
   'access.episode.read': {
     title: 'Kiểm tra quyền truy cập tập phim',
-    desc: 'Xem trạng thái mua vé và quyền truy cập tập phim của khán giả để hỗ trợ sự cố.',
+    desc: 'Xem tập Member đã mở khoá và quyền xem tập để hỗ trợ khi gặp sự cố.',
   },
   'wallet.read': {
     title: 'Kiểm tra số dư ví Coin',
@@ -151,7 +151,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'wallet.topup': {
     title: 'Nạp Coin vào tài khoản',
-    desc: 'Tạo đơn nạp Coin qua cổng thanh toán VNPay và thẻ ngân hàng liên kết.',
+    desc: 'Tạo đơn nạp Coin qua cổng thanh toán VNPay.',
   },
   'reward.checkin': {
     title: 'Điểm danh hàng ngày nhận thưởng',
@@ -159,33 +159,33 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'subscription.self.manage': {
     title: 'Quản lý gói thành viên cá nhân',
-    desc: 'Đăng ký, kích hoạt, bật hoặc tắt tự động gia hạn gói hội viên của chính mình.',
+    desc: 'Đăng ký gói thành viên, bật hoặc tắt tự gia hạn gói của chính mình.',
   },
 
   // Billing
   'billing.plan.manage': {
-    title: 'Quản lý danh mục gói hội viên',
-    desc: 'Tạo mới, chỉnh sửa quyền lợi, giới hạn thiết bị và ẩn/hiện các gói thành viên VIP.',
+    title: 'Quản lý danh mục gói thành viên',
+    desc: 'Tạo, sửa quyền lợi, giới hạn thiết bị và ẩn / hiện các gói thành viên.',
   },
   'billing.price.manage': {
-    title: 'Định giá gói cước theo chu kỳ',
+    title: 'Đặt giá gói theo kỳ thanh toán',
     desc: 'Thiết lập mức giá Coin theo từng chu kỳ thanh toán (tháng, quý, năm) cho các gói.',
   },
   'billing.subscription.read': {
     title: 'Tra cứu danh sách đăng ký gói',
-    desc: 'Xem toàn bộ thuê bao đang kích hoạt gói, hạn dùng và lịch sử thu phí định kỳ.',
+    desc: 'Xem các Member đang có gói, hạn dùng và lịch sử thu Coin định kỳ.',
   },
   'billing.subscription.cancel': {
-    title: 'Hủy gói thành viên của người dùng',
-    desc: 'Chấm dứt gói hội viên của tài khoản theo yêu cầu hoặc do vi phạm quy chế.',
+    title: 'Huỷ gói thành viên của người dùng',
+    desc: 'Chấm dứt gói thành viên của một tài khoản.',
   },
   'analytics.revenue.read': {
-    title: 'Xem báo cáo doanh thu gói cước',
+    title: 'Xem báo cáo doanh thu gói',
     desc: 'Xem biểu đồ doanh thu theo gói, số lượt thu phí và tăng trưởng tài chính nền tảng.',
   },
   'analytics.churn.read': {
-    title: 'Xem tỷ lệ hủy gói (Churn Rate)',
-    desc: 'Theo dõi tỷ lệ dừng gia hạn và phân tích lý do thành viên hủy gói.',
+    title: 'Xem tỉ lệ rời gói',
+    desc: 'Theo dõi tỷ lệ dừng gia hạn và phân tích lý do thành viên huỷ gói.',
   },
 
   // Coin & Reward Rules
@@ -209,7 +209,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Advertising
   'ad.manage': {
     title: 'Quản trị chiến dịch quảng cáo',
-    desc: 'Tạo quảng cáo, tải lên video clip, thiết lập Ad Break và bật/tắt chiến dịch.',
+    desc: 'Tạo quảng cáo, tải video lên, đặt vị trí chèn và bật / tắt quảng cáo.',
   },
 
   // Administration
@@ -223,7 +223,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'user:manage': {
     title: 'Quản trị tài khoản & Cấp vai trò',
-    desc: 'Tạo tài khoản nhân sự nội bộ, đổi vai trò, khóa hoặc mở khóa tài khoản.',
+    desc: 'Tạo tài khoản nhân sự nội bộ, đổi vai trò, khoá hoặc mở khoá tài khoản.',
   },
   'role:manage': {
     title: 'Phân quyền hạn theo từng vai trò',
@@ -231,7 +231,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'platform:settings.manage': {
     title: 'Cài đặt chính sách nền tảng',
-    desc: 'Điều chỉnh tỷ giá Coin, khung giá gói cước, số tập xem thử miễn phí và thông số hệ thống.',
+    desc: 'Điều chỉnh tỷ giá Coin, khoảng giá tập, số tập xem miễn phí và các thông số khác.',
   },
 };
 

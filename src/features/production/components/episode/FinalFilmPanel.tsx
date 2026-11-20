@@ -14,7 +14,7 @@ function stateOf(episode: Episode): string {
   if (episode.status !== 'COMPLIANCE_PASSED') {
     return 'Phim Final được xác nhận sau khi Reviewer duyệt bản Studio nộp, gắn nhãn AI và đạt 4 mục kiểm tra tuân thủ.';
   }
-  if (episode.finalConfirmedAt) return `Reviewer đã xác nhận Phim Final lúc ${formatDateTime(episode.finalConfirmedAt)}; chờ Admin đặt giá & publish.`;
+  if (episode.finalConfirmedAt) return `Reviewer đã xác nhận Phim Final lúc ${formatDateTime(episode.finalConfirmedAt)}; chờ Admin đặt giá và phát hành.`;
   return 'Đã đạt kiểm tra tuân thủ; Reviewer xác nhận Phim Final để chuyển sang Admin.';
 }
 

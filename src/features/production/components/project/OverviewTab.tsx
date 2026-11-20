@@ -111,7 +111,7 @@ export function OverviewTab() {
 
           <div className="px-5 pb-5 space-y-4 text-sm">
             <div className="rounded-xl bg-muted/60 border border-border p-4">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Ý tưởng &amp; Brief kịch bản</p>
+              <p className="text-xs font-medium text-muted-foreground mb-2">Ý tưởng & brief kịch bản</p>
               <p className="whitespace-pre-line text-secondary-foreground leading-relaxed">{project.ideaDescription}</p>
             </div>
             {project.synopsis && (

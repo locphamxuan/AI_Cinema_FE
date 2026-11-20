@@ -231,7 +231,7 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
     expect(save).toBeDisabled();
     await userEvent.type(screen.getByLabelText('Mã số thuế'), ' 0312345678 ');
     await userEvent.type(screen.getByLabelText('Email'), 'legal@aicinema.vn');
-    await userEvent.click(screen.getByRole('button', { name: 'Hủy thay đổi' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Huỷ thay đổi' }));
     expect(screen.getByLabelText('Mã số thuế')).toHaveValue('');
     await userEvent.type(screen.getByLabelText('Mã số thuế'), ' 0312345678 ');
     await userEvent.click(screen.getByRole('button', { name: 'Lưu Bên A (1)' }));

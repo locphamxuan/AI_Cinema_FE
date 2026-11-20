@@ -130,7 +130,7 @@ export function SeasonSection({
                 <th className="px-3 py-2 font-medium">Tập</th>
                 <th className="px-3 py-2 font-medium">Trạng thái</th>
                 <th className="px-3 py-2 font-medium hidden md:table-cell">Creator phụ trách</th>
-                <th className="px-3 py-2 font-medium hidden sm:table-cell text-right">Giá bán (Coin)</th>
+                <th className="px-3 py-2 font-medium hidden sm:table-cell text-right">Giá Coin</th>
                 <th className="px-3 py-2 font-medium hidden md:table-cell">Ngày dự kiến phát hành</th>
                 <th className="px-3 py-2 font-medium hidden lg:table-cell">Hạn giao Studio</th>
                 <th className="px-2 py-2 w-24" />
@@ -153,7 +153,7 @@ export function SeasonSection({
                       <td className="px-3 py-2.5">
                         <StatusPill {...EPISODE_STATUS[ep.status]} />
                         {ep.status === 'COMPLIANCE_PASSED' && ep.finalConfirmedAt && (
-                          <span className="block mt-0.5 text-[11px] text-emerald-600">Phim Final, chờ Admin publish</span>
+                          <span className="block mt-0.5 text-[11px] text-emerald-600">Phim Final, chờ Admin phát hành</span>
                         )}
                       </td>
                       <td className="px-3 py-2.5 hidden md:table-cell text-muted-foreground">
@@ -171,7 +171,7 @@ export function SeasonSection({
                           variant="ghost"
                           onClick={() => setOpen(expanded ? null : ep.id)}
                           aria-expanded={expanded}
-                          aria-label={`Submission của tập ${ep.episodeNumber}`}
+                          aria-label={`Các bản nộp của tập ${ep.episodeNumber}`}
                         >
                           {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                         </Button>

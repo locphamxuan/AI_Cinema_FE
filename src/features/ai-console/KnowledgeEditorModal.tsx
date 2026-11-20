@@ -75,7 +75,7 @@ export function KnowledgeEditorModal({
     const body: KnowledgeInput = { ...form, title: form.title.trim(), category: form.category.trim(), sourceRef: form.sourceRef?.trim() || undefined };
     const saved = await run(
       () => (articleId ? aiConsoleService.updateKnowledge(articleId, body) : aiConsoleService.createKnowledge(body)),
-      form.status === 'PUBLISHED' ? 'Đã lưu và xuất bản, bài đang chờ index' : 'Đã lưu bản nháp',
+      form.status === 'PUBLISHED' ? 'Đã lưu và xuất bản, bài đang chờ lập chỉ mục' : 'Đã lưu bản nháp',
     );
     if (saved) onSaved(saved as KnowledgeArticleDetail);
   };
@@ -169,7 +169,7 @@ export function KnowledgeEditorModal({
                 aria-label="Nội dung (Markdown)"
                 value={form.contentMarkdown}
                 onChange={(e) => set('contentMarkdown', e.target.value)}
-                placeholder={'## Tiêu đề mục\nNội dung trả lời...'}
+                placeholder={'## Tiêu đề mục\nNội dung trả lời…'}
                 className={`${fieldTextareaClass} font-mono text-xs`}
               />
             ) : (

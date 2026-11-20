@@ -32,7 +32,7 @@ export const APPLICATION_MESSAGES = {
   MSG08: {
     type: 'Inline or toast',
     scenario: 'A deactivated account attempts to sign in.',
-    message: 'Tài khoản này đã bị vô hiệu hóa.',
+    message: 'Tài khoản này đã bị khoá.',
   },
   MSG09: {
     type: 'Inline or toast',
@@ -57,7 +57,7 @@ export const APPLICATION_MESSAGES = {
   MSG13: {
     type: 'Inline or toast',
     scenario: 'An attempt is made to purchase an unpublished, free, or already-unlocked episode.',
-    message: 'Không thể mua tập này. Tập có thể chưa phát hành, miễn phí hoặc đã được mở khóa.',
+    message: 'Không thể mua tập này. Tập có thể chưa phát hành, miễn phí hoặc đã được mở khoá.',
   },
   MSG14: {
     type: 'Inline or toast',
@@ -72,7 +72,7 @@ export const APPLICATION_MESSAGES = {
   MSG16: {
     type: 'Toast',
     scenario: 'A project is cancelled successfully.',
-    message: 'Đã hủy dự án thành công.',
+    message: 'Đã huỷ dự án thành công.',
   },
   MSG17: {
     type: 'Toast',
@@ -132,7 +132,7 @@ export function localizeApiError(
   if (
     ['EPISODE_NOT_PUBLISHED', 'EPISODE_NOT_PRICED', 'ACCESS_ALREADY_OWNED'].includes(String(reason)) ||
     normalized.includes('episode is not published') ||
-    normalized.includes('episode has no coin price') ||
+    normalized.includes('episode has no Coin price') ||
     normalized.includes('episode is free') ||
     normalized.includes('episode is already unlocked')
   ) {

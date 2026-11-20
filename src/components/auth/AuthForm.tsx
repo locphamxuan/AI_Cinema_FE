@@ -142,7 +142,7 @@ export default function AuthForm() {
 
         {showResetHelp && (
           <p className="rounded-lg bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-            Tài khoản nội bộ không tự đặt lại mật khẩu. Vui lòng liên hệ Quản trị viên (Admin) tại mục Tài khoản &amp; Phân quyền để cấp mật khẩu mới.
+            Tài khoản nội bộ không tự đặt lại mật khẩu. Liên hệ Admin để được cấp mật khẩu mới.
           </p>
         )}
 

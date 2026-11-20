@@ -123,7 +123,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief kèm hợp đồng mẫu để báo giá và ký trên Studio Web, rồi mới bắt đầu sản xuất." maxWidth="max-w-lg">
+    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief kèm hợp đồng mẫu để ký (có thể đề xuất giá thấp hơn) trên Studio Web, rồi mới bắt đầu sản xuất." maxWidth="max-w-lg">
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} onChange={(patch) => setForm({ ...form, ...patch })} />
         <FormField label="Studio cũ giữ lại (₫, đã chi hoặc đền bù)">

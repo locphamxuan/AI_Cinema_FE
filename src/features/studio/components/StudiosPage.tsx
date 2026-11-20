@@ -71,7 +71,7 @@ export function StudiosPage() {
         <div>
           <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Studio đối tác</h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Studio là đối tác bên thứ 3, đăng nhập Studio Web bằng tài khoản Admin cấp để ký hợp đồng và nộp phim. Mỗi dự án đặt hàng một
+            Studio là đối tác bên thứ ba, đăng nhập Studio Web bằng tài khoản Admin cấp để ký hợp đồng và nộp phim. Mỗi dự án đặt hàng một
             Studio đang hoạt động.
           </p>
         </div>

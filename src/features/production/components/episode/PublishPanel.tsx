@@ -89,7 +89,7 @@ export function PublishPanel({
   return (
     <Panel
       title="Định giá & phát hành"
-      description="Admin đặt giá Coin và cờ xem miễn phí; Admin phát hành Phim Final sau khi Reviewer xác nhận và tập có giá Coin."
+      description="Admin đặt giá Coin và quyền xem miễn phí; Admin phát hành Phim Final sau khi Reviewer xác nhận và tập có giá Coin."
     >
       <div className="space-y-5 text-xs">
         {canPrice ? (

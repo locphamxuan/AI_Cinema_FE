@@ -83,7 +83,7 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
           value={counter}
           onChange={(e) => setCounter(e.target.value)}
           aria-label="Giá đề xuất mới"
-          placeholder="Ví dụ: 150000000"
+          placeholder="Ví dụ: 150.000.000"
           className={fieldInputClass}
         />
       </FormField>
@@ -110,7 +110,7 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
           Gửi giá đề xuất
         </Button>
         <Button type="button" disabled={busy || c.costVnd === null || !fileOk} onClick={sign} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
-          Đồng ý &amp; ký
+          Đồng ý và ký
         </Button>
       </div>
     </Modal>

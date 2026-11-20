@@ -122,7 +122,7 @@ interface FilmRowProps {
   onToggle: () => void;
   /** Present for an account allowed to place the episode's ads (BR-32). */
   onAds?: (episode: { id: string; label: string }) => void;
-  /** Present for an account allowed to set episode coin price and access flags (Admin). */
+  /** Present for an account allowed to set episode Coin price and access flags (Admin). */
   onPricing?: (target: EpisodePricingTarget) => void;
 }
 

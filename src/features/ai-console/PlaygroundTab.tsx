@@ -106,7 +106,7 @@ export function PlaygroundTab({ onOpenArticle }: { onOpenArticle: (articleId: st
               }
             }}
             aria-label="Câu hỏi thử"
-            placeholder="Ví dụ: Hủy gói Tháng có được hoàn tiền không?"
+            placeholder="Ví dụ: Huỷ gói Tháng có được hoàn tiền không?"
             className={fieldTextareaClass}
           />
           <Button type="submit" disabled={!valid || asking}>

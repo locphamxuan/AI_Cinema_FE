@@ -126,7 +126,7 @@ describe('ContractTab', () => {
     // Signing completes the contract and hands the project off: it asks once first.
     const dialog = await screen.findByRole('dialog');
     expect(calls.some((c) => c.path === '/contracts/c1/sign')).toBe(false);
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Đồng ý & ký' }));
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Đồng ý và ký' }));
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/contracts/c1/sign' && c.method === 'POST');
       expect(formOf(sent!.body).get('file')).toBe(file);

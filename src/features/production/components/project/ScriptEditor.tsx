@@ -47,7 +47,7 @@ export function ScriptEditor({ latest, onSubmitted }: { latest: ScriptVersion | 
             maxLength={MAX_CONTENT}
             required
             className={`${fieldTextareaClass} font-mono text-xs leading-relaxed`}
-            placeholder={'CẢNH 1 - NỘI. CĂN HỘ - ĐÊM\n...'}
+            placeholder={'CẢNH 1 - NỘI. CĂN HỘ - ĐÊM\n…'}
           />
         </FormField>
         {latest && (

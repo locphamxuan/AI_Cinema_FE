@@ -72,8 +72,8 @@ describe('HandoffCard - a studio change waiting for its contract', () => {
   it('tells a non-Admin reader the contract is waiting on Admin without linking a hidden tab', () => {
     renderCard(waiting('SENT'));
     const note = screen.getByRole('status');
-    expect(note).toHaveTextContent('Đang chờ Studio mới báo giá và ký hợp đồng');
-    expect(note).toHaveTextContent('Vòng 1: Đã gửi studio, chờ báo giá');
+    expect(note).toHaveTextContent('Đang chờ Studio mới ký hợp đồng');
+    expect(note).toHaveTextContent('Vòng 1: Đã gửi Studio, chờ Studio ký');
     expect(screen.getByText('Hợp đồng đang chờ Admin xử lý.')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /hợp đồng/i })).toBeNull();
     expect(screen.getByText(/phí đề xuất trong brief: 45\.000\.000/)).toBeTruthy();

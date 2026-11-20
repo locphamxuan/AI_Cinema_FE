@@ -66,7 +66,7 @@ export function StudioModal({ studio, onClose, onSaved }: { studio: Studio | nul
   };
 
   return (
-    <Modal open onClose={onClose} title={studio ? 'Sửa Studio' : 'Thêm Studio'} subtitle="Studio đối tác đăng nhập Studio Web bằng tài khoản STUDIO.">
+    <Modal open onClose={onClose} title={studio ? 'Sửa Studio' : 'Thêm Studio'} subtitle="Studio đối tác đăng nhập Studio Web bằng tài khoản Admin mở cho Studio.">
       <form onSubmit={submit} className="space-y-4">
         <FormField label="Tên Studio (tên pháp lý in trên hợp đồng)">
           <input value={draft.name} onChange={set('name')} minLength={2} maxLength={255} required className={fieldInputClass} />

@@ -18,7 +18,7 @@ const CARD = 'rounded-3xl bg-card border border-border shadow-xs dark:shadow-xl'
 const FILTERS: { key: QueueFilter; label: string; active: string }[] = [
   { key: 'all', label: 'Tất cả', active: 'bg-primary text-primary-foreground' },
   { key: 'script', label: 'Kịch bản chờ duyệt', active: 'bg-amber-600 text-white' },
-  { key: 'master', label: 'Phim cần kiểm', active: 'bg-primary text-primary-foreground' },
+  { key: 'master', label: 'Phim cần thẩm định', active: 'bg-primary text-primary-foreground' },
   { key: 'revising', label: 'Studio đang sửa', active: 'bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900' },
   { key: 'approved', label: 'Phim Final', active: 'bg-emerald-600 text-white' },
 ];
@@ -142,7 +142,7 @@ export function ReviewerProjectQueuePage() {
               <div className="flex items-center gap-2">
                 <div className="relative w-full sm:w-64">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                  <input type="search" value={search} onChange={(e) => handleSearch(e.target.value)} placeholder="Tìm phim, Studio, Creator..." aria-label="Tìm trong hàng đợi" className="w-full pl-9 pr-3 py-2 rounded-2xl bg-card border border-border text-xs text-foreground focus:outline-none" />
+                  <input type="search" value={search} onChange={(e) => handleSearch(e.target.value)} placeholder="Tìm phim, Studio, Creator…" aria-label="Tìm trong hàng đợi" className="w-full pl-9 pr-3 py-2 rounded-2xl bg-card border border-border text-xs text-foreground focus:outline-none" />
                 </div>
                 <div className="flex items-center rounded-2xl bg-card border border-border p-1">
                   {([['grid', LayoutGrid, 'Xem dạng thẻ'], ['table', List, 'Xem dạng bảng']] as const).map(([mode, Icon, label]) => (

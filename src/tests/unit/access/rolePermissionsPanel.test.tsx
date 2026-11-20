@@ -48,7 +48,7 @@ describe('RolePermissionsPanel', () => {
   it('filters the permissions by the search text', async () => {
     render(<RolePermissionsPanel />);
     await screen.findByRole('checkbox', { name: 'Staff: Xem thông tin member (chỉ đọc)' });
-    await userEvent.type(screen.getByPlaceholderText(/Tìm kiếm quyền hạn/), 'khongtontai');
+    await userEvent.type(screen.getByPlaceholderText(/Tìm quyền theo tên/), 'khongtontai');
     expect(screen.getByText(/Không tìm thấy quyền hạn nào/)).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Xoá từ khoá tìm kiếm' }));
     expect(screen.getByRole('checkbox', { name: 'Staff: Xem thông tin member (chỉ đọc)' })).toBeInTheDocument();

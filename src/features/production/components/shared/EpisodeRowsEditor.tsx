@@ -129,7 +129,7 @@ export function EpisodeRowsEditor({
             value={ep.deadline}
             onChange={(e) => update(i, { deadline: e.target.value })}
             aria-label={`Hạn giao tập ${firstNumber + i}`}
-            title="Hạn giao - studio phải giao tập này trước ngày này"
+            title="Hạn giao - Studio phải giao tập này trước ngày này"
             className={`${fieldInputClass} py-1.5 ${ep.deadline && !deadlineValid(ep.deadline) ? 'border-rose-500' : ''}`}
             style={{ width: '9.5rem', flex: '0 0 9.5rem' }}
           />
@@ -155,7 +155,7 @@ export function EpisodeRowsEditor({
           </Button>
         </div>
       ))}
-      <p className="text-[11px] text-muted-foreground pl-10">Hạn giao Studio: ngày Studio phải giao tập (bắt buộc). Dự kiến phát hành: ngày tập dự kiến lên sóng, nằm trong khoảng phát hành của mùa, không trước hạn giao (không bắt buộc).</p>
+      <p className="text-[11px] text-muted-foreground pl-10">Hạn giao Studio: ngày Studio phải giao tập (bắt buộc). Dự kiến phát hành: ngày tập dự kiến phát hành, nằm trong khoảng phát hành của mùa, không trước hạn giao (không bắt buộc).</p>
       <Button type="button" size="sm" variant="secondary" onClick={addEpisode}>
         Thêm tập
       </Button>
