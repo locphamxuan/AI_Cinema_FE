@@ -21,8 +21,8 @@ export default function LoginPage() {
             <Film className="size-5" aria-hidden="true" />
           </span>
           <div className="space-y-1">
-            <h1 className="font-heading text-2xl font-semibold tracking-tight">Đăng nhập AI Cinema</h1>
-            <p className="text-sm text-muted-foreground">Cổng quản trị và sản xuất nội bộ. Tài khoản do Admin cấp.</p>
+            <h1 className="font-heading text-2xl font-semibold tracking-tight">Đăng nhập</h1>
+            <p className="text-sm text-muted-foreground">Trang quản trị AI Cinema</p>
           </div>
         </div>
         <Suspense>

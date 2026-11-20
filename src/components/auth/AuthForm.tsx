@@ -60,11 +60,11 @@ export default function AuthForm() {
     setLoading(false);
 
     if (!res.success) {
-      setError(res.error || 'Đăng nhập thất bại. Kiểm tra lại email hoặc mật khẩu.');
+      setError(res.error || 'Email hoặc mật khẩu không đúng.');
       return;
     }
 
-    toast.success('Đăng nhập thành công!', 'Chào mừng bạn quay trở lại cổng nội bộ AI Cinema.');
+    toast.success('Đăng nhập thành công', 'Chào mừng bạn trở lại.');
     rememberEmail(email, rememberMe);
     const target = next ?? res.redirectUrl;
     if (target) router.replace(target);
@@ -87,7 +87,7 @@ export default function AuthForm() {
               href={STUDIO_WEB_LOGIN_URL}
               className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
-              Mở cổng đăng nhập Studio Web
+              Đăng nhập Studio Web
             </a>
           )}
         </div>
@@ -106,7 +106,7 @@ export default function AuthForm() {
             maxLength={255}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="ten@aicinema.vn"
+            placeholder="ban@aicinema.vn"
             className={INPUT}
           />
         </div>
@@ -128,7 +128,7 @@ export default function AuthForm() {
               onChange={(e) => setRememberMe(e.target.checked)}
               className="size-4 cursor-pointer rounded accent-primary"
             />
-            <span>Nhớ email trên máy này</span>
+            <span>Ghi nhớ email</span>
           </label>
 
           <button
@@ -142,7 +142,7 @@ export default function AuthForm() {
 
         {showResetHelp && (
           <p className="rounded-lg bg-muted px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-            Tài khoản nội bộ không tự đặt lại mật khẩu. Liên hệ Admin để được cấp mật khẩu mới.
+            Liên hệ Admin để đặt lại mật khẩu.
           </p>
         )}
 
@@ -151,17 +151,17 @@ export default function AuthForm() {
           disabled={loading}
           className="mt-2 h-10 w-full cursor-pointer rounded-lg bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? 'Đang xác thực…' : 'Đăng nhập'}
+          {loading ? 'Đang đăng nhập…' : 'Đăng nhập'}
         </button>
       </form>
 
       <div className="mt-6 flex items-center justify-between border-t border-border pt-4 text-sm text-muted-foreground">
-        <span>Bạn là Studio đối tác?</span>
+        <span>Bạn là Studio?</span>
         <a
           href={STUDIO_WEB_LOGIN_URL}
           className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
         >
-          Đăng nhập Studio Web
+          Vào Studio Web
         </a>
       </div>
     </>

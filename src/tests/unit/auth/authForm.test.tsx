@@ -80,14 +80,14 @@ describe('AuthForm sign-in', () => {
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
     await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
-    expect(screen.getByRole('link', { name: /Mở cổng đăng nhập Studio Web/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Đăng nhập Studio Web/ })).toBeInTheDocument();
   });
 
   it('displays back-office internal branding instead of viewer platform copy, over a decorative poster wall', () => {
     const { container } = render(<LoginPage />);
 
-    expect(screen.getByRole('heading', { name: 'Đăng nhập AI Cinema' })).toBeInTheDocument();
-    expect(screen.getByText(/Cổng quản trị và sản xuất nội bộ/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Đăng nhập' })).toBeInTheDocument();
+    expect(screen.getByText('Trang quản trị AI Cinema')).toBeInTheDocument();
     expect(container.querySelector('[aria-hidden="true"] img')).not.toBeNull();
     expect(screen.queryByText(/Nền tảng xem phim/)).not.toBeInTheDocument();
   });
