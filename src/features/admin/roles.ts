@@ -45,7 +45,7 @@ export const PERMISSION_AREA_LABEL: Record<string, string> = {
   catalog: 'Danh mục & Thể loại',
   'episode-access': 'Truy cập tập phim & Ví hội viên',
   billing: 'Gói thành viên & Doanh thu',
-  coin: 'COIN & Thưởng điểm danh',
+  coin: 'Coin & thưởng điểm danh',
   advertising: 'Quảng cáo & Ad Break',
   administration: 'Hệ thống & Quản trị',
   operations: 'Vận hành & Hỗ trợ',
@@ -70,7 +70,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
     desc: 'Creator chính soạn kịch bản của dự án được giao và nộp cho Reviewer duyệt.',
   },
   'script:approve': {
-    title: 'Duyệt Kịch bản Final',
+    title: 'Duyệt kịch bản Final',
     desc: 'Đồng ý Kịch bản Final (hệ thống gửi hợp đồng mẫu cho Studio) hoặc yêu cầu Creator sửa.',
   },
   'studio:portal': {
@@ -127,7 +127,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Publishing
   'episode:publish': {
     title: 'Xuất bản & gỡ tập phim',
-    desc: 'Xem Phim Final Reviewer đã xác nhận, phát hành ngay hoặc hẹn giờ, trả lại qua Reviewer hoặc gỡ tập.',
+    desc: 'Xem phim Final Reviewer đã xác nhận, phát hành ngay hoặc hẹn giờ, trả lại qua Reviewer hoặc gỡ tập.',
   },
   'price-alert:manage': {
     title: 'Theo dõi & Cảnh báo giá tập phim',

@@ -26,7 +26,7 @@ import { ActivityTab } from './ActivityTab';
 const TABS: readonly { key: ProjectTabKey; label: string }[] = [
   { key: 'overview', label: 'Tổng quan & Ý tưởng' },
   { key: 'script', label: 'Kịch bản' },
-  { key: 'episodes', label: 'Mùa & Tập phim' },
+  { key: 'episodes', label: 'Mùa & tập phim' },
   { key: 'team', label: 'Nhóm Creator' },
   { key: 'studio', label: 'Studio' },
   { key: 'fee', label: 'Chi phí sản xuất' },

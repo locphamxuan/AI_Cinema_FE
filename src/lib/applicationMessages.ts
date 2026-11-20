@@ -124,7 +124,7 @@ export function localizeApiError(
     typeof rawDetails === 'object' && rawDetails !== null && 'reason' in rawDetails ? rawDetails.reason : undefined;
 
   if (reason === 'STUDIO_HAS_NO_LOGIN') {
-    return 'Studio chưa có tài khoản đăng nhập Studio Web nên chưa gửi hợp đồng được. Vào Quản lý Studio, mở "Tài khoản đăng nhập" để tạo, rồi thử lại.';
+    return 'Studio chưa có tài khoản đăng nhập Studio Web nên chưa gửi hợp đồng được. Vào Studio đối tác, mở "Tài khoản đăng nhập" để tạo, rồi thử lại.';
   }
   if (reason === 'INSUFFICIENT_COINS' || normalized.includes('does not hold enough coins')) {
     return APPLICATION_MESSAGES.MSG12.message;

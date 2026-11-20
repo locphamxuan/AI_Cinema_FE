@@ -90,7 +90,7 @@ export function StudioFilterBar({
           <button
             type="button"
             onClick={() => onViewModeChange('grid')}
-            title="Dạng Lưới (Grid)"
+            title="Dạng lưới (Grid)"
             aria-pressed={viewMode === 'grid'}
             className={`p-1.5 rounded-full transition-colors cursor-pointer ${
               viewMode === 'grid'
@@ -103,7 +103,7 @@ export function StudioFilterBar({
           <button
             type="button"
             onClick={() => onViewModeChange('table')}
-            title="Dạng Bảng (Table)"
+            title="Dạng bảng (Table)"
             aria-pressed={viewMode === 'table'}
             className={`p-1.5 rounded-full transition-colors cursor-pointer ${
               viewMode === 'table'

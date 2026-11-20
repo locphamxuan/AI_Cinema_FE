@@ -68,7 +68,7 @@ export function RewardWheelPanel() {
             <p className="text-base font-black text-amber-600 dark:text-amber-400 mt-0.5">{coinPrizesCount} giải</p>
           </div>
           <div className="p-3 rounded-2xl bg-purple-500/5 border border-purple-500/10">
-            <p className="text-[11px] font-semibold text-purple-700 dark:text-purple-400">Giải Gói VIP 30 ngày</p>
+            <p className="text-[11px] font-semibold text-purple-700 dark:text-purple-400">Giải gói VIP 30 ngày</p>
             <p className="text-base font-black text-purple-600 dark:text-purple-400 mt-0.5">{planPrizesCount} giải (2%)</p>
           </div>
           <div className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">

@@ -71,7 +71,7 @@ describe('Knowledge tab', () => {
     render(<KnowledgeTab focus={null} />);
     const row = (await screen.findByText('Hủy gói Tháng')).closest('tr')!;
 
-    await userEvent.click(within(row).getByRole('button', { name: 'Index lại' }));
+    await userEvent.click(within(row).getByRole('button', { name: 'Tạo lại chỉ mục' }));
     await userEvent.click(within(row).getByRole('button', { name: 'Lưu trữ' }));
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Lưu trữ' }));
 

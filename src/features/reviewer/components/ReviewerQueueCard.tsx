@@ -5,11 +5,11 @@ import { formatDateTime } from '@/lib/format';
 import type { QueueItem, QueueStage } from '../reviewQueue';
 
 export const STAGE_STYLE: Record<QueueStage, { badge: string; action: string; button: string }> = {
-  MASTER_AUDIT: { badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30', action: 'Mở Bàn Thẩm Định', button: 'bg-primary hover:bg-primary/90 text-primary-foreground' },
-  SCRIPT_PENDING: { badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30', action: 'Thẩm Định Kịch Bản', button: 'bg-primary hover:bg-primary/90 text-primary-foreground' },
-  STUDIO_REVISING: { badge: 'bg-slate-100 text-secondary-foreground border-slate-200 dark:bg-slate-800 dark:border-slate-700', action: 'Xem Yêu Cầu Sửa', button: 'border border-input hover:bg-muted/60 text-foreground' },
-  FINAL_CONFIRMED: { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30', action: 'Xem Tập Phim', button: 'border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
-  PROJECT: { badge: 'bg-slate-100 text-secondary-foreground border-slate-200 dark:bg-slate-800 dark:border-slate-700', action: 'Mở Dự Án', button: 'border border-input hover:bg-muted/60 text-secondary-foreground' },
+  MASTER_AUDIT: { badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30', action: 'Mở bàn thẩm định', button: 'bg-primary hover:bg-primary/90 text-primary-foreground' },
+  SCRIPT_PENDING: { badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30', action: 'Thẩm định kịch bản', button: 'bg-primary hover:bg-primary/90 text-primary-foreground' },
+  STUDIO_REVISING: { badge: 'bg-slate-100 text-secondary-foreground border-slate-200 dark:bg-slate-800 dark:border-slate-700', action: 'Xem yêu cầu sửa', button: 'border border-input hover:bg-muted/60 text-foreground' },
+  FINAL_CONFIRMED: { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30', action: 'Xem tập phim', button: 'border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
+  PROJECT: { badge: 'bg-slate-100 text-secondary-foreground border-slate-200 dark:bg-slate-800 dark:border-slate-700', action: 'Mở dự án', button: 'border border-input hover:bg-muted/60 text-secondary-foreground' },
 };
 
 export const episodeText = (item: QueueItem) => (item.episodeNumber === null ? `${item.totalEpisodes} tập` : `Tập ${item.episodeNumber} / ${item.totalEpisodes}`);

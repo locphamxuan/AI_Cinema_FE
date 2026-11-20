@@ -60,7 +60,7 @@ export function CinematicProjectCard({ project, href }: { project: ScriptProject
         </div>
         <div className="pt-3 border-t border-border flex justify-end">
           <Link href={href} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold">
-            {needsWriting(project) ? 'Soạn Kịch Bản' : 'Xem Dự Án'}
+            {needsWriting(project) ? 'Soạn kịch bản' : 'Xem dự án'}
           </Link>
         </div>
       </div>

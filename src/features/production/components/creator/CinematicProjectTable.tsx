@@ -11,11 +11,11 @@ export function CinematicProjectTable({ projects, getHref }: { projects: ScriptP
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-border bg-muted/60 text-muted-foreground font-semibold text-[11px]">
-              <th className="py-4 px-5">Dự Án</th>
-              <th className="py-4 px-4">Thể Loại & Quy Mô</th>
-              <th className="py-4 px-4">Kịch Bản</th>
+              <th className="py-4 px-5">Dự án</th>
+              <th className="py-4 px-4">Thể loại & quy mô</th>
+              <th className="py-4 px-4">Kịch bản</th>
               <th className="py-4 px-4">Studio</th>
-              <th className="py-4 px-5 text-right">Thao Tác</th>
+              <th className="py-4 px-5 text-right">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-white/[0.05]">
@@ -40,7 +40,7 @@ export function CinematicProjectTable({ projects, getHref }: { projects: ScriptP
                 </td>
                 <td className="py-3.5 px-5 text-right">
                   <Link href={getHref(p)} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold">
-                    {needsWriting(p) ? 'Soạn Kịch Bản' : 'Xem Dự Án'}
+                    {needsWriting(p) ? 'Soạn kịch bản' : 'Xem dự án'}
                   </Link>
                 </td>
               </tr>

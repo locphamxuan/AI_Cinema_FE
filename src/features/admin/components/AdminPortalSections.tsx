@@ -60,7 +60,7 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
       </div>
       {first && (
         <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white dark:bg-white/[0.06] hover:bg-muted/60 text-foreground border border-input text-xs font-semibold cursor-pointer transition-all">
-          Xem Báo Giá &amp; Ký
+          Xem báo giá &amp; Ký
         </button>
       )}
     </section>
@@ -103,10 +103,10 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
       </span>
       <div className="shrink-0 flex flex-wrap gap-2">
         <Link href={`/admin/projects/${project.id}/episodes/${episode.id}`} className="px-4 py-2.5 rounded-full border border-input text-xs font-semibold text-secondary-foreground hover:bg-muted/60 transition-all">
-          Xem Phim Final
+          Xem phim Final
         </Link>
         <button type="button" disabled={busy} onClick={() => setConfirming(true)} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-xs cursor-pointer disabled:opacity-50 transition-all">
-          Phát Hành Ngay
+          Phát hành ngay
         </button>
       </div>
       <ConfirmModal

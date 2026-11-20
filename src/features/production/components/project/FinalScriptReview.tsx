@@ -60,7 +60,7 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
 
   return (
     <Panel
-      title="Duyệt Kịch bản Final"
+      title="Duyệt kịch bản Final"
       description="Đồng ý: kịch bản khoá lại và hệ thống tự gửi hợp đồng mẫu (chưa có giá) cho Studio. Không đồng ý: Creator sửa rồi nộp lại cho Reviewer."
     >
       <form onSubmit={approve} className="space-y-3 text-xs">

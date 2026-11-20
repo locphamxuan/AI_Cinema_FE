@@ -31,11 +31,11 @@ function QueueTable({ items }: { items: QueueItem[] }) {
       <table className="w-full text-left border-collapse text-xs">
         <thead>
           <tr className="border-b border-border bg-muted/60 text-muted-foreground font-bold text-[11px]">
-            <th className="py-3.5 px-4">Dự Án & Tập Phim</th>
-            <th className="py-3.5 px-4">Biên Kịch</th>
+            <th className="py-3.5 px-4">Dự án & tập phim</th>
+            <th className="py-3.5 px-4">Biên kịch</th>
             <th className="py-3.5 px-4">Studio</th>
-            <th className="py-3.5 px-4">Trạng Thái</th>
-            <th className="py-3.5 px-4 text-right">Hành Động</th>
+            <th className="py-3.5 px-4">Trạng thái</th>
+            <th className="py-3.5 px-4 text-right">Hành động</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-white/[0.04]">
@@ -110,7 +110,7 @@ export function ReviewerProjectQueuePage() {
           <>
             <section aria-label="Thống kê thẩm định" className={`${CARD} p-5 sm:p-6 space-y-3`}>
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                <h2 className="text-lg font-extrabold text-foreground tracking-tight">Tiến Độ Thẩm Định</h2>
+                <h2 className="text-lg font-extrabold text-foreground tracking-tight">Tiến độ thẩm định</h2>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl sm:text-4xl font-black text-foreground tracking-tight tabular-nums">{pending}</span>
                   <span className="text-xs sm:text-sm font-semibold text-muted-foreground">Hồ sơ đang chờ bạn xử lý</span>

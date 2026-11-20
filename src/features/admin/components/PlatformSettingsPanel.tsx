@@ -46,7 +46,7 @@ type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards' | 'co
 
 const TABS: { key: SettingsTab; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
-  { key: 'coin', label: 'COIN & Nạp tiền' },
+  { key: 'coin', label: 'Coin & nạp tiền' },
   { key: 'production', label: 'Giá tập' },
   { key: 'streaming', label: 'Phát sóng & Gói' },
   { key: 'rewards', label: 'Điểm danh & Vòng quay' },
@@ -180,7 +180,7 @@ export function PlatformSettingsPanel() {
           <div className="space-y-6">
             <div>
               <h3 className="text-xs font-bold text-sky-700 dark:text-sky-400 mb-2.5 flex items-center gap-1.5">
-                Phân khúc COIN & Nạp tiền
+                Coin & nạp tiền
               </h3>
               {renderFieldGroup(COIN_FIELDS)}
               <div className="mt-3">{refundToggle}</div>

@@ -94,7 +94,7 @@ export function FinalFilmPanel({
       />
       <TextPromptModal
         open={sendingBack}
-        title="Trả Phim Final lại qua Reviewer"
+        title="Trả phim Final lại qua Reviewer"
         subtitle={`Tập ${episode.episodeNumber}: ${episode.title}`}
         label="Lý do (Reviewer sẽ trao đổi với Studio để sửa)"
         confirmLabel="Trả lại"
