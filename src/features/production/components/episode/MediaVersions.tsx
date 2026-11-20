@@ -1,6 +1,7 @@
 'use client';
 
 import type { MediaAsset } from '@/types/production';
+import { inVietnamese } from '@/lib/apiMessages';
 import { INGEST_STATUS, LABEL_TYPE, SOURCE_METHOD } from '../../lib/labels';
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format';
 import { Empty, StatusPill } from '@/components/data/ui';
@@ -62,7 +63,7 @@ export function MediaVersions({
                   {running.progressPercent !== null && ` ${running.progressPercent}%`}…
                 </p>
               )}
-              {v.failureReason && <p className="text-rose-600">{v.failureReason}</p>}
+              {v.failureReason && <p className="text-rose-600">{inVietnamese(v.failureReason, 'Xử lý video không thành công. Hãy xử lý lại hoặc nộp bản khác.')}</p>}
               {v.submissionNote && <p className="text-muted-foreground">Ghi chú: {v.submissionNote}</p>}
               <p className="text-muted-foreground">
                 Nộp bởi {v.submittedBy.fullName}

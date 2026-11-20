@@ -114,7 +114,7 @@ describe('ChangeStudioModal', () => {
   });
 
   it('shows the refusal of the API and keeps the form open', async () => {
-    routeFetch({ '/projects/m1/studio-change': failWith(409, 'Studio email belongs to the current studio') });
+    routeFetch({ '/projects/m1/studio-change': failWith(409, 'That hand-off was replaced by another studio') });
     const onClose = vi.fn();
     const reload = vi.fn(async () => undefined);
     render(withProject(producing(), <ChangeStudioModal onClose={onClose} />, reload));
@@ -122,7 +122,7 @@ describe('ChangeStudioModal', () => {
     await fill();
     await userEvent.click(submitButton());
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('current studio')));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Lượt bàn giao này đã được thay bằng Studio khác.'));
     expect(onClose).not.toHaveBeenCalled();
     expect(reload).not.toHaveBeenCalled();
     expect(screen.getByLabelText('Email Studio')).toHaveValue('moi@studio.vn');

@@ -9,6 +9,7 @@ import { PERMISSION } from '@/lib/permissions';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { formatDateTime, formatDay, formatNumber } from '@/lib/format';
+import { inVietnamese } from '@/lib/apiMessages';
 import type { Tone } from '@/features/production/lib/labels';
 import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
@@ -202,7 +203,7 @@ function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
             <td className="py-1">
               {formatDay(c.periodStart)} → {formatDay(c.periodEnd)}
             </td>
-            <td className="py-1">{c.status === 'PAID' ? 'Đã thu' : (c.failureReason ?? 'Không thu được')}</td>
+            <td className="py-1">{c.status === 'PAID' ? 'Đã thu' : (c.failureReason ? inVietnamese(c.failureReason, 'Không thu được') : 'Không thu được')}</td>
             <td className="py-1 text-right tabular-nums">
               {c.mainCoinsCharged} + {c.bonusCoinsCharged}
             </td>

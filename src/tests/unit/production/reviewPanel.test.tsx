@@ -100,13 +100,13 @@ describe('ReviewPanel - the review sheet', () => {
   });
 
   it('shows the refusal of the API and changes nothing', async () => {
-    routeFetch({ '/media-assets/a1/reviews': failWith(409, 'The episode is not IN_REVIEW') });
+    routeFetch({ '/media-assets/a1/reviews': failWith(409, 'Cannot review media while the episode is PROCESSING') });
     const onChanged = renderPanel(sheet('IN_REVIEW'));
 
     await userEvent.click(screen.getByRole('button', { name: 'Duyệt' }));
     await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Duyệt bản này' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('IN_REVIEW')));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể duyệt bản phim khi tập đang ở trạng thái Đang xử lý video.'));
     expect(onChanged).not.toHaveBeenCalled();
   });
 });

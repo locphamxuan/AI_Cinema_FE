@@ -13,7 +13,7 @@ const failed = {
   qualities: [],
   proposedLabelType: 'AI_GENERATED',
   ingestJobs: [],
-  failureReason: 'Transcode failed',
+  failureReason: 'The file holds no video stream',
   submissionNote: null,
   submittedBy: { fullName: 'Studio Ánh Trăng (tài khoản)' },
   studioHandoff: { studio: { name: 'Ánh Trăng' } },
@@ -25,7 +25,7 @@ describe('MediaVersions', () => {
     render(<MediaVersions versions={[failed]} selectedId={null} approvedId={null} onSelect={vi.fn()} />);
     expect(screen.getByText(/Nộp bởi Studio Ánh Trăng \(tài khoản\)/)).toBeTruthy();
     expect(screen.getByText(/Studio Ánh Trăng · /)).toBeTruthy();
-    expect(screen.getByText('Transcode failed')).toBeTruthy();
+    expect(screen.getByText('Tệp không có hình video.')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Xử lý lại' })).toBeNull();
   });
 

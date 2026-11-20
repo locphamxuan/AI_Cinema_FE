@@ -56,9 +56,9 @@ describe('productionService', () => {
   });
 
   it('surfaces the backend message on a refused write', async () => {
-    mockFetch({ message: 'Allocate the production fee before assigning a Creator (BR-12)' }, 409);
+    mockFetch({ message: 'Assign the lead Content Creator first' }, 409);
     const res = await productionService.assignCreator('m1', 'c1');
     expect(res.success).toBe(false);
-    expect(res.message).toContain('BR-12');
+    expect(res.message).toBe('Hãy giao Creator chính trước.');
   });
 });

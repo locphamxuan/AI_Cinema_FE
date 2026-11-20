@@ -114,7 +114,7 @@ describe('FinalScriptReview', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Đồng ý Kịch bản Final' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('SUBMITTED')));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Kịch bản đang ở trạng thái Đã nộp (cần Reviewer đã duyệt).'));
     expect(onDecided).not.toHaveBeenCalled();
   });
 });

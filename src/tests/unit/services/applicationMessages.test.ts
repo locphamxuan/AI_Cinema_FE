@@ -30,13 +30,18 @@ describe('application messages', () => {
   });
 
   it('keeps the reason of any other business rule the backend refuses', () => {
-    const handoff = 'Episodes 2 have no delivery deadline or one already past; the Reviewer must set it first';
-    expect(localizeApiError(handoff, 409, undefined, '/projects/m1/handoff')).toBe(handoff);
+    const handoff = 'Every episode needs a delivery deadline before the studio is contracted';
+    expect(localizeApiError(handoff, 409, undefined, '/projects/m1/handoff')).toBe(
+      'Mỗi tập cần có hạn giao phim trước khi ký hợp đồng với Studio.',
+    );
     expect(localizeApiError('Only a failed delivery can be processed again', 400, undefined, '/media/a1/retry')).toBe(
-      'Only a failed delivery can be processed again',
+      'Chỉ bản phim xử lý lỗi mới xử lý lại được.',
     );
     expect(localizeApiError('Season not found in this project', 404, undefined, '/projects/m1/handoff')).toBe(
-      'Season not found in this project',
+      'Không tìm thấy mùa phim trong dự án.',
+    );
+    expect(localizeApiError('Cannot sign a contract that is SENT (expected STUDIO_SIGNED or ADMIN_COUNTERED)', 409, undefined, '/c')).toBe(
+      'Không thể ký hợp đồng đang ở trạng thái Đã gửi Studio (cần Studio đã ký hoặc Admin đề xuất giá mới).',
     );
   });
 
@@ -65,5 +70,23 @@ describe('application messages', () => {
     expect(localizeApiError('The episode cannot be released yet (BR-19)', 409, undefined, '/episodes/e1/publications')).toBe(
       APPLICATION_MESSAGES.MSG14.message,
     );
+  });
+});
+
+describe('API messages in Vietnamese', () => {
+  it('words a business refusal of the API in Vietnamese, values kept', () => {
+    expect(localizeApiError('Only a month that is over can be allocated', 409, undefined, '/finance')).toBe(
+      'Chỉ chia doanh thu cho tháng đã kết thúc.',
+    );
+    expect(localizeApiError('Studio "Sao Việt" is deactivated', 409, undefined, '/projects')).toBe(
+      'Studio "Sao Việt" đã ngừng hoạt động.',
+    );
+  });
+
+  it('never shows English it cannot word, and keeps Vietnamese as is', () => {
+    expect(localizeApiError('Some new English refusal', 409, undefined, '/x')).toMatch(/tải lại/);
+    expect(localizeApiError('Some new English refusal', 418, undefined, '/x')).toBe('Không thực hiện được thao tác này. Vui lòng thử lại.');
+    expect(localizeApiError('Tập đã có giá.', 409, undefined, '/x')).toBe('Tập đã có giá.');
+    expect(localizeApiError('', 404, undefined, '/x')).toBe(APPLICATION_MESSAGES.MSG10.message);
   });
 });

@@ -1,3 +1,5 @@
+import { inVietnamese } from './apiMessages';
+
 export const APPLICATION_MESSAGES = {
   MSG01: {
     type: 'Inline',
@@ -157,11 +159,16 @@ export function localizeApiError(
   if (status === 401) return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
   if (status >= 500) return APPLICATION_MESSAGES.MSG18.message;
 
-  // Any other business rule the backend explains (a refused hand-off, a Submission in the wrong state, …)
-  // reaches the user as is; the generic wording only stands in when the backend gave no reason.
-  if (message) return message;
-  if (status === 403) return APPLICATION_MESSAGES.MSG09.message;
-  if (status === 404) return APPLICATION_MESSAGES.MSG10.message;
-  if (status === 400 || status === 422) return APPLICATION_MESSAGES.MSG03.message;
-  return `HTTP error! status: ${status}`;
+  // Any other business rule the backend explains (a refused hand-off, a Submission in the wrong state, …) reaches
+  // the user in Vietnamese; the generic wording stands in when the backend gave no reason or one we cannot word.
+  const generic = GENERIC_BY_STATUS[status] ?? 'Không thực hiện được thao tác này. Vui lòng thử lại.';
+  return message ? inVietnamese(message, generic) : generic;
 }
+
+const GENERIC_BY_STATUS: Record<number, string> = {
+  400: APPLICATION_MESSAGES.MSG03.message,
+  403: APPLICATION_MESSAGES.MSG09.message,
+  404: APPLICATION_MESSAGES.MSG10.message,
+  409: 'Dữ liệu vừa thay đổi hoặc không còn ở trạng thái phù hợp. Hãy tải lại rồi thử lại.',
+  422: APPLICATION_MESSAGES.MSG03.message,
+};

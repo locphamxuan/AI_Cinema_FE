@@ -97,12 +97,12 @@ describe('PublishPanel - release (Admin)', () => {
   });
 
   it('shows the refusal of the API when the release fails', async () => {
-    routeFetch({ '/episodes/e1/publications': failWith(409, 'The Reviewer has not confirmed the Final Film') });
+    routeFetch({ '/episodes/e1/publications': failWith(409, 'The Reviewer has not confirmed this Final Film') });
     const onChanged = show(episode(), { canPublish: true });
 
     await userEvent.click(await screen.findByRole('button', { name: 'Phát hành ngay' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('Final Film')));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Reviewer chưa xác nhận Phim Final này.'));
     expect(onChanged).not.toHaveBeenCalled();
   });
 
