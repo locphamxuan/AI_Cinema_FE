@@ -1,8 +1,18 @@
-/** Read-only list of platform policies for the Reviewer and the Admin (`content:review` / `platform:settings.manage`). */
 import { apiClient } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type { Page } from '@/types/production';
 import type { Policy, PolicyType } from '@/types/policy';
+
+export interface PolicyInput {
+  name: string;
+  type: PolicyType;
+  version: string;
+  documentReference?: string | null;
+  content?: Record<string, unknown> | null;
+  effectiveFrom?: string | null;
+  effectiveTo?: string | null;
+  isActive?: boolean;
+}
 
 export interface PolicyFilters {
   search?: string;
@@ -22,4 +32,11 @@ export function policiesQuery(page: number, limit: number, f: PolicyFilters = {}
 export const policyService = {
   list: (page: number, limit: number, filters?: PolicyFilters) =>
     apiClient.get<Page<Policy>>(`${API_ROUTES.POLICIES}?${policiesQuery(page, limit, filters)}`),
+
+  create: (input: PolicyInput) => apiClient.post<Policy>(API_ROUTES.POLICIES, input),
+
+  update: (id: string, input: Partial<PolicyInput>) =>
+    apiClient.patch<Policy>(`${API_ROUTES.POLICIES}/${id}`, input),
+
+  remove: (id: string) => apiClient.delete<unknown>(`${API_ROUTES.POLICIES}/${id}`),
 };
