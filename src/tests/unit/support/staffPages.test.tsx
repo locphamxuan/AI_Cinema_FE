@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { StaffLookup, StaffPage } from '@/features/staff/components/StaffPage';
+import { StaffPage } from '@/features/staff/components/StaffPage';
+import { StaffLookup } from '@/features/staff/components/StaffLookup';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 
@@ -20,14 +21,20 @@ describe('Staff pages', () => {
     expect(screen.getByText(/chưa được cấp quyền hỗ trợ khách hàng/)).toBeInTheDocument();
   });
 
-  it('lists the read-only lookups the permissions open', async () => {
+  it('lists the read-only lookups the permissions open, one tab at a time', async () => {
     signInAs('staff', ['member:ops.read']);
     routeFetch({
       '/movies': page([{ id: 'm1', title: 'Mưa Trên Phố Cũ', episodeCount: 8, genres: [] }]),
       '/users': page([{ id: 'u1', fullName: 'An', email: 'an@test.vn', isActive: false }]),
     });
     render(<StaffLookup />);
+    // Default tab: films.
     expect(await screen.findByText('Mưa Trên Phố Cũ')).toBeInTheDocument();
+    // Switch to the Member tab (renders only that lookup).
+    await screen.findByRole('button', { name: /Member/ }).then((b) => b.click());
     expect(await screen.findByText('Đã khoá')).toBeInTheDocument();
+    // Sensitive data hidden: member ID and email are not shown to Staff.
+    expect(screen.queryByText('an@test.vn')).not.toBeInTheDocument();
+    expect(screen.queryByText('u1')).not.toBeInTheDocument();
   });
 });
