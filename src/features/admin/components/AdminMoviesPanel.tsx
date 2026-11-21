@@ -38,15 +38,15 @@ export function AdminMoviesPanel() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Quản lý phim</h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Quản lý phim</h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
           Phim đang có trên nền tảng theo từng thể loại: số tim, lượt xem, lượt mua và Coin Member đã trả, chi tiết tới từng tập.
         </p>
       </div>
       {genres.error && <ErrorNote message={genres.error} onRetry={genres.reload} />}
       {genres.loading && !genres.data && <Loading />}
       {genres.data && (
-        <div role="tablist" aria-label="Thể loại" className="flex gap-1.5 p-1 rounded-2xl bg-slate-100/80 dark:bg-white/5 overflow-x-auto">
+        <div role="tablist" aria-label="Thể loại" className="flex gap-1.5 p-1 rounded-2xl bg-muted overflow-x-auto">
           {genres.data.map((g) => (
             <button
               key={g.id}
@@ -55,7 +55,7 @@ export function AdminMoviesPanel() {
               aria-selected={g.id === genreId}
               onClick={() => { setChosen(g.id); setOpen(null); }}
               className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold cursor-pointer ${
-                g.id === genreId ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400'
+                g.id === genreId ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white shadow-xs' : 'text-muted-foreground'
               }`}
             >
               {g.name} <span className="opacity-60">({g.movieCount})</span>
@@ -75,7 +75,7 @@ export function AdminMoviesPanel() {
           {rows.length > 0 && (
             <div className="overflow-x-auto -mx-6 -my-6">
               <table className="w-full text-xs">
-                <thead className="text-[11px] text-slate-500 text-left bg-slate-50/60 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+                <thead className="text-[11px] text-muted-foreground text-left bg-muted/60 border-b border-border">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold">Phim</th>
                     <th className="py-2.5 px-3 font-semibold text-right">Tim</th>
@@ -122,7 +122,7 @@ interface FilmRowProps {
   onToggle: () => void;
   /** Present for an account allowed to place the episode's ads (BR-32). */
   onAds?: (episode: { id: string; label: string }) => void;
-  /** Present for an account allowed to set episode coin price and access flags (Admin). */
+  /** Present for an account allowed to set episode Coin price and access flags (Admin). */
   onPricing?: (target: EpisodePricingTarget) => void;
 }
 
@@ -138,21 +138,21 @@ function FilmRow({ film, expanded, onToggle, onAds, onPricing }: FilmRowProps) {
               onClick={onToggle}
               aria-expanded={expanded}
               aria-label={`${expanded ? 'Ẩn' : 'Xem'} từng tập của ${film.title}`}
-              className="text-slate-400 hover:text-sky-700 cursor-pointer"
+              className="text-muted-foreground hover:text-sky-700 cursor-pointer"
             >
               {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
             </button>
             {film.posterUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={film.posterUrl} alt="" className="w-9 h-12 rounded-md object-cover bg-slate-200 dark:bg-white/10" />
+              <img src={film.posterUrl} alt="" className="w-9 h-12 rounded-md object-cover bg-muted" />
             ) : (
-              <span className="w-9 h-12 rounded-md bg-slate-200 dark:bg-white/10 flex items-center justify-center"><Film className="w-4 h-4 text-slate-400" /></span>
+              <span className="w-9 h-12 rounded-md bg-muted flex items-center justify-center"><Film className="w-4 h-4 text-muted-foreground" /></span>
             )}
             <div className="min-w-0">
-              <Link href={productionPaths.project('/admin', film.id, 'episodes')} className="font-semibold text-slate-900 dark:text-white hover:text-sky-700">
+              <Link href={productionPaths.project('/admin', film.id, 'episodes')} className="font-semibold text-foreground hover:text-sky-700">
                 {film.title}
               </Link>
-              <p className="text-[11px] text-slate-500">
+              <p className="text-[11px] text-muted-foreground">
                 {film.episodes.length} tập{film.releaseYear ? ` · ${film.releaseYear}` : ''}{film.ageRating ? ` · ${film.ageRating}` : ''} · {film.genres.map((g) => g.name).join(', ')}
               </p>
             </div>
@@ -167,11 +167,11 @@ function FilmRow({ film, expanded, onToggle, onAds, onPricing }: FilmRowProps) {
         </td>
       </tr>
       {expanded && (
-        <tr className="bg-slate-50/60 dark:bg-white/[0.02]">
+        <tr className="bg-muted/60">
           <td colSpan={5} className="px-4 py-3">
-            {!many && <p className="text-[11px] text-slate-500 mb-2">Phim một tập - số liệu của tập chính là của phim.</p>}
+            {!many && <p className="text-[11px] text-muted-foreground mb-2">Phim một tập - số liệu của tập chính là của phim.</p>}
             <table className="w-full text-[11px]">
-              <thead className="text-slate-500 text-left">
+              <thead className="text-muted-foreground text-left">
                 <tr>
                   <th className="py-1.5 pl-10">Tập</th>
                   <th className="py-1.5 text-right">Giá</th>
@@ -184,7 +184,7 @@ function FilmRow({ film, expanded, onToggle, onAds, onPricing }: FilmRowProps) {
               </thead>
               <tbody>
                 {film.episodes.map((e) => (
-                  <tr key={e.id} className="border-t border-slate-200/60 dark:border-white/5">
+                  <tr key={e.id} className="border-t border-border">
                     <td className="py-1.5 pl-10">Tập {e.episodeNumber}{e.title && e.title !== `Tập ${e.episodeNumber}` ? ` - ${e.title}` : ''}</td>
                     <td className="py-1.5 text-right tabular-nums">{e.coinPrice ? `${e.coinPrice} Coin` : 'Miễn phí'}</td>
                     <td className="py-1.5 text-right tabular-nums">{formatNumber(e.views)}</td>

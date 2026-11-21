@@ -23,14 +23,14 @@ export function RewardLadderPanel() {
   const totalStreakCoins = sortedRules.reduce((sum, r) => sum + (r.isActive ? r.bonusCoins : 0), 0);
 
   return (
-    <section className="bg-white dark:bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
+    <section className="bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
       {/* ── Panel Header ── */}
-      <div className="p-6 border-b border-slate-100 dark:border-white/5 space-y-4">
+      <div className="p-6 border-b border-border space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
               <div>
-                <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                   Điểm danh hằng ngày
                   <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
                     Chuỗi 7 ngày
@@ -38,7 +38,7 @@ export function RewardLadderPanel() {
                 </h2>
               </div>
             </div>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">
+            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
               Bỏ lỡ một ngày thì chuỗi bắt đầu lại từ Ngày 1. Điểm danh đủ 7 ngày liên tục sẽ được nhận tổng cộng{' '}
               <strong className="text-amber-600 dark:text-amber-400 tabular-nums font-bold">+{totalStreakCoins} Coin</strong> và tự động tặng thêm{' '}
               <strong className="text-purple-600 dark:text-purple-400 font-semibold">1 lượt quay may mắn</strong>.
@@ -68,7 +68,7 @@ export function RewardLadderPanel() {
                   className={`relative p-3 rounded-2xl border transition-all text-center flex flex-col justify-between ${
                     isDay7
                       ? 'bg-gradient-to-b from-purple-500/10 via-amber-500/5 to-transparent border-purple-500/30 shadow-xs'
-                      : 'bg-slate-50/80 dark:bg-white/[0.02] border-slate-200/70 dark:border-white/5'
+                      : 'bg-muted/60 border-border'
                   }`}
                 >
                   {isDay7 && (
@@ -76,7 +76,7 @@ export function RewardLadderPanel() {
                       Đặc biệt
                     </span>
                   )}
-                  <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
+                  <p className="text-[11px] font-bold text-muted-foreground">
                     Ngày {r.streakDay}
                   </p>
                   <div className="my-1.5">
@@ -84,13 +84,13 @@ export function RewardLadderPanel() {
                       +{r.bonusCoins}
                     </span>
                   </div>
-                  <div className="pt-1 border-t border-slate-200/50 dark:border-white/5">
+                  <div className="pt-1 border-t border-border">
                     {isDay7 ? (
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-600 dark:text-purple-300">
-                        +1 Vòng quay
+                        +1 lượt quay
                       </span>
                     ) : (
-                      <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                      <span className="text-[10px] text-muted-foreground/70">
                         Coin thưởng
                       </span>
                     )}
@@ -106,14 +106,14 @@ export function RewardLadderPanel() {
       {rules.error && <ErrorNote message={rules.error} onRetry={rules.reload} />}
       {rules.loading && !rules.data && <Loading />}
       {rules.data?.length === 0 && (
-        <Empty>Chưa cấu hình ngày nào - Khán giả điểm danh sẽ không nhận được Coin thưởng.</Empty>
+        <Empty>Chưa cấu hình ngày nào: Member điểm danh sẽ không nhận được Coin thưởng.</Empty>
       )}
 
       {/* ── Detailed Table ── */}
       {sortedRules.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50/80 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5 text-left">
+            <thead className="text-[11px] text-muted-foreground bg-muted/60 border-b border-border text-left">
               <tr>
                 <th className="py-3 px-6 font-bold w-24">Ngày chuỗi</th>
                 <th className="py-3 px-4 font-bold">Tên hiển thị</th>
@@ -131,12 +131,12 @@ export function RewardLadderPanel() {
                     key={rule.id}
                     className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors"
                   >
-                    <td className="py-3 px-6 font-bold text-slate-900 dark:text-white whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-white/5 tabular-nums text-xs">
+                    <td className="py-3 px-6 font-bold text-foreground whitespace-nowrap">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-muted tabular-nums text-xs">
                         Ngày {rule.streakDay}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-slate-700 dark:text-slate-300 font-medium">
+                    <td className="py-3 px-4 text-secondary-foreground font-medium">
                       {rule.name}
                     </td>
                     <td className="py-3 px-4 text-right whitespace-nowrap">
@@ -147,10 +147,10 @@ export function RewardLadderPanel() {
                     <td className="py-3 px-4 text-center whitespace-nowrap">
                       {isDay7 ? (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/25">
-                          <span>+1 Lượt quay</span>
+                          <span>+1 lượt quay</span>
                         </span>
                       ) : (
-                        <span className="text-slate-400 dark:text-slate-600 tabular-nums">—</span>
+                        <span className="text-muted-foreground/70 tabular-nums">—</span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-center whitespace-nowrap">
@@ -158,7 +158,7 @@ export function RewardLadderPanel() {
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
                           rule.isActive
                             ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
-                            : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-white/5 dark:text-slate-400'
+                            : 'bg-muted text-muted-foreground border-border'
                         }`}
                       >
                         <span
@@ -174,7 +174,7 @@ export function RewardLadderPanel() {
                         type="button"
                         aria-label={`Sửa ngày ${rule.streakDay}`}
                         onClick={() => setEditing(rule)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-muted-foreground hover:text-sky-600 dark:hover:text-sky-400 hover:bg-muted transition-colors cursor-pointer"
                         title="Chỉnh sửa cấu hình ngày này"
                       >
                         <Pencil className="w-3.5 h-3.5" />

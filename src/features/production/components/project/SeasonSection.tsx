@@ -21,12 +21,12 @@ import { productionService } from '@/services/productionService';
 /** Submissions of one episode: every version of media the Creator uploaded from the studio's deliveries. */
 function Submissions({ episode }: { episode: Episode }) {
   const versions = useResource(`media:${episode.id}`, () => productionService.listMedia(episode.id));
-  if (versions.loading && !versions.data) return <p className="text-slate-500">Đang tải bản phim…</p>;
-  if (!versions.data?.length) return <p className="text-slate-500">Chưa có bản phim nào.</p>;
+  if (versions.loading && !versions.data) return <p className="text-muted-foreground">Đang tải bản phim…</p>;
+  if (!versions.data?.length) return <p className="text-muted-foreground">Chưa có bản phim nào.</p>;
   return (
     <ul className="space-y-1">
       {versions.data.map((media) => (
-        <li key={media.id} className="flex flex-wrap gap-x-3 text-slate-600 dark:text-slate-300">
+        <li key={media.id} className="flex flex-wrap gap-x-3 text-muted-foreground">
           <span className="font-medium">v{media.version}</span>
           <span>{INGEST_STATUS[media.ingestStatus].label}</span>
           <span>{media.submittedBy.fullName}</span>
@@ -47,10 +47,10 @@ function Assignee({ episode, seats, editable }: { episode: Episode; seats: Creat
   if (!editable) {
     return episode.assignedCreator ? (
       <span>
-        {episode.assignedCreator.fullName} <span className="text-slate-400">({held(episode.assignedCreator.id)} tập)</span>
+        {episode.assignedCreator.fullName} <span className="text-muted-foreground">({held(episode.assignedCreator.id)} tập)</span>
       </span>
     ) : (
-      <span className="text-slate-400">Cả nhóm</span>
+      <span className="text-muted-foreground">Cả nhóm</span>
     );
   }
   const change = async (creatorId: string) => {
@@ -62,7 +62,7 @@ function Assignee({ episode, seats, editable }: { episode: Episode; seats: Creat
       disabled={busy}
       onChange={(e) => change(e.target.value)}
       aria-label={`Creator phụ trách tập ${episode.episodeNumber}`}
-      className="rounded-lg border border-slate-200 dark:border-white/10 bg-transparent px-1.5 py-1 text-xs max-w-40"
+      className="rounded-lg border border-border bg-transparent px-1.5 py-1 text-xs max-w-40"
     >
       <option value="">Cả nhóm</option>
       {active.map((seat) => (
@@ -96,13 +96,13 @@ export function SeasonSection({
 
   return (
     <section className={`${CARD} overflow-hidden`} aria-label={seasonName(season.seasonNumber, season.episodes.length)}>
-      <header className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.02]">
+      <header className="flex flex-wrap items-center justify-between gap-2 px-5 py-3 border-b border-border bg-muted/60">
         <div className="min-w-0 space-y-1">
-          <h2 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white">
+          <h2 className="flex flex-wrap items-center gap-2 text-sm font-semibold text-foreground">
             {seasonLabel(season.seasonNumber, season.episodes.length, season.title)}
             <StatusPill {...SEASON_STATUS[season.status]} />
           </h2>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400">
+          <p className="text-[11px] text-muted-foreground">
             Phát hành {season.releaseStartDate || season.releaseEndDate ? `${formatDay(season.releaseStartDate)} → ${formatDay(season.releaseEndDate)}` : 'chưa đặt khoảng'}
           </p>
         </div>
@@ -124,13 +124,13 @@ export function SeasonSection({
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="text-slate-500 dark:text-slate-400 text-left bg-slate-50 dark:bg-white/5">
+            <thead className="text-muted-foreground text-left bg-muted/60">
               <tr>
                 <th className="px-3 py-2 font-medium w-10">#</th>
                 <th className="px-3 py-2 font-medium">Tập</th>
                 <th className="px-3 py-2 font-medium">Trạng thái</th>
                 <th className="px-3 py-2 font-medium hidden md:table-cell">Creator phụ trách</th>
-                <th className="px-3 py-2 font-medium hidden sm:table-cell text-right">Giá bán (Coin)</th>
+                <th className="px-3 py-2 font-medium hidden sm:table-cell text-right">Giá Coin</th>
                 <th className="px-3 py-2 font-medium hidden md:table-cell">Ngày dự kiến phát hành</th>
                 <th className="px-3 py-2 font-medium hidden lg:table-cell">Hạn giao Studio</th>
                 <th className="px-2 py-2 w-24" />
@@ -142,10 +142,10 @@ export function SeasonSection({
                 const expanded = open === ep.id;
                 return (
                   <Fragment key={ep.id}>
-                    <tr className="hover:bg-slate-50 dark:hover:bg-white/5">
-                      <td className="px-3 py-2.5 text-slate-500">{ep.episodeNumber}</td>
+                    <tr className="hover:bg-muted/60">
+                      <td className="px-3 py-2.5 text-muted-foreground">{ep.episodeNumber}</td>
                       <td className="px-3 py-2.5">
-                        <Link href={productionPaths.episode(base, project.id, ep.id)} className="font-medium text-slate-900 dark:text-white hover:underline">
+                        <Link href={productionPaths.episode(base, project.id, ep.id)} className="font-medium text-foreground hover:underline">
                           {ep.title}
                         </Link>
                         {ep.revisionStartedAt && <span className="ml-2 text-xs text-amber-600">đang sửa</span>}
@@ -153,15 +153,15 @@ export function SeasonSection({
                       <td className="px-3 py-2.5">
                         <StatusPill {...EPISODE_STATUS[ep.status]} />
                         {ep.status === 'COMPLIANCE_PASSED' && ep.finalConfirmedAt && (
-                          <span className="block mt-0.5 text-[11px] text-emerald-600">Phim Final, chờ Admin publish</span>
+                          <span className="block mt-0.5 text-[11px] text-emerald-600">Phim Final, chờ Admin phát hành</span>
                         )}
                       </td>
-                      <td className="px-3 py-2.5 hidden md:table-cell text-slate-600 dark:text-slate-300">
+                      <td className="px-3 py-2.5 hidden md:table-cell text-muted-foreground">
                         <Assignee episode={ep} seats={seats} editable={assign && ep.status !== 'PUBLISHED'} />
                       </td>
-                      <td className="px-3 py-2.5 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{formatNumber(ep.coinPrice)}</td>
-                      <td className="px-3 py-2.5 hidden md:table-cell text-slate-600 dark:text-slate-300">{formatDay(ep.expectedReleaseDate)}</td>
-                      <td className={`px-3 py-2.5 hidden lg:table-cell ${overdue ? 'text-rose-600 font-semibold' : 'text-slate-600 dark:text-slate-300'}`}>
+                      <td className="px-3 py-2.5 hidden sm:table-cell text-right text-muted-foreground">{formatNumber(ep.coinPrice)}</td>
+                      <td className="px-3 py-2.5 hidden md:table-cell text-muted-foreground">{formatDay(ep.expectedReleaseDate)}</td>
+                      <td className={`px-3 py-2.5 hidden lg:table-cell ${overdue ? 'text-rose-600 font-semibold' : 'text-muted-foreground'}`}>
                         {overdue && 'Quá hạn: '}
                         {ep.deliveryDeadline ? formatDay(ep.deliveryDeadline) : <span className="text-amber-600">Chưa đặt</span>}
                       </td>
@@ -171,7 +171,7 @@ export function SeasonSection({
                           variant="ghost"
                           onClick={() => setOpen(expanded ? null : ep.id)}
                           aria-expanded={expanded}
-                          aria-label={`Submission của tập ${ep.episodeNumber}`}
+                          aria-label={`Các bản nộp của tập ${ep.episodeNumber}`}
                         >
                           {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                         </Button>
@@ -183,10 +183,10 @@ export function SeasonSection({
                       </td>
                     </tr>
                     {expanded && (
-                      <tr className="bg-slate-50/60 dark:bg-white/5">
+                      <tr className="bg-muted/60">
                         <td />
                         <td colSpan={8} className="px-3 py-2.5">
-                          <p className="font-semibold text-slate-700 dark:text-slate-200 mb-1">Các bản phim đã nộp</p>
+                          <p className="font-semibold text-secondary-foreground mb-1">Các bản phim đã nộp</p>
                           <Submissions episode={ep} />
                         </td>
                       </tr>

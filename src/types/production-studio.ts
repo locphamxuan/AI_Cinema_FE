@@ -57,6 +57,11 @@ export interface Studio {
   contactName: string | null;
   phone: string | null;
   note: string | null;
+  /** Bên B of the production contract: contactName is the representative who signs. */
+  address?: string | null;
+  taxCode?: string | null;
+  bankAccount?: string | null;
+  representativeTitle?: string | null;
   isActive: boolean;
   createdAt: string;
   _count?: { projects: number; handoffs: number };

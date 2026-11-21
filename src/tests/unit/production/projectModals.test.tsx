@@ -87,10 +87,10 @@ describe('EditProjectModal', () => {
     await screen.findByRole('button', { name: 'Kinh dị' });
     expect(save()).toBeEnabled();
 
-    await userEvent.clear(screen.getByLabelText(/Ý tưởng gửi studio/));
-    await userEvent.type(screen.getByLabelText(/Ý tưởng gửi studio/), 'Quá ngắn');
+    await userEvent.clear(screen.getByLabelText(/Ý tưởng gửi Studio/));
+    await userEvent.type(screen.getByLabelText(/Ý tưởng gửi Studio/), 'Quá ngắn');
     expect(save()).toBeDisabled();
-    await userEvent.type(screen.getByLabelText(/Ý tưởng gửi studio/), ' để gửi cho studio đâu');
+    await userEvent.type(screen.getByLabelText(/Ý tưởng gửi Studio/), ' để gửi cho studio đâu');
     expect(save()).toBeEnabled();
 
     await userEvent.click(screen.getByRole('button', { name: 'Kinh dị' }));
@@ -101,13 +101,13 @@ describe('EditProjectModal', () => {
   });
 
   it('keeps the dialog open and shows the refusal of the API', async () => {
-    routeFetch({ '/genres': GENRES, '/projects/m1': failWith(409, 'The project is CANCELLED') });
+    routeFetch({ '/genres': GENRES, '/projects/m1': failWith(409, 'Cannot edit an episode while the project is CANCELLED') });
     const { onClose, reload } = editModal();
 
     await screen.findByRole('button', { name: 'Kinh dị' });
     await userEvent.click(save());
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('CANCELLED')));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể sửa tập khi dự án đang ở trạng thái Đã huỷ.'));
     expect(onClose).not.toHaveBeenCalled();
     expect(reload).not.toHaveBeenCalled();
   });
@@ -143,14 +143,14 @@ describe('AssignCreatorModal (Admin)', () => {
   });
 
   it('shows the refusal of the API and keeps the dialog open', async () => {
-    routeFetch({ '/users': creators, '/projects/m1/assign': failWith(409, 'Cannot reassign a project that is IN_PRODUCTION') });
+    routeFetch({ '/users': creators, '/projects/m1/assign': failWith(409, 'Pick an active Content Creator account') });
     const { onClose } = assign();
 
     await screen.findByRole('option', { name: /Creator Hai/ });
     await userEvent.selectOptions(screen.getByLabelText('Creator'), 'c2');
     await userEvent.click(screen.getByRole('button', { name: 'Giao' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('IN_PRODUCTION')));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Hãy chọn một tài khoản Creator đang hoạt động.'));
     expect(onClose).not.toHaveBeenCalled();
   });
 });

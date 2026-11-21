@@ -50,13 +50,13 @@ export function ChangeRequestCard({
   return (
     <li className="rounded-xl border border-sky-100 dark:border-white/10 p-3 text-xs space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-slate-500 dark:text-slate-400">
+        <p className="text-muted-foreground">
           {cr.requestedBy.fullName} · {formatDateTime(cr.createdAt)}
           {cr.season && ` · Mùa ${cr.season.seasonNumber}`}
           {cr.episode && ` · Tập ${cr.episode.episodeNumber}: ${cr.episode.title}`}
         </p>
         <div className="flex items-center gap-2">
-          <span className="font-medium text-slate-700 dark:text-slate-200">{CHANGE_REQUEST_TYPE[cr.requestType]}</span>
+          <span className="font-medium text-secondary-foreground">{CHANGE_REQUEST_TYPE[cr.requestType]}</span>
           <StatusPill {...CHANGE_REQUEST_STATUS[cr.status]} />
         </div>
       </div>
@@ -66,12 +66,12 @@ export function ChangeRequestCard({
         </Link>
       )}
       <div>
-        <p className="font-semibold text-slate-700 dark:text-slate-200">Nội dung</p>
-        <p className="whitespace-pre-line text-slate-800 dark:text-slate-200">{cr.content}</p>
+        <p className="font-semibold text-secondary-foreground">Nội dung</p>
+        <p className="whitespace-pre-line text-foreground">{cr.content}</p>
       </div>
       <div>
-        <p className="font-semibold text-slate-700 dark:text-slate-200">Lý do</p>
-        <p className="whitespace-pre-line text-slate-600 dark:text-slate-300">{cr.reason}</p>
+        <p className="font-semibold text-secondary-foreground">Lý do</p>
+        <p className="whitespace-pre-line text-muted-foreground">{cr.reason}</p>
       </div>
       {cr.attachmentName && (
         <Button size="sm" variant="ghost" onClick={proof}>
@@ -79,7 +79,7 @@ export function ChangeRequestCard({
         </Button>
       )}
       {cr.adminResponse && (
-        <p className="rounded-lg bg-slate-50 dark:bg-white/5 p-2 text-slate-600 dark:text-slate-300">
+        <p className="rounded-lg bg-muted/60 p-2 text-muted-foreground">
           <span className="font-semibold">{cr.resolvedBy?.fullName ?? 'Admin'}:</span> {cr.adminResponse}
         </p>
       )}

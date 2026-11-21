@@ -84,7 +84,7 @@ function CostRequestForm({ onSent }: { onSent: () => Promise<void> }) {
   };
 
   return (
-    <form onSubmit={submit} className="space-y-3 rounded-xl border border-slate-200/80 dark:border-white/[0.08] p-3">
+    <form onSubmit={submit} className="space-y-3 rounded-xl border border-border p-3">
       {live.length > 0 && (
         <FormField label="Đợt bàn giao">
           <select value={handoffId} onChange={(e) => setHandoffId(e.target.value)} className={fieldInputClass} aria-label="Đợt bàn giao">
@@ -105,7 +105,7 @@ function CostRequestForm({ onSent }: { onSent: () => Promise<void> }) {
           <input inputMode="numeric" value={requested} onChange={(e) => setRequested(e.target.value)} required className={fieldInputClass} aria-label="Số tiền xin thêm" />
         </FormField>
       </div>
-      <p className="text-[11px] text-slate-500">Ngân sách còn lại: {formatVnd(project.cost.remainingVnd)}. Số tiền là bội số 1.000 ₫.</p>
+      <p className="text-[11px] text-muted-foreground">Ngân sách còn lại: {formatVnd(project.cost.remainingVnd)}. Số tiền là bội số 1.000 ₫.</p>
       <FormField label="Lý do (Studio trả lời gì)">
         <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} minLength={5} maxLength={5000} required className={fieldTextareaClass} />
       </FormField>

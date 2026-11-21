@@ -49,7 +49,8 @@ export interface CoinLot {
   source: string;
   originalAmount: number;
   remainingAmount: number;
-  expiresAt: string;
+  /** Bonus Coins never expire; a lot only says when it was granted. */
+  grantedAt: string;
 }
 
 /** GET /admin/wallets/:userId */

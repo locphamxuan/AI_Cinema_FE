@@ -24,15 +24,15 @@ export function AiHealthCard() {
     h.mode === 'disabled'
       ? 'AI đang tắt: Member được chuyển thẳng cho nhân viên.'
       : h.failedArticles > 0
-        ? `${h.failedArticles} bài xuất bản bị lỗi index nên AI chưa đọc được. Lọc "Lỗi index" ở Kho tri thức để xử lý.`
+        ? `${h.failedArticles} bài xuất bản bị lỗi lập chỉ mục nên AI chưa đọc được. Lọc "Lỗi index" ở Kho tri thức để xử lý.`
         : null;
 
   const facts: [string, string][] = [
     ['Mô hình trả lời', h.chatConfigured ? (h.chatModel ?? '—') : 'Chưa cấu hình'],
     ['Mô hình nhúng', h.embeddingConfigured ? (h.embeddingModel ?? '—') : 'Chưa cấu hình'],
-    ['Đoạn đã index', formatNumber(h.indexedChunks)],
-    ['Bài chờ index', formatNumber(h.pendingArticles)],
-    ['Index gần nhất', formatDateTime(h.lastIndexedAt)],
+    ['Đoạn đã lập chỉ mục', formatNumber(h.indexedChunks)],
+    ['Bài chờ lập chỉ mục', formatNumber(h.pendingArticles)],
+    ['Lập chỉ mục gần nhất', formatDateTime(h.lastIndexedAt)],
   ];
 
   return (

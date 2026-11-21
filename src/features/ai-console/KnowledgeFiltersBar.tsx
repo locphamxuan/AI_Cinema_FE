@@ -71,7 +71,7 @@ export function KnowledgeFiltersBar({ value, onChange }: { value: KnowledgeFilte
           onChange={(e) => onChange({ ...value, failedOnly: e.target.checked || undefined })}
           className="size-4 accent-primary"
         />
-        Chỉ bài lỗi index
+        Chỉ bài lỗi lập chỉ mục
       </label>
     </div>
   );

@@ -17,7 +17,7 @@ const FILTER_OPTIONS: { key: ScriptFilterKey; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'draft', label: 'Chưa nộp' },
   { key: 'review', label: 'Reviewer & cần sửa' },
-  { key: 'admin_approval', label: 'Chờ Admin chốt' },
+  { key: 'admin_approval', label: 'Chờ Admin duyệt Final' },
   { key: 'handed_off', label: 'Kịch bản Final' },
 ];
 
@@ -35,7 +35,7 @@ export function StudioFilterBar({
       {/* Filter Tabs - Rounded Pill Buy Me a Coffee style */}
       <div
         role="tablist"
-        aria-label="Lọc trạng thái kịch bản phân cảnh"
+        aria-label="Lọc theo trạng thái kịch bản"
         className="flex items-center gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-none"
       >
         {FILTER_OPTIONS.map(({ key, label }) => {
@@ -49,8 +49,8 @@ export function StudioFilterBar({
               onClick={() => onFilterChange(key)}
               className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                 isActive
-                  ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm font-bold'
-                  : 'bg-white dark:bg-[#141724] text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-white/10'
+                  ? 'bg-primary text-primary-foreground shadow-sm font-bold'
+                  : 'bg-card text-muted-foreground hover:text-foreground border border-border'
               }`}
             >
               <span>{label}</span>
@@ -69,15 +69,15 @@ export function StudioFilterBar({
         {/* Search Input with rounded-full */}
         <div className="relative flex-1 md:w-72">
           <Search
-            className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none"
             aria-hidden="true"
           />
           <input
             type="search"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Tìm theo tên phim, thể loại, Studio..."
-            className="w-full pl-10 pr-4 py-2 rounded-full bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-900 dark:focus:border-white transition-all shadow-xs"
+            placeholder="Tìm theo tên phim, thể loại, Studio…"
+            className="w-full pl-10 pr-4 py-2 rounded-full bg-card border border-border text-xs text-foreground placeholder-slate-400 focus:outline-none focus:border-ring transition-all shadow-xs"
           />
         </div>
 
@@ -85,17 +85,17 @@ export function StudioFilterBar({
         <div
           role="group"
           aria-label="Chế độ hiển thị"
-          className="flex items-center p-1 rounded-full bg-white dark:bg-[#141724] border border-slate-200/80 dark:border-white/10 shrink-0"
+          className="flex items-center p-1 rounded-full bg-card border border-border shrink-0"
         >
           <button
             type="button"
             onClick={() => onViewModeChange('grid')}
-            title="Dạng Lưới (Grid)"
+            title="Dạng lưới"
             aria-pressed={viewMode === 'grid'}
             className={`p-1.5 rounded-full transition-colors cursor-pointer ${
               viewMode === 'grid'
-                ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white'
-                : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-muted text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
@@ -103,12 +103,12 @@ export function StudioFilterBar({
           <button
             type="button"
             onClick={() => onViewModeChange('table')}
-            title="Dạng Bảng (Table)"
+            title="Dạng bảng"
             aria-pressed={viewMode === 'table'}
             className={`p-1.5 rounded-full transition-colors cursor-pointer ${
               viewMode === 'table'
-                ? 'bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white'
-                : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-muted text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <List className="w-4 h-4" />

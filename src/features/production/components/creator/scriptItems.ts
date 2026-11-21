@@ -6,12 +6,12 @@ export type ScriptStage = 'DRAFT' | 'REVISION' | 'IN_REVIEW' | 'ADMIN_REVIEW' | 
 export type ScriptFilterKey = 'all' | 'draft' | 'review' | 'admin_approval' | 'handed_off';
 
 const STAGE_LABEL: Record<ScriptStage, string> = {
-  DRAFT: 'CHƯA NỘP KỊCH BẢN',
-  REVISION: 'CẦN SỬA KỊCH BẢN',
-  IN_REVIEW: 'CHỜ REVIEWER DUYỆT',
-  ADMIN_REVIEW: 'CHỜ ADMIN DUYỆT FINAL',
-  NEGOTIATING: 'ĐANG KÝ HỢP ĐỒNG STUDIO',
-  HANDED_OFF: 'ĐÃ BÀN GIAO STUDIO',
+  DRAFT: 'Chưa nộp kịch bản',
+  REVISION: 'Cần sửa kịch bản',
+  IN_REVIEW: 'Chờ Reviewer duyệt',
+  ADMIN_REVIEW: 'Chờ Admin duyệt Final',
+  NEGOTIATING: 'Đang ký hợp đồng Studio',
+  HANDED_OFF: 'Đã bàn giao Studio',
 };
 
 /** The steps a script goes through; the card's progress is how many are behind it. */

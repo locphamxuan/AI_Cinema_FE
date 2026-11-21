@@ -93,7 +93,7 @@ export function EpisodeRowsEditor({
 
   return (
     <div className="space-y-2">
-      <div aria-hidden="true" className="hidden sm:flex items-center gap-2 text-xs font-medium text-slate-500">
+      <div aria-hidden="true" className="hidden sm:flex items-center gap-2 text-xs font-medium text-muted-foreground">
         <span className="w-8 shrink-0 text-right">#</span>
         <span style={{ flex: '1 1 10rem', minWidth: '7rem' }}>Tên tập</span>
         <span style={{ flex: '0 0 6.5rem' }}>Thời lượng</span>
@@ -103,7 +103,7 @@ export function EpisodeRowsEditor({
       </div>
       {episodes.map((ep, i) => (
         <div key={i} className="flex flex-wrap sm:flex-nowrap items-center gap-2">
-          <span className="w-8 shrink-0 text-[11px] text-slate-500 text-right">#{firstNumber + i}</span>
+          <span className="w-8 shrink-0 text-[11px] text-muted-foreground text-right">#{firstNumber + i}</span>
           <input
             value={ep.title}
             onChange={(e) => update(i, { title: e.target.value })}
@@ -122,14 +122,14 @@ export function EpisodeRowsEditor({
             className={`${fieldInputClass} py-1.5 w-20 text-center`}
             style={{ width: '4.5rem', flex: '0 0 4.5rem' }}
           />
-          <span className="text-[11px] text-slate-500 shrink-0">phút</span>
+          <span className="text-[11px] text-muted-foreground shrink-0">phút</span>
           <input
             type="date"
             min={today}
             value={ep.deadline}
             onChange={(e) => update(i, { deadline: e.target.value })}
             aria-label={`Hạn giao tập ${firstNumber + i}`}
-            title="Hạn giao - studio phải giao tập này trước ngày này"
+            title="Hạn giao - Studio phải giao tập này trước ngày này"
             className={`${fieldInputClass} py-1.5 ${ep.deadline && !deadlineValid(ep.deadline) ? 'border-rose-500' : ''}`}
             style={{ width: '9.5rem', flex: '0 0 9.5rem' }}
           />
@@ -155,7 +155,7 @@ export function EpisodeRowsEditor({
           </Button>
         </div>
       ))}
-      <p className="text-[11px] text-slate-500 pl-10">Hạn giao Studio: ngày Studio phải giao tập (bắt buộc). Dự kiến phát hành: ngày tập dự kiến lên sóng, nằm trong khoảng phát hành của mùa, không trước hạn giao (không bắt buộc).</p>
+      <p className="text-[11px] text-muted-foreground pl-10">Hạn giao Studio: ngày Studio phải giao tập (bắt buộc). Dự kiến phát hành: ngày tập dự kiến phát hành, nằm trong khoảng phát hành của mùa, không trước hạn giao (không bắt buộc).</p>
       <Button type="button" size="sm" variant="secondary" onClick={addEpisode}>
         Thêm tập
       </Button>
@@ -168,7 +168,7 @@ export function DeadlineQuickFill({ onApply }: { onApply: (first: string, gapDay
   const [first, setFirst] = useState('');
   const [gap, setGap] = useState(7);
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-xl bg-slate-50 dark:bg-white/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">
+    <div className="flex flex-wrap items-center gap-2 rounded-xl bg-muted/60 px-3 py-2 text-[11px] text-muted-foreground">
       <span>Điền nhanh hạn giao: tập đầu</span>
       <input
         type="date"

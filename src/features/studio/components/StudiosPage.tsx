@@ -69,9 +69,9 @@ export function StudiosPage() {
     <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Studio đối tác</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Studio là đối tác bên thứ 3, đăng nhập Studio Web bằng tài khoản Admin cấp để ký hợp đồng và nộp phim. Mỗi dự án đặt hàng một
+          <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Studio đối tác</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Studio là đối tác bên thứ ba, đăng nhập Studio Web bằng tài khoản Admin cấp để ký hợp đồng và nộp phim. Mỗi dự án đặt hàng một
             Studio đang hoạt động.
           </p>
         </div>
@@ -91,7 +91,7 @@ export function StudiosPage() {
             <Empty>Chưa có Studio nào trong danh mục.</Empty>
           ) : (
             <table className="w-full text-xs">
-              <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-left">
+              <thead className="bg-muted/60 text-muted-foreground text-left">
                 <tr>
                   <th className="px-4 py-2.5 font-medium">Studio</th>
                   <th className="px-4 py-2.5 font-medium hidden md:table-cell">Liên hệ</th>
@@ -106,17 +106,17 @@ export function StudiosPage() {
                   return (
                     <tr key={studio.id}>
                       <td className="px-4 py-3">
-                        <p className="flex items-center gap-1.5 font-semibold text-slate-900 dark:text-white">
+                        <p className="flex items-center gap-1.5 font-semibold text-foreground">
                           {studio.name}
                         </p>
-                        <p className="text-slate-500">{studio.email}</p>
-                        {studio.note && <p className="text-slate-400">{studio.note}</p>}
+                        <p className="text-muted-foreground">{studio.email}</p>
+                        {studio.note && <p className="text-muted-foreground">{studio.note}</p>}
                       </td>
-                      <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">
+                      <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">
                         {studio.contactName ?? '-'}
-                        {studio.phone && <p className="text-slate-400">{studio.phone}</p>}
+                        {studio.phone && <p className="text-muted-foreground">{studio.phone}</p>}
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300">{studio._count?.projects ?? 0}</td>
+                      <td className="px-4 py-3 hidden sm:table-cell text-right text-muted-foreground">{studio._count?.projects ?? 0}</td>
                       <td className="px-4 py-3">
                         <Badge tone={studio.isActive ? 'emerald' : 'neutral'}>{studio.isActive ? 'Đang hoạt động' : 'Ngừng dùng'}</Badge>
                       </td>
@@ -177,13 +177,13 @@ export function StudiosPage() {
           subtitle={`Studio ${busyProjects.studioName} đang có ${busyProjects.projects.length} dự án sản xuất chưa hoàn tất`}
         >
           <div className="space-y-4 text-xs">
-            <p className="text-slate-600 dark:text-slate-300">
+            <p className="text-muted-foreground">
               Vui lòng đổi Studio cho các dự án sau trước khi ngừng dùng Studio này:
             </p>
-            <ul className="divide-y divide-slate-100 dark:divide-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden bg-slate-50/50 dark:bg-white/[0.02]">
+            <ul className="divide-y divide-slate-100 dark:divide-white/5 rounded-2xl border border-border overflow-hidden bg-muted/60">
               {busyProjects.projects.map((p) => (
                 <li key={p.id} className="p-3 flex items-center justify-between gap-3">
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">{p.title}</span>
+                  <span className="font-semibold text-foreground">{p.title}</span>
                   <Link
                     href={`/admin/projects/${p.id}?tab=studio`}
                     className="text-xs font-semibold text-sky-600 hover:underline shrink-0"

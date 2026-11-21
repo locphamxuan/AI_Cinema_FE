@@ -21,7 +21,7 @@ const display = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "AI Cinema - Quản trị nội dung",
+  title: "AI Cinema - Quản trị & sản xuất",
   description:
     "Khu làm việc của Reviewer, Creator, Staff và Admin trên AI Cinema.",
   keywords: ["AI Cinema", "streaming", "phim AI", "OTT", "Việt Nam"],

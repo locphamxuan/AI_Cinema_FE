@@ -124,7 +124,7 @@ describe('SignContractModal', () => {
 
     await userEvent.click(within(dialog).getByRole('button', { name: /Đồng ý/ }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('STUDIO_SIGNED')));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể ký hợp đồng đang ở trạng thái Đã ký đủ hai bên (cần Studio đã ký).'));
     expect(onClose).not.toHaveBeenCalled();
     expect(onChanged).not.toHaveBeenCalled();
   });

@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 function EyeIcon({ open }: { open: boolean }) {
   return (
-    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <svg className="w-3.5 h-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
       {open ? (
         <>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -42,14 +42,14 @@ export function PasswordField({ id, label, autoComplete, value, onChange, placeh
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label htmlFor={id} className="block text-xs font-semibold text-slate-700 dark:text-muted-light">
+        <label htmlFor={id} className="block text-sm font-medium">
           {label}
         </label>
         <button
           type="button"
           onClick={() => setVisible(!visible)}
           aria-label={visible ? `Ẩn ${label.toLowerCase()}` : `Hiện ${label.toLowerCase()}`}
-          className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-muted-light hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           <EyeIcon open={!visible} />
           <span>{visible ? 'Ẩn' : 'Hiện'}</span>
@@ -63,7 +63,7 @@ export function PasswordField({ id, label, autoComplete, value, onChange, placeh
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-slate-50 dark:bg-white/10 border border-slate-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 dark:text-foreground placeholder-slate-400 dark:placeholder-muted outline-none focus:border-ruby focus:ring-1 focus:ring-ruby transition-all font-medium"
+        className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
       />
     </div>
   );

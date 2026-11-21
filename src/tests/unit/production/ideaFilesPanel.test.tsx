@@ -79,14 +79,14 @@ describe('IdeaFilesPanel', () => {
   });
 
   it('shows the refusal and keeps the dialog when the delete fails', async () => {
-    routeFetch({ '/projects/m1/idea-files/f1': failWith(409, 'The project is no longer open') });
+    routeFetch({ '/projects/m1/idea-files/f1': failWith(409, 'Cannot remove idea files while the project is CANCELLED') });
     const reload = vi.fn(async () => undefined);
     render(panel(true, reload));
 
     await userEvent.click(screen.getByRole('button', { name: 'Xoá y-tuong.pdf v2' }));
     await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xoá file' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('no longer open')));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể xoá tệp ý tưởng khi dự án đang ở trạng thái Đã huỷ.'));
     expect(reload).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });

@@ -11,7 +11,7 @@ export function AdminHome() {
 
   if (!hasAccess) {
     return (
-      <p className="p-6 text-sm text-slate-500 dark:text-slate-400">
+      <p className="p-6 text-sm text-muted-foreground">
         Tài khoản của bạn chưa được cấp quyền quản trị nào. Hãy nhờ Admin cấp quyền ở mục Phân quyền.
       </p>
     );

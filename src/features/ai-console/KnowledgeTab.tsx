@@ -55,7 +55,7 @@ export function KnowledgeTab({ focus }: { focus: KnowledgeFocus | null }) {
     if (!pending) return;
     if (pending.kind === 'reindex-all') {
       const res = await run(() => aiConsoleService.reindexAll());
-      if (res) toast.success(`Đã đưa ${res.queued}/${res.total} bài vào hàng đợi index`);
+      if (res) toast.success(`Đã đưa ${res.queued}/${res.total} bài vào hàng đợi lập chỉ mục`);
     } else if (pending.kind === 'delete') {
       await run(() => aiConsoleService.deleteKnowledge(pending.article.id), 'Đã xoá bài, AI không dùng bài này nữa');
     } else {
@@ -66,20 +66,20 @@ export function KnowledgeTab({ focus }: { focus: KnowledgeFocus | null }) {
   };
 
   const reindex = async (article: KnowledgeArticle) => {
-    if (await run(() => aiConsoleService.reindexKnowledge(article.id), 'Đã đưa bài vào hàng đợi index')) await reload();
+    if (await run(() => aiConsoleService.reindexKnowledge(article.id), 'Đã đưa bài vào hàng đợi lập chỉ mục')) await reload();
   };
 
   return (
     <Panel
       title="Kho tri thức"
-      description="AI chỉ trả lời từ các bài đang dùng và đã index. Bài nháp và bài lưu trữ không được dùng."
+      description="AI chỉ trả lời từ các bài đang dùng và đã lập chỉ mục. Bài nháp và bài lưu trữ không được dùng."
       actions={
         <>
           <Button size="sm" variant="ghost" onClick={() => setPreviewing(true)}>
             Kiểm tra truy hồi
           </Button>
           <Button size="sm" variant="secondary" disabled={busy} onClick={() => setPending({ kind: 'reindex-all' })}>
-            <RefreshCw className="size-3.5" aria-hidden="true" /> Index lại tất cả
+            <RefreshCw className="size-3.5" aria-hidden="true" /> Lập lại chỉ mục tất cả
           </Button>
           <Button size="sm" onClick={() => setEditor({ id: null })}>
             Thêm bài
@@ -114,16 +114,16 @@ export function KnowledgeTab({ focus }: { focus: KnowledgeFocus | null }) {
       <ConfirmModal
         open={!!pending}
         title={
-          pending?.kind === 'delete' ? `Xoá bài "${pending.article.title}"?` : pending?.kind === 'archive' ? `Lưu trữ bài "${pending.article.title}"?` : 'Index lại tất cả bài đang dùng?'
+          pending?.kind === 'delete' ? `Xoá bài "${pending.article.title}"?` : pending?.kind === 'archive' ? `Lưu trữ bài "${pending.article.title}"?` : 'Lập lại chỉ mục cho mọi bài đang dùng?'
         }
         description={
           pending?.kind === 'delete'
-            ? 'Bài và toàn bộ đoạn đã index bị xoá hẳn, AI không trích dẫn bài này nữa. Không hoàn tác được.'
+            ? 'Bài và toàn bộ đoạn đã lập chỉ mục bị xoá hẳn, AI không trích dẫn bài này nữa. Không hoàn tác được.'
             : pending?.kind === 'archive'
               ? 'Bài bị ẩn khỏi AI nhưng vẫn giữ lại; bạn có thể sửa và xuất bản lại sau.'
-              : 'Mọi bài đang dùng được đưa vào hàng đợi index lại. Trong lúc chờ, AI vẫn dùng bản index cũ.'
+              : 'Mọi bài đang dùng được đưa vào hàng đợi lập lại chỉ mục. Trong lúc chờ, AI vẫn dùng chỉ mục cũ.'
         }
-        confirmLabel={pending?.kind === 'delete' ? 'Xoá bài' : pending?.kind === 'archive' ? 'Lưu trữ' : 'Index lại'}
+        confirmLabel={pending?.kind === 'delete' ? 'Xoá bài' : pending?.kind === 'archive' ? 'Lưu trữ' : 'Lập lại chỉ mục'}
         danger={pending?.kind === 'delete'}
         busy={busy}
         onClose={() => setPending(null)}

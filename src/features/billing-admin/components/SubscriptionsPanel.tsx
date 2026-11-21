@@ -9,6 +9,7 @@ import { PERMISSION } from '@/lib/permissions';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { formatDateTime, formatDay, formatNumber } from '@/lib/format';
+import { inVietnamese } from '@/lib/apiMessages';
 import type { Tone } from '@/features/production/lib/labels';
 import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
@@ -70,7 +71,7 @@ export function SubscriptionsPanel() {
       {list.data && list.data.data.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs table-cells">
-            <thead className="text-slate-500 dark:text-slate-400 text-left">
+            <thead className="text-muted-foreground text-left">
               <tr>
                 <th className="py-2 font-medium">Member</th>
                 <th className="py-2 font-medium">Gói</th>
@@ -84,8 +85,8 @@ export function SubscriptionsPanel() {
                 <tr key={row.id}>
                   <td className="py-2">
                     <button type="button" onClick={() => setOpenId(row.id)} className="text-left hover:underline cursor-pointer">
-                      <span className="block font-medium text-slate-900 dark:text-white">{row.user.fullName}</span>
-                      <span className="block text-[11px] text-slate-500">{row.user.email}</span>
+                      <span className="block font-medium text-foreground">{row.user.fullName}</span>
+                      <span className="block text-[11px] text-muted-foreground">{row.user.email}</span>
                     </button>
                   </td>
                   <td className="py-2">
@@ -141,7 +142,7 @@ function SubscriptionModal({ id, onClose, onChanged }: { id: string; onClose: ()
           )}
           {confirming && (
             <div className="space-y-2 rounded-lg border border-rose-500/30 bg-rose-500/5 p-3">
-              <p className="text-rose-700 dark:text-rose-300">Member mất quyền xem trọn bộ ngay, Coin đã thu không được hoàn.</p>
+              <p className="text-rose-700 dark:text-rose-300">Member mất ngay quyền xem của gói; Coin đã thu không được hoàn.</p>
               <FormField label="Lý do (ghi vào nhật ký)">
                 <textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} className={fieldTextareaClass} />
               </FormField>
@@ -175,8 +176,8 @@ function SubscriptionFacts({ sub }: { sub: AdminSubscription }) {
     <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5">
       {facts.map(([k, v]) => (
         <div key={k}>
-          <dt className="text-slate-500">{k}</dt>
-          <dd className="font-medium text-slate-900 dark:text-white">{v}</dd>
+          <dt className="text-muted-foreground">{k}</dt>
+          <dd className="font-medium text-foreground">{v}</dd>
         </div>
       ))}
     </dl>
@@ -187,7 +188,7 @@ function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
   if (cycles.length === 0) return <Empty>Chưa thu Coin kỳ nào.</Empty>;
   return (
     <table className="w-full">
-      <thead className="text-slate-500 text-left">
+      <thead className="text-muted-foreground text-left">
         <tr>
           <th className="py-1 font-medium">Kỳ</th>
           <th className="py-1 font-medium">Thời gian</th>
@@ -202,7 +203,7 @@ function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
             <td className="py-1">
               {formatDay(c.periodStart)} → {formatDay(c.periodEnd)}
             </td>
-            <td className="py-1">{c.status === 'PAID' ? 'Đã thu' : (c.failureReason ?? 'Không thu được')}</td>
+            <td className="py-1">{c.status === 'PAID' ? 'Đã thu' : (c.failureReason ? inVietnamese(c.failureReason, 'Không thu được') : 'Không thu được')}</td>
             <td className="py-1 text-right tabular-nums">
               {c.mainCoinsCharged} + {c.bonusCoinsCharged}
             </td>

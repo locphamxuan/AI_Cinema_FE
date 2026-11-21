@@ -123,7 +123,7 @@ export function AnswersTab({ onDraftArticle }: { onDraftArticle: (draft: Article
         title="Câu trả lời chưa tốt"
         subtitle={rating?.question ?? undefined}
         label="Cần bổ sung gì vào Kho tri thức?"
-        placeholder="Ví dụ: thiếu mốc 24 giờ khi hủy gói Tháng"
+        placeholder="Ví dụ: thiếu mốc 24 giờ khi huỷ gói Tháng"
         confirmLabel="Lưu đánh giá"
         required={false}
         busy={busy}

@@ -51,8 +51,8 @@ export function ContractTab() {
           title={`Hợp đồng với Studio ${studio.name}`}
           description={
             caps.contractManage
-              ? `Studio điền giá và ký trên Studio Web; Admin ký để đồng ý hoặc đề xuất giá khác. Ngân sách còn lại: ${formatVnd(project.cost.remainingVnd)}.`
-              : 'Studio điền giá và ký trên Studio Web; Admin ký để đồng ý hoặc đề xuất giá khác. Bạn chỉ xem các vòng thương lượng.'
+              ? `Studio tải hợp đồng (giá trị = ngân sách trần), ký và tải lên trên Studio Web; Admin ký Bên A để hoàn tất hoặc đề xuất giá khác. Ngân sách còn lại: ${formatVnd(project.cost.remainingVnd)}.`
+              : 'Studio tải hợp đồng và ký trên Studio Web; Admin ký Bên A để hoàn tất hoặc đề xuất giá khác. Bạn chỉ xem các vòng thương lượng.'
           }
         >
           <ul className="space-y-3">

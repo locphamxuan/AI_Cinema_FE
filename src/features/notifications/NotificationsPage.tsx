@@ -93,7 +93,7 @@ export function NotificationsPage() {
   return (
     <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       {/* ── Header Hero Bar ── */}
-      <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card p-6 sm:p-8 shadow-sm">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           <div className="space-y-1.5 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-600 dark:text-sky-400 text-xs font-bold">
@@ -102,10 +102,10 @@ export function NotificationsPage() {
                 <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
               )}
             </div>
-            <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">
               Thông báo hệ thống
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
               Theo dõi kịp thời mọi biến động về ngân sách và chi phí sản xuất, phê duyệt đề xuất, tiến độ gửi phim từ Studio và cảnh báo nền tảng.
             </p>
           </div>
@@ -116,7 +116,7 @@ export function NotificationsPage() {
               variant="secondary"
               disabled={markingAll || totalUnreadAll === 0}
               onClick={readAll}
-              className="px-4 py-2.5 rounded-2xl text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer border border-slate-200 dark:border-white/10"
+              className="px-4 py-2.5 rounded-2xl text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer border border-border"
             >
               <span>{markingAll ? 'Đang cập nhật…' : 'Đánh dấu đã đọc hết'}</span>
             </Button>
@@ -130,7 +130,7 @@ export function NotificationsPage() {
         <div
           role="tablist"
           aria-label="Nhóm thông báo"
-          className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-100/90 dark:bg-white/[0.04] border border-slate-200/60 dark:border-white/5"
+          className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-muted border border-border"
         >
           {tabs.map((t) => {
             const isActive = t.key === tabKey;
@@ -144,8 +144,8 @@ export function NotificationsPage() {
                 onClick={() => choose(t.key)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
                   isActive
-                    ? 'bg-white dark:bg-sky-500 text-slate-900 dark:text-white shadow-sm ring-1 ring-slate-200/50 dark:ring-transparent'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
+                    ? 'bg-white dark:bg-sky-500 text-foreground shadow-sm ring-1 ring-slate-200/50 dark:ring-transparent'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-white/50 dark:hover:bg-white/5'
                 }`}
               >
                 <span>{t.label}</span>
@@ -168,7 +168,7 @@ export function NotificationsPage() {
         {/* Sub-sections Pills (If current tab has multiple sections) */}
         {tab.sections.length > 0 && (
           <div className="flex flex-wrap items-center gap-2 px-1 pt-1">
-            <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 mr-1">
+            <span className="text-[11px] font-bold text-muted-foreground/70 mr-1">
               Lọc theo mục:
             </span>
             <button
@@ -177,7 +177,7 @@ export function NotificationsPage() {
               className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
                 sectionKey === null
                   ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400'
-                  : 'bg-white dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                  : 'bg-white dark:bg-white/[0.02] border-border text-muted-foreground hover:border-slate-300'
               }`}
             >
               Tất cả mục
@@ -190,7 +190,7 @@ export function NotificationsPage() {
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer border ${
                   sectionKey === s.key
                     ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400'
-                    : 'bg-white dark:bg-white/[0.02] border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                    : 'bg-white dark:bg-white/[0.02] border-border text-muted-foreground hover:border-slate-300'
                 }`}
               >
                 {s.label}
@@ -201,19 +201,19 @@ export function NotificationsPage() {
       </div>
 
       {/* ── Notification Content Container ── */}
-      <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card shadow-sm overflow-hidden">
+      <div className="rounded-3xl border border-border bg-card shadow-sm overflow-hidden">
         {/* Table Top Status Bar */}
-        <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 flex flex-wrap items-center justify-between gap-3 bg-slate-50/50 dark:bg-white/[0.01]">
+        <div className="px-6 py-4 border-b border-border flex flex-wrap items-center justify-between gap-3 bg-muted/60">
           <div>
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+            <h2 className="text-sm font-bold text-foreground">
               {section ? `${tab.label} · ${section.label}` : tab.label}
             </h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               {tab.description} {totalItems > 0 && `(Tổng cộng ${totalItems} thông báo)`}
             </p>
           </div>
 
-          <label className="inline-flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none bg-white dark:bg-white/5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 hover:border-slate-300 transition-colors">
+          <label className="inline-flex items-center gap-2 text-xs font-bold text-secondary-foreground cursor-pointer select-none bg-white dark:bg-white/5 px-3 py-1.5 rounded-xl border border-border hover:border-slate-300 transition-colors">
             <input
               type="checkbox"
               checked={unreadOnly}
@@ -221,7 +221,7 @@ export function NotificationsPage() {
                 setUnreadOnly(e.target.checked);
                 setPage(1);
               }}
-              className="w-4 h-4 rounded border-slate-300 dark:border-white/20 accent-sky-500 cursor-pointer"
+              className="w-4 h-4 rounded border-input accent-sky-500 cursor-pointer"
             />
             <span>Chỉ xem chưa đọc</span>
           </label>
@@ -239,10 +239,10 @@ export function NotificationsPage() {
 
           {list.data && rows.length === 0 && (
             <div className="py-16 text-center space-y-3">
-              <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+              <p className="text-sm font-bold text-secondary-foreground">
                 Không có thông báo nào ở mục này
               </p>
-              <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
+              <p className="text-xs text-muted-foreground/70 max-w-sm mx-auto">
                 Khi có hoạt động mới phát sinh về dự án hoặc giao dịch, các sự kiện sẽ hiển thị ngay tại đây.
               </p>
             </div>

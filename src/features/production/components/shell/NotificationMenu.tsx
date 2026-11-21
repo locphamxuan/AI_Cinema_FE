@@ -79,7 +79,7 @@ export function NotificationMenu() {
         onClick={toggle}
         aria-label={unread ? `Thông báo, ${unread} chưa đọc` : 'Thông báo'}
         aria-expanded={open}
-        className="relative w-8 h-8 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer"
+        className="relative w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:bg-muted transition cursor-pointer"
       >
         <Bell className="w-4 h-4" aria-hidden="true" />
         {unread > 0 && (
@@ -90,16 +90,16 @@ export function NotificationMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 max-h-[70vh] overflow-y-auto rounded-xl bg-white dark:bg-card border border-slate-200 dark:border-white/10 shadow-lg z-40">
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 dark:border-white/5">
-            <p className="text-xs font-semibold text-slate-900 dark:text-white">Thông báo</p>
+        <div className="absolute right-0 top-full mt-2 w-80 max-h-[70vh] overflow-y-auto rounded-xl bg-card border border-border shadow-lg z-40">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
+            <p className="text-xs font-semibold text-foreground">Thông báo</p>
             <button
               type="button"
               onClick={() => {
                 setOpen(false);
                 router.push(`/${homeAreaOf(role) ?? 'reviewer'}/notifications`);
               }}
-              className="text-[11px] font-medium text-slate-500 hover:text-sky-700 hover:underline cursor-pointer"
+              className="text-[11px] font-medium text-muted-foreground hover:text-sky-700 hover:underline cursor-pointer"
             >
               Xem tất cả theo mục
             </button>
@@ -109,22 +109,22 @@ export function NotificationMenu() {
               </button>
             )}
           </div>
-          {items === null && <p className="px-4 py-6 text-xs text-slate-500 text-center">Đang tải…</p>}
-          {items?.length === 0 && <p className="px-4 py-6 text-xs text-slate-500 text-center">Chưa có thông báo.</p>}
+          {items === null && <p className="px-4 py-6 text-xs text-muted-foreground text-center">Đang tải…</p>}
+          {items?.length === 0 && <p className="px-4 py-6 text-xs text-muted-foreground text-center">Chưa có thông báo.</p>}
           <ul className="divide-y divide-slate-100 dark:divide-white/5">
             {items?.map((item) => (
               <li key={item.id}>
                 <button
                   type="button"
                   onClick={() => openItem(item)}
-                  className="w-full text-left px-4 py-2.5 hover:bg-slate-50 dark:hover:bg-white/5 transition cursor-pointer"
+                  className="w-full text-left px-4 py-2.5 hover:bg-muted/60 transition cursor-pointer"
                 >
-                  <p className={`text-xs ${item.readAt ? 'text-slate-600 dark:text-slate-400' : 'font-semibold text-slate-900 dark:text-white'}`}>
+                  <p className={`text-xs ${item.readAt ? 'text-muted-foreground' : 'font-semibold text-foreground'}`}>
                     {!item.readAt && <span className="inline-block w-1.5 h-1.5 rounded-full bg-sky-500 mr-1.5 align-middle" />}
                     {item.title}
                   </p>
-                  {item.body && <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{item.body}</p>}
-                  <p className="text-xs text-slate-400 mt-1">{formatDateTime(item.createdAt)}</p>
+                  {item.body && <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{item.body}</p>}
+                  <p className="text-xs text-muted-foreground mt-1">{formatDateTime(item.createdAt)}</p>
                 </button>
               </li>
             ))}

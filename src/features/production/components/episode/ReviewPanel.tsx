@@ -79,13 +79,13 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
         />
         {sheet.contentReviews.length > 0 && (
           <div className="mt-4 space-y-2">
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">Lịch sử duyệt bản này</p>
+            <p className="text-xs font-semibold text-secondary-foreground">Lịch sử duyệt bản này</p>
             {sheet.contentReviews.map((r) => (
-              <div key={r.id} className="rounded-lg bg-slate-50 dark:bg-white/5 p-2 text-xs">
+              <div key={r.id} className="rounded-lg bg-muted/60 p-2 text-xs">
                 <p className={r.decision === 'APPROVED' ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}>
                   {r.decision === 'APPROVED' ? 'Duyệt' : 'Yêu cầu sửa'} · {r.reviewer.fullName} · {formatDateTime(r.createdAt)}
                 </p>
-                {r.comments && <p className="text-slate-600 dark:text-slate-300 mt-0.5">{r.comments}</p>}
+                {r.comments && <p className="text-muted-foreground mt-0.5">{r.comments}</p>}
               </div>
             ))}
           </div>
@@ -100,7 +100,12 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
       <ConfirmModal
         open={approving}
         title={`Duyệt bản ${sheet.version}`}
-        description="Bản này thành bản được duyệt của tập; bước tiếp theo là gắn nhãn AI và kiểm tra tuân thủ pháp lý."
+        description="Bản này thành bản được duyệt của tập."
+        details={[
+          ['Phiên bản', `Bản ${sheet.version}`],
+          ['Nhãn AI Studio đề xuất', LABEL_TYPE[sheet.proposedLabelType]],
+        ]}
+        consequence="bước tiếp theo là gắn nhãn AI và kiểm tra tuân thủ pháp lý."
         confirmLabel="Duyệt bản này"
         busy={busy}
         onClose={() => setApproving(false)}
@@ -108,7 +113,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
       />
       <TextPromptModal
         open={requesting}
-        title="Yêu cầu studio sửa"
+        title="Yêu cầu Studio sửa"
         subtitle="Tài khoản Studio nhận thông báo kèm nhận xét này trên Studio Web và nộp bản mới. Phim Final đã xác nhận (nếu có) sẽ bị huỷ xác nhận."
         label="Nhận xét (ví dụ: phút 03:10 nhân vật bị méo mặt…)"
         confirmLabel="Gửi yêu cầu sửa"
@@ -157,21 +162,21 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
     };
     const done = await run(
       () => productionService.runCompliance(sheet.id, input),
-      fails ? 'Không đạt - tập được trả về để studio sửa' : 'Tập đạt kiểm tra tuân thủ',
+      fails ? 'Không đạt - tập được trả về để Studio sửa' : 'Tập đạt kiểm tra tuân thủ',
     );
     if (done) await onChanged();
   };
 
   return (
     <Panel
-      title="Bước 11 - Kiểm tra pháp lý và an toàn nội dung"
-      description="Rà soát nhãn AI, thông báo theo Nghị định 142, an toàn nội dung và nguy cơ gây nhầm lẫn với người hoặc sự kiện có thật. Nếu có mục không đạt, tập sẽ được gửi lại để studio sửa."
+      title="Kiểm tra pháp lý và an toàn nội dung"
+      description="Rà soát nhãn AI, thông báo theo Nghị định 142, an toàn nội dung và nguy cơ gây nhầm lẫn với người hoặc sự kiện có thật. Nếu có mục không đạt, tập sẽ được gửi lại để Studio sửa."
     >
       {sheet.complianceChecks.length > 0 && (
         <ul className="space-y-1.5 text-xs mb-4">
           {sheet.complianceChecks.map((c) => (
             <li key={c.id} className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-slate-700 dark:text-slate-200">{COMPLIANCE_CHECK[c.checkType]}</span>
+              <span className="text-secondary-foreground">{COMPLIANCE_CHECK[c.checkType]}</span>
               <span className="flex items-center gap-2">
                 {c.failureReason && <span className="text-rose-600">{c.failureReason}</span>}
                 <StatusPill {...COMPLIANCE_RESULT[c.result]} />
@@ -185,7 +190,7 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
           <VerdictRow label={COMPLIANCE_CHECK.DECREE_142_NOTICE} value={decree} onChange={setDecree} />
           <VerdictRow label={COMPLIANCE_CHECK.CONTENT_SAFETY} value={safety} onChange={setSafety} />
           <fieldset className="space-y-2">
-            <legend className="font-medium text-slate-700 dark:text-slate-200">Tập có mô tả người hoặc sự kiện có thật theo cách dễ gây hiểu nhầm không?</legend>
+            <legend className="font-medium text-secondary-foreground">Tập có mô tả người hoặc sự kiện có thật theo cách dễ gây hiểu nhầm không?</legend>
             <div className="flex gap-4">
               {([false, true] as const).map((value) => (
                 <label key={String(value)} className="flex items-center gap-1.5 cursor-pointer">
@@ -196,7 +201,7 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
             </div>
           </fieldset>
           {!sheet.aiDisclosure.noRealPersonLikeness && (
-            <p className="text-amber-600">Studio chưa cam kết không dùng hình ảnh giống người thật. Mục này chưa thể đạt cho tới khi studio bổ sung cam kết trong bản giao.</p>
+            <p className="text-amber-600">Studio chưa cam kết không dùng hình ảnh giống người thật. Mục này chưa thể đạt cho tới khi Studio bổ sung cam kết trong bản giao.</p>
           )}
           {realPerson === true && (
             <textarea
@@ -208,7 +213,7 @@ function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; can
               className={fieldTextareaClass}
             />
           )}
-          <p className="text-slate-500">Hệ thống tự kiểm tra mục “Có nhãn AI” dựa trên nhãn đã gắn ở bước trước. Chọn kết quả cho từng mục; nếu không đạt, hãy ghi lý do.</p>
+          <p className="text-muted-foreground">Hệ thống tự kiểm tra mục “Có nhãn AI” dựa trên nhãn đã gắn ở bước trước. Chọn kết quả cho từng mục; nếu không đạt, hãy ghi lý do.</p>
           <Button type="submit" variant={fails ? 'danger' : 'success'} disabled={busy || !valid}>
             {!valid ? 'Hoàn tất các mục kiểm tra' : fails ? 'Ghi nhận không đạt' : 'Xác nhận đã kiểm tra và đạt'}
           </Button>
@@ -222,7 +227,7 @@ function VerdictRow({ label, value, onChange }: { label: string; value: Verdict;
   return (
     <div className="space-y-1.5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <span className="font-medium text-slate-700 dark:text-slate-200">{label}</span>
+        <span className="font-medium text-secondary-foreground">{label}</span>
         <div className="flex gap-3">
           {(['PASS', 'FAIL'] as const).map((r) => (
             <label key={r} className="flex items-center gap-1 cursor-pointer">

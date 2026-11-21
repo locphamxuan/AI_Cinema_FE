@@ -32,9 +32,9 @@ export function AccountProfilePage() {
 
   return (
     <main className="w-full px-6 lg:px-8 py-6 space-y-6">
-      <div className="border-b border-slate-200/60 dark:border-white/5 pb-4">
-        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Hồ sơ tài khoản</h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Thông tin cá nhân và bảo mật. Email và vai trò do Admin quản lý.</p>
+      <div className="border-b border-border pb-4">
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Hồ sơ tài khoản</h1>
+        <p className="text-xs text-muted-foreground mt-0.5">Thông tin cá nhân và bảo mật. Email và vai trò do Admin quản lý.</p>
       </div>
       {account.error && <ErrorNote message={account.error} onRetry={account.reload} />}
       {account.loading && !account.data && <Loading />}
@@ -42,12 +42,12 @@ export function AccountProfilePage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <Panel title="Tài khoản">
             <div className="flex items-center gap-3 mb-4">
-              <span className="w-12 h-12 rounded-full bg-[#121212] dark:bg-white text-white dark:text-slate-900 text-lg font-bold flex items-center justify-center">
+              <span className="w-12 h-12 rounded-full bg-primary text-primary-foreground text-lg font-bold flex items-center justify-center">
                 {account.data.fullName.charAt(0).toUpperCase()}
               </span>
               <div>
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">{account.data.fullName}</p>
-                <p className="text-xs text-slate-500">{ROLE_LABEL[account.data.role]}</p>
+                <p className="text-sm font-semibold text-foreground">{account.data.fullName}</p>
+                <p className="text-xs text-muted-foreground">{ROLE_LABEL[account.data.role]}</p>
               </div>
             </div>
             <Facts

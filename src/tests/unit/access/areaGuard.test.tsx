@@ -59,10 +59,12 @@ describe('AreaGuard', () => {
     expect(screen.getByRole('button', { name: /Đến trang Sản xuất nội dung/ })).toBeInTheDocument();
   });
 
-  it('sends a visitor straight to the sign-in screen', () => {
+  it('sends a visitor straight to the sign-in screen, which brings them back to the page they opened', () => {
+    window.history.pushState({}, '', '/staff/lookup?tab=members');
     render(<AreaGuard area="staff">Vận hành</AreaGuard>);
     expect(screen.queryByText('Vận hành')).not.toBeInTheDocument();
-    expect(router.replace).toHaveBeenCalledWith('/login');
+    expect(router.replace).toHaveBeenCalledWith('/login?next=%2Fstaff%2Flookup%3Ftab%3Dmembers');
+    window.history.pushState({}, '', '/');
   });
 
   it('signs a turned-away account out and opens the sign-in screen for another one', () => {

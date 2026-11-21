@@ -70,7 +70,7 @@ describe('review queue', () => {
     routeFetch({ '/projects/pipeline': pageOf([row({ script: rowScript('SUBMITTED') })]) });
     render(<ReviewerProjectQueuePage />);
 
-    const link = await screen.findByRole('link', { name: /Thẩm Định Kịch Bản/ });
+    const link = await screen.findByRole('link', { name: /Thẩm định kịch bản/ });
     expect(link).toHaveAttribute('href', '/reviewer/projects/m1?tab=script');
     expect(screen.getByRole('button', { name: 'Kịch bản chờ duyệt (1)' })).toBeInTheDocument();
   });
@@ -128,9 +128,9 @@ describe('CreatorStudioPortal', () => {
     render(<CreatorStudioPortal />);
 
     const list = await screen.findByRole('region', { name: 'Danh sách dự án' });
-    expect(within(list).getByRole('link', { name: /Soạn Kịch Bản/ })).toHaveAttribute('href', '/creator/projects/m1?tab=script');
+    expect(within(list).getByRole('link', { name: /Soạn kịch bản/ })).toHaveAttribute('href', '/creator/projects/m1?tab=script');
     expect(screen.getByText('Có kịch bản cần sửa theo góp ý')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Khởi tạo|Soạn Kịch Bản Mới/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Khởi tạo|Soạn kịch bản Mới/ })).not.toBeInTheDocument();
     expect(calls.map((c) => c.path)).toEqual(['/projects/pipeline']);
   });
 });
@@ -151,7 +151,7 @@ describe('AdminExecutivePortal', () => {
     const calls = portal([awaitingSignature], { '/contracts/c1/sign': round });
     render(<AdminExecutivePortal />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /Xem Báo Giá/ }));
+    await userEvent.click(await screen.findByRole('button', { name: /Xem báo giá/ }));
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveTextContent('Mưa Sài Gòn');
     expect(dialog).toHaveTextContent('Giao đúng hạn');
@@ -168,7 +168,7 @@ describe('AdminExecutivePortal', () => {
     const calls = portal([awaitingSignature], { '/contracts/c1/counter': round });
     render(<AdminExecutivePortal />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /Xem Báo Giá/ }));
+    await userEvent.click(await screen.findByRole('button', { name: /Xem báo giá/ }));
     const dialog = await screen.findByRole('dialog');
     expect(await within(dialog).findByText(/ngân sách còn lại 200\.000\.000/)).toBeInTheDocument();
     const send = within(dialog).getByRole('button', { name: 'Gửi giá đề xuất' });
@@ -192,7 +192,7 @@ describe('AdminExecutivePortal', () => {
 
     expect(await screen.findByRole('link', { name: 'Duyệt kịch bản: Mưa Sài Gòn' })).toHaveAttribute('href', '/admin/projects/m1?tab=script');
     expect(calls.filter((c) => c.path === '/projects/pipeline')).toHaveLength(1);
-    await userEvent.click(screen.getByRole('button', { name: /Phát Hành Ngay/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Phát hành ngay/ }));
     expect(calls.some((c) => c.path === '/episodes/e1/publications')).toBe(false);
     await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Phát hành' }));
     await waitFor(() => expect(calls.some((c) => c.path === '/episodes/e1/publications' && c.method === 'POST')).toBe(true));
@@ -213,7 +213,7 @@ describe('AdminExecutivePortal', () => {
     vi.mocked(fetch).mockImplementation(failingPath('/projects/m1/costs', vi.mocked(fetch).getMockImplementation()!));
     render(<AdminExecutivePortal />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /Xem Báo Giá/ }));
+    await userEvent.click(await screen.findByRole('button', { name: /Xem báo giá/ }));
     const dialog = await screen.findByRole('dialog');
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Chưa thể đề xuất giá khác');
     await userEvent.type(within(dialog).getByLabelText('Giá đề xuất mới'), '120000000');

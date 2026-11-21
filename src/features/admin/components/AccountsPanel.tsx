@@ -82,11 +82,11 @@ export function AccountsPanel() {
   const totalPages = result?.meta.totalPages ?? 1;
 
   return (
-    <section className="bg-white dark:bg-card rounded-2xl border border-slate-200/80 dark:border-white/10 overflow-hidden shadow-xs">
-      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5">
+    <section className="bg-card rounded-2xl border border-border overflow-hidden shadow-xs">
+      <div className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white">Quản lý Tài khoản</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <h2 className="text-base font-bold text-foreground">Quản lý tài khoản</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
             {result ? `${result.meta.totalItems} tài khoản trong hệ thống` : 'Đang tải…'} · Đổi vai trò hoặc trạng thái có hiệu lực tức thì.
           </p>
         </div>
@@ -95,14 +95,14 @@ export function AccountsPanel() {
             <Button
               size="sm"
               onClick={() => setEditing('new')}
-              className="shadow-xs bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 rounded-full font-semibold inline-flex items-center gap-1.5"
+              className="shadow-xs bg-primary hover:bg-primary/90 text-primary-foreground rounded-full font-semibold inline-flex items-center gap-1.5"
             >
               Tạo tài khoản
             </Button>
           )}
           <label className="relative">
             <span className="sr-only">Tìm theo tên hoặc email</span>
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <input
               type="search"
               value={search}
@@ -132,7 +132,7 @@ export function AccountsPanel() {
 
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
-          <thead className="text-left text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50/80 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+          <thead className="text-left text-[11px] text-muted-foreground bg-muted/60 border-b border-border">
             <tr>
               <th scope="col" className="py-3 px-5 font-semibold">Tài khoản</th>
               <th scope="col" className="py-3 px-4 font-semibold">Vai trò</th>
@@ -151,10 +151,10 @@ export function AccountsPanel() {
                     <div className="flex items-center gap-3">
                       <InitialsAvatar name={account.fullName} />
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900 dark:text-white">
+                        <p className="truncate font-medium text-foreground">
                           {account.fullName} {isMe && <span className="ml-1 text-xs font-normal text-[#E50914]">(bạn)</span>}
                         </p>
-                        <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{account.email}</p>
+                        <p className="mt-0.5 truncate text-xs text-muted-foreground">{account.email}</p>
                       </div>
                     </div>
                   </td>
@@ -192,7 +192,7 @@ export function AccountsPanel() {
                       {account.isActive ? 'Đang hoạt động' : 'Đã khoá'}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-slate-500 dark:text-slate-400">{dateFormat.format(new Date(account.createdAt))}</td>
+                  <td className="py-3 px-4 text-muted-foreground">{dateFormat.format(new Date(account.createdAt))}</td>
                   <td className="py-3 px-5 text-right whitespace-nowrap">
                     {canManage && (
                       <Button size="sm" variant="ghost" aria-label={`Sửa ${account.fullName}`} onClick={() => setEditing(account)} className="rounded-lg">
@@ -215,7 +215,7 @@ export function AccountsPanel() {
                             account.isActive ? 'Đã khoá tài khoản' : 'Đã mở khoá tài khoản'
                           )
                         }
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 transition cursor-pointer disabled:opacity-50"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border text-secondary-foreground hover:bg-muted transition cursor-pointer disabled:opacity-50"
                       >
                         {account.isActive ? <Lock className="w-3 h-3" aria-hidden="true" /> : <Unlock className="w-3 h-3" aria-hidden="true" />}
                         {account.isActive ? 'Khoá' : 'Mở khoá'}
@@ -227,7 +227,7 @@ export function AccountsPanel() {
             })}
             {result && accounts.length === 0 && (
               <tr>
-                <td colSpan={5} className="py-8 text-center text-slate-500 dark:text-slate-400">
+                <td colSpan={5} className="py-8 text-center text-muted-foreground">
                   Không có tài khoản nào khớp.
                 </td>
               </tr>

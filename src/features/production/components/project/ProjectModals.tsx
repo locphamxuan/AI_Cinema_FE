@@ -53,14 +53,14 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
         <FormField label="Tên phim">
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} required className={fieldInputClass} />
         </FormField>
-        <FormField label="Ý tưởng gửi studio (tối thiểu 20 ký tự)">
+        <FormField label="Ý tưởng gửi Studio (tối thiểu 20 ký tự)">
           <textarea rows={5} value={idea} onChange={(e) => setIdea(e.target.value)} minLength={20} maxLength={20000} className={fieldTextareaClass} />
         </FormField>
         <FormField label="Tóm tắt cho người xem">
           <textarea rows={3} value={synopsis} onChange={(e) => setSynopsis(e.target.value)} maxLength={5000} className={fieldTextareaClass} />
         </FormField>
         <div>
-          <span className="block text-slate-600 dark:text-slate-300 mb-1 text-xs font-medium">Thể loại</span>
+          <span className="block text-muted-foreground mb-1 text-xs font-medium">Thể loại</span>
           <GenrePicker value={genreIds} onChange={setGenreIds} />
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -86,7 +86,7 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
             aria-label="Số tập xem miễn phí"
             className={fieldInputClass}
           />
-          <span className="block mt-1 text-[11px] text-slate-500">
+          <span className="block mt-1 text-[11px] text-muted-foreground">
             Tính theo số thứ tự tập trong cả phim. Phim 1 tập trọn bộ: nhập 0 để thu Coin, 1 để cho xem miễn phí.
           </span>
         </FormField>

@@ -106,18 +106,18 @@ export function ToastContainer() {
         return (
           <div
             key={t.id}
-            className={`pointer-events-auto bg-white/95 dark:bg-[#151822]/95 backdrop-blur-md border border-slate-200/80 dark:border-white/10 ${style.borderAccent} rounded-2xl p-4 shadow-xl shadow-slate-900/10 dark:shadow-black/60 flex items-start gap-3 transition-all duration-300 animate-in slide-in-from-top-4 fade-in`}
+            className={`pointer-events-auto bg-card backdrop-blur-md border border-border ${style.borderAccent} rounded-2xl p-4 shadow-xl shadow-slate-900/10 dark:shadow-black/60 flex items-start gap-3 transition-all duration-300 animate-in slide-in-from-top-4 fade-in`}
           >
             <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${style.iconBoxClass}`}>
               <Icon className="w-5 h-5" />
             </div>
 
             <div className="flex-1 min-w-0 pt-0.5">
-              <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-tight">
+              <h4 className="text-xs sm:text-sm font-bold text-foreground leading-tight">
                 {t.title}
               </h4>
               {t.description && (
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                   {t.description}
                 </p>
               )}
@@ -126,7 +126,7 @@ export function ToastContainer() {
             <button
               onClick={() => removeToast(t.id)}
               aria-label="Đóng thông báo"
-              className="w-6 h-6 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 flex items-center justify-center transition cursor-pointer shrink-0 mt-0.5"
+              className="w-6 h-6 rounded-lg text-muted-foreground hover:text-secondary-foreground hover:bg-muted flex items-center justify-center transition cursor-pointer shrink-0 mt-0.5"
             >
               <X className="w-3.5 h-3.5" />
             </button>

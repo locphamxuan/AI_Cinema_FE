@@ -92,7 +92,7 @@ export function AccountFormModal({
           />
         </FormField>
         {studioLogin ? (
-          <p className="text-xs text-slate-500">Vai trò: {BACKEND_ROLE_LABEL.STUDIO} - tài khoản Studio chỉ đăng nhập Studio Web, không đổi vai trò được.</p>
+          <p className="text-xs text-muted-foreground">Vai trò: {BACKEND_ROLE_LABEL.STUDIO} - tài khoản Studio chỉ đăng nhập Studio Web, không đổi vai trò được.</p>
         ) : (
           <FormField label="Vai trò">
             <Select
@@ -122,20 +122,20 @@ export function AccountFormModal({
             className={`${fieldInputClass} text-xs py-2 rounded-xl`}
           />
         </FormField>
-        <div className="rounded-xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/[0.06] p-3">
-          <p className={`text-[11px] leading-relaxed ${passwordOk ? 'text-slate-500 dark:text-slate-400' : 'text-rose-500 font-medium'}`}>
+        <div className="rounded-xl bg-muted/60 border border-border p-3">
+          <p className={`text-[11px] leading-relaxed ${passwordOk ? 'text-muted-foreground' : 'text-rose-500 font-medium'}`}>
             💡 {PASSWORD_HINT}
             {!creating && ' Đặt mật khẩu mới sẽ đăng xuất tài khoản khỏi mọi thiết bị.'}
           </p>
         </div>
-        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
+        <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-full px-4 py-2 text-xs">
             Huỷ
           </Button>
           <Button
             type="submit"
             disabled={!valid || busy}
-            className="rounded-full px-5 py-2 text-xs font-semibold bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 shadow-xs transition-colors"
+            className="rounded-full px-5 py-2 text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs transition-colors"
           >
             {creating ? 'Tạo tài khoản' : 'Lưu'}
           </Button>
@@ -163,10 +163,10 @@ export function DeleteAccountModal({ account, onClose, onDeleted }: { account: A
       subtitle={`${account.fullName} · ${account.email}`}
     >
       <div className="space-y-4">
-        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        <p className="text-xs text-muted-foreground leading-relaxed">
           Chỉ xoá được tài khoản chưa có hoạt động nào. Tài khoản đã tham gia dự án, kiểm duyệt hay giao dịch là một phần lịch sử: hãy khoá thay vì xoá.
         </p>
-        <div className="flex justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-white/[0.06]">
+        <div className="flex justify-end gap-2.5 pt-2 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 py-2 text-xs">
             Huỷ
           </Button>

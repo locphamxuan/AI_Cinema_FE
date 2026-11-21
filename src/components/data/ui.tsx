@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldTextareaClass } from '@/components/ui/FormField';
-import { Modal } from '@/components/ui/Modal';
+import { Modal, type ModalTone } from '@/components/ui/Modal';
 import type { Tone } from '@/features/production/lib/labels';
 
 export const CARD = 'rounded-xl bg-card text-card-foreground ring-1 ring-foreground/10 shadow-xs';
@@ -105,6 +105,7 @@ export function TextPromptModal({
   placeholder,
   confirmLabel,
   danger,
+  tone,
   required = true,
   minLength = 5,
   busy,
@@ -119,6 +120,8 @@ export function TextPromptModal({
   placeholder?: string;
   confirmLabel: string;
   danger?: boolean;
+  /** The band colour; `danger` alone means the danger tone. */
+  tone?: ModalTone;
   required?: boolean;
   /** The backend's shortest accepted reason. */
   minLength?: number;
@@ -131,7 +134,7 @@ export function TextPromptModal({
   const blocked = required && text.trim().length < minLength;
 
   return (
-    <Modal open={open} onClose={onClose} title={title} subtitle={subtitle} maxWidth="max-w-md">
+    <Modal open={open} onClose={onClose} title={title} subtitle={subtitle} maxWidth="max-w-md" tone={tone ?? (danger ? 'danger' : 'info')}>
       <form
         className="space-y-4"
         onSubmit={(e) => {

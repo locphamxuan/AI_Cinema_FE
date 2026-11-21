@@ -3,8 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PoliciesPanel } from '@/features/policies/PoliciesPanel';
 import { validity } from '@/features/policies/policyLabels';
-import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
-import { ReviewerSidebar } from '@/features/production/components/shell/ReviewerSidebar';
+import { AppShell } from '@/components/shell/AppShell';
 import { policiesQuery } from '@/services/policyService';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
@@ -63,12 +62,12 @@ describe('Policies', () => {
 
   it('puts "Chính sách" in the Reviewer and Admin menus by permission', () => {
     signInAs('reviewer');
-    const { unmount } = render(<ReviewerSidebar />);
+    const { unmount } = render(<AppShell area="reviewer"><div /></AppShell>);
     expect(screen.getByRole('link', { name: 'Chính sách' })).toHaveAttribute('aria-current', 'page');
     unmount();
 
     signInAs('admin', ['platform:settings.manage']);
-    render(<AdminSidebar />);
+    render(<AppShell area="admin"><div /></AppShell>);
     expect(screen.getByRole('link', { name: 'Chính sách' })).toHaveAttribute('href', '/admin/policies');
   });
 });

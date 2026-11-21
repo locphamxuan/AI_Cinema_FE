@@ -49,6 +49,8 @@ export interface CreateProjectInput {
   studioId?: string;
   /** Content Reviewer in charge of the project. */
   reviewerId: string;
+  /** Production budget (VND, whole thousands): the ceiling of the contract the studio receives. */
+  budgetVnd?: number;
   /** Lead Content Creator; with one the project starts ASSIGNED. */
   creatorId?: string;
   /** Seasons and episodes; usually the Reviewer adds them later. */
@@ -75,6 +77,11 @@ export interface StudioInput {
   contactName?: string;
   phone?: string;
   note?: string;
+  /** Legal profile printed as Bên B; an empty string clears it. */
+  address?: string;
+  taxCode?: string;
+  bankAccount?: string;
+  representativeTitle?: string;
   isActive?: boolean;
 }
 

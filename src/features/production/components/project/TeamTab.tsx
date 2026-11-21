@@ -62,7 +62,7 @@ export function TeamTab() {
       {seats.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
-            <thead className="text-left text-slate-500 dark:text-slate-400">
+            <thead className="text-left text-muted-foreground">
               <tr>
                 <th className="px-3 py-2 font-medium">Creator</th>
                 <th className="px-3 py-2 font-medium">Người giao</th>
@@ -75,19 +75,19 @@ export function TeamTab() {
               {seats.map((seat) => (
                 <tr key={seat.id} className={seat.isActive ? '' : 'opacity-60'}>
                   <td className="px-3 py-2.5">
-                    <p className="font-medium text-slate-900 dark:text-white">
+                    <p className="font-medium text-foreground">
                       {seat.creator.fullName}{' '}
                       {seat.isLead && <Badge tone="purple">Creator chính</Badge>}
                       {!seat.isActive && <Badge tone="neutral">Đã gỡ</Badge>}
                     </p>
-                    <p className="text-slate-500">{seat.creator.email}</p>
+                    <p className="text-muted-foreground">{seat.creator.email}</p>
                   </td>
-                  <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300">
+                  <td className="px-3 py-2.5 text-muted-foreground">
                     {seat.assignedBy.fullName}
-                    <p className="text-slate-400">{formatDateTime(seat.assignedAt)}</p>
+                    <p className="text-muted-foreground">{formatDateTime(seat.assignedAt)}</p>
                   </td>
-                  <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300">{seat.delegatedFrom?.fullName ?? '-'}</td>
-                  <td className="px-3 py-2.5 text-slate-600 dark:text-slate-300">
+                  <td className="px-3 py-2.5 text-muted-foreground">{seat.delegatedFrom?.fullName ?? '-'}</td>
+                  <td className="px-3 py-2.5 text-muted-foreground">
                     {seat.episodes.length ? seat.episodes.map((e) => `Tập ${e.episodeNumber}`).join(', ') : seat.isActive ? 'Cả nhóm (chưa giao riêng)' : '-'}
                   </td>
                   <td className="px-3 py-2.5 text-right">

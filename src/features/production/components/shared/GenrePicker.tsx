@@ -19,7 +19,7 @@ export function GenrePicker({ value, onChange }: { value: string[]; onChange: (i
   const [newName, setNewName] = useState('');
   const { busy, run } = useAction();
 
-  if (genres.loading && !genres.data) return <p className="text-xs text-slate-500">Đang tải thể loại…</p>;
+  if (genres.loading && !genres.data) return <p className="text-xs text-muted-foreground">Đang tải thể loại…</p>;
 
   const toggle = (id: string) =>
     onChange(value.includes(id) ? value.filter((v) => v !== id) : value.length < MAX_GENRES ? [...value, id] : value);
@@ -35,7 +35,7 @@ export function GenrePicker({ value, onChange }: { value: string[]; onChange: (i
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1.5" role="group" aria-label="Thể loại">
-        {!genres.data?.length && <span className="text-xs text-slate-500">Chưa có thể loại nào.</span>}
+        {!genres.data?.length && <span className="text-xs text-muted-foreground">Chưa có thể loại nào.</span>}
         {genres.data?.map((g) => {
           const on = value.includes(g.id);
           return (
@@ -48,7 +48,7 @@ export function GenrePicker({ value, onChange }: { value: string[]; onChange: (i
               className={`px-2.5 py-1 rounded-full text-xs border transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
                 on
                   ? 'bg-sky-600 border-sky-600 text-white'
-                  : 'border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:border-sky-400'
+                  : 'border-border text-muted-foreground hover:border-sky-400'
               }`}
             >
               {g.name}

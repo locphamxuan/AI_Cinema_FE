@@ -33,7 +33,7 @@ describe('LabelPanel (BR-40)', () => {
     const calls = routeFetch({});
     render(<LabelPanel sheet={sheet('APPROVED', null)} canAct onChanged={async () => undefined} />);
 
-    expect(screen.getByText(/Creator đề xuất “Do AI tạo”/)).toBeInTheDocument();
+    expect(screen.getByText(/Studio đề xuất “Do AI tạo”/)).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /Xem trước nhãn AI/ })).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /Gắn nhãn/ }));
     expect(calls.some((c) => c.method === 'POST' && c.path === '/media-assets/a1/ai-content-labels')).toBe(true);
