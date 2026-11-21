@@ -1,6 +1,7 @@
 /** Contract negotiation of a project's production cost: the Admin here, the studio on Studio Web (/studio-portal). */
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type { Contract, ContractDocument, ContractDocumentSide } from '@/types/contract';
+import { saveBlob } from '@/lib/format';
 import { apiClient } from './apiClient';
 
 const R = API_ROUTES.PRODUCTION;
@@ -40,17 +41,16 @@ export const contractService = {
   /** List signed PDF documents of a round (ADMIN, STUDIO, FINAL). */
   documents: (id: string) => apiClient.get<ContractDocument[]>(R.CONTRACT_DOCUMENTS(id)),
   /** Download signed PDF document content. */
-  downloadDocument: async (id: string, side: ContractDocumentSide, fileName?: string): Promise<boolean> => {
-    const blob = await apiClient.getBlob(R.CONTRACT_DOCUMENT_CONTENT(id, side));
-    if (!blob) return false;
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName || `hop-dong-${side.toLowerCase()}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    return true;
-  },
+  downloadDocument: (id: string, side: ContractDocumentSide, fileName?: string): Promise<boolean> =>
+    saveFrom(R.CONTRACT_DOCUMENT_CONTENT(id, side), fileName || `hop-dong-${side.toLowerCase()}.pdf`),
+  /** Download the unsigned contract of a round, as the studio receives it. */
+  downloadTemplate: (id: string): Promise<boolean> => saveFrom(R.CONTRACT_TEMPLATE(id), `hop-dong-chua-ky-${id.slice(0, 8)}.pdf`),
 };
+
+/** Fetches a PDF behind auth and saves it under `fileName`; false when it cannot be read. */
+async function saveFrom(path: string, fileName: string): Promise<boolean> {
+  const blob = await apiClient.getBlob(path);
+  if (!blob) return false;
+  saveBlob(blob, fileName);
+  return true;
+}

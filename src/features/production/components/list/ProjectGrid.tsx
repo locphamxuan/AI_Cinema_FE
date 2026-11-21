@@ -58,7 +58,7 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
           <li key={p.id}>
             <Link
               href={productionPaths.project(base, p.id)}
-              className="group flex flex-col h-full rounded-3xl border border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#111420] hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 overflow-hidden"
+              className="group flex flex-col h-full rounded-3xl border border-border bg-card hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 overflow-hidden"
             >
               <div className="relative w-full aspect-[16/10] overflow-hidden bg-slate-900">
                 <ProjectPoster title={p.title} posterUrl={p.posterUrl} status={p.status} />
@@ -79,10 +79,10 @@ export function ProjectGrid({ projects, base }: { projects: ProjectSummary[]; ba
               </div>
 
               <div className="p-4 flex-1 flex flex-col justify-between gap-3">
-                <h2 className="text-base font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-sky-700 dark:group-hover:text-sky-500 transition-colors">
+                <h2 className="text-base font-bold text-foreground line-clamp-1 group-hover:text-sky-700 dark:group-hover:text-sky-500 transition-colors">
                   {p.title}
                 </h2>
-                <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-1.5 text-[11px] text-slate-600 dark:text-slate-300">
+                <div className="pt-2 border-t border-border space-y-1.5 text-[11px] text-muted-foreground">
                   {p.studio && (
                     <p className="flex items-center gap-2">
                       <span className="truncate font-medium">{p.studio.name}</span>

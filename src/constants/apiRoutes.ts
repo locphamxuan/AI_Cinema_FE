@@ -111,6 +111,8 @@ export const API_ROUTES = {
     CONTRACT_COUNTER: (id: string) => `/contracts/${id}/counter`,
     CONTRACT_DOCUMENTS: (id: string) => `/contracts/${id}/documents`,
     CONTRACT_DOCUMENT_CONTENT: (id: string, side: string) => `/contracts/${id}/documents/${side}/content`,
+    /** The unsigned contract of a round, generated from the project, both parties and the budget ceiling. */
+    CONTRACT_TEMPLATE: (id: string) => `/contracts/${id}/template`,
   },
   // MF-5: the support desk of Staff / Admin and the AI Chatbox console of the Admin
   ADMIN_SUPPORT: {
@@ -123,7 +125,6 @@ export const API_ROUTES = {
     AI_SUGGESTION: (id: string) => `/admin/support/conversations/${id}/ai-suggestion`,
     MESSAGES: (id: string) => `/admin/support/conversations/${id}/messages`,
     RESOLVE: (id: string) => `/admin/support/conversations/${id}/resolve`,
-    CLOSE: (id: string) => `/admin/support/conversations/${id}/close`,
     ASSIGN: (id: string) => `/admin/support/conversations/${id}/assign`,
     KNOWLEDGE: '/admin/support/knowledge',
     KNOWLEDGE_DETAIL: (id: string) => `/admin/support/knowledge/${id}`,
@@ -146,9 +147,6 @@ export const API_ROUTES = {
     RISK_FLAGS: '/admin/finance/risk/flags',
     RISK_SCAN: '/admin/finance/risk/scan',
     RISK_REVIEW: (flagId: string) => `/admin/finance/risk/flags/${flagId}/review`,
-  },
-  OAUTH: {
-    AUTHORIZE: '/oauth/authorize',
   },
 } as const;
 

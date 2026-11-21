@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
+import { AppShell } from '@/components/shell/AppShell';
 import { PlatformSettingsPanel } from '@/features/admin/components/PlatformSettingsPanel';
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 import { PlansPanel } from '@/features/billing-admin/components/PlansPanel';
@@ -67,8 +67,8 @@ afterEach(() => vi.unstubAllGlobals());
 describe('Admin MF-2 sections', () => {
   it('opens the billing and reward sections to the Admin', () => {
     signInAs('admin');
-    render(<AdminSidebar />);
-    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
+    render(<AppShell area="admin"><div /></AppShell>);
+    const nav = screen.getByRole('navigation', { name: 'Menu Quản trị' });
     for (const label of ['Gói thành viên & Doanh thu', 'Giao dịch Coin', 'Điểm danh & vòng quay']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }
@@ -199,7 +199,6 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
       coinRateVnd: 1000,
       episodeCoinPriceMin: 1,
       episodeCoinPriceMax: 50,
-      bonusCoinExpiryDays: 30,
       playbackHeartbeatTimeoutSeconds: 90,
       subscriptionCancelWindowHours: 24,
       planRenewalGraceHours: 48,
@@ -218,5 +217,25 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
     await userEvent.click(screen.getByRole('button', { name: /Lưu/ }));
 
     await waitFor(() => expect(bodyOf(fetchMock, 'PATCH', '/platform-settings')).toEqual({ planRenewalGraceHours: 0 }));
+  });
+
+  it('keeps Bên A of the production contract, saving only the fields changed', async () => {
+    signInAs('admin');
+    const settings = { coinRateVnd: 1000, refundOnRemoval: true, contractCompanyName: 'Công ty TNHH AI Cinema', contractTaxCode: null };
+    const fetchMock = mockApi({ 'GET /platform-settings': settings, 'PATCH /platform-settings': settings });
+    render(<PlatformSettingsPanel />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Hợp đồng (Bên A)' }));
+    expect(screen.getByLabelText('Tên công ty')).toHaveValue('Công ty TNHH AI Cinema');
+    const save = screen.getByRole('button', { name: 'Lưu Bên A' });
+    expect(save).toBeDisabled();
+    await userEvent.type(screen.getByLabelText('Mã số thuế'), ' 0312345678 ');
+    await userEvent.type(screen.getByLabelText('Email'), 'legal@aicinema.vn');
+    await userEvent.click(screen.getByRole('button', { name: 'Huỷ thay đổi' }));
+    expect(screen.getByLabelText('Mã số thuế')).toHaveValue('');
+    await userEvent.type(screen.getByLabelText('Mã số thuế'), ' 0312345678 ');
+    await userEvent.click(screen.getByRole('button', { name: 'Lưu Bên A (1)' }));
+
+    await waitFor(() => expect(bodyOf(fetchMock, 'PATCH', '/platform-settings')).toEqual({ contractTaxCode: '0312345678' }));
   });
 });

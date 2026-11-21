@@ -46,7 +46,7 @@ export function PlansPanel() {
       {plans.data && plans.data.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs table-cells">
-            <thead className="text-slate-500 dark:text-slate-400 text-left">
+            <thead className="text-muted-foreground text-left">
               <tr>
                 <th className="py-2 font-medium">Gói</th>
                 <th className="py-2 font-medium">Thời hạn</th>
@@ -60,16 +60,16 @@ export function PlansPanel() {
               {paged.rows.map((plan) => (
                 <tr key={plan.id}>
                   <td className="py-2">
-                    <p className="font-medium text-slate-900 dark:text-white">
+                    <p className="font-medium text-foreground">
                       {plan.name} {plan.isFeatured && <span className="text-xs text-amber-600">Đề xuất</span>}
                     </p>
-                    <p className="text-[11px] text-slate-500 tabular-nums">{plan.code}</p>
+                    <p className="text-[11px] text-muted-foreground tabular-nums">{plan.code}</p>
                   </td>
                   <td className="py-2">{plan.isFree ? 'Không thời hạn' : `${PERIOD_LABEL[plan.period]} · ${plan.durationDays} ngày`}</td>
                   <td className="py-2 text-right tabular-nums">
                     {plan.isFree ? 'Miễn phí' : plan.priceCoins === null ? 'Chưa đặt giá' : `${formatNumber(plan.priceCoins)} Coin`}
                   </td>
-                  <td className="py-2 pl-4 text-slate-600 dark:text-slate-300">{featuresSummary(plan.features) || 'Theo mặc định'}</td>
+                  <td className="py-2 pl-4 text-muted-foreground">{featuresSummary(plan.features) || 'Theo mặc định'}</td>
                   <td className="py-2">
                     <StatusPill
                       label={!plan.isActive ? 'Đang ẩn' : plan.isFree || plan.priceCoins !== null ? 'Đang mở bán' : 'Chờ đặt giá'}
@@ -137,7 +137,7 @@ function PriceModal({ plan, onClose, onDone }: ModalProps & { plan: AdminPlan })
         <FormField label="Bắt đầu áp dụng" hint="Để trống để áp dụng ngay.">
           <input type="datetime-local" value={from} onChange={(e) => setFrom(e.target.value)} className={fieldInputClass} />
         </FormField>
-        <p className="text-[11px] text-slate-500">Người đang dùng gói giữ giá cũ tới hết kỳ đã trả; từ lần gia hạn sau mới tính giá mới.</p>
+        <p className="text-[11px] text-muted-foreground">Người đang dùng gói giữ giá cũ tới hết kỳ đã trả; từ lần gia hạn sau mới tính giá mới.</p>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ

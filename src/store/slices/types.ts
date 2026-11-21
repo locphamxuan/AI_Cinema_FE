@@ -14,10 +14,9 @@ export interface UserProfile {
 export interface AuthSlice {
   isAuthenticated: boolean;
   user: UserProfile | null;
-  login: (email: string, password: string, allowStudio?: boolean) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
   logout: () => void;
-  /** `allowStudio`: keep a Studio session (the OAuth consent page only). */
-  restoreSession: (allowStudio?: boolean) => void;
+  restoreSession: () => void;
 }
 
 export interface ThemeSlice {

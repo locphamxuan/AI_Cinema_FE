@@ -173,7 +173,7 @@ class ApiClient {
         data: null as unknown as T,
         statusCode: isTimeout ? 504 : undefined,
         message: isTimeout
-          ? 'Yêu cầu phản hồi quá lâu (hết thời gian chờ). Vui lòng thử lại hoặc kết nối nhân viên hỗ trợ.'
+          ? 'Yêu cầu phản hồi quá lâu (hết thời gian chờ). Vui lòng thử lại sau ít phút.'
           : error instanceof Error
             ? error.message
             : 'Unknown network error',

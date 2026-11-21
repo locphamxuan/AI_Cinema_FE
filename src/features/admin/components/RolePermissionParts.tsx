@@ -30,7 +30,7 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
             className={`p-4 rounded-2xl border transition-all ${
               isChanged
                 ? 'border-amber-400 bg-amber-50/40 dark:bg-amber-500/10 shadow-sm'
-                : 'border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-card'
+                : 'border-border bg-card'
             }`}
           >
             <div className="flex items-center justify-between mb-2 min-h-5">
@@ -41,11 +41,11 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
                 </span>
               )}
             </div>
-            <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate">
+            <p className="text-xs font-bold text-foreground truncate">
               {ROLE_SHORT_LABEL[role]}
             </p>
-            <p className="text-lg font-black tabular-nums text-slate-900 dark:text-white mt-0.5">
-              {count} <span className="text-xs font-normal text-slate-400">quyền</span>
+            <p className="text-lg font-black tabular-nums text-foreground mt-0.5">
+              {count} <span className="text-xs font-normal text-muted-foreground">quyền</span>
             </p>
           </div>
         );
@@ -57,11 +57,11 @@ export function RoleSummaryCards({ draft, changedRoles }: { draft: Matrix; chang
 /** Table head: the permission column, then one column per role. */
 export function RoleColumnHeaders() {
   return (
-    <thead className="text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50/90 dark:bg-white/[0.02] border-b border-slate-100 dark:border-white/5">
+    <thead className="text-[11px] text-muted-foreground bg-muted/60 border-b border-border">
       <tr>
         <th
           scope="col"
-          className="py-3.5 px-6 text-left font-bold text-slate-700 dark:text-slate-300 w-1/3 min-w-[280px]"
+          className="py-3.5 px-6 text-left font-bold text-secondary-foreground w-1/3 min-w-[280px]"
         >
           Chức năng & Diễn giải quyền hạn
         </th>
@@ -69,11 +69,11 @@ export function RoleColumnHeaders() {
           return (
             <th key={role} scope="col" className="py-3.5 px-3 font-bold text-center whitespace-nowrap min-w-[130px]">
               <div className="flex items-center justify-center gap-1.5">
-                <span className="text-slate-900 dark:text-white font-semibold">
+                <span className="text-foreground font-semibold">
                   {ROLE_SHORT_LABEL[role]}
                 </span>
               </div>
-              <span className="block text-[10px] text-slate-400 font-normal mt-0.5">
+              <span className="block text-[10px] text-muted-foreground font-normal mt-0.5">
                 {BACKEND_ROLE_LABEL[role]}
               </span>
             </th>
@@ -125,7 +125,7 @@ export function PermissionCell({ role, permission, title, isLocked, isGranted, o
         className={`group inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer select-none border active:scale-95 ${
           isGranted
             ? 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/25 shadow-xs font-bold'
-            : 'bg-slate-50 dark:bg-white/[0.02] text-slate-400 dark:text-slate-500 border-slate-200/60 dark:border-white/5 hover:border-sky-300 dark:hover:border-sky-500/30 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-sky-50/50 font-medium'
+            : 'bg-muted/60 text-muted-foreground/70 border-border hover:border-sky-300 dark:hover:border-sky-500/30 hover:text-sky-600 dark:hover:text-sky-300 hover:bg-sky-50/50 font-medium'
         }`}
       >
         {isGranted ? (
@@ -134,7 +134,7 @@ export function PermissionCell({ role, permission, title, isLocked, isGranted, o
           </>
         ) : (
           <>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500 group-hover:text-sky-600 dark:group-hover:text-sky-300">
+            <span className="text-[11px] text-muted-foreground/70 group-hover:text-sky-600 dark:group-hover:text-sky-300">
               Chưa cấp
             </span>
           </>
@@ -160,9 +160,9 @@ export function PermissionRowView({
   return (
     <tr className="hover:bg-slate-50/80 dark:hover:bg-white/[0.025] transition-colors">
       <th scope="row" className="py-3.5 px-6 text-left font-normal align-middle">
-        <p className="font-bold text-slate-900 dark:text-slate-100 text-xs sm:text-sm">{meta.title}</p>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{meta.desc}</p>
-        <span className="mt-1 inline-block text-[10px] tabular-nums text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded border border-slate-200/50 dark:border-white/5">
+        <p className="font-bold text-foreground text-xs sm:text-sm">{meta.title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{meta.desc}</p>
+        <span className="mt-1 inline-block text-[10px] tabular-nums text-muted-foreground/70 bg-muted px-2 py-0.5 rounded border border-border">
           {permission.key}
         </span>
       </th>

@@ -70,20 +70,20 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
 
   return (
     <div className="space-y-4">
-      <p className="text-xs text-slate-500 dark:text-slate-400">
+      <p className="text-xs text-muted-foreground">
         Độ dài tập: <b>{duration ? formatDuration(duration) : 'chưa rõ'}</b> · Hiện tại:{' '}
         <b>{initial.mode === 'MANUAL' ? `${initial.slots.length} lần chèn do Admin đặt` : 'chèn ngẫu nhiên theo cài đặt nền tảng'}</b>
       </p>
       {slots.length === 0 && (
-        <p className="text-xs text-slate-500 italic">Chưa đặt vị trí nào - tập sẽ được chèn quảng cáo ngẫu nhiên.</p>
+        <p className="text-xs text-muted-foreground italic">Chưa đặt vị trí nào - tập sẽ được chèn quảng cáo ngẫu nhiên.</p>
       )}
       <ul className="space-y-3">
         {slots.map((slot, index) => (
-          <li key={index} className="rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50/60 dark:bg-white/[0.03] p-3 space-y-2.5">
+          <li key={index} className="rounded-xl border border-border bg-muted/60 p-3 space-y-2.5">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">
+              <p className="text-xs font-semibold text-foreground">
                 Lần {index + 1}
-                <span className="ml-2 font-normal text-slate-500 dark:text-slate-400">
+                <span className="ml-2 font-normal text-muted-foreground">
                   phát lúc <span className="tabular-nums">{formatDuration(slot.positionSeconds || 0)}</span>
                 </span>
               </p>
@@ -91,14 +91,14 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
                 type="button"
                 onClick={() => setSlots((all) => all.filter((_, i) => i !== index))}
                 aria-label={`Bỏ lần chèn ${index + 1}`}
-                className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
+                className="p-1 rounded-lg text-muted-foreground hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 cursor-pointer"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-[8rem_minmax(0,1fr)] gap-2.5">
               <div>
-                <span className="block mb-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">Giây chèn</span>
+                <span className="block mb-1 text-[11px] font-medium text-muted-foreground">Giây chèn</span>
                 <input
                   type="number"
                   min={1}
@@ -110,7 +110,7 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
                 />
               </div>
               <div className="min-w-0">
-                <span className="block mb-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">Quảng cáo</span>
+                <span className="block mb-1 text-[11px] font-medium text-muted-foreground">Quảng cáo</span>
                 <Select
                   value={slot.adId ?? RANDOM_AD}
                   onChange={(adId) => edit(index, { adId: adId || null })}
@@ -127,7 +127,7 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
         Thêm lần chèn
       </Button>
       {(problem || error) && <p role="alert" className="text-xs text-rose-600">{problem || error}</p>}
-      <div className="flex flex-wrap justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+      <div className="flex flex-wrap justify-end gap-2 pt-2 border-t border-border">
         {initial.mode === 'MANUAL' && (
           <Button type="button" variant="secondary" onClick={() => void save([])} disabled={busy}>
             Về chèn ngẫu nhiên

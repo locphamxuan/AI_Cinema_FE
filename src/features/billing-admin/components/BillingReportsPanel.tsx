@@ -32,11 +32,11 @@ export function BillingReportsPanel() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end gap-3 text-xs">
         <label className="space-y-1">
-          <span className="block text-slate-500">Từ ngày</span>
+          <span className="block text-muted-foreground">Từ ngày</span>
           <input type="date" value={range.from} max={range.to} onChange={(e) => setRange({ ...range, from: e.target.value })} className={`${fieldInputClass} py-1`} />
         </label>
         <label className="space-y-1">
-          <span className="block text-slate-500">Đến ngày</span>
+          <span className="block text-muted-foreground">Đến ngày</span>
           <input type="date" value={range.to} min={range.from} onChange={(e) => setRange({ ...range, to: e.target.value })} className={`${fieldInputClass} py-1`} />
         </label>
       </div>
@@ -64,7 +64,7 @@ function RevenueSection({ rangeKey, query }: { rangeKey: string; query: ReportRa
 
           {r.byPlan.length > 0 && (
             <div className="space-y-4 pt-2">
-              <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300">Biểu đồ doanh thu từng gói</h4>
+              <h4 className="text-xs font-bold text-secondary-foreground">Biểu đồ doanh thu từng gói</h4>
               <BarChart
                 categories={r.byPlan.map((row) => row.plan.name)}
                 series={[

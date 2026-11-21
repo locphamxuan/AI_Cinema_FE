@@ -72,14 +72,14 @@ export function ReviewerAuditWorkspace() {
   const target = pickEpisode(queue, params.get('project'), params.get('episode'));
 
   return (
-    <div className="flex flex-col lg:flex-row flex-1 w-full h-[calc(100vh-3.5rem)] max-h-[calc(100vh-3.5rem)] overflow-hidden bg-[#F9FAFB] dark:bg-[#090B10] text-slate-900 dark:text-slate-100">
+    <div className="flex flex-col lg:flex-row flex-1 w-full h-[calc(100vh-3.5rem)] max-h-[calc(100vh-3.5rem)] overflow-hidden bg-background text-foreground">
       {pipelines.loading && !pipelines.data && !target && <Loading label="Đang tìm phim cần thẩm định…" />}
       {pipelines.error && <ErrorNote message={pipelines.error} onRetry={pipelines.reload} />}
       {target && <AuditDesk key={target.episodeId} projectId={target.projectId} episodeId={target.episodeId} queue={queue} />}
       {pipelines.data && !target && (
         <div className="flex-1 flex flex-col items-center justify-center gap-4 p-10 text-center">
-          <h1 className="text-lg font-bold text-slate-900 dark:text-white">Chưa có bản phim nào chờ thẩm định</h1>
-          <Link href="/reviewer/projects" className="px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs font-semibold transition-all">
+          <h1 className="text-lg font-bold text-foreground">Chưa có bản phim nào chờ thẩm định</h1>
+          <Link href="/reviewer/projects" className="px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold transition-all">
             Xem hàng đợi dự án
           </Link>
         </div>

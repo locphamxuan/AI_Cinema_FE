@@ -40,7 +40,7 @@ export function KnowledgeTable({ resource, busy, filtered, onPage, onEdit, onRei
               <th className="py-2 pr-3 font-medium">Danh mục</th>
               <th className="py-2 pr-3 font-medium">Đối tượng</th>
               <th className="py-2 pr-3 font-medium">Trạng thái</th>
-              <th className="py-2 pr-3 font-medium">Index</th>
+              <th className="py-2 pr-3 font-medium">Chỉ mục</th>
               <th className="py-2 pr-3 font-medium">Cập nhật lúc</th>
               <th className="py-2 text-right font-medium">Thao tác</th>
             </tr>
@@ -70,7 +70,7 @@ export function KnowledgeTable({ resource, busy, filtered, onPage, onEdit, onRei
                   <div className="flex justify-end gap-1">
                     <IconAction label="Sửa" onClick={() => onEdit(a)} icon={<Pencil className="size-3.5" />} />
                     <IconAction
-                      label="Index lại"
+                      label="Lập lại chỉ mục"
                       disabled={busy || a.status !== 'PUBLISHED'}
                       onClick={() => onReindex(a)}
                       icon={<RefreshCw className="size-3.5" />}

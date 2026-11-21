@@ -45,7 +45,7 @@ export const SEASON_STATUS: Record<SeasonStatus, Label> = {
 
 export const EPISODE_STATUS: Record<EpisodeStatus, Label> = {
   DRAFT: { label: 'Nháp', tone: 'neutral' },
-  AWAITING_MEDIA: { label: 'Chờ studio giao', tone: 'neutral' },
+  AWAITING_MEDIA: { label: 'Chờ Studio giao', tone: 'neutral' },
   PROCESSING: { label: 'Đang xử lý video', tone: 'blue' },
   IN_REVIEW: { label: 'Chờ duyệt', tone: 'amber' },
   CHANGES_REQUESTED: { label: 'Yêu cầu sửa', tone: 'rose' },
@@ -69,7 +69,7 @@ export const INGEST_STATUS: Record<MediaIngestStatus, Label> = {
 
 export const SOURCE_METHOD: Record<MediaSourceMethod, string> = {
   UPLOAD: 'Tải file lên',
-  HLS_URL: 'Link HLS của studio',
+  HLS_URL: 'Link HLS của Studio',
   REMOTE_FILE: 'Link file (hệ thống tải về)',
 };
 
@@ -120,9 +120,9 @@ export const COST_REQUEST_STATUS: Record<CostRequestStatus, Label> = {
 };
 
 export const CONTRACT_STATUS: Record<ContractStatus, Label> = {
-  SENT: { label: 'Đã gửi studio, chờ báo giá', tone: 'neutral' },
+  SENT: { label: 'Đã gửi Studio, chờ Studio ký', tone: 'neutral' },
   STUDIO_SIGNED: { label: 'Studio đã ký, chờ Admin', tone: 'amber' },
-  ADMIN_COUNTERED: { label: 'Admin đề xuất giá mới, chờ studio', tone: 'amber' },
+  ADMIN_COUNTERED: { label: 'Admin đề xuất giá mới, chờ Studio', tone: 'amber' },
   SIGNED: { label: 'Đã ký đủ 2 bên', tone: 'emerald' },
   SUPERSEDED: { label: 'Đã thay bằng vòng mới', tone: 'neutral' },
 };
@@ -174,7 +174,7 @@ export const PRICE_ALERT_STATUS: Record<PriceAlertStatus, Label> = {
 export const UNPUBLISH_MODE: Record<UnpublishMode, { label: string; hint: string }> = {
   REVISION: {
     label: 'Gỡ để sửa',
-    hint: 'Tập về lại Creator để studio sửa. Người đã mua vẫn giữ quyền xem, không hoàn Coin; người xem thấy thông báo bảo trì.',
+    hint: 'Tập về lại Creator để Studio sửa. Người đã mua vẫn giữ quyền xem, không hoàn Coin; người xem thấy thông báo bảo trì.',
   },
   REMOVAL: {
     label: 'Gỡ hẳn',
@@ -223,8 +223,8 @@ export const EVENT_LABEL: Record<string, string> = {
   STUDIO_ACCOUNT_CREATED: 'Mở tài khoản Studio',
   FINAL_FILM_CONFIRMED: 'Reviewer xác nhận Phim Final',
   FINAL_FILM_REJECTED: 'Admin trả lại Phim Final',
-  STUDIO_HANDOFF_SENT: 'Gửi brief cho studio',
-  STUDIO_CHANGED: 'Đổi studio',
+  STUDIO_HANDOFF_SENT: 'Gửi brief cho Studio',
+  STUDIO_CHANGED: 'Đổi Studio',
   STUDIO_MILESTONE_UPDATED: 'Cập nhật mốc Studio',
   STUDIO_CREATED: 'Thêm Studio vào danh mục',
   STUDIO_UPDATED: 'Sửa Studio',

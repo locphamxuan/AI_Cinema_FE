@@ -34,13 +34,13 @@ export function UnpublishModal({ publication, onClose, onDone }: { publication: 
             {(Object.keys(UNPUBLISH_MODE) as UnpublishMode[]).map((m) => (
               <label
                 key={m}
-                className={`block rounded-xl border p-3 cursor-pointer ${mode === m ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-500/10' : 'border-slate-200 dark:border-white/10'}`}
+                className={`block rounded-xl border p-3 cursor-pointer ${mode === m ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-500/10' : 'border-border'}`}
               >
-                <span className="flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100">
+                <span className="flex items-center gap-2 font-semibold text-foreground">
                   <input type="radio" name="unpublish-mode" checked={mode === m} onChange={() => setMode(m)} />
                   {UNPUBLISH_MODE[m].label}
                 </span>
-                <span className="block mt-1 text-slate-500 dark:text-slate-400">{UNPUBLISH_MODE[m].hint}</span>
+                <span className="block mt-1 text-muted-foreground">{UNPUBLISH_MODE[m].hint}</span>
               </label>
             ))}
           </div>

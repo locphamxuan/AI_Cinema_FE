@@ -51,6 +51,9 @@ export function ContractCard({
   const canSign = canDecide && c.status === 'STUDIO_SIGNED';
   // BE ADMIN_OFFER_FROM: the Admin may propose a cost before the studio filled one (SENT) or after it signed.
   const canCounter = canDecide && (c.status === 'SENT' || c.status === 'STUDIO_SIGNED');
+  const downloadTemplate = async () => {
+    if (!(await contractService.downloadTemplate(c.id))) toast.error('Không tải được hợp đồng', 'Thử lại sau.');
+  };
   const download = async (side: 'ADMIN' | 'STUDIO' | 'FINAL', fileName: string) => {
     if (!(await contractService.downloadDocument(c.id, side, fileName))) toast.error('Không tải được file PDF', 'Thử lại sau.');
   };
@@ -65,7 +68,7 @@ export function ContractCard({
   };
   const counter = async () => {
     if (!(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile || contractPdfProblem(counterFile)) return;
-    if (await run(() => contractService.counter(c.id, priceVnd, counterFile), 'Đã gửi mức giá mới cho studio')) {
+    if (await run(() => contractService.counter(c.id, priceVnd, counterFile), 'Đã gửi mức giá mới cho Studio')) {
       setCountering(false);
       setPrice('');
       setCounterFile(null);
@@ -75,9 +78,9 @@ export function ContractCard({
   };
 
   return (
-    <li className="rounded-xl border border-slate-200/80 dark:border-white/[0.08] bg-slate-50/50 dark:bg-white/[0.02] p-3.5 text-xs space-y-2">
+    <li className="rounded-xl border border-border bg-muted/60 p-3.5 text-xs space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-slate-500 dark:text-slate-400">
+        <p className="text-muted-foreground">
           Vòng {c.round} · Studio {c.studio.name} · {formatDateTime(c.createdAt)}
         </p>
         <StatusPill {...CONTRACT_STATUS[c.status]} />
@@ -85,23 +88,32 @@ export function ContractCard({
       {showCost && c.costVnd !== null && (
         <p>
           Chi phí {c.proposedBy === 'ADMIN' ? 'Admin đề xuất' : 'Studio báo giá'}:{' '}
-          <span className="font-semibold text-slate-800 dark:text-slate-100">{formatVnd(c.costVnd)}</span>
+          <span className="font-semibold text-foreground">{formatVnd(c.costVnd)}</span>
         </p>
       )}
-      {c.terms && <p className="whitespace-pre-line text-slate-600 dark:text-slate-300">Điều khoản: {c.terms}</p>}
-      <p className="text-slate-600 dark:text-slate-300">
+      {c.terms && <p className="whitespace-pre-line text-muted-foreground">Điều khoản: {c.terms}</p>}
+      <p className="text-muted-foreground">
         {c.studioSignedAt && `Studio ký lúc ${formatDateTime(c.studioSignedAt)}. `}
         {c.adminSignedAt && c.adminSignedBy && `${c.adminSignedBy.fullName} (Admin) ký lúc ${formatDateTime(c.adminSignedAt)}.`}
-        {!c.studioSignedAt && !c.adminSignedAt && 'Chưa bên nào ký; chờ Studio điền giá và ký trên Studio Web.'}
+        {!c.studioSignedAt && !c.adminSignedAt && 'Chưa bên nào ký; chờ Studio ký trên Studio Web (giá in sẵn là ngân sách trần).'}
       </p>
       {c.status === 'SIGNED' && c.handoff && (
         <p className="text-emerald-700 dark:text-emerald-300">Đã tự bàn giao cho Studio: dự án vào sản xuất, các tập chờ Studio nộp phim.</p>
       )}
 
-      {docs.data && docs.data.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-slate-200/60 dark:border-white/5">
-          <span className="text-slate-500 font-medium">Tài liệu PDF:</span>
-          {docs.data.map((doc) => (
+      {canDownload && (
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border">
+          <span className="text-muted-foreground font-medium">Tài liệu PDF:</span>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            className="h-6 text-[11px] px-2 flex items-center gap-1"
+            onClick={() => void downloadTemplate()}
+          >
+            Hợp đồng chưa ký (bản Studio nhận)
+          </Button>
+          {docs.data?.map((doc) => (
             <Button
               key={doc.id}
               type="button"
@@ -127,7 +139,7 @@ export function ContractCard({
                 onClick={() => setConfirming(true)}
                 disabled={busy || !signFile || !!contractPdfProblem(signFile)}
               >
-                Đồng ý &amp; ký
+                Đồng ý và ký
               </Button>
             )}
             <Button type="button" size="sm" variant="secondary" onClick={() => setCountering(true)} disabled={busy}>
@@ -163,8 +175,14 @@ export function ContractCard({
       <ConfirmModal
         open={confirming}
         title="Đồng ý giá và ký hợp đồng"
-        description={`Ký theo giá Studio báo${c.costVnd !== null ? ` (${formatVnd(c.costVnd)})` : ''}. Hợp đồng hoàn tất và dự án tự bàn giao cho Studio ${c.studio.name}; không thể hoàn tác.`}
-        confirmLabel="Đồng ý & ký"
+        description="Admin ký theo giá Studio đã ký trên bản hợp đồng này."
+        details={[
+          ['Studio', c.studio.name],
+          ['Vòng', `Vòng ${c.round}`],
+          ['Giá ký', c.costVnd !== null ? formatVnd(c.costVnd) : 'Ngân sách trần'],
+        ]}
+        consequence={`hợp đồng đủ 2 chữ ký, dự án chuyển sang Đang sản xuất và tự bàn giao cho ${c.studio.name} với phí bằng giá ký. Không thể hoàn tác.`}
+        confirmLabel="Đồng ý và ký"
         busy={busy}
         onClose={() => setConfirming(false)}
         onConfirm={() => void sign()}

@@ -4,14 +4,18 @@ import userEvent from '@testing-library/user-event';
 import { FilmProfitTab } from '@/features/finance/FilmProfitTab';
 import { RevenueShareTab } from '@/features/finance/RevenueShareTab';
 import { RiskFlagsTab } from '@/features/finance/RiskFlagsTab';
-import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
+import { AppShell } from '@/components/shell/AppShell';
 import { isPeriodOver, previousPeriod } from '@/services/financeService';
 import { roi, vnd, watchTime } from '@/features/finance/financeFormat';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 
 vi.mock('@/components/ui/Toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
-vi.mock('next/navigation', () => ({ usePathname: () => '/admin/finance' }));
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/admin/finance',
+  useSearchParams: () => new URLSearchParams(),
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+}));
 afterEach(() => vi.unstubAllGlobals());
 
 const page = <T,>(data: T[]) => ({ data, meta: { totalItems: data.length, currentPage: 1, totalPages: 1, itemsPerPage: 20 } });
@@ -133,14 +137,14 @@ describe('Risk flags tab', () => {
 describe('Admin menu', () => {
   it('shows "Tài chính" and "Chatbox AI" to an Admin holding the permissions', () => {
     signInAs('admin');
-    render(<AdminSidebar />);
+    render(<AppShell area="admin"><div /></AppShell>);
     expect(screen.getByRole('link', { name: 'Tài chính' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Chatbox AI' })).toBeInTheDocument();
   });
 
   it('hides them without finance:report.read and support:knowledge.manage', () => {
     signInAs('admin', []);
-    render(<AdminSidebar />);
+    render(<AppShell area="admin"><div /></AppShell>);
     expect(screen.queryByRole('link', { name: 'Tài chính' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Chatbox AI' })).toBeNull();
   });

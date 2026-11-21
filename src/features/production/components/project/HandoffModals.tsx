@@ -34,8 +34,8 @@ function HandoffFields(props: {
   return (
     <>
       <fieldset className="space-y-3">
-        <legend className="text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1">Studio nhận brief (nhập tay)</legend>
-        <p className="text-[11px] text-slate-500">Email đã có trong hệ thống sẽ dùng lại Studio đó.</p>
+        <legend className="text-xs font-semibold text-foreground mb-1">Studio nhận brief (nhập tay)</legend>
+        <p className="text-[11px] text-muted-foreground">Email đã có trong hệ thống sẽ dùng lại Studio đó.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField label="Tên Studio">
             <input value={props.studioName} onChange={(e) => props.onChange({ studioName: e.target.value })} minLength={2} maxLength={255} className={fieldInputClass} aria-label="Tên Studio" />
@@ -71,7 +71,7 @@ function FeeField({ value, maxVnd, onChange }: { value: string; maxVnd: number; 
   return (
     <FormField label="Phí sản xuất đề xuất cho Studio mới (₫)">
       <input inputMode="numeric" value={value} onChange={(e) => onChange(e.target.value)} required className={fieldInputClass} aria-label="Phí đề xuất" />
-      <span className={`block mt-1 text-[11px] ${over ? 'text-rose-600' : 'text-slate-500'}`}>
+      <span className={`block mt-1 text-[11px] ${over ? 'text-rose-600' : 'text-muted-foreground'}`}>
         Mức đề xuất ghi trong brief, trọn gói, không chia doanh thu; phí chính thức là giá ký trong hợp đồng. Tối đa {formatVnd(maxVnd)} (ngân sách còn lại).
         {over && ' Vượt ngân sách: Reviewer cần gửi Admin yêu cầu thêm chi phí sản xuất.'}
       </span>
@@ -123,12 +123,12 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief kèm hợp đồng mẫu để báo giá và ký trên Studio Web, rồi mới bắt đầu sản xuất." maxWidth="max-w-lg">
+    <Modal open onClose={onClose} title="Đổi Studio" subtitle="Đợt bàn giao cũ chuyển sang “Đã đổi Studio”; Studio mới nhận brief kèm hợp đồng mẫu để ký (có thể đề xuất giá thấp hơn) trên Studio Web, rồi mới bắt đầu sản xuất." maxWidth="max-w-lg">
       <form onSubmit={submit} className="space-y-4">
         <HandoffFields {...form} onChange={(patch) => setForm({ ...form, ...patch })} />
         <FormField label="Studio cũ giữ lại (₫, đã chi hoặc đền bù)">
           <input inputMode="numeric" value={kept} onChange={(e) => setKept(e.target.value)} placeholder="0" className={fieldInputClass} aria-label="Studio cũ giữ lại" />
-          <span className={`block mt-1 text-[11px] ${keptValid ? 'text-slate-500' : 'text-rose-600'}`}>
+          <span className={`block mt-1 text-[11px] ${keptValid ? 'text-muted-foreground' : 'text-rose-600'}`}>
             Phí đã đề xuất cho Studio cũ: {formatVnd(preview.replacedFeeVnd)}. Phần còn lại trả về ngân sách.
           </span>
         </FormField>
@@ -136,11 +136,11 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
         <FormField label="Lý do đổi Studio (Reviewer sẽ nhận được)">
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} minLength={5} maxLength={2000} required className={fieldTextareaClass} />
         </FormField>
-        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+        <div className="flex justify-end gap-2 pt-2 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-full">
             Huỷ
           </Button>
-          <Button type="submit" disabled={busy || !keptValid || !feeValid(form.fee, preview.maxOfferVnd) || !studioTyped(form) || reason.trim().length < 5} className="rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
+          <Button type="submit" disabled={busy || !keptValid || !feeValid(form.fee, preview.maxOfferVnd) || !studioTyped(form) || reason.trim().length < 5} className="rounded-full bg-primary hover:bg-primary/90 text-primary-foreground">
             Đổi Studio
           </Button>
         </div>

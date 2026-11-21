@@ -159,12 +159,11 @@ export interface ProjectEvent {
   actor: { id: string; fullName: string; role: UserRole } | null;
 }
 
-export interface PlatformSettings {
+export interface PlatformSettings extends Partial<ContractPartySettings> {
   freeStarterEpisodeCount: number;
   coinRateVnd: number;
   episodeCoinPriceMin: number;
   episodeCoinPriceMax: number;
-  bonusCoinExpiryDays: number;
   playbackHeartbeatTimeoutSeconds: number;
   subscriptionCancelWindowHours: number;
   planRenewalGraceHours: number;
@@ -173,6 +172,19 @@ export interface PlatformSettings {
   coinTopUpMaxVnd: number;
   refundOnRemoval: boolean;
   updatedAt?: string;
+}
+
+/** Bên A of the production contract, kept in the settings (MF-1); an empty one prints as a blank. */
+export interface ContractPartySettings {
+  contractCompanyName: string | null;
+  contractAddress: string | null;
+  contractTaxCode: string | null;
+  contractPhone: string | null;
+  contractEmail: string | null;
+  contractBankAccount: string | null;
+  contractRepresentative: string | null;
+  contractRepresentativeTitle: string | null;
+  contractPlace: string | null;
 }
 
 export interface AppNotification {

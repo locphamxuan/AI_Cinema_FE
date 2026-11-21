@@ -51,13 +51,13 @@ export function PriceAlertsPanel() {
   };
 
   return (
-    <section className="bg-white dark:bg-card rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-slate-100 dark:border-white/5">
+    <section className="bg-card rounded-2xl border border-sky-100 dark:border-white/10 overflow-hidden">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 py-4 border-b border-border">
         <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white">Cảnh báo giá Coin</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Giá tập ngoài khoảng cho phép · Reviewer phụ trách là người đổi giá.</p>
+          <h2 className="text-base font-bold text-foreground">Cảnh báo giá Coin</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Giá tập ngoài khoảng cho phép. Admin hỏi ý kiến Reviewer rồi tự đặt lại giá, hoặc chấp nhận giá.</p>
         </div>
-        <div className="flex flex-wrap gap-1.5 p-1 rounded-xl bg-slate-100/80 dark:bg-white/5 border border-slate-200/60 dark:border-white/5">
+        <div className="flex flex-wrap gap-1.5 p-1 rounded-xl bg-muted border border-border">
           {FILTERS.map((f) => (
             <button
               key={f.key}
@@ -70,7 +70,7 @@ export function PriceAlertsPanel() {
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                 filter === f.key
                   ? 'bg-white dark:bg-sky-600 text-sky-800 dark:text-white font-semibold shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {f.label}
@@ -88,18 +88,18 @@ export function PriceAlertsPanel() {
               <div className="space-y-0.5 min-w-0">
                 <Link
                   href={productionPaths.episode('/reviewer', a.episode.movie.id, a.episode.id)}
-                  className="font-semibold text-slate-900 dark:text-white hover:underline"
+                  className="font-semibold text-foreground hover:underline"
                 >
                   {a.episode.movie.title} - tập {a.episode.episodeNumber}: {a.episode.title}
                 </Link>
-                <p className="text-slate-600 dark:text-slate-300">
+                <p className="text-muted-foreground">
                   Giá đặt <b>{a.coinPrice}</b> Coin, khoảng hợp lệ {a.rangeMin}–{a.rangeMax}
                   {a.episode.coinPrice !== a.coinPrice && ` · giá hiện tại ${a.episode.coinPrice ?? '-'}`}
                 </p>
-                <p className="text-slate-400">
+                <p className="text-muted-foreground">
                   {a.setBy.fullName} · {formatDateTime(a.createdAt)}
                 </p>
-                {a.adminNote && <p className="text-slate-600 dark:text-slate-300">Đã hỏi Reviewer: {a.adminNote}</p>}
+                {a.adminNote && <p className="text-muted-foreground">Đã hỏi Reviewer: {a.adminNote}</p>}
               </div>
               <div className="flex items-center gap-2">
                 <StatusPill {...PRICE_ALERT_STATUS[a.status]} />

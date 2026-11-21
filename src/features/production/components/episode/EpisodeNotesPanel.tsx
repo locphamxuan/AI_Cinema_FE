@@ -48,23 +48,23 @@ export function EpisodeNotesPanel({
       }
     >
       {notes.error && <ErrorNote message={notes.error} onRetry={notes.reload} />}
-      {notes.data && notes.data.length === 0 && <p className="text-xs text-slate-500">Chưa có ghi chú nào.</p>}
+      {notes.data && notes.data.length === 0 && <p className="text-xs text-muted-foreground">Chưa có ghi chú nào.</p>}
       {notes.data && notes.data.length > 0 && (
         <ul className="space-y-3" aria-label="Ghi chú của tập">
           {notes.data.map((note) => (
-            <li key={note.id} className="rounded-xl border border-slate-200 dark:border-white/10 p-3 text-xs">
-              <p className="font-medium text-slate-700 dark:text-slate-200">
+            <li key={note.id} className="rounded-xl border border-border p-3 text-xs">
+              <p className="font-medium text-secondary-foreground">
                 {note.author?.fullName ?? 'Người dùng đã xoá'}
-                <span className="ml-2 font-normal text-slate-500">{formatDateTime(note.createdAt)}</span>
+                <span className="ml-2 font-normal text-muted-foreground">{formatDateTime(note.createdAt)}</span>
               </p>
-              <p className="mt-1 whitespace-pre-line text-slate-600 dark:text-slate-300">{note.message}</p>
+              <p className="mt-1 whitespace-pre-line text-muted-foreground">{note.message}</p>
             </li>
           ))}
         </ul>
       )}
       {canWrite && (
         <div className="mt-3 space-y-2">
-          <label className="block text-xs font-medium text-slate-600 dark:text-slate-300" htmlFor={`note-${episodeId}`}>
+          <label className="block text-xs font-medium text-muted-foreground" htmlFor={`note-${episodeId}`}>
             {isLead ? 'Trả lời Creator phụ trách tập' : 'Ghi chú gửi Creator chính'}
           </label>
           <textarea

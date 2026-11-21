@@ -7,8 +7,8 @@ export const CASE_STATUS: Record<SupportStatus, Label> = {
   AI_HANDLING: { label: 'AI đang xử lý', tone: 'purple' },
   WAITING_FOR_STAFF: { label: 'Chờ nhân viên', tone: 'amber' },
   STAFF_HANDLING: { label: 'Nhân viên đang xử lý', tone: 'blue' },
-  RESOLVED: { label: 'Đã giải quyết', tone: 'emerald' },
-  CLOSED: { label: 'Đã đóng', tone: 'neutral' },
+  RESOLVED: { label: 'Chờ Member xác nhận', tone: 'emerald' },
+  CLOSED: { label: 'Đã kết thúc', tone: 'neutral' },
 };
 
 export const PRIORITY: Record<SupportPriority, Label> = {
@@ -30,7 +30,8 @@ export const ESCALATION: Record<SupportEscalationReason, string> = {
 /**
  * What the signed-in account may do on a case — the backend's state machine (support-status.ts) and ownership
  * rules (staff-support.service): claim only WAITING_FOR_STAFF; reply once escalated, unless another Staff holds it;
- * resolve from STAFF_HANDLING; close from STAFF_HANDLING / RESOLVED; release by the holder or an Admin.
+ * resolve from STAFF_HANDLING; release by the holder or an Admin. Staff never closes a case: the member confirms
+ * the resolution (or reopens it), or the case closes on its own after SUPPORT_AUTO_CLOSE_HOURS.
  */
 export function caseActions(c: SupportCase, me: { id?: string; isAdmin: boolean; canManage: boolean; canAssign: boolean }) {
   const mine = !!me.id && c.assignedAgentId === me.id;
@@ -42,7 +43,6 @@ export function caseActions(c: SupportCase, me: { id?: string; isAdmin: boolean;
     release: m && c.status === 'STAFF_HANDLING' && (mine || me.isAdmin),
     reply: m && open && (!heldByOther || me.isAdmin),
     resolve: m && c.status === 'STAFF_HANDLING' && (!heldByOther || me.isAdmin),
-    close: m && (c.status === 'STAFF_HANDLING' || c.status === 'RESOLVED') && (!heldByOther || me.isAdmin),
     assign: me.canAssign && open,
     suggest: m && open,
   };

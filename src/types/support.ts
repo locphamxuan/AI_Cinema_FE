@@ -8,6 +8,7 @@ export type SupportEscalationReason =
   | 'ACCOUNT_VERIFICATION'
   | 'MEMBER_REQUEST'
   | 'STAFF_NEEDED';
+export type SupportCloseReason = 'AI_RESOLVED' | 'STAFF_RESOLVED' | 'INACTIVITY' | 'MEMBER_CLOSED';
 export type SupportSenderType = 'MEMBER' | 'AI_CHATBOT' | 'SUPPORT_AGENT' | 'SYSTEM';
 export type SupportAudience = 'MEMBER' | 'STAFF' | 'ALL';
 
@@ -28,6 +29,10 @@ export interface SupportCase {
   claimedAt: string | null;
   resolvedAt: string | null;
   closedAt: string | null;
+  closeReason?: SupportCloseReason | null;
+  lastMemberMessageAt?: string | null;
+  lastStaffMessageAt?: string | null;
+  firstStaffReplyAt?: string | null;
   resolutionNote: string | null;
   satisfactionRating: number | null;
   satisfactionComment: string | null;
@@ -74,7 +79,7 @@ export interface StaffAiSuggestion {
   sources: AiSource[];
 }
 
-export type MemberContextSectionKey = 'Account' | 'Subscription' | 'Wallet' | 'Transactions' | 'EpisodeAccess' | 'Devices';
+export type MemberContextSectionKey = 'Account' | 'Subscription' | 'Wallet' | 'Transactions' | 'EpisodeAccess' | 'Devices' | 'WatchHistory';
 
 /** A section the caller may not read comes back `{ data: null, restricted: true }`, never a 403. */
 export interface MemberContextSection {

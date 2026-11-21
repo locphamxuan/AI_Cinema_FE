@@ -1,3 +1,5 @@
+import { inVietnamese } from './apiMessages';
+
 export const APPLICATION_MESSAGES = {
   MSG01: {
     type: 'Inline',
@@ -32,7 +34,7 @@ export const APPLICATION_MESSAGES = {
   MSG08: {
     type: 'Inline or toast',
     scenario: 'A deactivated account attempts to sign in.',
-    message: 'Tài khoản này đã bị vô hiệu hóa.',
+    message: 'Tài khoản này đã bị khoá.',
   },
   MSG09: {
     type: 'Inline or toast',
@@ -57,7 +59,7 @@ export const APPLICATION_MESSAGES = {
   MSG13: {
     type: 'Inline or toast',
     scenario: 'An attempt is made to purchase an unpublished, free, or already-unlocked episode.',
-    message: 'Không thể mua tập này. Tập có thể chưa phát hành, miễn phí hoặc đã được mở khóa.',
+    message: 'Không thể mua tập này. Tập có thể chưa phát hành, miễn phí hoặc đã được mở khoá.',
   },
   MSG14: {
     type: 'Inline or toast',
@@ -72,7 +74,7 @@ export const APPLICATION_MESSAGES = {
   MSG16: {
     type: 'Toast',
     scenario: 'A project is cancelled successfully.',
-    message: 'Đã hủy dự án thành công.',
+    message: 'Đã huỷ dự án thành công.',
   },
   MSG17: {
     type: 'Toast',
@@ -123,13 +125,16 @@ export function localizeApiError(
   const reason =
     typeof rawDetails === 'object' && rawDetails !== null && 'reason' in rawDetails ? rawDetails.reason : undefined;
 
+  if (reason === 'STUDIO_HAS_NO_LOGIN') {
+    return 'Studio chưa có tài khoản đăng nhập Studio Web nên chưa gửi hợp đồng được. Vào Studio đối tác, mở "Tài khoản đăng nhập" để tạo, rồi thử lại.';
+  }
   if (reason === 'INSUFFICIENT_COINS' || normalized.includes('does not hold enough coins')) {
     return APPLICATION_MESSAGES.MSG12.message;
   }
   if (
     ['EPISODE_NOT_PUBLISHED', 'EPISODE_NOT_PRICED', 'ACCESS_ALREADY_OWNED'].includes(String(reason)) ||
     normalized.includes('episode is not published') ||
-    normalized.includes('episode has no coin price') ||
+    normalized.includes('episode has no Coin price') ||
     normalized.includes('episode is free') ||
     normalized.includes('episode is already unlocked')
   ) {
@@ -154,11 +159,16 @@ export function localizeApiError(
   if (status === 401) return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
   if (status >= 500) return APPLICATION_MESSAGES.MSG18.message;
 
-  // Any other business rule the backend explains (a refused hand-off, a Submission in the wrong state, …)
-  // reaches the user as is; the generic wording only stands in when the backend gave no reason.
-  if (message) return message;
-  if (status === 403) return APPLICATION_MESSAGES.MSG09.message;
-  if (status === 404) return APPLICATION_MESSAGES.MSG10.message;
-  if (status === 400 || status === 422) return APPLICATION_MESSAGES.MSG03.message;
-  return `HTTP error! status: ${status}`;
+  // Any other business rule the backend explains (a refused hand-off, a Submission in the wrong state, …) reaches
+  // the user in Vietnamese; the generic wording stands in when the backend gave no reason or one we cannot word.
+  const generic = GENERIC_BY_STATUS[status] ?? 'Không thực hiện được thao tác này. Vui lòng thử lại.';
+  return message ? inVietnamese(message, generic) : generic;
 }
+
+const GENERIC_BY_STATUS: Record<number, string> = {
+  400: APPLICATION_MESSAGES.MSG03.message,
+  403: APPLICATION_MESSAGES.MSG09.message,
+  404: APPLICATION_MESSAGES.MSG10.message,
+  409: 'Dữ liệu vừa thay đổi hoặc không còn ở trạng thái phù hợp. Hãy tải lại rồi thử lại.',
+  422: APPLICATION_MESSAGES.MSG03.message,
+};

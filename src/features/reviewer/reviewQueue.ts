@@ -38,7 +38,7 @@ const AUDIT_LABEL: Partial<Record<PipelineEpisode['status'], string>> = {
 
 function episodeStage(episode: PipelineEpisode): { stage: QueueStage; label: string } | null {
   if (episode.status === 'CHANGES_REQUESTED') return { stage: 'STUDIO_REVISING', label: 'Studio đang sửa' };
-  if (episode.status === 'COMPLIANCE_PASSED' && episode.finalConfirmedAt) return { stage: 'FINAL_CONFIRMED', label: 'Phim Final chờ Admin publish' };
+  if (episode.status === 'COMPLIANCE_PASSED' && episode.finalConfirmedAt) return { stage: 'FINAL_CONFIRMED', label: 'Phim Final chờ Admin phát hành' };
   const label = AUDIT_LABEL[episode.status];
   return label ? { stage: 'MASTER_AUDIT', label } : null;
 }
@@ -65,7 +65,7 @@ export function toQueueItems(rows: ProjectPipeline[]): QueueItem[] {
         episodeId: null,
         episodeNumber: null,
         stage: 'SCRIPT_PENDING',
-        stageLabel: `Kịch bản bản ${script.currentVersion} chờ duyệt`,
+        stageLabel: `Kịch bản (bản ${script.currentVersion}) chờ duyệt`,
         updatedAt: script.latestVersionAt ?? project.updatedAt,
         href: `${projectHref}?tab=script`,
       });

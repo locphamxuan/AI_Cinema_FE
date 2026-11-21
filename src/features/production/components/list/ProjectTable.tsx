@@ -15,7 +15,7 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
   return (
     <div className={`${CARD} overflow-hidden`}>
       <table className="w-full text-xs">
-        <thead className="bg-slate-50 dark:bg-white/5 text-slate-500 dark:text-slate-400 text-left">
+        <thead className="bg-muted/60 text-muted-foreground text-left">
           <tr>
             <th className="px-4 py-3 font-semibold">Phim</th>
             <th className="px-4 py-3 font-semibold">Trạng thái</th>
@@ -34,11 +34,11 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
           {projects.map((p) => {
             const href = productionPaths.project(base, p.id);
             return (
-              <tr key={p.id} onClick={() => router.push(href)} className="hover:bg-slate-50 dark:hover:bg-white/5 cursor-pointer transition-colors">
+              <tr key={p.id} onClick={() => router.push(href)} className="hover:bg-muted/60 cursor-pointer transition-colors">
                 <td className="px-4 py-3">
                   <Link
                     href={href}
-                    className="font-semibold text-slate-900 dark:text-white hover:underline hover:text-sky-700"
+                    className="font-semibold text-foreground hover:underline hover:text-sky-700"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {p.title}
@@ -47,14 +47,14 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
                 <td className="px-4 py-3">
                   <StatusPill {...MOVIE_STATUS[p.status]} />
                 </td>
-                <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">{p.studio?.name ?? '—'}</td>
-                <td className="px-4 py-3 hidden md:table-cell text-slate-600 dark:text-slate-300">
+                <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">{p.studio?.name ?? '—'}</td>
+                <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">
                   {(isCreator ? p.reviewer : p.creator)?.fullName ?? 'Chưa giao'}
                 </td>
-                <td className="px-4 py-3 hidden sm:table-cell text-right text-slate-600 dark:text-slate-300 font-bold tabular-nums">
+                <td className="px-4 py-3 hidden sm:table-cell text-right text-muted-foreground font-bold tabular-nums">
                   {p._count.episodes}
                 </td>
-                <td className="px-4 py-3 hidden lg:table-cell text-slate-500 dark:text-slate-400">{formatDateTime(p.lastActivityAt)}</td>
+                <td className="px-4 py-3 hidden lg:table-cell text-muted-foreground">{formatDateTime(p.lastActivityAt)}</td>
               </tr>
             );
           })}

@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AccountsPanel } from '@/features/admin/components/AccountsPanel';
 import { AdminMoviesPanel } from '@/features/admin/components/AdminMoviesPanel';
-import { AdminSidebar } from '@/features/admin/components/AdminSidebar';
+import { AppShell } from '@/components/shell/AppShell';
 import { signInAs } from '@/tests/support/signIn';
 import { useAppStore } from '@/store/useAppStore';
 import { fakeResponse } from '@/tests/support/fakeResponse';
@@ -47,8 +47,8 @@ afterEach(() => vi.unstubAllGlobals());
 describe('AdminSidebar', () => {
   it('lists the Admin sections, the requests and settings merged into one each', () => {
     signInAs('admin');
-    render(<AdminSidebar />);
-    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
+    render(<AppShell area="admin"><div /></AppShell>);
+    const nav = screen.getByRole('navigation', { name: 'Menu Quản trị' });
     for (const label of ['Tài khoản & Phân quyền', 'Dự án phim', 'Duyệt yêu cầu', 'Quản lý phim', 'Cài đặt nền tảng']) {
       expect(within(nav).getByRole('link', { name: label })).toBeInTheDocument();
     }
@@ -60,10 +60,11 @@ describe('AdminSidebar', () => {
 
   it('shows the signed-in Admin, not a placeholder account', () => {
     signInAs('admin');
-    render(<AdminSidebar />);
-    const nav = screen.getByRole('navigation', { name: 'Khu quản trị' });
-    expect(within(nav).getByText('admin@test.vn')).toBeInTheDocument();
-    expect(within(nav).getByText('Test admin')).toBeInTheDocument();
+    render(<AppShell area="admin"><div /></AppShell>);
+    const nav = screen.getByRole('navigation', { name: 'Menu Quản trị' });
+    expect(nav).toBeInTheDocument();
+    expect(screen.getByText('admin@test.vn')).toBeInTheDocument();
+    expect(screen.getByText('Test admin')).toBeInTheDocument();
   });
 });
 

@@ -12,17 +12,17 @@ export function deadlineUsable(episode: Pick<Episode, 'deliveryDeadline'>): bool
 
 /** Read-only: the studio is due on the deadline the Reviewer set for each episode (BR-38). */
 export function DeadlineList({ episodes }: { episodes: Episode[] }) {
-  if (episodes.length === 0) return <p className="text-xs text-slate-500">Mọi tập của phạm vi này đã được bàn giao.</p>;
+  if (episodes.length === 0) return <p className="text-xs text-muted-foreground">Mọi tập của phạm vi này đã được bàn giao.</p>;
   return (
     <ul className="space-y-1.5 max-h-72 overflow-y-auto pr-1 text-xs">
       {episodes.map((ep) => {
         const usable = deadlineUsable(ep);
         return (
           <li key={ep.id} className="flex items-center justify-between gap-3">
-            <span className="min-w-0 truncate text-slate-700 dark:text-slate-200">
+            <span className="min-w-0 truncate text-secondary-foreground">
               #{ep.episodeNumber} {ep.title}
             </span>
-            <span className={`shrink-0 font-semibold ${usable ? 'text-slate-800 dark:text-slate-100' : 'text-rose-600'}`}>
+            <span className={`shrink-0 font-semibold ${usable ? 'text-foreground' : 'text-rose-600'}`}>
               {ep.deliveryDeadline ? formatDay(ep.deliveryDeadline) : 'Chưa đặt'}
               {ep.deliveryDeadline && !usable && ' (đã qua)'}
             </span>

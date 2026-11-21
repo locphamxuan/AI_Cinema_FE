@@ -123,7 +123,7 @@ const ADMIN_TABS: NotificationTab[] = [
   {
     key: 'projects',
     label: 'Dự án',
-    description: 'Kịch bản chờ duyệt Final, trao đổi ý tưởng, hợp đồng với Studio và Phim Final chờ publish.',
+    description: 'Kịch bản chờ duyệt Final, trao đổi ý tưởng, hợp đồng với Studio và Phim Final chờ phát hành.',
     sections: [
       section('script', 'Kịch bản', 'SCRIPT_UPDATED'),
       section('notes', 'Trao đổi ý tưởng', 'PROJECT_NOTE'),

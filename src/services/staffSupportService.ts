@@ -60,7 +60,6 @@ export const staffSupportService = {
 
   resolve: (id: string, note?: string) => apiClient.post<SupportCase>(S.RESOLVE(id), withNote(note)),
 
-  close: (id: string, note?: string) => apiClient.post<SupportCase>(S.CLOSE(id), withNote(note)),
 
   /** Admin (`support:case.assign`): hand the case to one Staff member. */
   assign: (id: string, staffId: string) => apiClient.post<SupportCase>(S.ASSIGN(id), { staffId }),

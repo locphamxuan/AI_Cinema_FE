@@ -106,7 +106,7 @@ export function ScriptTab() {
             </p>
           )}
           {!working && data?.status !== 'FINAL' && (
-            <p className="text-xs text-slate-500">Kịch bản chỉ được viết và duyệt khi dự án đã giao Creator (trạng thái “Đã giao”).</p>
+            <p className="text-xs text-muted-foreground">Kịch bản chỉ được viết và duyệt khi dự án đã giao Creator (trạng thái “Đã giao”).</p>
           )}
           {working && caps.review && status === 'SUBMITTED' && <ReviewerActions onChanged={changed} />}
         </Panel>

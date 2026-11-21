@@ -1,5 +1,7 @@
 'use client';
 
+import { Plus } from 'lucide-react';
+import { GreetingCard } from '@/components/data/GreetingCard';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ErrorNote, Loading } from '@/components/data/ui';
@@ -15,7 +17,7 @@ import { SignContractModal } from './SignContractModal';
 
 const TAB = 'inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all cursor-pointer';
 const tabClass = (active: boolean) =>
-  `${TAB} ${active ? 'bg-[#121212] text-white shadow-xs dark:bg-white dark:text-slate-900' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.05]'}`;
+  `${TAB} ${active ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`;
 
 /** /admin: what the Admin must decide in MF-1 (Final Scripts, contracts, Final Films) and the platform charts. */
 export function AdminExecutivePortal() {
@@ -28,14 +30,14 @@ export function AdminExecutivePortal() {
   const pipeline = useResource('admin-pipeline', loadAdminPipeline);
 
   return (
-    <div className="min-h-screen w-full bg-[#F9FAFB] dark:bg-[#090B10] text-slate-900 dark:text-slate-100 p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen w-full bg-background text-foreground p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        <div role="tablist" aria-label="Khu quản trị" className="flex items-center gap-2 border-b border-slate-200/80 dark:border-white/[0.08] pb-3.5 text-xs">
+        <div role="tablist" aria-label="Khu quản trị" className="flex items-center gap-2 border-b border-border pb-3.5 text-xs">
           <button type="button" role="tab" aria-selected={tab === 'projects'} onClick={() => setTab('projects')} className={tabClass(tab === 'projects')}>
-            Quản Trị Dự Án
+            Quản trị dự án
           </button>
           <button type="button" role="tab" aria-selected={tab === 'charts'} onClick={() => setTab('charts')} className={tabClass(tab === 'charts')}>
-            Biểu Đồ Doanh Thu & Vận Hành
+            Biểu đồ doanh thu & vận hành
           </button>
         </div>
 
@@ -43,22 +45,32 @@ export function AdminExecutivePortal() {
           <AdminOverviewDashboard />
         ) : (
           <>
-            <section aria-label="Hồ sơ quản trị viên" className="rounded-3xl bg-white dark:bg-[#111420] border border-slate-200/80 dark:border-white/[0.08] p-6 sm:p-7 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-[#121212] dark:bg-white flex items-center justify-center font-bold text-xl text-white dark:text-slate-900 shrink-0 shadow-xs">
-                  {user?.name.charAt(0).toUpperCase() ?? 'A'}
-                </div>
-                <div className="space-y-0.5">
-                  <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">{user?.name ?? 'Quản trị viên'}</h1>
-                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-medium">{user?.email}</p>
-                </div>
-              </div>
-              {can(PERMISSION.PROJECT_CREATE) && (
-                <button type="button" onClick={() => setCreating(true)} className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#121212] hover:bg-black text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 text-xs sm:text-sm font-semibold shadow-xs cursor-pointer transition-all">
-                  Khởi Tạo Dự Án Mới
-                </button>
-              )}
-            </section>
+            <GreetingCard
+              label="Hồ sơ quản trị viên"
+              name={user?.name ?? 'Quản trị viên'}
+              summary={
+                pipeline.data
+                  ? `${pipeline.data.finalScripts.length} kịch bản chờ duyệt Final, ${pipeline.data.contractsToSign.length} hợp đồng chờ ký, ${pipeline.data.readyFilms.length} phim chờ phát hành.`
+                  : user?.email
+              }
+              figures={
+                pipeline.data
+                  ? [
+                      { label: 'Dự án trên nền tảng', value: pipeline.data.totalProjects },
+                      { label: 'Đang sản xuất', value: pipeline.data.producingProjects },
+                      { label: 'Đã hoàn tất', value: pipeline.data.completedProjects },
+                    ]
+                  : undefined
+              }
+              action={
+                can(PERMISSION.PROJECT_CREATE) && (
+                  <button type="button" onClick={() => setCreating(true)} className="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-[#121212] shadow-sm transition-colors hover:bg-white/90 cursor-pointer">
+                    <Plus className="size-4" aria-hidden="true" />
+                    Tạo dự án mới
+                  </button>
+                )
+              }
+            />
 
             {pipeline.error && <ErrorNote message={pipeline.error} onRetry={pipeline.reload} />}
             {pipeline.loading && !pipeline.data && <Loading />}

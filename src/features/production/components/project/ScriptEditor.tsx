@@ -47,7 +47,7 @@ export function ScriptEditor({ latest, onSubmitted }: { latest: ScriptVersion | 
             maxLength={MAX_CONTENT}
             required
             className={`${fieldTextareaClass} font-mono text-xs leading-relaxed`}
-            placeholder={'CẢNH 1 - NỘI. CĂN HỘ - ĐÊM\n...'}
+            placeholder={'CẢNH 1 - NỘI. CĂN HỘ - ĐÊM\n…'}
           />
         </FormField>
         {latest && (
@@ -56,7 +56,7 @@ export function ScriptEditor({ latest, onSubmitted }: { latest: ScriptVersion | 
           </FormField>
         )}
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[11px] text-slate-500 tabular-nums">{content.length.toLocaleString('vi-VN')} ký tự</p>
+          <p className="text-[11px] text-muted-foreground tabular-nums">{content.length.toLocaleString('vi-VN')} ký tự</p>
           <Button type="submit" disabled={busy || !content.trim() || unchanged}>
             Nộp cho Reviewer
           </Button>

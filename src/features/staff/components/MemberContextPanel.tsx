@@ -3,8 +3,8 @@
 import type { ReactNode } from 'react';
 import { ErrorNote, Facts, Loading } from '@/components/data/ui';
 import { useResource } from '@/hooks/useResource';
-import { COIN_ENTRY_LABEL } from '@/lib/coinEntry';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { COIN_ENTRY_LABEL, signed } from '@/lib/coinEntry';
+import { formatDateTime, formatDuration, formatNumber } from '@/lib/format';
 import { staffSupportService } from '@/services/staffSupportService';
 import type { CoinEntryType } from '@/types/billing';
 import type { MemberContextSection, MemberContextSectionKey } from '@/types/support';
@@ -12,9 +12,34 @@ import type { MemberContextSection, MemberContextSectionKey } from '@/types/supp
 /* The shapes of BE member-context.service, read only. */
 type Account = { email: string; fullName: string; phoneNumber: string | null; isActive: boolean; emailVerifiedAt: string | null; createdAt: string };
 type Subscription = { status: string; autoRenew: boolean; currentPeriodEnd: string; cancelWindowEndsAt: string | null; priceCoins: number; plan: { name: string } } | null;
-type Wallet = { mainBalance: number; bonusBalance: number; lots?: { source: string; remainingAmount: number; expiresAt: string | null }[] } | null;
+type Wallet = { mainBalance: number; bonusBalance: number; lots?: { source: string; remainingAmount: number; grantedAt: string }[] } | null;
 type Tx = { entryType: string; mainAmount: number; bonusAmount: number; createdAt: string; description: string | null };
 type Access = { source: string; paidCoins: number; grantedAt: string; revokedAt: string | null; episode: { episodeNumber: number; title: string; movie: { title: string } } };
+const SUB_STATUS: Record<string, string> = {
+  PENDING: 'Chờ thanh toán',
+  ACTIVE: 'Đang chạy',
+  PAST_DUE: 'Gia hạn lỗi',
+  CANCELLED: 'Đã huỷ',
+  EXPIRED: 'Hết hạn',
+};
+const ACCESS_SOURCE: Record<string, string> = { EPISODE_PURCHASE: 'mua bằng Coin', FREE_STARTER: 'tập miễn phí', ADMIN_GRANT: 'Admin cấp' };
+
+/** The renewal deadline: until it the member may still turn auto-renew off; after it the next period is charged. */
+function cancelWindow(endsAt: string | null): string {
+  if (!endsAt) return 'Không tự gia hạn';
+  return new Date(endsAt).getTime() > Date.now() ? `Còn tắt được đến ${formatDateTime(endsAt)}` : 'Đã qua hạn, kỳ sau sẽ bị trừ Coin';
+}
+
+const amount = (n: number) => (n === 0 ? '0' : signed(n));
+
+type Watched = { positionSeconds: number; durationSeconds: number | null; completed: boolean; lastWatchedAt: string; episode: { episodeNumber: number; movie: { title: string } } };
+
+/** "Đang xem 12:34 / 45:00": where the member stopped, out of the episode length when known. */
+export function watchedAt(w: Pick<Watched, 'positionSeconds' | 'durationSeconds' | 'completed'>): string {
+  if (w.completed) return 'Đã xem hết';
+  return w.durationSeconds ? `Dừng ở ${formatDuration(w.positionSeconds)} / ${formatDuration(w.durationSeconds)}` : `Dừng ở ${formatDuration(w.positionSeconds)}`;
+}
+
 type Devices = { devices: { name: string | null; platform: string; lastSeenAt: string | null }[]; sessions: { status: string; startedAt: string }[] };
 
 const TITLES: Record<MemberContextSectionKey, string> = {
@@ -24,9 +49,10 @@ const TITLES: Record<MemberContextSectionKey, string> = {
   Transactions: 'Giao dịch Coin gần đây',
   EpisodeAccess: 'Tập đã mở khoá',
   Devices: 'Thiết bị',
+  WatchHistory: 'Lịch sử xem',
 };
 
-const ORDER: MemberContextSectionKey[] = ['Account', 'Subscription', 'Wallet', 'Transactions', 'EpisodeAccess', 'Devices'];
+const ORDER: MemberContextSectionKey[] = ['Account', 'Subscription', 'Wallet', 'Transactions', 'EpisodeAccess', 'Devices', 'WatchHistory'];
 
 function body(key: MemberContextSectionKey, data: unknown): ReactNode {
   switch (key) {
@@ -37,21 +63,23 @@ function body(key: MemberContextSectionKey, data: unknown): ReactNode {
     case 'Subscription': {
       const s = data as Subscription;
       if (!s) return 'Không có gói thành viên.';
-      return <Facts stacked items={[['Gói', s.plan.name], ['Trạng thái', s.status], ['Hết kỳ', formatDateTime(s.currentPeriodEnd)], ['Tự gia hạn', s.autoRenew ? 'Có' : 'Không'], ['Hạn huỷ hoàn tiền', formatDateTime(s.cancelWindowEndsAt)]]} />;
+      return <Facts stacked items={[['Gói', s.plan.name], ['Trạng thái', SUB_STATUS[s.status] ?? s.status], ['Hết kỳ', formatDateTime(s.currentPeriodEnd)], ['Tự gia hạn', s.autoRenew ? 'Có' : 'Không'], ['Hạn tắt tự gia hạn', cancelWindow(s.cancelWindowEndsAt)]]} />;
     }
     case 'Wallet': {
       const w = data as Wallet;
       if (!w) return 'Member chưa có ví.';
-      return <Facts stacked items={[['Coin chính', formatNumber(w.mainBalance)], ['Coin thưởng', formatNumber(w.bonusBalance)], ['Lô thưởng còn', String(w.lots?.length ?? 0)]]} />;
+      return <Facts stacked items={[['Coin chính', formatNumber(w.mainBalance)], ['Coin thưởng', formatNumber(w.bonusBalance)], ['Tổng có thể dùng', formatNumber(w.mainBalance + w.bonusBalance)], ['Thứ tự trừ', 'Coin chính trước, Coin thưởng bù phần thiếu (không hết hạn)']]} />;
     }
     case 'Transactions':
-      return rows((data as Tx[]).map((t) => [`${COIN_ENTRY_LABEL[t.entryType as CoinEntryType] ?? t.entryType}: ${t.mainAmount} chính / ${t.bonusAmount} thưởng`, formatDateTime(t.createdAt)]), 'Chưa có giao dịch.');
+      return rows((data as Tx[]).map((t) => [`${COIN_ENTRY_LABEL[t.entryType as CoinEntryType] ?? t.entryType}: ${amount(t.mainAmount)} chính · ${amount(t.bonusAmount)} thưởng`, formatDateTime(t.createdAt)]), 'Chưa có giao dịch.');
     case 'EpisodeAccess':
-      return rows((data as Access[]).map((x) => [`${x.episode.movie.title} · tập ${x.episode.episodeNumber}${x.revokedAt ? ' (đã thu hồi)' : ''}`, `${x.paidCoins} Coin`]), 'Chưa mở khoá tập nào.');
+      return rows((data as Access[]).map((x) => [`${x.episode.movie.title} · tập ${x.episode.episodeNumber}${x.revokedAt ? ' (đã thu hồi)' : ''}`, x.paidCoins ? `${x.paidCoins} Coin` : (ACCESS_SOURCE[x.source] ?? x.source)]), 'Chưa mở khoá tập nào.');
     case 'Devices': {
       const d = data as Devices;
-      return rows(d.devices.map((x) => [`${x.name ?? 'Thiết bị'} (${x.platform})`, formatDateTime(x.lastSeenAt)]), 'Chưa có thiết bị.');
+      return rows(d.devices.map((x) => [`${x.name ?? 'Thiết bị'} (${x.platform === 'ANDROID' ? 'Android' : x.platform})`, x.lastSeenAt ? `Dùng lần cuối ${formatDateTime(x.lastSeenAt)}` : 'Chưa dùng']), 'Chưa có thiết bị.');
     }
+    case 'WatchHistory':
+      return rows((data as Watched[]).map((w) => [`${w.episode.movie.title} · tập ${w.episode.episodeNumber} · ${watchedAt(w)}`, formatDateTime(w.lastWatchedAt)]), 'Chưa xem tập nào.');
   }
 }
 
@@ -76,7 +104,7 @@ export function MemberContextPanel({ caseId }: { caseId: string }) {
   if (!ctx.data) return <Loading />;
   const sections = ctx.data.sections;
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3 2xl:grid-cols-2">
       {ORDER.map((key) => {
         const section: MemberContextSection | undefined = sections[key];
         if (!section) return null;
@@ -87,7 +115,7 @@ export function MemberContextPanel({ caseId }: { caseId: string }) {
           </section>
         );
       })}
-      <p className="text-[11px] text-muted-foreground md:col-span-2">Chỉ đọc. Điều chỉnh Coin, gói hay thiết bị do Admin làm ở màn quản trị tương ứng.</p>
+      <p className="text-[11px] text-muted-foreground 2xl:col-span-2">Chỉ đọc. Điều chỉnh Coin, gói hay thiết bị do Admin làm ở màn quản trị tương ứng.</p>
     </div>
   );
 }

@@ -19,16 +19,16 @@ afterEach(() => {
 
 const page = <T,>(data: T[]) => ({ data, meta: { totalItems: data.length, currentPage: 1, totalPages: 1, itemsPerPage: 20 } });
 const ARTICLE = {
-  id: 'a1', title: 'Hủy gói Tháng', slug: 'huy-goi-thang', category: 'Gói cước', audience: 'MEMBER', locale: 'vi', status: 'PUBLISHED',
+  id: 'a1', title: 'Huỷ gói Tháng', slug: 'huy-goi-thang', category: 'Gói thành viên', audience: 'MEMBER', locale: 'vi', status: 'PUBLISHED',
   source: 'POLICY', sourceRef: null, version: 2, indexStatus: 'INDEXED', indexError: null, indexedAt: '2026-11-14T00:00:00Z',
   createdAt: '2026-11-01T00:00:00Z', updatedAt: '2026-11-14T00:00:00Z',
 };
 
 describe('AI console queries', () => {
   it('sends the knowledge filters in the backend pagination dialect', () => {
-    const q = new URLSearchParams(knowledgeQuery(2, 20, { search: ' hủy ', status: 'PUBLISHED', category: 'Gói cước', audience: 'MEMBER', failedOnly: true }));
+    const q = new URLSearchParams(knowledgeQuery(2, 20, { search: ' huỷ ', status: 'PUBLISHED', category: 'Gói cước', audience: 'MEMBER', failedOnly: true }));
     expect(Object.fromEntries(q)).toEqual({
-      page: '2', limit: '20', sortBy: 'updatedAt:DESC', search: 'hủy',
+      page: '2', limit: '20', sortBy: 'updatedAt:DESC', search: 'huỷ',
       'filter.status': '$eq:PUBLISHED', 'filter.category': '$eq:Gói cước', 'filter.audience': '$eq:MEMBER', 'filter.indexStatus': '$eq:FAILED',
     });
   });
@@ -44,7 +44,7 @@ describe('AI health card', () => {
   it('warns when articles failed to index', async () => {
     routeFetch({ '/admin/support/ai/health': { mode: 'live', chatModel: 'm', chatConfigured: true, embeddingModel: 'e', embeddingConfigured: true, indexedChunks: 40, failedArticles: 2, pendingArticles: 0, lastIndexedAt: null } });
     render(<AiHealthCard />);
-    expect(await screen.findByRole('alert')).toHaveTextContent('2 bài xuất bản bị lỗi index');
+    expect(await screen.findByRole('alert')).toHaveTextContent('2 bài xuất bản bị lỗi lập chỉ mục');
   });
 });
 
@@ -53,9 +53,9 @@ describe('Knowledge tab', () => {
     const calls = routeFetch({ '/admin/support/knowledge': page([ARTICLE]), '/admin/support/knowledge/a1': { id: 'a1', deleted: true } });
     render(<KnowledgeTab focus={null} />);
 
-    const row = (await screen.findByText('Hủy gói Tháng')).closest('tr')!;
+    const row = (await screen.findByText('Huỷ gói Tháng')).closest('tr')!;
     expect(within(row).getByText('Đang dùng')).toBeInTheDocument();
-    expect(within(row).getByText('Đã index')).toBeInTheDocument();
+    expect(within(row).getByText('Đã lập chỉ mục')).toBeInTheDocument();
 
     await userEvent.click(within(row).getByRole('button', { name: 'Xoá' }));
     const dialog = screen.getByRole('dialog');
@@ -69,9 +69,9 @@ describe('Knowledge tab', () => {
   it('archives through its own route and re-indexes a published article', async () => {
     const calls = routeFetch({ '/admin/support/knowledge': page([ARTICLE]) });
     render(<KnowledgeTab focus={null} />);
-    const row = (await screen.findByText('Hủy gói Tháng')).closest('tr')!;
+    const row = (await screen.findByText('Huỷ gói Tháng')).closest('tr')!;
 
-    await userEvent.click(within(row).getByRole('button', { name: 'Index lại' }));
+    await userEvent.click(within(row).getByRole('button', { name: 'Lập lại chỉ mục' }));
     await userEvent.click(within(row).getByRole('button', { name: 'Lưu trữ' }));
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Lưu trữ' }));
 
@@ -96,9 +96,9 @@ describe('Knowledge tab', () => {
 });
 
 const ANSWER: PlaygroundAnswer = {
-  question: 'Hủy gói có hoàn tiền không?', answer: 'Bạn hủy trong 24 giờ đầu được hoàn.', resolution: 'ANSWERED', confidence: 0.9,
-  escalationReason: null, grounded: true, sources: [{ articleId: 'a1', title: 'Hủy gói Tháng', heading: 'Mốc 24 giờ' }],
-  retrieved: [{ articleId: 'a1', title: 'Hủy gói Tháng', heading: 'Mốc 24 giờ', chunkIndex: 0, score: 0.82, excerpt: 'Trong 24 giờ đầu…' }],
+  question: 'Huỷ gói có hoàn tiền không?', answer: 'Bạn huỷ trong 24 giờ đầu được hoàn.', resolution: 'ANSWERED', confidence: 0.9,
+  escalationReason: null, grounded: true, sources: [{ articleId: 'a1', title: 'Huỷ gói Tháng', heading: 'Mốc 24 giờ' }],
+  retrieved: [{ articleId: 'a1', title: 'Huỷ gói Tháng', heading: 'Mốc 24 giờ', chunkIndex: 0, score: 0.82, excerpt: 'Trong 24 giờ đầu…' }],
   toolsUsed: [], model: 'gemini', latencyMs: 800,
 };
 
@@ -108,10 +108,10 @@ describe('Playground tab', () => {
     const onOpenArticle = vi.fn();
     render(<PlaygroundTab onOpenArticle={onOpenArticle} />);
 
-    await userEvent.type(screen.getByLabelText('Câu hỏi thử'), 'Hủy gói có hoàn tiền không?');
+    await userEvent.type(screen.getByLabelText('Câu hỏi thử'), 'Huỷ gói có hoàn tiền không?');
     await userEvent.click(screen.getByRole('button', { name: /Hỏi/ }));
-    expect(await screen.findByText('Bạn hủy trong 24 giờ đầu được hoàn.')).toBeInTheDocument();
-    expect(post).toHaveBeenLastCalledWith('/admin/support/ai/preview-chat', { question: 'Hủy gói có hoàn tiền không?', audience: 'MEMBER' }, { timeoutMs: 60_000 });
+    expect(await screen.findByText('Bạn huỷ trong 24 giờ đầu được hoàn.')).toBeInTheDocument();
+    expect(post).toHaveBeenLastCalledWith('/admin/support/ai/preview-chat', { question: 'Huỷ gói có hoàn tiền không?', audience: 'MEMBER' }, { timeoutMs: 60_000 });
 
     await userEvent.type(screen.getByLabelText('Câu hỏi thử'), 'Sau 24 giờ thì sao?');
     await userEvent.click(screen.getByRole('button', { name: /Hỏi/ }));
@@ -120,12 +120,12 @@ describe('Playground tab', () => {
       question: 'Sau 24 giờ thì sao?',
       audience: 'MEMBER',
       history: [
-        { role: 'MEMBER', content: 'Hủy gói có hoàn tiền không?' },
-        { role: 'AI', content: 'Bạn hủy trong 24 giờ đầu được hoàn.' },
+        { role: 'MEMBER', content: 'Huỷ gói có hoàn tiền không?' },
+        { role: 'AI', content: 'Bạn huỷ trong 24 giờ đầu được hoàn.' },
       ],
     });
 
-    await userEvent.click((await screen.findAllByRole('button', { name: /Hủy gói Tháng/ }))[0]);
+    await userEvent.click((await screen.findAllByRole('button', { name: /Huỷ gói Tháng/ }))[0]);
     expect(onOpenArticle).toHaveBeenCalledWith('a1');
   });
 

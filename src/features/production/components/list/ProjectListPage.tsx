@@ -61,25 +61,25 @@ export function ProjectListPage() {
   const totalCount = projects.data?.meta.totalItems ?? 0;
 
   return (
-    <main className="w-full bg-[#F9FAFB] dark:bg-[#090B10] min-h-[calc(100vh-3.5rem)]">
-      <div className="bg-white dark:bg-[#111420]">
+    <main className="w-full bg-background min-h-[calc(100vh-3.5rem)]">
+      <div className="bg-card">
         <div className="px-6 lg:px-8 pt-6 pb-5 flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-1.5 max-w-3xl">
-            <h1 className="font-heading text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="font-heading text-2xl font-bold text-foreground tracking-tight">
               Dự án phim
-              {totalCount > 0 && <span className="ml-3 text-base font-medium text-slate-400 tabular-nums">{totalCount}</span>}
+              {totalCount > 0 && <span className="ml-3 text-base font-medium text-muted-foreground tabular-nums">{totalCount}</span>}
             </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{INTRO[base]}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">{INTRO[base]}</p>
           </div>
           {canCreate && (
-            <Button onClick={() => setCreating(true)} className="shrink-0 rounded-full bg-[#121212] text-white hover:bg-black dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200">
+            <Button onClick={() => setCreating(true)} className="shrink-0 rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
               Tạo dự án
             </Button>
           )}
         </div>
       </div>
 
-      <div className="px-6 lg:px-8 py-3 border-y border-slate-200/80 dark:border-white/[0.08] bg-white dark:bg-[#111420] flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="px-6 lg:px-8 py-3 border-y border-border bg-card flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div role="tablist" aria-label="Lọc theo trạng thái" className="flex flex-wrap items-center gap-1.5">
           {FILTERS.map(({ key, label }) => (
             <button
@@ -93,8 +93,8 @@ export function ProjectListPage() {
               }}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs sm:text-sm transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20 ${
                 filter === key
-                  ? 'bg-[#121212] text-white font-semibold dark:bg-white dark:text-slate-900'
-                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                  ? 'bg-primary text-primary-foreground font-semibold'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               {label}
@@ -112,18 +112,18 @@ export function ProjectListPage() {
               setPage(1);
             }}
           >
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <input
               type="search"
               value={searchDraft}
               onChange={(e) => setSearchDraft(e.target.value)}
-              placeholder="Tìm phim, studio…"
+              placeholder="Tìm phim, Studio…"
               aria-label="Tìm dự án"
               className={`${fieldInputClass} pl-9 py-2`}
             />
           </form>
 
-          <div className="flex items-center p-0.5 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 shrink-0">
+          <div className="flex items-center p-0.5 rounded-xl bg-muted border border-border shrink-0">
             {VIEWS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
@@ -134,8 +134,8 @@ export function ProjectListPage() {
                 title={label}
                 className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                   viewMode === key
-                    ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-xs'
-                    : 'text-slate-400 hover:text-slate-700 dark:hover:text-white'
+                    ? 'bg-white dark:bg-white/15 text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-secondary-foreground'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" aria-hidden="true" />
@@ -160,12 +160,12 @@ export function ProjectListPage() {
             )}
 
             {projects.data.data.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-slate-200 dark:border-white/10 p-12 text-center bg-white dark:bg-white/[0.02]">
-                <p className="text-base font-semibold text-slate-800 dark:text-slate-100">
+              <div className="rounded-3xl border border-dashed border-border p-12 text-center bg-white dark:bg-white/[0.02]">
+                <p className="text-base font-semibold text-foreground">
                   {isCreator ? 'Bạn chưa được giao dự án nào' : 'Không có dự án nào khớp bộ lọc'}
                 </p>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                  {isCreator ? 'Dự án sẽ hiện ở đây khi Reviewer giao cho bạn.' : 'Đổi từ khoá hoặc chọn trạng thái khác.'}
+                <p className="text-sm text-muted-foreground mt-1">
+                  {isCreator ? 'Dự án sẽ hiện ở đây khi bạn được giao dự án.' : 'Đổi từ khoá hoặc chọn trạng thái khác.'}
                 </p>
               </div>
             ) : viewMode === 'grid' ? (

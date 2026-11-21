@@ -53,12 +53,12 @@ export function StudioAccountsModal({ studio, onClose }: { studio: Studio; onClo
         {accounts.loading && !accounts.data && <Loading />}
         {accounts.data && accounts.data.length === 0 && <Empty>Studio chưa có tài khoản đăng nhập.</Empty>}
         {accounts.data && accounts.data.length > 0 && (
-          <ul className="divide-y divide-slate-100 dark:divide-white/5 rounded-xl border border-slate-200 dark:border-white/10" aria-label="Tài khoản của Studio">
+          <ul className="divide-y divide-slate-100 dark:divide-white/5 rounded-xl border border-border" aria-label="Tài khoản của Studio">
             {accounts.data.map((a) => (
               <li key={a.id} className="flex items-center justify-between gap-3 px-3 py-2.5">
                 <span className="min-w-0">
-                  <span className="block truncate font-semibold text-slate-800 dark:text-slate-100">{a.fullName}</span>
-                  <span className="block truncate text-slate-500">{a.email}</span>
+                  <span className="block truncate font-semibold text-foreground">{a.fullName}</span>
+                  <span className="block truncate text-muted-foreground">{a.email}</span>
                 </span>
                 <Badge tone={a.isActive ? 'emerald' : 'neutral'}>{a.isActive ? 'Đang hoạt động' : 'Đã khoá'}</Badge>
               </li>
@@ -66,8 +66,8 @@ export function StudioAccountsModal({ studio, onClose }: { studio: Studio; onClo
           </ul>
         )}
 
-        <form onSubmit={create} className="space-y-3 rounded-xl border border-slate-200 dark:border-white/10 p-3">
-          <p className="font-semibold text-slate-800 dark:text-slate-100">Tạo tài khoản mới</p>
+        <form onSubmit={create} className="space-y-3 rounded-xl border border-border p-3">
+          <p className="font-semibold text-foreground">Tạo tài khoản mới</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <FormField label="Họ tên người phụ trách">
               <input value={fullName} onChange={(e) => setFullName(e.target.value)} minLength={2} maxLength={255} required className={fieldInputClass} />

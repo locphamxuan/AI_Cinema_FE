@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AuthForm from '@/components/auth/AuthForm';
-import AuthBrand from '@/components/auth/AuthBrand';
+import LoginPage from '@/app/login/page';
 import { useToastStore } from '@/components/ui/Toast';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -39,24 +39,10 @@ describe('AuthForm sign-in', () => {
 
     await userEvent.type(screen.getByLabelText('Email'), 'reviewer@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
-    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123', false);
+    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123');
     expect(push).toHaveBeenCalledWith('/reviewer');
-  });
-
-  it('lets a studio sign in from the OAuth consent page and goes back to it with the whole query', async () => {
-    const next = '/oauth/authorize?response_type=code&client_id=studio-web&state=s1';
-    search = new URLSearchParams({ next });
-    login.mockResolvedValue({ success: true, redirectUrl: undefined });
-    render(<AuthForm />);
-
-    await userEvent.type(screen.getByLabelText('Email'), 'studio@aicinema.com');
-    await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
-
-    expect(login).toHaveBeenCalledWith('studio@aicinema.com', 'matkhau123', true);
-    expect(push).toHaveBeenCalledWith(next);
   });
 
   it('ignores a next that leaves the site (no open redirect)', async () => {
@@ -65,9 +51,9 @@ describe('AuthForm sign-in', () => {
 
     await userEvent.type(screen.getByLabelText('Email'), 'reviewer@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
-    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123', false);
+    expect(login).toHaveBeenCalledWith('reviewer@example.com', 'matkhau123');
     expect(push).toHaveBeenCalledWith('/reviewer');
   });
 
@@ -77,7 +63,7 @@ describe('AuthForm sign-in', () => {
 
     await userEvent.type(screen.getByLabelText('Email'), 'member@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
     expect(screen.getByRole('alert')).toHaveTextContent('ứng dụng di động');
     expect(push).not.toHaveBeenCalled();
@@ -92,15 +78,17 @@ describe('AuthForm sign-in', () => {
 
     await userEvent.type(screen.getByLabelText('Email'), 'studio@example.com');
     await userEvent.type(screen.getByLabelText('Mật khẩu'), 'matkhau123');
-    await userEvent.click(screen.getByRole('button', { name: 'Đăng Nhập' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đăng nhập' }));
 
-    expect(screen.getByRole('link', { name: /Mở cổng đăng nhập Studio Web/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Đăng nhập Studio Web/ })).toBeInTheDocument();
   });
 
-  it('displays back-office internal branding instead of viewer platform copy', () => {
-    render(<AuthBrand />);
+  it('displays back-office internal branding instead of viewer platform copy, over a decorative poster wall', () => {
+    const { container } = render(<LoginPage />);
 
-    expect(screen.getByText('Cổng Quản Trị & Sản Xuất Nội Bộ')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Đăng nhập' })).toBeInTheDocument();
+    expect(screen.getByText('Trang quản trị AI Cinema')).toBeInTheDocument();
+    expect(container.querySelector('[aria-hidden="true"] img')).not.toBeNull();
     expect(screen.queryByText(/Nền tảng xem phim/)).not.toBeInTheDocument();
   });
 });

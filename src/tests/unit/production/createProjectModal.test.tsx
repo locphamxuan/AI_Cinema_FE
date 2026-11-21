@@ -43,6 +43,13 @@ it('lets the Admin create a project with its Reviewer, lead Creator and studio, 
   await userEvent.selectOptions(screen.getByLabelText('Creator chính'), 'c1');
   await userEvent.selectOptions(screen.getByLabelText('Studio (tuỳ chọn)'), await screen.findByRole('option', { name: 'Lumen Studio' }));
   await userEvent.selectOptions(screen.getByLabelText('Độ tuổi'), 'T18');
+  // The budget is entered with the project: it is the ceiling of the studio's contract.
+  expect(screen.getByRole('status')).toHaveTextContent('nhập ngân sách sản xuất');
+  await userEvent.type(screen.getByLabelText('Ngân sách sản xuất (₫)'), '1500');
+  expect(screen.getByText('Số tiền là bội số 1.000 ₫.')).toBeInTheDocument();
+  await userEvent.clear(screen.getByLabelText('Ngân sách sản xuất (₫)'));
+  await userEvent.type(screen.getByLabelText('Ngân sách sản xuất (₫)'), '200.000.000');
+  expect(screen.getByText(/= 200\.000\.000/)).toBeInTheDocument();
   // Seasons and episodes are the Reviewer's job afterwards; idea files are added on the Overview tab.
   expect(screen.queryByText(/Mùa và tập/)).not.toBeInTheDocument();
   expect(screen.queryByLabelText(/Tệp ý tưởng/)).not.toBeInTheDocument();
@@ -52,7 +59,7 @@ it('lets the Admin create a project with its Reviewer, lead Creator and studio, 
 
   const created = calls.find((c) => c.path === '/projects' && c.method === 'POST');
   const body = JSON.parse(created!.body as string);
-  expect(body).toMatchObject({ reviewerId: 'r1', creatorId: 'c1', studioId: 'st1', genreIds: ['g1'], ageRating: 'T18' });
+  expect(body).toMatchObject({ reviewerId: 'r1', creatorId: 'c1', studioId: 'st1', genreIds: ['g1'], ageRating: 'T18', budgetVnd: 200_000_000 });
   expect(body).not.toHaveProperty('seasons');
   const people = calls.filter((c) => c.path === '/users');
   expect(people.length).toBeGreaterThanOrEqual(2);

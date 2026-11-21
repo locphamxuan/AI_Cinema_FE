@@ -40,8 +40,8 @@ export function AdsPanel() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-slate-900 dark:text-white tracking-tight">Quảng cáo</h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+        <h1 className="font-heading text-2xl sm:text-3xl font-semibold text-foreground tracking-tight">Quảng cáo</h1>
+        <p className="text-xs text-muted-foreground mt-0.5">
           Quảng cáo chèn giữa tập cho gói có quảng cáo. Vị trí chèn từng tập đặt ở <b>Quản lý phim</b> → mở phim → &quot;Đặt vị trí&quot;.
         </p>
       </div>
@@ -61,8 +61,8 @@ export function AdsPanel() {
           {paged.rows?.map((ad) => (
             <li key={ad.id} className="py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="min-w-0 space-y-0.5">
-                <p className="font-semibold text-slate-900 dark:text-white">{ad.title}</p>
-                <p className="text-slate-500">
+                <p className="font-semibold text-foreground">{ad.title}</p>
+                <p className="text-muted-foreground">
                   Dài {formatDuration(ad.durationSeconds)} · trọng số {ad.weight}
                 </p>
                 <a href={ad.mediaUrl} target="_blank" rel="noopener noreferrer" className="text-sky-700 hover:underline break-all">

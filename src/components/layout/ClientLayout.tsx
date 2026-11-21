@@ -4,7 +4,7 @@ import { ReactNode, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { AREAS, homeAreaOf } from '@/lib/permissions';
-import { isOAuthPath, safeNext } from '@/lib/safeNext';
+import { safeNext } from '@/lib/safeNext';
 import { ToastContainer } from '@/components/ui/Toast';
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
@@ -13,9 +13,8 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   const { user, isAuthenticated, restoreSession } = useAppStore();
 
   // Bring back the session saved by a previous login so a page reload stays authenticated.
-  // A Studio session is kept only on the OAuth consent page, the one page a studio uses here.
   useEffect(() => {
-    restoreSession(isOAuthPath(window.location.pathname));
+    restoreSession();
   }, [restoreSession]);
 
   // Signing in lands each role on its own area, or back on the page that sent it to /login (?next=).
