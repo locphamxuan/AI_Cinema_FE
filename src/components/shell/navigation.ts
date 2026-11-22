@@ -58,6 +58,7 @@ export const NAVIGATION: Record<Area, NavGroup[]> = {
         { href: '/admin/membership-plans', label: 'Gói thành viên & Doanh thu', icon: ScrollText },
         { href: '/admin/coin-transactions', label: 'Giao dịch Coin', icon: Coins },
         { href: '/admin/rewards', label: 'Điểm danh & vòng quay', icon: Gift },
+        { href: '/admin/profile', label: 'Hồ sơ cá nhân', icon: UserRound },
         { href: '/admin/permissions', label: 'Tài khoản & Phân quyền', icon: Users },
       ],
     },

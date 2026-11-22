@@ -18,7 +18,6 @@ const COLUMNS: { key: SortKey; label: string }[] = [
   { key: 'productionCostVnd', label: 'Phí sản xuất' },
   { key: 'unlockRevenueVnd', label: 'Doanh thu mở khoá' },
   { key: 'refundedVnd', label: 'Coin hoàn' },
-  { key: 'planShareVnd', label: 'Chia từ gói Tháng' },
   { key: 'revenueVnd', label: 'Doanh thu' },
   { key: 'profitVnd', label: 'Lợi nhuận' },
   { key: 'roiPercent', label: 'ROI' },
@@ -68,7 +67,7 @@ export function FilmProfitTab() {
       {report.data && (
         <Panel
           title="Lợi nhuận từng phim"
-          description="Doanh thu = doanh thu mở khoá tập (đã trừ Coin hoàn) + phần chia từ gói Tháng."
+          description="Doanh thu = doanh thu mở khoá tập (đã trừ Coin hoàn)."
           actions={
             <div className="relative w-64">
               <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
@@ -106,7 +105,6 @@ export function FilmProfitTab() {
                       <Money value={f.productionCostVnd} />
                       <Money value={f.unlockRevenueVnd} />
                       <Money value={f.refundedVnd} />
-                      <Money value={f.planShareVnd} />
                       <Money value={f.revenueVnd} />
                       <Money value={f.profitVnd} warn={f.profitVnd < 0} />
                       <td className={`py-2.5 pl-3 text-right tabular-nums ${f.roiPercent !== null && f.roiPercent < 0 ? 'text-destructive' : ''}`}>

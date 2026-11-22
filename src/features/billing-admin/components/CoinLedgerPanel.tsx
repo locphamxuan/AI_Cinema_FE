@@ -10,13 +10,11 @@ import { COIN_ENTRY_LABEL, COIN_ENTRY_TYPES, signed, describeLine } from '@/lib/
 import { PERMISSION } from '@/lib/permissions';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
-import { formatDateTime, formatDay, formatNumber } from '@/lib/format';
+import { formatDateTime, formatNumber } from '@/lib/format';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { CoinEntryType } from '@/types/billing';
 import { MetaPager } from '@/components/data/MetaPager';
-
-const LOT_SOURCE_LABEL: Record<string, string> = { ...COIN_ENTRY_LABEL, TOP_UP_PROMO: 'Khuyến mãi nạp' };
 
 /** MF-2: the Coin ledger of every wallet. Reading a wallet and correcting it by hand need their own permissions. */
 export function CoinLedgerPanel() {
@@ -112,7 +110,7 @@ export function WalletModal({
   const w = wallet.data;
 
   return (
-    <Modal open onClose={onClose} title="Ví Coin" subtitle={`Tài khoản ${userId}`} maxWidth="max-w-xl">
+    <Modal open onClose={onClose} title="Ví Coin" subtitle="Ví Coin" maxWidth="max-w-xl">
       {wallet.error && <ErrorNote message={wallet.error} onRetry={wallet.reload} />}
       {wallet.loading && !w && <Loading />}
       {w && !adjusting && (
@@ -126,23 +124,6 @@ export function WalletModal({
               <p className="text-muted-foreground">Coin thưởng</p>
               <p className="text-lg font-bold tabular-nums">{formatNumber(w.bonusBalance)}</p>
             </div>
-          </div>
-          <div>
-            <p className="font-semibold mb-1">Lô Coin thưởng còn lại (không hết hạn)</p>
-            {w.lots.length === 0 ? (
-              <p className="text-muted-foreground">Không còn lô nào.</p>
-            ) : (
-              <ul className="space-y-1">
-                {w.lots.map((lot) => (
-                  <li key={lot.id} className="flex justify-between">
-                    <span>
-                      {LOT_SOURCE_LABEL[lot.source] ?? lot.source}: còn {lot.remainingAmount}/{lot.originalAmount}
-                    </span>
-                    <span className="text-muted-foreground">nhận {formatDay(lot.grantedAt)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
           {canAdjust && (
             <div className="flex justify-end">
