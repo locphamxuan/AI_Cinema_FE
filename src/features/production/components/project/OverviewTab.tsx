@@ -130,7 +130,7 @@ export function OverviewTab() {
 
       {/* ── Right: sidebar ── */}
       <div className="space-y-5">
-        <PosterPanel canManage={canEdit} />
+        <PosterPanel canManage={caps.posterUpload && isIn(project.status, EDITABLE_PROJECT)} />
 
         <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-xs">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">

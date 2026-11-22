@@ -52,6 +52,8 @@ export interface ProjectCapabilities {
   contractDocuments: boolean;
   /** Download the poster image the studio sent: the Reviewer in charge and the Admin. */
   studioPoster: boolean;
+  /** Upload or replace the poster: the Reviewer in charge, or the Admin who publishes. */
+  posterUpload: boolean;
   /** Write and submit the script: the lead Creator. */
   scriptWrite: boolean;
   /** Approve the Final Script or send it back: the Admin. */
@@ -99,6 +101,7 @@ export function projectCapabilities(
     contractManage: can(PERMISSION.CONTRACT_MANAGE),
     contractDocuments: can(PERMISSION.CONTRACT_DOCUMENT_READ),
     studioPoster: (owner && can(PERMISSION.PROJECT_MANAGE)) || can(PERMISSION.PROJECT_READ_ALL),
+    posterUpload: (owner && can(PERMISSION.PROJECT_MANAGE)) || can(PERMISSION.EPISODE_PUBLISH),
     scriptWrite: lead && can(PERMISSION.SCRIPT_WRITE),
     scriptApprove: can(PERMISSION.SCRIPT_APPROVE),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),
