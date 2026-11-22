@@ -213,3 +213,24 @@ describe('ContractTab', () => {
     await waitFor(() => expect(calls.some((c) => c.path === '/projects/m1/contracts' && c.method === 'POST')).toBe(true));
   });
 });
+
+describe('FinalFilmPanel – poster check before the Admin', () => {
+  const withPoster = (poster: { set: boolean; fromStudio: boolean }) => (
+    <FinalFilmPanel episode={episode()} canConfirm canSendBack={false} poster={poster} onChanged={vi.fn(async () => undefined)} />
+  );
+
+  it('reminds the Reviewer to check the poster the studio sent before confirming', () => {
+    routeFetch({});
+    render(withPoster({ set: false, fromStudio: true }));
+    expect(screen.getByRole('note')).toHaveTextContent(/Studio đã nộp poster/);
+  });
+
+  it('asks for a poster when the studio sent none, and says nothing once the poster is set', () => {
+    routeFetch({});
+    const { unmount } = render(withPoster({ set: false, fromStudio: false }));
+    expect(screen.getByRole('note')).toHaveTextContent(/Studio chưa nộp poster/);
+    unmount();
+    render(withPoster({ set: true, fromStudio: true }));
+    expect(screen.queryByRole('note')).not.toBeInTheDocument();
+  });
+});
