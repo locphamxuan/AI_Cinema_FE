@@ -11,6 +11,33 @@ import { POLICY_TYPE } from './policyLabels';
 
 const SELECT = `${fieldInputClass} py-1.5 text-xs`;
 
+/** ISO instant → the `YYYY-MM-DDTHH:mm` local value a datetime-local input shows. */
+export function toLocalInput(iso: string | null | undefined): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+/** datetime-local value → ISO instant, or null when the field is empty (no time limit). */
+export function fromLocalInput(value: string): string | null {
+  if (!value) return null;
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+/** The JSON box: empty = no content, otherwise it must be one JSON object. */
+export function parseContent(text: string): { ok: true; value: Record<string, unknown> | null } | { ok: false } {
+  if (!text.trim()) return { ok: true, value: null };
+  try {
+    const value: unknown = JSON.parse(text);
+    return value && typeof value === 'object' && !Array.isArray(value) ? { ok: true, value: value as Record<string, unknown> } : { ok: false };
+  } catch {
+    return { ok: false };
+  }
+}
+
 interface PolicyFormModalProps {
   policy: Policy | null;
   onClose: () => void;
@@ -22,21 +49,36 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
     name: policy?.name ?? '',
     type: policy?.type ?? 'AI_LABELING',
     version: policy?.version ?? '',
-    documentReference: policy?.documentReference ?? '',
-    content: policy?.content ?? null,
-    effectiveFrom: policy?.effectiveFrom ?? '',
-    effectiveTo: policy?.effectiveTo ?? '',
+    documentReference: policy?.documentReference ?? null,
     isActive: policy?.isActive ?? true,
   });
+  const [contentText, setContentText] = useState(policy?.content ? JSON.stringify(policy.content, null, 2) : '');
+  const [from, setFrom] = useState(toLocalInput(policy?.effectiveFrom));
+  const [to, setTo] = useState(toLocalInput(policy?.effectiveTo));
   const { busy, run } = useAction();
 
   const set = (patch: Partial<PolicyInput>) => setForm({ ...form, ...patch });
+  const content = parseContent(contentText);
+  const effectiveFrom = fromLocalInput(from);
+  const effectiveTo = fromLocalInput(to);
+  const rangeBad = Boolean(effectiveFrom && effectiveTo && effectiveTo <= effectiveFrom);
+  const valid = form.name.trim() && form.version.trim() && content.ok && !rangeBad;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!content.ok || rangeBad) return;
+    const input: PolicyInput = {
+      ...form,
+      name: form.name.trim(),
+      version: form.version.trim(),
+      documentReference: form.documentReference?.trim() || null,
+      content: content.value,
+      effectiveFrom,
+      effectiveTo,
+    };
     const done = policy
-      ? await run(() => policyService.update(policy.id, form), 'Đã cập nhật chính sách')
-      : await run(() => policyService.create(form), 'Đã tạo chính sách');
+      ? await run(() => policyService.update(policy.id, input), 'Đã cập nhật chính sách')
+      : await run(() => policyService.create(input), 'Đã tạo chính sách');
     if (done) {
       await onDone();
       onClose();
@@ -95,14 +137,9 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
 
         <FormField label="Nội dung và yêu cầu (JSON)">
           <textarea
-            value={form.content ? JSON.stringify(form.content, null, 2) : ''}
-            onChange={(e) => {
-              try {
-                set({ content: e.target.value ? JSON.parse(e.target.value) : null });
-              } catch {
-                // Bỏ qua nếu JSON chưa hợp lệ, người dùng đang nhập
-              }
-            }}
+            value={contentText}
+            onChange={(e) => setContentText(e.target.value)}
+            aria-invalid={!content.ok}
             rows={6}
             className={`${fieldInputClass} font-mono text-xs`}
             placeholder='Ví dụ: { "requiredLabel": "AI-generated", "minAge": 18 }'
@@ -110,26 +147,28 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
           <p className="text-[11px] text-muted-foreground mt-1">
             Nội dung có cấu trúc cho nhãn AI và kiểm tra tuân thủ tham chiếu. Để trống nếu không có.
           </p>
+          {!content.ok && <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">Nội dung phải là một đối tượng JSON hợp lệ, ví dụ {'{ "key": "value" }'}.</p>}
         </FormField>
 
         <div className="grid grid-cols-2 gap-3">
           <FormField label="Hiệu lực từ">
             <input
               type="datetime-local"
-              value={form.effectiveFrom ?? ''}
-              onChange={(e) => set({ effectiveFrom: e.target.value || null })}
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
               className={fieldInputClass}
             />
           </FormField>
           <FormField label="Hiệu lực đến">
             <input
               type="datetime-local"
-              value={form.effectiveTo ?? ''}
-              onChange={(e) => set({ effectiveTo: e.target.value || null })}
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
               className={fieldInputClass}
             />
           </FormField>
         </div>
+        {rangeBad && <p className="text-xs font-medium text-rose-600 dark:text-rose-400">Ngày kết thúc hiệu lực phải sau ngày bắt đầu.</p>}
 
         <div className="flex items-center gap-2">
           <input
@@ -151,7 +190,7 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 text-xs font-semibold">
             Huỷ
           </Button>
-          <Button type="submit" disabled={!form.name.trim() || !form.version.trim() || busy} className="rounded-xl px-5 text-xs font-bold">
+          <Button type="submit" disabled={!valid || busy} className="rounded-xl px-5 text-xs font-bold">
             {busy ? 'Đang lưu…' : policy ? 'Cập nhật' : 'Tạo'}
           </Button>
         </div>
