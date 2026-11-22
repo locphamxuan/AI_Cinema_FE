@@ -115,6 +115,12 @@ export interface RevisionSummary {
   bySeason: { seasonNumber: number; episodeNumbers: number[] }[];
 }
 
+/** The poster image a studio sent for the movie: its file name and when (the file itself is downloaded). */
+export interface StudioPoster {
+  fileName: string;
+  uploadedAt: string;
+}
+
 export interface ProjectDetail {
   id: string;
   title: string;
@@ -127,6 +133,8 @@ export interface ProjectDetail {
   freeEpisodeCount: number | null;
   status: MovieStatus;
   posterUrl: string | null;
+  /** The poster image the studio sent with its film, or null before it sends one. */
+  studioPoster?: StudioPoster | null;
   reviewerId: string;
   creatorId: string | null;
   reviewer: Person;

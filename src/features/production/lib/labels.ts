@@ -221,6 +221,7 @@ export const EVENT_LABEL: Record<string, string> = {
   CONTRACT_COUNTERED: 'Đề xuất giá mới',
   CONTRACT_SIGNED: 'Hợp đồng ký đủ 2 bên',
   STUDIO_ACCOUNT_CREATED: 'Mở tài khoản Studio',
+  STUDIO_POSTER_UPLOADED: 'Studio nộp poster phim',
   FINAL_FILM_CONFIRMED: 'Reviewer xác nhận Phim bản cuối',
   FINAL_FILM_REJECTED: 'Admin trả lại Phim bản cuối',
   STUDIO_HANDOFF_SENT: 'Gửi bản yêu cầu cho Studio',

@@ -50,6 +50,8 @@ export interface ProjectCapabilities {
   contractManage: boolean;
   /** Download the signed contract PDFs: the Admin and the Reviewer (Creators only see the rounds). */
   contractDocuments: boolean;
+  /** Download the poster image the studio sent: the Reviewer in charge and the Admin. */
+  studioPoster: boolean;
   /** Write and submit the script: the lead Creator. */
   scriptWrite: boolean;
   /** Approve the Final Script or send it back: the Admin. */
@@ -96,6 +98,7 @@ export function projectCapabilities(
     costRequest: owner && can(PERMISSION.COST_REQUEST),
     contractManage: can(PERMISSION.CONTRACT_MANAGE),
     contractDocuments: can(PERMISSION.CONTRACT_DOCUMENT_READ),
+    studioPoster: (owner && can(PERMISSION.PROJECT_MANAGE)) || can(PERMISSION.PROJECT_READ_ALL),
     scriptWrite: lead && can(PERMISSION.SCRIPT_WRITE),
     scriptApprove: can(PERMISSION.SCRIPT_APPROVE),
     ingest: creator && can(PERMISSION.MEDIA_INGEST),
