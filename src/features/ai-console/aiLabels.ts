@@ -10,10 +10,10 @@ export const ARTICLE_STATUS: Record<KnowledgeArticleStatus, Label> = {
 };
 
 export const INDEX_STATUS: Record<KnowledgeIndexStatus, Label> = {
-  PENDING: { label: 'Chờ lập chỉ mục', tone: 'blue' },
-  INDEXING: { label: 'Đang lập chỉ mục', tone: 'blue' },
-  INDEXED: { label: 'Đã lập chỉ mục', tone: 'emerald' },
-  FAILED: { label: 'Lỗi lập chỉ mục', tone: 'rose' },
+  PENDING: { label: 'Chờ cập nhật', tone: 'blue' },
+  INDEXING: { label: 'Đang cập nhật', tone: 'blue' },
+  INDEXED: { label: 'Đã cập nhật', tone: 'emerald' },
+  FAILED: { label: 'Lỗi cập nhật', tone: 'rose' },
 };
 
 export const AUDIENCE: Record<SupportAudience, string> = {

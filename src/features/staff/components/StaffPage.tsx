@@ -14,7 +14,7 @@ export function StaffPage() {
       <div>
         <h2 className="font-heading text-2xl font-semibold tracking-tight">Hỗ trợ khách hàng</h2>
         <p className="mt-0.5 text-sm text-muted-foreground">
-          Case do Chatbox AI chuyển sang: nhận case, trả lời Member, báo đã giải quyết để Member xác nhận.
+          Yêu cầu hỗ trợ do Trợ lý AI chuyển sang: nhận yêu cầu, trả lời Member, báo đã giải quyết để Member xác nhận.
         </p>
       </div>
       {can(PERMISSION.SUPPORT_CASE_READ) ? (

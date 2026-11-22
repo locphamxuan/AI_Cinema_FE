@@ -102,7 +102,7 @@ describe('PublishPanel - release (Admin)', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Phát hành ngay' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Reviewer chưa xác nhận Phim Final này.'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Reviewer chưa xác nhận Phim bản cuối này.'));
     expect(onChanged).not.toHaveBeenCalled();
   });
 

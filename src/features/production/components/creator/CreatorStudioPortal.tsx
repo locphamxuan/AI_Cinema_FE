@@ -90,7 +90,7 @@ export function CreatorStudioPortal() {
                 <Dot tone="bg-slate-400 dark:bg-slate-600" value={count('DRAFT')} label="Chưa nộp" />
                 <Dot tone="bg-amber-400" value={count('IN_REVIEW', 'ADMIN_REVIEW')} label="Đang chờ duyệt" />
                 <Dot tone="bg-rose-400" value={count('REVISION')} label="Cần sửa" />
-                <Dot tone="bg-emerald-500" value={count('NEGOTIATING', 'HANDED_OFF')} label="Kịch bản Final" />
+                <Dot tone="bg-emerald-500" value={count('NEGOTIATING', 'HANDED_OFF')} label="Kịch bản bản cuối" />
               </div>
             </section>
 

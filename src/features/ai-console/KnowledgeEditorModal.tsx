@@ -75,7 +75,7 @@ export function KnowledgeEditorModal({
     const body: KnowledgeInput = { ...form, title: form.title.trim(), category: form.category.trim(), sourceRef: form.sourceRef?.trim() || undefined };
     const saved = await run(
       () => (articleId ? aiConsoleService.updateKnowledge(articleId, body) : aiConsoleService.createKnowledge(body)),
-      form.status === 'PUBLISHED' ? 'Đã lưu và xuất bản, bài đang chờ lập chỉ mục' : 'Đã lưu bản nháp',
+      form.status === 'PUBLISHED' ? 'Đã lưu và xuất bản, bài đang chờ cập nhật cho AI' : 'Đã lưu bản nháp',
     );
     if (saved) onSaved(saved as KnowledgeArticleDetail);
   };
@@ -102,7 +102,7 @@ export function KnowledgeEditorModal({
                 className={fieldInputClass}
               />
             </FormField>
-            <FormField label="Slug (định danh duy nhất)" error={form.slug && !slugOk ? 'Chỉ chữ thường không dấu, số và dấu gạch ngang.' : null}>
+            <FormField label="Mã bài viết (không trùng)" error={form.slug && !slugOk ? 'Chỉ chữ thường không dấu, số và dấu gạch ngang.' : null}>
               <input
                 required
                 maxLength={255}
@@ -122,7 +122,7 @@ export function KnowledgeEditorModal({
                 ))}
               </datalist>
             </FormField>
-            <FormField label="Đối tượng đọc">
+            <FormField label="Dành cho">
               <select value={form.audience} onChange={(e) => set('audience', e.target.value as SupportAudience)} className={fieldInputClass}>
                 {(Object.keys(AUDIENCE) as SupportAudience[]).map((a) => (
                   <option key={a} value={a}>
@@ -140,7 +140,7 @@ export function KnowledgeEditorModal({
                 ))}
               </select>
             </FormField>
-            <FormField label="Mã nguồn (tuỳ chọn)" hint="Ví dụ: số điều khoản, mã gói">
+            <FormField label="Số hiệu nguồn (tuỳ chọn)" hint="Ví dụ: số điều khoản, mã gói">
               <input maxLength={255} value={form.sourceRef ?? ''} onChange={(e) => set('sourceRef', e.target.value)} className={fieldInputClass} />
             </FormField>
           </div>

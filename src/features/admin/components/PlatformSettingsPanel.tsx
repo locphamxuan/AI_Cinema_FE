@@ -34,10 +34,10 @@ const PRODUCTION_FIELDS: SettingField[] = [
 ];
 
 const STREAMING_FIELDS: SettingField[] = [
-  { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Số tập đầu Guest và Member gói Thường xem miễn phí.', min: 0 },
-  { key: 'playbackHeartbeatTimeoutSeconds', label: 'Hết phiên phát', unit: 'giây', hint: 'Trình phát không báo tín hiệu quá số giây này thì phiên xem bị đóng.', min: 10 },
+  { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Số tập đầu mà khách chưa đăng nhập và Member gói Thường được xem miễn phí.', min: 0 },
+  { key: 'playbackHeartbeatTimeoutSeconds', label: 'Tự ngắt khi mất tín hiệu', unit: 'giây', hint: 'Trình phát không gửi tín hiệu quá số giây này thì lượt xem bị ngắt.', min: 10 },
   { key: 'subscriptionCancelWindowHours', label: 'Hạn tắt gia hạn', unit: 'giờ', hint: 'Member tắt tự gia hạn trước ngày gia hạn ít nhất ngần này giờ.', min: 0 },
-  { key: 'planRenewalGraceHours', label: 'Thời gian chờ gia hạn lỗi', unit: 'giờ', hint: 'Gia hạn thiếu Coin được thử lại trong ngần này giờ, không có quyền xem; 0 = gói hết hạn ngay.', min: 0 },
+  { key: 'planRenewalGraceHours', label: 'Thời gian thử gia hạn lại', unit: 'giờ', hint: 'Gia hạn thiếu Coin được thử lại trong ngần này giờ, không có quyền xem; 0 = gói hết hạn ngay.', min: 0 },
 ];
 
 const ALL_FIELDS = [...COIN_FIELDS, ...PRODUCTION_FIELDS, ...STREAMING_FIELDS];
@@ -238,7 +238,7 @@ export function PlatformSettingsPanel() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Các quy tắc lũy tiến bậc thang điểm danh (Reward Ladder) và xác suất trọng số của vòng quay (Reward Wheel) được quản lý độc lập tại phân hệ Thưởng.
+              Mức thưởng theo ngày điểm danh và tỉ lệ trúng của vòng quay được chỉnh riêng ở trang Điểm danh & vòng quay.
             </p>
             <div className="pt-2">
               <Link

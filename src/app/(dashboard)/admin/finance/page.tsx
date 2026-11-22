@@ -13,7 +13,7 @@ export default function Page() {
       title="Tài chính"
       description="Lợi nhuận từng phim, phần chia doanh thu gói Tháng và các giao dịch Coin cần kiểm tra. Số liệu lấy trực tiếp từ sổ sách hệ thống."
       tabs={[
-        { key: 'profit', label: 'Lợi nhuận & ROI', permission: PERMISSION.FINANCE_REPORT_READ, content: <FilmProfitTab /> },
+        { key: 'profit', label: 'Lợi nhuận từng phim', permission: PERMISSION.FINANCE_REPORT_READ, content: <FilmProfitTab /> },
         { key: 'allocation', label: 'Chia doanh thu gói Tháng', permission: PERMISSION.FINANCE_REPORT_READ, content: <RevenueShareTab /> },
         { key: 'risk', label: 'Giao dịch rủi ro', permission: PERMISSION.RISK_FLAG_MANAGE, content: <RiskFlagsTab /> },
       ]}

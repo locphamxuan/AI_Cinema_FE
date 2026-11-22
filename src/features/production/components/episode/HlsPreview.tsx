@@ -28,7 +28,7 @@ export function HlsPreview({ src }: { src: string }) {
   return (
     <div className="space-y-1">
       <video ref={videoRef} controls playsInline className="w-full aspect-video rounded-xl bg-black" />
-      {failed?.src === src && <p className="text-[11px] text-rose-600">Không phát được luồng HLS này. Kiểm tra link của Studio.</p>}
+      {failed?.src === src && <p className="text-[11px] text-rose-600">Không phát được link video này. Hãy kiểm tra link Studio gửi.</p>}
     </div>
   );
 }

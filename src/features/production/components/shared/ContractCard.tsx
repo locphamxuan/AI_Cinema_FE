@@ -95,10 +95,10 @@ export function ContractCard({
       <p className="text-muted-foreground">
         {c.studioSignedAt && `Studio ký lúc ${formatDateTime(c.studioSignedAt)}. `}
         {c.adminSignedAt && c.adminSignedBy && `${c.adminSignedBy.fullName} (Admin) ký lúc ${formatDateTime(c.adminSignedAt)}.`}
-        {!c.studioSignedAt && !c.adminSignedAt && 'Chưa bên nào ký; chờ Studio ký trên Studio Web (giá in sẵn là ngân sách trần).'}
+        {!c.studioSignedAt && !c.adminSignedAt && 'Chưa bên nào ký; chờ Studio ký trên Studio Web (giá in sẵn là ngân sách tối đa).'}
       </p>
       {c.status === 'SIGNED' && c.handoff && (
-        <p className="text-emerald-700 dark:text-emerald-300">Đã tự bàn giao cho Studio: dự án vào sản xuất, các tập chờ Studio nộp phim.</p>
+        <p className="text-emerald-700 dark:text-emerald-300">Đã tự động giao việc cho Studio: dự án vào sản xuất, các tập chờ Studio nộp phim.</p>
       )}
 
       {canDownload && (
@@ -179,9 +179,9 @@ export function ContractCard({
         details={[
           ['Studio', c.studio.name],
           ['Vòng', `Vòng ${c.round}`],
-          ['Giá ký', c.costVnd !== null ? formatVnd(c.costVnd) : 'Ngân sách trần'],
+          ['Giá ký', c.costVnd !== null ? formatVnd(c.costVnd) : 'Ngân sách tối đa'],
         ]}
-        consequence={`hợp đồng đủ 2 chữ ký, dự án chuyển sang Đang sản xuất và tự bàn giao cho ${c.studio.name} với phí bằng giá ký. Không thể hoàn tác.`}
+        consequence={`hợp đồng đủ 2 chữ ký, dự án chuyển sang Đang sản xuất và tự động giao việc cho ${c.studio.name} với phí bằng giá ký. Không thể hoàn tác.`}
         confirmLabel="Đồng ý và ký"
         busy={busy}
         onClose={() => setConfirming(false)}

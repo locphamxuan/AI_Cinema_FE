@@ -94,6 +94,8 @@ export const productionService = {
   },
   deleteIdeaFile: (movieId: string, fileId: string) => apiClient.delete<null>(R.IDEA_FILE(movieId, fileId)),
   downloadIdeaFile: (movieId: string, fileId: string) => apiClient.getBlob(R.IDEA_FILE_CONTENT(movieId, fileId)),
+  /** The poster image the studio sent: the Reviewer in charge or the Admin downloads it, then sets the poster. */
+  downloadStudioPoster: (movieId: string) => apiClient.getBlob(R.STUDIO_POSTER_CONTENT(movieId)),
 
   // ---- Production cost (VND, BR-45/46) ----
   getCosts: (movieId: string) => apiClient.get<CostLedger>(R.COSTS(movieId)),

@@ -47,7 +47,7 @@ export function RiskFlagsTab() {
   const scan = async () => {
     const res = await run(() => financeService.scan());
     if (res) {
-      toast.success(`Thêm ${res.created} cờ mới`);
+      toast.success(`Thêm ${res.created} giao dịch nghi vấn mới`);
       await flags.reload();
     }
   };
@@ -55,7 +55,7 @@ export function RiskFlagsTab() {
   const review = async () => {
     if (!reviewing) return;
     const { flag, decision } = reviewing;
-    await run(() => financeService.review(flag.id, decision, note), decision === 'CONFIRMED' ? 'Đã xác nhận rủi ro' : 'Đã bỏ qua cờ');
+    await run(() => financeService.review(flag.id, decision, note), decision === 'CONFIRMED' ? 'Đã xác nhận rủi ro' : 'Đã bỏ dấu nghi vấn');
     setReviewing(null);
     setNote('');
     // A flag another Admin handled first answers 409 (shown as a toast): the list is reloaded either way.
@@ -67,7 +67,7 @@ export function RiskFlagsTab() {
   return (
     <Panel
       title="Giao dịch rủi ro"
-      description="Giao dịch Coin bị các quy tắc rủi ro gắn cờ. Xác nhận khi cần theo dõi tiếp, bỏ qua khi là giao dịch bình thường."
+      description="Giao dịch Coin bị các quy tắc rủi ro đánh dấu nghi vấn. Xác nhận khi cần theo dõi tiếp, bỏ qua khi là giao dịch bình thường."
       actions={
         <>
           <select
@@ -103,14 +103,14 @@ export function RiskFlagsTab() {
             ))}
           </select>
           <Button size="sm" onClick={() => void scan()} disabled={busy}>
-            Quét ngay
+            Kiểm tra ngay
           </Button>
         </>
       }
     >
       {flags.error && <ErrorNote message={flags.error} onRetry={flags.reload} />}
       {flags.loading && !flags.data && <Loading />}
-      {flags.data?.data.length === 0 && <Empty>Không có giao dịch nào bị gắn cờ theo bộ lọc này.</Empty>}
+      {flags.data?.data.length === 0 && <Empty>Không có giao dịch nghi vấn nào theo bộ lọc này.</Empty>}
       {flags.data && flags.data.data.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -179,7 +179,7 @@ export function RiskFlagsTab() {
 
       <ConfirmModal
         open={!!reviewing}
-        title={reviewing?.decision === 'CONFIRMED' ? 'Xác nhận giao dịch rủi ro?' : 'Bỏ qua cờ này?'}
+        title={reviewing?.decision === 'CONFIRMED' ? 'Xác nhận giao dịch rủi ro?' : 'Bỏ dấu nghi vấn này?'}
         description={reviewing ? `${reviewing.flag.coinTransaction.wallet.user.fullName}: ${reviewing.flag.reason}` : ''}
         confirmLabel={reviewing?.decision === 'CONFIRMED' ? 'Xác nhận rủi ro' : 'Bỏ qua'}
         danger={reviewing?.decision === 'CONFIRMED'}

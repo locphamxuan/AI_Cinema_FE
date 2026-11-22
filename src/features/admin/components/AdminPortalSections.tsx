@@ -16,12 +16,12 @@ export function PortalMetrics({ data }: { data: AdminPipeline }) {
   return (
     <section aria-label="Thống kê dự án và hợp đồng" className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Kịch bản chờ duyệt Final" value={data.finalScripts.length} icon={ScrollText} accent={1} note="Duyệt xong là hợp đồng tự gửi Studio" />
+        <StatCard label="Kịch bản bản cuối chờ duyệt" value={data.finalScripts.length} icon={ScrollText} accent={1} note="Duyệt xong là hợp đồng tự gửi Studio" />
         <StatCard label="Hợp đồng chờ Admin ký" value={data.contractsToSign.length} icon={FileSignature} accent={0} note="Studio đã ký trước" />
-        <StatCard label="Phim Final chờ phát hành" value={data.readyFilms.length} icon={Film} accent={2} note="Đã gắn nhãn AI và qua kiểm tra pháp lý" />
+        <StatCard label="Phim bản cuối chờ phát hành" value={data.readyFilms.length} icon={Film} accent={2} note="Đã gắn nhãn AI và qua kiểm tra pháp lý" />
       </div>
       {data.finalScripts.length > 0 && (
-        <ul aria-label="Kịch bản chờ duyệt Final" className="flex flex-wrap gap-2 pt-1 text-xs">
+        <ul aria-label="Kịch bản bản cuối chờ duyệt" className="flex flex-wrap gap-2 pt-1 text-xs">
           {data.finalScripts.map((project) => (
             <li key={project.id}>
               <Link href={`/admin/projects/${project.id}?tab=script`} className="inline-block px-3 py-1.5 rounded-xl border border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 font-semibold">
@@ -103,7 +103,7 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
       </span>
       <div className="shrink-0 flex flex-wrap gap-2">
         <Link href={`/admin/projects/${project.id}/episodes/${episode.id}`} className="px-4 py-2.5 rounded-full border border-input text-xs font-semibold text-secondary-foreground hover:bg-muted/60 transition-all">
-          Xem phim Final
+          Xem phim bản cuối
         </Link>
         <button type="button" disabled={busy} onClick={() => setConfirming(true)} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-xs cursor-pointer disabled:opacity-50 transition-all">
           Phát hành ngay
@@ -112,7 +112,7 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
       <ConfirmModal
         open={confirming}
         title="Phát hành ngay"
-        description={`${project.title} - Tập ${episode.episodeNumber}: ${episode.title} lên kệ ngay cho Member. Muốn hẹn giờ thì mở Phim Final.`}
+        description={`${project.title} - Tập ${episode.episodeNumber}: ${episode.title} lên kệ ngay cho Member. Muốn hẹn giờ thì mở mục Phim bản cuối.`}
         confirmLabel="Phát hành"
         busy={busy}
         onClose={() => setConfirming(false)}
@@ -126,19 +126,19 @@ export function PortalReadyFilms({ films, onPublished }: { films: ReadyFilm[]; o
   const [showAll, setShowAll] = useState(false);
   const shown = showAll ? films : films.slice(0, 5);
   return (
-    <section aria-label="Phim Final chờ phát hành" className="space-y-4">
+    <section aria-label="Phim bản cuối chờ phát hành" className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-extrabold text-foreground tracking-tight flex items-center gap-2">
-            Phim Final chờ phát hành
+            Phim bản cuối chờ phát hành
           </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Reviewer đã duyệt, gắn nhãn AI, kiểm tra tuân thủ và xác nhận Phim Final; Admin đặt giá Coin rồi phát hành.</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Reviewer đã duyệt, gắn nhãn AI, kiểm tra tuân thủ và xác nhận Phim bản cuối; Admin đặt giá Coin rồi phát hành.</p>
         </div>
         <span className="text-xs tabular-nums font-bold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
           {films.length} tập chờ lên sóng
         </span>
       </div>
-      {films.length === 0 && <p className="text-sm text-muted-foreground">Chưa có Phim Final nào chờ phát hành.</p>}
+      {films.length === 0 && <p className="text-sm text-muted-foreground">Chưa có Phim bản cuối nào chờ phát hành.</p>}
       <ul className="space-y-3">
         {shown.map((film) => (
           <ReadyFilmRow key={film.episode.id} film={film} onPublished={onPublished} />

@@ -66,7 +66,7 @@ export function PolicyDetailModal({ policy: p, onClose }: { policy: Policy; onCl
           </section>
         )}
         <section className="max-h-[45vh] overflow-y-auto rounded-lg border border-border p-4">
-          <h3 className="mb-3 text-sm font-medium">Nội dung và yêu cầu</h3>
+          <h3 className="mb-3 text-sm font-medium">Nội dung chi tiết</h3>
           <ContentView value={p.content} />
         </section>
       </div>

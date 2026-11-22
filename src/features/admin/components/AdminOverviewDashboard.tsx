@@ -223,7 +223,7 @@ export function AdminOverviewDashboard() {
 
         <OverviewChartCard
           title="Cơ cấu người dùng theo vai trò"
-          description="Phân bổ tài khoản khán giả, đội ngũ sáng tạo và quản trị"
+          description="Cơ cấu tài khoản khán giả, đội ngũ sáng tạo và quản trị"
           link={{ href: '/admin/permissions?tab=accounts', label: 'Quản lý tài khoản', className: EMERALD_LINK }}
         >
           <div className="py-3 flex items-center justify-center">

@@ -15,6 +15,7 @@ export function RewardLadderPanel() {
   const [editing, setEditing] = useState<RewardRule | 'new' | null>(null);
   const data = rules.data ?? [];
   const takenDays = new Set(data.filter((r) => r.isActive).map((r) => r.streakDay));
+  const takenCodes = new Set(data.map((r) => r.code.toLowerCase()));
 
   // Sort by streakDay ascending
   const sortedRules = [...data].sort((a, b) => a.streakDay - b.streakDay);
@@ -115,7 +116,7 @@ export function RewardLadderPanel() {
           <table className="w-full text-xs">
             <thead className="text-[11px] text-muted-foreground bg-muted/60 border-b border-border text-left">
               <tr>
-                <th className="py-3 px-6 font-bold w-24">Ngày chuỗi</th>
+                <th className="py-3 px-6 font-bold w-24">Ngày trong chuỗi</th>
                 <th className="py-3 px-4 font-bold">Tên hiển thị</th>
                 <th className="py-3 px-4 font-bold text-right">Coin thưởng</th>
                 <th className="py-3 px-4 font-bold text-center">Quà tặng kèm</th>
@@ -193,6 +194,7 @@ export function RewardLadderPanel() {
         <RewardRuleModal
           rule={editing === 'new' ? null : editing}
           takenDays={takenDays}
+          takenCodes={takenCodes}
           onClose={() => setEditing(null)}
           onDone={rules.reload}
         />

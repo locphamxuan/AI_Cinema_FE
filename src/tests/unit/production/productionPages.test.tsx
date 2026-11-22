@@ -209,7 +209,7 @@ describe('ProjectDetailPage', () => {
     routeFetch({ '/projects/m1': project(), '/projects/m1/handoffs': [] });
     render(<ProjectDetailPage />);
 
-    expect(await screen.findByText(/Hợp đồng ký đủ hai bên thì hệ thống tự bàn giao cho Studio/)).toBeInTheDocument();
+    expect(await screen.findByText(/Hợp đồng ký đủ hai bên thì hệ thống tự động giao việc cho Studio/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Bàn giao cho Studio/ })).not.toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Chi phí sản xuất' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Hợp đồng' })).toBeInTheDocument();

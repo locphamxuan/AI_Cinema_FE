@@ -119,7 +119,7 @@ describe('Risk flags tab', () => {
     expect(list.search.get('filter.status')).toBe('$eq:OPEN');
     expect(list.search.get('sortBy')).toBe('createdAt:DESC');
 
-    await userEvent.click(screen.getByRole('button', { name: /Quét ngay/ }));
+    await userEvent.click(screen.getByRole('button', { name: /Kiểm tra ngay/ }));
     await waitFor(() => expect(calls.some((c) => c.path === '/admin/finance/risk/scan' && c.method === 'POST')).toBe(true));
 
     await userEvent.click(screen.getByRole('button', { name: 'Xác nhận rủi ro' }));
@@ -139,13 +139,13 @@ describe('Admin menu', () => {
     signInAs('admin');
     render(<AppShell area="admin"><div /></AppShell>);
     expect(screen.getByRole('link', { name: 'Tài chính' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('link', { name: 'Chatbox AI' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Trợ lý AI' })).toBeInTheDocument();
   });
 
   it('hides them without finance:report.read and support:knowledge.manage', () => {
     signInAs('admin', []);
     render(<AppShell area="admin"><div /></AppShell>);
     expect(screen.queryByRole('link', { name: 'Tài chính' })).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Chatbox AI' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Trợ lý AI' })).toBeNull();
   });
 });

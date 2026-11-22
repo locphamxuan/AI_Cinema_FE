@@ -5,6 +5,7 @@ import { PoliciesPanel } from '@/features/policies/PoliciesPanel';
 import { validity } from '@/features/policies/policyLabels';
 import { AppShell } from '@/components/shell/AppShell';
 import { policiesQuery } from '@/services/policyService';
+import { fromLocalInput, parseContent, toLocalInput } from '@/features/policies/PolicyFormModal';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 
@@ -69,5 +70,44 @@ describe('Policies', () => {
     signInAs('admin', ['platform:settings.manage']);
     render(<AppShell area="admin"><div /></AppShell>);
     expect(screen.getByRole('link', { name: 'Chính sách' })).toHaveAttribute('href', '/admin/policies');
+  });
+  it('switches a policy out of force with a PATCH that only carries isActive', async () => {
+    const calls = routeFetch({ '/policies': page([POLICY]), '/policies/p1': { ...POLICY, isActive: false } });
+    render(<PoliciesPanel />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Ngừng áp dụng' }));
+    await waitFor(() => expect(calls.some((c) => c.method === 'PATCH' && c.path === '/policies/p1')).toBe(true));
+    const patch = calls.find((c) => c.method === 'PATCH')!;
+    expect(JSON.parse(String(patch.body))).toEqual({ isActive: false });
+  });
+
+  it('opens the create form from "Thêm chính sách" and posts empty dates as null', async () => {
+    const calls = routeFetch({ '/policies': page([POLICY]) });
+    render(<PoliciesPanel />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Thêm chính sách' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Tạo chính sách mới')).toBeInTheDocument();
+    await userEvent.type(within(dialog).getByPlaceholderText('Ví dụ: Quy định gắn nhãn AI'), 'Bản quyền');
+    await userEvent.type(within(dialog).getByPlaceholderText('Ví dụ: 1.0.0'), '2.0');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Tạo' }));
+    await waitFor(() => expect(calls.some((c) => c.method === 'POST' && c.path === '/policies')).toBe(true));
+    const body = JSON.parse(String(calls.find((c) => c.method === 'POST')!.body));
+    expect(body).toMatchObject({ name: 'Bản quyền', version: '2.0', content: null, effectiveFrom: null, effectiveTo: null, documentReference: null });
+  });
+
+  it('keeps the filters when nothing matches so they can be cleared', async () => {
+    routeFetch({ '/policies': page([]) });
+    render(<PoliciesPanel />);
+    expect(await screen.findByText('Không có chính sách nào theo bộ lọc này.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Lọc theo hiệu lực')).toBeInTheDocument();
+  });
+
+  it('reads the JSON box and the validity dates the way the backend expects', () => {
+    expect(parseContent('')).toEqual({ ok: true, value: null });
+    expect(parseContent('{"a":1}')).toEqual({ ok: true, value: { a: 1 } });
+    expect(parseContent('[1]').ok).toBe(false);
+    expect(parseContent('{"a":').ok).toBe(false);
+    expect(fromLocalInput('')).toBeNull();
+    const iso = '2026-05-01T03:30:00.000Z';
+    expect(fromLocalInput(toLocalInput(iso))).toBe(iso);
   });
 });

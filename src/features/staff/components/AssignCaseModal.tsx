@@ -28,11 +28,11 @@ export function AssignCaseModal({
   const active = staff.data?.data.filter((a) => a.isActive) ?? [];
 
   const assign = async () => {
-    if (staffId && (await run(() => staffSupportService.assign(caseId, staffId), 'Đã giao case'))) await onAssigned();
+    if (staffId && (await run(() => staffSupportService.assign(caseId, staffId), 'Đã giao yêu cầu'))) await onAssigned();
   };
 
   return (
-    <Modal open onClose={onClose} title="Giao case cho nhân viên" subtitle="Nhân viên được giao nhận thông báo và xử lý case này." maxWidth="max-w-md">
+    <Modal open onClose={onClose} title="Giao yêu cầu cho nhân viên" subtitle="Nhân viên được giao nhận thông báo và xử lý yêu cầu này." maxWidth="max-w-md">
       {staff.error && <ErrorNote message={staff.error} onRetry={staff.reload} />}
       {staff.loading && !staff.data && <Loading />}
       {staff.data && (
@@ -52,7 +52,7 @@ export function AssignCaseModal({
               Huỷ
             </Button>
             <Button type="button" onClick={() => void assign()} disabled={busy || !staffId || staffId === currentAgentId}>
-              Giao case
+              Giao yêu cầu
             </Button>
           </div>
         </div>

@@ -114,7 +114,7 @@ export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; 
       <TextPromptModal
         open={requesting}
         title="Yêu cầu Studio sửa"
-        subtitle="Tài khoản Studio nhận thông báo kèm nhận xét này trên Studio Web và nộp bản mới. Phim Final đã xác nhận (nếu có) sẽ bị huỷ xác nhận."
+        subtitle="Tài khoản Studio nhận thông báo kèm nhận xét này trên Studio Web và nộp bản mới. Phim bản cuối đã xác nhận (nếu có) sẽ bị huỷ xác nhận."
         label="Nhận xét (ví dụ: phút 03:10 nhân vật bị méo mặt…)"
         confirmLabel="Gửi yêu cầu sửa"
         danger

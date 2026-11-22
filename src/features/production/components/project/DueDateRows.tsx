@@ -12,7 +12,7 @@ export function deadlineUsable(episode: Pick<Episode, 'deliveryDeadline'>): bool
 
 /** Read-only: the studio is due on the deadline the Reviewer set for each episode (BR-38). */
 export function DeadlineList({ episodes }: { episodes: Episode[] }) {
-  if (episodes.length === 0) return <p className="text-xs text-muted-foreground">Mọi tập của phạm vi này đã được bàn giao.</p>;
+  if (episodes.length === 0) return <p className="text-xs text-muted-foreground">Mọi tập của phạm vi này đã được giao cho Studio.</p>;
   return (
     <ul className="space-y-1.5 max-h-72 overflow-y-auto pr-1 text-xs">
       {episodes.map((ep) => {

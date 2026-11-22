@@ -133,7 +133,7 @@ function ChangePassword() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ready) return;
-    if (await run(() => accountService.changePassword(current, next), 'Đã đổi mật khẩu; các phiên đăng nhập khác đã bị đăng xuất')) {
+    if (await run(() => accountService.changePassword(current, next), 'Đã đổi mật khẩu; các thiết bị khác đã bị đăng xuất')) {
       setCurrent('');
       setNext('');
       setConfirm('');

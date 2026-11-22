@@ -51,7 +51,7 @@ export function ContractTab() {
           title={`Hợp đồng với Studio ${studio.name}`}
           description={
             caps.contractManage
-              ? `Studio tải hợp đồng (giá trị = ngân sách trần), ký và tải lên trên Studio Web; Admin ký Bên A để hoàn tất hoặc đề xuất giá khác. Ngân sách còn lại: ${formatVnd(project.cost.remainingVnd)}.`
+              ? `Studio tải hợp đồng (giá trị bằng ngân sách tối đa), ký và tải lên trên Studio Web; Admin ký Bên A để hoàn tất hoặc đề xuất giá khác. Ngân sách còn lại: ${formatVnd(project.cost.remainingVnd)}.`
               : 'Studio tải hợp đồng và ký trên Studio Web; Admin ký Bên A để hoàn tất hoặc đề xuất giá khác. Bạn chỉ xem các vòng thương lượng.'
           }
         >
@@ -89,7 +89,7 @@ function ResendTemplate({ canSend, onSent }: { canSend: boolean; onSent: () => P
 
   return (
     <Panel title="Hợp đồng sản xuất">
-      <Empty>Chưa có hợp đồng. Hệ thống tự gửi hợp đồng mẫu cho Studio khi Admin duyệt Kịch bản Final (tab Kịch bản).</Empty>
+      <Empty>Chưa có hợp đồng. Hệ thống tự gửi hợp đồng mẫu cho Studio khi Admin duyệt Kịch bản bản cuối (tab Kịch bản).</Empty>
       {canSend && ready && (
         <div className="mt-3">
           <Button type="button" onClick={send} disabled={busy}>

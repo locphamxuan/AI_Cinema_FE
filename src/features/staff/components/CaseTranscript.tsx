@@ -10,7 +10,7 @@ const SENDER: Record<SupportMessage['senderType'], string> = {
 
 /** The messages of a case, oldest first, as the backend stored them; internal notes are marked as such. */
 export function CaseTranscript({ messages }: { messages: SupportMessage[] }) {
-  if (!messages.length) return <p className="py-8 text-center text-sm text-muted-foreground">Case chưa có tin nhắn.</p>;
+  if (!messages.length) return <p className="py-8 text-center text-sm text-muted-foreground">Chưa có tin nhắn.</p>;
   return (
     <ol className="space-y-3" aria-label="Hội thoại">
       {messages.map((m) => {

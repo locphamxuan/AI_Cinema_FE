@@ -48,12 +48,12 @@ export function ReviewerAuditCanvas({
         </div>
         <div className="flex items-center gap-1.5">
           {previousHref && (
-            <Link href={previousHref} aria-label="Tập trước trong hàng đợi" className={NAV}>
+            <Link href={previousHref} aria-label="Tập trước trong danh sách chờ duyệt" className={NAV}>
               <ChevronLeft className="w-4 h-4" />
             </Link>
           )}
           {nextHref && (
-            <Link href={nextHref} aria-label="Tập sau trong hàng đợi" className={NAV}>
+            <Link href={nextHref} aria-label="Tập sau trong danh sách chờ duyệt" className={NAV}>
               <ChevronRight className="w-4 h-4" />
             </Link>
           )}
@@ -61,7 +61,7 @@ export function ReviewerAuditCanvas({
       </header>
 
       {selected?.streamUrl && selected.ingestStatus === 'READY' ? (
-        <section aria-label="Xem bản dựng">
+        <section aria-label="Xem bản phim">
           <HlsPreview src={selected.streamUrl} />
         </section>
       ) : (

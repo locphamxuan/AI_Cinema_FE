@@ -102,7 +102,7 @@ export function EpisodePage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         <div className="lg:col-span-3 space-y-5">
           {selected?.streamUrl && selected.ingestStatus === 'READY' && (
-            <section aria-label="Xem bản dựng">
+            <section aria-label="Xem bản phim">
               <HlsPreview src={selected.streamUrl} />
             </section>
           )}
@@ -111,12 +111,18 @@ export function EpisodePage() {
             <Panel title={`Bản ${selected.version}`}>
               <p className="text-xs text-muted-foreground">
                 {selected.ingestStatus === 'FAILED'
-                  ? 'Bản này xử lý lỗi; Studio xử lý lại hoặc nộp bản mới trên Studio Web.'
+                  ? 'Bản này xử lý video bị lỗi; Studio cần xử lý lại hoặc nộp bản mới trên Studio Web.'
                   : 'Hệ thống đang xử lý bản này, trang tự cập nhật.'}
               </p>
             </Panel>
           )}
-          <FinalFilmPanel episode={episode} canConfirm={caps.review && delivering} canSendBack={caps.publish} onChanged={refreshAll} />
+          <FinalFilmPanel
+            episode={episode}
+            canConfirm={caps.review && delivering}
+            canSendBack={caps.publish}
+            poster={{ set: !!project.data.posterUrl, fromStudio: !!project.data.studioPoster }}
+            onChanged={refreshAll}
+          />
           <PublishPanel
             episode={episode}
             projectStatus={project.data.status}

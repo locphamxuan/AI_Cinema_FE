@@ -14,7 +14,7 @@ export const APPLICATION_MESSAGES = {
   MSG03: {
     type: 'Inline or toast',
     scenario: 'Request data is invalid.',
-    message: 'Dữ liệu yêu cầu không hợp lệ. Vui lòng kiểm tra lại các trường.',
+    message: 'Thông tin nhập chưa hợp lệ. Vui lòng kiểm tra lại.',
   },
   MSG04: {
     type: 'Toast',
@@ -96,7 +96,7 @@ export const APPLICATION_MESSAGES = {
 /** BR-19: what the backend still misses before a release, named in Vietnamese so the Admin knows who to ask. */
 const RELEASE_BLOCKERS: Record<string, string> = {
   'an approved media version': 'bản phim được Reviewer duyệt',
-  'the Final Film confirmation of the Reviewer': 'xác nhận Phim Final của Reviewer',
+  'the Final Film confirmation of the Reviewer': 'xác nhận Phim bản cuối của Reviewer',
   'a Coin price (BR-29)': 'giá Coin do Reviewer đặt',
   'the movie synopsis': 'tóm tắt phim (Reviewer điền ở tab Tổng quan)',
   'the movie age rating': 'độ tuổi phim (Reviewer điền ở tab Tổng quan)',
@@ -156,7 +156,7 @@ export function localizeApiError(
   // Session, rate limit and server faults read the same whatever the server said, and never leak internals.
   if (status === 429) return APPLICATION_MESSAGES.MSG19.message;
   if (status === 401 && endpoint.includes('/auth/login')) return APPLICATION_MESSAGES.MSG05.message;
-  if (status === 401) return 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+  if (status === 401) return 'Hết hạn đăng nhập, vui lòng đăng nhập lại.';
   if (status >= 500) return APPLICATION_MESSAGES.MSG18.message;
 
   // Any other business rule the backend explains (a refused hand-off, a Submission in the wrong state, …) reaches

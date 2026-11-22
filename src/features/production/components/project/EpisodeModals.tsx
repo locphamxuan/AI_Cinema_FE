@@ -242,7 +242,7 @@ function EpisodeForm(props: {
           Khoảng phát hành của mùa: {window.start || '…'} → {window.end || '…'}.
         </p>
       )}
-      {props.handedOff && <p className="text-[11px] text-muted-foreground">Đã bàn giao: Studio cũng phải giao theo hạn mới.</p>}
+      {props.handedOff && <p className="text-[11px] text-muted-foreground">Đã giao cho Studio: Studio cũng phải nộp theo hạn mới.</p>}
       <FormField label="Tóm tắt tập">
         <textarea rows={3} value={values.synopsis} onChange={(e) => set({ synopsis: e.target.value })} maxLength={5000} className={fieldTextareaClass} />
       </FormField>

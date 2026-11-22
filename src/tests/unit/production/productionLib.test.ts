@@ -64,6 +64,13 @@ describe('projectCapabilities', () => {
     expect(projectCapabilities(project, 'other', reviewerKeys)).toMatchObject({ manage: false, review: false, price: false, note: false, costRequest: false });
   });
 
+  it('lets the Reviewer in charge and the Admin who publishes put up the poster, nobody else', () => {
+    expect(projectCapabilities(project, 'rev', reviewerKeys).posterUpload).toBe(true);
+    expect(projectCapabilities(project, 'other', reviewerKeys).posterUpload).toBe(false);
+    expect(projectCapabilities(project, 'admin', grant(PERMISSION.EPISODE_PUBLISH)).posterUpload).toBe(true);
+    expect(projectCapabilities(project, 'cre', grant(PERMISSION.SCRIPT_WRITE)).posterUpload).toBe(false);
+  });
+
   it('lets the lead Creator write the script, not the other Creators', () => {
     const keys = grant(PERMISSION.SCRIPT_WRITE, PERMISSION.MEDIA_INGEST);
     const team = { ...project, creatorAssignments: [{ creatorId: 'second' }] };

@@ -16,7 +16,7 @@ import { useProject } from './ProjectContext';
 const COPY: Record<IdeaFilePurpose, { title: string; description: string; noun: string }> = {
   IDEA: {
     title: 'Tệp ý tưởng gửi Studio',
-    description: `Đi kèm brief khi bàn giao Studio. ${ATTACHMENT_HINT} Tải lại cùng tên sẽ tạo phiên bản mới.`,
+    description: `Gửi kèm bản yêu cầu khi giao cho Studio. ${ATTACHMENT_HINT} Tải lại cùng tên sẽ tạo phiên bản mới.`,
     noun: 'tệp ý tưởng',
   },
   SYNOPSIS: {
@@ -98,7 +98,7 @@ export function IdeaFilesPanel({ canManage, purpose = 'IDEA' }: { canManage: boo
         title={`Xoá ${copy.noun}`}
         subtitle={removing ? `${removing.fileName} · v${removing.version}` : undefined}
       >
-        <p className="text-xs text-muted-foreground">Tệp sẽ bị gỡ khỏi dự án{purpose === 'IDEA' ? ' và không còn đi kèm brief gửi Studio' : ''}.</p>
+        <p className="text-xs text-muted-foreground">Tệp sẽ bị gỡ khỏi dự án{purpose === 'IDEA' ? ' và không còn đi kèm bản yêu cầu gửi Studio' : ''}.</p>
         <div className="mt-4 flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={() => setRemoving(null)}>
             Huỷ

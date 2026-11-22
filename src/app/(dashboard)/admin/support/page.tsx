@@ -8,7 +8,7 @@ export default function AdminSupportPage() {
   return (
     <AdminPageFrame
       title="Hỗ trợ khách hàng"
-      description="Case AI chuyển cho nhân viên: theo dõi hàng chờ, giao case cho Staff hoặc tự xử lý."
+      description="Yêu cầu hỗ trợ AI chuyển cho nhân viên: theo dõi hàng chờ, giao cho Staff hoặc tự xử lý."
     >
       <PermissionGate permission={PERMISSION.SUPPORT_CASE_READ}>
         <Suspense>

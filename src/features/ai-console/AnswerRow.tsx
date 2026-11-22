@@ -29,7 +29,7 @@ export function AnswerRow({
       <div className="min-w-0 space-y-2 text-sm">
         <p className="text-xs text-muted-foreground">
           {formatDateTime(a.createdAt)} · {member.fullName} ({member.email})
-          {a.conversation.satisfactionRating !== null && ` · Member chấm case ${a.conversation.satisfactionRating}/5`}
+          {a.conversation.satisfactionRating !== null && ` · Member chấm cuộc hỗ trợ ${a.conversation.satisfactionRating}/5`}
         </p>
         <p className="font-medium">{a.question ?? 'Không còn câu hỏi gốc'}</p>
         <p className="line-clamp-3 whitespace-pre-line text-muted-foreground">{a.answer}</p>

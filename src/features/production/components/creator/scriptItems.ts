@@ -9,9 +9,9 @@ const STAGE_LABEL: Record<ScriptStage, string> = {
   DRAFT: 'Chưa nộp kịch bản',
   REVISION: 'Cần sửa kịch bản',
   IN_REVIEW: 'Chờ Reviewer duyệt',
-  ADMIN_REVIEW: 'Chờ Admin duyệt Final',
+  ADMIN_REVIEW: 'Chờ Admin duyệt bản cuối',
   NEGOTIATING: 'Đang ký hợp đồng Studio',
-  HANDED_OFF: 'Đã bàn giao Studio',
+  HANDED_OFF: 'Đã giao cho Studio',
 };
 
 /** The steps a script goes through; the card's progress is how many are behind it. */
