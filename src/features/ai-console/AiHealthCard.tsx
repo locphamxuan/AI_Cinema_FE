@@ -9,7 +9,7 @@ import type { SupportAiHealth } from '@/types/support';
 
 const MODE: Record<SupportAiHealth['mode'], { label: string; tone: 'emerald' | 'amber' | 'rose' }> = {
   live: { label: 'Đang chạy', tone: 'emerald' },
-  mock: { label: 'Chế độ thử (mock)', tone: 'amber' },
+  mock: { label: 'Chế độ thử (chưa dùng AI thật)', tone: 'amber' },
   disabled: { label: 'Đang tắt', tone: 'rose' },
 };
 
@@ -24,15 +24,15 @@ export function AiHealthCard() {
     h.mode === 'disabled'
       ? 'AI đang tắt: Member được chuyển thẳng cho nhân viên.'
       : h.failedArticles > 0
-        ? `${h.failedArticles} bài xuất bản bị lỗi lập chỉ mục nên AI chưa đọc được. Lọc "Lỗi index" ở Kho tri thức để xử lý.`
+        ? `${h.failedArticles} bài đã xuất bản bị lỗi cập nhật cho AI nên AI chưa đọc được. Lọc "Lỗi cập nhật" ở Kho tri thức để xử lý.`
         : null;
 
   const facts: [string, string][] = [
     ['Mô hình trả lời', h.chatConfigured ? (h.chatModel ?? '—') : 'Chưa cấu hình'],
-    ['Mô hình nhúng', h.embeddingConfigured ? (h.embeddingModel ?? '—') : 'Chưa cấu hình'],
-    ['Đoạn đã lập chỉ mục', formatNumber(h.indexedChunks)],
-    ['Bài chờ lập chỉ mục', formatNumber(h.pendingArticles)],
-    ['Lập chỉ mục gần nhất', formatDateTime(h.lastIndexedAt)],
+    ['Mô hình tìm bài', h.embeddingConfigured ? (h.embeddingModel ?? '—') : 'Chưa cấu hình'],
+    ['Đoạn AI đang dùng', formatNumber(h.indexedChunks)],
+    ['Bài chờ cập nhật cho AI', formatNumber(h.pendingArticles)],
+    ['Cập nhật cho AI gần nhất', formatDateTime(h.lastIndexedAt)],
   ];
 
   return (

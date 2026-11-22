@@ -99,7 +99,7 @@ export function RewardPrizeModal({
             maxLength={255}
             required
             className={fieldInputClass}
-            placeholder="Ví dụ: Ô 50 Coin…"
+            placeholder="Ví dụ: 50 Coin…"
           />
         </FormField>
 
@@ -116,7 +116,7 @@ export function RewardPrizeModal({
               className={fieldInputClass}
             />
           </FormField>
-          <FormField label={`Trọng số (1–${MAX_WEIGHT.toLocaleString('vi-VN')})`}>
+          <FormField label={`Mức ưu tiên (1–${MAX_WEIGHT.toLocaleString('vi-VN')}): số càng lớn càng dễ trúng`}>
             <input
               type="number"
               min={1}
@@ -130,7 +130,7 @@ export function RewardPrizeModal({
           </FormField>
         </div>
         <p className="text-[11px] text-muted-foreground">
-          Tỉ lệ trúng = trọng số của giải / tổng trọng số các giải đang bật. Member xem được tỉ lệ này trên vòng quay của app.
+          Tỉ lệ trúng = mức ưu tiên của giải / tổng mức ưu tiên các giải đang bật. Member xem được tỉ lệ này trên vòng quay của app.
         </p>
 
         {prize && (

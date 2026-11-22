@@ -45,7 +45,7 @@ export function ContractPartySettingsForm({ current, onSaved }: { current: Platf
     <form onSubmit={save} className="space-y-4 text-xs">
       <p className="rounded-2xl border border-border bg-muted/40 p-3 leading-relaxed text-muted-foreground">
         Thông tin này được in vào phần <strong>Bên A</strong> của hợp đồng mà hệ thống tự gửi cho Studio sau khi Admin duyệt
-        Kịch bản Final. Bên B lấy từ hồ sơ của từng Studio.
+        Kịch bản bản cuối. Bên B lấy từ hồ sơ của từng Studio.
       </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {CONTRACT_PARTY_FIELDS.map(({ key, label, placeholder }) => (

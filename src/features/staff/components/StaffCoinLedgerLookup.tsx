@@ -20,7 +20,7 @@ export function StaffCoinLedgerLookup() {
   return (
     <Panel
       title="Giao dịch Coin"
-      description="Sổ cái chỉ ghi thêm: mỗi dòng là một lần Coin vào hoặc ra ví. ID ví/thành viên được ẩn với Staff (dữ liệu nhạy cảm)."
+      description="Lịch sử giao dịch Coin (không sửa, không xoá): mỗi dòng là một lần Coin vào hoặc ra ví. ID ví/thành viên được ẩn với Staff (dữ liệu nhạy cảm)."
       actions={
         <select
           aria-label="Lọc theo loại giao dịch"
@@ -39,7 +39,7 @@ export function StaffCoinLedgerLookup() {
       }
     >
       {ledger.error && <ErrorNote message={ledger.error} onRetry={ledger.reload} />}
-      {ledger.loading && !ledger.data && <Loading label="Đang tải sổ cái Coin…" />}
+      {ledger.loading && !ledger.data && <Loading label="Đang tải lịch sử giao dịch Coin…" />}
       {ledger.data?.data.length === 0 && <Empty>Chưa có giao dịch nào.</Empty>}
       {ledger.data && ledger.data.data.length > 0 && (
         <div className="overflow-x-auto">

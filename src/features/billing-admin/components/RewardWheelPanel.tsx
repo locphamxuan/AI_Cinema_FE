@@ -48,13 +48,13 @@ export function RewardWheelPanel() {
                 <h2 className="text-base font-bold text-foreground flex items-center gap-2">
                   Vòng quay may mắn
                   <span className="text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-500/10 px-2.5 py-0.5 rounded-full border border-purple-500/20">
-                    Cơ cấu 10 ô giải
+                    Cơ cấu 10 giải
                   </span>
                 </h2>
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-              Cơ cấu chuẩn gồm 10 ô: 9 giải Coin và 1 giải 30 ngày gói Tháng (tỉ lệ trúng 2%). Admin chỉnh được số Coin, số ngày, trọng số và thêm / tắt giải; Member xem trước giải và tỉ lệ trên app. Trúng giải ngày gói Tháng: đang có gói thì cộng thêm số ngày, chưa có thì kích hoạt gói không tự gia hạn.
+              Cơ cấu chuẩn gồm 10 giải: 9 giải Coin và 1 giải 30 ngày gói Tháng (tỉ lệ trúng 2%). Admin chỉnh được số Coin, số ngày, mức ưu tiên và thêm / tắt giải; Member xem trước giải và tỉ lệ trên app. Trúng giải ngày gói Tháng: đang có gói thì cộng thêm số ngày, chưa có thì được tặng gói (không tự gia hạn).
             </p>
           </div>
 
@@ -63,7 +63,7 @@ export function RewardWheelPanel() {
               Thêm giải
             </Button>
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-xl bg-muted text-muted-foreground border border-border">
-              {activePrizes.length}/10 ô đang mở
+              {activePrizes.length}/10 giải đang bật
             </span>
           </div>
         </div>
@@ -71,8 +71,8 @@ export function RewardWheelPanel() {
         {/* ── Summary Badges ── */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
           <div className="p-3 rounded-2xl bg-muted/60 border border-border">
-            <p className="text-[11px] font-semibold text-muted-foreground">Tổng ô giải thưởng</p>
-            <p className="text-base font-black text-foreground mt-0.5">{list.length} ô</p>
+            <p className="text-[11px] font-semibold text-muted-foreground">Tổng số giải</p>
+            <p className="text-base font-black text-foreground mt-0.5">{list.length} giải</p>
           </div>
           <div className="p-3 rounded-2xl bg-amber-500/5 border border-amber-500/10">
             <p className="text-[11px] font-semibold text-amber-700 dark:text-amber-400">Giải Coin thưởng</p>
@@ -83,7 +83,7 @@ export function RewardWheelPanel() {
             <p className="text-base font-black text-purple-600 dark:text-purple-400 mt-0.5">{planPrizesCount} giải ({planChance.toFixed(1)}%)</p>
           </div>
           <div className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
-            <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">Tổng trọng số kích hoạt</p>
+            <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">Tổng mức ưu tiên (giải đang bật)</p>
             <p className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-0.5 tabular-nums">{totalWeight}</p>
           </div>
         </div>
@@ -113,9 +113,9 @@ export function RewardWheelPanel() {
             <thead>
               <tr className="bg-muted/60 border-b border-border text-muted-foreground text-[11px] font-bold">
                 <th className="py-3.5 px-6">Vị trí & Tên giải</th>
-                <th className="py-3.5 px-4">Mã nhận diện</th>
+                <th className="py-3.5 px-4">Mã giải</th>
                 <th className="py-3.5 px-4">Phần thưởng</th>
-                <th className="py-3.5 px-4 text-center">Tỉ lệ xuất hiện</th>
+                <th className="py-3.5 px-4 text-center">Mức ưu tiên</th>
                 <th className="py-3.5 px-6">Tỉ lệ trúng thưởng</th>
                 <th className="py-3.5 px-4 text-center">Trạng thái</th>
                 <th className="py-3.5 px-6 text-right">Thao tác</th>
@@ -138,7 +138,7 @@ export function RewardWheelPanel() {
                         <div>
                           <p className="font-bold text-foreground text-xs">{prize.name}</p>
                           <p className="text-[11px] text-muted-foreground mt-0.5">
-                            {isVip ? 'Ô giải đặc biệt' : 'Ô thưởng thông thường'}
+                            {isVip ? 'Giải đặc biệt' : 'Giải thường'}
                           </p>
                         </div>
                       </div>
@@ -153,7 +153,7 @@ export function RewardWheelPanel() {
                     <td className="py-4 px-4">
                       {isVip ? (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-purple-300 font-bold text-xs">
-                          {prize.planDays} ngày VIP Tháng
+                          {prize.planDays} ngày gói Tháng
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 font-bold tabular-nums text-xs">

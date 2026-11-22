@@ -64,7 +64,7 @@ export function RewardRuleModal({
     <Modal open onClose={onClose} title={rule ? `Sửa ngày ${rule.streakDay}` : 'Thêm ngày điểm danh'}>
       <form onSubmit={submit} className="space-y-4">
         {!rule && (
-          <FormField label="Mã định danh (không đổi sau khi tạo)">
+          <FormField label="Mã (không trùng, không đổi sau khi tạo)">
             <input
               value={form.code}
               onChange={(e) => set({ code: e.target.value })}
@@ -76,7 +76,7 @@ export function RewardRuleModal({
             {codeTaken && <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">Mã này đã được dùng cho một ngày khác.</p>}
           </FormField>
         )}
-        <FormField label="Tên mốc điểm danh">
+        <FormField label="Tên ngày điểm danh">
           <input
             value={form.name}
             onChange={(e) => set({ name: e.target.value })}
@@ -122,7 +122,7 @@ export function RewardRuleModal({
         <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 text-xs text-sky-800 dark:text-sky-300 flex items-start gap-2">
           <span>
             {day === LADDER_LENGTH
-              ? 'Ngày 7 là mốc cuối chuỗi: hệ thống tự tặng thêm 1 lượt quay.'
+              ? 'Ngày 7 là ngày cuối chuỗi: hệ thống tự tặng thêm 1 lượt quay.'
               : 'Lượt quay chỉ được tặng khi Member điểm danh đủ 7 ngày liên tục.'}
           </span>
         </div>
@@ -134,7 +134,7 @@ export function RewardRuleModal({
               onChange={(e) => set({ isActive: e.target.checked })}
               className="w-4 h-4 accent-sky-600 rounded"
             />
-            {rule.isActive ? 'Đang dùng (bỏ chọn để tắt ngày này)' : 'Kích hoạt lại ngày này'}
+            {rule.isActive ? 'Đang dùng (bỏ chọn để tắt ngày này)' : 'Bật lại ngày này'}
           </label>
         )}
         <div className="flex justify-end gap-2.5 pt-2 border-t border-border">

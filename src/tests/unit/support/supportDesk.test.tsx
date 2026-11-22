@@ -58,11 +58,11 @@ describe('Support queue', () => {
     const queue = screen.getByRole('region', { name: 'Hàng chờ hỗ trợ' });
     await userEvent.click(await within(queue).findByText('Nguyễn An'));
 
-    const detail = screen.getByRole('region', { name: 'Chi tiết case' });
+    const detail = screen.getByRole('region', { name: 'Chi tiết yêu cầu' });
     expect(await within(detail).findByText('Tôi bị trừ Coin hai lần')).toBeInTheDocument();
     expect(within(detail).getByText(/Member bị trừ 10 Coin hai lần/)).toBeInTheDocument();
 
-    await userEvent.click(within(detail).getByRole('button', { name: 'Nhận case' }));
+    await userEvent.click(within(detail).getByRole('button', { name: 'Nhận yêu cầu' }));
     await waitFor(() => expect(calls.some((c) => c.path === '/admin/support/conversations/c1/claim' && c.method === 'POST')).toBe(true));
 
     await userEvent.click(within(detail).getByRole('button', { name: /Gợi ý bằng AI/ }));
@@ -96,8 +96,8 @@ describe('Support queue', () => {
     await userEvent.click(within(queue).getByRole('button', { name: 'Của tôi' }));
     await userEvent.click(await within(queue).findByText('Nguyễn An'));
 
-    const detail = screen.getByRole('region', { name: 'Chi tiết case' });
-    expect(within(detail).queryByRole('button', { name: /Đóng case/ })).not.toBeInTheDocument();
+    const detail = screen.getByRole('region', { name: 'Chi tiết yêu cầu' });
+    expect(within(detail).queryByRole('button', { name: /Đóng yêu cầu/ })).not.toBeInTheDocument();
     await userEvent.click(await within(detail).findByRole('button', { name: 'Đã giải quyết xong' }));
     await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Huỷ' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
@@ -120,7 +120,7 @@ describe('Support queue', () => {
     const queue = screen.getByRole('region', { name: 'Hàng chờ hỗ trợ' });
     await userEvent.click(within(queue).getByRole('button', { name: 'Của tôi' }));
     await userEvent.click(await within(queue).findByText('Nguyễn An'));
-    const detail = screen.getByRole('region', { name: 'Chi tiết case' });
+    const detail = screen.getByRole('region', { name: 'Chi tiết yêu cầu' });
     await userEvent.click(await within(detail).findByRole('button', { name: 'Trả về hàng chờ' }));
     await waitFor(() => expect(calls.some((c) => c.path === '/admin/support/conversations/c1/release' && c.method === 'POST')).toBe(true));
   });
@@ -137,11 +137,11 @@ describe('Support queue', () => {
     });
     render(<StaffSupportWorkspace isAdmin />);
 
-    const detail = screen.getByRole('region', { name: 'Chi tiết case' });
+    const detail = screen.getByRole('region', { name: 'Chi tiết yêu cầu' });
     await userEvent.click(await within(detail).findByRole('button', { name: 'Giao cho người khác' }));
     const dialog = await screen.findByRole('dialog');
     await userEvent.selectOptions(await within(dialog).findByRole('combobox'), 's1');
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Giao case' }));
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Giao yêu cầu' }));
 
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/admin/support/conversations/c1/assign')!;

@@ -116,7 +116,7 @@ export function RewardLadderPanel() {
           <table className="w-full text-xs">
             <thead className="text-[11px] text-muted-foreground bg-muted/60 border-b border-border text-left">
               <tr>
-                <th className="py-3 px-6 font-bold w-24">Ngày chuỗi</th>
+                <th className="py-3 px-6 font-bold w-24">Ngày trong chuỗi</th>
                 <th className="py-3 px-4 font-bold">Tên hiển thị</th>
                 <th className="py-3 px-4 font-bold text-right">Coin thưởng</th>
                 <th className="py-3 px-4 font-bold text-center">Quà tặng kèm</th>

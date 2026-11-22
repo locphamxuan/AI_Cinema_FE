@@ -70,8 +70,8 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
     desc: 'Creator chính soạn kịch bản của dự án được giao và nộp cho Reviewer duyệt.',
   },
   'script:approve': {
-    title: 'Duyệt kịch bản Final',
-    desc: 'Đồng ý Kịch bản Final (hệ thống gửi hợp đồng mẫu cho Studio) hoặc yêu cầu Creator sửa.',
+    title: 'Duyệt kịch bản bản cuối',
+    desc: 'Đồng ý Kịch bản bản cuối (hệ thống gửi hợp đồng mẫu cho Studio) hoặc yêu cầu Creator sửa.',
   },
   'studio:portal': {
     title: 'Cổng Studio (Studio Web)',
@@ -98,12 +98,12 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
     desc: 'Xem danh sách và tiến độ sản xuất tất cả các dự án phim trên hệ thống (không chỉ dự án của mình).',
   },
   'project:suggest': {
-    title: 'Gửi đề xuất thay đổi dự án (BR-55)',
+    title: 'Gửi đề xuất thay đổi dự án',
     desc: 'Gửi yêu cầu thay đổi tiến độ, nhân sự hoặc ngân sách kèm lý do và minh chứng rõ ràng.',
   },
   'project:change.review': {
-    title: 'Phê duyệt đề xuất thay đổi dự án (BR-55)',
-    desc: 'Thẩm định, chấp thuận hoặc từ chối các đề xuất thay đổi gửi từ Reviewer và Creator.',
+    title: 'Phê duyệt đề xuất thay đổi dự án',
+    desc: 'Xem xét, chấp thuận hoặc từ chối các đề xuất thay đổi gửi từ Reviewer và Creator.',
   },
 
   // Studio
@@ -121,13 +121,13 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Review
   'content:review': {
     title: 'Kiểm duyệt nội dung & gắn nhãn AI',
-    desc: 'Thẩm định nội dung tập phim, kiểm tra tuân thủ pháp lý và gắn nhãn AI.',
+    desc: 'Xem xét nội dung tập phim, kiểm tra tuân thủ pháp lý và gắn nhãn AI.',
   },
 
   // Publishing
   'episode:publish': {
     title: 'Xuất bản & gỡ tập phim',
-    desc: 'Xem phim Final Reviewer đã xác nhận, phát hành ngay hoặc hẹn giờ, trả lại qua Reviewer hoặc gỡ tập.',
+    desc: 'Xem phim bản cuối Reviewer đã xác nhận, phát hành ngay hoặc hẹn giờ, trả lại qua Reviewer hoặc gỡ tập.',
   },
   'price-alert:manage': {
     title: 'Theo dõi & Cảnh báo giá tập phim',
@@ -191,14 +191,14 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   // Coin & Reward Rules
   'coin.wallet.read': {
     title: 'Tra cứu ví Coin thành viên',
-    desc: 'Xem số dư ví Coin chính và các lô Coin thưởng khuyến mãi của bất kỳ người dùng nào.',
+    desc: 'Xem số dư ví Coin chính và các khoản Coin thưởng khuyến mãi của bất kỳ người dùng nào.',
   },
   'coin.adjust': {
     title: 'Điều chỉnh số dư Coin thủ công',
-    desc: 'Cộng hoặc trừ Coin vào ví người dùng kèm lý do đối soát và mã chứng từ.',
+    desc: 'Cộng hoặc trừ Coin vào ví người dùng kèm lý do đối chiếu và mã chứng từ.',
   },
   'coin.transaction.read': {
-    title: 'Tra cứu sổ cái giao dịch Coin',
+    title: 'Tra cứu lịch sử giao dịch Coin',
     desc: 'Xem toàn bộ lịch sử nạp, tiêu, thưởng và hoàn trả Coin trên toàn hệ thống.',
   },
   'reward.rule.manage': {
@@ -214,7 +214,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
 
   // Administration
   'member:ops.read': {
-    title: 'Xem thông tin khán giả (Chỉ đọc, BR-20)',
+    title: 'Xem thông tin khán giả (chỉ xem)',
     desc: 'Tra cứu hồ sơ tài khoản khán giả phục vụ hỗ trợ khách hàng và tra cứu sự cố.',
   },
   'user:read': {
@@ -227,7 +227,7 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
   },
   'role:manage': {
     title: 'Phân quyền hạn theo từng vai trò',
-    desc: 'Thiết lập và phân bổ ma trận quyền hạn cho từng nhóm người dùng trong hệ thống.',
+    desc: 'Thiết lập bảng phân quyền cho từng nhóm người dùng trong hệ thống.',
   },
   'platform:settings.manage': {
     title: 'Cài đặt chính sách nền tảng',

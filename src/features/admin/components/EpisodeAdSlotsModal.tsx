@@ -49,7 +49,7 @@ function SlotsForm({ initial, adOptions, onClose }: { initial: EpisodeAdSlots; a
   const [error, setError] = useState<string | null>(null);
   const duration = initial.durationSeconds;
   const problem = adSlotProblem(slots, duration);
-  const options = [{ value: RANDOM_AD, label: 'Ngẫu nhiên theo trọng số' }, ...adOptions];
+  const options = [{ value: RANDOM_AD, label: 'Ngẫu nhiên theo mức ưu tiên' }, ...adOptions];
 
   const edit = (index: number, patch: Partial<EpisodeAdSlotInput>) =>
     setSlots((all) => all.map((s, i) => (i === index ? { ...s, ...patch } : s)));

@@ -12,16 +12,16 @@ export function CaseMilestones({ c }: { c: SupportCase }) {
   // Read once per opened case: the spans are minutes, not seconds.
   const [now] = useState(() => Date.now());
   const steps: [string, string | null][] = [
-    ['Mở case', c.createdAt],
+    ['Gửi yêu cầu', c.createdAt],
     ['Chuyển nhân viên', c.escalatedAt],
-    ['Nhận case', c.claimedAt],
+    ['Nhận yêu cầu', c.claimedAt],
     ['Trả lời đầu tiên', c.firstStaffReplyAt ?? null],
     ['Báo đã giải quyết', c.resolvedAt],
     ['Kết thúc', c.closedAt],
   ];
   return (
     <div className="space-y-2">
-      <ol aria-label="Mốc của case" className="grid grid-cols-3 gap-x-3 gap-y-1.5 text-[11px] sm:grid-cols-6">
+      <ol aria-label="Các mốc xử lý" className="grid grid-cols-3 gap-x-3 gap-y-1.5 text-[11px] sm:grid-cols-6">
         {steps.map(([label, at]) => (
           <li key={label} className={at ? 'text-foreground' : 'text-muted-foreground/60'}>
             <span className={`mb-1 block h-1 rounded-full ${at ? 'bg-primary' : 'bg-muted'}`} aria-hidden="true" />
@@ -45,9 +45,9 @@ function NextStep({ c, now }: { c: SupportCase; now: number }) {
   const note = c.resolutionNote ? `Ghi chú gửi Member: ${c.resolutionNote}` : null;
   switch (c.status) {
     case 'AI_HANDLING':
-      return line('bg-muted/60', `Trợ lý AI đang trả lời (${c.aiTurns} lượt). Case chỉ vào hàng chờ khi AI hoặc Member yêu cầu nhân viên.`);
+      return line('bg-muted/60', `Trợ lý AI đang trả lời (${c.aiTurns} lượt). Yêu cầu chỉ vào hàng chờ khi AI hoặc Member yêu cầu nhân viên.`);
     case 'WAITING_FOR_STAFF':
-      return line('bg-warning/10 text-foreground', `Chưa ai nhận, Member đã chờ ${formatSpan(now - new Date(c.escalatedAt ?? c.createdAt).getTime())}. Bấm "Nhận case" để trả lời.`);
+      return line('bg-warning/10 text-foreground', `Chưa ai nhận, Member đã chờ ${formatSpan(now - new Date(c.escalatedAt ?? c.createdAt).getTime())}. Bấm "Nhận yêu cầu" để trả lời.`);
     case 'STAFF_HANDLING':
       return awaitsStaffReply(c)
         ? line('bg-warning/10 text-foreground', `Member nhắn lúc ${formatDateTime(c.lastMemberMessageAt)} và đang chờ nhân viên trả lời.`)
@@ -56,7 +56,7 @@ function NextStep({ c, now }: { c: SupportCase; now: number }) {
       const at = autoCloseAt(c);
       return line(
         'bg-success/10 text-foreground',
-        `Đang chờ Member xác nhận. Member chọn "Vẫn cần hỗ trợ" thì case quay lại hàng chờ; không phản hồi thì tự đóng${at ? ` lúc ${formatDateTime(at.toISOString())}` : ''}.`,
+        `Đang chờ Member xác nhận. Member chọn "Vẫn cần hỗ trợ" thì yêu cầu quay lại hàng chờ; không phản hồi thì tự đóng${at ? ` lúc ${formatDateTime(at.toISOString())}` : ''}.`,
         note,
       );
     }

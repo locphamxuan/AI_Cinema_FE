@@ -33,7 +33,7 @@ describe('RewardWheelPanel: Admin configures the wheel members preview', () => {
     await userEvent.selectOptions(within(dialog).getByLabelText('Loại giải'), 'PLAN_DAYS');
     await userEvent.type(within(dialog).getByLabelText('Tên hiển thị'), '30 ngày gói Tháng');
     await userEvent.type(within(dialog).getByLabelText(/Số ngày gói Tháng/), '30');
-    await userEvent.type(within(dialog).getByLabelText(/Trọng số/), '2');
+    await userEvent.type(within(dialog).getByLabelText(/Mức ưu tiên/), '2');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Thêm giải' }));
 
     await waitFor(() =>
@@ -60,7 +60,7 @@ describe('RewardWheelPanel: Admin configures the wheel members preview', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Sửa 30 ngày' }));
     const dialog = screen.getByRole('dialog');
-    const weight = within(dialog).getByLabelText(/Trọng số/);
+    const weight = within(dialog).getByLabelText(/Mức ưu tiên/);
     await userEvent.clear(weight);
     await userEvent.type(weight, '5');
     await userEvent.click(within(dialog).getByLabelText('Bật lại trên vòng quay'));

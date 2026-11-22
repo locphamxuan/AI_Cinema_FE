@@ -53,7 +53,7 @@ export function StaffCaseChat({
     await Promise.all([detail.reload(), onChanged()]);
   };
   const act = async (call: 'claim' | 'release') =>
-    after(await run(() => staffSupportService[call](c.id), call === 'claim' ? 'Đã nhận case' : 'Đã trả case về hàng chờ'));
+    after(await run(() => staffSupportService[call](c.id), call === 'claim' ? 'Đã nhận yêu cầu' : 'Đã trả yêu cầu về hàng chờ'));
   const resolve = async (note: string) => {
     setResolving(false);
     await after(await run(() => staffSupportService.resolve(c.id, note), 'Đã báo Member: chờ Member xác nhận'));
@@ -82,7 +82,7 @@ export function StaffCaseChat({
           </div>
         )}
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div role="tablist" aria-label="Nội dung case" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 text-xs">
+          <div role="tablist" aria-label="Nội dung yêu cầu" className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1 text-xs">
             {(['chat', 'member'] as View[]).map((v) => (
               <button key={v} type="button" role="tab" aria-selected={view === v} onClick={() => setView(v)} className={`cursor-pointer rounded-md px-3 py-1 ${view === v ? 'bg-background font-medium shadow-sm' : 'text-muted-foreground'}`}>
                 {v === 'chat' ? 'Hội thoại' : 'Bối cảnh Member'}
@@ -90,7 +90,7 @@ export function StaffCaseChat({
             ))}
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {allowed.claim && <Button size="sm" disabled={busy} onClick={() => void act('claim')}>Nhận case</Button>}
+            {allowed.claim && <Button size="sm" disabled={busy} onClick={() => void act('claim')}>Nhận yêu cầu</Button>}
             {allowed.resolve && <Button size="sm" variant="success" disabled={busy} onClick={() => setResolving(true)}>Đã giải quyết xong</Button>}
             {allowed.assign && <Button size="sm" variant="ghost" disabled={busy} onClick={() => setAssigning(true)}>Giao cho người khác</Button>}
             {allowed.release && <Button size="sm" variant="ghost" disabled={busy} onClick={() => void act('release')}>Trả về hàng chờ</Button>}
@@ -105,14 +105,14 @@ export function StaffCaseChat({
       {view === 'chat' && allowed.reply && <StaffCaseComposer caseId={c.id} canSuggest={allowed.suggest} onSent={() => after(true)} />}
       {view === 'chat' && !allowed.reply && c.status === 'STAFF_HANDLING' && (
         <p className="border-t border-border px-4 py-3 text-xs text-muted-foreground">
-          Case đang do {c.assignedAgentName ?? 'nhân viên khác'} xử lý; chỉ người nhận hoặc Admin trả lời được.
+          Yêu cầu đang do {c.assignedAgentName ?? 'nhân viên khác'} xử lý; chỉ người nhận hoặc Admin trả lời được.
         </p>
       )}
 
       <TextPromptModal
         open={resolving}
         title="Đã giải quyết xong yêu cầu?"
-        subtitle="Member nhận thông báo và chọn Đã giải quyết (case đóng) hoặc Vẫn cần hỗ trợ (case quay lại hàng chờ). Không phản hồi thì case tự đóng."
+        subtitle="Member nhận thông báo và chọn Đã giải quyết (yêu cầu đóng) hoặc Vẫn cần hỗ trợ (yêu cầu quay lại hàng chờ). Không phản hồi thì yêu cầu tự đóng."
         label="Ghi chú cách xử lý gửi Member (tuỳ chọn)"
         confirmLabel="Đã giải quyết xong"
         tone="success"

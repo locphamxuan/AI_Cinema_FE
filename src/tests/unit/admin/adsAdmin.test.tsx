@@ -32,7 +32,7 @@ describe('Admin ads (MF-3)', () => {
     expect(adInputProblem(input({ title: '  ' }))).toMatch(/tên/);
     expect(adInputProblem(input({ mediaUrl: 'ad.mp4' }))).toMatch(/Link video/);
     expect(adInputProblem(input({ clickUrl: 'shop' }))).toMatch(/Link khi bấm/);
-    expect(adInputProblem(input({ weight: 0 }))).toMatch(/Trọng số/);
+    expect(adInputProblem(input({ weight: 0 }))).toMatch(/Mức ưu tiên/);
   });
 
   it('tells whether the draw can pick an ad: active until the Admin pauses it', () => {

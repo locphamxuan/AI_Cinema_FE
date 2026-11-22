@@ -135,7 +135,7 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
           />
         </FormField>
 
-        <FormField label="Nội dung và yêu cầu (JSON)">
+        <FormField label="Nội dung chi tiết (dạng JSON, có thể để trống)">
           <textarea
             value={contentText}
             onChange={(e) => setContentText(e.target.value)}

@@ -74,7 +74,7 @@ export function PoliciesPanel() {
   return (
     <Panel
       title="Chính sách"
-      description="Các văn bản mà nhãn AI và kiểm tra tuân thủ của mỗi tập phải theo. Admin có thể tạo, sửa, bật/tắt chính sách; khi thay đổi, AI labeling và kiểm tra tuân thủ trên toàn nền tảng sẽ tuân theo chính sách đang áp dụng."
+      description="Các văn bản mà nhãn AI và kiểm tra tuân thủ của mỗi tập phải theo. Admin có thể tạo, sửa, bật/tắt chính sách; khi thay đổi, việc gắn nhãn AI và kiểm tra tuân thủ trên toàn nền tảng sẽ tuân theo chính sách đang áp dụng."
       actions={
         <Button size="sm" onClick={() => setEditing('new')}>
           Thêm chính sách

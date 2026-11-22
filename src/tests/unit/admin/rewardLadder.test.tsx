@@ -33,7 +33,7 @@ describe('RewardLadderPanel: "Thêm ngày" edge cases', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: /Thêm ngày/ }));
     expect(screen.getByDisplayValue('day_1_2')).toBeInTheDocument();
-    await userEvent.type(screen.getByLabelText('Tên mốc điểm danh'), 'Ngày đầu');
+    await userEvent.type(screen.getByLabelText('Tên ngày điểm danh'), 'Ngày đầu');
     await userEvent.type(screen.getByLabelText('Số Coin thưởng'), '5');
     await userEvent.click(screen.getByRole('button', { name: 'Lưu cấu hình' }));
 
@@ -46,7 +46,7 @@ describe('RewardLadderPanel: "Thêm ngày" edge cases', () => {
     render(<RewardLadderPanel />);
 
     await userEvent.click(await screen.findByRole('button', { name: /Thêm ngày/ }));
-    const code = screen.getByLabelText(/Mã định danh/);
+    const code = screen.getByLabelText(/Mã \(không trùng/);
     await userEvent.clear(code);
     await userEvent.type(code, 'DAY_1');
     expect(screen.getByText('Mã này đã được dùng cho một ngày khác.')).toBeInTheDocument();
@@ -60,7 +60,7 @@ describe('RewardLadderPanel: "Thêm ngày" edge cases', () => {
 
     const edits = await screen.findAllByRole('button', { name: 'Sửa ngày 1' });
     await userEvent.click(edits[1]);
-    await userEvent.click(screen.getByLabelText('Kích hoạt lại ngày này'));
+    await userEvent.click(screen.getByLabelText('Bật lại ngày này'));
     expect(screen.getByText(/Ngày 1 đã có cấu hình đang dùng/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Lưu cấu hình' })).toBeDisabled();
   });

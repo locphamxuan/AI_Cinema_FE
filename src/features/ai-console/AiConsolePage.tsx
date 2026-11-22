@@ -41,11 +41,11 @@ export function AiConsolePage() {
   return (
     <main className="mx-auto w-full max-w-7xl space-y-5 px-6 py-6 lg:px-8">
       <PageHeader
-        title="Chatbox AI"
+        title="Trợ lý AI"
         description="Quản lý nội dung AI dùng để trả lời Member, hỏi thử AI trước khi Member hỏi, và đánh giá câu trả lời AI đã gửi."
       />
       <AiHealthCard />
-      <nav aria-label="Chatbox AI" className="grid max-w-xl grid-cols-3 gap-1 rounded-lg bg-muted p-1">
+      <nav aria-label="Trợ lý AI" className="grid max-w-xl grid-cols-3 gap-1 rounded-lg bg-muted p-1">
         {TABS.map((t) => (
           <button
             key={t.key}

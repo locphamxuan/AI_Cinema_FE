@@ -44,7 +44,7 @@ describe('AI health card', () => {
   it('warns when articles failed to index', async () => {
     routeFetch({ '/admin/support/ai/health': { mode: 'live', chatModel: 'm', chatConfigured: true, embeddingModel: 'e', embeddingConfigured: true, indexedChunks: 40, failedArticles: 2, pendingArticles: 0, lastIndexedAt: null } });
     render(<AiHealthCard />);
-    expect(await screen.findByRole('alert')).toHaveTextContent('2 bài xuất bản bị lỗi lập chỉ mục');
+    expect(await screen.findByRole('alert')).toHaveTextContent('2 bài đã xuất bản bị lỗi cập nhật cho AI');
   });
 });
 
@@ -55,7 +55,7 @@ describe('Knowledge tab', () => {
 
     const row = (await screen.findByText('Huỷ gói Tháng')).closest('tr')!;
     expect(within(row).getByText('Đang dùng')).toBeInTheDocument();
-    expect(within(row).getByText('Đã lập chỉ mục')).toBeInTheDocument();
+    expect(within(row).getByText('Đã cập nhật')).toBeInTheDocument();
 
     await userEvent.click(within(row).getByRole('button', { name: 'Xoá' }));
     const dialog = screen.getByRole('dialog');
@@ -71,7 +71,7 @@ describe('Knowledge tab', () => {
     render(<KnowledgeTab focus={null} />);
     const row = (await screen.findByText('Huỷ gói Tháng')).closest('tr')!;
 
-    await userEvent.click(within(row).getByRole('button', { name: 'Lập lại chỉ mục' }));
+    await userEvent.click(within(row).getByRole('button', { name: 'Cập nhật lại cho AI' }));
     await userEvent.click(within(row).getByRole('button', { name: 'Lưu trữ' }));
     await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Lưu trữ' }));
 
@@ -84,7 +84,7 @@ describe('Knowledge tab', () => {
     render(<KnowledgeTab focus={{ kind: 'new', draft: { title: 'Đổi email đăng nhập', contentMarkdown: '## Đổi email đăng nhập\n\nBạn vào Tài khoản.' } }} />);
 
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByLabelText('Slug (định danh duy nhất)')).toHaveValue('doi-email-dang-nhap');
+    expect(within(dialog).getByLabelText('Mã bài viết (không trùng)')).toHaveValue('doi-email-dang-nhap');
     await userEvent.click(within(dialog).getByLabelText('Xuất bản cho AI dùng'));
     await userEvent.click(within(dialog).getByRole('button', { name: 'Lưu bài' }));
 
