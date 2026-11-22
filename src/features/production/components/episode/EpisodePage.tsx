@@ -116,7 +116,13 @@ export function EpisodePage() {
               </p>
             </Panel>
           )}
-          <FinalFilmPanel episode={episode} canConfirm={caps.review && delivering} canSendBack={caps.publish} onChanged={refreshAll} />
+          <FinalFilmPanel
+            episode={episode}
+            canConfirm={caps.review && delivering}
+            canSendBack={caps.publish}
+            poster={{ set: !!project.data.posterUrl, fromStudio: !!project.data.studioPoster }}
+            onChanged={refreshAll}
+          />
           <PublishPanel
             episode={episode}
             projectStatus={project.data.status}

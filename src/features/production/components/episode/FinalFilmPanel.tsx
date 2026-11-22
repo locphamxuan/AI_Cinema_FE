@@ -27,6 +27,7 @@ export function FinalFilmPanel({
   episode,
   canConfirm,
   canSendBack,
+  poster,
   onChanged,
 }: {
   episode: Episode;
@@ -34,6 +35,8 @@ export function FinalFilmPanel({
   canConfirm: boolean;
   /** The Admin (episode:publish). */
   canSendBack: boolean;
+  /** Whether the movie has its poster, and whether the studio sent one: the Reviewer checks it before confirming. */
+  poster?: { set: boolean; fromStudio: boolean };
   onChanged: () => Promise<void>;
 }) {
   const [sendingBack, setSendingBack] = useState(false);
@@ -65,6 +68,14 @@ export function FinalFilmPanel({
             {canConfirm && ' - yêu cầu Studio sửa ở phiếu duyệt (Yêu cầu sửa), rồi xác nhận lại bản mới.'}
           </p>
         )}
+        {confirmable && poster && !poster.set && (
+          <p role="note" className="rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-2.5 text-amber-800 dark:text-amber-300">
+            Phim chưa có ảnh bìa.{' '}
+            {poster.fromStudio
+              ? 'Studio đã nộp poster: tải về ở tab Tổng quan, kiểm tra rồi đặt làm ảnh bìa trước khi xác nhận.'
+              : 'Studio chưa nộp poster: nhắc Studio nộp hoặc tự tải ảnh bìa lên ở tab Tổng quan trước khi xác nhận.'}
+          </p>
+        )}
         <div className="flex flex-wrap gap-2">
           {confirmable && (
             <Button size="sm" variant="success" disabled={busy} onClick={() => setConfirming(true)}>
@@ -85,6 +96,7 @@ export function FinalFilmPanel({
         details={[
           ['Tập', `Tập ${episode.episodeNumber}: ${episode.title}`],
           ['Trạng thái mới', 'Phim bản cuối chờ phát hành'],
+          ...(poster ? [['Ảnh bìa', poster.set ? 'Đã có' : 'Chưa có'] as [string, string]] : []),
         ]}
         consequence="Admin được báo để đặt giá Coin, cấu hình tập miễn phí và phát hành."
         confirmLabel="Xác nhận Phim bản cuối"
