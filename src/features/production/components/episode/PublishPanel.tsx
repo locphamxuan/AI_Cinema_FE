@@ -89,7 +89,7 @@ export function PublishPanel({
   return (
     <Panel
       title="Định giá & phát hành"
-      description="Admin đặt giá Coin và quyền xem miễn phí; Admin phát hành Phim Final sau khi Reviewer xác nhận và tập có giá Coin."
+      description="Admin đặt giá Coin và quyền xem miễn phí; Admin phát hành Phim bản cuối sau khi Reviewer xác nhận và tập có giá Coin."
     >
       <div className="space-y-5 text-xs">
         {canPrice ? (
@@ -112,7 +112,7 @@ export function PublishPanel({
                   onChange={(e) => saveFlags(e.target.checked, isFreeForMember)}
                   className="rounded border-input text-sky-600 focus:ring-sky-500"
                 />
-                <span className="text-secondary-foreground">Miễn phí cho khách (Guest)</span>
+                <span className="text-secondary-foreground">Miễn phí cho khách chưa đăng nhập</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
@@ -131,7 +131,7 @@ export function PublishPanel({
             <p>Giá Coin: {formatNumber(episode.coinPrice)}</p>
             {(episode.isFreeForGuest || episode.isFreeForMember) && (
               <p className="text-muted-foreground">
-                Miễn phí: {episode.isFreeForGuest ? 'Khách (Guest)' : ''}{episode.isFreeForGuest && episode.isFreeForMember ? ', ' : ''}{episode.isFreeForMember ? 'Thành viên (Member)' : ''}
+                Miễn phí: {episode.isFreeForGuest ? 'Khách chưa đăng nhập' : ''}{episode.isFreeForGuest && episode.isFreeForMember ? ', ' : ''}{episode.isFreeForMember ? 'Thành viên (Member)' : ''}
               </p>
             )}
           </div>
@@ -140,7 +140,7 @@ export function PublishPanel({
         {canRelease && (
           <div className="space-y-2 rounded-xl border border-sky-100 dark:border-white/10 p-3">
             {episode.coinPrice === null && <p className="text-amber-600">Admin cần đặt giá Coin trước khi phát hành.</p>}
-            {awaitingFinal && <p className="text-amber-600">Chờ Reviewer xác nhận Phim Final trước khi phát hành.</p>}
+            {awaitingFinal && <p className="text-amber-600">Chờ Reviewer xác nhận Phim bản cuối trước khi phát hành.</p>}
             <div className="flex flex-wrap items-end gap-2">
               <Button disabled={busy || releaseBlocked} onClick={() => publish(false)}>
                 Phát hành ngay

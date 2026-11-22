@@ -86,8 +86,8 @@ function CostRequestForm({ onSent }: { onSent: () => Promise<void> }) {
   return (
     <form onSubmit={submit} className="space-y-3 rounded-xl border border-border p-3">
       {live.length > 0 && (
-        <FormField label="Đợt bàn giao">
-          <select value={handoffId} onChange={(e) => setHandoffId(e.target.value)} className={fieldInputClass} aria-label="Đợt bàn giao">
+        <FormField label="Đợt giao việc">
+          <select value={handoffId} onChange={(e) => setHandoffId(e.target.value)} className={fieldInputClass} aria-label="Đợt giao việc">
             <option value="">Không gắn với Studio cụ thể</option>
             {live.map((h) => (
               <option key={h.id} value={h.id}>

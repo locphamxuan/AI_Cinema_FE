@@ -153,7 +153,7 @@ export function SeasonSection({
                       <td className="px-3 py-2.5">
                         <StatusPill {...EPISODE_STATUS[ep.status]} />
                         {ep.status === 'COMPLIANCE_PASSED' && ep.finalConfirmedAt && (
-                          <span className="block mt-0.5 text-[11px] text-emerald-600">Phim Final, chờ Admin phát hành</span>
+                          <span className="block mt-0.5 text-[11px] text-emerald-600">Phim bản cuối, chờ Admin phát hành</span>
                         )}
                       </td>
                       <td className="px-3 py-2.5 hidden md:table-cell text-muted-foreground">

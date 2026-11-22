@@ -23,11 +23,11 @@ function nextStep(script: ProjectScript | null): string {
     case 'SUBMITTED':
       return `Bản ${script.currentVersion} đang chờ Reviewer phụ trách duyệt.`;
     case 'REVIEWER_APPROVED':
-      return `Reviewer đã duyệt bản ${script.currentVersion}; chờ Admin duyệt Kịch bản Final.`;
+      return `Reviewer đã duyệt bản ${script.currentVersion}; chờ Admin duyệt Kịch bản bản cuối.`;
     case 'REVISION_REQUESTED':
       return 'Kịch bản cần sửa theo góp ý bên dưới; Creator chính nộp bản mới cho Reviewer.';
     case 'FINAL':
-      return `Kịch bản Final (bản ${script.currentVersion}) đã khoá; hệ thống đã gửi hợp đồng mẫu cho Studio.`;
+      return `Kịch bản bản cuối (bản ${script.currentVersion}) đã khoá; hệ thống đã gửi hợp đồng mẫu cho Studio.`;
   }
 }
 
@@ -40,7 +40,7 @@ function ReviewerActions({ onChanged }: { onChanged: (script: ProjectScript) => 
   const decide = async (approve: boolean, comment?: string) => {
     const next = await run(
       () => scriptService.review(project.id, approve, comment),
-      approve ? 'Đã duyệt, chuyển Admin xem Kịch bản Final' : 'Đã gửi yêu cầu sửa cho Creator',
+      approve ? 'Đã duyệt, chuyển Admin xem Kịch bản bản cuối' : 'Đã gửi yêu cầu sửa cho Creator',
     );
     if (next) {
       setSendingBack(false);

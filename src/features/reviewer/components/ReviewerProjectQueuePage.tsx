@@ -18,9 +18,9 @@ const CARD = 'rounded-3xl bg-card border border-border shadow-xs dark:shadow-xl'
 const FILTERS: { key: QueueFilter; label: string; active: string }[] = [
   { key: 'all', label: 'Tất cả', active: 'bg-primary text-primary-foreground' },
   { key: 'script', label: 'Kịch bản chờ duyệt', active: 'bg-amber-600 text-white' },
-  { key: 'master', label: 'Phim cần thẩm định', active: 'bg-primary text-primary-foreground' },
+  { key: 'master', label: 'Phim cần duyệt', active: 'bg-primary text-primary-foreground' },
   { key: 'revising', label: 'Studio đang sửa', active: 'bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900' },
-  { key: 'approved', label: 'Phim Final', active: 'bg-emerald-600 text-white' },
+  { key: 'approved', label: 'Phim bản cuối', active: 'bg-emerald-600 text-white' },
 ];
 
 const isFilter = (value: string | null): value is QueueFilter => FILTERS.some((f) => f.key === value);
@@ -93,12 +93,12 @@ export function ReviewerProjectQueuePage() {
     <div className="min-h-screen w-full bg-background text-foreground p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         <GreetingCard
-          label="Hồ sơ thẩm định viên"
+          label="Hồ sơ Reviewer"
           name={user?.name ?? 'Reviewer'}
-          summary="Dự án bạn phụ trách: kịch bản chờ thẩm định, bản phim Studio vừa nộp và những tập cần sửa."
+          summary="Dự án bạn phụ trách: kịch bản chờ duyệt, bản phim Studio vừa nộp và những tập cần sửa."
           action={
             <Link href="/reviewer" className="inline-flex h-10 items-center rounded-lg bg-white px-5 text-sm font-semibold text-[#121212] shadow-sm transition-colors hover:bg-white/90">
-              Mở bàn thẩm định
+              Mở trang duyệt phim
             </Link>
           }
         />
@@ -108,9 +108,9 @@ export function ReviewerProjectQueuePage() {
 
         {pipelines.data && (
           <>
-            <section aria-label="Thống kê thẩm định" className={`${CARD} p-5 sm:p-6 space-y-3`}>
+            <section aria-label="Thống kê duyệt" className={`${CARD} p-5 sm:p-6 space-y-3`}>
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                <h2 className="text-lg font-extrabold text-foreground tracking-tight">Tiến độ thẩm định</h2>
+                <h2 className="text-lg font-extrabold text-foreground tracking-tight">Tiến độ duyệt</h2>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl sm:text-4xl font-black text-foreground tracking-tight tabular-nums">{pending}</span>
                   <span className="text-xs sm:text-sm font-semibold text-muted-foreground">Hồ sơ đang chờ bạn xử lý</span>
@@ -142,7 +142,7 @@ export function ReviewerProjectQueuePage() {
               <div className="flex items-center gap-2">
                 <div className="relative w-full sm:w-64">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                  <input type="search" value={search} onChange={(e) => handleSearch(e.target.value)} placeholder="Tìm phim, Studio, Creator…" aria-label="Tìm trong hàng đợi" className="w-full pl-9 pr-3 py-2 rounded-2xl bg-card border border-border text-xs text-foreground focus:outline-none" />
+                  <input type="search" value={search} onChange={(e) => handleSearch(e.target.value)} placeholder="Tìm phim, Studio, Creator…" aria-label="Tìm trong danh sách chờ duyệt" className="w-full pl-9 pr-3 py-2 rounded-2xl bg-card border border-border text-xs text-foreground focus:outline-none" />
                 </div>
                 <div className="flex items-center rounded-2xl bg-card border border-border p-1">
                   {([['grid', LayoutGrid, 'Xem dạng thẻ'], ['table', List, 'Xem dạng bảng']] as const).map(([mode, Icon, label]) => (

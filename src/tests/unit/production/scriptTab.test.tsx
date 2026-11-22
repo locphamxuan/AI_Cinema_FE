@@ -99,7 +99,7 @@ describe('ScriptTab', () => {
     const reload = vi.fn(async () => undefined);
     render(withProject(assignedProject({ studio: null }), <ScriptTab />, reload));
 
-    const approve = await screen.findByRole('button', { name: 'Đồng ý Kịch bản Final' });
+    const approve = await screen.findByRole('button', { name: 'Đồng ý Kịch bản bản cuối' });
     expect(approve).toBeDisabled();
     await userEvent.selectOptions(screen.getByLabelText('Studio nhận hợp đồng'), await screen.findByRole('option', { name: 'Lumen Studio' }));
     await userEvent.type(screen.getByLabelText('Điều khoản hợp đồng (tuỳ chọn)'), 'Giao đúng hạn');
@@ -111,18 +111,18 @@ describe('ScriptTab', () => {
     await waitFor(() => expect(reload).toHaveBeenCalled());
     // The Final Script is locked.
     expect(await screen.findByText(/không sửa được nữa/)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Đồng ý Kịch bản Final' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Đồng ý Kịch bản bản cuối' })).not.toBeInTheDocument();
   });
 
   it('blocks the Final Script until the Reviewer planned every episode with a deadline', async () => {
-    expect(finalScriptBlockers(assignedProject({ seasons: [] }))).toEqual(['Reviewer chưa lên tập nào cho dự án']);
+    expect(finalScriptBlockers(assignedProject({ seasons: [] }))).toEqual(['Reviewer chưa tạo tập nào cho dự án']);
     const undated = assignedProject({ seasons: [{ episodes: [{ id: 'e3', episodeNumber: 3, title: 'Ba', deliveryDeadline: null }] }] as never });
     expect(finalScriptBlockers(undated)).toEqual(['tập 3 chưa có hạn giao Studio']);
 
     signIn('admin', 'admin-id');
     routeFetch({ '/projects/m1/script': script({ status: 'REVIEWER_APPROVED' }) });
     render(withProject(undated, <ScriptTab />));
-    expect(await screen.findByRole('button', { name: 'Đồng ý Kịch bản Final' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Đồng ý Kịch bản bản cuối' })).toBeDisabled();
     expect(screen.getByText(/tập 3 chưa có hạn giao Studio/)).toBeInTheDocument();
   });
 });

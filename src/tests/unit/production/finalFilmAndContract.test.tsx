@@ -28,21 +28,21 @@ describe('FinalFilmPanel', () => {
     const onChanged = vi.fn(async () => undefined);
     render(panel(episode(), { canConfirm: true }, onChanged));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Xác nhận Phim Final' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Xác nhận Phim bản cuối' }));
     expect(calls).toHaveLength(0);
-    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xác nhận Phim Final' }));
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xác nhận Phim bản cuối' }));
     await waitFor(() => expect(onChanged).toHaveBeenCalled());
     expect(calls.some((c) => c.path === '/episodes/e1/final-confirmation' && c.method === 'POST')).toBe(true);
   });
 
   it('offers confirmation once compliance passed even if Coin price is not set yet', () => {
     render(panel(episode({ coinPrice: null }), { canConfirm: true }));
-    expect(screen.getByRole('button', { name: 'Xác nhận Phim Final' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Xác nhận Phim bản cuối' })).toBeInTheDocument();
   });
 
   it('offers no confirmation before compliance checks pass', () => {
     render(panel(episode({ status: 'IN_REVIEW' }), { canConfirm: true }));
-    expect(screen.queryByRole('button', { name: 'Xác nhận Phim Final' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Xác nhận Phim bản cuối' })).not.toBeInTheDocument();
   });
 
   it('shows the Reviewer why the Admin sent the film back', () => {
@@ -74,7 +74,7 @@ describe('PublishPanel', () => {
     routeFetch({ '/episodes/e1/publications': [] });
     show(episode(), { canPublish: true });
     expect(await screen.findByRole('button', { name: 'Phát hành ngay' })).toBeDisabled();
-    expect(screen.getByText(/Chờ Reviewer xác nhận Phim Final/)).toBeInTheDocument();
+    expect(screen.getByText(/Chờ Reviewer xác nhận Phim bản cuối/)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Lưu giá' })).not.toBeInTheDocument();
   });
 

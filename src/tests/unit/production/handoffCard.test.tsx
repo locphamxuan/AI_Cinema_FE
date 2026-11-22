@@ -76,7 +76,7 @@ describe('HandoffCard - a studio change waiting for its contract', () => {
     expect(note).toHaveTextContent('Vòng 1: Đã gửi Studio, chờ Studio ký');
     expect(screen.getByText('Hợp đồng đang chờ Admin xử lý.')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /hợp đồng/i })).toBeNull();
-    expect(screen.getByText(/phí đề xuất trong brief: 45\.000\.000/)).toBeTruthy();
+    expect(screen.getByText(/phí đề xuất trong bản yêu cầu: 45\.000\.000/)).toBeTruthy();
   });
 
   it('sends the Admin to sign once the new studio signed its quote', () => {

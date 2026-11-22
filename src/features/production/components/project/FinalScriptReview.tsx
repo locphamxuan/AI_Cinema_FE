@@ -17,7 +17,7 @@ import type { Studio } from '@/types/production';
 /** What still blocks the Final Script on the backend: episodes planned with a delivery deadline (BE script.service). */
 export function finalScriptBlockers(project: Pick<ProjectDetail, 'seasons'>): string[] {
   const episodes = project.seasons.flatMap((s) => s.episodes);
-  if (episodes.length === 0) return ['Reviewer chưa lên tập nào cho dự án'];
+  if (episodes.length === 0) return ['Reviewer chưa tạo tập nào cho dự án'];
   const undated = episodes.filter((e) => !e.deliveryDeadline).map((e) => e.episodeNumber);
   return undated.length ? [`tập ${undated.join(', ')} chưa có hạn giao Studio`] : [];
 }
@@ -46,7 +46,7 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
     const targetStudioId = studioId && studioId !== project.studio?.id ? studioId : project.studio ? undefined : studioId;
     const next = await run(
       () => scriptService.finalReview(project.id, { approve: true, studioId: targetStudioId, terms }),
-      'Đã duyệt Kịch bản Final, hợp đồng mẫu đã gửi Studio',
+      'Đã duyệt Kịch bản bản cuối, hợp đồng mẫu đã gửi Studio',
     );
     if (next) onDecided(next);
   };
@@ -60,8 +60,8 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
 
   return (
     <Panel
-      title="Duyệt kịch bản Final"
-      description="Đồng ý: kịch bản khoá lại và hệ thống tự gửi Studio hợp đồng mẫu in sẵn ngân sách trần. Không đồng ý: Creator sửa rồi nộp lại cho Reviewer."
+      title="Duyệt kịch bản bản cuối"
+      description="Đồng ý: kịch bản khoá lại và hệ thống tự gửi Studio hợp đồng mẫu in sẵn ngân sách tối đa. Không đồng ý: Creator sửa rồi nộp lại cho Reviewer."
     >
       <form onSubmit={approve} className="space-y-3 text-xs">
         {project.studio ? (
@@ -129,7 +129,7 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
             Yêu cầu sửa
           </Button>
           <Button type="submit" variant="success" disabled={busy || !studioReady || blockers.length > 0}>
-            Đồng ý Kịch bản Final
+            Đồng ý Kịch bản bản cuối
           </Button>
         </div>
       </form>

@@ -24,7 +24,7 @@ export function PosterPanel({ canManage }: { canManage: boolean }) {
 
   return (
     <Panel
-      title="Ảnh bìa / thumbnail"
+      title="Ảnh bìa"
       description="PNG, JPEG, WebP, GIF, BMP hoặc AVIF, tối đa 20 MB."
       actions={
         canManage && (

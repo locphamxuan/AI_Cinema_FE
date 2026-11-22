@@ -73,7 +73,7 @@ export function OverviewTab() {
       value: formatDateTime(project.createdAt),
     },
     {
-      label: 'Bàn giao Studio',
+      label: 'Giao cho Studio',
       value: formatDateTime(project.handedOffAt) ?? <span className="text-muted-foreground">—</span>,
     },
     {
@@ -111,7 +111,7 @@ export function OverviewTab() {
 
           <div className="px-5 pb-5 space-y-4 text-sm">
             <div className="rounded-xl bg-muted/60 border border-border p-4">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Ý tưởng & brief kịch bản</p>
+              <p className="text-xs font-medium text-muted-foreground mb-2">Ý tưởng & bản yêu cầu kịch bản</p>
               <p className="whitespace-pre-line text-secondary-foreground leading-relaxed">{project.ideaDescription}</p>
             </div>
             {project.synopsis && (
@@ -142,7 +142,7 @@ export function OverviewTab() {
                 {project.reviewer.fullName.charAt(0)}
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground">Reviewer thẩm định</p>
+                <p className="text-xs font-medium text-muted-foreground">Reviewer phụ trách</p>
                 <p className="text-xs font-bold text-foreground">{project.reviewer.fullName}</p>
               </div>
             </div>

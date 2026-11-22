@@ -100,7 +100,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <section className="rounded-xl border p-5">
-              <h3 className="mb-4 text-sm font-semibold">Phân bổ trạng thái dự án</h3>
+              <h3 className="mb-4 text-sm font-semibold">Tỉ lệ trạng thái dự án</h3>
               <DonutChart
                 data={donutData}
                 centerLabel="dự án"

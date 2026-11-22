@@ -53,7 +53,7 @@ export function HandoffCard({
           </p>
           <p className="text-muted-foreground">
             Giao ngày {formatDateTime(h.createdAt)} bởi {h.createdBy.fullName} · {h.studio.email} ·{' '}
-            {signed ? 'phí theo hợp đồng đã ký' : 'phí đề xuất trong brief'}: {formatVnd(h.offeredFeeVnd)}
+            {signed ? 'phí theo hợp đồng đã ký' : 'phí đề xuất trong bản yêu cầu'}: {formatVnd(h.offeredFeeVnd)}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -93,8 +93,8 @@ export function HandoffCard({
         <ul className="space-y-1">
           {h.briefFileKey && (
             <li className="flex items-center gap-2">
-              <span className="flex-1">Brief PDF</span>
-              <Button size="sm" variant="ghost" onClick={onBrief} aria-label="Tải brief">
+              <span className="flex-1">Bản yêu cầu (PDF)</span>
+              <Button size="sm" variant="ghost" onClick={onBrief} aria-label="Tải bản yêu cầu">
                 <Download className="w-3.5 h-3.5" />
               </Button>
             </li>

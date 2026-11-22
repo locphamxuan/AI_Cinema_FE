@@ -23,7 +23,7 @@ const PAGE_SIZE = 5;
  */
 const FILTERS: { key: string; label: string; match: (h: StudioHandoff) => boolean }[] = [
   { key: 'all', label: 'Tất cả', match: () => true },
-  { key: 'sent', label: 'Đã gửi brief', match: (h) => h.milestoneStatus === 'BRIEF_SENT' },
+  { key: 'sent', label: 'Đã gửi bản yêu cầu', match: (h) => h.milestoneStatus === 'BRIEF_SENT' },
   { key: 'progress', label: 'Studio đang làm', match: (h) => h.milestoneStatus === 'IN_PROGRESS' },
   { key: 'delivered', label: 'Studio đã giao', match: (h) => h.milestoneStatus === 'DELIVERED' },
   { key: 'failed', label: 'Lỗi gửi email', match: (h) => h.emailMessage?.status === 'FAILED' },
@@ -48,7 +48,7 @@ export function StudioTab() {
   const { rows, totalPages } = pageOf(matching, page, PAGE_SIZE);
 
   const downloadBrief = (handoff: StudioHandoff) =>
-    downloadFile(() => studioService.downloadBrief(project.id, handoff.id), `brief-${project.title}.pdf`);
+    downloadFile(() => studioService.downloadBrief(project.id, handoff.id), `ban-yeu-cau-${project.title}.pdf`);
   const downloadMaterial = (handoff: StudioHandoff, material: HandoffMaterial) =>
     downloadFile(() => studioService.downloadMaterial(project.id, handoff.id, material.id), material.fileName);
 
@@ -57,7 +57,7 @@ export function StudioTab() {
       <div className="lg:col-span-2 space-y-5">
         <Panel
           title="Dòng thời gian Studio"
-          description="Hợp đồng ký đủ hai bên thì hệ thống tự bàn giao cho Studio (brief PDF và tài liệu). Studio nộp phim từng tập trên Studio Web để Reviewer duyệt."
+          description="Hợp đồng ký đủ hai bên thì hệ thống tự động giao việc cho Studio (bản yêu cầu dạng PDF và tài liệu). Studio nộp phim từng tập trên Studio Web để Reviewer duyệt."
         >
           <div role="group" aria-label="Lọc theo trạng thái" className="flex flex-wrap gap-1.5 mb-4">
             {FILTERS.map((f) => {
@@ -79,7 +79,7 @@ export function StudioTab() {
           </div>
           {history.error && <ErrorNote message={history.error} onRetry={history.reload} />}
           {history.loading && !history.data && <Loading />}
-          {history.data && matching.length === 0 && <Empty>{all.length ? 'Không có bàn giao nào ở mục này.' : 'Chưa bàn giao cho Studio nào.'}</Empty>}
+          {history.data && matching.length === 0 && <Empty>{all.length ? 'Không có đợt giao việc nào ở mục này.' : 'Chưa giao việc cho Studio nào.'}</Empty>}
           <ol className="space-y-3">
             {rows.map((handoff) => (
               <HandoffCard
@@ -121,7 +121,7 @@ export function StudioTab() {
             )}
             {project.status === 'DRAFT' && <p className="text-xs text-muted-foreground">Chờ Admin giao Creator chính.</p>}
             {project.status === 'ASSIGNED' && (
-              <p className="text-xs text-muted-foreground">Bàn giao tự động khi hợp đồng với Studio có đủ chữ ký Admin và Studio (tab Hợp đồng).</p>
+              <p className="text-xs text-muted-foreground">Tự động giao việc cho Studio khi hợp đồng có đủ chữ ký Admin và Studio (tab Hợp đồng).</p>
             )}
             {caps.creator && !caps.lead && (
               <p className="rounded-xl border border-sky-200 dark:border-sky-500/30 bg-sky-50 dark:bg-sky-500/10 p-3 text-xs text-sky-800 dark:text-sky-300">

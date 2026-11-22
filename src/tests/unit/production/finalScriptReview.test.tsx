@@ -65,7 +65,7 @@ describe('FinalScriptReview', () => {
     render(withProject(assignedProject(), <FinalScriptReview onDecided={onDecided} />));
 
     expect(screen.getByText('Lumen Studio')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Đồng ý Kịch bản Final' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đồng ý Kịch bản bản cuối' }));
 
     await waitFor(() => expect(onDecided).toHaveBeenCalled());
     expect(bodyOf(calls)).toEqual({ approve: true });
@@ -87,20 +87,20 @@ describe('FinalScriptReview', () => {
     render(withProject(project, <FinalScriptReview onDecided={vi.fn()} />));
 
     expect(screen.getByRole('status')).toHaveTextContent('tập 2 chưa có hạn giao Studio');
-    expect(screen.getByRole('button', { name: 'Đồng ý Kịch bản Final' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Đồng ý Kịch bản bản cuối' })).toBeDisabled();
   });
 
   it('cannot approve before the Reviewer planned any episode', () => {
     routeFetch({ ...LOGINS });
     render(withProject(assignedProject({ seasons: [] }), <FinalScriptReview onDecided={vi.fn()} />));
-    expect(screen.getByRole('status')).toHaveTextContent('Reviewer chưa lên tập nào cho dự án');
+    expect(screen.getByRole('status')).toHaveTextContent('Reviewer chưa tạo tập nào cho dự án');
   });
 
   it('needs a studio picked when the project has none', async () => {
     routeFetch({ ...LOGINS, '/studios': [{ id: 'st2', name: 'Nova Studio' }] });
     render(withProject(assignedProject({ studio: null }), <FinalScriptReview onDecided={vi.fn()} />));
 
-    const approve = screen.getByRole('button', { name: 'Đồng ý Kịch bản Final' });
+    const approve = screen.getByRole('button', { name: 'Đồng ý Kịch bản bản cuối' });
     expect(approve).toBeDisabled();
     await screen.findByRole('option', { name: 'Nova Studio' });
     await userEvent.selectOptions(screen.getByLabelText('Studio nhận hợp đồng'), 'st2');
@@ -112,7 +112,7 @@ describe('FinalScriptReview', () => {
     const onDecided = vi.fn();
     render(withProject(assignedProject(), <FinalScriptReview onDecided={onDecided} />));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Đồng ý Kịch bản Final' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Đồng ý Kịch bản bản cuối' }));
 
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Kịch bản đang ở trạng thái Đã nộp (cần Reviewer đã duyệt).'));
     expect(onDecided).not.toHaveBeenCalled();
@@ -123,7 +123,7 @@ describe('ScriptTab gating of the Final Script decision', () => {
   it('is offered to the Admin once the Reviewer approved the script', async () => {
     routeFetch({ ...LOGINS, '/projects/m1/script': scriptIn() });
     render(withProject(assignedProject(), <ScriptTab />));
-    expect(await screen.findByRole('button', { name: 'Đồng ý Kịch bản Final' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Đồng ý Kịch bản bản cuối' })).toBeInTheDocument();
   });
 
   it('is not offered to the Reviewer in charge', async () => {
@@ -131,13 +131,13 @@ describe('ScriptTab gating of the Final Script decision', () => {
     routeFetch({ ...LOGINS, '/projects/m1/script': scriptIn() });
     render(withProject(assignedProject({ reviewerId: 'reviewer-id' }), <ScriptTab />));
     expect(await screen.findByText('CẢNH 1')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Đồng ý Kịch bản Final' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Đồng ý Kịch bản bản cuối' })).not.toBeInTheDocument();
   });
 
   it('is not offered on a script still waiting for the Reviewer', async () => {
     routeFetch({ ...LOGINS, '/projects/m1/script': scriptIn('SUBMITTED') });
     render(withProject(assignedProject(), <ScriptTab />));
     expect(await screen.findByText('CẢNH 1')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Đồng ý Kịch bản Final' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Đồng ý Kịch bản bản cuối' })).not.toBeInTheDocument();
   });
 });
