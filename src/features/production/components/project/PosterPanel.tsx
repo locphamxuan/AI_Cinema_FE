@@ -1,20 +1,37 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
 import { useAction } from '@/hooks/useAction';
 import { Panel } from '@/components/data/ui';
+import { formatDateTime } from '@/lib/format';
+import { downloadFile } from '../../lib/download';
 import { useProject } from './ProjectContext';
 
 const IMAGE_ACCEPT = 'image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif';
 
-/** The poster of the project (PNG, JPEG, WebP, GIF, BMP or AVIF, ≤ 20 MB) the catalog shows; the Reviewer uploads and replaces it. */
+/**
+ * The poster of the project (PNG, JPEG, WebP, GIF, BMP or AVIF, ≤ 20 MB) the catalog shows; the Reviewer uploads and
+ * replaces it. The poster image the studio sent is downloaded here first, then uploaded as the poster.
+ */
 export function PosterPanel({ canManage }: { canManage: boolean }) {
-  const { project, reload } = useProject();
+  const { project, caps, reload } = useProject();
   const input = useRef<HTMLInputElement>(null);
   const { busy, run } = useAction();
+  const [fetching, setFetching] = useState(false);
+  const studioPoster = project.studioPoster;
+
+  const downloadStudioPoster = async () => {
+    if (!studioPoster) return;
+    setFetching(true);
+    try {
+      await downloadFile(() => productionService.downloadStudioPoster(project.id), studioPoster.fileName);
+    } finally {
+      setFetching(false);
+    }
+  };
 
   const upload = async (file: File | undefined) => {
     if (!file) return;
@@ -42,6 +59,17 @@ export function PosterPanel({ canManage }: { canManage: boolean }) {
         <img src={project.posterUrl} alt={`Ảnh bìa phim ${project.title}`} className="w-full rounded-lg object-cover aspect-[2/3]" />
       ) : (
         <p className="text-xs text-muted-foreground py-6 text-center">Chưa có ảnh bìa.</p>
+      )}
+      {studioPoster && caps.studioPoster && (
+        <div className="mt-3 space-y-2 border-t border-border pt-3">
+          <p className="text-xs text-muted-foreground">
+            Poster Studio đã nộp: <span className="font-medium text-foreground break-all">{studioPoster.fileName}</span> ·{' '}
+            {formatDateTime(studioPoster.uploadedAt)}
+          </p>
+          <Button size="sm" variant="secondary" className="w-full" disabled={fetching} onClick={() => void downloadStudioPoster()}>
+            {fetching ? 'Đang tải…' : 'Tải poster của Studio'}
+          </Button>
+        </div>
       )}
     </Panel>
   );
