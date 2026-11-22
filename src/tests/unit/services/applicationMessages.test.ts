@@ -47,7 +47,7 @@ describe('application messages', () => {
 
   it('never shows what the server said about a session, rate limit or server fault', () => {
     expect(localizeApiError('Invalid refresh token', 401, undefined, '/auth/refresh')).toBe(
-      'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+      'Hết hạn đăng nhập, vui lòng đăng nhập lại.',
     );
     expect(localizeApiError('ThrottlerException: Too Many Requests', 429, undefined, '/movies')).toBe(
       APPLICATION_MESSAGES.MSG19.message,

@@ -211,7 +211,7 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
     const fetchMock = mockApi({ 'GET /platform-settings': settings, 'PATCH /platform-settings': settings });
     render(<PlatformSettingsPanel />);
 
-    const grace = await screen.findByLabelText(/Thời gian chờ gia hạn lỗi/);
+    const grace = await screen.findByLabelText(/Thời gian thử gia hạn lại/);
     await userEvent.clear(grace);
     await userEvent.type(grace, '0');
     await userEvent.click(screen.getByRole('button', { name: /Lưu/ }));

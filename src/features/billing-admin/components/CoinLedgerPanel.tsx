@@ -31,7 +31,7 @@ export function CoinLedgerPanel() {
   return (
     <Panel
       title="Giao dịch Coin"
-      description="Sổ cái chỉ ghi thêm: mỗi dòng là một lần Coin vào hoặc ra ví, kèm số dư ngay sau đó."
+      description="Lịch sử giao dịch Coin (không sửa, không xoá): mỗi dòng là một lần Coin vào hoặc ra ví, kèm số dư ngay sau đó."
       actions={
         <select
           aria-label="Lọc theo loại giao dịch"
@@ -175,7 +175,7 @@ function AdjustForm({ userId, onCancel, onDone }: { userId: string; onCancel: ()
 
   return (
     <form onSubmit={submit} className="space-y-3">
-      <p className="text-xs text-muted-foreground">Số dương cộng thêm, số âm trừ bớt. Mỗi lần điều chỉnh ghi một dòng sổ cái và nhật ký kiểm toán.</p>
+      <p className="text-xs text-muted-foreground">Số dương cộng thêm, số âm trừ bớt. Mỗi lần điều chỉnh được ghi vào lịch sử giao dịch Coin và nhật ký thao tác.</p>
       <div className="grid grid-cols-2 gap-3">
         <FormField label="Coin chính">
           <input type="number" step={1} value={main} onChange={(e) => setMain(e.target.value)} className={fieldInputClass} />

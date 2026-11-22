@@ -36,8 +36,8 @@ type ViewMode = (typeof VIEWS)[number]['key'];
 /** What each role does with its projects, under the page title. */
 const INTRO: Record<ProductionBase, string> = {
   '/creator': 'Các dự án bạn được giao: trao đổi ý tưởng với Admin, viết kịch bản và theo dõi Studio sản xuất.',
-  '/reviewer': 'Các dự án bạn phụ trách: lên mùa/tập, duyệt kịch bản và phim Studio nộp, gắn nhãn AI, đặt giá và xác nhận Phim Final.',
-  '/admin': 'Mọi dự án trên nền tảng. Admin tạo dự án, giao Creator, duyệt Kịch bản Final, ký hợp đồng với Studio và phát hành Phim Final.',
+  '/reviewer': 'Các dự án bạn phụ trách: tạo mùa và tập, duyệt kịch bản và phim Studio nộp, gắn nhãn AI, đặt giá và xác nhận Phim bản cuối.',
+  '/admin': 'Mọi dự án trên nền tảng. Admin tạo dự án, giao Creator, duyệt Kịch bản bản cuối, ký hợp đồng với Studio và phát hành Phim bản cuối.',
 };
 
 /** Projects the account may see (own projects of a Reviewer, assigned ones of a Creator, all for the Admin). */

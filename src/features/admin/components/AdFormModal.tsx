@@ -137,7 +137,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
             className={`${fieldInputClass} text-xs py-2 rounded-xl`}
           />
         </FormField>
-        <FormField label={`Trọng số (1-${MAX_AD_WEIGHT}): số càng lớn, quảng cáo càng hay được chọn`}>
+        <FormField label={`Mức ưu tiên (1-${MAX_AD_WEIGHT}): số càng lớn, quảng cáo càng dễ được chọn`}>
           <input
             type="number"
             min={1}

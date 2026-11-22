@@ -24,7 +24,7 @@ export function ProjectTable({ projects, base }: { projects: ProjectSummary[]; b
             <th className="px-4 py-3 font-semibold hidden sm:table-cell text-right">Số tập</th>
             <th
               className="px-4 py-3 font-semibold hidden lg:table-cell"
-              title="Thời điểm thay đổi gần nhất của dự án: sửa thông tin, mùa/tập, bàn giao Studio, duyệt, phát hành…"
+              title="Thời điểm thay đổi gần nhất của dự án: sửa thông tin, mùa/tập, giao cho Studio, duyệt, phát hành…"
             >
               Cập nhật lần cuối
             </th>

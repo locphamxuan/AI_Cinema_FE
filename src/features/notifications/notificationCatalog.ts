@@ -45,11 +45,11 @@ const REVIEWER_TABS: NotificationTab[] = [
   {
     key: 'admin',
     label: 'Admin & chi phí',
-    description: 'Giao dự án, đổi Studio, Phim Final bị trả lại, ngân sách, yêu cầu thêm chi phí, đề xuất và cảnh báo giá.',
+    description: 'Giao dự án, đổi Studio, Phim bản cuối bị trả lại, ngân sách, yêu cầu thêm chi phí, đề xuất và cảnh báo giá.',
     sections: [
       section('assign', 'Giao việc', 'PROJECT_ASSIGNED', 'STUDIO_SELECTED'),
       section('handoff', 'Đổi Studio', 'STUDIO_HANDOFF_SENT'),
-      section('final', 'Phim Final bị trả lại', 'FINAL_FILM_REJECTED'),
+      section('final', 'Phim bản cuối bị trả lại', 'FINAL_FILM_REJECTED'),
       section('budget', 'Ngân sách sản xuất', 'COST_BUDGET_CHANGED'),
       section('cost', 'Yêu cầu thêm chi phí', 'COST_REQUEST_APPROVED', 'COST_REQUEST_REJECTED'),
       section('change', 'Trả lời đề xuất', 'CHANGE_RESOLVED'),
@@ -59,7 +59,7 @@ const REVIEWER_TABS: NotificationTab[] = [
   {
     key: 'release',
     label: 'Phát hành & hệ thống',
-    description: 'Nhãn AI, kiểm tra tuân thủ, phát hành (cả lần lỗi), lỗi video và link HLS hỏng.',
+    description: 'Nhãn AI, kiểm tra tuân thủ, phát hành (cả lần lỗi), lỗi video và link video hỏng.',
     sections: [
       section('review', 'Duyệt nội dung', 'AI_LABEL_APPLIED', 'COMPLIANCE_PASSED'),
       section('published', 'Phát hành', 'EPISODE_PUBLISHED', 'EPISODE_RELEASE_FAILED'),
@@ -73,7 +73,7 @@ const CREATOR_TABS: NotificationTab[] = [
   {
     key: 'studio',
     label: 'Studio',
-    description: 'Tập trễ hạn và lỗi gửi brief.',
+    description: 'Tập trễ hạn và lỗi gửi bản yêu cầu.',
     sections: [
       section('late', 'Trễ hạn', 'EPISODE_OVERDUE'),
       section('mail', 'Lỗi gửi email', 'BRIEF_EMAIL_FAILED'),
@@ -95,7 +95,7 @@ const CREATOR_TABS: NotificationTab[] = [
   {
     key: 'episodes',
     label: 'Tập phim',
-    description: 'Video xử lý xong / lỗi, tập đã phát hành, link HLS hỏng.',
+    description: 'Video xử lý xong / lỗi, tập đã phát hành, link video hỏng.',
     sections: [
       section('ready', 'Xử lý xong', 'MEDIA_READY'),
       section('failed', 'Lỗi xử lý', 'MEDIA_FAILED', 'HLS_LINK_DEAD'),
@@ -108,7 +108,7 @@ const CREATOR_TABS: NotificationTab[] = [
 const SUPPORT_TAB: NotificationTab = {
   key: 'support',
   label: 'Hỗ trợ khách hàng',
-  description: 'Case AI chuyển cho nhân viên, case được giao cho bạn và Member trả lời.',
+  description: 'Yêu cầu hỗ trợ AI chuyển cho nhân viên, yêu cầu được giao cho bạn và Member trả lời.',
   sections: [
     section('escalated', 'AI chuyển nhân viên', 'SUPPORT_CASE_ESCALATED'),
     section('assigned', 'Được giao', 'SUPPORT_CASE_ASSIGNED'),
@@ -123,12 +123,12 @@ const ADMIN_TABS: NotificationTab[] = [
   {
     key: 'projects',
     label: 'Dự án',
-    description: 'Kịch bản chờ duyệt Final, trao đổi ý tưởng, hợp đồng với Studio và Phim Final chờ phát hành.',
+    description: 'Kịch bản bản cuối chờ duyệt, trao đổi ý tưởng, hợp đồng với Studio và Phim bản cuối chờ phát hành.',
     sections: [
       section('script', 'Kịch bản', 'SCRIPT_UPDATED'),
       section('notes', 'Trao đổi ý tưởng', 'PROJECT_NOTE'),
       section('contract', 'Studio & hợp đồng', 'STUDIO_SELECTED', 'CONTRACT_UPDATED'),
-      section('final', 'Kiểm duyệt & Phim Final', 'FINAL_FILM_CONFIRMED', 'AI_LABEL_APPLIED', 'COMPLIANCE_PASSED'),
+      section('final', 'Kiểm duyệt & Phim bản cuối', 'FINAL_FILM_CONFIRMED', 'AI_LABEL_APPLIED', 'COMPLIANCE_PASSED'),
       section('status', 'Tiến độ & sự cố', 'PROJECT_CANCELLED', 'EPISODE_OVERDUE', 'EPISODE_RELEASE_FAILED', 'HLS_LINK_DEAD'),
     ],
   },

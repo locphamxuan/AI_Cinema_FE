@@ -34,7 +34,7 @@ export function EpisodesTab() {
       )}
 
       {project.seasons.length === 0 && (
-        <Empty>{plan ? 'Chưa có mùa nào. Thêm mùa, tập và hạn giao trước khi Admin duyệt Kịch bản Final.' : 'Reviewer chưa lên mùa và tập cho dự án.'}</Empty>
+        <Empty>{plan ? 'Chưa có mùa nào. Thêm mùa, tập và hạn giao trước khi Admin duyệt Kịch bản bản cuối.' : 'Reviewer chưa tạo mùa và tập cho dự án.'}</Empty>
       )}
 
       {project.seasons.map((season) => (

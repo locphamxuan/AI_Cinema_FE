@@ -64,6 +64,7 @@ export const API_ROUTES = {
     SEASON: (seasonId: string) => `/seasons/${seasonId}`,
     SEASON_EPISODES: (seasonId: string) => `/seasons/${seasonId}/episodes`,
     POSTER: (movieId: string) => `/projects/${movieId}/poster`,
+    STUDIO_POSTER_CONTENT: (movieId: string) => `/projects/${movieId}/studio-poster/content`,
     EPISODE_THUMBNAIL: (episodeId: string) => `/episodes/${episodeId}/thumbnail`,
     EPISODE_ASSIGNEE: (episodeId: string) => `/episodes/${episodeId}/assignee`,
     CREATOR_DIRECTORY: '/creators',

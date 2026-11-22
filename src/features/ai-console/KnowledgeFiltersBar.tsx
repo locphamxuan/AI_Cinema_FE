@@ -25,7 +25,7 @@ export function KnowledgeFiltersBar({ value, onChange }: { value: KnowledgeFilte
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Tìm theo tiêu đề, slug, danh mục"
+          placeholder="Tìm theo tiêu đề, mã bài viết, danh mục"
           aria-label="Tìm bài tri thức"
           className={`${SELECT} pl-8`}
         />
@@ -52,12 +52,12 @@ export function KnowledgeFiltersBar({ value, onChange }: { value: KnowledgeFilte
         ))}
       </select>
       <select
-        aria-label="Lọc theo đối tượng"
+        aria-label="Lọc theo người xem"
         value={value.audience ?? ''}
         onChange={(e) => onChange({ ...value, audience: (e.target.value || undefined) as SupportAudience | undefined })}
         className={SELECT}
       >
-        <option value="">Mọi đối tượng</option>
+        <option value="">Mọi người xem</option>
         {(Object.keys(AUDIENCE) as SupportAudience[]).map((a) => (
           <option key={a} value={a}>
             {AUDIENCE[a]}
@@ -71,7 +71,7 @@ export function KnowledgeFiltersBar({ value, onChange }: { value: KnowledgeFilte
           onChange={(e) => onChange({ ...value, failedOnly: e.target.checked || undefined })}
           className="size-4 accent-primary"
         />
-        Chỉ bài lỗi lập chỉ mục
+        Chỉ bài lỗi cập nhật cho AI
       </label>
     </div>
   );

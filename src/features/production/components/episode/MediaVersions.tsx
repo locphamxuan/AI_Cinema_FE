@@ -6,7 +6,7 @@ import { INGEST_STATUS, LABEL_TYPE, SOURCE_METHOD } from '../../lib/labels';
 import { formatBytes, formatDateTime, formatDuration } from '@/lib/format';
 import { Empty, StatusPill } from '@/components/data/ui';
 
-const JOB_LABEL = { DOWNLOAD: 'Tải về', TRANSCODE: 'Chuyển mã', VALIDATE: 'Kiểm tra' } as const;
+const JOB_LABEL = { DOWNLOAD: 'Tải về', TRANSCODE: 'Xử lý video', VALIDATE: 'Kiểm tra' } as const;
 
 /** Every version the studio delivered, newest first; picking one opens it in the player and review sheet. */
 export function MediaVersions({

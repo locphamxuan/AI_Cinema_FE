@@ -54,7 +54,7 @@ function PeopleFields({ value, onChange }: { value: PeopleDraft; onChange: (next
       </FormField>
       <FormField label="Studio (tuỳ chọn)">
         <select value={value.studioId} onChange={(e) => patch({ studioId: e.target.value })} className={fieldInputClass}>
-          <option value="">{loading(studios) ? 'Đang tải…' : 'Chọn khi duyệt Kịch bản Final'}</option>
+          <option value="">{loading(studios) ? 'Đang tải…' : 'Chọn khi duyệt Kịch bản bản cuối'}</option>
           {studios.data?.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
@@ -123,7 +123,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
       open
       onClose={onClose}
       title="Tạo dự án phim"
-      subtitle="Ý tưởng, thể loại, ngân sách, Reviewer phụ trách và Creator chính; Reviewer lên mùa/tập sau"
+      subtitle="Ý tưởng, thể loại, ngân sách, Reviewer phụ trách và Creator chính; Reviewer tạo mùa và tập sau"
       maxWidth="max-w-3xl"
     >
       <form onSubmit={submit} className="space-y-4">
@@ -140,7 +140,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
         <PeopleFields value={people} onChange={setPeople} />
         <FormField
           label="Ngân sách sản xuất (₫)"
-          hint={budgetVnd >= 1000 ? `= ${formatVnd(budgetVnd)}, là ngân sách trần và giá trị hợp đồng gửi Studio.` : 'Là ngân sách trần và giá trị hợp đồng hệ thống gửi Studio sau khi duyệt Kịch bản Final.'}
+          hint={budgetVnd >= 1000 ? `= ${formatVnd(budgetVnd)}, là ngân sách tối đa và giá trị hợp đồng gửi Studio.` : 'Là ngân sách tối đa và giá trị hợp đồng hệ thống gửi Studio sau khi duyệt Kịch bản bản cuối.'}
           error={budget && !(budgetVnd >= 1000) ? 'Số tiền là bội số 1.000 ₫.' : null}
         >
           <input
@@ -161,7 +161,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
         </FormField>
         <p className="text-[11px] text-muted-foreground">
           Creator chính trao đổi ý tưởng với Admin ở mục “Trao đổi ý tưởng” rồi viết kịch bản; Reviewer lên mùa, tập và hạn giao trước khi
-          Admin duyệt Kịch bản Final.
+          Admin duyệt Kịch bản bản cuối.
         </p>
 
         <div className="space-y-2 pt-2">

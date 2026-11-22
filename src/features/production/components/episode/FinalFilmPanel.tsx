@@ -12,10 +12,10 @@ import { ConfirmModal } from '@/components/data/ConfirmModal';
 /** Where the episode stands on the way to the Final Film, in words. */
 function stateOf(episode: Episode): string {
   if (episode.status !== 'COMPLIANCE_PASSED') {
-    return 'Phim Final được xác nhận sau khi Reviewer duyệt bản Studio nộp, gắn nhãn AI và đạt 4 mục kiểm tra tuân thủ.';
+    return 'Phim bản cuối được xác nhận sau khi Reviewer duyệt bản Studio nộp, gắn nhãn AI và đạt 4 mục kiểm tra tuân thủ.';
   }
-  if (episode.finalConfirmedAt) return `Reviewer đã xác nhận Phim Final lúc ${formatDateTime(episode.finalConfirmedAt)}; chờ Admin đặt giá và phát hành.`;
-  return 'Đã đạt kiểm tra tuân thủ; Reviewer xác nhận Phim Final để chuyển sang Admin.';
+  if (episode.finalConfirmedAt) return `Reviewer đã xác nhận Phim bản cuối lúc ${formatDateTime(episode.finalConfirmedAt)}; chờ Admin đặt giá và phát hành.`;
+  return 'Đã đạt kiểm tra tuân thủ; Reviewer xác nhận Phim bản cuối để chuyển sang Admin.';
 }
 
 /**
@@ -27,6 +27,7 @@ export function FinalFilmPanel({
   episode,
   canConfirm,
   canSendBack,
+  poster,
   onChanged,
 }: {
   episode: Episode;
@@ -34,6 +35,8 @@ export function FinalFilmPanel({
   canConfirm: boolean;
   /** The Admin (episode:publish). */
   canSendBack: boolean;
+  /** Whether the movie has its poster, and whether the studio sent one: the Reviewer checks it before confirming. */
+  poster?: { set: boolean; fromStudio: boolean };
   onChanged: () => Promise<void>;
 }) {
   const [sendingBack, setSendingBack] = useState(false);
@@ -44,31 +47,39 @@ export function FinalFilmPanel({
   const returnable = canSendBack && checked && !!episode.finalConfirmedAt;
 
   const confirm = async () => {
-    if (await run(() => productionService.confirmFinalFilm(episode.id), 'Đã xác nhận Phim Final, Admin được báo')) {
+    if (await run(() => productionService.confirmFinalFilm(episode.id), 'Đã xác nhận Phim bản cuối, Admin được báo')) {
       setConfirming(false);
       await onChanged();
     }
   };
   const sendBack = async (reason: string) => {
-    if (await run(() => productionService.rejectFinalFilm(episode.id, reason), 'Đã trả Phim Final lại cho Reviewer')) {
+    if (await run(() => productionService.rejectFinalFilm(episode.id, reason), 'Đã trả Phim bản cuối lại cho Reviewer')) {
       setSendingBack(false);
       await onChanged();
     }
   };
 
   return (
-    <Panel title="Phim Final" description={stateOf(episode)}>
+    <Panel title="Phim bản cuối" description={stateOf(episode)}>
       <div className="space-y-3 text-xs">
         {episode.finalRejectionNote && !episode.finalConfirmedAt && (
           <p role="note" className="rounded-lg border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-2.5 text-rose-700 dark:text-rose-300">
-            <span className="font-semibold">Admin trả lại Phim Final:</span> {episode.finalRejectionNote}
+            <span className="font-semibold">Admin trả lại Phim bản cuối:</span> {episode.finalRejectionNote}
             {canConfirm && ' - yêu cầu Studio sửa ở phiếu duyệt (Yêu cầu sửa), rồi xác nhận lại bản mới.'}
+          </p>
+        )}
+        {confirmable && poster && !poster.set && (
+          <p role="note" className="rounded-lg border border-amber-200 dark:border-amber-500/30 bg-amber-50 dark:bg-amber-500/10 p-2.5 text-amber-800 dark:text-amber-300">
+            Phim chưa có ảnh bìa.{' '}
+            {poster.fromStudio
+              ? 'Studio đã nộp poster: tải về ở tab Tổng quan, kiểm tra rồi đặt làm ảnh bìa trước khi xác nhận.'
+              : 'Studio chưa nộp poster: nhắc Studio nộp hoặc tự tải ảnh bìa lên ở tab Tổng quan trước khi xác nhận.'}
           </p>
         )}
         <div className="flex flex-wrap gap-2">
           {confirmable && (
             <Button size="sm" variant="success" disabled={busy} onClick={() => setConfirming(true)}>
-              Xác nhận Phim Final
+              Xác nhận Phim bản cuối
             </Button>
           )}
           {returnable && (
@@ -80,21 +91,22 @@ export function FinalFilmPanel({
       </div>
       <ConfirmModal
         open={confirming}
-        title="Xác nhận Phim Final"
-        description="Bản đã duyệt, đã gắn nhãn AI và đã qua kiểm tra pháp lý của tập này trở thành Phim Final."
+        title="Xác nhận Phim bản cuối"
+        description="Bản đã duyệt, đã gắn nhãn AI và đã qua kiểm tra pháp lý của tập này trở thành Phim bản cuối."
         details={[
           ['Tập', `Tập ${episode.episodeNumber}: ${episode.title}`],
-          ['Trạng thái mới', 'Phim Final chờ phát hành'],
+          ['Trạng thái mới', 'Phim bản cuối chờ phát hành'],
+          ...(poster ? [['Ảnh bìa', poster.set ? 'Đã có' : 'Chưa có'] as [string, string]] : []),
         ]}
         consequence="Admin được báo để đặt giá Coin, cấu hình tập miễn phí và phát hành."
-        confirmLabel="Xác nhận Phim Final"
+        confirmLabel="Xác nhận Phim bản cuối"
         busy={busy}
         onClose={() => setConfirming(false)}
         onConfirm={() => void confirm()}
       />
       <TextPromptModal
         open={sendingBack}
-        title="Trả phim Final lại qua Reviewer"
+        title="Trả phim bản cuối lại qua Reviewer"
         subtitle={`Tập ${episode.episodeNumber}: ${episode.title}`}
         label="Lý do (Reviewer sẽ trao đổi với Studio để sửa)"
         confirmLabel="Trả lại"

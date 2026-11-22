@@ -71,7 +71,7 @@ describe('IdeaFilesPanel', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Xoá y-tuong.pdf v2' }));
     const dialog = await screen.findByRole('dialog');
-    expect(dialog).toHaveTextContent('không còn đi kèm brief gửi Studio');
+    expect(dialog).toHaveTextContent('không còn đi kèm bản yêu cầu gửi Studio');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Xoá file' }));
 
     await waitFor(() => expect(reload).toHaveBeenCalled());

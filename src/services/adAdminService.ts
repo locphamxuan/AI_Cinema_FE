@@ -49,6 +49,6 @@ export function adInputProblem(input: AdInput): string | null {
   if (!/^https?:\/\/\S+$/i.test(input.mediaUrl)) return 'Link video phải bắt đầu bằng http:// hoặc https://.';
   if (input.clickUrl && !/^https?:\/\/\S+$/i.test(input.clickUrl)) return 'Link khi bấm phải bắt đầu bằng http:// hoặc https://.';
   const weight = input.weight ?? 1;
-  if (!Number.isInteger(weight) || weight < 1 || weight > MAX_AD_WEIGHT) return `Trọng số từ 1 đến ${MAX_AD_WEIGHT}.`;
+  if (!Number.isInteger(weight) || weight < 1 || weight > MAX_AD_WEIGHT) return `Mức ưu tiên từ 1 đến ${MAX_AD_WEIGHT}.`;
   return null;
 }

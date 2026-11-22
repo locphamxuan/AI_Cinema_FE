@@ -70,7 +70,7 @@ describe('review queue', () => {
     routeFetch({ '/projects/pipeline': pageOf([row({ script: rowScript('SUBMITTED') })]) });
     render(<ReviewerProjectQueuePage />);
 
-    const link = await screen.findByRole('link', { name: /Thẩm định kịch bản/ });
+    const link = await screen.findByRole('link', { name: /Duyệt kịch bản/ });
     expect(link).toHaveAttribute('href', '/reviewer/projects/m1?tab=script');
     expect(screen.getByRole('button', { name: 'Kịch bản chờ duyệt (1)' })).toBeInTheDocument();
   });
@@ -91,7 +91,7 @@ describe('ReviewerAuditWorkspace', () => {
     routeFetch({ '/projects/pipeline': pageOf([]) });
     render(<ReviewerAuditWorkspace />);
 
-    expect(await screen.findByText('Chưa có bản phim nào chờ thẩm định')).toBeInTheDocument();
+    expect(await screen.findByText('Chưa có bản phim nào chờ duyệt')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Xem hàng đợi dự án' })).toHaveAttribute('href', '/reviewer/projects');
   });
 
@@ -109,7 +109,7 @@ describe('ReviewerAuditWorkspace', () => {
     render(<ReviewerAuditWorkspace />);
 
     expect(await screen.findByText('CẢNH MỞ ĐẦU')).toBeInTheDocument();
-    expect(await screen.findByRole('button', { name: 'Xác nhận Phim Final' })).toBeEnabled();
+    expect(await screen.findByRole('button', { name: 'Xác nhận Phim bản cuối' })).toBeEnabled();
     expect(screen.queryByRole('button', { name: 'Phát hành ngay' })).not.toBeInTheDocument();
   });
 });

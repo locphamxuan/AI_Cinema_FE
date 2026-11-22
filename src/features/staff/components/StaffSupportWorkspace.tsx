@@ -52,10 +52,10 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard icon={Inbox} label="Chờ người nhận" value={s?.waiting ?? '—'} note={s?.oldestWaiting ? `Lâu nhất ${s.oldestWaiting.waitingMinutes} phút` : 'Không có case chờ'} noteTone={s?.oldestWaiting ? 'warn' : 'muted'} />
+        <StatCard icon={Inbox} label="Chờ người nhận" value={s?.waiting ?? '—'} note={s?.oldestWaiting ? `Lâu nhất ${s.oldestWaiting.waitingMinutes} phút` : 'Không có yêu cầu chờ'} noteTone={s?.oldestWaiting ? 'warn' : 'muted'} />
         <StatCard icon={Headset} label="Nhân viên đang xử lý" value={s?.byStatus.STAFF_HANDLING ?? '—'} note={s ? `Chờ Member xác nhận: ${s.byStatus.RESOLVED ?? 0}` : undefined} />
         <StatCard icon={Bot} label="AI chuyển cho nhân viên hôm nay" value={s?.escalatedToday ?? '—'} note={s ? `Đã giải quyết hôm nay: ${s.resolvedToday}` : undefined} />
-        <StatCard icon={Sparkles} label="AI tự giải quyết" value={s ? `${Math.round(s.aiResolvedRate * 100)}%` : '—'} note="Tỉ lệ trên các case đã kết thúc gần đây" />
+        <StatCard icon={Sparkles} label="AI tự giải quyết" value={s ? `${Math.round(s.aiResolvedRate * 100)}%` : '—'} note="Tỉ lệ trên các yêu cầu đã kết thúc gần đây" />
       </div>
       {stats.error && <ErrorNote message={stats.error} onRetry={stats.reload} />}
 
@@ -108,7 +108,7 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
               </select>
               <select aria-label="Lọc theo người nhận" value={filters.assignee ?? ''} onChange={(e) => set({ assignee: e.target.value || undefined })} className={SELECT}>
                 <option value="">Mọi người nhận</option>
-                {me?.id && <option value={me.id}>Case của tôi</option>}
+                {me?.id && <option value={me.id}>Yêu cầu của tôi</option>}
                 <option value="NONE">Chưa ai nhận</option>
               </select>
             </div>
@@ -121,7 +121,7 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
               </div>
             )}
             {queue.loading && !queue.data && <Loading />}
-            {queue.data?.data.length === 0 && <Empty>Không có case nào theo bộ lọc này.</Empty>}
+            {queue.data?.data.length === 0 && <Empty>Không có yêu cầu nào theo bộ lọc này.</Empty>}
             <ul className="divide-y divide-border">
               {queue.data?.data.map((c) => (
                 <li key={c.id}>
@@ -160,12 +160,12 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
           )}
         </section>
 
-        <section aria-label="Chi tiết case" className="flex h-[860px] flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 lg:col-span-7">
+        <section aria-label="Chi tiết yêu cầu" className="flex h-[860px] flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 lg:col-span-7">
           {activeId ? (
             <StaffCaseChat key={activeId} caseId={activeId} currentUserId={me?.id} isAdmin={isAdmin} onChanged={refresh} />
           ) : (
             <div className="flex flex-1 items-center justify-center p-8 text-center text-sm text-muted-foreground">
-              Chọn một case ở hàng chờ để xem hội thoại, bối cảnh Member và trả lời.
+              Chọn một yêu cầu ở hàng chờ để xem hội thoại, bối cảnh Member và trả lời.
             </div>
           )}
         </section>

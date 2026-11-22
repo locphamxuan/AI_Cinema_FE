@@ -63,7 +63,7 @@ export function AdsPanel() {
               <div className="min-w-0 space-y-0.5">
                 <p className="font-semibold text-foreground">{ad.title}</p>
                 <p className="text-muted-foreground">
-                  Dài {formatDuration(ad.durationSeconds)} · trọng số {ad.weight}
+                  Dài {formatDuration(ad.durationSeconds)} · mức ưu tiên {ad.weight}
                 </p>
                 <a href={ad.mediaUrl} target="_blank" rel="noopener noreferrer" className="text-sky-700 hover:underline break-all">
                   {ad.mediaUrl}

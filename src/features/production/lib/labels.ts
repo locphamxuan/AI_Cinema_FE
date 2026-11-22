@@ -60,7 +60,7 @@ export const EPISODE_STATUS: Record<EpisodeStatus, Label> = {
 export const INGEST_STATUS: Record<MediaIngestStatus, Label> = {
   PENDING: { label: 'Chờ xử lý', tone: 'neutral' },
   DOWNLOADING: { label: 'Đang tải về', tone: 'blue' },
-  TRANSCODING: { label: 'Đang chuyển mã HLS', tone: 'blue' },
+  TRANSCODING: { label: 'Đang xử lý video', tone: 'blue' },
   VALIDATING: { label: 'Đang kiểm tra link', tone: 'blue' },
   READY: { label: 'Sẵn sàng', tone: 'emerald' },
   FAILED: { label: 'Lỗi', tone: 'rose' },
@@ -69,7 +69,7 @@ export const INGEST_STATUS: Record<MediaIngestStatus, Label> = {
 
 export const SOURCE_METHOD: Record<MediaSourceMethod, string> = {
   UPLOAD: 'Tải file lên',
-  HLS_URL: 'Link HLS của Studio',
+  HLS_URL: 'Link video của Studio',
   REMOTE_FILE: 'Link file (hệ thống tải về)',
 };
 
@@ -131,7 +131,7 @@ export const SCRIPT_STATUS: Record<ScriptStatus, Label> = {
   SUBMITTED: { label: 'Đã nộp, chờ Reviewer duyệt', tone: 'amber' },
   REVIEWER_APPROVED: { label: 'Reviewer đã duyệt, chờ Admin', tone: 'blue' },
   REVISION_REQUESTED: { label: 'Cần sửa', tone: 'rose' },
-  FINAL: { label: 'Kịch bản Final', tone: 'emerald' },
+  FINAL: { label: 'Kịch bản bản cuối', tone: 'emerald' },
 };
 
 export const SCRIPT_STAGE: Record<ScriptReviewStage, string> = { REVIEWER: 'Reviewer', ADMIN: 'Admin' };
@@ -150,7 +150,7 @@ export const CHANGE_REQUEST_TYPE: Record<ChangeRequestType, string> = {
 
 /** Where a hand-off stands with the studio (BR-58). */
 export const MILESTONE_STATUS: Record<StudioMilestoneStatus, Label> = {
-  BRIEF_SENT: { label: 'Đã gửi brief', tone: 'blue' },
+  BRIEF_SENT: { label: 'Đã gửi bản yêu cầu', tone: 'blue' },
   STUDIO_ACCEPTED: { label: 'Studio đã nhận', tone: 'purple' },
   IN_PROGRESS: { label: 'Studio đang làm', tone: 'amber' },
   DELIVERED: { label: 'Studio đã giao', tone: 'emerald' },
@@ -215,15 +215,16 @@ export const EVENT_LABEL: Record<string, string> = {
   SCRIPT_SUBMITTED: 'Creator nộp kịch bản',
   SCRIPT_REVIEWED: 'Duyệt kịch bản',
   SCRIPT_REVISION_REQUESTED: 'Yêu cầu sửa kịch bản',
-  SCRIPT_FINALIZED: 'Admin duyệt Kịch bản Final',
+  SCRIPT_FINALIZED: 'Admin duyệt Kịch bản bản cuối',
   CONTRACT_SENT: 'Gửi hợp đồng mẫu cho Studio',
   CONTRACT_PROPOSED: 'Studio báo giá và ký',
   CONTRACT_COUNTERED: 'Đề xuất giá mới',
   CONTRACT_SIGNED: 'Hợp đồng ký đủ 2 bên',
   STUDIO_ACCOUNT_CREATED: 'Mở tài khoản Studio',
-  FINAL_FILM_CONFIRMED: 'Reviewer xác nhận Phim Final',
-  FINAL_FILM_REJECTED: 'Admin trả lại Phim Final',
-  STUDIO_HANDOFF_SENT: 'Gửi brief cho Studio',
+  STUDIO_POSTER_UPLOADED: 'Studio nộp poster phim',
+  FINAL_FILM_CONFIRMED: 'Reviewer xác nhận Phim bản cuối',
+  FINAL_FILM_REJECTED: 'Admin trả lại Phim bản cuối',
+  STUDIO_HANDOFF_SENT: 'Gửi bản yêu cầu cho Studio',
   STUDIO_CHANGED: 'Đổi Studio',
   STUDIO_MILESTONE_UPDATED: 'Cập nhật mốc Studio',
   STUDIO_CREATED: 'Thêm Studio vào danh mục',
@@ -237,7 +238,7 @@ export const EVENT_LABEL: Record<string, string> = {
   PROJECT_CANCELLED: 'Huỷ dự án',
   PROJECT_COMPLETED: 'Hoàn tất dự án',
   PROJECT_UNDER_REVISION: 'Dự án có tập đang sửa',
-  MEDIA_SUBMITTED: 'Giao bản dựng',
+  MEDIA_SUBMITTED: 'Studio nộp bản phim',
   MEDIA_READY: 'Video sẵn sàng',
   MEDIA_FAILED: 'Xử lý video lỗi',
   CONTENT_CHANGES_REQUESTED: 'Yêu cầu sửa tập',
@@ -265,14 +266,14 @@ export const NOTIFICATION_TYPE_LABEL: Record<string, string> = {
   CHANGE_REQUESTED: 'Đề xuất mới',
   CHANGE_RESOLVED: 'Trả lời đề xuất',
   EPISODE_RELEASE_FAILED: 'Phát hành lỗi',
-  SUPPORT_CASE_ESCALATED: 'AI chuyển nhân viên',
-  SUPPORT_CASE_ASSIGNED: 'Case được giao',
+  SUPPORT_CASE_ESCALATED: 'AI chuyển cho nhân viên',
+  SUPPORT_CASE_ASSIGNED: 'Yêu cầu hỗ trợ được giao',
   SUPPORT_MEMBER_REPLIED: 'Member trả lời',
-  FINAL_FILM_CONFIRMED: 'Phim Final chờ duyệt',
-  FINAL_FILM_REJECTED: 'Phim Final bị trả lại',
+  FINAL_FILM_CONFIRMED: 'Phim bản cuối chờ duyệt',
+  FINAL_FILM_REJECTED: 'Phim bản cuối bị trả lại',
   AI_LABEL_APPLIED: 'Đã gắn nhãn AI',
   COMPLIANCE_PASSED: 'Đạt kiểm tra tuân thủ',
   EPISODE_OVERDUE: 'Tập trễ hạn',
-  HLS_LINK_DEAD: 'Link HLS lỗi',
+  HLS_LINK_DEAD: 'Link video lỗi',
   PROJECT_CANCELLED: 'Dự án đã huỷ',
 };

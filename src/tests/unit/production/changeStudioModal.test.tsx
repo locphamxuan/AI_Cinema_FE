@@ -60,7 +60,7 @@ describe('ChangeStudioModal', () => {
       forfeitedVnd: '20000000',
     });
     expect(reload).toHaveBeenCalled();
-    expect(toast.success).toHaveBeenCalledWith('Đã đổi Studio, gửi brief và hợp đồng mẫu cho Studio mới');
+    expect(toast.success).toHaveBeenCalledWith('Đã đổi Studio, gửi bản yêu cầu và hợp đồng mẫu cho Studio mới');
   });
 
   it('calls the fee a proposal and says the new studio gets a contract to quote and sign', () => {
@@ -70,7 +70,7 @@ describe('ChangeStudioModal', () => {
     expect(screen.getByLabelText('Phí đề xuất')).toBeInTheDocument();
     expect(screen.getByText('Phí sản xuất đề xuất cho Studio mới (₫)')).toBeInTheDocument();
     expect(screen.getByText(/phí chính thức là giá ký trong hợp đồng/)).toBeInTheDocument();
-    expect(screen.getByRole('dialog')).toHaveTextContent('Studio mới nhận brief kèm hợp đồng mẫu để ký (có thể đề xuất giá thấp hơn) trên Studio Web');
+    expect(screen.getByRole('dialog')).toHaveTextContent('Studio mới nhận bản yêu cầu kèm hợp đồng mẫu để ký (có thể đề xuất giá thấp hơn) trên Studio Web');
   });
 
   it('blocks a fee above what the budget allows and says the Reviewer must ask for more', async () => {
@@ -108,7 +108,7 @@ describe('ChangeStudioModal', () => {
     render(withProject(project, <ChangeStudioModal onClose={vi.fn()} />));
     routeFetch({});
 
-    await userEvent.selectOptions(screen.getByLabelText('Phạm vi bàn giao'), 's1');
+    await userEvent.selectOptions(screen.getByLabelText('Phạm vi giao việc'), 's1');
     expect(screen.getByText(/Phí đã đề xuất cho Studio cũ: 0/)).toBeInTheDocument();
     expect(screen.getByText(/Tối đa 50\.000\.000/)).toBeInTheDocument();
   });
@@ -122,7 +122,7 @@ describe('ChangeStudioModal', () => {
     await fill();
     await userEvent.click(submitButton());
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Lượt bàn giao này đã được thay bằng Studio khác.'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Đợt giao việc này đã được chuyển cho Studio khác.'));
     expect(onClose).not.toHaveBeenCalled();
     expect(reload).not.toHaveBeenCalled();
     expect(screen.getByLabelText('Email Studio')).toHaveValue('moi@studio.vn');

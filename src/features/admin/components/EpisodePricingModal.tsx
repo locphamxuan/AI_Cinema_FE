@@ -79,7 +79,7 @@ export function EpisodePricingModal({
               onChange={(e) => setIsFreeForGuest(e.target.checked)}
               className="rounded border-input text-sky-600 focus:ring-sky-500"
             />
-            <span className="text-secondary-foreground">Miễn phí cho Guest (chưa đăng nhập)</span>
+            <span className="text-secondary-foreground">Miễn phí cho khách chưa đăng nhập</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input

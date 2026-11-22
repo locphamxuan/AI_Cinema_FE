@@ -120,7 +120,7 @@ export function ProjectDetailPage() {
 
               {/* Facts strip */}
               <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-muted/60 border border-border">
-                <Fact label="Reviewer thẩm định" value={data.reviewer.fullName} />
+                <Fact label="Reviewer phụ trách" value={data.reviewer.fullName} />
                 <Fact label="Creator chính" value={data.creator?.fullName ?? 'Chưa giao'} />
                 <Fact label="Studio đối tác" value={data.studio?.name ?? 'Chưa chọn'} />
                 <Fact label="Cấu trúc" value={`${data.seasons.length} mùa · ${totalEpisodes} tập`} />

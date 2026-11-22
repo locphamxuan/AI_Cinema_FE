@@ -59,7 +59,7 @@ export function FilmProfitTab() {
           <StatCard label="Phí sản xuất" value={vnd(t.productionCostVnd)} />
           <StatCard label="Doanh thu" value={vnd(t.revenueVnd)} />
           <StatCard label="Lợi nhuận" value={vnd(t.profitVnd)} noteTone={t.profitVnd < 0 ? 'bad' : 'good'} note={t.profitVnd < 0 ? 'Đang lỗ' : 'Đang lãi'} />
-          <StatCard label="ROI" value={roi(t.roiPercent)} />
+          <StatCard label="Tỉ suất lợi nhuận" value={roi(t.roiPercent)} />
           <StatCard label="Phim đã hoà vốn" value={t.breakEvenMovies} unit={`/ ${report.data?.films.length ?? 0} phim`} />
         </div>
       )}

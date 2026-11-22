@@ -66,7 +66,7 @@ export const NAVIGATION: Record<Area, NavGroup[]> = {
       label: 'Vận hành',
       items: [
         { href: '/admin/support', label: 'Hỗ trợ khách hàng', icon: Headset, permission: PERMISSION.SUPPORT_CASE_READ },
-        { href: '/admin/support/ai', label: 'Chatbox AI', icon: Bot, permission: PERMISSION.SUPPORT_KNOWLEDGE_MANAGE },
+        { href: '/admin/support/ai', label: 'Trợ lý AI', icon: Bot, permission: PERMISSION.SUPPORT_KNOWLEDGE_MANAGE },
         { href: '/admin/ads', label: 'Quảng cáo', icon: Megaphone, permission: PERMISSION.AD_MANAGE },
         { href: '/admin/policies', label: 'Chính sách', icon: ShieldCheck, permission: PERMISSION.PLATFORM_SETTINGS_MANAGE },
         { href: '/admin/notifications', label: 'Thông báo', icon: Bell },
@@ -76,11 +76,11 @@ export const NAVIGATION: Record<Area, NavGroup[]> = {
   ],
   reviewer: [
     {
-      label: 'Thẩm định',
+      label: 'Kiểm duyệt',
       items: [
-        { href: '/reviewer', label: 'Thẩm định video Master', icon: Clapperboard },
-        { href: '/reviewer/projects', label: 'Hàng đợi dự án', icon: FolderKanban },
-        { href: '/reviewer/projects?filter=approved', label: 'Phim Final', icon: FileCheck2 },
+        { href: '/reviewer', label: 'Duyệt video gốc', icon: Clapperboard },
+        { href: '/reviewer/projects', label: 'Danh sách dự án', icon: FolderKanban },
+        { href: '/reviewer/projects?filter=approved', label: 'Phim bản cuối', icon: FileCheck2 },
         { href: '/reviewer/projects?filter=revising', label: 'Yêu cầu chỉnh sửa', icon: FilePenLine },
       ],
     },

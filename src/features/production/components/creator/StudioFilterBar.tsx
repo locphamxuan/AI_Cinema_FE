@@ -17,8 +17,8 @@ const FILTER_OPTIONS: { key: ScriptFilterKey; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'draft', label: 'Chưa nộp' },
   { key: 'review', label: 'Reviewer & cần sửa' },
-  { key: 'admin_approval', label: 'Chờ Admin duyệt Final' },
-  { key: 'handed_off', label: 'Kịch bản Final' },
+  { key: 'admin_approval', label: 'Chờ Admin duyệt bản cuối' },
+  { key: 'handed_off', label: 'Kịch bản bản cuối' },
 ];
 
 export function StudioFilterBar({

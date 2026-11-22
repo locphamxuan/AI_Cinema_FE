@@ -33,12 +33,12 @@ const AUDIT_LABEL: Partial<Record<PipelineEpisode['status'], string>> = {
   IN_REVIEW: 'Bản phim chờ duyệt',
   APPROVED: 'Đã duyệt, chờ gắn nhãn AI',
   LABELED: 'Đã gắn nhãn, chờ kiểm tra tuân thủ',
-  COMPLIANCE_PASSED: 'Đạt tuân thủ, chờ xác nhận Phim Final',
+  COMPLIANCE_PASSED: 'Đạt tuân thủ, chờ xác nhận Phim bản cuối',
 };
 
 function episodeStage(episode: PipelineEpisode): { stage: QueueStage; label: string } | null {
   if (episode.status === 'CHANGES_REQUESTED') return { stage: 'STUDIO_REVISING', label: 'Studio đang sửa' };
-  if (episode.status === 'COMPLIANCE_PASSED' && episode.finalConfirmedAt) return { stage: 'FINAL_CONFIRMED', label: 'Phim Final chờ Admin phát hành' };
+  if (episode.status === 'COMPLIANCE_PASSED' && episode.finalConfirmedAt) return { stage: 'FINAL_CONFIRMED', label: 'Phim bản cuối chờ Admin phát hành' };
   const label = AUDIT_LABEL[episode.status];
   return label ? { stage: 'MASTER_AUDIT', label } : null;
 }

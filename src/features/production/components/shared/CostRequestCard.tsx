@@ -133,7 +133,7 @@ export function CostRequestCard({
           ['Reviewer xin', formatVnd(cr.requestedVnd)],
           ['Cấp', formatVnd(grantedVnd)],
         ]}
-        consequence="số tiền được cộng vào ngân sách dự án và ghi vào sổ chi phí, không thể xoá."
+        consequence="số tiền được cộng vào ngân sách dự án và ghi vào lịch sử ngân sách, không thể xoá."
         confirmLabel="Cấp chi phí"
         busy={busy}
         onClose={() => setApproving(false)}

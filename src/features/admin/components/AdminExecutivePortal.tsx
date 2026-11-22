@@ -50,7 +50,7 @@ export function AdminExecutivePortal() {
               name={user?.name ?? 'Quản trị viên'}
               summary={
                 pipeline.data
-                  ? `${pipeline.data.finalScripts.length} kịch bản chờ duyệt Final, ${pipeline.data.contractsToSign.length} hợp đồng chờ ký, ${pipeline.data.readyFilms.length} phim chờ phát hành.`
+                  ? `${pipeline.data.finalScripts.length} kịch bản bản cuối chờ duyệt, ${pipeline.data.contractsToSign.length} hợp đồng chờ ký, ${pipeline.data.readyFilms.length} phim chờ phát hành.`
                   : user?.email
               }
               figures={
