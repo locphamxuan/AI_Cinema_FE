@@ -15,6 +15,7 @@ export function RewardLadderPanel() {
   const [editing, setEditing] = useState<RewardRule | 'new' | null>(null);
   const data = rules.data ?? [];
   const takenDays = new Set(data.filter((r) => r.isActive).map((r) => r.streakDay));
+  const takenCodes = new Set(data.map((r) => r.code.toLowerCase()));
 
   // Sort by streakDay ascending
   const sortedRules = [...data].sort((a, b) => a.streakDay - b.streakDay);
@@ -193,6 +194,7 @@ export function RewardLadderPanel() {
         <RewardRuleModal
           rule={editing === 'new' ? null : editing}
           takenDays={takenDays}
+          takenCodes={takenCodes}
           onClose={() => setEditing(null)}
           onDone={rules.reload}
         />

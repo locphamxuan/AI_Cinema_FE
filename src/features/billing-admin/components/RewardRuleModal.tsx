@@ -16,17 +16,20 @@ export const LADDER_LENGTH = 7;
 export function RewardRuleModal({
   rule,
   takenDays,
+  takenCodes = new Set<string>(),
   onClose,
   onDone,
 }: {
   rule: RewardRule | null;
   takenDays: Set<number>;
+  /** Codes already used by any rule, active or not: the BE keeps them unique. */
+  takenCodes?: Set<string>;
   onClose: () => void;
   onDone: () => Promise<void>;
 }) {
   const firstFree = Array.from({ length: LADDER_LENGTH }, (_, i) => i + 1).find((d) => !takenDays.has(d)) ?? 1;
   const [form, setForm] = useState({
-    code: '',
+    code: rule ? '' : suggestCode(firstFree, takenCodes),
     name: rule?.name ?? '',
     streakDay: String(rule?.streakDay ?? firstFree),
     bonusCoins: String(rule?.bonusCoins ?? ''),
@@ -36,16 +39,21 @@ export function RewardRuleModal({
   const set = (patch: Partial<typeof form>) => setForm({ ...form, ...patch });
   const day = Number(form.streakDay);
   const coins = Number(form.bonusCoins);
-  // One active rung per day: the BE refuses a second one.
-  const dayTaken = form.isActive && takenDays.has(day) && day !== rule?.streakDay;
-  const valid = form.name.trim() && Number.isInteger(coins) && coins >= 1 && !dayTaken && (rule || form.code.trim().length >= 3);
+  // One active rung per day: the BE refuses a second one. A rule only "owns" its day while it is active,
+  // so reactivating a switched-off rule whose day another rule now holds is refused too.
+  const ownsDay = Boolean(rule?.isActive) && day === rule?.streakDay;
+  const dayTaken = form.isActive && takenDays.has(day) && !ownsDay;
+  const code = form.code.trim();
+  const codeTaken = !rule && takenCodes.has(code.toLowerCase());
+  const codeValid = Boolean(rule) || (code.length >= 3 && !codeTaken);
+  const valid = form.name.trim() && Number.isInteger(coins) && coins >= 1 && !dayTaken && codeValid;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const input = { name: form.name.trim(), streakDay: day, bonusCoins: coins, grantsSpin: day === LADDER_LENGTH };
     const done = rule
       ? await run(() => billingAdminService.updateRewardRule(rule.id, { ...input, isActive: form.isActive }), 'Đã lưu ngày điểm danh')
-      : await run(() => billingAdminService.createRewardRule({ ...input, code: form.code.trim() }), 'Đã thêm ngày điểm danh');
+      : await run(() => billingAdminService.createRewardRule({ ...input, code }), 'Đã thêm ngày điểm danh');
     if (done) {
       await onDone();
       onClose();
@@ -65,6 +73,7 @@ export function RewardRuleModal({
               required
               className={fieldInputClass}
             />
+            {codeTaken && <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">Mã này đã được dùng cho một ngày khác.</p>}
           </FormField>
         )}
         <FormField label="Tên mốc điểm danh">
@@ -117,7 +126,7 @@ export function RewardRuleModal({
               : 'Lượt quay chỉ được tặng khi Member điểm danh đủ 7 ngày liên tục.'}
           </span>
         </div>
-        {rule && !rule.isActive && (
+        {rule && (
           <label className="flex items-center gap-2 text-xs text-secondary-foreground font-medium cursor-pointer">
             <input
               type="checkbox"
@@ -125,7 +134,7 @@ export function RewardRuleModal({
               onChange={(e) => set({ isActive: e.target.checked })}
               className="w-4 h-4 accent-sky-600 rounded"
             />
-            Kích hoạt lại ngày này
+            {rule.isActive ? 'Đang dùng (bỏ chọn để tắt ngày này)' : 'Kích hoạt lại ngày này'}
           </label>
         )}
         <div className="flex justify-end gap-2.5 pt-2 border-t border-border">
@@ -139,4 +148,12 @@ export function RewardRuleModal({
       </form>
     </Modal>
   );
+}
+
+/** `day_N`, or `day_N_2`, `day_N_3`… when an older (switched-off) rule already holds that code. */
+function suggestCode(day: number, taken: Set<string>): string {
+  const base = `day_${day}`;
+  let code = base;
+  for (let i = 2; taken.has(code); i += 1) code = `${base}_${i}`;
+  return code;
 }
