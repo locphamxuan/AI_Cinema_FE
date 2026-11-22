@@ -27,8 +27,10 @@ export function PoliciesPanel() {
   const [text, setText] = useState('');
   const [page, setPage] = useState(1);
   const [open, setOpen] = useState<Policy | null>(null);
-  const [editing, setEditing] = useState<Policy | null>(null);
+  // null = closed, 'new' = create form, a policy = edit form.
+  const [editing, setEditing] = useState<Policy | 'new' | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [toggling, setToggling] = useState<string | null>(null);
   const { run } = useAction();
   const list = useResource(`policies:${JSON.stringify(filters)}:${page}`, () => policyService.list(page, PAGE_SIZE, filters));
 
@@ -55,52 +57,66 @@ export function PoliciesPanel() {
     }
   };
 
+  /** Switches a policy in or out of force: PATCH /policies/:id with only `isActive`. */
+  const toggle = async (p: Policy) => {
+    setToggling(p.id);
+    try {
+      const done = await run(
+        () => policyService.update(p.id, { isActive: !p.isActive }),
+        p.isActive ? 'Đã ngừng áp dụng chính sách' : 'Đã bật áp dụng chính sách',
+      );
+      if (done) await list.reload();
+    } finally {
+      setToggling(null);
+    }
+  };
+
   return (
     <Panel
       title="Chính sách"
       description="Các văn bản mà nhãn AI và kiểm tra tuân thủ của mỗi tập phải theo. Admin có thể tạo, sửa, bật/tắt chính sách; khi thay đổi, AI labeling và kiểm tra tuân thủ trên toàn nền tảng sẽ tuân theo chính sách đang áp dụng."
       actions={
-        <Button size="sm" onClick={() => setEditing(null)}>
+        <Button size="sm" onClick={() => setEditing('new')}>
           Thêm chính sách
         </Button>
       }
     >
+      <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-[2fr_1fr_1fr]">
+        <div className="relative">
+          <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <input
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Tìm theo tên hoặc văn bản pháp lý"
+            aria-label="Tìm chính sách"
+            className={`${SELECT} pl-8`}
+          />
+        </div>
+        <select aria-label="Lọc theo loại" value={filters.type ?? ''} onChange={(e) => set({ type: (e.target.value || undefined) as PolicyType | undefined })} className={SELECT}>
+          <option value="">Mọi loại</option>
+          {(Object.keys(POLICY_TYPE) as PolicyType[]).map((t) => (
+            <option key={t} value={t}>
+              {POLICY_TYPE[t]}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Lọc theo hiệu lực"
+          value={filters.active === undefined ? '' : String(filters.active)}
+          onChange={(e) => set({ active: e.target.value === '' ? undefined : e.target.value === 'true' })}
+          className={SELECT}
+        >
+          <option value="">Mọi trạng thái</option>
+          <option value="true">Đang áp dụng</option>
+          <option value="false">Ngừng áp dụng</option>
+        </select>
+      </div>
+
       {list.error && <ErrorNote message={list.error} onRetry={list.reload} />}
       {list.loading && !list.data && <Loading />}
       {list.data?.data.length === 0 && <Empty>Không có chính sách nào theo bộ lọc này.</Empty>}
       {list.data && list.data.data.length > 0 && (
         <div className="space-y-4">
-          <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-[2fr_1fr_1fr]">
-            <div className="relative">
-              <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <input
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Tìm theo tên hoặc văn bản pháp lý"
-                aria-label="Tìm chính sách"
-                className={`${SELECT} pl-8`}
-              />
-            </div>
-            <select aria-label="Lọc theo loại" value={filters.type ?? ''} onChange={(e) => set({ type: (e.target.value || undefined) as PolicyType | undefined })} className={SELECT}>
-              <option value="">Mọi loại</option>
-              {(Object.keys(POLICY_TYPE) as PolicyType[]).map((t) => (
-                <option key={t} value={t}>
-                  {POLICY_TYPE[t]}
-                </option>
-              ))}
-            </select>
-            <select
-              aria-label="Lọc theo hiệu lực"
-              value={filters.active === undefined ? '' : String(filters.active)}
-              onChange={(e) => set({ active: e.target.value === '' ? undefined : e.target.value === 'true' })}
-              className={SELECT}
-            >
-              <option value="">Mọi trạng thái</option>
-              <option value="true">Đang áp dụng</option>
-              <option value="false">Ngừng áp dụng</option>
-            </select>
-          </div>
-
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead className="text-left text-muted-foreground">
@@ -134,6 +150,9 @@ export function PoliciesPanel() {
                         <Button size="sm" variant="ghost" onClick={() => setEditing(p)}>
                           Sửa
                         </Button>
+                        <Button size="sm" variant="ghost" onClick={() => void toggle(p)} disabled={toggling === p.id}>
+                          {toggling === p.id ? 'Đang lưu…' : p.isActive ? 'Ngừng áp dụng' : 'Áp dụng'}
+                        </Button>
                         <Button
                           size="sm"
                           variant="ghost"
@@ -158,7 +177,7 @@ export function PoliciesPanel() {
         </div>
       )}
       {open && <PolicyDetailModal policy={open} onClose={() => setOpen(null)} />}
-      {editing && <PolicyFormModal policy={editing} onClose={() => setEditing(null)} onDone={list.reload} />}
+      {editing && <PolicyFormModal policy={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onDone={list.reload} />}
     </Panel>
   );
 }
