@@ -1,7 +1,6 @@
 'use client';
-
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -104,10 +103,11 @@ export function RewardWheelPanel() {
                 <th className="py-3.5 px-6">Vị trí & Tên giải</th>
                 <th className="py-3.5 px-4">Mã nhận diện</th>
                 <th className="py-3.5 px-4">Phần thưởng</th>
-                <th className="py-3.5 px-4 text-center">Trọng số</th>
+                <th className="py-3.5 px-4 text-center">Tỉ lệ xuất hiện</th>
                 <th className="py-3.5 px-6">Tỉ lệ trúng thưởng</th>
                 <th className="py-3.5 px-4 text-center">Trạng thái</th>
                 <th className="py-3.5 px-6 text-right">Thao tác</th>
+                <th className="py-3.5 px-4 text-center">Xóa</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5 font-medium">
@@ -197,6 +197,20 @@ export function RewardWheelPanel() {
                         className="rounded-xl hover:bg-muted p-2"
                       >
                         <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                      </Button>
+                    </td>
+                    <td className="py-4 px-4 text-center">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          if (window.confirm(`Xóa giải "${prize.name}" khỏi vòng quay?`)) {
+                            void rewardPrizeService.deletePrize(prize.id).then(() => prizes.reload());
+                          }
+                        }}
+                        className="rounded-xl hover:bg-rose-50/50 text-rose-600 p-2"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     </td>
                   </tr>

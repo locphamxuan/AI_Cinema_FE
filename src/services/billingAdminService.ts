@@ -36,6 +36,10 @@ export const billingAdminService = {
   cancelSubscription: (id: string, reason?: string) =>
     apiClient.post<unknown>(`/admin/subscriptions/${id}/cancel`, reason ? { reason } : {}),
 
+  /** Member ends their own plan right now; access stops immediately, no Coin refund. */
+  cancelMySubscription: (id: string, reason?: string) =>
+    apiClient.post<unknown>(`/subscriptions/${id}/cancel`, reason ? { reason } : {}),
+
   ledger: ({ page = 1, kind, entryType, walletId, from, to }: StatementQuery = {}): Promise<ApiResponse<Page<LedgerLine>>> =>
     apiClient.get<Page<LedgerLine>>(
       `/admin/coin-transactions${queryString({ page, limit: PAGE_SIZE, kind, entryType, walletId, from, to })}`,

@@ -1,4 +1,4 @@
-import { StaffLookup } from '@/features/staff/components/StaffPage';
+import { StaffLookup } from '@/features/staff/components/StaffLookup';
 
 export default function Page() {
   return <StaffLookup />;
