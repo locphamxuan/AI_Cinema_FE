@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
@@ -42,18 +41,17 @@ const STREAMING_FIELDS: SettingField[] = [
 
 const ALL_FIELDS = [...COIN_FIELDS, ...PRODUCTION_FIELDS, ...STREAMING_FIELDS];
 
-type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards' | 'contract';
+type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'contract';
 
 const TABS: { key: SettingsTab; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'coin', label: 'Coin & nạp tiền' },
   { key: 'production', label: 'Giá tập' },
   { key: 'streaming', label: 'Trình phát & gói' },
-  { key: 'rewards', label: 'Điểm danh & Vòng quay' },
   { key: 'contract', label: 'Hợp đồng (Bên A)' },
 ];
 
-/** Segmented platform policies: Coin, Production, Playback & Rewards */
+/** Segmented platform policies: Coin, Production, Playback and the contract's party A. */
 export function PlatformSettingsPanel() {
   const settings = useResource('settings', productionService.getPlatformSettings);
   const [activeTab, setActiveTab] = useState<SettingsTab>('all');
@@ -223,31 +221,6 @@ export function PlatformSettingsPanel() {
         {activeTab === 'streaming' && (
           <div className="space-y-4">
             {renderFieldGroup(STREAMING_FIELDS)}
-          </div>
-        )}
-
-        {/* Tab 4: Rewards Guide & Quick Link */}
-        {activeTab === 'rewards' && (
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 space-y-4">
-            <div className="flex items-center gap-3">
-              <div>
-                <h3 className="text-sm font-bold text-foreground">Quy tắc thưởng & vòng quay</h3>
-                <p className="text-xs text-muted-foreground">
-                  Cấu hình phần thưởng theo chuỗi ngày điểm danh và giải thưởng của vòng quay.
-                </p>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Mức thưởng theo ngày điểm danh và tỉ lệ trúng của vòng quay được chỉnh riêng ở trang Điểm danh & vòng quay.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/admin/rewards"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors shadow-md shadow-amber-500/20"
-              >
-                <span>Mở trang Điểm danh & vòng quay</span>
-              </Link>
-            </div>
           </div>
         )}
 

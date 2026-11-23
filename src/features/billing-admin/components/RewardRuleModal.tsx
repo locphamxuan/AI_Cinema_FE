@@ -12,24 +12,30 @@ import type { RewardRule } from '@/types/billing';
 /** The BE ladder runs seven streak days, then starts again at day 1. */
 export const LADDER_LENGTH = 7;
 
-/** Creates a ladder day, or edits one; a new rung takes the first free day. */
+/**
+ * Creates a ladder day, or edits one; a new rung takes `initialDay` or the first free day. The
+ * unique code the BE needs is made from the day (`day_3`, `day_3_2`…), never typed by the Admin.
+ */
 export function RewardRuleModal({
   rule,
+  initialDay,
   takenDays,
   takenCodes = new Set<string>(),
   onClose,
   onDone,
 }: {
   rule: RewardRule | null;
+  /** The day a new rung starts on, e.g. the empty day card the Admin clicked. */
+  initialDay?: number;
   takenDays: Set<number>;
   /** Codes already used by any rule, active or not: the BE keeps them unique. */
   takenCodes?: Set<string>;
   onClose: () => void;
   onDone: () => Promise<void>;
 }) {
-  const firstFree = Array.from({ length: LADDER_LENGTH }, (_, i) => i + 1).find((d) => !takenDays.has(d)) ?? 1;
+  const firstFree =
+    initialDay ?? Array.from({ length: LADDER_LENGTH }, (_, i) => i + 1).find((d) => !takenDays.has(d)) ?? 1;
   const [form, setForm] = useState({
-    code: rule ? '' : suggestCode(firstFree, takenCodes),
     name: rule?.name ?? '',
     streakDay: String(rule?.streakDay ?? firstFree),
     bonusCoins: String(rule?.bonusCoins ?? ''),
@@ -43,17 +49,15 @@ export function RewardRuleModal({
   // so reactivating a switched-off rule whose day another rule now holds is refused too.
   const ownsDay = Boolean(rule?.isActive) && day === rule?.streakDay;
   const dayTaken = form.isActive && takenDays.has(day) && !ownsDay;
-  const code = form.code.trim();
-  const codeTaken = !rule && takenCodes.has(code.toLowerCase());
-  const codeValid = Boolean(rule) || (code.length >= 3 && !codeTaken);
-  const valid = form.name.trim() && Number.isInteger(coins) && coins >= 1 && !dayTaken && codeValid;
+  const name = form.name.trim() || `Ngày ${day}`;
+  const valid = Number.isInteger(coins) && coins >= 1 && !dayTaken;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const input = { name: form.name.trim(), streakDay: day, bonusCoins: coins, grantsSpin: day === LADDER_LENGTH };
+    const input = { name, streakDay: day, bonusCoins: coins, grantsSpin: day === LADDER_LENGTH };
     const done = rule
       ? await run(() => billingAdminService.updateRewardRule(rule.id, { ...input, isActive: form.isActive }), 'Đã lưu ngày điểm danh')
-      : await run(() => billingAdminService.createRewardRule({ ...input, code }), 'Đã thêm ngày điểm danh');
+      : await run(() => billingAdminService.createRewardRule({ ...input, code: suggestCode(day, takenCodes) }), 'Đã thêm ngày điểm danh');
     if (done) {
       await onDone();
       onClose();
@@ -61,33 +65,10 @@ export function RewardRuleModal({
   };
 
   return (
-    <Modal open onClose={onClose} title={rule ? `Sửa ngày ${rule.streakDay}` : 'Thêm ngày điểm danh'}>
+    <Modal open onClose={onClose} title={rule ? `Sửa thưởng Ngày ${rule.streakDay}` : 'Đặt thưởng cho một ngày'}>
       <form onSubmit={submit} className="space-y-4">
-        {!rule && (
-          <FormField label="Mã (không trùng, không đổi sau khi tạo)">
-            <input
-              value={form.code}
-              onChange={(e) => set({ code: e.target.value })}
-              maxLength={50}
-              placeholder="day_1, day_2…"
-              required
-              className={fieldInputClass}
-            />
-            {codeTaken && <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">Mã này đã được dùng cho một ngày khác.</p>}
-          </FormField>
-        )}
-        <FormField label="Tên ngày điểm danh">
-          <input
-            value={form.name}
-            onChange={(e) => set({ name: e.target.value })}
-            maxLength={255}
-            placeholder="Ví dụ: Ngày thứ 1 trong chuỗi"
-            required
-            className={fieldInputClass}
-          />
-        </FormField>
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="Ngày trong chuỗi">
+          <FormField label="Ngày thứ mấy trong chuỗi">
             <select
               value={form.streakDay}
               onChange={(e) => set({ streakDay: e.target.value })}
@@ -108,33 +89,48 @@ export function RewardRuleModal({
               step={1}
               value={form.bonusCoins}
               onChange={(e) => set({ bonusCoins: e.target.value })}
-              placeholder="Số Coin tặng…"
+              placeholder="Ví dụ: 10"
               required
               className={fieldInputClass}
             />
           </FormField>
         </div>
+        <FormField label="Tên hiển thị (không bắt buộc)">
+          <input
+            value={form.name}
+            onChange={(e) => set({ name: e.target.value })}
+            maxLength={255}
+            placeholder={`Ngày ${day}`}
+            className={fieldInputClass}
+          />
+        </FormField>
         {dayTaken && (
           <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">
-            Ngày {day} đã có cấu hình đang dùng; hãy sửa hoặc tắt nó trước.
+            Ngày {day} đã có thưởng đang dùng; hãy sửa hoặc tắt thưởng đó trước.
           </p>
         )}
-        <div className="p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 text-xs text-sky-800 dark:text-sky-300 flex items-start gap-2">
+        <div className="rounded-xl border border-border bg-muted/50 p-3 text-sm text-foreground">
           <span>
             {day === LADDER_LENGTH
-              ? 'Ngày 7 là ngày cuối chuỗi: hệ thống tự tặng thêm 1 lượt quay.'
-              : 'Lượt quay chỉ được tặng khi Member điểm danh đủ 7 ngày liên tục.'}
+              ? 'Ngày 7 là ngày cuối chuỗi: ngoài Coin thưởng, Member được tặng thêm 1 lượt quay.'
+              : 'Ngày này chỉ tặng Coin thưởng. Lượt quay được tặng vào Ngày 7.'}
           </span>
         </div>
         {rule && (
-          <label className="flex items-center gap-2 text-xs text-secondary-foreground font-medium cursor-pointer">
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border p-3">
             <input
               type="checkbox"
+              role="switch"
               checked={form.isActive}
               onChange={(e) => set({ isActive: e.target.checked })}
-              className="w-4 h-4 accent-sky-600 rounded"
+              className="mt-0.5 size-4 accent-primary"
             />
-            {rule.isActive ? 'Đang dùng (bỏ chọn để tắt ngày này)' : 'Bật lại ngày này'}
+            <span>
+              <span className="block text-sm font-semibold text-foreground">Dùng thưởng này</span>
+              <span className="block text-xs text-muted-foreground">
+                {form.isActive ? 'Đang bật: Member điểm danh ngày này được nhận thưởng.' : 'Đang tắt: ngày này không có thưởng.'}
+              </span>
+            </span>
           </label>
         )}
         <div className="flex justify-end gap-2.5 pt-2 border-t border-border">
@@ -142,7 +138,7 @@ export function RewardRuleModal({
             Huỷ
           </Button>
           <Button type="submit" disabled={!valid || busy} className="rounded-xl px-5 py-2 text-xs font-bold">
-            {busy ? 'Đang lưu…' : 'Lưu cấu hình'}
+            {busy ? 'Đang lưu…' : 'Lưu'}
           </Button>
         </div>
       </form>

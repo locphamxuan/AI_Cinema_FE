@@ -6,7 +6,7 @@ import { PlatformSettingsPanel } from '@/features/admin/components/PlatformSetti
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 import { PlansPanel } from '@/features/billing-admin/components/PlansPanel';
 import { RewardLadderPanel } from '@/features/billing-admin/components/RewardLadderPanel';
-import { chanceOf } from '@/features/billing-admin/components/RewardWheelPanel';
+import { chanceOf } from '@/features/billing-admin/components/rewardOdds';
 import { SubscriptionsPanel } from '@/features/billing-admin/components/SubscriptionsPanel';
 import { useAppStore } from '@/store/useAppStore';
 import { mockApi } from '@/tests/support/mockApi';
@@ -186,8 +186,8 @@ describe('Rewards', () => {
     render(<RewardLadderPanel />);
 
     await userEvent.click(await screen.findByRole('button', { name: /Thêm ngày/ }));
-    await userEvent.selectOptions(screen.getByLabelText('Ngày trong chuỗi'), '1');
-    expect(screen.getByText(/Ngày 1 đã có cấu hình đang dùng/)).toBeInTheDocument();
+    await userEvent.selectOptions(screen.getByLabelText('Ngày thứ mấy trong chuỗi'), '1');
+    expect(screen.getByText(/Ngày 1 đã có thưởng đang dùng/)).toBeInTheDocument();
   });
 });
 

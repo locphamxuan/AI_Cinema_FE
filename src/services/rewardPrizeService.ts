@@ -29,12 +29,12 @@ export const rewardPrizeService = {
     return apiClient.post<RewardPrize>('/admin/reward-prizes', dto);
   },
 
-  /** PATCH /admin/reward-prizes/:id - update a display name, Coin amount or weight */
+  /** PATCH /admin/reward-prizes/:id - update a name, amount, weight, or switch it on/off */
   updatePrize(id: string, dto: UpdateRewardPrizeDto): Promise<ApiResponse<RewardPrize>> {
     return apiClient.patch<RewardPrize>(`/admin/reward-prizes/${id}`, dto);
   },
 
-  /** DELETE /admin/reward-prizes/:id - take a prize off the wheel (keeps history) */
+  /** DELETE /admin/reward-prizes/:id - delete a prize for good (past spins keep what they won) */
   deletePrize(id: string): Promise<ApiResponse<unknown>> {
     return apiClient.delete<unknown>(`/admin/reward-prizes/${id}`);
   },
