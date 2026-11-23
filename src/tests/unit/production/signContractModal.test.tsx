@@ -5,7 +5,7 @@ import { toast } from '@/components/ui/Toast';
 import { SignContractModal } from '@/features/admin/components/SignContractModal';
 import type { ContractToSign } from '@/features/admin/adminPipeline';
 import { failWith, routeFetch } from '@/tests/support/routeFetch';
-import { attachPdf, formOf, pdfFile } from '@/tests/support/pdf';
+import { attachSignature, formOf, signatureFile, stubImageDecoding } from '@/tests/support/signature';
 import type { Contract } from '@/types/contract';
 
 vi.mock('@/components/ui/Toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
@@ -55,7 +55,7 @@ describe('SignContractModal', () => {
     const { dialog, onClose, onChanged } = open();
     const sign = within(dialog).getByRole('button', { name: /Đồng ý/ });
     expect(sign).toBeDisabled();
-    const file = await attachPdf(dialog, /PDF AI Cinema đã ký/);
+    const file = await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
 
     await userEvent.click(sign);
 
@@ -77,7 +77,7 @@ describe('SignContractModal', () => {
     await userEvent.clear(offerInput(dialog));
     await userEvent.type(offerInput(dialog), '130.000.000');
     expect(send).toBeDisabled();
-    const file = await attachPdf(dialog, /PDF AI Cinema đã ký/);
+    const file = await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     await userEvent.click(send);
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
@@ -97,7 +97,7 @@ describe('SignContractModal', () => {
     // 10 M left + the 45 M the waiting hand-off holds.
     expect(await within(dialog).findByText(/ngân sách còn lại 55\.000\.000/)).toBeInTheDocument();
     await userEvent.type(offerInput(dialog), '50000000');
-    await attachPdf(dialog, /PDF AI Cinema đã ký/);
+    await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     await userEvent.click(within(dialog).getByRole('button', { name: 'Gửi giá đề xuất' }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
@@ -120,7 +120,7 @@ describe('SignContractModal', () => {
   it('shows the refusal and stays open when the signature is refused', async () => {
     routeFetch({ '/projects/m1/costs': COSTS, '/contracts/c1/sign': failWith(409, 'Cannot sign a contract that is SIGNED (expected STUDIO_SIGNED)') });
     const { dialog, onClose, onChanged } = open();
-    await attachPdf(dialog, /PDF AI Cinema đã ký/);
+    await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
 
     await userEvent.click(within(dialog).getByRole('button', { name: /Đồng ý/ }));
 
@@ -129,13 +129,18 @@ describe('SignContractModal', () => {
     expect(onChanged).not.toHaveBeenCalled();
   });
 
-  it('refuses a file that is not a PDF or is over 10 MB, before sending', async () => {
+  it('refuses a file that is not a signature image, is over 2 MB or too small to read, before sending', async () => {
     const calls = routeFetch({ '/projects/m1/costs': COSTS });
     const { dialog } = open();
     const sign = within(dialog).getByRole('button', { name: /Đồng ý/ });
 
-    await attachPdf(dialog, /PDF AI Cinema đã ký/, pdfFile('to.pdf', 'application/pdf', 11 * 1024 * 1024));
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('tối đa 10 MB');
+    await attachSignature(dialog, /Ảnh chữ ký AI Cinema/, signatureFile('hop-dong.pdf', 'application/pdf'), false);
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('PNG hoặc JPG');
+    await attachSignature(dialog, /Ảnh chữ ký AI Cinema/, signatureFile('to.png', 'image/png', 3 * 1024 * 1024), false);
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('tối đa 2 MB');
+    stubImageDecoding({ width: 100, height: 30 });
+    await userEvent.upload(within(dialog).getByLabelText(/Ảnh chữ ký AI Cinema/), signatureFile());
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Ảnh quá nhỏ (100x30 px)');
     expect(sign).toBeDisabled();
     expect(calls.some((c) => c.path === '/contracts/c1/sign')).toBe(false);
   });

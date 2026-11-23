@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
-import { MAX_CONTRACT_VND, contractPdfProblem, contractService } from '@/services/contractService';
+import { MAX_CONTRACT_VND, contractService } from '@/services/contractService';
 import { toast } from '@/components/ui/Toast';
-import { ContractPdfInput } from './ContractPdfInput';
+import { SignatureImageInput } from './SignatureImageInput';
 import type { Contract } from '@/types/contract';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
@@ -26,7 +26,7 @@ export function ContractCard({
   contract: Contract;
   /** Admin may sign (agree) or counter-propose (disagree) a round the studio just signed. */
   canDecide?: boolean;
-  /** Admin and Reviewer may download the signed PDFs (BE CONTRACT_DOCUMENT_READ). */
+  /** Admin and Reviewer may download the signed copies (BE CONTRACT_DOCUMENT_READ). */
   canDownload?: boolean;
   /** The cost of a round; hidden from Creators, who never see production costs. */
   showCost?: boolean;
@@ -55,11 +55,11 @@ export function ContractCard({
     if (!(await contractService.downloadTemplate(c.id))) toast.error('Không tải được hợp đồng', 'Thử lại sau.');
   };
   const download = async (side: 'ADMIN' | 'STUDIO' | 'FINAL', fileName: string) => {
-    if (!(await contractService.downloadDocument(c.id, side, fileName))) toast.error('Không tải được file PDF', 'Thử lại sau.');
+    if (!(await contractService.downloadDocument(c.id, side, fileName))) toast.error('Không tải được bản hợp đồng', 'Thử lại sau.');
   };
 
   const sign = async () => {
-    if (!signFile || contractPdfProblem(signFile)) return;
+    if (!signFile) return;
     if (await run(() => contractService.sign(c.id, signFile), 'Đã ký, hợp đồng hoàn tất')) {
       setConfirming(false);
       await docs.reload();
@@ -67,7 +67,7 @@ export function ContractCard({
     }
   };
   const counter = async () => {
-    if (!(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile || contractPdfProblem(counterFile)) return;
+    if (!(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile) return;
     if (await run(() => contractService.counter(c.id, priceVnd, counterFile), 'Đã gửi mức giá mới cho Studio')) {
       setCountering(false);
       setPrice('');
@@ -103,7 +103,7 @@ export function ContractCard({
 
       {canDownload && (
         <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border">
-          <span className="text-muted-foreground font-medium">Tài liệu PDF:</span>
+          <span className="text-muted-foreground font-medium">Bản hợp đồng (cùng mẫu):</span>
           <Button
             type="button"
             variant="secondary"
@@ -130,14 +130,14 @@ export function ContractCard({
 
       {(canSign || canCounter) && !countering && (
         <div className="space-y-2.5 border-t border-border pt-2.5">
-          {canSign && <ContractPdfInput label="Bản PDF Admin đã ký theo giá Studio" file={signFile} onChange={setSignFile} />}
+          {canSign && <SignatureImageInput label="Ảnh chữ ký AI Cinema (ký theo giá Studio)" onChange={setSignFile} />}
           <div className="flex flex-wrap gap-2">
             {canSign && (
               <Button
                 type="button"
                 size="sm"
                 onClick={() => setConfirming(true)}
-                disabled={busy || !signFile || !!contractPdfProblem(signFile)}
+                disabled={busy || !signFile}
               >
                 Đồng ý và ký
               </Button>
@@ -155,7 +155,7 @@ export function ContractCard({
             <FormField label="Giá mới (₫)" hint="Bội số của 1.000 ₫." error={priceProblem}>
               <input inputMode="numeric" value={price} onChange={(e) => setPrice(e.target.value)} className={fieldInputClass} aria-label="Giá mới" />
             </FormField>
-            <ContractPdfInput label="Bản PDF đã ký cho giá mới" file={counterFile} onChange={setCounterFile} />
+            <SignatureImageInput label="Ảnh chữ ký AI Cinema cho giá mới" onChange={setCounterFile} />
           </div>
           <div className="flex justify-end gap-2">
             <Button type="button" size="sm" variant="secondary" onClick={() => setCountering(false)} disabled={busy}>
@@ -165,7 +165,7 @@ export function ContractCard({
               type="button"
               size="sm"
               onClick={counter}
-              disabled={busy || !(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile || !!contractPdfProblem(counterFile)}
+              disabled={busy || !(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile}
             >
               Gửi giá cho Studio
             </Button>
@@ -175,7 +175,7 @@ export function ContractCard({
       <ConfirmModal
         open={confirming}
         title="Đồng ý giá và ký hợp đồng"
-        description="Admin ký theo giá Studio đã ký trên bản hợp đồng này."
+        description="Hệ thống đặt ảnh chữ ký AI Cinema vào ô Bên A của bản hợp đồng Studio đã ký."
         details={[
           ['Studio', c.studio.name],
           ['Vòng', `Vòng ${c.round}`],

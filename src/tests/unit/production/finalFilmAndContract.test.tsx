@@ -6,7 +6,7 @@ import { PublishPanel } from '@/features/production/components/episode/PublishPa
 import { ContractTab } from '@/features/production/components/project/ContractTab';
 import { assignedProject, withProject } from '@/tests/support/projectContext';
 import { failWith, routeFetch } from '@/tests/support/routeFetch';
-import { attachPdf, formOf } from '@/tests/support/pdf';
+import { attachSignature, formOf } from '@/tests/support/signature';
 import { signInAs } from '@/tests/support/signIn';
 import { toast } from '@/components/ui/Toast';
 import type { Episode } from '@/types/production';
@@ -121,7 +121,7 @@ describe('ContractTab', () => {
     expect(await screen.findByText(/Hợp đồng với Studio Lumen Studio/)).toBeInTheDocument();
     const sign = screen.getByRole('button', { name: /Đồng ý/ });
     expect(sign).toBeDisabled();
-    const file = await attachPdf(document.body, /PDF Admin đã ký/);
+    const file = await attachSignature(document.body, /ký theo giá Studio/);
     await userEvent.click(sign);
     // Signing completes the contract and hands the project off: it asks once first.
     const dialog = await screen.findByRole('dialog');
@@ -142,7 +142,7 @@ describe('ContractTab', () => {
     await userEvent.type(screen.getByLabelText('Giá mới'), '120000000');
     const send = screen.getByRole('button', { name: 'Gửi giá cho Studio' });
     expect(send).toBeDisabled();
-    await attachPdf(document.body, /PDF đã ký cho giá mới/);
+    await attachSignature(document.body, /chữ ký AI Cinema cho giá mới/);
     await userEvent.click(send);
     await waitFor(() => {
       const sent = formOf(calls.find((c) => c.path === '/contracts/c1/counter')!.body);

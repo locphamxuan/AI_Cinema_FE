@@ -8,9 +8,9 @@ import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { formatDateTime, formatVnd } from '@/lib/format';
 import { parseVnd } from '@/features/production/components/shared/CostRequestCard';
-import { MAX_CONTRACT_VND, contractPdfProblem, contractService } from '@/services/contractService';
+import { MAX_CONTRACT_VND, contractService } from '@/services/contractService';
 import { toast } from '@/components/ui/Toast';
-import { ContractPdfInput } from '@/features/production/components/shared/ContractPdfInput';
+import { SignatureImageInput } from '@/features/production/components/shared/SignatureImageInput';
 import { productionService } from '@/services/productionService';
 import { studioService } from '@/services/studioService';
 import type { ContractToSign } from '../adminPipeline';
@@ -29,7 +29,7 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
   const left = costs.data ? costs.data.remainingVnd + heldVnd : null;
   const remainingVnd = left !== null && !Number.isNaN(left) ? left : null;
   const offerValid = remainingVnd !== null && offer > 0 && offer <= Math.min(remainingVnd, MAX_CONTRACT_VND);
-  const fileOk = !!signFile && !contractPdfProblem(signFile);
+  const fileOk = !!signFile;
   const readError = costs.error ?? handoffs.error;
 
   const finish = async (done: unknown) => {
@@ -90,16 +90,12 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
 
       <div className="space-y-2 border-t border-border pt-3">
         <div className="flex items-center justify-between gap-3 text-xs">
-          <span className="text-muted-foreground">Đọc bản Studio đã ký trước khi ký hoặc đề xuất giá.</span>
+          <span className="text-muted-foreground">Đọc bản Studio đã ký trước khi ký hoặc đề xuất giá. Bản đủ hai chữ ký có cùng mẫu với bản này.</span>
           <Button type="button" size="sm" variant="ghost" onClick={() => void downloadStudio()}>
             Tải bản Studio ký
           </Button>
         </div>
-        <ContractPdfInput
-          label="Bản PDF AI Cinema đã ký (cho giá Studio, hoặc cho giá mới bạn đề xuất)"
-          file={signFile}
-          onChange={setSignFile}
-        />
+        <SignatureImageInput label="Ảnh chữ ký AI Cinema (ký theo giá Studio, hoặc cho giá mới bạn đề xuất)" onChange={setSignFile} />
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-border">

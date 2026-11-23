@@ -77,11 +77,6 @@ export interface StudioInput {
   contactName?: string;
   phone?: string;
   note?: string;
-  /** Legal profile printed as Bên B; an empty string clears it. */
-  address?: string;
-  taxCode?: string;
-  bankAccount?: string;
-  representativeTitle?: string;
   isActive?: boolean;
 }
 
