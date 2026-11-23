@@ -120,7 +120,7 @@ export function RiskFlagsTab() {
                 <th className="py-2 pr-3 font-medium">Member</th>
                 <th className="py-2 pr-3 font-medium">Giao dịch</th>
                 <th className="py-2 pr-3 text-right font-medium">Coin chính / thưởng</th>
-                <th className="py-2 pr-3 text-right font-medium">Quy đổi</th>
+                <th className="py-2 pr-3 text-right font-medium">Giá trị Coin chính</th>
                 <th className="py-2 pr-3 font-medium">Quy tắc và lý do</th>
                 <th className="py-2 pr-3 font-medium">Trạng thái</th>
                 <th className="py-2 text-right font-medium">Thao tác</th>

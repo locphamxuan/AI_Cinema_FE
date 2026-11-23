@@ -1,12 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FilmProfitTab } from '@/features/finance/FilmProfitTab';
-import { RevenueShareTab } from '@/features/finance/RevenueShareTab';
 import { RiskFlagsTab } from '@/features/finance/RiskFlagsTab';
 import { AppShell } from '@/components/shell/AppShell';
-import { isPeriodOver, previousPeriod } from '@/services/financeService';
-import { roi, vnd, watchTime } from '@/features/finance/financeFormat';
+import { FilmProfitTab, planCoverage } from '@/features/finance/FilmProfitTab';
+import { day, roi, signTone, vnd } from '@/features/finance/financeFormat';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 
@@ -21,77 +19,66 @@ afterEach(() => vi.unstubAllGlobals());
 const page = <T,>(data: T[]) => ({ data, meta: { totalItems: data.length, currentPage: 1, totalPages: 1, itemsPerPage: 20 } });
 
 const FILMS = {
-  totals: { productionCostVnd: 150_000_000, revenueVnd: 120_000_000, profitVnd: -30_000_000, roiPercent: -20, breakEvenMovies: 0 },
+  currentPeriod: '2026-11',
+  lastSharedPeriod: '2026-10',
+  totals: { productionCostVnd: 150_000_000, episodeSalesVnd: 90_000_000, planShareVnd: 30_000_000, revenueVnd: 120_000_000, profitVnd: -30_000_000, roiPercent: -20, marginPercent: -25, costedMovies: 1, brokeEvenMovies: 0 },
   films: [
-    { movieId: 'm1', title: 'Mưa Sài Gòn', projectStatus: 'COMPLETED', productionCostVnd: 150_000_000, unlockRevenueVnd: 90_000_000, refundedVnd: 2_000_000, planShareVnd: 30_000_000, revenueVnd: 120_000_000, profitVnd: -30_000_000, roiPercent: -20, breakEven: false },
-    { movieId: 'm2', title: 'Phim chưa có chi phí', projectStatus: 'ASSIGNED', productionCostVnd: 0, unlockRevenueVnd: 0, refundedVnd: 0, planShareVnd: 0, revenueVnd: 0, profitVnd: 0, roiPercent: null, breakEven: false },
+    { movieId: 'm1', title: 'Mưa Sài Gòn', studioName: 'Studio Sen', createdAt: '2026-10-01T03:00:00Z', productionCostVnd: 150_000_000, episodeSalesVnd: 90_000_000, refundedVnd: 2_000_000, planShareVnd: 30_000_000, revenueVnd: 120_000_000, profitVnd: -30_000_000, roiPercent: -20, breakEven: 'NOT_YET' },
+    { movieId: 'm2', title: 'Mưa Sài Gòn', studioName: null, createdAt: '2026-11-05T03:00:00Z', productionCostVnd: 0, episodeSalesVnd: 0, refundedVnd: 0, planShareVnd: 0, revenueVnd: 0, profitVnd: 0, roiPercent: null, breakEven: 'NO_COST' },
   ],
 };
 
 describe('Financial Dashboard formatting', () => {
-  it('spells VND, shows "—" for a film without cost, and watch time as hours:minutes', () => {
+  it('spells VND, shows "—" when there is nothing to divide by, colours gains and losses', () => {
     expect(vnd(1_500_000)).toBe('1.500.000 VND');
     expect(roi(null)).toBe('—');
     expect(roi(-20)).toBe('-20%');
-    expect(watchTime(3725)).toBe('1:02');
+    expect(signTone(5)).toBe('text-success');
+    expect(signTone(-5)).toBe('text-destructive');
+    expect(signTone(0)).toBe('');
+    expect(day('2026-10-31T18:00:00Z')).toBe('01/11/2026');
   });
 
-  it('takes last month in Vietnam time and only lets a finished month be allocated', () => {
-    const now = new Date('2026-11-30T18:00:00Z'); // 01/12 01:00 in Vietnam
-    expect(previousPeriod(now)).toBe('2026-11');
-    expect(isPeriodOver('2026-11', now)).toBe(true);
-    expect(isPeriodOver('2026-12', now)).toBe(false);
+  it('says in plain words which months the monthly-plan column covers', () => {
+    expect(planCoverage({ currentPeriod: '2026-11', lastSharedPeriod: '2026-10' })).toMatch(/gần nhất là tháng 10\/2026.*Tháng 11\/2026 đang diễn ra/);
+    expect(planCoverage({ currentPeriod: '2026-11', lastSharedPeriod: null })).toMatch(/^Chưa có tháng nào/);
   });
 });
 
-describe('Profit & ROI tab', () => {
-  it('reads /admin/finance/films and shows totals, the loss and "—" for a null ROI', async () => {
+describe('Profit per film', () => {
+  it('reads /admin/finance/films and shows both revenue sources, the loss and a neutral state for a film without cost', async () => {
     const calls = routeFetch({ '/admin/finance/films': FILMS });
     render(<FilmProfitTab />);
 
-    expect(await screen.findByText('Mưa Sài Gòn')).toBeInTheDocument();
+    expect(await screen.findByText('Studio Sen · tạo ngày 01/10/2026')).toBeInTheDocument();
     expect(calls[0].path).toBe('/admin/finance/films');
+    for (const name of ['Bán tập lẻ', 'Từ gói Tháng', 'Tổng doanh thu', 'Lợi nhuận', 'ROI']) {
+      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+    }
+    expect(screen.getByText('đã trừ hoàn 2.000.000 VND')).toBeInTheDocument();
+    expect(screen.getByText(/gần nhất là tháng 10\/2026/)).toBeInTheDocument();
     const loss = screen.getAllByText('-30.000.000 VND');
     expect(loss.some((el) => el.className.includes('text-destructive'))).toBe(true);
-    const row = screen.getByText('Phim chưa có chi phí').closest('tr')!;
-    expect(within(row).getByText('—')).toBeInTheDocument();
+
+    const noCost = screen.getByText('tạo ngày 05/11/2026').closest('tr')!;
+    expect(within(noCost).getByText('Chưa có chi phí')).toBeInTheDocument();
+    expect(within(noCost).getByText('—')).toBeInTheDocument();
+    expect(within(noCost).queryByText('Đã hoà vốn')).toBeNull();
+    expect(screen.getByText('Chưa hoà vốn')).toBeInTheDocument();
   });
 
-  it('filters films by name', async () => {
+  it('filters films by name or studio', async () => {
     routeFetch({ '/admin/finance/films': FILMS });
     render(<FilmProfitTab />);
-    await userEvent.type(await screen.findByLabelText('Tìm theo tên phim'), 'mưa');
-    expect(screen.queryByText('Phim chưa có chi phí')).not.toBeInTheDocument();
-  });
-});
-
-describe('Monthly-plan revenue share tab', () => {
-  it('reads the chosen month and re-runs it after confirming', async () => {
-    signInAs('admin');
-    const period = previousPeriod();
-    const result = { period, monthlyPoolVnd: 1_000_000, totalWatchSeconds: 400, allocatedAt: '2026-11-01T00:05:00Z', movies: [{ movieId: 'm1', title: 'Mưa Sài Gòn', watchSeconds: 300, sharePercent: 75, allocatedVnd: 750_000 }] };
-    const calls = routeFetch({
-      '/admin/finance/revenue-allocations': { ...result, allocatedAt: null, movies: [] },
-      [`/admin/finance/revenue-allocations/${period}/run`]: result,
-    });
-    render(<RevenueShareTab />);
-
-    expect(await screen.findByText(/Tháng này chưa chia/)).toBeInTheDocument();
-    expect(calls[0].search.get('period')).toBe(period);
-
-    await userEvent.click(screen.getByRole('button', { name: /Chia lại tháng này/ }));
-    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Chia lại' }));
-
-    expect(await screen.findByText('750.000 VND')).toBeInTheDocument();
-    expect(calls.some((c) => c.path === `/admin/finance/revenue-allocations/${period}/run` && c.method === 'POST')).toBe(true);
+    await userEvent.type(await screen.findByLabelText('Tìm theo tên phim hoặc studio'), 'sen');
+    expect(screen.queryByText('tạo ngày 05/11/2026')).not.toBeInTheDocument();
+    expect(screen.getByText('Studio Sen · tạo ngày 01/10/2026')).toBeInTheDocument();
   });
 
-  it('hides the re-run button without finance:allocation.run', async () => {
-    signInAs('admin', ['finance:report.read']);
-    routeFetch({ '/admin/finance/revenue-allocations': { period: '2026-10', monthlyPoolVnd: 0, totalWatchSeconds: 0, allocatedAt: null, movies: [] } });
-    render(<RevenueShareTab />);
-    await screen.findByText(/Tháng này chưa chia/);
-    expect(screen.queryByRole('button', { name: /Chia lại/ })).not.toBeInTheDocument();
+  it('shows an empty state without films', async () => {
+    routeFetch({ '/admin/finance/films': { ...FILMS, lastSharedPeriod: null, films: [] } });
+    render(<FilmProfitTab />);
+    expect(await screen.findByText('Chưa có phim nào.')).toBeInTheDocument();
   });
 });
 

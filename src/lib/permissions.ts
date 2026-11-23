@@ -49,7 +49,6 @@ export const PERMISSION = {
   SUPPORT_CASE_ASSIGN: 'support:case.assign',
   SUPPORT_KNOWLEDGE_MANAGE: 'support:knowledge.manage',
   FINANCE_REPORT_READ: 'finance:report.read',
-  FINANCE_ALLOCATION_RUN: 'finance:allocation.run',
   RISK_FLAG_MANAGE: 'risk:flag.manage',
   // Administration
   MEMBER_OPS_READ: 'member:ops.read',
