@@ -23,11 +23,10 @@ export const useAppStore = create<AppState>()(
               removeItem: () => {},
             }
       ),
-      partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
-        user: state.user,
-        theme: state.theme,
-      }),
+      // Only the theme is shared by all tabs. The signed-in account belongs to each tab (lib/authSession):
+      // a profile kept here would make one window believe it is the account another window just signed in.
+      partialize: (state) => ({ theme: state.theme }),
+      merge: (persisted, current) => ({ ...current, theme: (persisted as Partial<AppState> | undefined)?.theme ?? current.theme }),
     }
   )
 );

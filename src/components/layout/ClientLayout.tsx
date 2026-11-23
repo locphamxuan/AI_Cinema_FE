@@ -5,7 +5,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useAppStore } from '@/store/useAppStore';
 import { AREAS, homeAreaOf } from '@/lib/permissions';
 import { safeNext } from '@/lib/safeNext';
-import { ToastContainer } from '@/components/ui/Toast';
+import { toast, ToastContainer } from '@/components/ui/Toast';
+import { authSession } from '@/lib/authSession';
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -16,6 +17,17 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
+
+  // Each tab keeps its own account. When this tab's session ends elsewhere (signed out in a tab duplicated from
+  // this one, or no longer renewable), the window says so and goes back to the sign-in screen instead of failing.
+  useEffect(
+    () =>
+      authSession.subscribe(() => {
+        const change = useAppStore.getState().syncSession();
+        if (change === 'ended') toast.warning('Phiên đăng nhập của cửa sổ này đã kết thúc', 'Vui lòng đăng nhập lại để tiếp tục.');
+      }),
+    [],
+  );
 
   // Signing in lands each role on its own area, or back on the page that sent it to /login (?next=).
   const area = isAuthenticated ? homeAreaOf(user?.role) : null;

@@ -4,7 +4,7 @@
 
 import { API_BASE_URL } from '@/constants/apiRoutes';
 import { localizeApiError } from '@/lib/applicationMessages';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { authSession } from '@/lib/authSession';
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -41,48 +41,50 @@ class ApiClient {
     this.baseUrl = baseUrl;
   }
 
+  /** The access token of this tab's own session: another window signed in as another account never changes it. */
   private getAuthHeader(): Record<string, string> {
-    const token = storage.getString(STORAGE_KEYS.AUTH_TOKEN);
+    const token = authSession.read()?.accessToken;
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
-  private async tryRefreshToken(): Promise<boolean> {
+  /**
+   * Swaps this tab's refresh token for a new pair; `staleAccess` is the token the API just refused. Tabs sharing the
+   * session refresh one at a time, and a tab that finds the pair already renewed by another one simply uses it.
+   */
+  private tryRefreshToken(staleAccess?: string): Promise<boolean> {
     if (this.refreshPromise) return this.refreshPromise;
 
-    this.refreshPromise = (async () => {
-      const refreshToken = storage.getString(STORAGE_KEYS.REFRESH_TOKEN);
-      if (!refreshToken) return false;
+    this.refreshPromise = authSession
+      .exclusive(async () => {
+        const current = authSession.read();
+        if (!current) return false;
+        if (staleAccess && current.accessToken !== staleAccess) return true;
 
-      try {
-        const res = await fetch(`${this.baseUrl}/auth/refresh`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken }),
-        });
-
-        if (!res.ok) {
-          storage.remove(STORAGE_KEYS.AUTH_TOKEN);
-          storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
-          storage.remove(STORAGE_KEYS.USER_DATA);
+        try {
+          const res = await fetch(`${this.baseUrl}/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken: current.refreshToken }),
+          });
+          if (!res.ok) {
+            authSession.end();
+            return false;
+          }
+          const body = await res.json();
+          const session = body?.data ?? body;
+          if (!session?.accessToken) return false;
+          authSession.update({
+            accessToken: session.accessToken,
+            refreshToken: session.refreshToken ?? current.refreshToken,
+          });
+          return true;
+        } catch {
           return false;
         }
-
-        const body = await res.json();
-        const session = body?.data ?? body;
-        if (session?.accessToken) {
-          storage.set(STORAGE_KEYS.AUTH_TOKEN, session.accessToken);
-          if (session.refreshToken) {
-            storage.set(STORAGE_KEYS.REFRESH_TOKEN, session.refreshToken);
-          }
-          return true;
-        }
-        return false;
-      } catch {
-        return false;
-      } finally {
+      })
+      .finally(() => {
         this.refreshPromise = null;
-      }
-    })();
+      });
 
     return this.refreshPromise;
   }
@@ -129,7 +131,7 @@ class ApiClient {
           !endpoint.includes('/auth/login') &&
           !endpoint.includes('/auth/refresh')
         ) {
-          const refreshed = await this.tryRefreshToken();
+          const refreshed = await this.tryRefreshToken(authHeaders.Authorization?.slice('Bearer '.length));
           if (refreshed) {
             return this.request<T>(endpoint, { ...options, _isRetry: true });
           }
@@ -211,8 +213,9 @@ class ApiClient {
   async getBlob(endpoint: string): Promise<Blob | null> {
     const load = () => fetch(`${this.baseUrl}${endpoint}`, { headers: this.getAuthHeader() });
     try {
+      const sent = authSession.read()?.accessToken;
       let response = await load();
-      if (response.status === 401 && (await this.tryRefreshToken())) response = await load();
+      if (response.status === 401 && (await this.tryRefreshToken(sent))) response = await load();
       return response.ok ? await response.blob() : null;
     } catch {
       return null;

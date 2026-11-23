@@ -16,6 +16,7 @@ export const API_ROUTES = {
   // Auth
   AUTH: {
     LOGIN: '/auth/login',
+    LOGOUT: '/auth/logout',
     PROFILE: '/auth/me',
     CHANGE_PASSWORD: '/auth/me/password',
   },
@@ -131,8 +132,6 @@ export const API_ROUTES = {
     KNOWLEDGE_DETAIL: (id: string) => `/admin/support/knowledge/${id}`,
     KNOWLEDGE_ARCHIVE: (id: string) => `/admin/support/knowledge/${id}/archive`,
     KNOWLEDGE_REINDEX: (id: string) => `/admin/support/knowledge/${id}/reindex`,
-    KNOWLEDGE_REINDEX_ALL: '/admin/support/knowledge/reindex-all',
-    KNOWLEDGE_PREVIEW: '/admin/support/knowledge/preview',
     AI_HEALTH: '/admin/support/ai/health',
     AI_PREVIEW_CHAT: '/admin/support/ai/preview-chat',
     AI_ANSWERS: '/admin/support/ai/answers',
@@ -142,8 +141,6 @@ export const API_ROUTES = {
   // MF-5: the Financial Dashboard of the Admin (BR-48 monthly-plan revenue share, risk flags)
   FINANCE: {
     FILMS: '/admin/finance/films',
-    ALLOCATIONS: '/admin/finance/revenue-allocations',
-    ALLOCATION_RUN: (period: string) => `/admin/finance/revenue-allocations/${period}/run`,
     RISK_RULES: '/admin/finance/risk/rules',
     RISK_FLAGS: '/admin/finance/risk/flags',
     RISK_SCAN: '/admin/finance/risk/scan',

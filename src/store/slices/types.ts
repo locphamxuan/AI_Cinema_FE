@@ -17,6 +17,8 @@ export interface AuthSlice {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; redirectUrl?: string }>;
   logout: () => void;
   restoreSession: () => void;
+  /** Follows this tab's stored session after it ended or changed underneath (another tab of the same session). */
+  syncSession: () => 'same' | 'changed' | 'ended';
 }
 
 export interface ThemeSlice {
