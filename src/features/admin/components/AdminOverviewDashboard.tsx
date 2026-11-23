@@ -9,7 +9,8 @@ import { billingAdminService } from '@/services/billingAdminService';
 import { productionService } from '@/services/productionService';
 import { adminService } from '@/services/adminService';
 import { ErrorNote, Loading } from '@/components/data/ui';
-import type { RevenueReport, ReportRange } from '@/types/billing';
+import type { RevenueReport } from '@/types/billing';
+import type { ProjectSummary } from '@/types/production';
 import { PageHeader } from '@/components/data/PageHeader';
 import { Tabs, TabsList, TabsTrigger } from '@/components/shadcn/tabs';
 import { AdminOverviewKpis } from './AdminOverviewKpis';
@@ -18,117 +19,82 @@ import { OverviewChartCard } from './OverviewChartCard';
 const today = () => new Date().toISOString().slice(0, 10);
 
 const RANGES = [
-  { key: '7d', label: '7 ngày qua', days: -7 },
-  { key: '30d', label: '30 ngày qua', days: -30 },
-  { key: '90d', label: '90 ngày qua', days: -90 },
+  { key: '7d', label: '7 ngày qua', period: '7 ngày', days: -7 },
+  { key: '30d', label: '30 ngày qua', period: '30 ngày', days: -30 },
+  { key: '90d', label: '90 ngày qua', period: '90 ngày', days: -90 },
 ] as const;
+type RangeKey = (typeof RANGES)[number]['key'];
 
-const PURPLE_LINK = 'text-purple-600 dark:text-purple-400';
-const EMERALD_LINK = 'text-emerald-600 dark:text-emerald-400';
+/** Each entity keeps one hue of the dashboard palette on every chart: Coin chính violet, Coin thưởng amber… */
+const HUE = { main: 'var(--viz-1)', bonus: 'var(--viz-2)', done: 'var(--viz-3)', member: 'var(--viz-4)', cancelled: 'var(--viz-5)' };
+
+const endOfDay = (ymd: string) => `${ymd}T23:59:59.999Z`;
+const shortTitle = (p: ProjectSummary, i: number) => {
+  const title = p.title?.trim();
+  if (!title) return `Dự án ${i + 1}`;
+  return title.length > 14 ? `${title.slice(0, 12)}…` : title;
+};
 
 export function AdminOverviewDashboard() {
-  const [selectedRange, setSelectedRange] = useState<'7d' | '30d' | '90d'>('30d');
-  const daysOffset = RANGES.find((r) => r.key === selectedRange)?.days ?? -30;
+  const [selectedRange, setSelectedRange] = useState<RangeKey>('30d');
+  const range = RANGES.find((r) => r.key === selectedRange) ?? RANGES[1];
 
-  const fromDate = addDays(today(), daysOffset);
   const toDate = today();
-  const query: ReportRange = { from: fromDate, to: `${toDate}T23:59:59.999Z` };
+  const fromDate = addDays(toDate, range.days);
+  // The period just before, of the same length, for the change shown on the revenue figures.
+  const prevTo = addDays(fromDate, -1);
+  const prevFrom = addDays(fromDate, range.days - 1);
   const rangeKey = `${selectedRange}:${fromDate}:${toDate}`;
 
-  // Resources
   const revenueRes = useResource<RevenueReport>(`admin:overview:revenue:${rangeKey}`, () =>
-    billingAdminService.revenue(query),
+    billingAdminService.revenue({ from: fromDate, to: endOfDay(toDate) }),
   );
-  const projectsRes = useResource('admin:overview:projects', () =>
-    productionService.listProjects({ limit: 100 }),
+  const previousRes = useResource<RevenueReport>(`admin:overview:revenue-prev:${rangeKey}`, () =>
+    billingAdminService.revenue({ from: prevFrom, to: endOfDay(prevTo) }),
   );
-  const accountsRes = useResource('admin:overview:accounts', () =>
-    adminService.listAccounts({ limit: 100 }),
-  );
+  const projectsRes = useResource('admin:overview:projects', () => productionService.listProjects({ limit: 100 }));
+  const accountsRes = useResource('admin:overview:accounts', () => adminService.listAccounts({ limit: 100 }));
 
   const revenue = revenueRes.data;
   const projects = projectsRes.data?.data ?? [];
   const accounts = accountsRes.data?.data ?? [];
-
-  // Project status breakdown
-  const projectStats = {
-    production: projects.filter((p) => p.status === 'IN_PRODUCTION' || p.status === 'UNDER_REVISION').length,
-    done: projects.filter((p) => p.status === 'COMPLETED').length,
-    plan: projects.filter((p) => p.status === 'DRAFT' || p.status === 'ASSIGNED').length,
-    cancelled: projects.filter((p) => p.status === 'CANCELLED').length,
-  };
+  const countProjects = (...statuses: ProjectSummary['status'][]) => projects.filter((p) => statuses.includes(p.status)).length;
+  const countRole = (...roles: string[]) => accounts.filter((a) => roles.includes(a.role)).length;
+  const doneProjects = countProjects('COMPLETED');
 
   const projectDonutData = [
-    { label: 'Đang sản xuất', value: projectStats.production, color: 'var(--chart-1)' },
-    { label: 'Hoàn tất', value: projectStats.done, color: 'var(--chart-3)' },
-    { label: 'Lên kế hoạch', value: projectStats.plan, color: 'var(--chart-2)' },
-    { label: 'Đã huỷ', value: projectStats.cancelled, color: 'var(--chart-4)' },
+    { label: 'Đang sản xuất', value: countProjects('IN_PRODUCTION', 'UNDER_REVISION'), color: HUE.main },
+    { label: 'Lên kế hoạch', value: countProjects('DRAFT', 'ASSIGNED'), color: HUE.bonus },
+    { label: 'Hoàn tất', value: doneProjects, color: HUE.done },
+    { label: 'Đã huỷ', value: countProjects('CANCELLED'), color: HUE.cancelled },
   ];
 
-  // Real-time episode output by project
-  const topProjectsWithEpisodes = [...projects]
-    .filter((p) => (p._count?.episodes ?? 0) > 0 || p.status === 'IN_PRODUCTION')
-    .slice(0, 6);
+  const withEpisodes = projects.filter((p) => (p._count?.episodes ?? 0) > 0 || p.status === 'IN_PRODUCTION').slice(0, 6);
 
-  const episodeCategories = topProjectsWithEpisodes.map((p, idx) => {
-    const title = p.title?.trim();
-    if (title && title.length > 0) {
-      return title.length > 14 ? `${title.slice(0, 12)}…` : title;
-    }
-    return `Dự án ${idx + 1}`;
-  });
-
-  const episodeBarSeries = [
-    {
-      name: 'Số tập phim',
-      color: 'var(--chart-3)',
-      values: topProjectsWithEpisodes.map((p) => p._count?.episodes ?? 0),
-    },
-  ];
-
-  // Revenue by Plan bar chart
-  const planCategories = revenue?.byPlan.map((p) => p.plan.name) ?? [];
   const planBarSeries = [
-    {
-      name: 'Coin chính',
-      color: 'var(--chart-1)',
-      values: revenue?.byPlan.map((p) => p.mainCoins) ?? [],
-    },
-    {
-      name: 'Coin thưởng',
-      color: 'var(--chart-5)',
-      values: revenue?.byPlan.map((p) => p.bonusCoins) ?? [],
-    },
+    { name: 'Coin chính', color: HUE.main, values: revenue?.byPlan.map((p) => p.mainCoins) ?? [] },
+    { name: 'Coin thưởng', color: HUE.bonus, values: revenue?.byPlan.map((p) => p.bonusCoins) ?? [] },
   ];
 
-  // Coin composition donut
   const coinCompositionData = [
-    { label: 'Coin chính', value: revenue?.totals.mainCoins ?? 0, color: 'var(--chart-1)' },
-    { label: 'Coin thưởng', value: revenue?.totals.bonusCoins ?? 0, color: 'var(--chart-5)' },
+    { label: 'Coin chính', value: revenue?.totals.mainCoins ?? 0, color: HUE.main },
+    { label: 'Coin thưởng', value: revenue?.totals.bonusCoins ?? 0, color: HUE.bonus },
   ];
-
-  // User role breakdown
-  const roleStats = {
-    member: accounts.filter((a) => a.role === 'MEMBER').length,
-    creator: accounts.filter((a) => a.role === 'CONTENT_CREATOR').length,
-    reviewer: accounts.filter((a) => a.role === 'CONTENT_REVIEWER').length,
-    staff: accounts.filter((a) => a.role === 'STAFF' || a.role === 'ADMIN').length,
-  };
 
   const roleDonutData = [
-    { label: 'Khán giả (Member)', value: roleStats.member, color: 'var(--chart-5)' },
-    { label: 'Creator', value: roleStats.creator, color: 'var(--chart-1)' },
-    { label: 'Reviewer', value: roleStats.reviewer, color: 'var(--chart-3)' },
-    { label: 'Quản trị & Staff', value: roleStats.staff, color: 'var(--chart-2)' },
+    { label: 'Khán giả (Member)', value: countRole('MEMBER'), color: HUE.member },
+    { label: 'Creator', value: countRole('CONTENT_CREATOR'), color: HUE.main },
+    { label: 'Reviewer', value: countRole('CONTENT_REVIEWER'), color: HUE.done },
+    { label: 'Quản trị & Staff', value: countRole('STAFF', 'ADMIN'), color: HUE.bonus },
   ];
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6 p-6 lg:p-8">
+    <div className="mx-auto w-full max-w-7xl space-y-6">
       <PageHeader
         title="Tổng quan hệ thống"
         description="Doanh thu gói thành viên, tiến độ sản xuất phim và tài khoản trên toàn nền tảng."
         actions={
-          <Tabs value={selectedRange} onValueChange={(v) => setSelectedRange(v as typeof selectedRange)}>
+          <Tabs value={selectedRange} onValueChange={(v) => setSelectedRange(v as RangeKey)}>
             <TabsList>
               {RANGES.map((r) => (
                 <TabsTrigger key={r.key} value={r.key}>
@@ -142,99 +108,71 @@ export function AdminOverviewDashboard() {
 
       <AdminOverviewKpis
         revenue={revenue}
+        previous={previousRes.data}
+        periodLabel={range.period}
         projectCount={projects.length}
-        completedProjects={projectStats.done}
+        completedProjects={doneProjects}
         accountCount={accountsRes.data?.meta.totalItems ?? accounts.length}
       />
 
-      {/* ── Main Analytics Grid: Revenue breakdown & Coin structure ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <OverviewChartCard
           className="lg:col-span-2"
           title="Doanh thu theo gói thành viên"
           description="Số Coin thu được từ từng gói thành viên trong khoảng thời gian đã chọn"
-          link={{ href: '/admin/membership-plans?tab=reports', label: 'Chi tiết báo cáo', className: PURPLE_LINK }}
+          link={{ href: '/admin/membership-plans?tab=reports', label: 'Chi tiết báo cáo' }}
         >
           {revenueRes.loading && !revenue && <Loading />}
           {revenueRes.error && <ErrorNote message={revenueRes.error} onRetry={revenueRes.reload} />}
-          {revenue && (
-            <div className="pt-2">
-              <BarChart categories={planCategories} series={planBarSeries} valueUnit="Coin" height={230} />
-            </div>
-          )}
+          {revenue && <BarChart categories={revenue.byPlan.map((p) => p.plan.name)} series={planBarSeries} valueUnit="Coin" height={240} />}
         </OverviewChartCard>
 
-        <OverviewChartCard
-          className="flex flex-col justify-between"
-          title="Cơ cấu Coin thu được"
-          description="Tỉ trọng giữa Coin chính (nạp tiền) và Coin thưởng (khuyến mãi)"
-        >
+        <OverviewChartCard title="Cơ cấu Coin thu được" description="Tỉ trọng giữa Coin chính (nạp tiền) và Coin thưởng (khuyến mãi)">
           {revenue && (
-            <div className="py-2 flex items-center justify-center">
-              <DonutChart
-                data={coinCompositionData}
-                centerLabel="tổng Coin"
-                centerValue={formatNumber(revenue.totals.coins)}
-                valueUnit="Coin"
-                size={190}
-              />
-            </div>
+            <DonutChart data={coinCompositionData} centerLabel="tổng Coin" centerValue={formatNumber(revenue.totals.coins)} valueUnit="Coin" size={180} />
           )}
-          <div className="p-3 rounded-xl bg-muted/60 border border-border text-[11px] text-muted-foreground">
-             Coin thưởng tính vào chi phí quảng bá, chỉ có Coin chính là doanh thu thực.
-          </div>
+          <p className="mt-auto rounded-lg border border-projector/40 bg-projector/10 px-3 py-2 text-xs text-foreground">
+            Coin thưởng tính vào chi phí quảng bá, chỉ có Coin chính là doanh thu thực.
+          </p>
         </OverviewChartCard>
       </div>
 
-      {/* ── Real-time Episode Output Chart ── */}
       <OverviewChartCard
         title="Số tập phim theo dự án"
         description="Số tập đang sản xuất hoặc đã hoàn tất của các dự án gần đây"
-        link={{ href: '/admin/projects', label: 'Quản lý dự án phim', className: EMERALD_LINK }}
+        link={{ href: '/admin/projects', label: 'Quản lý dự án phim' }}
       >
-        {episodeCategories.length > 0 ? (
-          <div className="pt-2">
-            <BarChart categories={episodeCategories} series={episodeBarSeries} valueUnit="tập" height={220} />
-          </div>
-        ) : (
-          <div className="py-12 text-center text-xs text-muted-foreground">
-            Chưa có dữ liệu tập phim từ các dự án hiện tại.
-          </div>
-        )}
+        {projectsRes.loading && !projectsRes.data && <Loading />}
+        {projectsRes.error && <ErrorNote message={projectsRes.error} onRetry={projectsRes.reload} />}
+        {projectsRes.data &&
+          (withEpisodes.length > 0 ? (
+            <BarChart
+              categories={withEpisodes.map(shortTitle)}
+              series={[{ name: 'Số tập phim', color: HUE.done, values: withEpisodes.map((p) => p._count?.episodes ?? 0) }]}
+              valueUnit="tập"
+              height={220}
+            />
+          ) : (
+            <p className="py-12 text-center text-sm text-muted-foreground">Chưa có dự án nào có tập phim.</p>
+          ))}
       </OverviewChartCard>
 
-      {/* ── Secondary Charts Grid ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <OverviewChartCard
-          title="Trạng thái dự án phim trên nền tảng"
-          description="Tỷ lệ các dự án đang sản xuất, đã hoàn tất và đang lên kế hoạch"
-          link={{ href: '/admin/projects', label: 'Xem danh sách', className: PURPLE_LINK }}
+          title="Trạng thái dự án phim"
+          description="Tỉ lệ dự án đang sản xuất, lên kế hoạch, hoàn tất và đã huỷ"
+          link={{ href: '/admin/projects', label: 'Xem danh sách' }}
         >
-          <div className="py-3 flex items-center justify-center">
-            <DonutChart
-              data={projectDonutData}
-              centerLabel="dự án"
-              centerValue={projects.length}
-              valueUnit="phim"
-              size={190}
-            />
-          </div>
+          <DonutChart data={projectDonutData} centerLabel="dự án" centerValue={projects.length} valueUnit="phim" size={180} />
         </OverviewChartCard>
 
         <OverviewChartCard
-          title="Cơ cấu người dùng theo vai trò"
-          description="Cơ cấu tài khoản khán giả, đội ngũ sáng tạo và quản trị"
-          link={{ href: '/admin/permissions?tab=accounts', label: 'Quản lý tài khoản', className: EMERALD_LINK }}
+          title="Tài khoản theo vai trò"
+          description="Khán giả, đội ngũ sáng tạo và quản trị trên nền tảng"
+          link={{ href: '/admin/permissions?tab=accounts', label: 'Quản lý tài khoản' }}
         >
-          <div className="py-3 flex items-center justify-center">
-            <DonutChart
-              data={roleDonutData}
-              centerLabel="tài khoản"
-              centerValue={accounts.length}
-              valueUnit="user"
-              size={190}
-            />
-          </div>
+          {accountsRes.error && <ErrorNote message={accountsRes.error} onRetry={accountsRes.reload} />}
+          <DonutChart data={roleDonutData} centerLabel="tài khoản" centerValue={accounts.length} valueUnit="tài khoản" size={180} />
         </OverviewChartCard>
       </div>
     </div>

@@ -10,12 +10,12 @@ import { formatVnd } from '@/lib/format';
 import { productionService } from '@/services/productionService';
 import type { AdminPipeline, ContractToSign, ReadyFilm } from '../adminPipeline';
 
-const CARD = 'rounded-3xl bg-card border border-border p-6 sm:p-7 shadow-xs';
+const CARD = 'rounded-2xl bg-card ring-1 ring-foreground/10 p-6 shadow-xs';
 
 export function PortalMetrics({ data }: { data: AdminPipeline }) {
   return (
     <section aria-label="Thống kê dự án và hợp đồng" className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label="Kịch bản bản cuối chờ duyệt" value={data.finalScripts.length} icon={ScrollText} accent={1} note="Duyệt xong là hợp đồng tự gửi Studio" />
         <StatCard label="Hợp đồng chờ Admin ký" value={data.contractsToSign.length} icon={FileSignature} accent={0} note="Studio đã ký trước" />
         <StatCard label="Phim bản cuối chờ phát hành" value={data.readyFilms.length} icon={Film} accent={2} note="Đã gắn nhãn AI và qua kiểm tra pháp lý" />
@@ -24,7 +24,7 @@ export function PortalMetrics({ data }: { data: AdminPipeline }) {
         <ul aria-label="Kịch bản bản cuối chờ duyệt" className="flex flex-wrap gap-2 pt-1 text-xs">
           {data.finalScripts.map((project) => (
             <li key={project.id}>
-              <Link href={`/admin/projects/${project.id}?tab=script`} className="inline-block px-3 py-1.5 rounded-xl border border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 font-semibold">
+              <Link href={`/admin/projects/${project.id}?tab=script`} className="inline-flex items-center gap-1.5 rounded-full border border-viz-2/35 bg-viz-2/10 px-3 py-1.5 font-semibold text-amber-800 transition-colors hover:bg-viz-2/20 dark:text-amber-200">
                 Duyệt kịch bản: {project.title}
               </Link>
             </li>
@@ -38,19 +38,23 @@ export function PortalMetrics({ data }: { data: AdminPipeline }) {
 export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSign[]; onOpen: (item: ContractToSign) => void }) {
   const first = items[0];
   return (
-    <section aria-label="Ký duyệt hợp đồng Studio" className={`${CARD} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}>
+    <section
+      aria-label="Ký duyệt hợp đồng Studio"
+      className={`${CARD} relative flex flex-col justify-between gap-4 overflow-hidden pl-7 sm:flex-row sm:items-center ${first ? 'before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-reel' : ''}`}
+    >
       <div className="flex items-start gap-4">
-        <div className="space-y-1">
-          <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400">
-            Ký duyệt hợp đồng Studio {items.length > 1 && `(${items.length} hợp đồng chờ)`}
-          </span>
+        <div className="space-y-1.5">
+          <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-reel">
+            Ký duyệt hợp đồng Studio
+            {items.length > 0 && <span className="rounded-full bg-reel/12 px-2 py-0.5 text-xs tabular-nums">{items.length} hợp đồng chờ</span>}
+          </p>
           {first ? (
             <>
-              <h3 className="text-lg font-bold text-foreground">
-                Dự án: {first.project.title} • Đối tác: <span className="text-indigo-600 dark:text-indigo-300">{first.contract.studio.name}</span>
+              <h3 className="font-display text-lg font-semibold text-foreground text-balance">
+                {first.project.title} <span className="font-sans text-sm font-normal text-muted-foreground">với Studio {first.contract.studio.name}</span>
               </h3>
-              <p className="text-xs text-muted-foreground">
-                Studio đề xuất <strong className="text-emerald-600 dark:text-emerald-400 tabular-nums">{formatVnd(first.contract.costVnd)}</strong> và đã ký; chờ Admin ký hoặc đề xuất giá khác.
+              <p className="text-sm text-muted-foreground">
+                Studio đề xuất <strong className="font-semibold text-foreground tabular-nums">{formatVnd(first.contract.costVnd)}</strong> và đã ký; chờ Admin ký hoặc đề xuất giá khác.
               </p>
             </>
           ) : (
@@ -59,7 +63,7 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
         </div>
       </div>
       {first && (
-        <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-white dark:bg-white/[0.06] hover:bg-muted/60 text-foreground border border-input text-xs font-semibold cursor-pointer transition-all">
+        <button type="button" onClick={() => onOpen(first)} className="shrink-0 self-start sm:self-center inline-flex h-10 items-center rounded-lg bg-purple-600 px-5 text-sm font-semibold text-white shadow-sm shadow-purple-600/25 transition-colors hover:bg-purple-700 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-reel">
           Xem báo giá và ký
         </button>
       )}
@@ -77,7 +81,7 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
     }
   };
   return (
-    <li className="rounded-2xl bg-card border border-border p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <li className="flex flex-col justify-between gap-4 rounded-2xl bg-card p-4 shadow-xs ring-1 ring-foreground/10 transition-shadow hover:shadow-md sm:p-5 lg:flex-row lg:items-center">
       <div className="flex items-center gap-4 min-w-0">
         <div className="w-28 sm:w-36 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-black/60 shrink-0 border border-border flex items-center justify-center">
           {project.posterUrl ? (
@@ -88,19 +92,20 @@ function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: Ready
           )}
         </div>
         <div className="space-y-1 min-w-0">
-          <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">{project.genres.map((g) => g.name).join(' / ')}</span>
-          <h4 className="text-sm sm:text-base font-bold text-foreground truncate">
+          <span className="text-xs font-medium text-reel">{project.genres.map((g) => g.name).join(' / ')}</span>
+          <h4 className="truncate text-sm font-semibold text-foreground sm:text-base">
             {project.title} - Tập {episode.episodeNumber}: {episode.title}
           </h4>
           <p className="text-xs text-muted-foreground">Reviewer xác nhận: {project.reviewer.fullName}</p>
         </div>
       </div>
-      <span className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 text-xs font-bold">
-        Đã gắn nhãn AI & đạt tuân thủ
-      </span>
-      <span className="shrink-0 text-xs font-bold text-foreground flex items-center gap-1.5">
-        {project.studio?.name ?? '-'}
-      </span>
+      <div className="flex shrink-0 flex-col gap-1.5 text-xs">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 font-semibold text-success">
+          <span className="size-1.5 rounded-full bg-success" aria-hidden="true" />
+          Đã gắn nhãn AI và đạt tuân thủ
+        </span>
+        <span className="text-muted-foreground">Studio: {project.studio?.name ?? '-'}</span>
+      </div>
       <div className="shrink-0 flex flex-wrap gap-2">
         <Link href={`/admin/projects/${project.id}/episodes/${episode.id}`} className="px-4 py-2.5 rounded-full border border-input text-xs font-semibold text-secondary-foreground hover:bg-muted/60 transition-all">
           Xem phim bản cuối
@@ -127,18 +132,16 @@ export function PortalReadyFilms({ films, onPublished }: { films: ReadyFilm[]; o
   const shown = showAll ? films : films.slice(0, 5);
   return (
     <section aria-label="Phim bản cuối chờ phát hành" className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h3 className="text-lg font-extrabold text-foreground tracking-tight flex items-center gap-2">
-            Phim bản cuối chờ phát hành
-          </h3>
+          <h3 className="font-display text-lg font-semibold tracking-tight text-foreground">Phim bản cuối chờ phát hành</h3>
           <p className="text-xs text-muted-foreground mt-0.5">Reviewer đã duyệt, gắn nhãn AI, kiểm tra tuân thủ và xác nhận Phim bản cuối; Admin đặt giá Coin rồi phát hành.</p>
         </div>
-        <span className="text-xs tabular-nums font-bold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
-          {films.length} tập chờ lên sóng
+        <span className="w-fit shrink-0 rounded-full bg-viz-3/12 px-3 py-1 text-xs font-semibold tabular-nums text-teal-800 dark:text-teal-200">
+          {films.length} tập chờ phát hành
         </span>
       </div>
-      {films.length === 0 && <p className="text-sm text-muted-foreground">Chưa có Phim bản cuối nào chờ phát hành.</p>}
+      {films.length === 0 && <p className="rounded-2xl border border-dashed border-border px-6 py-10 text-center text-sm text-muted-foreground">Chưa có Phim bản cuối nào chờ phát hành.</p>}
       <ul className="space-y-3">
         {shown.map((film) => (
           <ReadyFilmRow key={film.episode.id} film={film} onPublished={onPublished} />

@@ -1,6 +1,5 @@
 'use client';
 
-import { Plus } from 'lucide-react';
 import { GreetingCard } from '@/components/data/GreetingCard';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -15,9 +14,9 @@ import { AdminOverviewDashboard } from './AdminOverviewDashboard';
 import { PortalContractQuickSign, PortalMetrics, PortalReadyFilms } from './AdminPortalSections';
 import { SignContractModal } from './SignContractModal';
 
-const TAB = 'inline-flex items-center gap-2 px-4 py-2 rounded-full font-semibold transition-all cursor-pointer';
+const TAB = 'inline-flex items-center rounded-lg px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-reel';
 const tabClass = (active: boolean) =>
-  `${TAB} ${active ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`;
+  `${TAB} ${active ? 'bg-card text-foreground shadow-sm ring-1 ring-foreground/10' : 'text-muted-foreground hover:text-foreground'}`;
 
 /** /admin: what the Admin must decide in MF-1 (Final Scripts, contracts, Final Films) and the platform charts. */
 export function AdminExecutivePortal() {
@@ -32,7 +31,7 @@ export function AdminExecutivePortal() {
   return (
     <div className="min-h-screen w-full bg-background text-foreground p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
-        <div role="tablist" aria-label="Khu quản trị" className="flex items-center gap-2 border-b border-border pb-3.5 text-xs">
+        <div role="tablist" aria-label="Khu quản trị" className="flex w-full max-w-full items-center gap-1 overflow-x-auto rounded-xl bg-muted p-1 sm:w-fit">
           <button type="button" role="tab" aria-selected={tab === 'projects'} onClick={() => setTab('projects')} className={tabClass(tab === 'projects')}>
             Quản trị dự án
           </button>
@@ -64,8 +63,7 @@ export function AdminExecutivePortal() {
               }
               action={
                 can(PERMISSION.PROJECT_CREATE) && (
-                  <button type="button" onClick={() => setCreating(true)} className="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-[#121212] shadow-sm transition-colors hover:bg-white/90 cursor-pointer">
-                    <Plus className="size-4" aria-hidden="true" />
+                  <button type="button" onClick={() => setCreating(true)} className="inline-flex h-10 items-center gap-2 rounded-lg bg-[#F5B83D] px-5 text-sm font-semibold text-[#1C1830] shadow-sm shadow-black/30 transition-colors hover:bg-[#FCD98A] cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
                     Tạo dự án mới
                   </button>
                 )
