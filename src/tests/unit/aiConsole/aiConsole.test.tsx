@@ -5,6 +5,7 @@ import { KnowledgeTab } from '@/features/ai-console/KnowledgeTab';
 import { PlaygroundTab, historyOf } from '@/features/ai-console/PlaygroundTab';
 import { AnswersTab } from '@/features/ai-console/AnswersTab';
 import { AiHealthCard } from '@/features/ai-console/AiHealthCard';
+import { articleState } from '@/features/ai-console/aiLabels';
 import { apiClient } from '@/services/apiClient';
 import { answersQuery, knowledgeQuery } from '@/services/aiConsoleService';
 import { fakeResponse } from '@/tests/support/fakeResponse';
@@ -19,17 +20,17 @@ afterEach(() => {
 
 const page = <T,>(data: T[]) => ({ data, meta: { totalItems: data.length, currentPage: 1, totalPages: 1, itemsPerPage: 20 } });
 const ARTICLE = {
-  id: 'a1', title: 'Huỷ gói Tháng', slug: 'huy-goi-thang', category: 'Gói thành viên', audience: 'MEMBER', locale: 'vi', status: 'PUBLISHED',
+  id: 'a1', title: 'Huỷ gói Tháng', slug: 'huy-goi-thang', category: 'Gói Tháng', audience: 'MEMBER', locale: 'vi', status: 'PUBLISHED',
   source: 'POLICY', sourceRef: null, version: 2, indexStatus: 'INDEXED', indexError: null, indexedAt: '2026-11-14T00:00:00Z',
   createdAt: '2026-11-01T00:00:00Z', updatedAt: '2026-11-14T00:00:00Z',
 };
 
 describe('AI console queries', () => {
   it('sends the knowledge filters in the backend pagination dialect', () => {
-    const q = new URLSearchParams(knowledgeQuery(2, 20, { search: ' huỷ ', status: 'PUBLISHED', category: 'Gói cước', audience: 'MEMBER', failedOnly: true }));
+    const q = new URLSearchParams(knowledgeQuery(2, 20, { search: ' huỷ ', status: 'PUBLISHED', category: 'Gói Tháng', failedOnly: true }));
     expect(Object.fromEntries(q)).toEqual({
       page: '2', limit: '20', sortBy: 'updatedAt:DESC', search: 'huỷ',
-      'filter.status': '$eq:PUBLISHED', 'filter.category': '$eq:Gói cước', 'filter.audience': '$eq:MEMBER', 'filter.indexStatus': '$eq:FAILED',
+      'filter.status': '$eq:PUBLISHED', 'filter.category': '$eq:Gói Tháng', 'filter.indexStatus': '$eq:FAILED',
     });
   });
 
@@ -38,59 +39,95 @@ describe('AI console queries', () => {
     expect(new URLSearchParams(answersQuery(1, 20, 'NOT_HELPFUL')).get('filter.aiFeedback')).toBe('$eq:NOT_HELPFUL');
     expect(new URLSearchParams(answersQuery(1, 20, 'ALL')).has('filter.aiFeedback')).toBe(false);
   });
+
+  it('turns the article and AI reading states into one plain state', () => {
+    expect(articleState({ status: 'PUBLISHED', indexStatus: 'INDEXED' })).toBe('IN_USE');
+    expect(articleState({ status: 'PUBLISHED', indexStatus: 'INDEXING' })).toBe('UPDATING');
+    expect(articleState({ status: 'PUBLISHED', indexStatus: 'FAILED' })).toBe('NOT_READ');
+    expect(articleState({ status: 'ARCHIVED', indexStatus: 'PENDING' })).toBe('HIDDEN');
+    expect(articleState({ status: 'DRAFT', indexStatus: 'PENDING' })).toBe('DRAFT');
+  });
 });
 
 describe('AI health card', () => {
-  it('warns when articles failed to index', async () => {
-    routeFetch({ '/admin/support/ai/health': { mode: 'live', chatModel: 'm', chatConfigured: true, embeddingModel: 'e', embeddingConfigured: true, indexedChunks: 40, failedArticles: 2, pendingArticles: 0, lastIndexedAt: null } });
-    render(<AiHealthCard />);
-    expect(await screen.findByRole('alert')).toHaveTextContent('2 bài đã xuất bản bị lỗi cập nhật cho AI');
+  it('says in plain words that some articles were not read, without model names', async () => {
+    routeFetch({
+      '/admin/support/ai/health': {
+        mode: 'live', chatModel: 'gemini-x', chatConfigured: true, embeddingModel: 'embed-y', embeddingConfigured: true,
+        indexedChunks: 40, failedArticles: 2, pendingArticles: 0, lastIndexedAt: null,
+      },
+    });
+    const { container } = render(<AiHealthCard />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('2 bài AI chưa đọc được');
+    expect(screen.getByText('Đang trả lời Member')).toBeInTheDocument();
+    expect(container).not.toHaveTextContent('gemini-x');
+    expect(container).not.toHaveTextContent('embed-y');
   });
 });
 
 describe('Knowledge tab', () => {
-  it('lists articles with their status and index, and deletes one only after confirming', async () => {
+  it('lists articles with one plain state, hides the article code, and deletes one only after confirming', async () => {
     const calls = routeFetch({ '/admin/support/knowledge': page([ARTICLE]), '/admin/support/knowledge/a1': { id: 'a1', deleted: true } });
     render(<KnowledgeTab focus={null} />);
 
     const row = (await screen.findByText('Huỷ gói Tháng')).closest('tr')!;
     expect(within(row).getByText('Đang dùng')).toBeInTheDocument();
-    expect(within(row).getByText('Đã cập nhật')).toBeInTheDocument();
+    expect(row).not.toHaveTextContent('huy-goi-thang');
 
     await userEvent.click(within(row).getByRole('button', { name: 'Xoá' }));
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveTextContent('Không hoàn tác được');
     expect(calls.some((c) => c.method === 'DELETE')).toBe(false);
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Xoá bài' }));
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Xoá hẳn' }));
 
     await waitFor(() => expect(calls.some((c) => c.path === '/admin/support/knowledge/a1' && c.method === 'DELETE')).toBe(true));
   });
 
-  it('archives through its own route and re-indexes a published article', async () => {
-    const calls = routeFetch({ '/admin/support/knowledge': page([ARTICLE]) });
+  it('hides an article through the archive route and retries one the AI could not read', async () => {
+    const failed = { ...ARTICLE, id: 'a2', title: 'Nạp Coin qua VNPay', indexStatus: 'FAILED', indexError: 'quota' };
+    const calls = routeFetch({ '/admin/support/knowledge': page([ARTICLE, failed]) });
     render(<KnowledgeTab focus={null} />);
     const row = (await screen.findByText('Huỷ gói Tháng')).closest('tr')!;
+    const failedRow = screen.getByText('Nạp Coin qua VNPay').closest('tr')!;
+    expect(within(failedRow).getByText('AI chưa đọc được')).toBeInTheDocument();
+    expect(failedRow).not.toHaveTextContent('quota');
+    expect(within(row).queryByRole('button', { name: 'Thử lại' })).toBeNull();
 
-    await userEvent.click(within(row).getByRole('button', { name: 'Cập nhật lại cho AI' }));
-    await userEvent.click(within(row).getByRole('button', { name: 'Lưu trữ' }));
-    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Lưu trữ' }));
+    await userEvent.click(within(failedRow).getByRole('button', { name: 'Thử lại' }));
+    await userEvent.click(within(row).getByRole('button', { name: 'Tạm ẩn' }));
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Tạm ẩn' }));
 
     await waitFor(() => expect(calls.some((c) => c.path === '/admin/support/knowledge/a1/archive' && c.method === 'POST')).toBe(true));
-    expect(calls.some((c) => c.path === '/admin/support/knowledge/a1/reindex' && c.method === 'POST')).toBe(true);
+    expect(calls.some((c) => c.path === '/admin/support/knowledge/a2/reindex' && c.method === 'POST')).toBe(true);
   });
 
-  it('opens a new article prefilled from a weak answer and publishes it', async () => {
+  it('puts a hidden article back in use', async () => {
+    const calls = routeFetch({ '/admin/support/knowledge': page([{ ...ARTICLE, status: 'ARCHIVED', indexStatus: 'PENDING' }]) });
+    render(<KnowledgeTab focus={null} />);
+    const row = (await screen.findByText('Huỷ gói Tháng')).closest('tr')!;
+    expect(within(row).getByText('Tạm ẩn')).toBeInTheDocument();
+
+    await userEvent.click(within(row).getByRole('button', { name: 'Dùng lại' }));
+    await waitFor(() => {
+      const sent = calls.find((c) => c.path === '/admin/support/knowledge/a1' && c.method === 'PATCH')!;
+      expect(JSON.parse(sent.body as string)).toEqual({ status: 'PUBLISHED' });
+    });
+  });
+
+  it('opens a new article prefilled from a weak answer and saves it for the AI to use', async () => {
     const calls = routeFetch({ '/admin/support/knowledge': page([]) });
     render(<KnowledgeTab focus={{ kind: 'new', draft: { title: 'Đổi email đăng nhập', contentMarkdown: '## Đổi email đăng nhập\n\nBạn vào Tài khoản.' } }} />);
 
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByLabelText('Mã bài viết (không trùng)')).toHaveValue('doi-email-dang-nhap');
-    await userEvent.click(within(dialog).getByLabelText('Xuất bản cho AI dùng'));
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Lưu bài' }));
+    expect(within(dialog).getByLabelText('Tiêu đề')).toHaveValue('Đổi email đăng nhập');
+    expect(within(dialog).queryByText(/Mã bài viết/)).toBeNull();
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Lưu và cho AI dùng' }));
 
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/admin/support/knowledge' && c.method === 'POST')!;
-      expect(JSON.parse(sent.body as string)).toMatchObject({ title: 'Đổi email đăng nhập', slug: 'doi-email-dang-nhap', status: 'PUBLISHED', audience: 'MEMBER' });
+      expect(JSON.parse(sent.body as string)).toMatchObject({
+        title: 'Đổi email đăng nhập', slug: 'doi-email-dang-nhap', category: 'Gói Tháng', status: 'PUBLISHED', audience: 'MEMBER', source: 'MANUAL',
+      });
     });
   });
 });
@@ -103,18 +140,19 @@ const ANSWER: PlaygroundAnswer = {
 };
 
 describe('Playground tab', () => {
-  it('sends earlier turns oldest first, shows the sources, and a source opens its article', async () => {
+  it('sends earlier turns oldest first, shows the articles used, and an article opens for editing', async () => {
     const post = vi.spyOn(apiClient, 'post').mockResolvedValue({ success: true, data: ANSWER });
     const onOpenArticle = vi.fn();
     render(<PlaygroundTab onOpenArticle={onOpenArticle} />);
 
     await userEvent.type(screen.getByLabelText('Câu hỏi thử'), 'Huỷ gói có hoàn tiền không?');
-    await userEvent.click(screen.getByRole('button', { name: /Hỏi/ }));
+    await userEvent.click(screen.getByRole('button', { name: /^Hỏi$/ }));
     expect(await screen.findByText('Bạn huỷ trong 24 giờ đầu được hoàn.')).toBeInTheDocument();
+    expect(screen.queryByText(/gemini|Độ tin cậy|Độ khớp/)).toBeNull();
     expect(post).toHaveBeenLastCalledWith('/admin/support/ai/preview-chat', { question: 'Huỷ gói có hoàn tiền không?', audience: 'MEMBER' }, { timeoutMs: 60_000 });
 
     await userEvent.type(screen.getByLabelText('Câu hỏi thử'), 'Sau 24 giờ thì sao?');
-    await userEvent.click(screen.getByRole('button', { name: /Hỏi/ }));
+    await userEvent.click(screen.getByRole('button', { name: /^Hỏi$/ }));
     await waitFor(() => expect(post).toHaveBeenCalledTimes(2));
     expect(post.mock.calls[1][1]).toEqual({
       question: 'Sau 24 giờ thì sao?',
@@ -125,16 +163,16 @@ describe('Playground tab', () => {
       ],
     });
 
-    await userEvent.click((await screen.findAllByRole('button', { name: /Huỷ gói Tháng/ }))[0]);
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Huỷ gói Tháng' }))[0]);
     expect(onOpenArticle).toHaveBeenCalledWith('a1');
   });
 
-  it('says the AI is unavailable on a 503', async () => {
+  it('says the AI is off on a 503', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => fakeResponse({ error: { message: 'AI off', details: { reason: 'AI_UNAVAILABLE' } } }, 503)));
     render(<PlaygroundTab onOpenArticle={vi.fn()} />);
     await userEvent.type(screen.getByLabelText('Câu hỏi thử'), 'Xin chào');
-    await userEvent.click(screen.getByRole('button', { name: /Hỏi/ }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('AI đang không khả dụng');
+    await userEvent.click(screen.getByRole('button', { name: /^Hỏi$/ }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Trợ lý AI đang tắt');
   });
 
   it('keeps at most the last 10 turns of history', () => {
@@ -162,11 +200,12 @@ describe('Answers tab', () => {
     render(<AnswersTab onDraftArticle={vi.fn()} />);
 
     expect(await screen.findByText('Đổi email?')).toBeInTheDocument();
-    expect(screen.getByText('Đã chuyển nhân viên')).toBeInTheDocument();
+    expect(screen.getByText('Đã chuyển cho nhân viên')).toBeInTheDocument();
+    expect(screen.queryByText(/an@test.vn/)).toBeNull();
 
-    await userEvent.click(screen.getByRole('button', { name: /Chưa tốt/ }));
+    await userEvent.click(screen.getByRole('button', { name: 'Chưa tốt' }));
     const dialog = screen.getByRole('dialog');
-    await userEvent.type(within(dialog).getByLabelText('Cần bổ sung gì vào Kho tri thức?'), 'Thiếu bước đổi email');
+    await userEvent.type(within(dialog).getByLabelText('Bài kiến thức cần bổ sung gì?'), 'Thiếu bước đổi email');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Lưu đánh giá' }));
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/admin/support/ai/answers/msg1/feedback')!;

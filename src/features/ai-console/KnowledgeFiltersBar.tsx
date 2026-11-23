@@ -1,14 +1,24 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
 import { fieldInputClass } from '@/components/ui/FormField';
-import type { KnowledgeArticleStatus, KnowledgeFilters, SupportAudience } from '@/types/support';
-import { ARTICLE_STATUS, AUDIENCE, CATEGORY_SUGGESTIONS } from './aiLabels';
+import type { KnowledgeFilters } from '@/types/support';
+import { TOPICS } from './aiLabels';
 
 const SELECT = `${fieldInputClass} py-1.5 text-xs`;
 
-/** Search (title, slug, category) and the backend filters; the search is sent once typing pauses. */
+/** The plain-word states an Admin filters by, mapped to the backend filters. */
+const STATE_FILTERS: { key: string; label: string; filters: KnowledgeFilters }[] = [
+  { key: '', label: 'Mọi tình trạng', filters: {} },
+  { key: 'PUBLISHED', label: 'Đang dùng', filters: { status: 'PUBLISHED' } },
+  { key: 'DRAFT', label: 'Bản nháp', filters: { status: 'DRAFT' } },
+  { key: 'ARCHIVED', label: 'Tạm ẩn', filters: { status: 'ARCHIVED' } },
+  { key: 'FAILED', label: 'AI chưa đọc được', filters: { failedOnly: true } },
+];
+
+const stateKeyOf = (f: KnowledgeFilters) => (f.failedOnly ? 'FAILED' : (f.status ?? ''));
+
+/** Search by title, topic and state; the search is sent once typing pauses. */
 export function KnowledgeFiltersBar({ value, onChange }: { value: KnowledgeFilters; onChange: (next: KnowledgeFilters) => void }) {
   const [text, setText] = useState(value.search ?? '');
 
@@ -18,61 +28,29 @@ export function KnowledgeFiltersBar({ value, onChange }: { value: KnowledgeFilte
     return () => clearTimeout(timer);
   }, [text, value, onChange]);
 
+  const changeState = (key: string) => {
+    const picked = STATE_FILTERS.find((s) => s.key === key) ?? STATE_FILTERS[0];
+    onChange({ search: value.search, category: value.category, ...picked.filters });
+  };
+
   return (
-    <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_auto]">
-      <div className="relative">
-        <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Tìm theo tiêu đề, mã bài viết, danh mục"
-          aria-label="Tìm bài tri thức"
-          className={`${SELECT} pl-8`}
-        />
-      </div>
-      <select aria-label="Lọc theo danh mục" value={value.category ?? ''} onChange={(e) => onChange({ ...value, category: e.target.value || undefined })} className={SELECT}>
-        <option value="">Mọi danh mục</option>
-        {CATEGORY_SUGGESTIONS.map((c) => (
-          <option key={c} value={c}>
-            {c}
+    <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-[2fr_1fr_1fr]">
+      <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Tìm theo tiêu đề" aria-label="Tìm bài kiến thức" className={SELECT} />
+      <select aria-label="Lọc theo chủ đề" value={value.category ?? ''} onChange={(e) => onChange({ ...value, category: e.target.value || undefined })} className={SELECT}>
+        <option value="">Mọi chủ đề</option>
+        {TOPICS.map((t) => (
+          <option key={t} value={t}>
+            {t}
           </option>
         ))}
       </select>
-      <select
-        aria-label="Lọc theo trạng thái"
-        value={value.status ?? ''}
-        onChange={(e) => onChange({ ...value, status: (e.target.value || undefined) as KnowledgeArticleStatus | undefined })}
-        className={SELECT}
-      >
-        <option value="">Mọi trạng thái</option>
-        {(Object.keys(ARTICLE_STATUS) as KnowledgeArticleStatus[]).map((s) => (
-          <option key={s} value={s}>
-            {ARTICLE_STATUS[s].label}
+      <select aria-label="Lọc theo tình trạng" value={stateKeyOf(value)} onChange={(e) => changeState(e.target.value)} className={SELECT}>
+        {STATE_FILTERS.map((s) => (
+          <option key={s.key} value={s.key}>
+            {s.label}
           </option>
         ))}
       </select>
-      <select
-        aria-label="Lọc theo người xem"
-        value={value.audience ?? ''}
-        onChange={(e) => onChange({ ...value, audience: (e.target.value || undefined) as SupportAudience | undefined })}
-        className={SELECT}
-      >
-        <option value="">Mọi người xem</option>
-        {(Object.keys(AUDIENCE) as SupportAudience[]).map((a) => (
-          <option key={a} value={a}>
-            {AUDIENCE[a]}
-          </option>
-        ))}
-      </select>
-      <label className="flex cursor-pointer items-center gap-2 px-1 text-xs whitespace-nowrap">
-        <input
-          type="checkbox"
-          checked={!!value.failedOnly}
-          onChange={(e) => onChange({ ...value, failedOnly: e.target.checked || undefined })}
-          className="size-4 accent-primary"
-        />
-        Chỉ bài lỗi cập nhật cho AI
-      </label>
     </div>
   );
 }

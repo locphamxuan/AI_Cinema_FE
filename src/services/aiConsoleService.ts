@@ -12,9 +12,7 @@ import type {
   KnowledgeInput,
   PlaygroundAnswer,
   PlaygroundTurn,
-  RetrievalPreview,
   SupportAiHealth,
-  SupportAudience,
 } from '@/types/support';
 
 const S = API_ROUTES.ADMIN_SUPPORT;
@@ -27,7 +25,6 @@ export function knowledgeQuery(page: number, limit: number, f: KnowledgeFilters 
   if (f.search?.trim()) params.set('search', f.search.trim());
   if (f.status) params.set('filter.status', `$eq:${f.status}`);
   if (f.category) params.set('filter.category', `$eq:${f.category}`);
-  if (f.audience) params.set('filter.audience', `$eq:${f.audience}`);
   if (f.failedOnly) params.set('filter.indexStatus', '$eq:FAILED');
   return params.toString();
 }
@@ -53,16 +50,12 @@ export const aiConsoleService = {
   /** Hides the article (ARCHIVED) and drops its vectors; it can be edited and published again. */
   archiveKnowledge: (id: string) => apiClient.post<KnowledgeArticleDetail>(S.KNOWLEDGE_ARCHIVE(id), {}),
   reindexKnowledge: (id: string) => apiClient.post<KnowledgeArticle>(S.KNOWLEDGE_REINDEX(id), {}),
-  reindexAll: () => apiClient.post<{ total: number; queued: number }>(S.KNOWLEDGE_REINDEX_ALL, {}),
-  /** Which articles retrieval finds for a question; no AI call. */
-  previewRetrieval: (query: string, audience?: SupportAudience) =>
-    apiClient.post<RetrievalPreview>(S.KNOWLEDGE_PREVIEW, { query: query.trim(), ...(audience ? { audience } : {}) }),
 
   /** Ask the AI as a member would; nothing is stored or sent. `history` is oldest first, at most 10 turns. */
-  previewChat: (question: string, history: PlaygroundTurn[], audience: SupportAudience = 'MEMBER') =>
+  previewChat: (question: string, history: PlaygroundTurn[]) =>
     apiClient.post<PlaygroundAnswer>(
       S.AI_PREVIEW_CHAT,
-      { question: question.trim(), audience, ...(history.length ? { history: history.slice(-10) } : {}) },
+      { question: question.trim(), audience: 'MEMBER', ...(history.length ? { history: history.slice(-10) } : {}) },
       { timeoutMs: 60_000 },
     ),
 

@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import { Panel } from '@/components/data/ui';
 import { Button } from '@/components/ui/Button';
-import { fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { fieldTextareaClass } from '@/components/ui/FormField';
 import { aiConsoleService } from '@/services/aiConsoleService';
-import type { PlaygroundAnswer, PlaygroundTurn, SupportAudience } from '@/types/support';
-import { AUDIENCE } from './aiLabels';
+import type { PlaygroundAnswer, PlaygroundTurn } from '@/types/support';
 import { PlaygroundAnswerCard } from './PlaygroundAnswerCard';
 
 interface Exchange {
@@ -22,9 +21,8 @@ export function historyOf(exchanges: Exchange[]): PlaygroundTurn[] {
   ]).slice(-10);
 }
 
-/** Ask the AI as a member (or as Staff's assistant) would; the backend stores and sends nothing. */
+/** Ask the AI as a member would; the backend stores and sends nothing. */
 export function PlaygroundTab({ onOpenArticle }: { onOpenArticle: (articleId: string) => void }) {
-  const [audience, setAudience] = useState<SupportAudience>('MEMBER');
   const [question, setQuestion] = useState('');
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [asking, setAsking] = useState(false);
@@ -37,13 +35,13 @@ export function PlaygroundTab({ onOpenArticle }: { onOpenArticle: (articleId: st
     if (!valid || asking) return;
     setAsking(true);
     setError(null);
-    const res = await aiConsoleService.previewChat(text, historyOf(exchanges), audience);
+    const res = await aiConsoleService.previewChat(text, historyOf(exchanges));
     setAsking(false);
     if (res.success) {
       setExchanges((list) => [...list, { question: text, answer: res.data }]);
       setQuestion('');
     } else if (res.statusCode === 503 || res.reason === 'AI_UNAVAILABLE') {
-      setError('AI đang không khả dụng (đang tắt hoặc chưa cấu hình). Xem thẻ Tình trạng AI ở trên.');
+      setError('Trợ lý AI đang tắt nên chưa hỏi thử được. Member đang được chuyển thẳng cho nhân viên.');
     } else {
       setError(res.message ?? 'Không hỏi được AI. Thử lại.');
     }
@@ -56,30 +54,20 @@ export function PlaygroundTab({ onOpenArticle }: { onOpenArticle: (articleId: st
 
   return (
     <Panel
-      title="Thử nghiệm"
-      description="Hỏi AI như Member hỏi để xem câu trả lời, nguồn trích dẫn và các đoạn tìm được. Không lưu và không gửi cho ai."
+      title="Hỏi thử AI"
       actions={
-        <>
-          <select aria-label="Hỏi với vai trò" value={audience} onChange={(e) => setAudience(e.target.value as SupportAudience)} className={`${fieldInputClass} w-36 py-1.5 text-xs`}>
-            {(['MEMBER', 'STAFF'] as SupportAudience[]).map((a) => (
-              <option key={a} value={a}>
-                Hỏi như {AUDIENCE[a]}
-              </option>
-            ))}
-          </select>
-          <Button size="sm" variant="secondary" onClick={reset} disabled={!exchanges.length || asking}>
-            Cuộc thử mới
-          </Button>
-        </>
+        <Button size="sm" variant="secondary" onClick={reset} disabled={!exchanges.length || asking}>
+          Hỏi lại từ đầu
+        </Button>
       }
     >
       <div className="space-y-4">
         {exchanges.length === 0 && (
           <p className="rounded-lg border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
-            Nhập một câu hỏi bên dưới. Các lượt trước được gửi kèm để hỏi tiếp.
+            Nhập một câu hỏi bên dưới. AI nhớ các câu trước để bạn hỏi tiếp.
           </p>
         )}
-        <ol className="space-y-4" aria-label="Cuộc thử">
+        <ol className="space-y-4" aria-label="Các câu đã hỏi thử">
           {exchanges.map((e, i) => (
             <li key={i} className="space-y-2">
               <p className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-sm bg-primary px-3.5 py-2 text-sm text-primary-foreground">{e.question}</p>
@@ -106,7 +94,7 @@ export function PlaygroundTab({ onOpenArticle }: { onOpenArticle: (articleId: st
               }
             }}
             aria-label="Câu hỏi thử"
-            placeholder="Ví dụ: Huỷ gói Tháng có được hoàn tiền không?"
+            placeholder="Ví dụ: Coin thưởng có hết hạn không?"
             className={fieldTextareaClass}
           />
           <Button type="submit" disabled={!valid || asking}>
@@ -114,8 +102,7 @@ export function PlaygroundTab({ onOpenArticle }: { onOpenArticle: (articleId: st
           </Button>
         </form>
         <p className="text-xs text-muted-foreground">
-          Công cụ tra cứu tài khoản chạy trên chính tài khoản Admin (không có dữ liệu Member), nên câu như &ldquo;số dư Coin của tôi&rdquo; sẽ
-          được trả lời là không có dữ liệu.
+          Hỏi thử không được lưu và không gửi cho ai. Câu hỏi về tài khoản riêng (ví dụ &ldquo;số dư Coin của tôi&rdquo;) được trả lời bằng tài khoản của bạn.
         </p>
       </div>
     </Panel>

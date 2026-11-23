@@ -141,13 +141,7 @@ export interface KnowledgeFilters {
   search?: string;
   status?: KnowledgeArticleStatus;
   category?: string;
-  audience?: SupportAudience;
   failedOnly?: boolean;
-}
-
-export interface RetrievalPreview {
-  articles: { articleId: string; title: string; chunks: { heading: string | null; content: string; score: number }[] }[];
-  totalFound: number;
 }
 
 // ---- AI health, Playground, answer log (Admin) ----
