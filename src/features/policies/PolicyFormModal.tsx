@@ -2,14 +2,15 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { FormField, fieldInputClass } from '@/components/ui/FormField';
+import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { useAction } from '@/hooks/useAction';
 import { policyService, type PolicyInput } from '@/services/policyService';
 import type { Policy, PolicyType } from '@/types/policy';
-import { POLICY_TYPE } from './policyLabels';
+import { POLICY_TYPE_KEYS, POLICY_TYPES } from './policyLabels';
 
-const SELECT = `${fieldInputClass} py-1.5 text-xs`;
+/** Same limit as the BE `CreatePolicyDto.content`. */
+export const CONTENT_MAX = 20000;
 
 /** ISO instant → the `YYYY-MM-DDTHH:mm` local value a datetime-local input shows. */
 export function toLocalInput(iso: string | null | undefined): string {
@@ -27,58 +28,45 @@ export function fromLocalInput(value: string): string | null {
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
 
-/** The JSON box: empty = no content, otherwise it must be one JSON object. */
-export function parseContent(text: string): { ok: true; value: Record<string, unknown> | null } | { ok: false } {
-  if (!text.trim()) return { ok: true, value: null };
-  try {
-    const value: unknown = JSON.parse(text);
-    return value && typeof value === 'object' && !Array.isArray(value) ? { ok: true, value: value as Record<string, unknown> } : { ok: false };
-  } catch {
-    return { ok: false };
-  }
-}
-
 interface PolicyFormModalProps {
   policy: Policy | null;
   onClose: () => void;
   onDone: () => Promise<void>;
 }
 
+/** Create or edit one policy. The content is ordinary text; on/off is switched from the list. */
 export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProps) {
-  const [form, setForm] = useState<PolicyInput>({
-    name: policy?.name ?? '',
-    type: policy?.type ?? 'AI_LABELING',
-    version: policy?.version ?? '',
-    documentReference: policy?.documentReference ?? null,
-    isActive: policy?.isActive ?? true,
-  });
-  const [contentText, setContentText] = useState(policy?.content ? JSON.stringify(policy.content, null, 2) : '');
+  const [name, setName] = useState(policy?.name ?? '');
+  const [type, setType] = useState<PolicyType>(policy?.type ?? 'AI_LABELING');
+  const [content, setContent] = useState(policy?.content ?? '');
+  const [reference, setReference] = useState(policy?.documentReference ?? '');
+  const [version, setVersion] = useState(policy?.version ?? '1.0');
   const [from, setFrom] = useState(toLocalInput(policy?.effectiveFrom));
   const [to, setTo] = useState(toLocalInput(policy?.effectiveTo));
+  const [activate, setActivate] = useState(true);
   const { busy, run } = useAction();
 
-  const set = (patch: Partial<PolicyInput>) => setForm({ ...form, ...patch });
-  const content = parseContent(contentText);
   const effectiveFrom = fromLocalInput(from);
   const effectiveTo = fromLocalInput(to);
   const rangeBad = Boolean(effectiveFrom && effectiveTo && effectiveTo <= effectiveFrom);
-  const valid = form.name.trim() && form.version.trim() && content.ok && !rangeBad;
+  const valid = name.trim() && version.trim() && content.trim() && content.length <= CONTENT_MAX && !rangeBad;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.ok || rangeBad) return;
+    if (!valid) return;
     const input: PolicyInput = {
-      ...form,
-      name: form.name.trim(),
-      version: form.version.trim(),
-      documentReference: form.documentReference?.trim() || null,
-      content: content.value,
+      name: name.trim(),
+      type,
+      version: version.trim(),
+      documentReference: reference.trim() || null,
+      content: content.trim(),
       effectiveFrom,
       effectiveTo,
+      ...(policy ? {} : { isActive: activate }),
     };
     const done = policy
-      ? await run(() => policyService.update(policy.id, input), 'Đã cập nhật chính sách')
-      : await run(() => policyService.create(input), 'Đã tạo chính sách');
+      ? await run(() => policyService.update(policy.id, input), 'Đã lưu chính sách')
+      : await run(() => policyService.create(input), 'Đã thêm chính sách');
     if (done) {
       await onDone();
       onClose();
@@ -86,112 +74,85 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
   };
 
   return (
-    <Modal open onClose={onClose} maxWidth="max-w-2xl" title={policy ? 'Sửa chính sách' : 'Tạo chính sách mới'}>
+    <Modal open onClose={onClose} maxWidth="max-w-2xl" title={policy ? 'Sửa chính sách' : 'Thêm chính sách'}>
       <form onSubmit={submit} className="space-y-4 pt-1">
-        <FormField label="Tên chính sách">
+        <FormField label="Tiêu đề">
           <input
-            value={form.name}
-            onChange={(e) => set({ name: e.target.value })}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             maxLength={255}
             required
             className={fieldInputClass}
-            placeholder="Ví dụ: Quy định gắn nhãn AI"
+            placeholder="Ví dụ: Quy định gắn nhãn nội dung do AI tạo"
           />
         </FormField>
 
-        <FormField label="Loại chính sách">
-          <select
-            value={form.type}
-            onChange={(e) => set({ type: e.target.value as PolicyType })}
-            required
-            className={SELECT}
-          >
-            {Object.entries(POLICY_TYPE).map(([key, label]) => (
-              <option key={key} value={key as PolicyType}>
-                {label}
+        <FormField label="Loại chính sách" hint={`${POLICY_TYPES[type].purpose} ${POLICY_TYPES[type].usedFor}`}>
+          <select value={type} onChange={(e) => setType(e.target.value as PolicyType)} className={fieldInputClass}>
+            {POLICY_TYPE_KEYS.map((key) => (
+              <option key={key} value={key}>
+                {POLICY_TYPES[key].label}
               </option>
             ))}
           </select>
         </FormField>
 
-        <FormField label="Phiên bản">
-          <input
-            value={form.version}
-            onChange={(e) => set({ version: e.target.value })}
-            maxLength={50}
-            required
-            className={fieldInputClass}
-            placeholder="Ví dụ: 1.0.0"
-          />
-        </FormField>
-
-        <FormField label="Văn bản pháp lý tham khảo">
-          <input
-            value={form.documentReference ?? ''}
-            onChange={(e) => set({ documentReference: e.target.value || null })}
-            maxLength={1000}
-            className={fieldInputClass}
-            placeholder="Ví dụ: Điều 44 Luật số 134/2025/QH15"
-          />
-        </FormField>
-
-        <FormField label="Nội dung chi tiết (dạng JSON, có thể để trống)">
+        <FormField
+          label="Nội dung"
+          hint={`Viết như văn bản thường. Mỗi ý một dòng; dòng bắt đầu bằng "- " sẽ thành gạch đầu dòng. ${content.length}/${CONTENT_MAX} ký tự.`}
+          error={content.length > CONTENT_MAX ? `Nội dung dài quá ${CONTENT_MAX} ký tự.` : null}
+        >
           <textarea
-            value={contentText}
-            onChange={(e) => setContentText(e.target.value)}
-            aria-invalid={!content.ok}
-            rows={6}
-            className={`${fieldInputClass} font-mono text-xs`}
-            placeholder='Ví dụ: { "requiredLabel": "AI-generated", "minAge": 18 }'
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={10}
+            required
+            className={fieldTextareaClass}
+            placeholder={'Ví dụ:\nMọi tập có phần do AI tạo phải gắn nhãn rõ ràng.\n- Nhãn hiện trên màn hình suốt tập phim.\n- Không được che hoặc làm mờ nhãn.'}
           />
-          <p className="text-[11px] text-muted-foreground mt-1">
-            Nội dung có cấu trúc cho nhãn AI và kiểm tra tuân thủ tham chiếu. Để trống nếu không có.
-          </p>
-          {!content.ok && <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-400">Nội dung phải là một đối tượng JSON hợp lệ, ví dụ {'{ "key": "value" }'}.</p>}
         </FormField>
 
-        <div className="grid grid-cols-2 gap-3">
-          <FormField label="Hiệu lực từ">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[2fr_1fr]">
+          <FormField label="Căn cứ pháp lý (không bắt buộc)">
             <input
-              type="datetime-local"
-              value={from}
-              onChange={(e) => setFrom(e.target.value)}
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              maxLength={1000}
               className={fieldInputClass}
+              placeholder="Ví dụ: Điều 44 Luật số 134/2025/QH15"
             />
           </FormField>
-          <FormField label="Hiệu lực đến">
-            <input
-              type="datetime-local"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-              className={fieldInputClass}
-            />
+          <FormField label="Phiên bản">
+            <input value={version} onChange={(e) => setVersion(e.target.value)} maxLength={50} required className={fieldInputClass} />
           </FormField>
         </div>
-        {rangeBad && <p className="text-xs font-medium text-rose-600 dark:text-rose-400">Ngày kết thúc hiệu lực phải sau ngày bắt đầu.</p>}
 
-        <div className="flex items-center gap-2">
-          <input
-            id="isActive"
-            type="checkbox"
-            checked={form.isActive ?? true}
-            onChange={(e) => set({ isActive: e.target.checked })}
-            className="w-4 h-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
-          />
-          <label htmlFor="isActive" className="text-sm font-medium text-foreground">
-            Đang áp dụng
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <FormField label="Áp dụng từ" hint="Để trống nếu áp dụng ngay.">
+            <input type="datetime-local" value={from} onChange={(e) => setFrom(e.target.value)} className={fieldInputClass} />
+          </FormField>
+          <FormField
+            label="Áp dụng đến"
+            hint="Để trống nếu không có ngày kết thúc."
+            error={rangeBad ? 'Ngày kết thúc phải sau ngày bắt đầu.' : null}
+          >
+            <input type="datetime-local" value={to} onChange={(e) => setTo(e.target.value)} className={fieldInputClass} />
+          </FormField>
+        </div>
+
+        {!policy && (
+          <label className="flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={activate} onChange={(e) => setActivate(e.target.checked)} className="size-4" />
+            Bật áp dụng ngay sau khi lưu
           </label>
-          <p className="ml-auto text-xs text-muted-foreground">
-            Khi tắt, chính sách này sẽ không còn được áp dụng cho nhãn AI và kiểm tra tuân thủ.
-          </p>
-        </div>
+        )}
 
-        <div className="flex justify-end gap-2.5 pt-3 border-t border-border">
-          <Button type="button" variant="secondary" onClick={onClose} className="rounded-xl px-4 text-xs font-semibold">
+        <div className="flex justify-end gap-2 border-t border-border pt-3">
+          <Button type="button" variant="secondary" onClick={onClose}>
             Huỷ
           </Button>
-          <Button type="submit" disabled={!valid || busy} className="rounded-xl px-5 text-xs font-bold">
-            {busy ? 'Đang lưu…' : policy ? 'Cập nhật' : 'Tạo'}
+          <Button type="submit" disabled={!valid || busy}>
+            {busy ? 'Đang lưu…' : policy ? 'Lưu thay đổi' : 'Thêm chính sách'}
           </Button>
         </div>
       </form>

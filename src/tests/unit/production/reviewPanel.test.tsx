@@ -112,7 +112,33 @@ describe('ReviewPanel - the review sheet', () => {
 });
 
 describe('ReviewPanel - the compliance check (BR-42)', () => {
-  const pass = (name: string) => userEvent.click(within(screen.getByText(name).parentElement!).getByLabelText('Đạt'));
+  const form = () => screen.getByRole('form', { name: 'Kết quả kiểm tra tuân thủ' });
+  const pass = (name: string) => userEvent.click(within(within(form()).getByText(name).parentElement!).getByLabelText('Đạt'));
+  const compared = () => userEvent.click(screen.getByLabelText('Tôi đã đối chiếu tập phim với các chính sách đang áp dụng'));
+  const inForce = [
+    {
+      id: 'p2', name: 'Quy định an toàn nội dung', type: 'CONTENT_POLICY', version: '1.0', documentReference: null,
+      content: 'Tập phim không được chứa:\n- Bạo lực cực đoan.', effectiveFrom: null, effectiveTo: null, isActive: true,
+      createdAt: '2026-05-01T00:00:00.000Z', updatedAt: '2026-05-01T00:00:00.000Z',
+    },
+  ];
+
+  it('shows the policies in force beside the form and asks the Reviewer to confirm comparing them', async () => {
+    routeFetch({ '/policies/in-force': inForce, '/media-assets/a1/compliance-checks': {} });
+    renderPanel(sheet('LABELED'));
+
+    const policies = screen.getByRole('region', { name: 'Chính sách cần đối chiếu' });
+    expect(await within(policies).findByText('Quy định an toàn nội dung')).toBeInTheDocument();
+    expect(within(policies).getByText('Bạo lực cực đoan.')).toBeInTheDocument();
+    expect(within(policies).getAllByText('Chưa có chính sách loại này đang áp dụng.')).toHaveLength(2);
+
+    await pass('Thông báo theo Nghị định 142');
+    await pass('An toàn nội dung');
+    await userEvent.click(screen.getByRole('radio', { name: 'Không' }));
+    expect(screen.getByRole('button', { name: 'Xác nhận đã đối chiếu chính sách' })).toBeDisabled();
+    await compared();
+    expect(screen.getByRole('button', { name: /Xác nhận đã kiểm tra và đạt/ })).toBeEnabled();
+  });
 
   it('records a passing check once every item is answered', async () => {
     const calls = routeFetch({ '/media-assets/a1/compliance-checks': {} });
@@ -123,6 +149,7 @@ describe('ReviewPanel - the compliance check (BR-42)', () => {
     await pass('Thông báo theo Nghị định 142');
     await pass('An toàn nội dung');
     await userEvent.click(screen.getByRole('radio', { name: 'Không' }));
+    await compared();
     await userEvent.click(screen.getByRole('button', { name: /Xác nhận đã kiểm tra và đạt/ }));
 
     await waitFor(() => expect(onChanged).toHaveBeenCalled());
@@ -138,12 +165,13 @@ describe('ReviewPanel - the compliance check (BR-42)', () => {
     renderPanel(sheet('LABELED'));
 
     await pass('Thông báo theo Nghị định 142');
-    await userEvent.click(within(screen.getByText('An toàn nội dung').parentElement!).getByLabelText('Không đạt'));
+    await userEvent.click(within(within(form()).getByText('An toàn nội dung').parentElement!).getByLabelText('Không đạt'));
     await userEvent.click(screen.getByRole('radio', { name: 'Có' }));
     await userEvent.type(screen.getByLabelText('Lý do không đạt: An toàn nội dung'), 'bạo');
     expect(screen.getByRole('button', { name: /Hoàn tất các mục kiểm tra/ })).toBeDisabled();
     await userEvent.type(screen.getByLabelText('Lý do không đạt: An toàn nội dung'), ' lực');
     await userEvent.type(screen.getByLabelText('Ghi chú người/sự kiện thật'), 'Giống ca sĩ có thật');
+    await compared();
     await userEvent.click(screen.getByRole('button', { name: /Ghi nhận không đạt/ }));
 
     await waitFor(() =>
@@ -169,6 +197,8 @@ describe('ReviewPanel - the compliance check (BR-42)', () => {
     ];
     renderPanel(sheet('COMPLIANCE_PASSED', { complianceChecks: checks }), false);
     expect(screen.getByText('Cảnh máu me')).toBeInTheDocument();
+    expect(screen.getByText('· theo Nghị định 142')).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Chính sách cần đối chiếu' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Hoàn tất|Xác nhận đã kiểm tra/ })).not.toBeInTheDocument();
   });
 });

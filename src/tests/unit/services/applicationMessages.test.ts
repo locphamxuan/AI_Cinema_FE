@@ -83,6 +83,12 @@ describe('API messages in Vietnamese', () => {
     );
   });
 
+  it('names a missing policy by its Vietnamese type', () => {
+    expect(
+      localizeApiError('No AI_LABELING policy is in force; ask an Admin to activate one', 409, undefined, '/media-assets'),
+    ).toBe('Chưa có chính sách "Gắn nhãn AI" nào đang áp dụng; hãy nhờ Admin bật.');
+  });
+
   it('never shows English it cannot word, and keeps Vietnamese as is', () => {
     expect(localizeApiError('Some new English refusal', 409, undefined, '/x')).toMatch(/tải lại/);
     expect(localizeApiError('Some new English refusal', 418, undefined, '/x')).toBe('Không thực hiện được thao tác này. Vui lòng thử lại.');
