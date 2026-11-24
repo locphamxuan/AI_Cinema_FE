@@ -64,6 +64,18 @@ describe('IdeaFilesPanel', () => {
     expect(toast.success).toHaveBeenCalledWith('Đã tải tệp tóm tắt');
   });
 
+  it('refuses a file above 100 MB before sending it', async () => {
+    const calls = routeFetch({});
+    const { container } = render(panel(true));
+    const big = new File(['x'], 'phim-dai.mp4', { type: 'video/mp4' });
+    Object.defineProperty(big, 'size', { value: 101 * 1024 * 1024 });
+
+    await userEvent.upload(container.querySelector('input[type="file"]') as HTMLInputElement, big);
+
+    expect(toast.error).toHaveBeenCalledWith('Tệp quá lớn', expect.stringContaining('tối đa 100 MB'));
+    expect(calls.some((c) => c.method === 'POST')).toBe(false);
+  });
+
   it('asks before deleting a version, then deletes it', async () => {
     const calls = routeFetch({ '/projects/m1/idea-files/f1': null });
     const reload = vi.fn(async () => undefined);
@@ -78,7 +90,7 @@ describe('IdeaFilesPanel', () => {
     expect(calls.some((c) => c.path === '/projects/m1/idea-files/f1' && c.method === 'DELETE')).toBe(true);
   });
 
-  it('shows the refusal and keeps the dialog when the delete fails', async () => {
+  it('shows the refusal, reloads the stale project and keeps the dialog when the delete fails', async () => {
     routeFetch({ '/projects/m1/idea-files/f1': failWith(409, 'Cannot remove idea files while the project is CANCELLED') });
     const reload = vi.fn(async () => undefined);
     render(panel(true, reload));
@@ -86,8 +98,14 @@ describe('IdeaFilesPanel', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Xoá y-tuong.pdf v2' }));
     await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xoá file' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể xoá tệp ý tưởng khi dự án đang ở trạng thái Đã huỷ.'));
-    expect(reload).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        'Không thực hiện được',
+        'Không thể xoá tệp ý tưởng khi dự án đang ở trạng thái Đã huỷ. Màn hình đã được tải lại.',
+      ),
+    );
+    // The project changed meanwhile (409): it is loaded again so the screen shows its real state.
+    expect(reload).toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
 

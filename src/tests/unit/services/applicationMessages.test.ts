@@ -95,4 +95,28 @@ describe('API messages in Vietnamese', () => {
     expect(localizeApiError('Tập đã có giá.', 409, undefined, '/x')).toBe('Tập đã có giá.');
     expect(localizeApiError('', 404, undefined, '/x')).toBe(APPLICATION_MESSAGES.MSG10.message);
   });
+
+  it('words the signature image and legal profile refusals of a contract', () => {
+    expect(localizeApiError('The signature image is 100x20 px; it must be at least 150x50 px', 400, undefined, '/x')).toBe(
+      'Ảnh chữ ký 100x20 px quá nhỏ: cần ít nhất 150x50 px.',
+    );
+    expect(
+      localizeApiError(
+        'The studio legal profile is incomplete (taxCode, bankAccount); complete it before signing the contract',
+        409,
+        undefined,
+        '/x',
+      ),
+    ).toBe('Hồ sơ pháp lý của Studio còn thiếu (mã số thuế, số tài khoản). Studio cần điền đủ trên Studio Web trước khi ký hợp đồng.');
+  });
+
+  it('tells the Admin the corrected wallet is short, not "your wallet"', () => {
+    const details = { reason: 'INSUFFICIENT_COINS' };
+    expect(localizeApiError('The wallet does not hold that many main Coins', 422, details, '/admin/wallet-adjustments')).toBe(
+      'Ví này không đủ Coin cho lần trừ này. Hãy xem lại số dư hiện tại.',
+    );
+    expect(localizeApiError('The episode has no Coin price', 409, undefined, '/episodes/e1/purchase')).toBe(
+      APPLICATION_MESSAGES.MSG13.message,
+    );
+  });
 });

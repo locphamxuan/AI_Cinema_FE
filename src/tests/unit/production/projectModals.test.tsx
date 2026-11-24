@@ -107,9 +107,10 @@ describe('EditProjectModal', () => {
     await screen.findByRole('button', { name: 'Kinh dị' });
     await userEvent.click(save());
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể sửa tập khi dự án đang ở trạng thái Đã huỷ.'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể sửa tập khi dự án đang ở trạng thái Đã huỷ. Màn hình đã được tải lại.'));
     expect(onClose).not.toHaveBeenCalled();
-    expect(reload).not.toHaveBeenCalled();
+    // 409: the project changed meanwhile, so it is loaded again.
+    expect(reload).toHaveBeenCalled();
   });
 });
 
@@ -150,7 +151,7 @@ describe('AssignCreatorModal (Admin)', () => {
     await userEvent.selectOptions(screen.getByLabelText('Creator'), 'c2');
     await userEvent.click(screen.getByRole('button', { name: 'Giao' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Hãy chọn một tài khoản Creator đang hoạt động.'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Hãy chọn một tài khoản Creator đang hoạt động. Màn hình đã được tải lại.'));
     expect(onClose).not.toHaveBeenCalled();
   });
 });

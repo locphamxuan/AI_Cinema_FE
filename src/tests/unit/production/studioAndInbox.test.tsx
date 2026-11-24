@@ -89,6 +89,7 @@ describe('StudiosPage (BR-59)', () => {
     await userEvent.clear(within(dialog).getByLabelText('Số điện thoại'));
     await userEvent.type(within(dialog).getByLabelText('Số điện thoại'), 'abc');
     expect(save).toBeDisabled();
+    expect(within(dialog).getByText(/Chỉ gồm 6–30 chữ số/)).toBeInTheDocument();
     await userEvent.clear(within(dialog).getByLabelText('Số điện thoại'));
     await userEvent.type(within(dialog).getByLabelText('Ghi chú'), 'Đối tác lâu năm');
     await userEvent.click(save);

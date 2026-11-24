@@ -3,10 +3,12 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AppShell } from '@/components/shell/AppShell';
 import { PlatformSettingsPanel } from '@/features/admin/components/PlatformSettingsPanel';
+import { BillingReportsPanel } from '@/features/billing-admin/components/BillingReportsPanel';
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 import { PlansPanel } from '@/features/billing-admin/components/PlansPanel';
 import { RewardLadderPanel } from '@/features/billing-admin/components/RewardLadderPanel';
 import { chanceOf } from '@/features/billing-admin/components/rewardOdds';
+import { adjustmentProblem, MAX_ADJUST_COINS } from '@/features/billing-admin/components/WalletAdjustForm';
 import { SubscriptionsPanel } from '@/features/billing-admin/components/SubscriptionsPanel';
 import { useAppStore } from '@/store/useAppStore';
 import { mockApi } from '@/tests/support/mockApi';
@@ -153,12 +155,28 @@ describe('CoinLedgerPanel', () => {
     await userEvent.click(walletButton);
     await userEvent.click(await screen.findByRole('button', { name: /Điều chỉnh số dư/ }));
     await userEvent.type(screen.getByLabelText('Coin chính'), '20');
-    await userEvent.type(screen.getByLabelText('Lý do (bắt buộc)'), 'Bù lần nạp lỗi');
+    await userEvent.type(screen.getByLabelText('Lý do'), 'Bù lần nạp lỗi');
     await userEvent.click(screen.getByRole('button', { name: 'Ghi điều chỉnh' }));
+    expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false);
+    expect(await screen.findByText('100 → 120 (+20)')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Điều chỉnh ví' }));
 
     await waitFor(() =>
       expect(bodyOf(fetchMock, 'POST', '/admin/wallet-adjustments')).toEqual({ userId: 'u1', mainAmount: 20, reason: 'Bù lần nạp lỗi' }),
     );
+    const post = fetchMock.mock.calls.find(([, init]) => init?.method === 'POST');
+    expect((post?.[1]?.headers as Record<string, string>)['Idempotency-Key']).toMatch(/^adjust-[0-9a-f]{32}$/);
+  });
+
+  it('checks a correction as the API does before it is sent', () => {
+    const wallet = { mainBalance: 100, bonusBalance: 10 };
+    expect(adjustmentProblem(20, 0, wallet)).toBeNull();
+    expect(adjustmentProblem(1.5, 0, wallet)).toMatch('số nguyên');
+    expect(adjustmentProblem(MAX_ADJUST_COINS + 1, 0, wallet)).toMatch('tối đa');
+    expect(adjustmentProblem(0, 0, wallet)).toMatch('Nhập số Coin');
+    expect(adjustmentProblem(5, -5, wallet)).toMatch('Khi trừ Coin thưởng');
+    expect(adjustmentProblem(-101, 0, wallet)).toMatch('100 Coin chính');
+    expect(adjustmentProblem(0, -11, wallet)).toMatch('10 Coin thưởng');
   });
 
   it('gives Staff no way to change a wallet', async () => {
@@ -215,8 +233,29 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
     await userEvent.clear(grace);
     await userEvent.type(grace, '0');
     await userEvent.click(screen.getByRole('button', { name: /Lưu/ }));
+    expect(await screen.findByText('48 → 0 giờ')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Lưu cài đặt' }));
 
     await waitFor(() => expect(bodyOf(fetchMock, 'PATCH', '/platform-settings')).toEqual({ planRenewalGraceHours: 0 }));
+  });
+
+  it('explains a setting out of the API range and never sends an emptied box as 0', async () => {
+    signInAs('admin');
+    mockApi({
+      'GET /platform-settings': {
+        freeStarterEpisodeCount: 2, coinRateVnd: 1000, episodeCoinPriceMin: 1, episodeCoinPriceMax: 50,
+        playbackHeartbeatTimeoutSeconds: 90, subscriptionCancelWindowHours: 24, planRenewalGraceHours: 48,
+        newMemberBonusCoins: 0, coinTopUpMinVnd: 10000, coinTopUpMaxVnd: 2000000, refundOnRemoval: true, updatedAt: '2026-10-01T00:00:00.000Z',
+      },
+    });
+    render(<PlatformSettingsPanel />);
+
+    const free = await screen.findByLabelText('Số tập xem miễn phí');
+    await userEvent.clear(free);
+    expect(screen.getByRole('button', { name: /Lưu/ })).toBeDisabled();
+    await userEvent.type(free, '21');
+    expect(screen.getByText('Nhập số nguyên từ 0 đến 20.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Lưu/ })).toBeDisabled();
   });
 
   it('keeps Bên A of the production contract, saving only the fields changed', async () => {
@@ -237,5 +276,17 @@ describe('PlatformSettingsPanel (MF-2 fields)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Lưu Bên A (1)' }));
 
     await waitFor(() => expect(bodyOf(fetchMock, 'PATCH', '/platform-settings')).toEqual({ contractTaxCode: '0312345678' }));
+  });
+});
+
+describe('BillingReportsPanel', () => {
+  it('asks for whole Vietnam business days, never a UTC end-of-day instant', async () => {
+    signInAs('admin');
+    const fetchMock = mockApi({});
+    render(<BillingReportsPanel />);
+    await waitFor(() => expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/admin/reports/revenue'))).toBe(true));
+    const url = new URL(String(fetchMock.mock.calls.find(([u]) => String(u).includes('/admin/reports/revenue'))?.[0]), 'http://x');
+    expect(url.searchParams.get('to')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(url.searchParams.get('from')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

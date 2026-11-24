@@ -82,6 +82,7 @@ describe('PublishPanel', () => {
     const calls = routeFetch({ '/episodes/e1/publications': [] });
     show(episode({ finalConfirmedAt: '2026-11-03T00:00:00.000Z' }), { canPublish: true });
     await userEvent.click(await screen.findByRole('button', { name: 'Phát hành ngay' }));
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Phát hành' }));
     await waitFor(() => expect(calls.some((c) => c.path === '/episodes/e1/publications' && c.method === 'POST')).toBe(true));
   });
 
@@ -144,6 +145,11 @@ describe('ContractTab', () => {
     expect(send).toBeDisabled();
     await attachSignature(document.body, /chữ ký AI Cinema cho giá mới/);
     await userEvent.click(send);
+    // Signing at a new cost cannot be taken back: it asks once first.
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText('120.000.000 ₫')).toBeInTheDocument();
+    expect(calls.some((c) => c.path === '/contracts/c1/counter')).toBe(false);
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Ký và gửi giá' }));
     await waitFor(() => {
       const sent = formOf(calls.find((c) => c.path === '/contracts/c1/counter')!.body);
       expect(sent.get('costVnd')).toBe('120000000');

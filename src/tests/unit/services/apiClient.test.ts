@@ -56,7 +56,7 @@ describe('apiClient', () => {
 
   it('reports a network failure', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
-    await expect(apiClient.get('/projects')).resolves.toMatchObject({ success: false, message: 'Failed to fetch' });
+    await expect(apiClient.get('/projects')).resolves.toMatchObject({ success: false, message: 'Không kết nối được máy chủ. Hãy kiểm tra mạng rồi thử lại.' });
   });
 
   it('keeps the status and the reason of a refusal', async () => {

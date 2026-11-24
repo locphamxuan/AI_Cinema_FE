@@ -157,6 +157,7 @@ describe('AdminExecutivePortal', () => {
     expect(dialog).toHaveTextContent('Giao đúng hạn');
     const file = await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     await userEvent.click(within(dialog).getByRole('button', { name: /Đồng ý/ }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Ký hợp đồng' }));
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/contracts/c1/sign' && c.method === 'POST');
       expect(formOf(sent!.body).get('file')).toBe(file);
@@ -178,6 +179,7 @@ describe('AdminExecutivePortal', () => {
     await userEvent.type(within(dialog).getByLabelText('Giá đề xuất mới'), '120000000');
     await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     await userEvent.click(send);
+    await userEvent.click(await screen.findByRole('button', { name: 'Ký và gửi giá' }));
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/contracts/c1/counter');
       expect(formOf(sent!.body).get('costVnd')).toBe('120000000');

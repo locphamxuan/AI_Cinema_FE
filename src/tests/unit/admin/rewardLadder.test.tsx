@@ -50,6 +50,17 @@ describe('RewardLadderPanel: the 7-day check-in schedule', () => {
     expect(screen.getAllByText('Chưa có thưởng')).toHaveLength(5);
   });
 
+  it('refuses more bonus Coins than the API takes for one day', async () => {
+    signInAs('admin');
+    mockApi({ 'GET /admin/reward-rules': [] });
+    render(<RewardLadderPanel />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Đặt thưởng ngày 1' }));
+    await userEvent.type(screen.getByLabelText('Số Coin thưởng'), '100001');
+    expect(screen.getByRole('alert')).toHaveTextContent('từ 1 đến 100.000');
+    expect(screen.getByRole('button', { name: 'Lưu' })).toBeDisabled();
+  });
+
   it('will not reactivate a switched-off rung on a day another rung now holds', async () => {
     signInAs('admin');
     mockApi({ 'GET /admin/reward-rules': [rung('r1', 'day_1', 1), rung('r0', 'day_1_old', 1, false)] });

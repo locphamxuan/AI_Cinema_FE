@@ -181,6 +181,11 @@ describe('Playground tab', () => {
     expect(h).toHaveLength(10);
     expect(h[0]).toEqual({ role: 'MEMBER', content: 'q2' });
   });
+
+  it('cuts an earlier AI answer to the 4000 characters the API accepts per turn', () => {
+    const h = historyOf([{ question: 'q', answer: { ...ANSWER, answer: 'a'.repeat(4500) } }]);
+    expect(h[1].content).toHaveLength(4000);
+  });
 });
 
 describe('Answers tab', () => {

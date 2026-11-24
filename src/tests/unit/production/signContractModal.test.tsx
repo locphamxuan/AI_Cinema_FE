@@ -50,6 +50,20 @@ describe('SignContractModal', () => {
     expect(await within(dialog).findByText(/ngân sách còn lại 150\.000\.000/)).toBeInTheDocument();
   });
 
+  it('explains why a counter price cannot be sent', async () => {
+    routeFetch({ '/projects/m1/costs': COSTS });
+    const { dialog } = open();
+    const input = within(dialog).getByLabelText('Giá đề xuất mới');
+    await userEvent.type(input, '140.000.000');
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('bằng giá Studio đề xuất');
+    await userEvent.clear(input);
+    await userEvent.type(input, '160.000.000');
+    expect(await within(dialog).findByText(/vượt ngân sách còn lại/)).toBeInTheDocument();
+    await userEvent.clear(input);
+    await userEvent.type(input, '150.500');
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('bội số của 1.000');
+  });
+
   it('signs the round the studio signed, then refreshes and closes', async () => {
     const calls = routeFetch({ '/projects/m1/costs': COSTS, '/contracts/c1/sign': { id: 'c1', status: 'SIGNED' } });
     const { dialog, onClose, onChanged } = open();
@@ -58,6 +72,7 @@ describe('SignContractModal', () => {
     const file = await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
 
     await userEvent.click(sign);
+    await userEvent.click(await screen.findByRole('button', { name: 'Ký hợp đồng' }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(onChanged).toHaveBeenCalled();
@@ -79,6 +94,7 @@ describe('SignContractModal', () => {
     expect(send).toBeDisabled();
     const file = await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     await userEvent.click(send);
+    await userEvent.click(await screen.findByRole('button', { name: 'Ký và gửi giá' }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     const sent = formOf(calls.find((c) => c.path === '/contracts/c1/counter')!.body);
@@ -99,6 +115,7 @@ describe('SignContractModal', () => {
     await userEvent.type(offerInput(dialog), '50000000');
     await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     await userEvent.click(within(dialog).getByRole('button', { name: 'Gửi giá đề xuất' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Ký và gửi giá' }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(formOf(calls.find((c) => c.path === '/contracts/c1/counter')!.body).get('costVnd')).toBe('50000000');
@@ -117,16 +134,22 @@ describe('SignContractModal', () => {
     expect(within(dialog).getByRole('button', { name: /Đồng ý/ })).toBeDisabled();
   });
 
-  it('shows the refusal and stays open when the signature is refused', async () => {
+  it('shows the refusal, reloads the inbox and closes when the contract changed meanwhile (409)', async () => {
     routeFetch({ '/projects/m1/costs': COSTS, '/contracts/c1/sign': failWith(409, 'Cannot sign a contract that is SIGNED (expected STUDIO_SIGNED)') });
     const { dialog, onClose, onChanged } = open();
     await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
 
     await userEvent.click(within(dialog).getByRole('button', { name: /Đồng ý/ }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Ký hợp đồng' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể ký hợp đồng đang ở trạng thái Đã ký đủ hai bên (cần Studio đã ký).'));
-    expect(onClose).not.toHaveBeenCalled();
-    expect(onChanged).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        'Không thực hiện được',
+        'Không thể ký hợp đồng đang ở trạng thái Đã ký đủ hai bên (cần Studio đã ký). Màn hình đã được tải lại.',
+      ),
+    );
+    await waitFor(() => expect(onClose).toHaveBeenCalled());
+    expect(onChanged).toHaveBeenCalled();
   });
 
   it('refuses a file that is not a signature image, is over 2 MB or too small to read, before sending', async () => {

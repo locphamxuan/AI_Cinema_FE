@@ -106,8 +106,9 @@ describe('ReviewPanel - the review sheet', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Duyệt' }));
     await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Duyệt bản này' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể duyệt bản phim khi tập đang ở trạng thái Đang xử lý video.'));
-    expect(onChanged).not.toHaveBeenCalled();
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể duyệt bản phim khi tập đang ở trạng thái Đang xử lý video. Màn hình đã được tải lại.'));
+    // 409: the episode changed meanwhile, so the screen is loaded again.
+    expect(onChanged).toHaveBeenCalled();
   });
 });
 
