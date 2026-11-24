@@ -13,12 +13,18 @@ interface Exchange {
   answer: PlaygroundAnswer;
 }
 
+/** The backend takes at most 4000 characters per earlier turn; a longer AI answer is cut, not refused. */
+const TURN_MAX = 4000;
+
 /** Earlier exchanges as the backend's `history`, oldest first, at most the last 10 turns. */
 export function historyOf(exchanges: Exchange[]): PlaygroundTurn[] {
-  return exchanges.flatMap<PlaygroundTurn>((e) => [
-    { role: 'MEMBER', content: e.question },
-    { role: 'AI', content: e.answer.answer },
-  ]).slice(-10);
+  return exchanges
+    .flatMap<PlaygroundTurn>((e) => [
+      { role: 'MEMBER', content: e.question },
+      { role: 'AI', content: e.answer.answer },
+    ])
+    .slice(-10)
+    .map((turn) => ({ ...turn, content: turn.content.slice(0, TURN_MAX) }));
 }
 
 /** Ask the AI as a member would; the backend stores and sends nothing. */

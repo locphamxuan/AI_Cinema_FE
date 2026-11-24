@@ -101,10 +101,10 @@ export function KnowledgeEditorModal({
           className="space-y-4"
         >
           <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-[2fr_1fr]">
-            <FormField label="Tiêu đề">
+            <FormField label="Tiêu đề" required>
               <input required maxLength={255} value={form.title} onChange={(e) => set('title', e.target.value)} className={fieldInputClass} />
             </FormField>
-            <FormField label="Chủ đề">
+            <FormField label="Chủ đề" required>
               <input required maxLength={100} list="knowledge-topics" value={form.category} onChange={(e) => set('category', e.target.value)} className={fieldInputClass} />
               <datalist id="knowledge-topics">
                 {TOPICS.map((t) => (
@@ -114,7 +114,7 @@ export function KnowledgeEditorModal({
             </FormField>
           </div>
 
-          <FormField label="Nội dung" hint="Mỗi câu hỏi nên có một dòng tiêu đề riêng bắt đầu bằng ##, ví dụ: ## Coin thưởng có hết hạn không?">
+          <FormField label="Nội dung" hint="Mỗi câu hỏi nên có một dòng tiêu đề riêng bắt đầu bằng ##, ví dụ: ## Coin thưởng có hết hạn không?" required>
             <textarea
               required
               rows={14}
