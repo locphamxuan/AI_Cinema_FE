@@ -131,7 +131,7 @@ function PriceModal({ plan, onClose, onDone }: ModalProps & { plan: AdminPlan })
       subtitle={plan.priceCoins ? `Giá đang áp dụng: ${formatNumber(plan.priceCoins)} Coin mỗi kỳ` : 'Gói chưa có giá nên Member chưa mua được.'}
     >
       <form onSubmit={submit} className="space-y-3">
-        <FormField label="Giá mới (Coin / kỳ)" error={error} hint={`Từ 1 đến ${formatNumber(MAX_PLAN_PRICE_COINS)} Coin.`}>
+        <FormField label="Giá mới (Coin / kỳ)" error={error} hint={`Từ 1 đến ${formatNumber(MAX_PLAN_PRICE_COINS)} Coin.`} required>
           <input type="number" min={1} max={MAX_PLAN_PRICE_COINS} step={1} value={price} onChange={(e) => setPrice(e.target.value)} required className={fieldInputClass} />
         </FormField>
         <FormField label="Bắt đầu áp dụng" hint="Để trống để áp dụng ngay.">

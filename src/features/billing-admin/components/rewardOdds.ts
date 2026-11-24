@@ -1,7 +1,8 @@
 import type { RewardPrize } from '@/types/billing';
 
-/** The BE limits for a prize: plan days 1–30, "tỉ lệ trúng" points (weight) 1–10 000. */
+/** The BE limits for a prize: plan days 1–30, bonus Coins 1–100 000 (also a check-in day), "tỉ lệ trúng" points 1–10 000. */
 export const MAX_PLAN_DAYS = 30;
+export const MAX_REWARD_BONUS_COINS = 100_000;
 export const MAX_WEIGHT = 10_000;
 
 /** Chance of a prize, in percent: its weight over the weights of every active prize. */

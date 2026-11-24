@@ -7,7 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useAction } from '@/hooks/useAction';
 import { rewardPrizeService } from '@/services/rewardPrizeService';
 import type { RewardPrize, RewardPrizeType } from '@/types/billing';
-import { MAX_PLAN_DAYS, MAX_WEIGHT, chanceWith, formatPercent } from './rewardOdds';
+import { MAX_PLAN_DAYS, MAX_REWARD_BONUS_COINS, MAX_WEIGHT, chanceWith, formatPercent } from './rewardOdds';
 
 const isIntIn = (n: number, min: number, max = Number.MAX_SAFE_INTEGER) => Number.isInteger(n) && n >= min && n <= max;
 
@@ -50,7 +50,7 @@ export function RewardPrizeModal({
   const plan = form.type === 'PLAN_DAYS';
   const amount = Number(form.amount);
   const weight = Number(form.weight);
-  const amountOk = plan ? isIntIn(amount, 1, MAX_PLAN_DAYS) : isIntIn(amount, 1);
+  const amountOk = plan ? isIntIn(amount, 1, MAX_PLAN_DAYS) : isIntIn(amount, 1, MAX_REWARD_BONUS_COINS);
   const weightOk = isIntIn(weight, 1, MAX_WEIGHT);
   const defaultName = amountOk ? (plan ? `${amount} ngày gói Tháng` : `${amount} Coin thưởng`) : '';
   const name = form.name.trim() || defaultName;
@@ -85,11 +85,15 @@ export function RewardPrizeModal({
           </FormField>
         )}
 
-        <FormField label={plan ? `Số ngày gói Tháng (1–${MAX_PLAN_DAYS})` : 'Số Coin thưởng'}>
+        <FormField
+          label={plan ? `Số ngày gói Tháng (1–${MAX_PLAN_DAYS})` : `Số Coin thưởng (1–${MAX_REWARD_BONUS_COINS.toLocaleString('vi-VN')})`}
+          error={form.amount && !amountOk ? 'Nhập số nguyên trong khoảng cho phép.' : null}
+          required
+        >
           <input
             type="number"
             min={1}
-            max={plan ? MAX_PLAN_DAYS : undefined}
+            max={plan ? MAX_PLAN_DAYS : MAX_REWARD_BONUS_COINS}
             step={1}
             value={form.amount}
             onChange={(e) => set({ amount: e.target.value })}
@@ -111,6 +115,7 @@ export function RewardPrizeModal({
         <FormField
           label="Tỉ lệ trúng"
           hint={`Nhập số từ 1 đến ${MAX_WEIGHT.toLocaleString('vi-VN')}. Số càng lớn so với các giải khác thì giải càng dễ trúng.`}
+          required
         >
           <input
             type="number"

@@ -45,7 +45,9 @@ export const billingAdminService = {
       `/admin/coin-transactions${queryString({ page, limit: PAGE_SIZE, kind, entryType, walletId, from, to })}`,
     ),
   wallet: (userId: string) => apiClient.get<AdminWallet>(`/admin/wallets/${userId}`),
-  adjustWallet: (input: WalletAdjustment) => apiClient.post<WalletAdjustmentResult>('/admin/wallet-adjustments', input),
+  /** One key per correction form, so a retried request is never applied twice. */
+  adjustWallet: (input: WalletAdjustment, idempotencyKey: string) =>
+    apiClient.post<WalletAdjustmentResult>('/admin/wallet-adjustments', input, { headers: { 'Idempotency-Key': idempotencyKey } }),
 
   listRewardRules: (): Promise<ApiResponse<RewardRule[]>> => apiClient.get<RewardRule[]>('/admin/reward-rules'),
   createRewardRule: (input: RewardRuleInput) => apiClient.post<RewardRule>('/admin/reward-rules', input),

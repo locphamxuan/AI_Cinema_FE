@@ -20,7 +20,12 @@ export function RewardWheelPanel() {
   const prizes = useResource('admin:reward-prizes', rewardPrizeService.getAdminPrizes);
   const [editing, setEditing] = useState<RewardPrize | 'new' | null>(null);
   const [deleting, setDeleting] = useState<RewardPrize | null>(null);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({
+    onStale: () => {
+      setDeleting(null);
+      return prizes.reload();
+    },
+  });
   const list = prizes.data ?? [];
   const activeCount = list.filter((p) => p.isActive).length;
 

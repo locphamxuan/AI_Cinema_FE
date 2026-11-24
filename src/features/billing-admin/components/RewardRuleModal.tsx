@@ -8,6 +8,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useAction } from '@/hooks/useAction';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { RewardRule } from '@/types/billing';
+import { MAX_REWARD_BONUS_COINS } from './rewardOdds';
 
 /** The BE ladder runs seven streak days, then starts again at day 1. */
 export const LADDER_LENGTH = 7;
@@ -50,7 +51,8 @@ export function RewardRuleModal({
   const ownsDay = Boolean(rule?.isActive) && day === rule?.streakDay;
   const dayTaken = form.isActive && takenDays.has(day) && !ownsDay;
   const name = form.name.trim() || `Ngày ${day}`;
-  const valid = Number.isInteger(coins) && coins >= 1 && !dayTaken;
+  const coinsOk = Number.isInteger(coins) && coins >= 1 && coins <= MAX_REWARD_BONUS_COINS;
+  const valid = coinsOk && !dayTaken;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,10 +84,15 @@ export function RewardRuleModal({
               ))}
             </select>
           </FormField>
-          <FormField label="Số Coin thưởng">
+          <FormField
+            label="Số Coin thưởng"
+            error={form.bonusCoins && !coinsOk ? `Nhập số nguyên từ 1 đến ${MAX_REWARD_BONUS_COINS.toLocaleString('vi-VN')}.` : null}
+            required
+          >
             <input
               type="number"
               min={1}
+              max={MAX_REWARD_BONUS_COINS}
               step={1}
               value={form.bonusCoins}
               onChange={(e) => set({ bonusCoins: e.target.value })}

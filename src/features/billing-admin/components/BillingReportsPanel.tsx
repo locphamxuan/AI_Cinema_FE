@@ -24,8 +24,12 @@ function Stat({ label, value, hint }: { label: string; value: string; hint?: str
 export function BillingReportsPanel() {
   const can = useCan();
   const [range, setRange] = useState({ from: addDays(today(), -30), to: today() });
-  // The end day is included: the BE reads `to` as an instant, so send the end of that day.
-  const query: ReportRange = { from: range.from, to: `${range.to}T23:59:59.999Z` };
+  // Date-only bounds: the BE reads each as a whole Vietnam business day, the end day included (report-range.ts).
+  const query: ReportRange = { from: range.from, to: range.to };
+  // A cleared box or a start after the end keeps the last valid range instead of sending a request the BE refuses.
+  const pick = (next: { from: string; to: string }) => {
+    if (next.from && next.to && next.from <= next.to) setRange(next);
+  };
   const key = `${range.from}:${range.to}`;
 
   return (
@@ -33,11 +37,11 @@ export function BillingReportsPanel() {
       <div className="flex flex-wrap items-end gap-3 text-xs">
         <label className="space-y-1">
           <span className="block text-muted-foreground">Từ ngày</span>
-          <input type="date" value={range.from} max={range.to} onChange={(e) => setRange({ ...range, from: e.target.value })} className={`${fieldInputClass} py-1`} />
+          <input type="date" value={range.from} max={range.to} onChange={(e) => pick({ ...range, from: e.target.value })} className={`${fieldInputClass} py-1`} />
         </label>
         <label className="space-y-1">
           <span className="block text-muted-foreground">Đến ngày</span>
-          <input type="date" value={range.to} min={range.from} onChange={(e) => setRange({ ...range, to: e.target.value })} className={`${fieldInputClass} py-1`} />
+          <input type="date" value={range.to} min={range.from} onChange={(e) => pick({ ...range, to: e.target.value })} className={`${fieldInputClass} py-1`} />
         </label>
       </div>
       {can(PERMISSION.ANALYTICS_REVENUE_READ) && <RevenueSection rangeKey={key} query={query} />}

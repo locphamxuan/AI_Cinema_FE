@@ -144,7 +144,7 @@ function SubscriptionModal({ id, onClose, onChanged }: { id: string; onClose: ()
             <div className="space-y-2 rounded-lg border border-rose-500/30 bg-rose-500/5 p-3">
               <p className="text-rose-700 dark:text-rose-300">Member mất ngay quyền xem của gói; Coin đã thu không được hoàn.</p>
               <FormField label="Lý do (ghi vào nhật ký)">
-                <textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} className={fieldTextareaClass} />
+                <textarea rows={2} value={reason} maxLength={500} onChange={(e) => setReason(e.target.value)} className={fieldTextareaClass} />
               </FormField>
               <div className="flex justify-end gap-2">
                 <Button size="sm" variant="secondary" onClick={() => setConfirming(false)}>

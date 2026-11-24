@@ -3,18 +3,18 @@
 import { useState } from 'react';
 import { Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { useCan } from '@/hooks/useCan';
 import { COIN_ENTRY_LABEL, COIN_ENTRY_TYPES, signed, describeLine } from '@/lib/coinEntry';
 import { PERMISSION } from '@/lib/permissions';
-import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { formatDateTime, formatNumber } from '@/lib/format';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { CoinEntryType } from '@/types/billing';
 import { MetaPager } from '@/components/data/MetaPager';
+import { WalletAdjustForm } from './WalletAdjustForm';
 
 /** MF-2: the Coin ledger of every wallet. Reading a wallet and correcting it by hand need their own permissions. */
 export function CoinLedgerPanel() {
@@ -135,8 +135,8 @@ export function WalletModal({
         </div>
       )}
       {w && adjusting && (
-        <AdjustForm
-          userId={userId}
+        <WalletAdjustForm
+          wallet={w}
           onCancel={() => setAdjusting(false)}
           onDone={async () => {
             setAdjusting(false);
@@ -145,56 +145,5 @@ export function WalletModal({
         />
       )}
     </Modal>
-  );
-}
-
-function AdjustForm({ userId, onCancel, onDone }: { userId: string; onCancel: () => void; onDone: () => Promise<void> }) {
-  const [main, setMain] = useState('');
-  const [bonus, setBonus] = useState('');
-  const [reason, setReason] = useState('');
-  const { busy, run } = useAction();
-  const mainAmount = Number(main || 0);
-  const bonusAmount = Number(bonus || 0);
-  const valid =
-    Number.isInteger(mainAmount) && Number.isInteger(bonusAmount) && (mainAmount !== 0 || bonusAmount !== 0) && reason.trim().length > 0;
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const done = await run(
-      () =>
-        billingAdminService.adjustWallet({
-          userId,
-          ...(mainAmount ? { mainAmount } : {}),
-          ...(bonusAmount ? { bonusAmount } : {}),
-          reason: reason.trim(),
-        }),
-      'Đã điều chỉnh ví',
-    );
-    if (done) await onDone();
-  };
-
-  return (
-    <form onSubmit={submit} className="space-y-3">
-      <p className="text-xs text-muted-foreground">Số dương cộng thêm, số âm trừ bớt. Mỗi lần điều chỉnh được ghi vào lịch sử giao dịch Coin và nhật ký thao tác.</p>
-      <div className="grid grid-cols-2 gap-3">
-        <FormField label="Coin chính">
-          <input type="number" step={1} value={main} onChange={(e) => setMain(e.target.value)} className={fieldInputClass} />
-        </FormField>
-        <FormField label="Coin thưởng">
-          <input type="number" step={1} value={bonus} onChange={(e) => setBonus(e.target.value)} className={fieldInputClass} />
-        </FormField>
-      </div>
-      <FormField label="Lý do (bắt buộc)">
-        <textarea rows={3} value={reason} maxLength={500} onChange={(e) => setReason(e.target.value)} className={fieldTextareaClass} />
-      </FormField>
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="secondary" onClick={onCancel}>
-          Huỷ
-        </Button>
-        <Button type="submit" disabled={!valid || busy}>
-          Ghi điều chỉnh
-        </Button>
-      </div>
-    </form>
   );
 }
