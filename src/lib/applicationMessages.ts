@@ -129,12 +129,14 @@ export function localizeApiError(
     return 'Studio chưa có tài khoản đăng nhập Studio Web nên chưa gửi hợp đồng được. Vào Studio đối tác, mở "Tài khoản đăng nhập" để tạo, rồi thử lại.';
   }
   if (reason === 'INSUFFICIENT_COINS' || normalized.includes('does not hold enough coins')) {
+    // An Admin correcting someone else's wallet is not told "your wallet".
+    if (endpoint.includes('/admin/')) return 'Ví này không đủ Coin cho lần trừ này. Hãy xem lại số dư hiện tại.';
     return APPLICATION_MESSAGES.MSG12.message;
   }
   if (
     ['EPISODE_NOT_PUBLISHED', 'EPISODE_NOT_PRICED', 'ACCESS_ALREADY_OWNED'].includes(String(reason)) ||
     normalized.includes('episode is not published') ||
-    normalized.includes('episode has no Coin price') ||
+    normalized.includes('episode has no coin price') ||
     normalized.includes('episode is free') ||
     normalized.includes('episode is already unlocked')
   ) {
@@ -170,5 +172,6 @@ const GENERIC_BY_STATUS: Record<number, string> = {
   403: APPLICATION_MESSAGES.MSG09.message,
   404: APPLICATION_MESSAGES.MSG10.message,
   409: 'Dữ liệu vừa thay đổi hoặc không còn ở trạng thái phù hợp. Hãy tải lại rồi thử lại.',
+  413: 'Tệp quá lớn so với giới hạn cho phép.',
   422: APPLICATION_MESSAGES.MSG03.message,
 };

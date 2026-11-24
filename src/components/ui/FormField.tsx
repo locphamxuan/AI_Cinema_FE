@@ -8,17 +8,24 @@ export interface FormFieldProps {
   hint?: ReactNode;
   /** What is wrong with the value; shown instead of the hint. */
   error?: string | null;
+  /** Marks the field as one that must be filled in (a red star after the label). */
+  required?: boolean;
 }
 
 /**
  * A labelled form control with an optional help line or error under it. The wrapper stays the same whether or not
  * a message shows, so an error that appears while typing does not remount the control and drop its focus.
  */
-export function FormField({ label, children, className = '', hint, error }: FormFieldProps) {
+export function FormField({ label, children, className = '', hint, error, required = false }: FormFieldProps) {
   return (
     <div className={className}>
       <label className="block">
-        <span className="mb-1.5 block text-sm font-medium text-foreground">{label}</span>
+        {/* The star is CSS only: the control's own `required` already tells assistive technology. */}
+        <span
+          className={`mb-1.5 block text-sm font-medium text-foreground ${required ? "after:ml-0.5 after:text-destructive after:content-['*']" : ''}`}
+        >
+          {label}
+        </span>
         {children}
       </label>
       {/* Outside the label, so the help text does not become part of the control's name. */}

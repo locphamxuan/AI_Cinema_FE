@@ -108,6 +108,7 @@ export function TextPromptModal({
   tone,
   required = true,
   minLength = 5,
+  maxLength = 2000,
   busy,
   onClose,
   onConfirm,
@@ -125,6 +126,8 @@ export function TextPromptModal({
   required?: boolean;
   /** The backend's shortest accepted reason. */
   minLength?: number;
+  /** The backend's longest accepted text. */
+  maxLength?: number;
   busy?: boolean;
   onClose: () => void;
   onConfirm: (text: string) => void;
@@ -143,7 +146,7 @@ export function TextPromptModal({
         }}
       >
         {children}
-        <FormField label={label}>
+        <FormField label={label} required={required}>
           <textarea
             rows={4}
             value={text}
@@ -151,7 +154,7 @@ export function TextPromptModal({
             placeholder={placeholder}
             className={fieldTextareaClass}
             required={required}
-            maxLength={2000}
+            maxLength={maxLength}
           />
         </FormField>
         {required && text.trim().length > 0 && blocked && (

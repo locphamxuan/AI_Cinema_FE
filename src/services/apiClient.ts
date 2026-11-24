@@ -176,9 +176,7 @@ class ApiClient {
         statusCode: isTimeout ? 504 : undefined,
         message: isTimeout
           ? 'Yêu cầu phản hồi quá lâu (hết thời gian chờ). Vui lòng thử lại sau ít phút.'
-          : error instanceof Error
-            ? error.message
-            : 'Unknown network error',
+          : 'Không kết nối được máy chủ. Hãy kiểm tra mạng rồi thử lại.',
       };
     }
   }
