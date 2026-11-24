@@ -210,6 +210,51 @@ describe('ContractTab', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/số tiền dương/);
   });
 
+  it('refuses a counter-offer at the price the studio already signed', async () => {
+    signInAs('admin');
+    routeFetch({ '/projects/m1/contracts': [round] });
+    render(withProject(assignedProject(), <ContractTab />));
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Đề xuất giá khác' }));
+    await userEvent.type(screen.getByLabelText('Giá mới'), '150.000.000');
+    expect(screen.getByRole('alert')).toHaveTextContent('bằng giá Studio đề xuất');
+    await attachSignature(document.body, /chữ ký AI Cinema cho giá mới/);
+    expect(screen.getByRole('button', { name: 'Gửi giá cho Studio' })).toBeDisabled();
+  });
+
+  it('says in Vietnamese why a round signed before signature images cannot be completed, and reloads', async () => {
+    signInAs('admin');
+    vi.mocked(toast.error).mockClear();
+    const missing = "The other side's signature image of this round is missing; the round must be sent again";
+    const calls = routeFetch({ '/projects/m1/contracts': [round], '/contracts/c1/sign': failWith(409, missing) });
+    render(withProject(assignedProject(), <ContractTab />));
+
+    await screen.findByText(/Hợp đồng với Studio Lumen Studio/);
+    await attachSignature(document.body, /ký theo giá Studio/);
+    await userEvent.click(screen.getByRole('button', { name: /Đồng ý/ }));
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Đồng ý và ký' }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', expect.stringContaining('thiếu ảnh chữ ký của bên kia')),
+    );
+    expect(calls.filter((c) => c.path === '/projects/m1/contracts' && c.method === 'GET').length).toBeGreaterThan(1);
+  });
+
+  it('saves the unsigned contract under the contract number the backend prints on it', async () => {
+    signInAs('reviewer');
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:x'), revokeObjectURL: vi.fn() }));
+    const names: string[] = [];
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+      names.push(this.download);
+    });
+    routeFetch({ '/projects/m1/contracts': [round], '/contracts/c1/documents': [doc], '/contracts/c1/template': {} });
+    render(withProject(assignedProject(), <ContractTab />));
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Hợp đồng chưa ký (bản Studio nhận)' }));
+    await waitFor(() => expect(names).toEqual(['hop-dong-chua-ky-AIC-2026-C1-R1.pdf']));
+    click.mockRestore();
+  });
+
   it('explains that the template goes out with the Final Script, and resends it only then', async () => {
     signInAs('admin');
     const calls = routeFetch({ '/projects/m1/contracts': [], '/projects/m1/script': { status: 'FINAL' } });

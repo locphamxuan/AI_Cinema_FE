@@ -46,13 +46,16 @@ export function ContractCard({
       ? 'Nhập số tiền dương, là bội số của 1.000 ₫ (ví dụ 120.000.000).'
       : priceVnd > MAX_CONTRACT_VND
         ? `Tối đa ${formatVnd(MAX_CONTRACT_VND)}.`
-        : null;
+        : priceVnd === c.costVnd
+          ? 'Giá này bằng giá Studio đề xuất; hãy bấm "Đồng ý và ký".'
+          : null;
 
   const canSign = canDecide && c.status === 'STUDIO_SIGNED';
   // BE ADMIN_OFFER_FROM: the Admin may propose a cost before the studio filled one (SENT) or after it signed.
   const canCounter = canDecide && (c.status === 'SENT' || c.status === 'STUDIO_SIGNED');
+  const priceOk = priceVnd > 0 && priceVnd <= MAX_CONTRACT_VND && priceVnd !== c.costVnd;
   const downloadTemplate = async () => {
-    if (!(await contractService.downloadTemplate(c.id))) toast.error('Không tải được hợp đồng', 'Thử lại sau.');
+    if (!(await contractService.downloadTemplate(c))) toast.error('Không tải được hợp đồng', 'Thử lại sau.');
   };
   const download = async (side: 'ADMIN' | 'STUDIO' | 'FINAL', fileName: string) => {
     if (!(await contractService.downloadDocument(c.id, side, fileName))) toast.error('Không tải được bản hợp đồng', 'Thử lại sau.');
@@ -67,7 +70,7 @@ export function ContractCard({
     }
   };
   const counter = async () => {
-    if (!(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile) return;
+    if (!priceOk || !counterFile) return;
     if (await run(() => contractService.counter(c.id, priceVnd, counterFile), 'Đã gửi mức giá mới cho Studio')) {
       setConfirming(null);
       setCountering(false);
@@ -166,7 +169,7 @@ export function ContractCard({
               type="button"
               size="sm"
               onClick={() => setConfirming('counter')}
-              disabled={busy || !(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile}
+              disabled={busy || !priceOk || !counterFile}
             >
               Gửi giá cho Studio
             </Button>

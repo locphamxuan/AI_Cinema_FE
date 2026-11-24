@@ -71,7 +71,8 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
     await (action === 'sign' ? sign() : propose());
   };
   const downloadStudio = async () => {
-    if (!(await contractService.downloadDocument(c.id, 'STUDIO'))) toast.error('Không tải được bản Studio đã ký', 'Thử lại sau.');
+    const studioCopy = c.documents?.find((document) => document.side === 'STUDIO');
+    if (!(await contractService.downloadDocument(c.id, 'STUDIO', studioCopy?.fileName))) toast.error('Không tải được bản Studio đã ký', 'Thử lại sau.');
   };
 
   return (

@@ -168,6 +168,24 @@ describe('SignContractModal', () => {
     expect(calls.some((c) => c.path === '/contracts/c1/sign')).toBe(false);
   });
 
+  it("saves the studio-signed copy under the file name the backend gave it", async () => {
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: vi.fn(() => 'blob:x'), revokeObjectURL: vi.fn() }));
+    const names: string[] = [];
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {
+      names.push(this.download);
+    });
+    const fileName = 'hop-dong-studio-da-ky-AIC-2026-C1-R2.pdf';
+    const studioCopy = { id: 'd1', side: 'STUDIO', fileName, sizeBytes: 10, checksum: 'x', uploadedAt: '2026-11-04T00:00:00.000Z' };
+    const calls = routeFetch({ '/projects/m1/costs': COSTS, '/contracts/c1/documents/STUDIO/content': {} });
+    const { dialog } = open(item({ documents: [studioCopy] } as Partial<Contract>));
+
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Tải bản Studio ký' }));
+
+    await waitFor(() => expect(names).toEqual([fileName]));
+    expect(calls.some((c) => c.path === '/contracts/c1/documents/STUDIO/content')).toBe(true);
+    click.mockRestore();
+  });
+
   it('closes without a call when the Admin dismisses it', async () => {
     const calls = routeFetch({ '/projects/m1/costs': COSTS });
     const { dialog, onClose } = open();

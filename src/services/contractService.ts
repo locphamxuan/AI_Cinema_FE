@@ -34,6 +34,11 @@ export function signatureSizeProblem(width: number, height: number): string | nu
   return null;
 }
 
+/** "AIC-2026-9F2B4C6E-R1", the number the BE prints on a round and puts in the name of each of its files. */
+export function contractNo(contract: Pick<Contract, 'id' | 'round' | 'createdAt'>): string {
+  return `AIC-${new Date(contract.createdAt).getUTCFullYear()}-${contract.id.slice(0, 8).toUpperCase()}-R${contract.round}`;
+}
+
 export const contractService = {
   forProject: (movieId: string) => apiClient.get<Contract[]>(R.CONTRACTS(movieId)),
   /** Admin: send the project's studio its template contract again (normally sent on the Final Script). */
@@ -56,8 +61,9 @@ export const contractService = {
   /** Download a signed copy. */
   downloadDocument: (id: string, side: ContractDocumentSide, fileName?: string): Promise<boolean> =>
     saveFrom(R.CONTRACT_DOCUMENT_CONTENT(id, side), fileName || `hop-dong-${side.toLowerCase()}.pdf`),
-  /** Download the unsigned contract of a round, as the studio receives it. */
-  downloadTemplate: (id: string): Promise<boolean> => saveFrom(R.CONTRACT_TEMPLATE(id), `hop-dong-chua-ky-${id.slice(0, 8)}.pdf`),
+  /** Download the unsigned contract of a round, as the studio receives it, under the name the BE gives it. */
+  downloadTemplate: (contract: Pick<Contract, 'id' | 'round' | 'createdAt'>): Promise<boolean> =>
+    saveFrom(R.CONTRACT_TEMPLATE(contract.id), `hop-dong-chua-ky-${contractNo(contract)}.pdf`),
 };
 
 /** Fetches a PDF behind auth and saves it under `fileName`; false when it cannot be read. */
