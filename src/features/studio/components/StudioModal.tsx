@@ -28,7 +28,7 @@ const draftOf = (studio: Studio | null): Draft => ({
  */
 export function StudioModal({ studio, onClose, onSaved }: { studio: Studio | null; onClose: () => void; onSaved: () => Promise<void> }) {
   const [draft, setDraft] = useState<Draft>(() => draftOf(studio));
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onSaved });
   const set = (key: keyof Draft) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setDraft({ ...draft, [key]: event.target.value });
   const phone = draft.phone.trim();
@@ -56,17 +56,25 @@ export function StudioModal({ studio, onClose, onSaved }: { studio: Studio | nul
   return (
     <Modal open onClose={onClose} title={studio ? 'Sửa Studio' : 'Thêm Studio'} subtitle="Studio đối tác đăng nhập Studio Web bằng tài khoản Admin mở cho Studio.">
       <form onSubmit={submit} className="space-y-4">
-        <FormField label="Tên Studio (tên pháp lý in trên hợp đồng)">
+        <FormField
+          label="Tên Studio (tên pháp lý in trên hợp đồng)"
+          error={draft.name && draft.name.trim().length < 2 ? 'Tên Studio cần ít nhất 2 ký tự.' : null}
+          required
+        >
           <input value={draft.name} onChange={set('name')} minLength={2} maxLength={255} required className={fieldInputClass} />
         </FormField>
-        <FormField label="Email nhận hợp đồng (không trùng Studio khác)">
+        <FormField
+          label="Email nhận hợp đồng (không trùng Studio khác)"
+          error={draft.email.trim() && !EMAIL.test(draft.email.trim()) ? 'Email chưa đúng định dạng.' : null}
+          required
+        >
           <input type="email" value={draft.email} onChange={set('email')} maxLength={255} required className={fieldInputClass} />
         </FormField>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField label="Người đại diện ký hợp đồng">
             <input value={draft.contactName} onChange={set('contactName')} maxLength={255} className={fieldInputClass} />
           </FormField>
-          <FormField label="Số điện thoại">
+          <FormField label="Số điện thoại" error={phone && !PHONE.test(phone) ? 'Chỉ gồm 6–30 chữ số và các ký tự + ( ) . -' : null}>
             <input value={draft.phone} onChange={set('phone')} maxLength={30} className={fieldInputClass} />
           </FormField>
         </div>

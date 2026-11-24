@@ -11,7 +11,7 @@ export const SIGNATURE_MAX_BYTES = 2 * 1024 * 1024;
 export const SIGNATURE_MIN_SIZE = { width: 150, height: 50 };
 export const SIGNATURE_MAX_SIDE = 4000;
 
-/** The highest cost a round may carry (BE: 100 billion VND). */
+/** The highest VND amount the API accepts anywhere: a contract cost, a budget, a fee (BE MAX_VND, 100 billion). */
 export const MAX_CONTRACT_VND = 100_000_000_000;
 
 /** Why a picked file cannot be sent as a signature image, or null when it can. */

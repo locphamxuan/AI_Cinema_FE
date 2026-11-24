@@ -28,7 +28,7 @@ export function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewShe
   );
   const [realPersonNote, setRealPersonNote] = useState(savedRealPerson?.failureReason ?? '');
   const [compared, setCompared] = useState(false);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onChanged });
 
   const reasonOk = (v: Verdict) => v.result !== null && (v.result === 'PASS' || v.failureReason.trim().length >= 5);
   const filled = reasonOk(decree) && reasonOk(safety) && realPerson !== null && (realPerson === false || realPersonNote.trim().length >= 5);
@@ -101,7 +101,8 @@ export function CompliancePanel({ sheet, canAct, onChanged }: { sheet: ReviewShe
                 rows={2}
                 value={realPersonNote}
                 onChange={(e) => setRealPersonNote(e.target.value)}
-                placeholder="Mô tả chỗ vi phạm…"
+                maxLength={2000}
+                placeholder="Mô tả chỗ vi phạm (tối thiểu 5 ký tự)…"
                 aria-label="Ghi chú người/sự kiện thật"
                 className={fieldTextareaClass}
               />
@@ -139,6 +140,7 @@ function VerdictRow({ label, value, onChange }: { label: string; value: Verdict;
         <input
           value={value.failureReason}
           onChange={(e) => onChange({ ...value, failureReason: e.target.value })}
+          maxLength={2000}
           placeholder="Lý do không đạt (tối thiểu 5 ký tự)"
           aria-label={`Lý do không đạt: ${label}`}
           className={fieldInputClass}

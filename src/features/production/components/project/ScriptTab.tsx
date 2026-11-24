@@ -33,9 +33,9 @@ function nextStep(script: ProjectScript | null): string {
 
 /** The Reviewer in charge passes the submitted version on to the Admin, or sends it back with a comment. */
 function ReviewerActions({ onChanged }: { onChanged: (script: ProjectScript) => void }) {
-  const { project } = useProject();
+  const { project, reload } = useProject();
   const [sendingBack, setSendingBack] = useState(false);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
 
   const decide = async (approve: boolean, comment?: string) => {
     const next = await run(

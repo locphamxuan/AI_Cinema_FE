@@ -28,12 +28,12 @@ export function finalScriptBlockers(project: Pick<ProjectDetail, 'seasons'>): st
  * template contract - or sends it straight back to the Creator with a reason.
  */
 export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectScript) => void }) {
-  const { project } = useProject();
+  const { project, reload } = useProject();
   const studios = useResource('studios:active', () => studioService.list(true));
   const [studioId, setStudioId] = useState('');
   const [terms, setTerms] = useState('');
   const [sendingBack, setSendingBack] = useState(false);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const blockers = finalScriptBlockers(project);
   const targetId = studioId || project.studio?.id || '';
   const target = (studios.data?.find((s) => s.id === targetId) ?? (project.studio?.id === targetId ? project.studio : null)) as Studio | null;
@@ -91,7 +91,7 @@ export function FinalScriptReview({ onDecided }: { onDecided: (script: ProjectSc
             </details>
           </div>
         ) : (
-          <FormField label="Studio nhận hợp đồng">
+          <FormField label="Studio nhận hợp đồng" required>
             <select value={studioId} onChange={(e) => setStudioId(e.target.value)} required className={fieldInputClass}>
               <option value="">{studios.loading && !studios.data ? 'Đang tải…' : 'Chọn Studio'}</option>
               {studios.data?.map((s) => (

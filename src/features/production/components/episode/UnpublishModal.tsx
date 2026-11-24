@@ -54,7 +54,7 @@ export function UnpublishModal({ publication, onClose, onDone }: { publication: 
             ))}
           </select>
         </FormField>
-        <FormField label={live && mode === 'REVISION' ? 'Nhận xét gửi Reviewer / Studio' : 'Ghi chú'}>
+        <FormField label={live && mode === 'REVISION' ? 'Nhận xét gửi Reviewer / Studio' : 'Ghi chú'} required>
           <textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} minLength={5} maxLength={2000} required className={fieldTextareaClass} />
         </FormField>
         <div className="flex justify-end gap-2">

@@ -23,7 +23,7 @@ export function ProjectNotesPanel() {
   const { project, caps } = useProject();
   const notes = useResource(`project-notes:${project.id}`, () => projectNoteService.list(project.id));
   const [message, setMessage] = useState('');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: notes.reload });
   const canWrite = caps.note && isIn(project.status, NOTE_PROJECT);
 
   const send = async () => {

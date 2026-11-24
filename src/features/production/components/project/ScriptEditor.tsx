@@ -18,10 +18,10 @@ const MAX_NOTE = 2000;
  * once the Reviewer or the Admin asked for changes (it starts from the latest version).
  */
 export function ScriptEditor({ latest, onSubmitted }: { latest: ScriptVersion | null; onSubmitted: (script: ProjectScript) => void }) {
-  const { project } = useProject();
+  const { project, reload } = useProject();
   const [content, setContent] = useState(latest?.content ?? '');
   const [note, setNote] = useState('');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const unchanged = latest !== null && content.trim() === latest.content.trim();
 
   const submit = async (e: React.FormEvent) => {
@@ -39,7 +39,7 @@ export function ScriptEditor({ latest, onSubmitted }: { latest: ScriptVersion | 
       description="Viết toàn bộ kịch bản (cảnh, thoại, ghi chú dựng). Nộp xong, Reviewer phụ trách sẽ duyệt hoặc góp ý."
     >
       <form onSubmit={submit} className="space-y-3">
-        <FormField label="Nội dung kịch bản">
+        <FormField label="Nội dung kịch bản" required>
           <textarea
             rows={16}
             value={content}

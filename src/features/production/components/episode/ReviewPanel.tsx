@@ -20,7 +20,7 @@ import { CompliancePanel } from './CompliancePanel';
 export function ReviewPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; canAct: boolean; onChanged: () => Promise<void> }) {
   const [requesting, setRequesting] = useState(false);
   const [approving, setApproving] = useState(false);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onChanged });
   const status = sheet.episode.status;
   const underReview = status === 'IN_REVIEW' && sheet.ingestStatus === 'READY';
   const reviewed = isIn(status, REVIEWED_EPISODE) && sheet.isApprovedVersion;

@@ -33,7 +33,7 @@ export function AddCreatorModal({ seats, onClose, onDone }: { seats: CreatorSeat
   const { project } = useProject();
   const [creatorId, setCreatorId] = useState('');
   const [note, setNote] = useState('');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onDone });
   const taken = seats.filter((s) => s.isActive).map((s) => s.creatorId);
 
   const submit = async (e: React.FormEvent) => {
@@ -85,7 +85,7 @@ export function DelegateModal({
   const [picked, setPicked] = useState<string[]>([]);
   const [toCreatorId, setToCreatorId] = useState('');
   const [note, setNote] = useState('');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onDone });
 
   const toggle = (id: string) => setPicked(picked.includes(id) ? picked.filter((p) => p !== id) : [...picked, id]);
   const submit = async (e: React.FormEvent) => {

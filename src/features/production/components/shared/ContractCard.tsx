@@ -33,11 +33,11 @@ export function ContractCard({
   onChanged?: () => Promise<unknown>;
 }) {
   const [countering, setCountering] = useState(false);
-  const [confirming, setConfirming] = useState(false);
+  const [confirming, setConfirming] = useState<'sign' | 'counter' | null>(null);
   const [price, setPrice] = useState('');
   const [signFile, setSignFile] = useState<File | null>(null);
   const [counterFile, setCounterFile] = useState<File | null>(null);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onChanged });
   const priceVnd = parseVnd(price);
   const docs = useResource(canDownload ? `contract-docs:${c.id}` : null, () => contractService.documents(c.id));
   const priceProblem = !price.trim()
@@ -61,7 +61,7 @@ export function ContractCard({
   const sign = async () => {
     if (!signFile) return;
     if (await run(() => contractService.sign(c.id, signFile), 'Đã ký, hợp đồng hoàn tất')) {
-      setConfirming(false);
+      setConfirming(null);
       await docs.reload();
       await onChanged?.();
     }
@@ -69,6 +69,7 @@ export function ContractCard({
   const counter = async () => {
     if (!(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile) return;
     if (await run(() => contractService.counter(c.id, priceVnd, counterFile), 'Đã gửi mức giá mới cho Studio')) {
+      setConfirming(null);
       setCountering(false);
       setPrice('');
       setCounterFile(null);
@@ -136,7 +137,7 @@ export function ContractCard({
               <Button
                 type="button"
                 size="sm"
-                onClick={() => setConfirming(true)}
+                onClick={() => setConfirming('sign')}
                 disabled={busy || !signFile}
               >
                 Đồng ý và ký
@@ -164,7 +165,7 @@ export function ContractCard({
             <Button
               type="button"
               size="sm"
-              onClick={counter}
+              onClick={() => setConfirming('counter')}
               disabled={busy || !(priceVnd > 0) || priceVnd > MAX_CONTRACT_VND || !counterFile}
             >
               Gửi giá cho Studio
@@ -173,7 +174,22 @@ export function ContractCard({
         </div>
       )}
       <ConfirmModal
-        open={confirming}
+        open={confirming === 'counter'}
+        title="Ký hợp đồng với giá mới"
+        description="Hệ thống đặt ảnh chữ ký AI Cinema vào hợp đồng với giá mới và gửi vòng mới cho Studio trên Studio Web."
+        details={[
+          ['Studio', c.studio.name],
+          ['Giá hiện tại', c.costVnd !== null ? formatVnd(c.costVnd) : 'Ngân sách tối đa'],
+          ['Giá mới', formatVnd(priceVnd)],
+        ]}
+        consequence="vòng này khép lại; Studio ký đồng ý hoặc trả giá khác. Chữ ký đã gửi không rút lại được."
+        confirmLabel="Ký và gửi giá"
+        busy={busy}
+        onClose={() => setConfirming(null)}
+        onConfirm={() => void counter()}
+      />
+      <ConfirmModal
+        open={confirming === 'sign'}
         title="Đồng ý giá và ký hợp đồng"
         description="Hệ thống đặt ảnh chữ ký AI Cinema vào ô Bên A của bản hợp đồng Studio đã ký."
         details={[
@@ -184,7 +200,7 @@ export function ContractCard({
         consequence={`hợp đồng đủ 2 chữ ký, dự án chuyển sang Đang sản xuất và tự động giao việc cho ${c.studio.name} với phí bằng giá ký. Không thể hoàn tác.`}
         confirmLabel="Đồng ý và ký"
         busy={busy}
-        onClose={() => setConfirming(false)}
+        onClose={() => setConfirming(null)}
         onConfirm={() => void sign()}
       />
     </li>

@@ -4,12 +4,12 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
-import { toast } from '@/components/ui/Toast';
 import { productionService } from '@/services/productionService';
 import { studioService } from '@/services/studioService';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
 import { formatVnd } from '@/lib/format';
+import { MAX_CONTRACT_VND } from '@/services/contractService';
 import { parseVnd } from '../shared/CostRequestCard';
 import { GenrePicker } from '../shared/GenrePicker';
 import { emptyProjectInfo, ProjectInfoFields, releaseYearValid, type ProjectInfoDraft } from '../shared/ProjectInfoFields';
@@ -32,7 +32,7 @@ function PeopleFields({ value, onChange }: { value: PeopleDraft; onChange: (next
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-      <FormField label="Reviewer phụ trách">
+      <FormField label="Reviewer phụ trách" required>
         <select value={value.reviewerId} onChange={(e) => patch({ reviewerId: e.target.value })} required className={fieldInputClass}>
           <option value="">{loading(reviewers) ? 'Đang tải…' : 'Chọn Reviewer'}</option>
           {reviewers.data?.map((r) => (
@@ -86,7 +86,7 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
     idea.trim().length < MIN_IDEA_LENGTH ? `mô tả ý tưởng có ít nhất ${MIN_IDEA_LENGTH} ký tự` : null,
     genreIds.length === 0 ? 'chọn ít nhất một thể loại' : null,
     !people.reviewerId ? 'chọn Reviewer phụ trách' : null,
-    !(budgetVnd >= 1000) ? 'nhập ngân sách sản xuất (bội số 1.000 ₫)' : null,
+    !(budgetVnd >= 1000 && budgetVnd <= MAX_CONTRACT_VND) ? `nhập ngân sách sản xuất (bội số 1.000 ₫, tối đa ${formatVnd(MAX_CONTRACT_VND)})` : null,
     !releaseYearValid(info.releaseYear) ? 'năm phát hành từ 2000 đến 2100' : null,
   ].filter((issue): issue is string => issue !== null);
   const valid = validationIssues.length === 0;
@@ -94,28 +94,24 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!valid) return;
-    try {
-      const created = await run(
-        () =>
-          productionService.createProject({
-            title: title.trim(),
-            ideaDescription: idea.trim(),
-            genreIds,
-            defaultLanguage: language,
-            reviewerId: people.reviewerId,
-            budgetVnd,
-            ...(people.creatorId ? { creatorId: people.creatorId } : {}),
-            ...(people.studioId ? { studioId: people.studioId } : {}),
-            ...(info.synopsis.trim() ? { synopsis: info.synopsis.trim() } : {}),
-            ...(info.ageRating ? { ageRating: info.ageRating } : {}),
-            ...(info.releaseYear ? { releaseYear: Number(info.releaseYear) } : {}),
-          }),
-        people.creatorId ? 'Đã tạo dự án và giao cho Creator' : 'Đã tạo dự án',
-      );
-      if (created) onCreated(created.id);
-    } catch {
-      toast.error('Không tạo được dự án', 'Không kết nối được tới máy chủ. Vui lòng kiểm tra kết nối rồi thử lại.');
-    }
+    const created = await run(
+      () =>
+        productionService.createProject({
+          title: title.trim(),
+          ideaDescription: idea.trim(),
+          genreIds,
+          defaultLanguage: language,
+          reviewerId: people.reviewerId,
+          budgetVnd,
+          ...(people.creatorId ? { creatorId: people.creatorId } : {}),
+          ...(people.studioId ? { studioId: people.studioId } : {}),
+          ...(info.synopsis.trim() ? { synopsis: info.synopsis.trim() } : {}),
+          ...(info.ageRating ? { ageRating: info.ageRating } : {}),
+          ...(info.releaseYear ? { releaseYear: Number(info.releaseYear) } : {}),
+        }),
+      people.creatorId ? 'Đã tạo dự án và giao cho Creator' : 'Đã tạo dự án',
+    );
+    if (created) onCreated(created.id);
   };
 
   return (
@@ -127,10 +123,10 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
       maxWidth="max-w-3xl"
     >
       <form onSubmit={submit} className="space-y-4">
-        <FormField label="Tên phim">
+        <FormField label="Tên phim" required>
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} required className={fieldInputClass} />
         </FormField>
-        <FormField label={`Ý tưởng phim (tối thiểu ${MIN_IDEA_LENGTH} ký tự)`}>
+        <FormField label={`Ý tưởng phim (tối thiểu ${MIN_IDEA_LENGTH} ký tự)`} required>
           <textarea rows={5} value={idea} onChange={(e) => setIdea(e.target.value)} maxLength={20000} required className={fieldTextareaClass} />
         </FormField>
         <div>
@@ -141,7 +137,8 @@ export function CreateProjectModal({ onClose, onCreated }: { onClose: () => void
         <FormField
           label="Ngân sách sản xuất (₫)"
           hint={budgetVnd >= 1000 ? `= ${formatVnd(budgetVnd)}, là ngân sách tối đa và giá trị hợp đồng gửi Studio.` : 'Là ngân sách tối đa và giá trị hợp đồng hệ thống gửi Studio sau khi duyệt Kịch bản bản cuối.'}
-          error={budget && !(budgetVnd >= 1000) ? 'Số tiền là bội số 1.000 ₫.' : null}
+          error={budget && !(budgetVnd >= 1000 && budgetVnd <= MAX_CONTRACT_VND) ? `Số tiền là bội số 1.000 ₫, tối đa ${formatVnd(MAX_CONTRACT_VND)}.` : null}
+          required
         >
           <input
             value={budget}

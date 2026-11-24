@@ -23,7 +23,7 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
   const [freeEpisodes, setFreeEpisodes] = useState<string>(
     project.freeEpisodeCount === null || project.freeEpisodeCount === undefined ? '' : String(project.freeEpisodeCount),
   );
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const freeValid = freeEpisodes === '' || (Number.isInteger(Number(freeEpisodes)) && Number(freeEpisodes) >= 0);
 
   const submit = async (e: React.FormEvent) => {
@@ -50,7 +50,7 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
   return (
     <Modal open onClose={onClose} title="Sửa thông tin phim" maxWidth="max-w-2xl">
       <form onSubmit={submit} className="space-y-4">
-        <FormField label="Tên phim">
+        <FormField label="Tên phim" required>
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} required className={fieldInputClass} />
         </FormField>
         <FormField label="Ý tưởng gửi Studio (tối thiểu 20 ký tự)">
@@ -106,7 +106,7 @@ export function AssignCreatorModal({ current, onClose }: { current: Person | nul
   const { project, reload } = useProject();
   const creators = useResource('people:creators', () => productionService.listCreators());
   const [creatorId, setCreatorId] = useState(current?.id ?? '');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,7 +119,7 @@ export function AssignCreatorModal({ current, onClose }: { current: Person | nul
   return (
     <Modal open onClose={onClose} title="Giao cho Creator" subtitle="Creator chính trao đổi ý tưởng và viết kịch bản cho dự án.">
       <form onSubmit={submit} className="space-y-4">
-        <FormField label="Creator">
+        <FormField label="Creator" required>
           <select value={creatorId} onChange={(e) => setCreatorId(e.target.value)} required className={fieldInputClass}>
             <option value="" disabled>
               {creators.loading ? 'Đang tải…' : 'Chọn Creator'}

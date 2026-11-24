@@ -69,7 +69,7 @@ function FeeField({ value, maxVnd, onChange }: { value: string; maxVnd: number; 
   const fee = parseVnd(value);
   const over = fee > maxVnd;
   return (
-    <FormField label="Phí sản xuất đề xuất cho Studio mới (₫)">
+    <FormField label="Phí sản xuất đề xuất cho Studio mới (₫)" required>
       <input inputMode="numeric" value={value} onChange={(e) => onChange(e.target.value)} required className={fieldInputClass} aria-label="Phí đề xuất" />
       <span className={`block mt-1 text-[11px] ${over ? 'text-rose-600' : 'text-muted-foreground'}`}>
         Mức đề xuất ghi trong brief, trọn gói, không chia doanh thu; phí chính thức là giá ký trong hợp đồng. Tối đa {formatVnd(maxVnd)} (ngân sách còn lại).
@@ -98,7 +98,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState(EMPTY);
   const [reason, setReason] = useState('');
   const [kept, setKept] = useState('');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const keptVnd = kept.trim() ? parseVnd(kept) : 0;
   const preview = swapPreview(project, form.seasonId || null, keptVnd);
   const keptValid = !Number.isNaN(keptVnd) && keptVnd >= 0 && keptVnd <= preview.replacedFeeVnd;
@@ -133,7 +133,7 @@ export function ChangeStudioModal({ onClose }: { onClose: () => void }) {
           </span>
         </FormField>
         <FeeField value={form.fee} maxVnd={preview.maxOfferVnd} onChange={(fee) => setForm({ ...form, fee })} />
-        <FormField label="Lý do đổi Studio (Reviewer sẽ nhận được)">
+        <FormField label="Lý do đổi Studio (Reviewer sẽ nhận được)" required>
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} minLength={5} maxLength={2000} required className={fieldTextareaClass} />
         </FormField>
         <div className="flex justify-end gap-2 pt-2 border-t border-border">

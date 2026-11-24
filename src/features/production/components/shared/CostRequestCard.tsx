@@ -38,7 +38,7 @@ export function CostRequestCard({
   const [note, setNote] = useState('');
   const [rejecting, setRejecting] = useState(false);
   const [approving, setApproving] = useState(false);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onDecided });
   const grantedVnd = parseVnd(granted);
   const grantValid = grantedVnd > 0 && grantedVnd <= Number(cr.requestedVnd);
 

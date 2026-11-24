@@ -42,7 +42,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
   const [labelType, setLabelType] = useState<LabelType>(label?.labelType ?? sheet.proposedLabelType);
   const [text, setText] = useState(label?.labelText ?? LABEL_DEFAULT_TEXT[sheet.proposedLabelType]);
   const [location, setLocation] = useState<LabelLocation>(label?.displayLocation ?? 'TOP_RIGHT');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onChanged });
   const form = canAct && (!label || editing);
   const recheck = !!label && sheet.episode.status !== 'APPROVED';
 
@@ -120,7 +120,7 @@ export function LabelPanel({ sheet, canAct, onChanged }: { sheet: ReviewSheet; c
               </select>
             </FormField>
           </div>
-          <FormField label="Nội dung nhãn">
+          <FormField label="Nội dung nhãn" error={text.trim().length < 5 ? 'Nội dung nhãn cần ít nhất 5 ký tự.' : null}>
             <input value={text} onChange={(e) => setText(e.target.value)} minLength={5} maxLength={500} className={fieldInputClass} />
           </FormField>
           <LabelPreview text={text.trim() || '…'} location={location} />

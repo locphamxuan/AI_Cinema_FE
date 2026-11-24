@@ -39,7 +39,7 @@ export function StudiosPage() {
   const [busyProjects, setBusyProjects] = useState<{ studioName: string; projects: { id: string; title: string }[] } | null>(null);
   const [asking, setAsking] = useState<{ studio: Studio; action: 'deactivate' | 'remove' } | null>(null);
   const [page, setPage] = useState(1);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: studios.reload });
   const { rows, totalPages } = pageOf(studios.data ?? [], page, PAGE_SIZE);
   // After the last studio of the last page goes, step back to the page that still exists.
   if (studios.data && page > totalPages) setPage(totalPages);

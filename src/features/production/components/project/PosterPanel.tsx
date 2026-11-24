@@ -6,11 +6,14 @@ import { Button } from '@/components/ui/Button';
 import { productionService } from '@/services/productionService';
 import { useAction } from '@/hooks/useAction';
 import { Panel } from '@/components/data/ui';
-import { formatDateTime } from '@/lib/format';
+import { toast } from '@/components/ui/Toast';
+import { formatBytes, formatDateTime } from '@/lib/format';
 import { downloadFile } from '../../lib/download';
 import { useProject } from './ProjectContext';
 
 const IMAGE_ACCEPT = 'image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif';
+/** The backend's poster size limit (ARTWORK_MAX_BYTES). */
+const POSTER_MAX_BYTES = 20 * 1024 * 1024;
 
 /**
  * The poster of the project (PNG, JPEG, WebP, GIF, BMP or AVIF, ≤ 20 MB) the catalog shows; the Reviewer uploads and
@@ -19,7 +22,7 @@ const IMAGE_ACCEPT = 'image/*,.png,.jpg,.jpeg,.webp,.gif,.bmp,.avif';
 export function PosterPanel({ canManage }: { canManage: boolean }) {
   const { project, caps, reload } = useProject();
   const input = useRef<HTMLInputElement>(null);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const [fetching, setFetching] = useState(false);
   const studioPoster = project.studioPoster;
 
@@ -35,6 +38,11 @@ export function PosterPanel({ canManage }: { canManage: boolean }) {
 
   const upload = async (file: File | undefined) => {
     if (!file) return;
+    if (file.size > POSTER_MAX_BYTES) {
+      toast.error('Ảnh quá lớn', `${file.name} nặng ${formatBytes(file.size)}; ảnh bìa tối đa 20 MB.`);
+      if (input.current) input.current.value = '';
+      return;
+    }
     if (await run(() => productionService.uploadPoster(project.id, file), 'Đã cập nhật ảnh bìa')) await reload();
     if (input.current) input.current.value = '';
   };
