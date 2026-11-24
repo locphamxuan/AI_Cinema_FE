@@ -23,7 +23,7 @@ export function AdsPanel() {
   const [editing, setEditing] = useState<AdminAd | 'new' | null>(null);
   const [page, setPage] = useState(1);
   const paged = pageOf(ads.data ?? [], page, 10);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: ads.reload });
 
   const save = async (input: AdInput) => {
     const call = editing === 'new' || !editing ? () => adAdminService.createAd(input) : () => adAdminService.updateAd(editing.id, input);

@@ -74,7 +74,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
           if (!problem) onSubmit(input);
         }}
       >
-        <FormField label="Tên quảng cáo">
+        <FormField label="Tên quảng cáo" required>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -84,7 +84,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
             required
           />
         </FormField>
-        <FormField label="Video (MP4): dán link hoặc tải file từ máy">
+        <FormField label="Video (MP4): dán link hoặc tải file từ máy" required>
           <div className="flex gap-2">
             <input
               type="url"

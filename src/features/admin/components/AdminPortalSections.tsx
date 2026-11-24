@@ -72,8 +72,14 @@ export function PortalContractQuickSign({ items, onOpen }: { items: ContractToSi
 }
 
 function ReadyFilmRow({ film: { project, episode }, onPublished }: { film: ReadyFilm; onPublished: () => Promise<void> }) {
-  const { busy, run } = useAction();
   const [confirming, setConfirming] = useState(false);
+  // Someone else released or changed the episode meanwhile (409): the list is read again.
+  const { busy, run } = useAction({
+    onStale: () => {
+      setConfirming(false);
+      return onPublished();
+    },
+  });
   const publish = async () => {
     if (await run(() => productionService.publish(episode.id), `Đã phát hành tập ${episode.episodeNumber}`)) {
       setConfirming(false);

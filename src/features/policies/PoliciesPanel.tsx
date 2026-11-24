@@ -33,8 +33,13 @@ export function PoliciesPanel() {
   // null = closed, 'new' = create form, a policy = edit form.
   const [editing, setEditing] = useState<Policy | 'new' | null>(null);
   const [pending, setPending] = useState<Pending | null>(null);
-  const { busy, run } = useAction();
   const list = useResource(`policies:${JSON.stringify(filters)}:${page}`, () => policyService.list(page, PAGE_SIZE, filters));
+  const { busy, run } = useAction({
+    onStale: () => {
+      setPending(null);
+      return list.reload();
+    },
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {

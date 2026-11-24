@@ -76,7 +76,7 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
   return (
     <Modal open onClose={onClose} maxWidth="max-w-2xl" title={policy ? 'Sửa chính sách' : 'Thêm chính sách'}>
       <form onSubmit={submit} className="space-y-4 pt-1">
-        <FormField label="Tiêu đề">
+        <FormField label="Tiêu đề" required>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -101,6 +101,7 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
           label="Nội dung"
           hint={`Viết như văn bản thường. Mỗi ý một dòng; dòng bắt đầu bằng "- " sẽ thành gạch đầu dòng. ${content.length}/${CONTENT_MAX} ký tự.`}
           error={content.length > CONTENT_MAX ? `Nội dung dài quá ${CONTENT_MAX} ký tự.` : null}
+          required
         >
           <textarea
             value={content}
@@ -122,7 +123,7 @@ export function PolicyFormModal({ policy, onClose, onDone }: PolicyFormModalProp
               placeholder="Ví dụ: Điều 44 Luật số 134/2025/QH15"
             />
           </FormField>
-          <FormField label="Phiên bản">
+          <FormField label="Phiên bản" required>
             <input value={version} onChange={(e) => setVersion(e.target.value)} maxLength={50} required className={fieldInputClass} />
           </FormField>
         </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { toast } from '@/components/ui/Toast';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -85,8 +86,9 @@ export function NotificationsPage() {
 
   const readAll = async () => {
     setMarkingAll(true);
-    await notificationService.markAllRead();
+    const res = await notificationService.markAllRead();
     setMarkingAll(false);
+    if (!res.success) toast.error('Chưa đánh dấu được', res.message ?? 'Vui lòng thử lại.');
     setVersion((v) => v + 1);
   };
 

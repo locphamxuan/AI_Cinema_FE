@@ -16,6 +16,7 @@ import { AccountFormModal, DeleteAccountModal } from './AccountFormModal';
 import { DataPagination } from '@/components/data/DataPagination';
 import { InitialsAvatar } from '@/components/data/InitialsAvatar';
 import { Badge } from '@/components/ui/Badge';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 
 const ROLE_FILTER_OPTIONS = [
   { value: '', label: 'Mọi vai trò' },
@@ -49,6 +50,8 @@ export function AccountsPanel() {
   const [savingId, setSavingId] = useState<string | null>(null);
   const [editing, setEditing] = useState<AccountRow | 'new' | null>(null);
   const [deleting, setDeleting] = useState<AccountRow | null>(null);
+  // A role or lock change takes effect at once (a lock signs the account out), so it is confirmed first.
+  const [pending, setPending] = useState<{ account: AccountRow; dto: { role?: UserRole; isActive?: boolean }; done: string } | null>(null);
 
   const load = useCallback(async () => {
     const res = await adminService.listAccounts({ page, search, role: role || undefined });
@@ -169,11 +172,12 @@ export function AccountsPanel() {
                         value={account.role}
                         disabled={locked}
                         onChange={(newRole) =>
-                          void update(
+                          setPending({
                             account,
-                            { role: newRole as UserRole },
-                            `Đã đổi vai trò thành ${BACKEND_ROLE_LABEL[newRole as UserRole]}`
-                          )
+                            dto: 
+{ role: newRole as UserRole },
+                            done: `Đã đổi vai trò thành ${BACKEND_ROLE_LABEL[newRole as UserRole]}`,
+                          })
                         }
                         options={ROLE_OPTIONS}
                         size="sm"
@@ -209,11 +213,11 @@ export function AccountsPanel() {
                         type="button"
                         disabled={savingId === account.id}
                         onClick={() =>
-                          void update(
+                          setPending({
                             account,
-                            { isActive: !account.isActive },
-                            account.isActive ? 'Đã khoá tài khoản' : 'Đã mở khoá tài khoản'
-                          )
+                            dto: { isActive: !account.isActive },
+                            done: account.isActive ? 'Đã khoá tài khoản' : 'Đã mở khoá tài khoản',
+                          })
                         }
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border text-secondary-foreground hover:bg-muted transition cursor-pointer disabled:opacity-50"
                       >
@@ -242,6 +246,29 @@ export function AccountsPanel() {
           isMe={editing !== 'new' && editing.id === myId}
           onClose={() => setEditing(null)}
           onSaved={load}
+        />
+      )}
+      {pending && (
+        <ConfirmModal
+          open
+          tone={pending.dto.isActive === false ? 'danger' : 'warning'}
+          title={pending.dto.role ? 'Đổi vai trò tài khoản' : pending.dto.isActive ? 'Mở khoá tài khoản' : 'Khoá tài khoản'}
+          description={`${pending.account.fullName} · ${pending.account.email}`}
+          details={pending.dto.role ? [['Vai trò', `${BACKEND_ROLE_LABEL[pending.account.role]} → ${BACKEND_ROLE_LABEL[pending.dto.role]}`]] : undefined}
+          consequence={
+            pending.dto.role
+              ? 'Quyền của tài khoản đổi theo vai trò mới ngay lập tức.'
+              : pending.dto.isActive
+                ? 'Tài khoản đăng nhập lại được.'
+                : 'Tài khoản bị đăng xuất và không đăng nhập được cho tới khi mở khoá.'
+          }
+          confirmLabel={pending.dto.role ? 'Đổi vai trò' : pending.dto.isActive ? 'Mở khoá' : 'Khoá tài khoản'}
+          busy={savingId === pending.account.id}
+          onClose={() => setPending(null)}
+          onConfirm={async () => {
+            await update(pending.account, pending.dto, pending.done);
+            setPending(null);
+          }}
         />
       )}
       {deleting && <DeleteAccountModal account={deleting} onClose={() => setDeleting(null)} onDeleted={load} />}

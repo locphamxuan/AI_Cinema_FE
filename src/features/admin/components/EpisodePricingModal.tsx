@@ -5,7 +5,12 @@ import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { useAction } from '@/hooks/useAction';
+import { useResource } from '@/hooks/useResource';
+import { formatNumber } from '@/lib/format';
 import { productionService } from '@/services/productionService';
+
+/** The highest Coin price the API takes for one episode (SetCoinPriceRequestDto). */
+export const MAX_EPISODE_COIN_PRICE = 1_000_000;
 
 export interface EpisodePricingTarget {
   id: string;
@@ -28,9 +33,14 @@ export function EpisodePricingModal({
   const [isFreeForGuest, setIsFreeForGuest] = useState(!!episode.isFreeForGuest);
   const [isFreeForMember, setIsFreeForMember] = useState(!!episode.isFreeForMember);
   const { busy, run } = useAction();
+  const settings = useResource('settings', productionService.getPlatformSettings);
 
   const priceValue = Number(price);
-  const priceValid = price !== '' && Number.isInteger(priceValue) && priceValue >= 0;
+  const priceValid = price !== '' && Number.isInteger(priceValue) && priceValue >= 0 && priceValue <= MAX_EPISODE_COIN_PRICE;
+  const min = settings.data?.episodeCoinPriceMin;
+  const max = settings.data?.episodeCoinPriceMax;
+  // BR-47: a price outside the platform range is kept, and the Admin is warned through a price alert.
+  const outOfRange = priceValid && min !== undefined && max !== undefined && (priceValue < min || priceValue > max);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +49,9 @@ export function EpisodePricingModal({
     const done = await run(async () => {
       const pRes = await productionService.setCoinPrice(episode.id, priceValue);
       if (!pRes.success) return pRes;
-      return productionService.setAccessFlags(episode.id, { isFreeForGuest, isFreeForMember });
-    }, 'Đã cập nhật giá Coin và quyền xem tập');
+      // BR-03/19: an episode free for Guests is free for Members too, as the API stores it.
+      return productionService.setAccessFlags(episode.id, { isFreeForGuest, isFreeForMember: isFreeForGuest || isFreeForMember });
+    }, outOfRange ? 'Đã lưu - giá ngoài khoảng cho phép nên có cảnh báo giá' : 'Đã cập nhật giá Coin và quyền xem tập');
 
     if (done) {
       await onChanged();
@@ -57,10 +68,22 @@ export function EpisodePricingModal({
       subtitle={episode.label}
     >
       <form onSubmit={submit} className="space-y-4 text-xs">
-        <FormField label="Giá Coin (nhập 0 nếu hoàn toàn miễn phí)">
+        <FormField
+          label="Giá Coin (nhập 0 nếu hoàn toàn miễn phí)"
+          error={price !== '' && !priceValid ? `Giá Coin là số nguyên từ 0 đến ${formatNumber(MAX_EPISODE_COIN_PRICE)}.` : null}
+          hint={
+            outOfRange
+              ? `Ngoài khoảng ${formatNumber(min)}–${formatNumber(max)} Coin: vẫn lưu được nhưng sẽ có cảnh báo giá.`
+              : min !== undefined && max !== undefined
+                ? `Khoảng giá nền tảng: ${formatNumber(min)}–${formatNumber(max)} Coin.`
+                : undefined
+          }
+          required
+        >
           <input
             type="number"
             min={0}
+            max={MAX_EPISODE_COIN_PRICE}
             step={1}
             value={price}
             onChange={(e) => setPrice(e.target.value)}
@@ -84,11 +107,14 @@ export function EpisodePricingModal({
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
-              checked={isFreeForMember}
+              checked={isFreeForGuest || isFreeForMember}
+              disabled={isFreeForGuest}
               onChange={(e) => setIsFreeForMember(e.target.checked)}
               className="rounded border-input text-sky-600 focus:ring-sky-500"
             />
-            <span className="text-secondary-foreground">Miễn phí cho Member</span>
+            <span className="text-secondary-foreground">
+              Miễn phí cho Member{isFreeForGuest && ' (tự bật vì tập đã miễn phí cho khách)'}
+            </span>
           </label>
         </div>
 

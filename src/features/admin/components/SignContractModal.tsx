@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { Button } from '@/components/ui/Button';
 import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
@@ -20,7 +21,15 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
   const { contract: c, project } = item;
   const [counter, setCounter] = useState('');
   const [signFile, setSignFile] = useState<File | null>(null);
-  const { busy, run } = useAction();
+  // Signing and a counter-offer both put the platform's signature on a price: one more look before it goes.
+  const [confirming, setConfirming] = useState<'sign' | 'propose' | null>(null);
+  // The studio withdrew or another Admin answered meanwhile (409): show the inbox as it is now.
+  const { busy, run } = useAction({
+    onStale: async () => {
+      await onChanged();
+      onClose();
+    },
+  });
   const offer = parseVnd(counter);
   const costs = useResource(`costs:${project.id}`, () => productionService.getCosts(project.id));
   const waitsOnHandoff = !!c.handoffId && c.handoff?.milestoneStatus === 'BRIEF_SENT';
@@ -28,7 +37,16 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
   const heldVnd = waitsOnHandoff ? Number(handoffs.data?.find((h) => h.id === c.handoffId)?.offeredFeeVnd ?? Number.NaN) : 0;
   const left = costs.data ? costs.data.remainingVnd + heldVnd : null;
   const remainingVnd = left !== null && !Number.isNaN(left) ? left : null;
-  const offerValid = remainingVnd !== null && offer > 0 && offer <= Math.min(remainingVnd, MAX_CONTRACT_VND);
+  const offerValid = remainingVnd !== null && offer > 0 && offer !== c.costVnd && offer <= Math.min(remainingVnd, MAX_CONTRACT_VND);
+  const counterProblem = !counter.trim()
+    ? null
+    : Number.isNaN(offer) || offer <= 0
+      ? 'Nhập số tiền là bội số của 1.000 ₫.'
+      : offer === c.costVnd
+        ? 'Giá này bằng giá Studio đề xuất; hãy bấm "Đồng ý và ký".'
+        : remainingVnd !== null && offer > Math.min(remainingVnd, MAX_CONTRACT_VND)
+          ? `Giá vượt ngân sách còn lại (${formatVnd(Math.min(remainingVnd, MAX_CONTRACT_VND))}).`
+          : null;
   const fileOk = !!signFile;
   const readError = costs.error ?? handoffs.error;
 
@@ -47,6 +65,11 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
     );
   const propose = async () =>
     fileOk && finish(await run(() => contractService.counter(c.id, offer, signFile!), 'Đã gửi mức giá mới cho Studio'));
+  const confirm = async () => {
+    const action = confirming;
+    setConfirming(null);
+    await (action === 'sign' ? sign() : propose());
+  };
   const downloadStudio = async () => {
     if (!(await contractService.downloadDocument(c.id, 'STUDIO'))) toast.error('Không tải được bản Studio đã ký', 'Thử lại sau.');
   };
@@ -76,7 +99,7 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
 
       <FormField
         label="Hoặc đề xuất giá khác (₫, bội số 1.000, tối đa ngân sách còn lại)"
-        error={readError ? `${readError} Chưa thể đề xuất giá khác; vẫn có thể ký theo giá Studio.` : null}
+        error={readError ? `${readError} Chưa thể đề xuất giá khác; vẫn có thể ký theo giá Studio.` : counterProblem}
       >
         <input
           inputMode="numeric"
@@ -99,16 +122,35 @@ export function SignContractModal({ item, onClose, onChanged }: { item: Contract
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-2.5 pt-3 border-t border-border">
+        {!fileOk && <span className="mr-auto text-xs text-muted-foreground">Chọn ảnh chữ ký để ký hoặc gửi giá đề xuất.</span>}
         <Button type="button" variant="secondary" onClick={onClose} className="rounded-full">
           Đóng
         </Button>
-        <Button type="button" variant="secondary" disabled={busy || !offerValid || !fileOk} onClick={propose} className="rounded-full">
+        <Button type="button" variant="secondary" disabled={busy || !offerValid || !fileOk} onClick={() => setConfirming('propose')} className="rounded-full">
           Gửi giá đề xuất
         </Button>
-        <Button type="button" disabled={busy || c.costVnd === null || !fileOk} onClick={sign} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button type="button" disabled={busy || c.costVnd === null || !fileOk} onClick={() => setConfirming('sign')} className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
           Đồng ý và ký
         </Button>
       </div>
+      <ConfirmModal
+        open={confirming !== null}
+        tone="warning"
+        title={confirming === 'sign' ? 'Ký hợp đồng theo giá Studio?' : 'Ký và gửi giá mới cho Studio?'}
+        description={
+          confirming === 'sign'
+            ? 'Chữ ký của AI Cinema được gắn vào hợp đồng; không rút lại được.'
+            : 'AI Cinema ký trước theo giá mới; Studio đồng ý thì ký lại, không thì đề xuất giá khác.'
+        }
+        details={[
+          ['Studio', c.studio.name],
+          ['Giá', formatVnd(confirming === 'sign' ? c.costVnd : offer)],
+        ]}
+        confirmLabel={confirming === 'sign' ? 'Ký hợp đồng' : 'Ký và gửi giá'}
+        busy={busy}
+        onClose={() => setConfirming(null)}
+        onConfirm={() => void confirm()}
+      />
     </Modal>
   );
 }
