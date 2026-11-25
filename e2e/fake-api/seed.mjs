@@ -108,5 +108,6 @@ export function seed() {
       prize('pz-a', 'Giải A', 'BONUS_COIN', 100, true),
       prize('pz-b', 'Giải B', 'PLAN_DAYS', 7, true),
     ],
+    knowledge: [],
   };
 }
