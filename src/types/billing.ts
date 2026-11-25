@@ -33,6 +33,20 @@ export interface StatementLine {
 export interface LedgerLine extends StatementLine {
   walletId: string;
   userId: string;
+  /** The first row of the payment this row belongs to; rows sharing it are one payment, refunded together. */
+  paymentId: string | null;
+}
+
+/** POST /admin/coin-transactions/:id/refund - the whole payment paid back and what it bought taken back. */
+export interface PaymentRefund {
+  paymentId: string;
+  mainCoins: number;
+  bonusCoins: number;
+  /** The episode unlock the refund revoked, if the payment bought one. */
+  episodeAccessId: string | null;
+  /** The plan cycle marked REFUNDED, and whether its running plan ended. */
+  subscriptionCycleId: string | null;
+  subscriptionEnded: boolean;
 }
 
 export interface StatementQuery {
@@ -143,7 +157,7 @@ export interface SubscriptionCycle {
   periodStart: string;
   periodEnd: string;
   priceCoins: number;
-  status: 'PAID' | 'FAILED' | 'SKIPPED';
+  status: 'PAID' | 'FAILED' | 'SKIPPED' | 'REFUNDED';
   mainCoinsCharged: number;
   bonusCoinsCharged: number;
   failureReason: string | null;

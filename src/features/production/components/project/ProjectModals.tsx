@@ -20,11 +20,7 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
   const [genreIds, setGenreIds] = useState(project.genres.map((g) => g.id));
   const [ageRating, setAgeRating] = useState<AgeRating | ''>(project.ageRating ?? '');
   const [releaseYear, setReleaseYear] = useState(project.releaseYear ? String(project.releaseYear) : '');
-  const [freeEpisodes, setFreeEpisodes] = useState<string>(
-    project.freeEpisodeCount === null || project.freeEpisodeCount === undefined ? '' : String(project.freeEpisodeCount),
-  );
   const { busy, run } = useAction({ onStale: reload });
-  const freeValid = freeEpisodes === '' || (Number.isInteger(Number(freeEpisodes)) && Number(freeEpisodes) >= 0);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +33,6 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
           ...(synopsis.trim() ? { synopsis: synopsis.trim() } : {}),
           ...(ageRating ? { ageRating } : {}),
           ...(releaseYear ? { releaseYear: Number(releaseYear) } : {}),
-          freeEpisodeCount: freeEpisodes === '' ? null : Number(freeEpisodes),
         }),
       'Đã lưu thông tin phim',
     );
@@ -75,24 +70,9 @@ export function EditProjectModal({ onClose }: { onClose: () => void }) {
             <input type="number" min={2000} max={2100} value={releaseYear} onChange={(e) => setReleaseYear(e.target.value)} className={fieldInputClass} />
           </FormField>
         </div>
-        <FormField label="Số tập xem miễn phí">
-          <input
-            type="number"
-            min={0}
-            max={1000}
-            value={freeEpisodes}
-            onChange={(e) => setFreeEpisodes(e.target.value)}
-            placeholder="Để trống = theo mặc định nền tảng"
-            aria-label="Số tập xem miễn phí"
-            className={fieldInputClass}
-          />
-          <span className="block mt-1 text-[11px] text-muted-foreground">
-            Tính theo số thứ tự tập trong cả phim. Phim 1 tập trọn bộ: nhập 0 để thu Coin, 1 để cho xem miễn phí.
-          </span>
-        </FormField>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>Huỷ</Button>
-          <Button type="submit" disabled={busy || !freeValid || !title.trim() || idea.trim().length < 20 || genreIds.length === 0}>
+          <Button type="submit" disabled={busy || !title.trim() || idea.trim().length < 20 || genreIds.length === 0}>
             Lưu
           </Button>
         </div>

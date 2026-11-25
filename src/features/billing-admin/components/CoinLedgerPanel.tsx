@@ -14,6 +14,7 @@ import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { CoinEntryType } from '@/types/billing';
 import { MetaPager } from '@/components/data/MetaPager';
+import { RefundPaymentButton, isRefundablePayment } from './RefundPaymentButton';
 import { WalletAdjustForm } from './WalletAdjustForm';
 
 /** MF-2: the Coin ledger of every wallet. Reading a wallet and correcting it by hand need their own permissions. */
@@ -31,7 +32,7 @@ export function CoinLedgerPanel() {
   return (
     <Panel
       title="Giao dịch Coin"
-      description="Lịch sử giao dịch Coin (không sửa, không xoá): mỗi dòng là một lần Coin vào hoặc ra ví, kèm số dư ngay sau đó."
+      description="Lịch sử giao dịch Coin (không sửa, không xoá): mỗi dòng là một lần Coin vào hoặc ra ví, kèm số dư ngay sau đó. Hoàn Coin trả lại cả khoản thanh toán và thu hồi tập hoặc kỳ gói đã mua."
       actions={
         <select
           aria-label="Lọc theo loại giao dịch"
@@ -64,7 +65,7 @@ export function CoinLedgerPanel() {
                 <th className="py-2 font-medium hidden md:table-cell">Mô tả</th>
                 <th className="py-2 font-medium text-right">Coin chính</th>
                 <th className="py-2 font-medium text-right">Coin thưởng</th>
-                <th className="py-2 w-10" />
+                <th className="py-2 w-28" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -75,7 +76,8 @@ export function CoinLedgerPanel() {
                   <td className="py-2 hidden md:table-cell text-muted-foreground">{describeLine(line.description) ?? '-'}</td>
                   <td className="py-2 text-right tabular-nums">{signed(line.mainAmount)}</td>
                   <td className="py-2 text-right tabular-nums">{signed(line.bonusAmount)}</td>
-                  <td className="py-2 text-right">
+                  <td className="py-2 text-right whitespace-nowrap">
+                    {canAdjust && isRefundablePayment(line) && <RefundPaymentButton line={line} onRefunded={ledger.reload} />}
                     {canWallet && (
                       <Button size="sm" variant="ghost" aria-label="Xem ví của tài khoản này" onClick={() => setWalletOf(line.userId)}>
                         <Wallet className="w-3.5 h-3.5" aria-hidden="true" />

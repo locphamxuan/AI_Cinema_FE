@@ -110,6 +110,22 @@ describe('API messages in Vietnamese', () => {
     ).toBe('Hồ sơ pháp lý của Studio còn thiếu (mã số thuế, số tài khoản). Studio cần điền đủ trên Studio Web trước khi ký hợp đồng.');
   });
 
+  it('words the newer refusals of the structure, filters, pricing, accounts and refunds', () => {
+    expect(localizeApiError('A movie has at most 20 seasons', 409, { reason: 'SEASON_LIMIT_REACHED' }, '/x')).toBe('Một phim có tối đa 20 mùa.');
+    expect(localizeApiError('A season has at most 100 episodes', 409, undefined, '/x')).toBe('Một mùa có tối đa 100 tập.');
+    expect(localizeApiError('filter.status has an invalid value: OOPS', 400, undefined, '/x')).toBe('Bộ lọc có giá trị không hợp lệ: OOPS.');
+    expect(localizeApiError('dueDate must be a calendar day (YYYY-MM-DD), without a time', 400, undefined, '/x')).toBe(
+      'Ngày phải là một ngày trên lịch, không kèm giờ.',
+    );
+    expect(localizeApiError('The studio of this project changed meanwhile; reload it', 409, undefined, '/x')).toBe(
+      'Studio của dự án vừa thay đổi; hãy tải lại.',
+    );
+    expect(localizeApiError('A Studio login keeps its role; lock it instead', 409, undefined, '/users/u1')).toMatch(/khoá tài khoản/);
+    expect(
+      localizeApiError('This bonus row could not be linked to its payment; refund the payment from its first row', 409, undefined, '/x'),
+    ).toMatch(/dòng đầu tiên/);
+  });
+
   it('tells the Admin the corrected wallet is short, not "your wallet"', () => {
     const details = { reason: 'INSUFFICIENT_COINS' };
     expect(localizeApiError('The wallet does not hold that many main Coins', 422, details, '/admin/wallet-adjustments')).toBe(

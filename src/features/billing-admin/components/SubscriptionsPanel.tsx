@@ -184,6 +184,12 @@ function SubscriptionFacts({ sub }: { sub: AdminSubscription }) {
   );
 }
 
+function cycleResult(c: SubscriptionCycle): string {
+  if (c.status === 'PAID') return 'Đã thu';
+  if (c.status === 'REFUNDED') return 'Đã hoàn Coin cho Member';
+  return c.failureReason ? inVietnamese(c.failureReason, 'Không thu được') : 'Không thu được';
+}
+
 function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
   if (cycles.length === 0) return <Empty>Chưa thu Coin kỳ nào.</Empty>;
   return (
@@ -203,7 +209,7 @@ function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
             <td className="py-1">
               {formatDay(c.periodStart)} → {formatDay(c.periodEnd)}
             </td>
-            <td className="py-1">{c.status === 'PAID' ? 'Đã thu' : (c.failureReason ? inVietnamese(c.failureReason, 'Không thu được') : 'Không thu được')}</td>
+            <td className="py-1">{cycleResult(c)}</td>
             <td className="py-1 text-right tabular-nums">
               {c.mainCoinsCharged} + {c.bonusCoinsCharged}
             </td>

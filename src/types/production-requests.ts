@@ -66,8 +66,6 @@ export interface UpdateProjectInput {
   synopsis?: string;
   ageRating?: AgeRating;
   releaseYear?: number;
-  /** Free episodes of this movie; null = the platform's default (BR-03). */
-  freeEpisodeCount?: number | null;
   studioId?: string;
 }
 

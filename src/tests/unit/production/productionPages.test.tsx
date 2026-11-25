@@ -39,7 +39,6 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
     defaultLanguage: 'vi',
     ageRating: null,
     releaseYear: null,
-    freeEpisodeCount: null,
     status: 'ASSIGNED',
     posterUrl: null,
     reviewerId: 'reviewer-id',
