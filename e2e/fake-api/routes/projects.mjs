@@ -1,35 +1,16 @@
 // Movie projects (MF-1): the Admin lists them all, a Reviewer its own, a Creator the ones assigned to it.
-import { id, now, on, paged, person, refuse } from '../core.mjs';
+import { id, now, on, paged, refuse } from '../core.mjs';
+import { projectDetail, projectFor, projectSummary } from '../production.mjs';
 
 const SORT = { 'updatedAt:DESC': (a, b) => b.updatedAt.localeCompare(a.updatedAt) };
-
-function detail(p) {
-  return {
-    ...p,
-    ideaDescription: p.ideaDescription ?? '',
-    synopsis: p.synopsis ?? null,
-    defaultLanguage: p.defaultLanguage ?? 'vi',
-    ageRating: p.ageRating ?? null,
-    releaseYear: p.releaseYear ?? null,
-    cancelReason: p.cancelReason ?? null,
-    handedOffAt: null,
-    completedAt: null,
-    cancelledAt: null,
-    genres: p.genres ?? [],
-    seasons: [],
-    ideaFiles: [],
-    studioHandoffs: [],
-    creatorAssignments: [],
-    cost: { budgetVnd: p.budgetVnd ?? 0, committedVnd: 0, leftVnd: p.budgetVnd ?? 0, entries: [] },
-    openChangeRequests: 0,
-    revision: { episodeCount: 0, bySeason: [] },
-  };
-}
 
 on('GET', '/projects', ({ db, user, query }) => {
   let items = db.projects;
   if (user.role === 'CONTENT_REVIEWER') items = items.filter((p) => p.reviewerId === user.id);
-  else if (user.role === 'CONTENT_CREATOR') items = items.filter((p) => p.creatorId === user.id);
+  else if (user.role === 'CONTENT_CREATOR') {
+    const seated = (p) => db.seats.some((s) => s.movieId === p.id && s.creatorId === user.id && s.isActive);
+    items = items.filter((p) => p.creatorId === user.id || seated(p));
+  }
 
   const status = query.get('filter.status');
   if (status) {
@@ -40,47 +21,41 @@ on('GET', '/projects', ({ db, user, query }) => {
   if (search) items = items.filter((p) => p.title.toLowerCase().includes(search.toLowerCase()));
 
   const sorted = [...items].sort(SORT[query.get('sortBy')] ?? SORT['updatedAt:DESC']);
-  return paged(sorted, query);
+  return paged(sorted.map((p) => projectSummary(db, p)), query);
 });
 
-on('POST', '/projects', ({ db, body }) => {
+on('POST', '/projects', ({ db, user, body }) => {
   const title = String(body.title ?? '').trim();
   if (!title) throw refuse(400, 'The project needs a title');
   const reviewer = db.users.find((u) => u.id === body.reviewerId);
   if (!reviewer) throw refuse(400, 'Pick an active Content Reviewer account');
   const creator = body.creatorId ? db.users.find((u) => u.id === body.creatorId) ?? null : null;
-  const studio = body.studioId ? db.studios.find((s) => s.id === body.studioId) ?? null : null;
   const project = {
     id: id(),
     title,
     status: creator ? 'ASSIGNED' : 'DRAFT',
     posterUrl: null,
-    studio,
+    studioId: body.studioId ?? null,
     reviewerId: reviewer.id,
     creatorId: creator?.id ?? null,
-    reviewer: person(reviewer),
-    creator: person(creator),
     ideaDescription: body.ideaDescription ?? '',
     synopsis: body.synopsis ?? null,
     defaultLanguage: body.defaultLanguage ?? 'vi',
     ageRating: body.ageRating ?? null,
     releaseYear: body.releaseYear ?? null,
-    budgetVnd: body.budgetVnd ?? 0,
     genres: db.genres.filter((g) => (body.genreIds ?? []).includes(g.id)),
     createdAt: now(),
     updatedAt: now(),
     lastActivityAt: now(),
-    _count: { episodes: 0 },
   };
+  if (body.budgetVnd) {
+    db.costEntries.push({ id: id(), projectId: project.id, entryType: 'BUDGET', amountVnd: Number(body.budgetVnd), reason: null, createdAt: now(), createdById: user.id, request: null });
+  }
   db.projects.unshift(project);
-  return detail(project);
+  return projectDetail(db, project);
 }, ['ADMIN']);
 
-on('GET', '/projects/:id', ({ db, params }) => {
-  const p = db.projects.find((x) => x.id === params.id);
-  if (!p) throw refuse(404, 'Movie project not found');
-  return detail(p);
-});
+on('GET', '/projects/:id', ({ db, user, params }) => projectDetail(db, projectFor(db, params.id, user)));
 
 on('GET', '/genres', ({ db, query }) => paged(db.genres, query));
 on('POST', '/genres', ({ db, body }) => {

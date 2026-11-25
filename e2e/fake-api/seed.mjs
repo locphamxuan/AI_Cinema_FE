@@ -1,10 +1,11 @@
 // Seed of the fake AI Cinema API: a fresh copy of every account and record; each test starts from it.
 import { people, U, DEFAULT_PERMISSIONS } from './seed/people.mjs';
+import { LUMEN, PROJECT, production } from './seed/production.mjs';
+import { support } from './seed/support.mjs';
 
 const AT = '2026-10-01T03:00:00.000Z';
 
-const person = (u) => (u ? { id: u.id, fullName: u.fullName, email: u.email } : null);
-const studio = (u) => ({ id: `studio-${u.id}`, name: u.fullName, email: u.email, phone: '0900000000', isActive: true });
+const studio = (sid, name, email) => ({ id: sid, name, email, contactName: null, phone: '0900000000', note: null, isActive: true, createdAt: AT });
 const policy = (pid, name, type) => ({
   id: pid,
   name,
@@ -36,54 +37,45 @@ function project(id, title, status, fields) {
     title,
     status,
     posterUrl: null,
-    studio: null,
+    studioId: null,
     reviewerId: U.reviewer.id,
     creatorId: null,
-    reviewer: person(U.reviewer),
-    creator: null,
     createdAt: AT,
     updatedAt: AT,
     lastActivityAt: AT,
-    _count: { episodes: 0 },
     ...fields,
   };
 }
 
 export function seed() {
   const projects = [
-    project('11111111-1111-4111-8111-000000000001', 'Ánh sáng cuối', 'IN_PRODUCTION', {
-      studio: studio(U.studio),
-      creatorId: U.creator.id,
-      creator: person(U.creator),
-      _count: { episodes: 3 },
-    }),
-    project('11111111-1111-4111-8111-000000000002', 'Mùa đông ấm', 'DRAFT', {
-      _count: { episodes: 0 },
-    }),
+    project(PROJECT.light, 'Ánh sáng cuối', 'IN_PRODUCTION', { studioId: LUMEN, creatorId: U.creator.id }),
+    project(PROJECT.winter, 'Mùa đông ấm', 'DRAFT'),
     project('11111111-1111-4111-8111-000000000003', 'Bến cảng', 'COMPLETED', {
-      studio: studio(U.studio),
+      studioId: LUMEN,
       reviewerId: U.reviewer2.id,
-      reviewer: person(U.reviewer2),
       creatorId: U.creator2.id,
-      creator: person(U.creator2),
-      _count: { episodes: 2 },
     }),
+    project(PROJECT.monsoon, 'Gió mùa', 'IN_PRODUCTION', { studioId: LUMEN, creatorId: U.creator.id }),
+    project(PROJECT.alley, 'Hẻm nhỏ', 'ASSIGNED', { studioId: LUMEN, creatorId: U.creator.id }),
   ];
   return {
     users: people(),
     tokens: { access: {}, refresh: {} },
     notifications: [],
     projects,
-    studios: [{ id: `studio-${U.studio.id}`, name: U.studio.fullName, email: U.studio.email, phone: '0900000000', isActive: true }],
+    studios: [studio(LUMEN, U.studio.fullName, U.studio.email), studio('studio-nova', 'Nova Studio', 'nova@studio.vn')],
+    ...production(),
+    ...support(),
     roles: Object.fromEntries(Object.entries(DEFAULT_PERMISSIONS).map(([r, p]) => [r, [...p]])),
     genres: [
-      { id: 'g1', name: 'HÃ nh Ä‘á»™ng', description: null },
-      { id: 'g2', name: 'TÃ¢m lÃ½', description: null },
+      { id: 'g1', name: 'Hành động', description: null },
+      { id: 'g2', name: 'Tâm lý', description: null },
     ],
     policies: [
-      policy('pol-ai', 'Quy Ä‘á»‹nh gáº¯n nhuÃ£n AI', 'AI_LABELING'),
-      policy('pol-content', 'Quy Ä‘á»‹nh ná»™i dung', 'CONTENT_POLICY'),
-      policy('pol-legal', 'Quy Ä‘á»‹nh phaÃ¡p lÃ½', 'LEGAL'),
+      policy('pol-ai', 'Quy định gắn nhãn AI', 'AI_LABELING'),
+      policy('pol-content', 'Quy định nội dung', 'CONTENT_POLICY'),
+      policy('pol-legal', 'Quy định pháp lý', 'LEGAL'),
     ],
     settings: {
       freeStarterEpisodeCount: 1,

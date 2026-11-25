@@ -9,12 +9,15 @@ import './routes/admin.mjs';
 import './routes/studios.mjs';
 import './routes/projects.mjs';
 import './routes/project-work.mjs';
+import './routes/script.mjs';
+import './routes/costs.mjs';
 import './routes/episodes.mjs';
 import './routes/contracts.mjs';
 import './routes/platform.mjs';
 import './routes/policies.mjs';
 import './routes/rewards.mjs';
 import './routes/support.mjs';
+import './routes/support-cases.mjs';
 import './routes/reports.mjs';
 
 const PORT = Number(process.env.FAKE_API_PORT ?? 3499);
