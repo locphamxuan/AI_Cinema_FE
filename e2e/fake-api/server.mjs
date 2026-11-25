@@ -13,6 +13,7 @@ import './routes/episodes.mjs';
 import './routes/contracts.mjs';
 import './routes/platform.mjs';
 import './routes/policies.mjs';
+import './routes/rewards.mjs';
 import './routes/support.mjs';
 import './routes/reports.mjs';
 

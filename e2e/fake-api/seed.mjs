@@ -11,12 +11,23 @@ const policy = (pid, name, type) => ({
   type,
   version: '1.0',
   documentReference: null,
-  content: `Ná»™i dung ${name}.`,
+  content: `Nội dung ${name}.`,
   effectiveFrom: null,
   effectiveTo: null,
   isActive: true,
   createdAt: AT,
   updatedAt: AT,
+});
+const prize = (pid, name, type, amount, isActive) => ({
+  id: pid,
+  code: pid,
+  name,
+  type,
+  bonusCoins: type === 'BONUS_COIN' ? amount : null,
+  planDays: type === 'PLAN_DAYS' ? amount : null,
+  weight: 1,
+  isActive,
+  createdAt: AT,
 });
 
 function project(id, title, status, fields) {
@@ -72,7 +83,30 @@ export function seed() {
     policies: [
       policy('pol-ai', 'Quy Ä‘á»‹nh gáº¯n nhuÃ£n AI', 'AI_LABELING'),
       policy('pol-content', 'Quy Ä‘á»‹nh ná»™i dung', 'CONTENT_POLICY'),
-      policy('pol-legal', 'Quy Ä‘á»‹nh phÃ¡p lÃ½', 'LEGAL'),
+      policy('pol-legal', 'Quy Ä‘á»‹nh phaÃ¡p lÃ½', 'LEGAL'),
+    ],
+    settings: {
+      freeStarterEpisodeCount: 1,
+      coinRateVnd: 1000,
+      episodeCoinPriceMin: 1,
+      episodeCoinPriceMax: 100,
+      playbackHeartbeatTimeoutSeconds: 30,
+      subscriptionCancelWindowHours: 24,
+      planRenewalGraceHours: 0,
+      newMemberBonusCoins: 0,
+      coinTopUpMinVnd: 10000,
+      coinTopUpMaxVnd: 1000000,
+      refundOnRemoval: true,
+      contractCompanyName: null,
+      contractAddress: null,
+      contractTaxCode: null,
+      contractPhone: null,
+      contractEmail: null,
+      updatedAt: AT,
+    },
+    prizes: [
+      prize('pz-a', 'Giải A', 'BONUS_COIN', 100, true),
+      prize('pz-b', 'Giải B', 'PLAN_DAYS', 7, true),
     ],
   };
 }
