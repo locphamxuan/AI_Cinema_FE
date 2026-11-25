@@ -19,5 +19,22 @@ on('GET', '/admin/reports/churn', ({ query }) => ({
   expiredUnused: 0,
   failedRenewals: 0,
 }));
-on('GET', '/admin/finance/films', ({ query }) => paged([], query));
+on('GET', '/admin/finance/films', () => ({
+  currentPeriod: '2026-10',
+  lastSharedPeriod: null,
+  totals: {
+    productionCostVnd: 0,
+    episodeSalesVnd: 0,
+    planShareVnd: 0,
+    revenueVnd: 0,
+    profitVnd: 0,
+    roiPercent: null,
+    marginPercent: null,
+    costedMovies: 0,
+    brokeEvenMovies: 0,
+  },
+  films: [],
+}));
+on('GET', '/admin/finance/risk/rules', () => []);
+on('POST', '/admin/finance/risk/scan', () => ({ created: 0 }));
 on('GET', '/admin/finance/risk/flags', ({ query }) => paged([], query));

@@ -108,6 +108,20 @@ export function seed() {
       prize('pz-a', 'Giải A', 'BONUS_COIN', 100, true),
       prize('pz-b', 'Giải B', 'PLAN_DAYS', 7, true),
     ],
-    knowledge: [],
+    knowledge: [
+      {
+        id: 'kb-1',
+        slug: 'bai-mau',
+        title: 'Bài mẫu',
+        category: 'Gói Tháng',
+        contentMarkdown: '## Hỏi\nĐáp.',
+        status: 'PUBLISHED',
+        indexStatus: 'READY',
+        audience: 'MEMBER',
+        source: 'MANUAL',
+        createdAt: AT,
+        updatedAt: AT,
+      },
+    ],
   };
 }
