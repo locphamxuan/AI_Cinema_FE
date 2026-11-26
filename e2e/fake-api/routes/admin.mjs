@@ -32,6 +32,19 @@ on('GET', '/users', ({ db, query }) => {
   }
   return paged(items.map(account), query);
 });
+/** The Admin locks, unlocks or renames an account; a lock signs it out at once, as the API does. */
+on('PATCH', '/users/:id', ({ db, user, params, body }) => {
+  const target = db.users.find((u) => u.id === params.id);
+  if (!target) throw refuse(404, `User with id "${params.id}" does not exist`);
+  if (target.id === user.id && body.isActive === false) throw refuse(400, 'You cannot change your own role or lock your own account');
+  for (const key of ['fullName', 'role', 'isActive']) if (body[key] !== undefined) target[key] = body[key];
+  if (body.isActive === false) {
+    for (const kind of ['access', 'refresh']) {
+      for (const [token, owner] of Object.entries(db.tokens[kind])) if (owner === target.id) delete db.tokens[kind][token];
+    }
+  }
+  return account(target);
+}, ['ADMIN']);
 
 const CATALOG = [
   { key: 'project:create', area: 'movie-project', description: 'Tạo dự án phim' },

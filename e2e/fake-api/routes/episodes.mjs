@@ -216,7 +216,16 @@ on('POST', '/publications/:id/unpublish', ({ db, user, params, body }) => {
 
 on('GET', '/admin/coin-transactions', ({ db, query }) => {
   const type = query.get('entryType');
-  return paged(db.coinLines.filter((l) => !type || l.entryType === type), query);
+  const account = query.get('account')?.toLowerCase();
+  const lines = db.coinLines.map((l) => ({ ...l, account: l.account ?? person(userById(l.userId)) }));
+  const matches = (a) => !account || a.fullName.toLowerCase().includes(account) || a.email.toLowerCase().includes(account);
+  return paged(lines.filter((l) => (!type || l.entryType === type) && matches(l.account)), query);
+}, ['ADMIN']);
+/** The balance after the latest row of the member, read only. */
+on('GET', '/admin/wallets/:userId', ({ db, params }) => {
+  const latest = db.coinLines.find((l) => l.userId === params.userId);
+  if (!latest) throw refuse(404, 'Wallet not found', { reason: 'WALLET_NOT_FOUND' });
+  return { id: latest.walletId, userId: params.userId, mainBalance: latest.mainBalanceAfter, bonusBalance: latest.bonusBalanceAfter, updatedAt: latest.createdAt, lots: [] };
 }, ['ADMIN']);
 
 // ---- Price alerts (BR-47) ----

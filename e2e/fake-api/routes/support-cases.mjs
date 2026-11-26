@@ -78,5 +78,3 @@ on('POST', '/admin/support/conversations/:id/resolve', ({ db, user, params, body
   return c;
 }, DESK);
 
-/** Correcting a wallet by hand needs coin.adjust, which only the Admin holds. */
-on('POST', '/admin/wallet-adjustments', ({ body }) => ({ ...body, applied: true }), ['ADMIN']);

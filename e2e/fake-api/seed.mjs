@@ -19,14 +19,26 @@ const policy = (pid, name, type) => ({
   createdAt: AT,
   updatedAt: AT,
 });
-const prize = (pid, name, type, amount, isActive) => ({
+const riskFlag = (fid, ruleCode, reason, entryType, mainAmount) => ({
+  id: fid,
+  ruleCode,
+  reason,
+  status: 'OPEN',
+  reviewNote: null,
+  reviewedAt: null,
+  reviewedById: null,
+  createdAt: AT,
+  userId: U.member.id,
+  coinTransaction: { id: `tx-${fid}`, entryType, mainAmount, bonusAmount: 0, rateVnd: 1000, createdAt: AT },
+});
+const prize = (pid, name, type, amount, isActive, weight) => ({
   id: pid,
   code: pid,
   name,
   type,
   bonusCoins: type === 'BONUS_COIN' ? amount : null,
   planDays: type === 'PLAN_DAYS' ? amount : null,
-  weight: 1,
+  weight,
   isActive,
   createdAt: AT,
 });
@@ -97,9 +109,16 @@ export function seed() {
       updatedAt: AT,
     },
     prizes: [
-      prize('pz-a', 'Giải A', 'BONUS_COIN', 100, true),
-      prize('pz-b', 'Giải B', 'PLAN_DAYS', 7, true),
+      prize('pz-a', 'Giải A', 'BONUS_COIN', 100, true, 6000),
+      prize('pz-b', 'Giải B', 'PLAN_DAYS', 7, true, 4000),
+      prize('pz-c', 'Giải C', 'BONUS_COIN', 20, false, 1000),
     ],
+    /** One open large top-up of the seeded member; the unlock burst shows up on the first scan. */
+    riskFlags: [
+      riskFlag('rf-1', 'LARGE_TOP_UP', 'Nạp 6000000 VND trong một lần', 'TOP_UP', 6000),
+      { ...riskFlag('rf-2', 'RAPID_UNLOCKS', '15 lượt mở khóa trong 10 phút', 'EPISODE_PURCHASE', -10), pendingScan: true },
+    ],
+    ads: [{ id: 'ad-1', title: 'Nước cam', mediaUrl: 'https://cdn.example/ads/cam.mp4', durationSeconds: 30, status: 'ACTIVE' }],
     knowledge: [
       {
         id: 'kb-1',

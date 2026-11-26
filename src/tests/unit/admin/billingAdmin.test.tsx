@@ -7,13 +7,10 @@ import { BillingReportsPanel } from '@/features/billing-admin/components/Billing
 import { CoinLedgerPanel } from '@/features/billing-admin/components/CoinLedgerPanel';
 import { PlansPanel } from '@/features/billing-admin/components/PlansPanel';
 import { RewardLadderPanel } from '@/features/billing-admin/components/RewardLadderPanel';
-import { chanceOf } from '@/features/billing-admin/components/rewardOdds';
-import { adjustmentProblem, MAX_ADJUST_COINS } from '@/features/billing-admin/components/WalletAdjustForm';
 import { SubscriptionsPanel } from '@/features/billing-admin/components/SubscriptionsPanel';
 import { useAppStore } from '@/store/useAppStore';
 import { mockApi } from '@/tests/support/mockApi';
 import { signInAs } from '@/tests/support/signIn';
-import type { RewardPrize } from '@/types/billing';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
@@ -125,77 +122,55 @@ describe('SubscriptionsPanel', () => {
 });
 
 describe('CoinLedgerPanel', () => {
-  it('records a manual correction with its reason', async () => {
+  const line = {
+    id: 't1',
+    entryType: 'TOP_UP',
+    mainAmount: 100,
+    bonusAmount: 0,
+    rateVnd: 1000,
+    description: 'Nạp qua VNPay',
+    referenceType: null,
+    referenceId: null,
+    createdAt: '2026-10-10T00:00:00.000Z',
+    mainBalanceAfter: 100,
+    bonusBalanceAfter: 0,
+    walletId: 'w1',
+    userId: 'u1',
+    paymentId: null,
+    account: { id: 'u1', fullName: 'Trần Thu Hà', email: 'ha@test.vn' },
+  };
+
+  it('names the account of every row, searches by it and only reads the wallet', async () => {
     signInAs('admin');
     const fetchMock = mockApi({
-      'GET /admin/coin-transactions': page([
-        {
-          id: 't1',
-          entryType: 'TOP_UP',
-          mainAmount: 100,
-          bonusAmount: 0,
-          rateVnd: 1000,
-          description: 'Nạp qua VNPay',
-          referenceType: null,
-          referenceId: null,
-          createdAt: '2026-10-10T00:00:00.000Z',
-          mainBalanceAfter: 100,
-          bonusBalanceAfter: 0,
-          walletId: 'w1',
-          userId: 'u1',
-        },
-      ]),
+      'GET /admin/coin-transactions': page([line]),
       'GET /admin/wallets/u1': { id: 'w1', userId: 'u1', mainBalance: 100, bonusBalance: 0, updatedAt: '2026-10-10T00:00:00.000Z', lots: [] },
-      'POST /admin/wallet-adjustments': { userId: 'u1', mainBalance: 120, bonusBalance: 0 },
     });
     render(<CoinLedgerPanel />);
 
-    const walletButton = await screen.findByRole('button', { name: 'Xem ví của tài khoản này' });
-    expect(walletButton.querySelector('svg')).not.toBeNull();
-    await userEvent.click(walletButton);
-    await userEvent.click(await screen.findByRole('button', { name: /Điều chỉnh số dư/ }));
-    await userEvent.type(screen.getByLabelText('Coin chính'), '20');
-    await userEvent.type(screen.getByLabelText('Lý do'), 'Bù lần nạp lỗi');
-    await userEvent.click(screen.getByRole('button', { name: 'Ghi điều chỉnh' }));
+    expect(await screen.findByText('Trần Thu Hà')).toBeInTheDocument();
+    expect(screen.getByText('ha@test.vn')).toBeInTheDocument();
+    await userEvent.type(screen.getByRole('searchbox', { name: 'Tìm theo tên hoặc email tài khoản' }), 'ha@test');
+    await waitFor(() => expect(fetchMock.mock.calls.some(([url]) => String(url).includes('account=ha%40test'))).toBe(true));
+
+    await userEvent.click(screen.getByRole('button', { name: 'Xem ví của Trần Thu Hà' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText('Trần Thu Hà · ha@test.vn')).toBeInTheDocument();
+    expect(await within(dialog).findByText('Coin chính')).toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: /Điều chỉnh/ })).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.some(([, init]) => init?.method === 'POST')).toBe(false);
-    expect(await screen.findByText('100 → 120 (+20)')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Điều chỉnh ví' }));
-
-    await waitFor(() =>
-      expect(bodyOf(fetchMock, 'POST', '/admin/wallet-adjustments')).toEqual({ userId: 'u1', mainAmount: 20, reason: 'Bù lần nạp lỗi' }),
-    );
-    const post = fetchMock.mock.calls.find(([, init]) => init?.method === 'POST');
-    expect((post?.[1]?.headers as Record<string, string>)['Idempotency-Key']).toMatch(/^adjust-[0-9a-f]{32}$/);
   });
 
-  it('checks a correction as the API does before it is sent', () => {
-    const wallet = { mainBalance: 100, bonusBalance: 10 };
-    expect(adjustmentProblem(20, 0, wallet)).toBeNull();
-    expect(adjustmentProblem(1.5, 0, wallet)).toMatch('số nguyên');
-    expect(adjustmentProblem(MAX_ADJUST_COINS + 1, 0, wallet)).toMatch('tối đa');
-    expect(adjustmentProblem(0, 0, wallet)).toMatch('Nhập số Coin');
-    expect(adjustmentProblem(5, -5, wallet)).toMatch('Khi trừ Coin thưởng');
-    expect(adjustmentProblem(-101, 0, wallet)).toMatch('100 Coin chính');
-    expect(adjustmentProblem(0, -11, wallet)).toMatch('10 Coin thưởng');
-  });
-
-  it('gives Staff no way to change a wallet', async () => {
+  it('gives Staff no refund and no way to change a wallet', async () => {
     signInAs('staff', []);
     mockApi({ 'GET /admin/coin-transactions': page([]) });
     render(<CoinLedgerPanel />);
     expect(await screen.findByText('Chưa có giao dịch nào.')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Điều chỉnh/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Điều chỉnh|Hoàn Coin/ })).not.toBeInTheDocument();
   });
 });
 
 describe('Rewards', () => {
-  it('works out each prize chance from the active weights', () => {
-    const prize = (id: string, weight: number, isActive = true) => ({ id, weight, isActive }) as RewardPrize;
-    const prizes = [prize('a', 60), prize('b', 40), prize('c', 900, false)];
-    expect(chanceOf(prizes[0], prizes)).toBeCloseTo(60);
-    expect(chanceOf(prizes[2], prizes)).toBe(0);
-  });
-
   it('refuses a second active rung for a streak day', async () => {
     signInAs('admin');
     mockApi({
@@ -288,5 +263,20 @@ describe('BillingReportsPanel', () => {
     const url = new URL(String(fetchMock.mock.calls.find(([u]) => String(u).includes('/admin/reports/revenue'))?.[0]), 'http://x');
     expect(url.searchParams.get('to')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(url.searchParams.get('from')).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+it('explains plan churn in plain words', async () => {
+    signInAs('admin');
+    mockApi({
+      'GET /admin/reports/churn': {
+        from: '2026-10-01', to: '2026-10-31', started: 10, renewed: 4, ended: 2, cancelledByMember: 1, cancelledByAdmin: 0,
+        expiredForPayment: 1, expiredUnused: 0, failedRenewals: 3, running: 12, churnRate: 0.2,
+      },
+    });
+    render(<BillingReportsPanel />);
+    expect(await screen.findByText('Gói Tháng mới đăng ký')).toBeInTheDocument();
+    expect(screen.getByText('Gói Tháng đã huỷ hoặc hết hạn')).toBeInTheDocument();
+    expect(screen.getByText('= gói huỷ hoặc hết hạn ÷ gói mới đăng ký')).toBeInTheDocument();
+    expect(screen.getByText('20.0%')).toBeInTheDocument();
+    expect(screen.queryByText('Gói vào và ra')).not.toBeInTheDocument();
   });
 });

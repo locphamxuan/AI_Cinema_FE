@@ -25,6 +25,7 @@ const line = (id: string, entryType: string, fields: Record<string, unknown> = {
   bonusBalanceAfter: 0,
   walletId: 'w1',
   userId: 'u1',
+  account: { id: 'u1', fullName: 'Trần Thu Hà', email: 'ha@test.vn' },
   paymentId: id,
   ...fields,
 });

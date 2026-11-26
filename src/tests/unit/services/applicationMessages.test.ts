@@ -121,15 +121,19 @@ describe('API messages in Vietnamese', () => {
       'Studio của dự án vừa thay đổi; hãy tải lại.',
     );
     expect(localizeApiError('A Studio login keeps its role; lock it instead', 409, undefined, '/users/u1')).toMatch(/khoá tài khoản/);
+    expect(localizeApiError('The prizes switched on would add up to 112.5%, not 100%', 409, undefined, '/admin/reward-prizes')).toMatch(
+      /sẽ là 112.5%, phải đúng 100%/,
+    );
+    expect(localizeApiError('The flag is already ACCOUNT_LOCKED', 409, undefined, '/x')).toMatch(/Đã khoá tài khoản/);
     expect(
       localizeApiError('This bonus row could not be linked to its payment; refund the payment from its first row', 409, undefined, '/x'),
     ).toMatch(/dòng đầu tiên/);
   });
 
-  it('tells the Admin the corrected wallet is short, not "your wallet"', () => {
+  it('tells a member the wallet is short and the episode cannot be bought', () => {
     const details = { reason: 'INSUFFICIENT_COINS' };
-    expect(localizeApiError('The wallet does not hold that many main Coins', 422, details, '/admin/wallet-adjustments')).toBe(
-      'Ví này không đủ Coin cho lần trừ này. Hãy xem lại số dư hiện tại.',
+    expect(localizeApiError('The wallet does not hold enough Coins', 422, details, '/episodes/e1/purchase')).toBe(
+      APPLICATION_MESSAGES.MSG12.message,
     );
     expect(localizeApiError('The episode has no Coin price', 409, undefined, '/episodes/e1/purchase')).toBe(
       APPLICATION_MESSAGES.MSG13.message,

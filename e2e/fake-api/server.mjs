@@ -16,6 +16,7 @@ import './routes/contracts.mjs';
 import './routes/platform.mjs';
 import './routes/policies.mjs';
 import './routes/rewards.mjs';
+import './routes/ads.mjs';
 import './routes/support.mjs';
 import './routes/support-cases.mjs';
 import './routes/reports.mjs';

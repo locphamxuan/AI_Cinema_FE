@@ -1,14 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { RiskFlagsTab } from '@/features/finance/RiskFlagsTab';
+import { RiskFlagsTab, scanSummary } from '@/features/finance/RiskFlagsTab';
+import { toast } from '@/components/ui/Toast';
 import { AppShell } from '@/components/shell/AppShell';
 import { FilmProfitTab, planCoverage } from '@/features/finance/FilmProfitTab';
 import { day, roi, signTone, vnd } from '@/features/finance/financeFormat';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 
-vi.mock('@/components/ui/Toast', () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+vi.mock('@/components/ui/Toast', () => ({ toast: { error: vi.fn(), success: vi.fn(), warning: vi.fn() } }));
 vi.mock('next/navigation', () => ({
   usePathname: () => '/admin/finance',
   useSearchParams: () => new URLSearchParams(),
@@ -83,40 +84,70 @@ describe('Profit per film', () => {
 });
 
 describe('Risk flags tab', () => {
+  const user = { id: 'u1', fullName: 'Nguyễn An', email: 'an@test.vn', isActive: true };
   const flag = {
     id: 'f1', ruleCode: 'LARGE_TOP_UP', reason: 'Nạp 6000000 VND trong một lần', status: 'OPEN', reviewNote: null, reviewedAt: null, createdAt: '2026-11-10T00:00:00Z', reviewedBy: null,
-    coinTransaction: { id: 't1', entryType: 'TOP_UP', mainAmount: 6000, bonusAmount: 0, rateVnd: 1000, createdAt: '2026-11-10T00:00:00Z', wallet: { id: 'w1', user: { id: 'u1', fullName: 'Nguyễn An', email: 'an@test.vn' } } },
+    coinTransaction: { id: 't1', entryType: 'TOP_UP', mainAmount: 6000, bonusAmount: 0, rateVnd: 1000, createdAt: '2026-11-10T00:00:00Z', wallet: { id: 'w1', user } },
   };
+  const scanResult = { created: 2, rules: [{ code: 'LARGE_TOP_UP', description: 'Nạp lớn trong một lần', created: 2 }] };
 
-  it('lists OPEN flags with the VND value, scans and reviews with a note', async () => {
+  it('sums up what a scan found in plain words', () => {
+    expect(scanSummary(scanResult)).toEqual({ title: 'Tìm thấy 2 giao dịch rủi ro mới', description: 'Nạp lớn trong một lần: 2' });
+    expect(scanSummary({ created: 0, rules: [] })).toEqual({ title: 'Không có giao dịch rủi ro mới' });
+  });
+
+  it('lists OPEN flags with the account and VND value, scans, and locks the account with a reason', async () => {
     signInAs('admin');
     const calls = routeFetch({
       '/admin/finance/risk/rules': [{ code: 'LARGE_TOP_UP', description: 'Nạp lớn trong một lần' }],
       '/admin/finance/risk/flags': page([flag]),
-      '/admin/finance/risk/scan': { created: 2 },
-      '/admin/finance/risk/flags/f1/review': { ...flag, status: 'CONFIRMED' },
+      '/admin/finance/risk/scan': scanResult,
+      '/admin/finance/risk/flags/f1/review': { ...flag, status: 'ACCOUNT_LOCKED' },
     });
     render(<RiskFlagsTab />);
 
     expect(await screen.findByText('Nguyễn An')).toBeInTheDocument();
     expect(screen.getByText('6.000.000 VND')).toBeInTheDocument();
-    // An icon-only control keeps its icon, so it is never an empty box.
-    expect(screen.getByRole('button', { name: 'Mở ví của Nguyễn An' }).querySelector('svg')).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Xem ví của Nguyễn An' })).toHaveTextContent('Xem ví');
     const list = calls.find((c) => c.path === '/admin/finance/risk/flags')!;
     expect(list.search.get('filter.status')).toBe('$eq:OPEN');
     expect(list.search.get('sortBy')).toBe('createdAt:DESC');
 
     await userEvent.click(screen.getByRole('button', { name: /Kiểm tra ngay/ }));
-    await waitFor(() => expect(calls.some((c) => c.path === '/admin/finance/risk/scan' && c.method === 'POST')).toBe(true));
+    await waitFor(() => expect(toast.warning).toHaveBeenCalledWith('Tìm thấy 2 giao dịch rủi ro mới', 'Nạp lớn trong một lần: 2'));
 
-    await userEvent.click(screen.getByRole('button', { name: 'Xác nhận rủi ro' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Khoá tài khoản' }));
     const dialog = screen.getByRole('dialog');
-    await userEvent.type(within(dialog).getByLabelText('Ghi chú (tuỳ chọn)'), 'Đã gọi xác minh');
-    await userEvent.click(within(dialog).getByRole('button', { name: 'Xác nhận rủi ro' }));
+    expect(within(dialog).getByText(/đăng xuất khỏi mọi thiết bị/)).toBeInTheDocument();
+    const confirm = within(dialog).getByRole('button', { name: 'Khoá tài khoản' });
+    expect(confirm).toBeDisabled();
+    await userEvent.type(within(dialog).getByLabelText(/Lý do khoá/), 'Nạp lớn bất thường');
+    await userEvent.click(confirm);
 
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/admin/finance/risk/flags/f1/review')!;
-      expect(JSON.parse(sent.body as string)).toEqual({ decision: 'CONFIRMED', note: 'Đã gọi xác minh' });
+      expect(JSON.parse(sent.body as string)).toEqual({ decision: 'ACCOUNT_LOCKED', note: 'Nạp lớn bất thường' });
+    });
+  });
+
+  it('dismisses without a note, and points to the accounts page for a member already locked', async () => {
+    signInAs('admin');
+    const locked = { ...flag, id: 'f2', coinTransaction: { ...flag.coinTransaction, wallet: { id: 'w1', user: { ...user, isActive: false } } } };
+    const calls = routeFetch({
+      '/admin/finance/risk/rules': [],
+      '/admin/finance/risk/flags': page([locked]),
+      '/admin/finance/risk/flags/f2/review': { ...locked, status: 'DISMISSED' },
+    });
+    render(<RiskFlagsTab />);
+
+    expect(await screen.findByText('Đang bị khoá')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Khoá tài khoản' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Mở khoá ở trang Tài khoản' })).toHaveAttribute('href', '/admin/permissions?tab=accounts');
+    await userEvent.click(screen.getByRole('button', { name: 'Bỏ qua' }));
+    await userEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Bỏ qua' }));
+    await waitFor(() => {
+      const sent = calls.find((c) => c.path === '/admin/finance/risk/flags/f2/review')!;
+      expect(JSON.parse(sent.body as string)).toEqual({ decision: 'DISMISSED' });
     });
   });
 });

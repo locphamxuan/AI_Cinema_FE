@@ -5,13 +5,12 @@ test('ST-WEB-25 Staff reads the member wallet and plan, then claims, drafts with
   await page.getByRole('region', { name: 'Hàng chờ hỗ trợ' }).getByRole('button', { name: /Member Một/ }).click();
   const detail = page.getByRole('region', { name: 'Chi tiết yêu cầu' });
 
-  // The member's data is read only: no correction here, and the API refuses one from Staff.
+  // The member's data is read only.
   await detail.getByRole('tab', { name: 'Bối cảnh Member' }).click();
   await expect(detail.getByRole('region', { name: 'Ví Coin' })).toContainText('Coin chính120');
   await expect(detail.getByRole('region', { name: 'Gói thành viên' })).toContainText('Gói Tháng');
-  await expect(detail.getByText('Chỉ đọc. Điều chỉnh Coin, gói hay thiết bị do Admin làm ở màn quản trị tương ứng.')).toBeVisible();
+  await expect(detail.getByText('Chỉ đọc. Gói và thiết bị do Admin xử lý ở màn quản trị.')).toBeVisible();
   await expect(detail.getByRole('textbox')).toHaveCount(0);
-  expect(await callApi(page, 'POST', '/admin/wallet-adjustments', { userId: '00000000-0000-4000-8000-000000000007', mainDelta: 50, reason: 'Bù Coin nạp lỗi' })).toBe(403);
 
   await detail.getByRole('tab', { name: 'Hội thoại' }).click();
   await detail.getByRole('button', { name: 'Nhận yêu cầu' }).click();

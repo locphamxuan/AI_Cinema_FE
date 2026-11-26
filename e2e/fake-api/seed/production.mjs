@@ -250,6 +250,18 @@ export function production() {
     ],
     /** A member who bought episode 2 of "Ánh sáng cuối": removing it for good refunds those Coins. */
     unlocks: [{ episodeId: episodes[1].id, memberId: U.member.id, paidCoins: 10 }],
-    coinLines: [],
+    /** The Coin ledger the Admin reads: one top-up of the seeded member, one of another member. */
+    coinLines: [
+      coinLine(1, U.member, 'TOP_UP', 120),
+      coinLine(2, { id: uid('00000000', 20), fullName: 'Trần Thu Hà', email: 'ha@test.vn' }, 'TOP_UP', 50),
+    ],
+  };
+}
+
+function coinLine(n, user, entryType, mainAmount) {
+  return {
+    id: uid('cccccccc', n), walletId: `wallet-${user.id}`, userId: user.id, account: { id: user.id, fullName: user.fullName, email: user.email },
+    paymentId: null, entryType, mainAmount, bonusAmount: 0, rateVnd: 1000, description: null, referenceType: null, referenceId: null,
+    createdAt: AT, mainBalanceAfter: mainAmount, bonusBalanceAfter: 0,
   };
 }
