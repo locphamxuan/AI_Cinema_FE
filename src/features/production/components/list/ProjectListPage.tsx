@@ -45,7 +45,7 @@ export function ProjectListPage() {
   const base = baseFromPath(usePathname());
   const router = useRouter();
   const can = useCan();
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('done');
   const [searchDraft, setSearchDraft] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
