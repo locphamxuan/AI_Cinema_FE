@@ -131,10 +131,6 @@ export function PlanFormModal({ plan, onClose, onDone }: Props) {
               </select>
             </FormField>
           </div>
-          <label className="flex items-center gap-2 text-xs">
-            <input type="checkbox" checked={form.adFree} onChange={(e) => set({ adFree: e.target.checked })} className="accent-sky-600" />
-            Xem không có quảng cáo giữa tập
-          </label>
         </fieldset>
 
         {!isFree && (
