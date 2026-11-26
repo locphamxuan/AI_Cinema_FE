@@ -4,9 +4,9 @@ import { ArrowDown, ArrowUp } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/shadcn/table';
 import { Badge } from '@/components/ui/Badge';
 import type { FilmFinance } from '@/types/finance';
-import { BREAK_EVEN, day, roi, signTone, vnd } from './financeFormat';
+import { BREAK_EVEN, day, signTone, vnd } from './financeFormat';
 
-export type SortKey = 'title' | 'productionCostVnd' | 'episodeSalesVnd' | 'planShareVnd' | 'revenueVnd' | 'profitVnd' | 'roiPercent';
+export type SortKey = 'title' | 'productionCostVnd' | 'episodeSalesVnd' | 'revenueVnd' | 'profitVnd';
 export interface Sort {
   key: SortKey;
   desc: boolean;
@@ -16,15 +16,12 @@ export interface Sort {
 export const COLUMNS: { key: Exclude<SortKey, 'title'>; label: string; hint: string }[] = [
   { key: 'productionCostVnd', label: 'Phí sản xuất', hint: 'Tổng chi phí làm phim đã ghi nhận.' },
   { key: 'episodeSalesVnd', label: 'Bán tập lẻ', hint: 'Coin chính Member trả để mở khoá tập, đã trừ Coin hoàn khi tập bị gỡ. Coin thưởng không tính.' },
-  { key: 'planShareVnd', label: 'Từ gói Tháng', hint: 'Phần tiền gói Tháng chia cho phim theo thời gian Member gói Tháng xem phim, chia tự động mỗi đầu tháng.' },
-  { key: 'revenueVnd', label: 'Tổng doanh thu', hint: 'Bán tập lẻ + Từ gói Tháng.' },
+  { key: 'revenueVnd', label: 'Tổng doanh thu', hint: 'Gồm doanh thu bán tập lẻ và phần phân bổ theo gói Tháng.' },
   { key: 'profitVnd', label: 'Lợi nhuận', hint: 'Tổng doanh thu − Phí sản xuất.' },
-  { key: 'roiPercent', label: 'ROI', hint: 'Lợi nhuận chia cho Phí sản xuất.' },
 ];
 
 export function compare(a: FilmFinance, b: FilmFinance, key: SortKey): number {
   if (key === 'title') return a.title.localeCompare(b.title, 'vi') || a.createdAt.localeCompare(b.createdAt);
-  // A film without cost (ROI null) sorts after every film with one.
   return (a[key] ?? Number.NEGATIVE_INFINITY) - (b[key] ?? Number.NEGATIVE_INFINITY);
 }
 
@@ -57,10 +54,8 @@ export function FilmProfitTable({ rows, sort, onSort }: { rows: FilmFinance[]; s
                 {vnd(f.episodeSalesVnd)}
                 {f.refundedVnd > 0 && <p className="text-muted-foreground">đã trừ hoàn {vnd(f.refundedVnd)}</p>}
               </TableCell>
-              <Money value={f.planShareVnd} />
               <Money value={f.revenueVnd} strong />
               <Money value={f.profitVnd} className={signTone(f.profitVnd)} strong />
-              <TableCell className={`text-right tabular-nums ${signTone(f.roiPercent)}`}>{roi(f.roiPercent)}</TableCell>
               <TableCell className="text-right">
                 <Badge tone={state.tone}>{state.label}</Badge>
               </TableCell>

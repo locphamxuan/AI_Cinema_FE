@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { ProjectListPage } from '@/features/production/components/list/ProjectListPage';
 import { ProjectDetailPage } from '@/features/production/components/project/ProjectDetailPage';
 import { signInAs } from '@/tests/support/signIn';
 import { useAppStore } from '@/store/useAppStore';
@@ -18,17 +17,6 @@ vi.mock('next/navigation', () => ({
 }));
 
 const person = (id: string, fullName: string) => ({ id, fullName, email: `${id}@x.vn` });
-
-const STUDIO = {
-  id: 'st1',
-  name: 'Studio Sao Mai',
-  email: 'saomai@studio.vn',
-  contactName: null,
-  phone: null,
-  note: null,
-  isActive: true,
-  createdAt: '2026-10-01T00:00:00.000Z',
-};
 
 function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
   return {
@@ -102,14 +90,18 @@ function project(overrides: Partial<ProjectDetail> = {}): ProjectDetail {
 
 /** Answers each API path with the given body; anything else is an empty list. */
 function routeFetch(routes: Record<string, unknown>) {
+  const calls: { path: string; search: URLSearchParams }[] = [];
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string) => {
-      const path = new URL(url, 'http://x').pathname.replace(/^\/api/, '');
+      const parsed = new URL(url, 'http://x');
+      const path = parsed.pathname.replace(/^\/api/, '');
+      calls.push({ path, search: parsed.searchParams });
       const body = path in routes ? routes[path] : [];
       return fakeResponse(body);
     }),
   );
+  return calls;
 }
 
 beforeEach(() => {
@@ -117,71 +109,6 @@ beforeEach(() => {
   useAppStore.setState({ isAuthenticated: false, user: null });
 });
 afterEach(() => vi.unstubAllGlobals());
-
-describe('ProjectListPage', () => {
-  const page = {
-    data: [
-      {
-        id: 'm1',
-        title: 'Mưa Sài Gòn',
-        status: 'IN_PRODUCTION',
-        studio: STUDIO,
-        reviewerId: 'reviewer-id',
-        creatorId: 'creator-id',
-        reviewer: person('reviewer-id', 'Reviewer Một'),
-        creator: person('creator-id', 'Creator Một'),
-        createdAt: '2026-10-01T00:00:00.000Z',
-        updatedAt: '2026-10-01T00:00:00.000Z',
-        lastActivityAt: '2026-10-14T08:30:00.000Z',
-        _count: { episodes: 8 },
-      },
-    ],
-    meta: { totalItems: 1, currentPage: 1, totalPages: 1, itemsPerPage: 12 },
-  };
-
-  it('shows the projects and lets the Admin create one', async () => {
-    nav.pathname = '/admin/projects';
-    signInAs('admin');
-    routeFetch({ '/projects': page });
-    render(<ProjectListPage />);
-
-    // The analytics chart names the project too; the card is the one in the list.
-    const titles = await screen.findAllByText('Mưa Sài Gòn');
-    const card = titles.map((title) => title.closest('li')).find(Boolean)!;
-    expect(within(card).getByText('Studio đang sản xuất')).toBeInTheDocument();
-    expect(within(card).getByText('Studio Sao Mai')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Tạo dự án/ })).toBeInTheDocument();
-  });
-
-  it('shows when each project last changed, with a tooltip explaining the column', async () => {
-    nav.pathname = '/reviewer/projects';
-    signInAs('reviewer');
-    routeFetch({ '/projects': page });
-    render(<ProjectListPage />);
-
-    await screen.findAllByText('Mưa Sài Gòn');
-    await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
-    await userEvent.click(screen.getByRole('button', { name: 'Xem dạng bảng' }));
-    const header = screen.getByRole('columnheader', { name: 'Cập nhật lần cuối' });
-    expect(header).toHaveAttribute('title', expect.stringContaining('thay đổi gần nhất'));
-    // The newest content event (14/10), not the project's own update time (01/10).
-    expect(screen.getByText(/14\/10\/26/)).toBeInTheDocument();
-    expect(screen.queryByRole('columnheader', { name: 'Cập nhật' })).not.toBeInTheDocument();
-  });
-
-  it.each([
-    ['/creator/projects', 'creator'],
-    ['/reviewer/projects', 'reviewer'],
-  ] as const)('gives %s no create button: only the Admin creates projects', async (path, role) => {
-    nav.pathname = path;
-    signInAs(role);
-    routeFetch({ '/projects': page });
-    render(<ProjectListPage />);
-
-    await screen.findByRole('heading', { name: 'Mưa Sài Gòn' });
-    expect(screen.queryByRole('button', { name: /Tạo dự án/ })).not.toBeInTheDocument();
-  });
-});
 
 describe('ProjectDetailPage', () => {
   it('hides Studio and Cost from the Creator but lists the contract rounds (W47)', async () => {

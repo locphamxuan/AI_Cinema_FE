@@ -1,12 +1,13 @@
 import { expect, signIn, test } from './fixtures';
 
-test('smoke: the Admin project list shows every seeded project', async ({ page }) => {
+test('ST-WEB-40 the Admin project list opens on the completed projects', async ({ page }) => {
   await signIn(page, 'admin');
   await page.goto('/admin/projects');
   await expect(page.getByRole('heading', { name: /Dự án phim/ }).first()).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Ánh sáng cuối' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Mùa đông ấm' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Hoàn tất' })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('heading', { name: 'Bến cảng' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Ánh sáng cuối' })).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Mùa đông ấm' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Tạo dự án' })).toBeVisible();
 });
 
