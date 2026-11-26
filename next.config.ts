@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The Docker image ships only the traced files + server.js (see Dockerfile); Vercel and
+  // `next dev` keep the normal .next output.
+  output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
   devIndicators: false,
   experimental: {
     // The /api rewrite gives up after 30 s by default. Without REDIS_URL the backend transcodes an episode upload

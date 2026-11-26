@@ -1,0 +1,44 @@
+# AI Cinema — web back office (Next.js) in Docker.
+#
+#   docker compose up -d --build     → http://localhost:3000
+#   docker compose logs -f web
+#   docker compose down
+#
+# The API is its own repository (../AI_Cinema_BE): start it with `docker compose up -d --build`
+# there (it publishes 3001) or `npm run start:local`, and this container reaches it through
+# host.docker.internal. To attach to the backend's compose network instead, set
+# DOCKER_BACKEND_URL=http://api:3001 and add
+#   networks: [ai-cinema]
+# plus a top-level `networks: { ai-cinema: { external: true, name: ai-cinema_default } }`.
+#
+# BACKEND_URL and NEXT_PUBLIC_* are compiled in by `next build`: after changing them, rebuild with
+# `docker compose up -d --build`. A plain `restart` keeps the values of the existing image.
+
+name: ai-cinema-web
+
+services:
+  web:
+    image: manhhiep2003/ai-cinema-web:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BACKEND_URL: ${DOCKER_BACKEND_URL:-http://api:3001}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-/api}
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: ${NEXT_PUBLIC_GOOGLE_CLIENT_ID:-}
+        NEXT_PUBLIC_STUDIO_WEB_URL: ${NEXT_PUBLIC_STUDIO_WEB_URL}
+
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+
+    networks:
+      - ai-cinema-network
+
+networks:
+  ai-cinema-network:
+    external: true
+    name: ai-cinema_ai-cinema-network
