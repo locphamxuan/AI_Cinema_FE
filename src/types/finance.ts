@@ -47,7 +47,17 @@ export interface RiskRule {
   description: string;
 }
 
-export type RiskFlagStatus = 'OPEN' | 'CONFIRMED' | 'DISMISSED';
+/** CONFIRMED only on flags handled before 26/11/2026; today the Admin locks the account or dismisses. */
+export type RiskFlagStatus = 'OPEN' | 'ACCOUNT_LOCKED' | 'DISMISSED' | 'CONFIRMED';
+
+/** What the Admin does with an open flag. */
+export type RiskDecision = 'ACCOUNT_LOCKED' | 'DISMISSED';
+
+/** POST /admin/finance/risk/scan: the new flags in all and per rule. */
+export interface RiskScanResult {
+  created: number;
+  rules: { code: string; description: string; created: number }[];
+}
 
 export interface RiskFlag {
   id: string;
@@ -64,7 +74,7 @@ export interface RiskFlag {
     bonusAmount: number;
     rateVnd: number | null;
     createdAt: string;
-    wallet: { id: string; user: { id: string; fullName: string; email: string } };
+    wallet: { id: string; user: { id: string; fullName: string; email: string; isActive: boolean } };
   };
   reviewedBy: { id: string; fullName: string } | null;
 }

@@ -44,6 +44,7 @@ const VALUES: Record<string, string> = {
   OPEN: 'Đang mở',
   RESOLVED: 'Đã xử lý',
   DISMISSED: 'Đã bỏ qua',
+  ACCOUNT_LOCKED: 'Đã khoá tài khoản',
   AI_LABELING: '"Gắn nhãn AI"',
   CONTENT_POLICY: '"An toàn nội dung"',
   LEGAL: '"Thông báo và người, sự kiện thật"',

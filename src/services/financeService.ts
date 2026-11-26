@@ -2,7 +2,7 @@
 import { apiClient } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type { Page } from '@/types/production';
-import type { FilmFinanceReport, RiskFlag, RiskFlagStatus, RiskRule } from '@/types/finance';
+import type { FilmFinanceReport, RiskDecision, RiskFlag, RiskFlagStatus, RiskRule, RiskScanResult } from '@/types/finance';
 
 const F = API_ROUTES.FINANCE;
 
@@ -18,8 +18,9 @@ export const financeService = {
   riskRules: () => apiClient.get<RiskRule[]>(F.RISK_RULES),
   riskFlags: (page: number, limit: number, status?: RiskFlagStatus, ruleCode?: string) =>
     apiClient.get<Page<RiskFlag>>(`${F.RISK_FLAGS}?${flagsQuery(page, limit, status, ruleCode)}`),
-  scan: () => apiClient.post<{ created: number }>(F.RISK_SCAN, {}),
-  review: (flagId: string, decision: 'CONFIRMED' | 'DISMISSED', note?: string) =>
+  scan: () => apiClient.post<RiskScanResult>(F.RISK_SCAN, {}),
+  /** ACCOUNT_LOCKED locks the member account and signs it out everywhere; it needs a note (the reason). */
+  review: (flagId: string, decision: RiskDecision, note?: string) =>
     apiClient.post<RiskFlag>(F.RISK_REVIEW(flagId), { decision, ...(note?.trim() ? { note: note.trim() } : {}) }),
 };
 
