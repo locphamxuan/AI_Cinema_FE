@@ -46,7 +46,7 @@ it('lets the Admin create a project with its Reviewer, lead Creator and studio, 
   // The budget is entered with the project: it is the ceiling of the studio's contract.
   expect(screen.getByRole('status')).toHaveTextContent('nhập ngân sách sản xuất');
   await userEvent.type(screen.getByLabelText('Ngân sách sản xuất (₫)'), '1500');
-  expect(screen.getByText('Số tiền là bội số 1.000 ₫.')).toBeInTheDocument();
+  expect(screen.getByText(/Số tiền là bội số 1.000 ₫, tối đa 100.000.000.000/)).toBeInTheDocument();
   await userEvent.clear(screen.getByLabelText('Ngân sách sản xuất (₫)'));
   await userEvent.type(screen.getByLabelText('Ngân sách sản xuất (₫)'), '200.000.000');
   expect(screen.getByText(/= 200\.000\.000/)).toBeInTheDocument();

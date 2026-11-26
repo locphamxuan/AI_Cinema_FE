@@ -7,7 +7,8 @@ import { Modal } from '@/components/ui/Modal';
 import { productionService } from '@/services/productionService';
 import type { IdeaFile, IdeaFilePurpose } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
-import { ATTACHMENT_ACCEPT, ATTACHMENT_HINT } from '../../lib/attachments';
+import { toast } from '@/components/ui/Toast';
+import { ATTACHMENT_ACCEPT, ATTACHMENT_HINT, ATTACHMENT_MAX_BYTES } from '../../lib/attachments';
 import { downloadFile } from '../../lib/download';
 import { formatBytes } from '@/lib/format';
 import { Empty, Panel } from '@/components/data/ui';
@@ -32,12 +33,17 @@ export function IdeaFilesPanel({ canManage, purpose = 'IDEA' }: { canManage: boo
   const { project, reload } = useProject();
   const input = useRef<HTMLInputElement>(null);
   const [removing, setRemoving] = useState<IdeaFile | null>(null);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   // Files saved before purposes existed have none: they are idea files.
   const files = project.ideaFiles.filter((f) => (f.purpose ?? 'IDEA') === purpose);
 
   const upload = async (file: File | undefined) => {
     if (!file) return;
+    if (file.size > ATTACHMENT_MAX_BYTES) {
+      toast.error('Tệp quá lớn', `${file.name} nặng ${formatBytes(file.size)}; mỗi tệp tối đa 100 MB.`);
+      if (input.current) input.current.value = '';
+      return;
+    }
     if (await run(() => productionService.uploadIdeaFile(project.id, file, purpose), `Đã tải ${copy.noun}`)) await reload();
     if (input.current) input.current.value = '';
   };

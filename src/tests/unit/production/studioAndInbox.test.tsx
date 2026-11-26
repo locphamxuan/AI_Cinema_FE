@@ -53,15 +53,30 @@ describe('StudiosPage (BR-59)', () => {
     expect(save).toBeDisabled();
     await userEvent.type(within(dialog).getByLabelText(/Tên Studio/), 'Studio Mới');
     await userEvent.type(within(dialog).getByLabelText(/Email nhận hợp đồng/), 'moi@studio.vn');
-    await userEvent.type(within(dialog).getByLabelText('Mã số thuế'), '0319876543');
+    // The Admin never types the partner's tax or bank data: the studio fills its legal profile on Studio Web.
+    expect(within(dialog).queryByLabelText('Mã số thuế')).not.toBeInTheDocument();
+    expect(within(dialog).getByText(/do Studio tự điền trên Studio Web/)).toBeInTheDocument();
     expect(save).toBeEnabled();
     await userEvent.click(save);
     const created = calls.find((c) => c.method === 'POST' && c.path === '/studios');
-    // The legal profile is Bên B of the contract; an empty field is sent empty so it can be cleared.
-    expect(JSON.parse(created!.body as string)).toMatchObject({ name: 'Studio Mới', taxCode: '0319876543', address: '' });
+    expect(JSON.parse(created!.body as string)).toEqual({ name: 'Studio Mới', email: 'moi@studio.vn' });
   });
 
-  it('edits the legal profile of a studio, Bên B of its contract, and refuses a malformed phone', async () => {
+  it('shows the Admin the legal profile the studio filled in, read-only, and what still blocks signing', async () => {
+    nav.pathname = '/admin/studios';
+    signInAs('admin');
+    routeFetch({ '/studios': [studio({ taxCode: '0319876543', address: '12 Nguyễn Huệ', bankAccount: '0123456789', bankName: null, representativeTitle: 'Giám đốc' })] });
+    render(<StudiosPage />);
+
+    expect(await screen.findByText(/Hồ sơ pháp lý chưa đủ/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Hồ sơ pháp lý của Studio Ánh Trăng' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toHaveTextContent('0319876543');
+    expect(dialog).toHaveTextContent('Còn thiếu, Studio chưa ký được');
+    expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('edits how to reach a studio, never its legal profile, and refuses a malformed phone', async () => {
     nav.pathname = '/admin/studios';
     signInAs('admin');
     const calls = routeFetch({ '/studios': [studio({ taxCode: '0319876543', address: '12 Nguyễn Huệ', phone: '028 1234' })] });
@@ -69,15 +84,13 @@ describe('StudiosPage (BR-59)', () => {
 
     await userEvent.click(await screen.findByRole('button', { name: 'Sửa Studio Ánh Trăng' }));
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByLabelText('Mã số thuế')).toHaveValue('0319876543');
     expect(within(dialog).getByLabelText('Người đại diện ký hợp đồng')).toHaveValue('Chị Lan');
     const save = within(dialog).getByRole('button', { name: 'Lưu' });
     await userEvent.clear(within(dialog).getByLabelText('Số điện thoại'));
     await userEvent.type(within(dialog).getByLabelText('Số điện thoại'), 'abc');
     expect(save).toBeDisabled();
+    expect(within(dialog).getByText(/Chỉ gồm 6–30 chữ số/)).toBeInTheDocument();
     await userEvent.clear(within(dialog).getByLabelText('Số điện thoại'));
-    await userEvent.clear(within(dialog).getByLabelText('Địa chỉ trụ sở'));
-    await userEvent.type(within(dialog).getByLabelText('Chức vụ người đại diện'), 'Giám đốc');
     await userEvent.type(within(dialog).getByLabelText('Ghi chú'), 'Đối tác lâu năm');
     await userEvent.click(save);
 
@@ -85,10 +98,8 @@ describe('StudiosPage (BR-59)', () => {
     expect(JSON.parse(updated!.body as string)).toMatchObject({
       contactName: 'Chị Lan',
       note: 'Đối tác lâu năm',
-      address: '',
-      representativeTitle: 'Giám đốc',
-      taxCode: '0319876543',
     });
+    expect(Object.keys(JSON.parse(updated!.body as string))).not.toEqual(expect.arrayContaining(['taxCode']));
     expect(JSON.parse(updated!.body as string)).not.toHaveProperty('phone');
   });
 

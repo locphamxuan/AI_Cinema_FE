@@ -16,6 +16,9 @@ import { ChangeRequestCard } from '../shared/ChangeRequestCard';
 import { FilePicker } from '../shared/FilePicker';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { useProject } from './ProjectContext';
+import { Pager, pageOf } from '@/components/data/Pager';
+
+const PAGE_SIZE = 10;
 
 /** BR-55: the Reviewer or a Creator sends the Admin a request with the reason and proof; the Admin decides. */
 export function ChangeRequestsTab() {
@@ -23,6 +26,8 @@ export function ChangeRequestsTab() {
   const can = useCan();
   const requests = useResource(`changes:${project.id}`, () => changeRequestService.list(project.id));
   const refresh = () => Promise.all([requests.reload(), reload()]);
+  const [page, setPage] = useState(1);
+  const { rows, totalPages } = pageOf(requests.data ?? [], page, PAGE_SIZE);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -39,10 +44,11 @@ export function ChangeRequestsTab() {
         {requests.loading && !requests.data && <Loading />}
         {requests.data?.length === 0 && <Empty>Chưa có đề xuất nào.</Empty>}
         <ul className="space-y-3">
-          {requests.data?.map((request) => (
+          {rows.map((request) => (
             <ChangeRequestCard key={request.id} request={request} canDecide={can(PERMISSION.PROJECT_CHANGE_REVIEW)} onDecided={refresh} />
           ))}
         </ul>
+        <Pager page={Math.min(page, totalPages)} totalPages={totalPages} onChange={setPage} />
       </Panel>
 
       {caps.suggest && project.status !== 'CANCELLED' && <ProposeForm onDone={refresh} />}
@@ -58,7 +64,7 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
   const [seasonId, setSeasonId] = useState('');
   const [episodeId, setEpisodeId] = useState('');
   const [proof, setProof] = useState<File[]>([]);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onDone });
   const episodes = project.seasons.filter((s) => !seasonId || s.id === seasonId).flatMap((s) => s.episodes);
   const valid = content.trim().length >= 5 && reason.trim().length >= 5;
 
@@ -126,10 +132,10 @@ function ProposeForm({ onDone }: { onDone: () => Promise<unknown> }) {
             </select>
           </FormField>
         </div>
-        <FormField label="Nội dung đề xuất">
+        <FormField label="Nội dung đề xuất (tối thiểu 5 ký tự)" required>
           <textarea rows={3} value={content} onChange={(e) => setContent(e.target.value)} maxLength={5000} required className={fieldTextareaClass} />
         </FormField>
-        <FormField label="Lý do">
+        <FormField label="Lý do (tối thiểu 5 ký tự)" required>
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={5000} required className={fieldTextareaClass} />
         </FormField>
         <FilePicker

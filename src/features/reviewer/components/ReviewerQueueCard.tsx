@@ -5,10 +5,10 @@ import { formatDateTime } from '@/lib/format';
 import type { QueueItem, QueueStage } from '../reviewQueue';
 
 export const STAGE_STYLE: Record<QueueStage, { badge: string; action: string; button: string }> = {
-  MASTER_AUDIT: { badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-300 dark:border-rose-500/30', action: 'Mở trang duyệt phim', button: 'bg-primary hover:bg-primary/90 text-primary-foreground' },
-  SCRIPT_PENDING: { badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30', action: 'Duyệt kịch bản', button: 'bg-primary hover:bg-primary/90 text-primary-foreground' },
-  STUDIO_REVISING: { badge: 'bg-slate-100 text-secondary-foreground border-slate-200 dark:bg-slate-800 dark:border-slate-700', action: 'Xem yêu cầu sửa', button: 'border border-input hover:bg-muted/60 text-foreground' },
-  FINAL_CONFIRMED: { badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30', action: 'Xem tập phim', button: 'border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
+  MASTER_AUDIT: { badge: 'bg-viz-1/10 text-violet-800 border-viz-1/30 dark:text-violet-200', action: 'Mở trang duyệt phim', button: 'bg-primary hover:bg-primary/90 text-primary-foreground' },
+  SCRIPT_PENDING: { badge: 'bg-viz-2/10 text-amber-800 border-viz-2/30 dark:text-amber-200', action: 'Duyệt kịch bản', button: 'bg-primary hover:bg-primary/90 text-primary-foreground' },
+  STUDIO_REVISING: { badge: 'bg-viz-5/10 text-pink-800 border-viz-5/30 dark:text-pink-200', action: 'Xem yêu cầu sửa', button: 'border border-input hover:bg-muted/60 text-foreground' },
+  FINAL_CONFIRMED: { badge: 'bg-viz-3/10 text-teal-800 border-viz-3/30 dark:text-teal-200', action: 'Xem tập phim', button: 'border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400' },
   PROJECT: { badge: 'bg-slate-100 text-secondary-foreground border-slate-200 dark:bg-slate-800 dark:border-slate-700', action: 'Mở dự án', button: 'border border-input hover:bg-muted/60 text-secondary-foreground' },
 };
 
@@ -18,7 +18,7 @@ export const episodeText = (item: QueueItem) => (item.episodeNumber === null ? `
 export function ReviewerQueueCard({ item }: { item: QueueItem }) {
   const style = STAGE_STYLE[item.stage];
   return (
-    <article className="group relative flex flex-col h-full rounded-3xl bg-card border border-border shadow-xs hover:shadow-md transition-all overflow-hidden">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-card shadow-xs ring-1 ring-foreground/10 transition-shadow hover:shadow-md">
       <div className="relative w-full aspect-[16/9] bg-slate-900 overflow-hidden">
         {item.posterUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -44,7 +44,7 @@ export function ReviewerQueueCard({ item }: { item: QueueItem }) {
           <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${style.badge}`}>
             {item.stageLabel}
           </span>
-          <h3 className="text-base font-extrabold text-foreground line-clamp-1">{item.title}</h3>
+          <h3 className="line-clamp-1 font-display text-base font-semibold text-foreground">{item.title}</h3>
           <p className="text-xs text-muted-foreground">
             Biên kịch: <strong className="text-foreground">{item.creatorName}</strong>
           </p>

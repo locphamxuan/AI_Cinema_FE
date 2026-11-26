@@ -23,7 +23,7 @@ export function AdsPanel() {
   const [editing, setEditing] = useState<AdminAd | 'new' | null>(null);
   const [page, setPage] = useState(1);
   const paged = pageOf(ads.data ?? [], page, 10);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: ads.reload });
 
   const save = async (input: AdInput) => {
     const call = editing === 'new' || !editing ? () => adAdminService.createAd(input) : () => adAdminService.updateAd(editing.id, input);
@@ -63,7 +63,7 @@ export function AdsPanel() {
               <div className="min-w-0 space-y-0.5">
                 <p className="font-semibold text-foreground">{ad.title}</p>
                 <p className="text-muted-foreground">
-                  Dài {formatDuration(ad.durationSeconds)} · mức ưu tiên {ad.weight}
+                  Dài {formatDuration(ad.durationSeconds)}
                 </p>
                 <a href={ad.mediaUrl} target="_blank" rel="noopener noreferrer" className="text-sky-700 hover:underline break-all">
                   {ad.mediaUrl}

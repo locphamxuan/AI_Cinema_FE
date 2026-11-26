@@ -36,7 +36,8 @@ export function StaffCaseChat({
   const [view, setView] = useState<View>('chat');
   const [resolving, setResolving] = useState(false);
   const [assigning, setAssigning] = useState(false);
-  const { busy, run } = useAction();
+  // Another Staff member may have claimed or closed the case meanwhile: a 409 shows the case as it is now.
+  const { busy, run } = useAction({ onStale: () => Promise.all([detail.reload(), onChanged()]) });
 
   if (detail.error) return <div className="p-4"><ErrorNote message={detail.error} onRetry={detail.reload} /></div>;
   if (!detail.data) return <Loading />;

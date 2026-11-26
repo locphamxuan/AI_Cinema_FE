@@ -5,4 +5,7 @@ export const ATTACHMENT_ACCEPT = [
   '.mp4', '.m4v', '.mov', '.webm', '.mkv', '.avi',
 ].join(',');
 
+/** The backend's size limit for one idea or synopsis file (IDEA_FILE_MAX_BYTES). */
+export const ATTACHMENT_MAX_BYTES = 100 * 1024 * 1024;
+
 export const ATTACHMENT_HINT = 'Word, PDF, TXT, Excel, PowerPoint, ảnh hoặc video - tối đa 100 MB mỗi tệp.';

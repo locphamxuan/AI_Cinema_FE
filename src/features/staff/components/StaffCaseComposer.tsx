@@ -17,7 +17,7 @@ export function StaffCaseComposer({ caseId, canSuggest, onSent }: { caseId: stri
   const [mode, setMode] = useState<Mode>('reply');
   const [content, setContent] = useState('');
   const [suggestion, setSuggestion] = useState<StaffAiSuggestion | null>(null);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onSent });
   const text = content.trim();
 
   const suggest = async () => {

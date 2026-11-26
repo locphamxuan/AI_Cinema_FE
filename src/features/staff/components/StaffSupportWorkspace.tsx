@@ -51,11 +51,11 @@ export function StaffSupportWorkspace({ isAdmin = false }: { isAdmin?: boolean }
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard icon={Inbox} label="Chờ người nhận" value={s?.waiting ?? '—'} note={s?.oldestWaiting ? `Lâu nhất ${s.oldestWaiting.waitingMinutes} phút` : 'Không có yêu cầu chờ'} noteTone={s?.oldestWaiting ? 'warn' : 'muted'} />
-        <StatCard icon={Headset} label="Nhân viên đang xử lý" value={s?.byStatus.STAFF_HANDLING ?? '—'} note={s ? `Chờ Member xác nhận: ${s.byStatus.RESOLVED ?? 0}` : undefined} />
-        <StatCard icon={Bot} label="AI chuyển cho nhân viên hôm nay" value={s?.escalatedToday ?? '—'} note={s ? `Đã giải quyết hôm nay: ${s.resolvedToday}` : undefined} />
-        <StatCard icon={Sparkles} label="AI tự giải quyết" value={s ? `${Math.round(s.aiResolvedRate * 100)}%` : '—'} note="Tỉ lệ trên các yêu cầu đã kết thúc gần đây" />
+      <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-4">
+        <StatCard icon={Inbox} accent={1} label="Chờ người nhận" value={s?.waiting ?? '—'} note={s?.oldestWaiting ? `Lâu nhất ${s.oldestWaiting.waitingMinutes} phút` : 'Không có yêu cầu chờ'} noteTone={s?.oldestWaiting ? 'warn' : 'muted'} />
+        <StatCard icon={Headset} accent={3} label="Nhân viên đang xử lý" value={s?.byStatus.STAFF_HANDLING ?? '—'} note={s ? `Chờ Member xác nhận: ${s.byStatus.RESOLVED ?? 0}` : undefined} />
+        <StatCard icon={Bot} accent={0} label="AI chuyển cho nhân viên hôm nay" value={s?.escalatedToday ?? '—'} note={s ? `Đã giải quyết hôm nay: ${s.resolvedToday}` : undefined} />
+        <StatCard icon={Sparkles} accent={2} label="AI tự giải quyết" value={s ? `${Math.round(s.aiResolvedRate * 100)}%` : '—'} note="Tỉ lệ trên các yêu cầu đã kết thúc gần đây" />
       </div>
       {stats.error && <ErrorNote message={stats.error} onRetry={stats.reload} />}
 

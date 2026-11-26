@@ -6,7 +6,7 @@ import { FormField, fieldInputClass } from '@/components/ui/FormField';
 import { Modal } from '@/components/ui/Modal';
 import { toast } from '@/components/ui/Toast';
 import { formatDuration } from '@/lib/format';
-import { MAX_AD_DURATION_SECONDS, MAX_AD_VIDEO_BYTES, MAX_AD_WEIGHT, adAdminService, adInputProblem } from '@/services/adAdminService';
+import { MAX_AD_DURATION_SECONDS, MAX_AD_VIDEO_BYTES, adAdminService, adInputProblem } from '@/services/adAdminService';
 import type { AdInput, AdminAd } from '@/types/playback';
 
 interface Props {
@@ -18,14 +18,12 @@ interface Props {
 }
 
 /**
- * Create or edit one mid-roll ad: its video and how often the draw picks it. The viewer watches the whole
- * video, so its length is read from the file (here for the preview, by the BE when saving), never typed.
+ * Create or edit one mid-roll ad: its name and its video. Every active ad has the same chance at each cue. The viewer
+ * watches the whole video, so its length is read from the file (here for the preview, by the BE when saving), never typed.
  */
 export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
   const [title, setTitle] = useState(ad?.title ?? '');
   const [mediaUrl, setMediaUrl] = useState(ad?.mediaUrl ?? '');
-  const [clickUrl, setClickUrl] = useState(ad?.clickUrl ?? '');
-  const [weight, setWeight] = useState(ad?.weight ?? 1);
   const [uploading, setUploading] = useState(false);
   const [length, setLength] = useState<{ url: string; seconds: number } | null>(null);
 
@@ -48,13 +46,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
     }
   };
 
-  const input: AdInput = {
-    title: title.trim(),
-    mediaUrl: mediaUrl.trim(),
-    // The BE takes null to clear the link of an existing ad and refuses an empty string.
-    clickUrl: clickUrl.trim() || (ad ? null : undefined),
-    weight,
-  };
+  const input: AdInput = { title: title.trim(), mediaUrl: mediaUrl.trim() };
   const seconds = length?.url === mediaUrl ? length.seconds : null;
   const tooLong = seconds !== null && seconds > MAX_AD_DURATION_SECONDS;
   const problem = adInputProblem(input) ?? (tooLong ? `Video dài ${formatDuration(seconds)}, quảng cáo tối đa ${MAX_AD_DURATION_SECONDS / 60} phút.` : null);
@@ -74,7 +66,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
           if (!problem) onSubmit(input);
         }}
       >
-        <FormField label="Tên quảng cáo">
+        <FormField label="Tên quảng cáo" required>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
@@ -84,7 +76,7 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
             required
           />
         </FormField>
-        <FormField label="Video (MP4): dán link hoặc tải file từ máy">
+        <FormField label="Video (MP4): dán link hoặc tải file từ máy" required>
           <div className="flex gap-2">
             <input
               type="url"
@@ -127,26 +119,6 @@ export function AdFormModal({ ad, busy, onClose, onSubmit }: Props) {
             </p>
           </div>
         )}
-        <FormField label="Link khi người xem bấm (không bắt buộc)">
-          <input
-            type="url"
-            value={clickUrl}
-            onChange={(e) => setClickUrl(e.target.value)}
-            maxLength={1000}
-            placeholder="https://example.com/landing-page"
-            className={`${fieldInputClass} text-xs py-2 rounded-xl`}
-          />
-        </FormField>
-        <FormField label={`Mức ưu tiên (1-${MAX_AD_WEIGHT}): số càng lớn, quảng cáo càng dễ được chọn`}>
-          <input
-            type="number"
-            min={1}
-            max={MAX_AD_WEIGHT}
-            value={weight}
-            onChange={(e) => setWeight(Number(e.target.value))}
-            className={`${fieldInputClass} text-xs py-2 rounded-xl`}
-          />
-        </FormField>
         {problem && title && mediaUrl && <p role="alert" className="text-xs text-rose-600 dark:text-rose-400 font-medium">{problem}</p>}
         <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-border">
           <Button type="button" variant="secondary" onClick={onClose} className="rounded-full px-4 py-2 text-xs">

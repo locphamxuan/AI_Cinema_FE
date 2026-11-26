@@ -144,7 +144,7 @@ function SubscriptionModal({ id, onClose, onChanged }: { id: string; onClose: ()
             <div className="space-y-2 rounded-lg border border-rose-500/30 bg-rose-500/5 p-3">
               <p className="text-rose-700 dark:text-rose-300">Member mất ngay quyền xem của gói; Coin đã thu không được hoàn.</p>
               <FormField label="Lý do (ghi vào nhật ký)">
-                <textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} className={fieldTextareaClass} />
+                <textarea rows={2} value={reason} maxLength={500} onChange={(e) => setReason(e.target.value)} className={fieldTextareaClass} />
               </FormField>
               <div className="flex justify-end gap-2">
                 <Button size="sm" variant="secondary" onClick={() => setConfirming(false)}>
@@ -184,6 +184,12 @@ function SubscriptionFacts({ sub }: { sub: AdminSubscription }) {
   );
 }
 
+function cycleResult(c: SubscriptionCycle): string {
+  if (c.status === 'PAID') return 'Đã thu';
+  if (c.status === 'REFUNDED') return 'Đã hoàn Coin cho Member';
+  return c.failureReason ? inVietnamese(c.failureReason, 'Không thu được') : 'Không thu được';
+}
+
 function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
   if (cycles.length === 0) return <Empty>Chưa thu Coin kỳ nào.</Empty>;
   return (
@@ -203,7 +209,7 @@ function CycleTable({ cycles }: { cycles: SubscriptionCycle[] }) {
             <td className="py-1">
               {formatDay(c.periodStart)} → {formatDay(c.periodEnd)}
             </td>
-            <td className="py-1">{c.status === 'PAID' ? 'Đã thu' : (c.failureReason ? inVietnamese(c.failureReason, 'Không thu được') : 'Không thu được')}</td>
+            <td className="py-1">{cycleResult(c)}</td>
             <td className="py-1 text-right tabular-nums">
               {c.mainCoinsCharged} + {c.bonusCoinsCharged}
             </td>

@@ -10,6 +10,7 @@ import type {
   UserProfile,
 } from '@/types/auth';
 import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { authSession } from '@/lib/authSession';
 import { AREAS, homeAreaOf } from '@/lib/permissions';
 
 
@@ -56,11 +57,10 @@ export function redirectUrlFor(role: UserProfile['role']): string | undefined {
   return area ? AREAS[area].path : undefined;
 }
 
+/** Opens this tab's own session: the accounts signed in on other windows keep theirs. */
 function persistSession(session: AuthSession): UserProfile {
   const profile = toUserProfile(session.user);
-  storage.set(STORAGE_KEYS.AUTH_TOKEN, session.accessToken);
-  storage.set(STORAGE_KEYS.REFRESH_TOKEN, session.refreshToken);
-  storage.set(STORAGE_KEYS.USER_DATA, profile);
+  authSession.start({ accessToken: session.accessToken, refreshToken: session.refreshToken }, profile);
   return profile;
 }
 
@@ -91,21 +91,22 @@ export const authService = {
       return { ...res, data: null as unknown as UserProfile };
     }
     const profile = toUserProfile(res.data);
-    storage.set(STORAGE_KEYS.USER_DATA, profile);
+    authSession.update({ user: profile });
     return { ...res, data: profile };
   },
 
+  /** Ends this tab's session and revokes its refresh token on the API; other windows stay signed in. */
   logout(): void {
-    storage.remove(STORAGE_KEYS.AUTH_TOKEN);
-    storage.remove(STORAGE_KEYS.REFRESH_TOKEN);
-    storage.remove(STORAGE_KEYS.USER_DATA);
+    const refreshToken = authSession.read()?.refreshToken;
+    authSession.end();
+    if (refreshToken) void apiClient.post(API_ROUTES.AUTH.LOGOUT, { refreshToken });
   },
 
   getStoredUser(): UserProfile | null {
-    return storage.get<UserProfile | null>(STORAGE_KEYS.USER_DATA, null);
+    return authSession.read()?.user ?? null;
   },
 
   hasSession(): boolean {
-    return Boolean(storage.getString(STORAGE_KEYS.AUTH_TOKEN));
+    return Boolean(authSession.read());
   },
 };

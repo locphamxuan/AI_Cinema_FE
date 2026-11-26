@@ -80,7 +80,7 @@ export function ContractTab() {
 function ResendTemplate({ canSend, onSent }: { canSend: boolean; onSent: () => Promise<void> }) {
   const { project } = useProject();
   const script = useResource(canSend ? `script:${project.id}` : null, () => scriptService.get(project.id));
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onSent });
   const ready = project.status === 'ASSIGNED' && !!project.studio && script.data?.status === 'FINAL';
 
   const send = async () => {

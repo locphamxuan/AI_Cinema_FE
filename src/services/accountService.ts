@@ -1,6 +1,6 @@
 /** The signed-in account's own profile: details, edits and password (PATCH /auth/me, POST /auth/me/password). */
 import { API_ROUTES } from '@/constants/apiRoutes';
-import { storage, STORAGE_KEYS } from '@/lib/storage';
+import { authSession } from '@/lib/authSession';
 import type { AuthRole } from '@/types/auth';
 import { apiClient, type ApiResponse } from './apiClient';
 import { toUserProfile } from './authService';
@@ -26,7 +26,7 @@ export interface AccountUpdate {
 export const PHONE_PATTERN = /^\+?[0-9][0-9 .]{6,18}[0-9]$/;
 
 function remember(account: AccountDetails): void {
-  storage.set(STORAGE_KEYS.USER_DATA, toUserProfile(account));
+  authSession.update({ user: toUserProfile(account) });
 }
 
 export const accountService = {
@@ -45,9 +45,11 @@ export const accountService = {
       { currentPassword, newPassword },
     );
     if (res.success) {
-      storage.set(STORAGE_KEYS.AUTH_TOKEN, res.data.accessToken);
-      storage.set(STORAGE_KEYS.REFRESH_TOKEN, res.data.refreshToken);
-      remember(res.data.user);
+      authSession.update({
+        accessToken: res.data.accessToken,
+        refreshToken: res.data.refreshToken,
+        user: toUserProfile(res.data.user),
+      });
     }
     return res;
   },

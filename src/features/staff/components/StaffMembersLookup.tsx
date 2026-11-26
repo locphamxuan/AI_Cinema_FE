@@ -1,35 +1,29 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { adminService, type AccountRow } from '@/services/adminService';
-import { Panel, Empty, Loading } from '@/components/data/ui';
+import { useState } from 'react';
+import { useResource } from '@/hooks/useResource';
+import { adminService } from '@/services/adminService';
+import { Panel, Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { MetaPager } from '@/components/data/MetaPager';
 
 const PAGE_SIZE = 20;
 
 /** Read-only member lookup for Staff. ID and email are intentionally hidden (sensitive data). */
 export function StaffMembersLookup() {
-  const [members, setMembers] = useState<AccountRow[] | null>(null);
   const [page, setPage] = useState(1);
-  const [meta, setMeta] = useState({ totalItems: 0, currentPage: 1, totalPages: 1, itemsPerPage: PAGE_SIZE });
-
-  useEffect(() => {
-    void adminService.listAccounts({ role: 'MEMBER', page, limit: PAGE_SIZE }).then((res) => {
-      if (res.success) {
-        setMembers(res.data.data);
-        setMeta(res.data.meta);
-      }
-    });
-  }, [page]);
+  const list = useResource(`staff:members:${page}`, () => adminService.listAccounts({ role: 'MEMBER', page, limit: PAGE_SIZE }));
+  const members = list.data?.data ?? null;
+  const meta = list.data?.meta;
 
   return (
     <Panel
       title="Thành viên"
-      description={`Danh sách Member (${meta.totalItems}). ID và email của Member được ẩn với Staff (dữ liệu nhạy cảm).`}
+      description={`Danh sách Member${meta ? ` (${meta.totalItems})` : ''}. ID và email của Member được ẩn với Staff (dữ liệu nhạy cảm).`}
     >
-      {members === null && <Loading label="Đang tải danh sách thành viên…" />}
+      {list.error && <ErrorNote message={list.error} onRetry={list.reload} />}
+      {list.loading && !members && <Loading label="Đang tải danh sách thành viên…" />}
       {members?.length === 0 && <Empty>Chưa có Member nào.</Empty>}
-      {members && members.length > 0 && (
+      {members && meta && members.length > 0 && (
         <>
           <ul className="divide-y divide-border text-xs">
             {members.map((member) => (

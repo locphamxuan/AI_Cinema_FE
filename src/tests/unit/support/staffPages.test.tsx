@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { StaffPage } from '@/features/staff/components/StaffPage';
 import { StaffLookup } from '@/features/staff/components/StaffLookup';
-import { routeFetch } from '@/tests/support/routeFetch';
+import { failWith, routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 
 vi.mock('next/navigation', () => ({ useSearchParams: () => new URLSearchParams() }));
@@ -36,5 +36,15 @@ describe('Staff pages', () => {
     // Sensitive data hidden: member ID and email are not shown to Staff.
     expect(screen.queryByText('an@test.vn')).not.toBeInTheDocument();
     expect(screen.queryByText('u1')).not.toBeInTheDocument();
+  });
+
+  it('says a lookup failed and offers a retry instead of an empty list or an endless spinner', async () => {
+    signInAs('staff', ['member:ops.read']);
+    routeFetch({ '/movies': failWith(500, 'boom'), '/users': failWith(500, 'boom') });
+    render(<StaffLookup />);
+    expect(await screen.findByRole('button', { name: /Thử lại/ })).toBeInTheDocument();
+    expect(screen.queryByText('Chưa có phim nào phát hành.')).not.toBeInTheDocument();
+    await screen.findByRole('button', { name: /Member/ }).then((b) => b.click());
+    expect(await screen.findByRole('button', { name: /Thử lại/ })).toBeInTheDocument();
   });
 });

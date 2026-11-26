@@ -41,7 +41,7 @@ export function FinalFilmPanel({
 }) {
   const [sendingBack, setSendingBack] = useState(false);
   const [confirming, setConfirming] = useState(false);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onChanged });
   const checked = episode.status === 'COMPLIANCE_PASSED';
   const confirmable = canConfirm && checked && !episode.finalConfirmedAt;
   const returnable = canSendBack && checked && !!episode.finalConfirmedAt;

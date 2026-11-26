@@ -29,7 +29,7 @@ export function ChangeRequestCard({
 }) {
   const [rejecting, setRejecting] = useState(false);
   const [approving, setApproving] = useState(false);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: onDecided });
 
   const approve = async () => {
     if (await run(() => changeRequestService.approve(cr.id), 'Đã duyệt đề xuất')) {

@@ -3,17 +3,12 @@
  * src/modules/playback one-to-one; field names are the BE ones.
  */
 
-export interface AdCreative {
+/** GET /admin/ads */
+export interface AdminAd {
   id: string;
   title: string;
   mediaUrl: string;
-  clickUrl: string | null;
   durationSeconds: number;
-}
-
-/** GET /admin/ads */
-export interface AdminAd extends AdCreative {
-  weight: number;
   status: 'ACTIVE' | 'PAUSED';
 }
 
@@ -21,8 +16,6 @@ export interface AdminAd extends AdCreative {
 export interface AdInput {
   title: string;
   mediaUrl: string;
-  clickUrl?: string | null;
-  weight?: number;
   status?: 'ACTIVE' | 'PAUSED';
 }
 
@@ -37,6 +30,6 @@ export interface EpisodeAdSlots {
 
 export interface EpisodeAdSlotInput {
   positionSeconds: number;
-  /** Empty = weighted draw among the valid ads. */
+  /** Empty = random draw among the active ads. */
   adId?: string | null;
 }

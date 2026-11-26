@@ -1,42 +1,42 @@
 import type { Tone } from '@/features/production/lib/labels';
-import type { AiResolution, KnowledgeArticleStatus, KnowledgeIndexStatus, KnowledgeSource, SupportAudience } from '@/types/support';
+import type { AiResolution, KnowledgeArticle } from '@/types/support';
 
 type Label = { label: string; tone: Tone };
 
-export const ARTICLE_STATUS: Record<KnowledgeArticleStatus, Label> = {
-  DRAFT: { label: 'Nháp', tone: 'neutral' },
-  PUBLISHED: { label: 'Đang dùng', tone: 'emerald' },
-  ARCHIVED: { label: 'Lưu trữ', tone: 'amber' },
+/** What an Admin needs to know about an article, in one word: the article state and the AI reading state together. */
+export type ArticleState = 'IN_USE' | 'UPDATING' | 'NOT_READ' | 'DRAFT' | 'HIDDEN';
+
+export const ARTICLE_STATE: Record<ArticleState, Label> = {
+  IN_USE: { label: 'Đang dùng', tone: 'emerald' },
+  UPDATING: { label: 'AI đang đọc bài', tone: 'blue' },
+  NOT_READ: { label: 'AI chưa đọc được', tone: 'rose' },
+  DRAFT: { label: 'Bản nháp', tone: 'neutral' },
+  HIDDEN: { label: 'Tạm ẩn', tone: 'amber' },
 };
 
-export const INDEX_STATUS: Record<KnowledgeIndexStatus, Label> = {
-  PENDING: { label: 'Chờ cập nhật', tone: 'blue' },
-  INDEXING: { label: 'Đang cập nhật', tone: 'blue' },
-  INDEXED: { label: 'Đã cập nhật', tone: 'emerald' },
-  FAILED: { label: 'Lỗi cập nhật', tone: 'rose' },
-};
+export function articleState(a: Pick<KnowledgeArticle, 'status' | 'indexStatus'>): ArticleState {
+  if (a.status === 'DRAFT') return 'DRAFT';
+  if (a.status === 'ARCHIVED') return 'HIDDEN';
+  if (a.indexStatus === 'FAILED') return 'NOT_READ';
+  return a.indexStatus === 'INDEXED' ? 'IN_USE' : 'UPDATING';
+}
 
-export const AUDIENCE: Record<SupportAudience, string> = {
-  MEMBER: 'Member',
-  STAFF: 'Nhân viên',
-  ALL: 'Tất cả',
-};
-
-export const SOURCE: Record<KnowledgeSource, string> = {
-  MANUAL: 'Tự viết',
-  POLICY: 'Chính sách',
-  PLAN: 'Gói thành viên',
-  FAQ: 'Câu hỏi thường gặp',
-};
-
-/** Suggested categories; the backend takes any text up to 100 characters. */
-export const CATEGORY_SUGGESTIONS = ['Gói cước', 'Coin & Thanh toán', 'Kỹ thuật & Sự cố', 'Bản quyền', 'Tài khoản'];
+/** Topics of the seeded articles; an Admin may also type a new one. */
+export const TOPICS = [
+  'Gói Tháng',
+  'Coin',
+  'Nạp Coin',
+  'Mở khóa tập',
+  'Hoàn Coin và khiếu nại',
+  'Điểm danh và vòng quay',
+  'Tài khoản',
+  'Thiết bị',
+  'Xem phim',
+  'Phim và đề xuất',
+];
 
 /** The AI hands the case to Staff when it needs a person or is not sure. */
 export const handsOff = (r: AiResolution | null | undefined) => r === 'NEEDS_HUMAN' || r === 'UNCERTAIN';
-
-/** 0.82 → "82%" */
-export const percent = (value: number | null | undefined) => (value === null || value === undefined ? '—' : `${Math.round(value * 100)}%`);
 
 /** A slug the backend accepts: lowercase ASCII words joined by hyphens. */
 export function toSlug(text: string): string {

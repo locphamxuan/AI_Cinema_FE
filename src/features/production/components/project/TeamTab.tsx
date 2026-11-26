@@ -24,7 +24,7 @@ export function TeamTab() {
   const [delegating, setDelegating] = useState(false);
   const [removing, setRemoving] = useState<CreatorSeat | null>(null);
   const team = useResource(`team:${project.id}:${project.updatedAt}`, () => teamService.listCreators(project.id));
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const editable = isIn(project.status, TEAM_EDITABLE_PROJECT);
 
   const remove = async (seat: CreatorSeat) => {

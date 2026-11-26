@@ -4,7 +4,7 @@ import React from 'react';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { SubscriptionStatus } from '@/types/billing';
 import { useResource } from '@/hooks/useResource';
-import { Panel, Empty, Loading } from '@/components/data/ui';
+import { Panel, Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { formatDay, formatNumber } from '@/lib/format';
 import { MetaPager } from '@/components/data/MetaPager';
 
@@ -51,8 +51,9 @@ export function StaffSubscriptionsLookup() {
         </select>
       }
     >
-      {list.loading && <Loading label="Đang tải danh sách đăng ký…" />}
-      {rows.length === 0 && <Empty>Không có đăng ký nào.</Empty>}
+      {list.error && <ErrorNote message={list.error} onRetry={list.reload} />}
+      {list.loading && !list.data && <Loading label="Đang tải danh sách đăng ký…" />}
+      {list.data && rows.length === 0 && <Empty>Không có đăng ký nào.</Empty>}
       {rows.length > 0 && (
         <>
           <div className="overflow-x-auto">

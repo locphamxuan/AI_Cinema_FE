@@ -8,9 +8,7 @@ const ad: AdminAd = {
   id: 'a1',
   title: 'TestQC',
   mediaUrl: 'https://cdn.example/ad.mp4',
-  clickUrl: null,
   durationSeconds: 15,
-  weight: 1,
   status: 'ACTIVE',
 };
 

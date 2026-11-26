@@ -22,8 +22,8 @@ const bodyOf = (fetchMock: ReturnType<typeof mockApi>, method: string, path: str
   return call ? JSON.parse(String(call[1]?.body)) : undefined;
 };
 
-describe('RewardLadderPanel: "Thêm ngày" edge cases', () => {
-  it('suggests a code no older (switched-off) rung holds and posts it', async () => {
+describe('RewardLadderPanel: the 7-day check-in schedule', () => {
+  it('makes a code no older (switched-off) rung holds and posts the clicked day', async () => {
     signInAs('admin');
     const fetchMock = mockApi({
       'GET /admin/reward-rules': [rung('r1', 'day_1', 1, false)],
@@ -31,26 +31,34 @@ describe('RewardLadderPanel: "Thêm ngày" edge cases', () => {
     });
     render(<RewardLadderPanel />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /Thêm ngày/ }));
-    expect(screen.getByDisplayValue('day_1_2')).toBeInTheDocument();
-    await userEvent.type(screen.getByLabelText('Tên ngày điểm danh'), 'Ngày đầu');
+    await userEvent.click(await screen.findByRole('button', { name: 'Đặt thưởng ngày 1' }));
     await userEvent.type(screen.getByLabelText('Số Coin thưởng'), '5');
-    await userEvent.click(screen.getByRole('button', { name: 'Lưu cấu hình' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Lưu' }));
 
-    await waitFor(() => expect(bodyOf(fetchMock, 'POST', '/admin/reward-rules')).toMatchObject({ code: 'day_1_2', streakDay: 1, bonusCoins: 5 }));
+    await waitFor(() =>
+      expect(bodyOf(fetchMock, 'POST', '/admin/reward-rules')).toMatchObject({ code: 'day_1_2', name: 'Ngày 1', streakDay: 1, bonusCoins: 5 }),
+    );
   });
 
-  it('refuses a code already used, before the backend does', async () => {
+  it('shows each day with its Coins, the spin day and the week total', async () => {
     signInAs('admin');
-    mockApi({ 'GET /admin/reward-rules': [rung('r1', 'day_1', 1)] });
+    mockApi({ 'GET /admin/reward-rules': [rung('r1', 'day_1', 1), rung('r7', 'day_7', 7)] });
     render(<RewardLadderPanel />);
 
-    await userEvent.click(await screen.findByRole('button', { name: /Thêm ngày/ }));
-    const code = screen.getByLabelText(/Mã \(không trùng/);
-    await userEvent.clear(code);
-    await userEvent.type(code, 'DAY_1');
-    expect(screen.getByText('Mã này đã được dùng cho một ngày khác.')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Lưu cấu hình' })).toBeDisabled();
+    expect(await screen.findByText('+1 lượt quay')).toBeInTheDocument();
+    expect(screen.getByText('10 Coin thưởng')).toBeInTheDocument();
+    expect(screen.getAllByText('Chưa có thưởng')).toHaveLength(5);
+  });
+
+  it('refuses more bonus Coins than the API takes for one day', async () => {
+    signInAs('admin');
+    mockApi({ 'GET /admin/reward-rules': [] });
+    render(<RewardLadderPanel />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Đặt thưởng ngày 1' }));
+    await userEvent.type(screen.getByLabelText('Số Coin thưởng'), '100001');
+    expect(screen.getByRole('alert')).toHaveTextContent('từ 1 đến 100.000');
+    expect(screen.getByRole('button', { name: 'Lưu' })).toBeDisabled();
   });
 
   it('will not reactivate a switched-off rung on a day another rung now holds', async () => {
@@ -60,9 +68,9 @@ describe('RewardLadderPanel: "Thêm ngày" edge cases', () => {
 
     const edits = await screen.findAllByRole('button', { name: 'Sửa ngày 1' });
     await userEvent.click(edits[1]);
-    await userEvent.click(screen.getByLabelText('Bật lại ngày này'));
-    expect(screen.getByText(/Ngày 1 đã có cấu hình đang dùng/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Lưu cấu hình' })).toBeDisabled();
+    await userEvent.click(screen.getByRole('switch', { name: /Dùng thưởng này/ }));
+    expect(screen.getByText(/Ngày 1 đã có thưởng đang dùng/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Lưu' })).toBeDisabled();
   });
 
   it('lets the Admin switch off an active rung', async () => {
@@ -74,8 +82,8 @@ describe('RewardLadderPanel: "Thêm ngày" edge cases', () => {
     render(<RewardLadderPanel />);
 
     await userEvent.click(await screen.findByRole('button', { name: 'Sửa ngày 1' }));
-    await userEvent.click(screen.getByLabelText(/Đang dùng/));
-    await userEvent.click(screen.getByRole('button', { name: 'Lưu cấu hình' }));
+    await userEvent.click(screen.getByRole('switch', { name: /Dùng thưởng này/ }));
+    await userEvent.click(screen.getByRole('button', { name: 'Lưu' }));
     await waitFor(() => expect(bodyOf(fetchMock, 'PATCH', '/admin/reward-rules/r1')).toMatchObject({ isActive: false }));
   });
 });

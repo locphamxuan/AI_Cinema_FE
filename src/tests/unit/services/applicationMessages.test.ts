@@ -83,10 +83,60 @@ describe('API messages in Vietnamese', () => {
     );
   });
 
+  it('names a missing policy by its Vietnamese type', () => {
+    expect(
+      localizeApiError('No AI_LABELING policy is in force; ask an Admin to activate one', 409, undefined, '/media-assets'),
+    ).toBe('Chưa có chính sách "Gắn nhãn AI" nào đang áp dụng; hãy nhờ Admin bật.');
+  });
+
   it('never shows English it cannot word, and keeps Vietnamese as is', () => {
     expect(localizeApiError('Some new English refusal', 409, undefined, '/x')).toMatch(/tải lại/);
     expect(localizeApiError('Some new English refusal', 418, undefined, '/x')).toBe('Không thực hiện được thao tác này. Vui lòng thử lại.');
     expect(localizeApiError('Tập đã có giá.', 409, undefined, '/x')).toBe('Tập đã có giá.');
     expect(localizeApiError('', 404, undefined, '/x')).toBe(APPLICATION_MESSAGES.MSG10.message);
+  });
+
+  it('words the signature image and legal profile refusals of a contract', () => {
+    expect(localizeApiError('The signature image is 100x20 px; it must be at least 150x50 px', 400, undefined, '/x')).toBe(
+      'Ảnh chữ ký 100x20 px quá nhỏ: cần ít nhất 150x50 px.',
+    );
+    expect(
+      localizeApiError(
+        'The studio legal profile is incomplete (taxCode, bankAccount); complete it before signing the contract',
+        409,
+        undefined,
+        '/x',
+      ),
+    ).toBe('Hồ sơ pháp lý của Studio còn thiếu (mã số thuế, số tài khoản). Studio cần điền đủ trên Studio Web trước khi ký hợp đồng.');
+  });
+
+  it('words the newer refusals of the structure, filters, pricing, accounts and refunds', () => {
+    expect(localizeApiError('A movie has at most 20 seasons', 409, { reason: 'SEASON_LIMIT_REACHED' }, '/x')).toBe('Một phim có tối đa 20 mùa.');
+    expect(localizeApiError('A season has at most 100 episodes', 409, undefined, '/x')).toBe('Một mùa có tối đa 100 tập.');
+    expect(localizeApiError('filter.status has an invalid value: OOPS', 400, undefined, '/x')).toBe('Bộ lọc có giá trị không hợp lệ: OOPS.');
+    expect(localizeApiError('dueDate must be a calendar day (YYYY-MM-DD), without a time', 400, undefined, '/x')).toBe(
+      'Ngày phải là một ngày trên lịch, không kèm giờ.',
+    );
+    expect(localizeApiError('The studio of this project changed meanwhile; reload it', 409, undefined, '/x')).toBe(
+      'Studio của dự án vừa thay đổi; hãy tải lại.',
+    );
+    expect(localizeApiError('A Studio login keeps its role; lock it instead', 409, undefined, '/users/u1')).toMatch(/khoá tài khoản/);
+    expect(localizeApiError('The prizes switched on would add up to 112.5%, not 100%', 409, undefined, '/admin/reward-prizes')).toMatch(
+      /sẽ là 112.5%, phải đúng 100%/,
+    );
+    expect(localizeApiError('The flag is already ACCOUNT_LOCKED', 409, undefined, '/x')).toMatch(/Đã khoá tài khoản/);
+    expect(
+      localizeApiError('This bonus row could not be linked to its payment; refund the payment from its first row', 409, undefined, '/x'),
+    ).toMatch(/dòng đầu tiên/);
+  });
+
+  it('tells a member the wallet is short and the episode cannot be bought', () => {
+    const details = { reason: 'INSUFFICIENT_COINS' };
+    expect(localizeApiError('The wallet does not hold enough Coins', 422, details, '/episodes/e1/purchase')).toBe(
+      APPLICATION_MESSAGES.MSG12.message,
+    );
+    expect(localizeApiError('The episode has no Coin price', 409, undefined, '/episodes/e1/purchase')).toBe(
+      APPLICATION_MESSAGES.MSG13.message,
+    );
   });
 });

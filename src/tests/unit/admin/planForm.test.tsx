@@ -26,7 +26,7 @@ const free: AdminPlan = {
   isActive: true,
   sortOrder: 0,
   isFeatured: false,
-  features: { maxRegisteredDevices: 2, maxConcurrentStreams: 1, adFree: false, maxQuality: '720p' },
+  features: { maxRegisteredDevices: 2, maxConcurrentStreams: 1, maxQuality: '720p' },
   priceCoins: null,
 };
 
@@ -49,7 +49,7 @@ describe('plan form rules', () => {
       durationDays: 30,
       sortOrder: 0,
       isFeatured: false,
-      features: { maxRegisteredDevices: 2, maxConcurrentStreams: 1, adFree: false, maxQuality: '720p' },
+      features: { maxRegisteredDevices: 2, maxConcurrentStreams: 1, maxQuality: '720p' },
     });
   });
 
@@ -72,7 +72,7 @@ describe('plan form rules', () => {
   });
 
   it('sums up what a plan allows', () => {
-    expect(featuresSummary(free.features)).toBe('2 thiết bị · xem cùng lúc 1 · có quảng cáo · tối đa 720p');
+    expect(featuresSummary(free.features)).toBe('2 thiết bị · xem cùng lúc 1 · tối đa 720p');
     expect(featuresSummary(null)).toBe('');
   });
 
@@ -92,7 +92,7 @@ describe('PlansPanel create', () => {
     const fetchMock = mockApi({ 'GET /admin/membership-plans': [free], 'POST /admin/membership-plans': { id: 'p2' } });
     render(<PlansPanel />);
 
-    expect(await screen.findByText('2 thiết bị · xem cùng lúc 1 · có quảng cáo · tối đa 720p')).toBeInTheDocument();
+    expect(await screen.findByText('2 thiết bị · xem cùng lúc 1 · tối đa 720p')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: /Thêm gói Tháng/ }));
     await userEvent.type(screen.getByLabelText('Mã gói'), 'gói vip');
     await userEvent.click(screen.getByRole('button', { name: 'Tạo gói' }));
@@ -104,7 +104,6 @@ describe('PlansPanel create', () => {
     await userEvent.type(screen.getByLabelText('Tên gói'), 'Premium Tháng');
     await userEvent.clear(screen.getByLabelText('Số thiết bị được đăng ký'));
     await userEvent.type(screen.getByLabelText('Số thiết bị được đăng ký'), '4');
-    await userEvent.click(screen.getByLabelText('Xem không có quảng cáo giữa tập'));
     await userEvent.click(screen.getByRole('button', { name: 'Tạo gói' }));
 
     await waitFor(() => {
@@ -112,7 +111,7 @@ describe('PlansPanel create', () => {
       expect(JSON.parse(String(call?.[1]?.body))).toMatchObject({
         code: 'premium_thang',
         name: 'Premium Tháng',
-        features: { maxRegisteredDevices: 4, maxConcurrentStreams: 1, adFree: true },
+        features: { maxRegisteredDevices: 4, maxConcurrentStreams: 1 },
       });
     });
   });

@@ -3,60 +3,41 @@
 import { ErrorNote } from '@/components/data/ui';
 import { Badge } from '@/components/ui/Badge';
 import { useResource } from '@/hooks/useResource';
-import { formatDateTime, formatNumber } from '@/lib/format';
+import { formatNumber } from '@/lib/format';
 import { aiConsoleService } from '@/services/aiConsoleService';
 import type { SupportAiHealth } from '@/types/support';
 
 const MODE: Record<SupportAiHealth['mode'], { label: string; tone: 'emerald' | 'amber' | 'rose' }> = {
-  live: { label: 'Đang chạy', tone: 'emerald' },
-  mock: { label: 'Chế độ thử (chưa dùng AI thật)', tone: 'amber' },
+  live: { label: 'Đang trả lời Member', tone: 'emerald' },
+  mock: { label: 'Đang chạy thử, chưa dùng AI thật', tone: 'amber' },
   disabled: { label: 'Đang tắt', tone: 'rose' },
 };
 
-/** Whether the AI can answer right now, and how much of the knowledge base it can read. */
+/** Whether the AI answers members right now, and whether some articles still wait or failed to be read. */
 export function AiHealthCard() {
   const health = useResource('support:ai:health', aiConsoleService.health);
   const h = health.data;
   if (health.error) return <ErrorNote message={health.error} onRetry={health.reload} />;
-  if (!h) return <div className="h-[76px] animate-pulse rounded-xl bg-muted" aria-hidden="true" />;
+  if (!h) return <div className="h-12 animate-pulse rounded-xl bg-muted" aria-hidden="true" />;
 
   const warning =
     h.mode === 'disabled'
-      ? 'AI đang tắt: Member được chuyển thẳng cho nhân viên.'
+      ? 'Trợ lý AI đang tắt: Member được chuyển thẳng cho nhân viên.'
       : h.failedArticles > 0
-        ? `${h.failedArticles} bài đã xuất bản bị lỗi cập nhật cho AI nên AI chưa đọc được. Lọc "Lỗi cập nhật" ở Kho tri thức để xử lý.`
+        ? `${formatNumber(h.failedArticles)} bài AI chưa đọc được. Chọn tình trạng "AI chưa đọc được" ở danh sách bài rồi bấm Thử lại.`
         : null;
 
-  const facts: [string, string][] = [
-    ['Mô hình trả lời', h.chatConfigured ? (h.chatModel ?? '—') : 'Chưa cấu hình'],
-    ['Mô hình tìm bài', h.embeddingConfigured ? (h.embeddingModel ?? '—') : 'Chưa cấu hình'],
-    ['Đoạn AI đang dùng', formatNumber(h.indexedChunks)],
-    ['Bài chờ cập nhật cho AI', formatNumber(h.pendingArticles)],
-    ['Cập nhật cho AI gần nhất', formatDateTime(h.lastIndexedAt)],
-  ];
-
   return (
-    <section aria-label="Tình trạng AI" className="rounded-xl bg-card px-5 py-4 ring-1 ring-foreground/10">
-      <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Tình trạng AI</span>
-          <Badge tone={MODE[h.mode].tone} dot>
-            {MODE[h.mode].label}
-          </Badge>
-        </div>
-        <dl className="grid flex-1 grid-cols-2 gap-x-6 gap-y-2 text-xs sm:grid-cols-5">
-          {facts.map(([label, value]) => (
-            <div key={label} className="min-w-0">
-              <dt className="text-muted-foreground">{label}</dt>
-              <dd className="truncate font-medium tabular-nums" title={value}>
-                {value}
-              </dd>
-            </div>
-          ))}
-        </dl>
+    <section aria-label="Tình trạng Trợ lý AI" className="rounded-xl bg-card px-5 py-3 ring-1 ring-foreground/10">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+        <span className="font-medium">Trợ lý AI</span>
+        <Badge tone={MODE[h.mode].tone} dot>
+          {MODE[h.mode].label}
+        </Badge>
+        {h.pendingArticles > 0 && <span className="text-muted-foreground">{formatNumber(h.pendingArticles)} bài đang chờ AI đọc</span>}
       </div>
       {warning && (
-        <p role="alert" className="mt-3 flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-xs text-warning">
+        <p role="alert" className="mt-2 rounded-lg bg-warning/10 px-3 py-2 text-xs text-warning">
           {warning}
         </p>
       )}

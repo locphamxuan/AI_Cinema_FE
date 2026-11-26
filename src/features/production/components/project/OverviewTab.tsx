@@ -18,7 +18,7 @@ export function OverviewTab() {
   const [editing, setEditing] = useState(false);
   const [assigning, setAssigning] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const canEdit = caps.manage && isIn(project.status, EDITABLE_PROJECT);
   const open = isIn(project.status, OPEN_PROJECT);
   const hasPublished = project.seasons.some((s) => s.episodes.some((e) => e.status === 'PUBLISHED'));
@@ -59,10 +59,6 @@ export function OverviewTab() {
     {
       label: 'Năm phát hành',
       value: project.releaseYear ?? <span className="text-muted-foreground">—</span>,
-    },
-    {
-      label: 'Tập xem miễn phí',
-      value: project.freeEpisodeCount ?? <span className="text-muted-foreground">Mặc định nền tảng</span>,
     },
     {
       label: 'Studio',

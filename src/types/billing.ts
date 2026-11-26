@@ -33,6 +33,22 @@ export interface StatementLine {
 export interface LedgerLine extends StatementLine {
   walletId: string;
   userId: string;
+  /** The member account the row belongs to. */
+  account: { id: string; fullName: string; email: string };
+  /** The first row of the payment this row belongs to; rows sharing it are one payment, refunded together. */
+  paymentId: string | null;
+}
+
+/** POST /admin/coin-transactions/:id/refund - the whole payment paid back and what it bought taken back. */
+export interface PaymentRefund {
+  paymentId: string;
+  mainCoins: number;
+  bonusCoins: number;
+  /** The episode unlock the refund revoked, if the payment bought one. */
+  episodeAccessId: string | null;
+  /** The plan cycle marked REFUNDED, and whether its running plan ended. */
+  subscriptionCycleId: string | null;
+  subscriptionEnded: boolean;
 }
 
 export interface StatementQuery {
@@ -40,6 +56,8 @@ export interface StatementQuery {
   kind?: StatementKind;
   entryType?: CoinEntryType;
   walletId?: string;
+  /** Admin ledger: part of the member name or email. */
+  account?: string;
   from?: string;
   to?: string;
 }
@@ -61,20 +79,6 @@ export interface AdminWallet {
   bonusBalance: number;
   updatedAt: string;
   lots: CoinLot[];
-}
-
-/** POST /admin/wallet-adjustments */
-export interface WalletAdjustment {
-  userId: string;
-  mainAmount?: number;
-  bonusAmount?: number;
-  reason: string;
-}
-
-export interface WalletAdjustmentResult extends Required<WalletAdjustment> {
-  transactionId: string;
-  mainBalance: number;
-  bonusBalance: number;
 }
 
 export type PlanPeriod = 'WEEKLY' | 'MONTHLY' | 'YEARLY';
@@ -112,7 +116,6 @@ export interface PlanInput {
 export interface PlanFeatures {
   maxRegisteredDevices?: number;
   maxConcurrentStreams?: number;
-  adFree?: boolean;
   maxQuality?: string;
 }
 
@@ -143,7 +146,7 @@ export interface SubscriptionCycle {
   periodStart: string;
   periodEnd: string;
   priceCoins: number;
-  status: 'PAID' | 'FAILED' | 'SKIPPED';
+  status: 'PAID' | 'FAILED' | 'SKIPPED' | 'REFUNDED';
   mainCoinsCharged: number;
   bonusCoinsCharged: number;
   failureReason: string | null;
@@ -220,6 +223,7 @@ export interface RewardPrize {
   type: RewardPrizeType;
   bonusCoins: number | null;
   planDays: number | null;
+  /** Admin only: chance in basis points (1 = 0,01 %, 10 000 = 100 %). */
   weight?: number;
   chancePercent?: number;
   isActive?: boolean;

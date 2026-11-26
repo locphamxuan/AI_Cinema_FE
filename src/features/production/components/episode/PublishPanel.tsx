@@ -12,11 +12,15 @@ import { EDITABLE_PROJECT, RELEASABLE_EPISODE, RELEASING_PROJECT, isIn } from '.
 import { UNPUBLISH_MODE, UNPUBLISH_REASON } from '../../lib/labels';
 import { formatDateTime, formatNumber, localDateTimeToIso } from '@/lib/format';
 import { Empty, Panel } from '@/components/data/ui';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { UnpublishModal } from './UnpublishModal';
 
+/** The highest Coin price the API accepts for one episode (SetCoinPriceRequestDto). */
+const MAX_COIN_PRICE = 1_000_000;
+
 /**
- * Steps 12–16: the Reviewer in charge sets the Coin price (BR-29, BR-47); the Admin alone releases the Final Film
- * now or on a schedule, once the Reviewer confirmed it, and takes an episode down (BR-52, BR-56).
+ * Steps 12–16: the Admin sets the Coin price (BR-29, BR-47) and the free flags (BR-03/19), releases the Final Film
+ * now or on a schedule once the Reviewer confirmed it, and takes an episode down (BR-52, BR-56).
  */
 export function PublishPanel({
   episode,
@@ -27,7 +31,7 @@ export function PublishPanel({
 }: {
   episode: Episode;
   projectStatus: MovieStatus;
-  /** The Reviewer in charge (episode:price). */
+  /** The Admin (episode:price). */
   canPrice: boolean;
   /** The Admin (episode:publish). */
   canPublish: boolean;
@@ -40,12 +44,16 @@ export function PublishPanel({
   const [isFreeForMember, setIsFreeForMember] = useState(!!episode.isFreeForMember);
   const [scheduleAt, setScheduleAt] = useState('');
   const [takingDown, setTakingDown] = useState<Publication | null>(null);
-  const { busy, run } = useAction();
+  const [confirming, setConfirming] = useState<'now' | 'schedule' | null>(null);
+  const refresh = () => Promise.all([publications.reload(), onChanged()]).then(() => undefined);
+  const { busy, run } = useAction({ onStale: refresh });
 
   const min = settings.data?.episodeCoinPriceMin;
   const max = settings.data?.episodeCoinPriceMax;
   const priceValue = Number(price);
-  const priceValid = price !== '' && Number.isInteger(priceValue) && priceValue >= 0;
+  const priceValid = price !== '' && Number.isInteger(priceValue) && priceValue >= 0 && priceValue <= MAX_COIN_PRICE;
+  const priceProblem =
+    price === '' || priceValid ? null : `Giá Coin phải là số nguyên từ 0 đến ${formatNumber(MAX_COIN_PRICE)}.`;
   const outOfRange = priceValid && min !== undefined && max !== undefined && (priceValue < min || priceValue > max);
   const canPrice = mayPrice && isIn(projectStatus, EDITABLE_PROJECT);
   const canRelease = canPublish && isIn(projectStatus, RELEASING_PROJECT) && isIn(episode.status, RELEASABLE_EPISODE);
@@ -54,16 +62,18 @@ export function PublishPanel({
   const releaseBlocked = episode.coinPrice === null || awaitingFinal;
   const active = publications.data?.find((p) => !p.unpublishedAt);
 
-  const refresh = () => Promise.all([publications.reload(), onChanged()]).then(() => undefined);
-
+  // BR-03/19: an episode free for Guests is free for Members too, as the API stores it.
   const saveFlags = async (guest: boolean, member: boolean) => {
+    const before = { guest: isFreeForGuest, member: isFreeForMember };
     setIsFreeForGuest(guest);
-    setIsFreeForMember(member);
+    setIsFreeForMember(guest || member);
     const done = await run(
-      () => productionService.setAccessFlags(episode.id, { isFreeForGuest: guest, isFreeForMember: member }),
-      'Đã cập nhật quyền truy cập tập',
+      () => productionService.setAccessFlags(episode.id, { isFreeForGuest: guest, isFreeForMember: guest || member }),
+      'Đã cập nhật quyền xem miễn phí của tập',
     );
-    if (done) await onChanged();
+    if (done) return onChanged();
+    setIsFreeForGuest(before.guest);
+    setIsFreeForMember(before.member);
   };
 
   const savePrice = async (e: React.FormEvent) => {
@@ -76,6 +86,7 @@ export function PublishPanel({
   };
 
   const publish = async (scheduled: boolean) => {
+    setConfirming(null);
     const done = await run(
       () => productionService.publish(episode.id, scheduled ? localDateTimeToIso(scheduleAt) : undefined),
       scheduled ? 'Đã lên lịch phát hành' : 'Tập đã phát hành',
@@ -95,8 +106,8 @@ export function PublishPanel({
         {canPrice ? (
           <div className="space-y-3">
             <form onSubmit={savePrice} className="flex flex-wrap items-end gap-2">
-              <FormField label={`Giá Coin${min !== undefined ? ` (khoảng hợp lệ ${min}–${max})` : ''}`} className="w-48">
-                <input type="number" min={0} step={1} value={price} onChange={(e) => setPrice(e.target.value)} className={fieldInputClass} />
+              <FormField label={`Giá Coin${min !== undefined ? ` (khoảng hợp lệ ${min}–${max})` : ''}`} className="w-48" error={priceProblem}>
+                <input type="number" min={0} max={MAX_COIN_PRICE} step={1} aria-invalid={!!priceProblem} value={price} onChange={(e) => setPrice(e.target.value)} className={fieldInputClass} />
               </FormField>
               <Button type="submit" variant="secondary" disabled={busy || !priceValid || priceValue === episode.coinPrice}>
                 Lưu giá
@@ -117,8 +128,9 @@ export function PublishPanel({
               <label className="flex items-center gap-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
-                  checked={isFreeForMember}
-                  disabled={busy}
+                  checked={isFreeForGuest || isFreeForMember}
+                  disabled={busy || isFreeForGuest}
+                  title={isFreeForGuest ? 'Tập miễn phí cho khách thì cũng miễn phí cho thành viên' : undefined}
                   onChange={(e) => saveFlags(isFreeForGuest, e.target.checked)}
                   className="rounded border-input text-sky-600 focus:ring-sky-500"
                 />
@@ -142,7 +154,7 @@ export function PublishPanel({
             {episode.coinPrice === null && <p className="text-amber-600">Admin cần đặt giá Coin trước khi phát hành.</p>}
             {awaitingFinal && <p className="text-amber-600">Chờ Reviewer xác nhận Phim bản cuối trước khi phát hành.</p>}
             <div className="flex flex-wrap items-end gap-2">
-              <Button disabled={busy || releaseBlocked} onClick={() => publish(false)}>
+              <Button disabled={busy || releaseBlocked} onClick={() => setConfirming('now')}>
                 Phát hành ngay
               </Button>
               <span className="text-muted-foreground px-1">hoặc</span>
@@ -152,7 +164,7 @@ export function PublishPanel({
               <Button
                 variant="secondary"
                 disabled={busy || releaseBlocked || !scheduleAt || new Date(scheduleAt) <= new Date()}
-                onClick={() => publish(true)}
+                onClick={() => setConfirming('schedule')}
               >
                 {episode.status === 'SCHEDULED' ? 'Đổi lịch' : 'Lên lịch'}
               </Button>
@@ -191,6 +203,22 @@ export function PublishPanel({
           </ul>
         </div>
       </div>
+
+      <ConfirmModal
+        open={confirming !== null}
+        title={confirming === 'schedule' ? 'Lên lịch phát hành tập' : 'Phát hành tập ngay'}
+        description={`Tập ${episode.episodeNumber}${episode.title ? ` - ${episode.title}` : ''} sẽ hiện với khán giả trên ứng dụng.`}
+        details={[
+          ['Giá Coin', formatNumber(episode.coinPrice)],
+          ['Miễn phí', episode.isFreeForGuest ? 'Khách và thành viên' : episode.isFreeForMember ? 'Thành viên' : 'Không'],
+          ...(confirming === 'schedule' && scheduleAt ? [['Thời điểm', formatDateTime(localDateTimeToIso(scheduleAt))] as [string, string]] : []),
+        ]}
+        consequence="Khán giả mua hoặc xem tập theo giá trên. Muốn dừng phải gỡ tập (người đã mua được hoàn Coin nếu gỡ hẳn)."
+        confirmLabel={confirming === 'schedule' ? 'Lên lịch' : 'Phát hành'}
+        busy={busy}
+        onClose={() => setConfirming(null)}
+        onConfirm={() => void publish(confirming === 'schedule')}
+      />
 
       {takingDown && (
         <UnpublishModal

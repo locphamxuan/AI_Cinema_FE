@@ -9,7 +9,6 @@ import { fakeResponse } from '@/tests/support/fakeResponse';
 const input = (patch: Partial<AdInput> = {}): AdInput => ({
   title: 'Trà sữa',
   mediaUrl: 'https://cdn.example/ad.mp4',
-  weight: 1,
   ...patch,
 });
 
@@ -17,9 +16,7 @@ const ad = (patch: Partial<AdminAd> = {}): AdminAd => ({
   id: 'a1',
   title: 'Trà sữa',
   mediaUrl: 'https://cdn.example/ad.mp4',
-  clickUrl: null,
   durationSeconds: 15,
-  weight: 1,
   status: 'ACTIVE',
   ...patch,
 });
@@ -31,8 +28,21 @@ describe('Admin ads (MF-3)', () => {
     expect(adInputProblem(input())).toBeNull();
     expect(adInputProblem(input({ title: '  ' }))).toMatch(/tên/);
     expect(adInputProblem(input({ mediaUrl: 'ad.mp4' }))).toMatch(/Link video/);
-    expect(adInputProblem(input({ clickUrl: 'shop' }))).toMatch(/Link khi bấm/);
-    expect(adInputProblem(input({ weight: 0 }))).toMatch(/Mức ưu tiên/);
+  });
+
+  it('asks only for a name and a video: no click-through link, no priority', () => {
+    render(<AdFormModal ad={null} busy={false} onClose={vi.fn()} onSubmit={vi.fn()} />);
+    expect(screen.queryByText(/Link khi người xem bấm/)).toBeNull();
+    expect(screen.queryByText(/Mức ưu tiên/)).toBeNull();
+    expect(screen.queryByRole('spinbutton')).toBeNull();
+  });
+
+  it('sends only the name and the video of an edited ad', () => {
+    const onSubmit = vi.fn();
+    render(<AdFormModal ad={ad()} busy={false} onClose={vi.fn()} onSubmit={onSubmit} />);
+    fireEvent.change(screen.getByDisplayValue('Trà sữa'), { target: { value: 'Trà sữa mới' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
+    expect(onSubmit).toHaveBeenCalledWith({ title: 'Trà sữa mới', mediaUrl: 'https://cdn.example/ad.mp4' });
   });
 
   it('tells whether the draw can pick an ad: active until the Admin pauses it', () => {

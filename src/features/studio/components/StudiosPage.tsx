@@ -17,6 +17,7 @@ import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { Pager, pageOf } from '@/components/data/Pager';
 import { CARD, Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { StudioAccountsModal } from './StudioAccountsModal';
+import { missingLegalFields, StudioLegalProfileModal } from './StudioLegalProfileModal';
 import { StudioModal } from './StudioModal';
 
 const PAGE_SIZE = 15;
@@ -32,12 +33,13 @@ export function StudiosPage() {
   const manage = !isReviewer && can(PERMISSION.STUDIO_MANAGE);
   const manageAccounts = !isReviewer && can(PERMISSION.USER_MANAGE);
   const [accountsOf, setAccountsOf] = useState<Studio | null>(null);
+  const [profileOf, setProfileOf] = useState<Studio | null>(null);
   const studios = useResource('studios:all', () => studioService.list());
   const [editing, setEditing] = useState<Studio | 'new' | null>(null);
   const [busyProjects, setBusyProjects] = useState<{ studioName: string; projects: { id: string; title: string }[] } | null>(null);
   const [asking, setAsking] = useState<{ studio: Studio; action: 'deactivate' | 'remove' } | null>(null);
   const [page, setPage] = useState(1);
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: studios.reload });
   const { rows, totalPages } = pageOf(studios.data ?? [], page, PAGE_SIZE);
   // After the last studio of the last page goes, step back to the page that still exists.
   if (studios.data && page > totalPages) setPage(totalPages);
@@ -97,7 +99,7 @@ export function StudiosPage() {
                   <th className="px-4 py-2.5 font-medium hidden md:table-cell">Liên hệ</th>
                   <th className="px-4 py-2.5 font-medium hidden sm:table-cell text-right">Dự án</th>
                   <th className="px-4 py-2.5 font-medium">Trạng thái</th>
-                  <th className="px-4 py-2.5 w-40" />
+                  <th className="px-4 py-2.5 w-52" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
@@ -111,6 +113,9 @@ export function StudiosPage() {
                         </p>
                         <p className="text-muted-foreground">{studio.email}</p>
                         {studio.note && <p className="text-muted-foreground">{studio.note}</p>}
+                        {missingLegalFields(studio).length > 0 && (
+                          <p className="text-amber-700 dark:text-amber-300">Hồ sơ pháp lý chưa đủ, Studio chưa ký được hợp đồng</p>
+                        )}
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell text-muted-foreground">
                         {studio.contactName ?? '-'}
@@ -121,6 +126,9 @@ export function StudiosPage() {
                         <Badge tone={studio.isActive ? 'emerald' : 'neutral'}>{studio.isActive ? 'Đang hoạt động' : 'Ngừng dùng'}</Badge>
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
+                        <Button size="sm" variant="ghost" onClick={() => setProfileOf(studio)} aria-label={`Hồ sơ pháp lý của ${studio.name}`}>
+                          Hồ sơ
+                        </Button>
                         {manageAccounts && (
                           <Button size="sm" variant="ghost" onClick={() => setAccountsOf(studio)} aria-label={`Tài khoản của ${studio.name}`}>
                             Tài khoản
@@ -167,6 +175,7 @@ export function StudiosPage() {
         onConfirm={() => asking && void (asking.action === 'remove' ? remove(asking.studio) : toggle(asking.studio))}
       />
 
+      {profileOf && <StudioLegalProfileModal studio={profileOf} onClose={() => setProfileOf(null)} />}
       {accountsOf && <StudioAccountsModal studio={accountsOf} onClose={() => setAccountsOf(null)} />}
       {editing && <StudioModal studio={editing === 'new' ? null : editing} onClose={() => setEditing(null)} onSaved={studios.reload} />}
       {busyProjects && (

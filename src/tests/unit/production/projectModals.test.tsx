@@ -24,7 +24,6 @@ const film = (overrides: Partial<ProjectDetail> = {}) =>
     genres: [{ id: 'g1', name: 'Kinh dị' }],
     ageRating: null,
     releaseYear: null,
-    freeEpisodeCount: null,
     ...overrides,
   });
 
@@ -54,7 +53,6 @@ describe('EditProjectModal', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Tâm lý' }));
     await userEvent.selectOptions(screen.getByLabelText('Độ tuổi'), 'T16');
     await userEvent.type(screen.getByLabelText('Năm phát hành'), '2027');
-    await userEvent.type(screen.getByLabelText('Số tập xem miễn phí'), '2');
     await userEvent.click(save());
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
@@ -64,21 +62,8 @@ describe('EditProjectModal', () => {
       genreIds: ['g1', 'g2'],
       ageRating: 'T16',
       releaseYear: 2027,
-      freeEpisodeCount: 2,
     });
     expect(reload).toHaveBeenCalled();
-  });
-
-  it('sends null free episodes when the field is cleared, meaning the platform default', async () => {
-    const calls = routeFetch({ '/genres': GENRES, '/projects/m1': film() });
-    const { onClose } = editModal(film({ freeEpisodeCount: 3 }));
-
-    await screen.findByRole('button', { name: 'Tâm lý' });
-    await userEvent.clear(screen.getByLabelText('Số tập xem miễn phí'));
-    await userEvent.click(save());
-
-    await waitFor(() => expect(onClose).toHaveBeenCalled());
-    expect(sentPatch(calls).freeEpisodeCount).toBeNull();
   });
 
   it('needs a title, an idea of 20 characters and one genre', async () => {
@@ -107,9 +92,10 @@ describe('EditProjectModal', () => {
     await screen.findByRole('button', { name: 'Kinh dị' });
     await userEvent.click(save());
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể sửa tập khi dự án đang ở trạng thái Đã huỷ.'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Không thể sửa tập khi dự án đang ở trạng thái Đã huỷ. Màn hình đã được tải lại.'));
     expect(onClose).not.toHaveBeenCalled();
-    expect(reload).not.toHaveBeenCalled();
+    // 409: the project changed meanwhile, so it is loaded again.
+    expect(reload).toHaveBeenCalled();
   });
 });
 
@@ -150,7 +136,7 @@ describe('AssignCreatorModal (Admin)', () => {
     await userEvent.selectOptions(screen.getByLabelText('Creator'), 'c2');
     await userEvent.click(screen.getByRole('button', { name: 'Giao' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Hãy chọn một tài khoản Creator đang hoạt động.'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Hãy chọn một tài khoản Creator đang hoạt động. Màn hình đã được tải lại.'));
     expect(onClose).not.toHaveBeenCalled();
   });
 });

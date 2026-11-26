@@ -41,7 +41,7 @@ function Submissions({ episode }: { episode: Episode }) {
 /** Who holds an episode: a Reviewer or the lead picks from the team; everyone else sees the name. */
 function Assignee({ episode, seats, editable }: { episode: Episode; seats: CreatorSeat[]; editable: boolean }) {
   const { reload } = useProject();
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const active = seats.filter((seat) => seat.isActive);
   const held = (creatorId: string) => active.find((seat) => seat.creatorId === creatorId)?.episodes.length ?? 0;
   if (!editable) {

@@ -193,9 +193,9 @@ const PERMISSION_VI_MAP: Record<string, { title: string; desc: string }> = {
     title: 'Tra cứu ví Coin thành viên',
     desc: 'Xem số dư ví Coin chính và các khoản Coin thưởng khuyến mãi của bất kỳ người dùng nào.',
   },
-  'coin.adjust': {
-    title: 'Điều chỉnh số dư Coin thủ công',
-    desc: 'Cộng hoặc trừ Coin vào ví người dùng kèm lý do đối chiếu và mã chứng từ.',
+  'coin.refund': {
+    title: 'Hoàn Coin một khoản thanh toán',
+    desc: 'Trả lại toàn bộ Coin của một lần mở khoá tập hoặc thanh toán gói, đồng thời thu hồi thứ đã mua.',
   },
   'coin.transaction.read': {
     title: 'Tra cứu lịch sử giao dịch Coin',

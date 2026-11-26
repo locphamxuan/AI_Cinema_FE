@@ -17,7 +17,7 @@ function sessionStateFor(user: UserProfile) {
   return { isAuthenticated: true, user };
 }
 
-export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) => ({
+export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set, get) => ({
   isAuthenticated: false,
   user: null,
 
@@ -35,8 +35,8 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
     void authService.me().then((res) => {
       if (!res.success || !res.data) return;
       if (refusalOf(res.data.role)) {
-        authService.logout();
         set({ isAuthenticated: false, user: null });
+        authService.logout();
         return;
       }
       set(sessionStateFor(res.data));
@@ -65,7 +65,23 @@ export const createAuthSlice: StateCreator<AppState, [], [], AuthSlice> = (set) 
   },
 
   logout: () => {
-    authService.logout();
+    // Signed out first, so the session watcher does not read this as a session ended elsewhere.
     set({ isAuthenticated: false, user: null });
+    authService.logout();
+  },
+
+  syncSession: () => {
+    const stored = authService.hasSession() ? authService.getStoredUser() : null;
+    const { isAuthenticated, user } = get();
+    if (!stored) {
+      if (!isAuthenticated) return 'same';
+      set({ isAuthenticated: false, user: null });
+      return 'ended';
+    }
+    if (stored.id !== user?.id || stored.role !== user?.role || stored.name !== user?.name) {
+      set(sessionStateFor(stored));
+      return 'changed';
+    }
+    return 'same';
   },
 });

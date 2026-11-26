@@ -160,8 +160,8 @@ export function ProjectDetailPage() {
             </div>
           )}
 
-          {/* Banner: episodes under revision */}
-          {data.revision && (
+          {/* Banner: episodes under revision (the API always sends the summary, empty when none is) */}
+          {data.revision.episodeCount > 0 && (
             <div role="status" className="flex items-start gap-2 bg-amber-50 dark:bg-amber-500/10 border-t border-amber-200 dark:border-amber-500/20 px-6 py-3 text-xs text-amber-800 dark:text-amber-400">
               <span>
                 <b>Đang sửa {data.revision.episodeCount} tập:</b>{' '}
