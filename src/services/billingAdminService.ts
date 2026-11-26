@@ -15,8 +15,6 @@ import type {
   StatementQuery,
   SubscriptionDetail,
   SubscriptionQuery,
-  WalletAdjustment,
-  WalletAdjustmentResult,
 } from '@/types/billing';
 import type { Page } from '@/types/production';
 
@@ -41,16 +39,14 @@ export const billingAdminService = {
   cancelMySubscription: (id: string, reason?: string) =>
     apiClient.post<unknown>(`/subscriptions/${id}/cancel`, reason ? { reason } : {}),
 
-  ledger: ({ page = 1, kind, entryType, walletId, from, to }: StatementQuery = {}): Promise<ApiResponse<Page<LedgerLine>>> =>
+  /** Every Coin row of the platform, each naming its member account; `account` matches a name or an email. */
+  ledger: ({ page = 1, kind, entryType, walletId, account, from, to }: StatementQuery = {}): Promise<ApiResponse<Page<LedgerLine>>> =>
     apiClient.get<Page<LedgerLine>>(
-      `/admin/coin-transactions${queryString({ page, limit: PAGE_SIZE, kind, entryType, walletId, from, to })}`,
+      `/admin/coin-transactions${queryString({ page, limit: PAGE_SIZE, kind, entryType, walletId, account, from, to })}`,
     ),
   /** Refunds the whole payment `transactionId` belongs to, once; the episode or plan it bought is taken back. */
   refundPayment: (transactionId: string) => apiClient.post<PaymentRefund>(`/admin/coin-transactions/${transactionId}/refund`, {}),
   wallet: (userId: string) => apiClient.get<AdminWallet>(`/admin/wallets/${userId}`),
-  /** One key per correction form, so a retried request is never applied twice. */
-  adjustWallet: (input: WalletAdjustment, idempotencyKey: string) =>
-    apiClient.post<WalletAdjustmentResult>('/admin/wallet-adjustments', input, { headers: { 'Idempotency-Key': idempotencyKey } }),
 
   listRewardRules: (): Promise<ApiResponse<RewardRule[]>> => apiClient.get<RewardRule[]>('/admin/reward-rules'),
   createRewardRule: (input: RewardRuleInput) => apiClient.post<RewardRule>('/admin/reward-rules', input),

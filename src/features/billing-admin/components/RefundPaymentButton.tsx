@@ -10,7 +10,7 @@ import { formatDateTime, formatNumber } from '@/lib/format';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { CoinEntryType, LedgerLine, PaymentRefund } from '@/types/billing';
 
-/** The payments an Admin can refund; anything else is corrected with a wallet adjustment. */
+/** The payments an Admin can refund: an episode unlock or a plan payment. */
 const REFUNDABLE: ReadonlySet<CoinEntryType> = new Set(['EPISODE_PURCHASE', 'PLAN_PAYMENT', 'PLAN_RENEWAL']);
 
 /** A payment is refunded from its first row; the bonus rows of the same payment point at that row. */
@@ -54,6 +54,7 @@ export function RefundPaymentButton({ line, onRefunded }: { line: LedgerLine; on
         title="Hoàn toàn bộ khoản thanh toán?"
         description="Mọi Coin của khoản thanh toán này được trả lại một lần: Coin chính về Coin chính, Coin thưởng về Coin thưởng."
         details={[
+          ['Tài khoản', `${line.account.fullName} · ${line.account.email}`],
           ['Loại', COIN_ENTRY_LABEL[line.entryType]],
           ['Thời gian', formatDateTime(line.createdAt)],
         ]}

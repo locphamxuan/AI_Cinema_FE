@@ -129,8 +129,6 @@ export function localizeApiError(
     return 'Studio chưa có tài khoản đăng nhập Studio Web nên chưa gửi hợp đồng được. Vào Studio đối tác, mở "Tài khoản đăng nhập" để tạo, rồi thử lại.';
   }
   if (reason === 'INSUFFICIENT_COINS' || normalized.includes('does not hold enough coins')) {
-    // An Admin correcting someone else's wallet is not told "your wallet".
-    if (endpoint.includes('/admin/')) return 'Ví này không đủ Coin cho lần trừ này. Hãy xem lại số dư hiện tại.';
     return APPLICATION_MESSAGES.MSG12.message;
   }
   if (
