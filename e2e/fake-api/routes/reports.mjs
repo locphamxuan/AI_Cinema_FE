@@ -31,7 +31,6 @@ const FILMS = [
     planShareVnd: 20000000,
     revenueVnd: 170000000,
     profitVnd: 70000000,
-    roiPercent: 70,
     breakEven: 'BROKE_EVEN',
   },
   {
@@ -45,7 +44,6 @@ const FILMS = [
     planShareVnd: 0,
     revenueVnd: 50000000,
     profitVnd: 50000000,
-    roiPercent: null,
     breakEven: 'NO_COST',
   },
 ];
@@ -59,7 +57,6 @@ on('GET', '/admin/finance/films', () => ({
     planShareVnd: 20000000,
     revenueVnd: 220000000,
     profitVnd: 120000000,
-    roiPercent: 54.5,
     marginPercent: 54.5,
     costedMovies: 1,
     brokeEvenMovies: 1,
