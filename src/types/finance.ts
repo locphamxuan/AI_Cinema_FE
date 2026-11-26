@@ -1,6 +1,6 @@
 /** MF-5 Financial Dashboard (BE src/modules/platform/finance). Every amount is whole VND. */
 
-/** NO_COST: no production cost recorded yet, so ROI and break-even do not apply. */
+/** NO_COST: no production cost recorded yet, so break-even does not apply. */
 export type BreakEvenStatus = 'NO_COST' | 'BROKE_EVEN' | 'NOT_YET';
 
 export interface FilmFinance {
@@ -17,8 +17,6 @@ export interface FilmFinance {
   planShareVnd: number;
   revenueVnd: number;
   profitVnd: number;
-  /** null while the film has no production cost. */
-  roiPercent: number | null;
   breakEven: BreakEvenStatus;
 }
 
@@ -33,7 +31,6 @@ export interface FilmFinanceReport {
     planShareVnd: number;
     revenueVnd: number;
     profitVnd: number;
-    roiPercent: number | null;
     /** Profit / revenue in percent; null without revenue. */
     marginPercent: number | null;
     costedMovies: number;
