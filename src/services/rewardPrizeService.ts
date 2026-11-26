@@ -7,7 +7,10 @@ export interface CreateRewardPrizeDto {
   type: RewardPrizeType;
   bonusCoins?: number;
   planDays?: number;
+  /** Chance in basis points (10 000 = 100 %). */
   weight: number;
+  /** false adds it switched off, to be switched on with a rebalance. */
+  isActive?: boolean;
 }
 
 export interface UpdateRewardPrizeDto {
@@ -32,6 +35,11 @@ export const rewardPrizeService = {
   /** PATCH /admin/reward-prizes/:id - update a name, amount, weight, or switch it on/off */
   updatePrize(id: string, dto: UpdateRewardPrizeDto): Promise<ApiResponse<RewardPrize>> {
     return apiClient.patch<RewardPrize>(`/admin/reward-prizes/${id}`, dto);
+  },
+
+  /** PUT /admin/reward-prizes/chances - the listed prizes switched on with these chances (adding up to 100 %), the rest off */
+  setChances(prizes: { id: string; weight: number }[]): Promise<ApiResponse<RewardPrize[]>> {
+    return apiClient.put<RewardPrize[]>('/admin/reward-prizes/chances', { prizes });
   },
 
   /** DELETE /admin/reward-prizes/:id - delete a prize for good (past spins keep what they won) */

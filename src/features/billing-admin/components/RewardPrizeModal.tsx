@@ -7,7 +7,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useAction } from '@/hooks/useAction';
 import { rewardPrizeService } from '@/services/rewardPrizeService';
 import type { RewardPrize, RewardPrizeType } from '@/types/billing';
-import { MAX_PLAN_DAYS, MAX_REWARD_BONUS_COINS, MAX_WEIGHT, chanceWith, formatPercent } from './rewardOdds';
+import { MAX_PLAN_DAYS, MAX_REWARD_BONUS_COINS, activeTotal, formatChance, parsePercent, percentInput, totalProblem } from './rewardOdds';
 
 const isIntIn = (n: number, min: number, max = Number.MAX_SAFE_INTEGER) => Number.isInteger(n) && n >= min && n <= max;
 
@@ -21,27 +21,30 @@ export function suggestPrizeCode(type: RewardPrizeType, amount: number, prizes: 
 }
 
 /**
- * Adds a prize to the wheel, or edits one (BR-09). The type of a saved prize stays: the amount
- * edited is the one its type pays. While the Admin types the "tỉ lệ trúng" points, the modal shows
- * the percentage they give next to the other prizes that are on.
+ * Adds a prize to the wheel, or edits one (BR-09). The Admin types the chance in percent; the prizes switched on
+ * must still add up to exactly 100 % after the save, so the modal shows the new total and refuses otherwise. A
+ * new prize can be added switched off and switched on later with "Chia lại tỉ lệ".
  */
 export function RewardPrizeModal({
   prize,
   prizes,
   onClose,
   onDone,
+  onRebalance,
 }: {
   prize: RewardPrize | null;
-  /** Every prize of the wheel, to work out the live percentage. */
+  /** Every prize of the wheel, to work out the new total. */
   prizes: RewardPrize[];
   onClose: () => void;
   onDone: () => Promise<void>;
+  /** Opens "Chia lại tỉ lệ" instead, when one prize alone cannot keep the wheel at 100 %. */
+  onRebalance: () => void;
 }) {
   const [form, setForm] = useState({
     name: prize?.name ?? '',
     type: (prize?.type ?? 'BONUS_COIN') as RewardPrizeType,
     amount: String((prize?.type === 'PLAN_DAYS' ? prize.planDays : prize?.bonusCoins) ?? ''),
-    weight: String(prize?.weight ?? ''),
+    chance: prize?.weight ? percentInput(prize.weight) : '',
     isActive: prize?.isActive ?? true,
   });
   const { busy, run } = useAction();
@@ -49,22 +52,35 @@ export function RewardPrizeModal({
 
   const plan = form.type === 'PLAN_DAYS';
   const amount = Number(form.amount);
-  const weight = Number(form.weight);
+  const weight = parsePercent(form.chance);
   const amountOk = plan ? isIntIn(amount, 1, MAX_PLAN_DAYS) : isIntIn(amount, 1, MAX_REWARD_BONUS_COINS);
-  const weightOk = isIntIn(weight, 1, MAX_WEIGHT);
   const defaultName = amountOk ? (plan ? `${amount} ngày gói Tháng` : `${amount} Coin thưởng`) : '';
   const name = form.name.trim() || defaultName;
-  const valid = Boolean(name) && amountOk && weightOk;
-  const chance = weightOk ? chanceWith(weight, prizes, prize?.id) : 0;
+
+  // Only a change of the chances on the wheel is checked, as the API does: renaming a prize never is.
+  const touchesWheel = !prize || form.isActive !== prize.isActive || (form.isActive && weight !== prize.weight);
+  const others = prizes.filter((p) => p.id !== prize?.id);
+  const total = activeTotal(others) + (form.isActive ? (weight ?? 0) : 0);
+  const anyOn = form.isActive || others.some((p) => p.isActive);
+  const problem = weight !== null && touchesWheel ? totalProblem(total, anyOn) : null;
+  const valid = Boolean(name) && amountOk && weight !== null && !problem;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (weight === null) return;
     const amountField = plan ? { planDays: amount } : { bonusCoins: amount };
     const done = prize
       ? await run(() => rewardPrizeService.updatePrize(prize.id, { name, weight, isActive: form.isActive, ...amountField }), 'Đã lưu giải')
       : await run(
           () =>
-            rewardPrizeService.createPrize({ code: suggestPrizeCode(form.type, amount, prizes), name, type: form.type, weight, ...amountField }),
+            rewardPrizeService.createPrize({
+              code: suggestPrizeCode(form.type, amount, prizes),
+              name,
+              type: form.type,
+              weight,
+              isActive: form.isActive,
+              ...amountField,
+            }),
           'Đã thêm giải vào vòng quay',
         );
     if (done) {
@@ -113,54 +129,40 @@ export function RewardPrizeModal({
         </FormField>
 
         <FormField
-          label="Tỉ lệ trúng"
-          hint={`Nhập số từ 1 đến ${MAX_WEIGHT.toLocaleString('vi-VN')}. Số càng lớn so với các giải khác thì giải càng dễ trúng.`}
+          label="Tỉ lệ trúng (%)"
+          hint="Từ 0,01 đến 100, tối đa 2 số lẻ."
+          error={form.chance && weight === null ? 'Nhập số từ 0,01 đến 100, tối đa 2 số lẻ.' : null}
           required
         >
-          <input
-            type="number"
-            min={1}
-            max={MAX_WEIGHT}
-            step={1}
-            value={form.weight}
-            onChange={(e) => set({ weight: e.target.value })}
-            required
-            className={fieldInputClass}
-          />
+          <input inputMode="decimal" value={form.chance} onChange={(e) => set({ chance: e.target.value })} required className={fieldInputClass} />
         </FormField>
 
-        <div className="rounded-xl border border-border bg-muted/50 p-3" aria-live="polite">
-          {weightOk ? (
-            <>
-              <p className="text-sm text-foreground">
-                {form.isActive ? 'Giải này sẽ trúng khoảng ' : 'Khi bật lại, giải này sẽ trúng khoảng '}
-                <strong className="tabular-nums">{formatPercent(chance)}</strong> số lượt quay.
-              </p>
-              <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-muted" aria-hidden="true">
-                <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, chance)}%` }} />
-              </div>
-            </>
-          ) : (
-            <p className="text-sm text-muted-foreground">Nhập tỉ lệ trúng để xem phần trăm.</p>
-          )}
-        </div>
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-border p-3">
+          <input
+            type="checkbox"
+            role="switch"
+            checked={form.isActive}
+            onChange={(e) => set({ isActive: e.target.checked })}
+            className="size-4 accent-primary"
+          />
+          <span className="text-sm font-semibold text-foreground">Bật giải trên vòng quay</span>
+        </label>
 
-        {prize && (
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border p-3">
-            <input
-              type="checkbox"
-              role="switch"
-              checked={form.isActive}
-              onChange={(e) => set({ isActive: e.target.checked })}
-              className="mt-0.5 size-4 accent-primary"
-            />
-            <span>
-              <span className="block text-sm font-semibold text-foreground">Bật giải trên vòng quay</span>
-              <span className="block text-xs text-muted-foreground">
-                {form.isActive ? 'Đang bật: Member có thể trúng giải này.' : 'Đang tắt: giải vẫn nằm trong danh sách nhưng không ai trúng.'}
-              </span>
-            </span>
-          </label>
+        {weight !== null && touchesWheel && (
+          <div className="rounded-xl border border-border bg-muted/50 p-3 text-sm" aria-live="polite">
+            <p>
+              Tổng các giải đang bật sau khi lưu: <strong className="tabular-nums">{formatChance(total)}</strong>
+            </p>
+            {problem && (
+              <p role="alert" className="mt-1 text-destructive">
+                Tổng phải đúng 100%, đang {problem}.{' '}
+                <button type="button" onClick={onRebalance} className="font-semibold underline underline-offset-2">
+                  Chia lại tỉ lệ
+                </button>{' '}
+                {prize ? 'để sửa nhiều giải cùng lúc.' : 'hoặc tắt giải này rồi lưu.'}
+              </p>
+            )}
+          </div>
         )}
 
         <div className="flex justify-end gap-2.5 border-t border-border pt-3">

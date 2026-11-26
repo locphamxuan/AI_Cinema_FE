@@ -8,17 +8,25 @@ import { useResource } from '@/hooks/useResource';
 import { cn } from '@/lib/utils';
 import { rewardPrizeService } from '@/services/rewardPrizeService';
 import type { RewardPrize } from '@/types/billing';
+import { RewardChancesModal } from './RewardChancesModal';
 import { RewardPrizeModal } from './RewardPrizeModal';
-import { chanceOf, formatPercent, prizeReward } from './rewardOdds';
+import { activeTotal, formatChance, prizeReward, totalProblem } from './rewardOdds';
+
+/** Why "Chia lại tỉ lệ" opened, and the switch already applied in it. */
+interface Rebalance {
+  preset?: Record<string, boolean>;
+  notice?: string;
+}
 
 /**
- * BR-09: the prizes of the lucky wheel. Each prize has "tỉ lệ trúng" points; the list shows the
- * percentage they give among the prizes that are on. Switching a prize off and deleting it are
- * separate: off keeps it in the list, delete removes it for good (members' past wins stay).
+ * BR-09: the prizes of the lucky wheel. Each spin wins exactly one prize, so the prizes switched on add up to
+ * exactly 100 %. A switch or a delete that would break it opens "Chia lại tỉ lệ" with that change applied, so the
+ * Admin sets every chance in one save. Switching off keeps a prize in the list; delete removes it for good.
  */
 export function RewardWheelPanel() {
   const prizes = useResource('admin:reward-prizes', rewardPrizeService.getAdminPrizes);
   const [editing, setEditing] = useState<RewardPrize | 'new' | null>(null);
+  const [rebalance, setRebalance] = useState<Rebalance | null>(null);
   const [deleting, setDeleting] = useState<RewardPrize | null>(null);
   const { busy, run } = useAction({
     onStale: () => {
@@ -28,12 +36,33 @@ export function RewardWheelPanel() {
   });
   const list = prizes.data ?? [];
   const activeCount = list.filter((p) => p.isActive).length;
+  const total = activeTotal(list);
+  const problem = totalProblem(total);
 
   const toggle = async (prize: RewardPrize) => {
     const on = !prize.isActive;
+    const next = activeTotal(list, { [prize.id]: on ? (prize.weight ?? 0) : null });
+    if (totalProblem(next)) {
+      setRebalance({
+        preset: { [prize.id]: on },
+        notice: `${on ? 'Bật' : 'Tắt'} "${prize.name}" thì tổng là ${formatChance(next)}. Chỉnh lại tỉ lệ cho đủ 100% rồi lưu.`,
+      });
+      return;
+    }
     if (await run(() => rewardPrizeService.updatePrize(prize.id, { isActive: on }), on ? 'Đã bật giải' : 'Đã tắt giải')) {
       await prizes.reload();
     }
+  };
+
+  const askDelete = (prize: RewardPrize) => {
+    if (prize.isActive && activeCount > 1) {
+      setRebalance({
+        preset: { [prize.id]: false },
+        notice: `"${prize.name}" đang bật. Tắt giải và chia lại tỉ lệ cho các giải còn lại trước, rồi mới xoá được.`,
+      });
+      return;
+    }
+    setDeleting(prize);
   };
 
   const remove = async () => {
@@ -50,22 +79,30 @@ export function RewardWheelPanel() {
         <div className="space-y-1.5">
           <h2 className="text-base font-bold text-foreground">Vòng quay may mắn</h2>
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Mỗi lượt quay trúng đúng một giải trong các giải đang bật. Giải có tỉ lệ cao hơn thì dễ trúng hơn; cột
-            &quot;Tỉ lệ trúng&quot; là phần trăm Member thấy trên app.
-          </p>
-          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Trúng ngày gói Tháng: Member đang có gói thì được cộng thêm ngày, chưa có thì được tặng gói (không tự gia hạn).
+            Mỗi lượt quay trúng đúng một giải, nên tỉ lệ các giải đang bật cộng lại phải đúng 100%. Trúng ngày gói Tháng thì
+            được cộng thêm ngày, chưa có gói thì được tặng gói (không tự gia hạn).
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <span className="text-sm text-muted-foreground tabular-nums">
-            {activeCount}/{list.length} giải đang bật
-          </span>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <Button size="sm" variant="secondary" disabled={list.length === 0} onClick={() => setRebalance({})} className="rounded-xl px-4">
+            Chia lại tỉ lệ
+          </Button>
           <Button size="sm" onClick={() => setEditing('new')} className="rounded-xl px-4">
             Thêm giải
           </Button>
         </div>
       </header>
+
+      {list.length > 0 && (
+        <p
+          role="status"
+          className={cn('border-b border-border px-6 py-3 text-sm', problem || activeCount === 0 ? 'bg-destructive/5 text-destructive' : 'text-muted-foreground')}
+        >
+          {activeCount === 0
+            ? 'Tất cả giải đang tắt: Member chỉ xem được vòng quay, chưa quay được.'
+            : `${activeCount}/${list.length} giải đang bật · Tổng tỉ lệ ${formatChance(total)}${problem ? ` · ${problem}` : ''}`}
+        </p>
+      )}
 
       {prizes.error && (
         <div className="p-6">
@@ -81,11 +118,6 @@ export function RewardWheelPanel() {
         <div className="p-12">
           <Empty>Vòng quay chưa có giải nào. Member có lượt quay sẽ chưa quay được cho tới khi có giải.</Empty>
         </div>
-      )}
-      {list.length > 0 && activeCount === 0 && (
-        <p className="border-b border-border bg-destructive/5 px-6 py-3 text-sm text-destructive">
-          Tất cả giải đang tắt: Member chỉ xem được vòng quay, chưa quay được.
-        </p>
       )}
 
       {list.length > 0 && (
@@ -103,44 +135,41 @@ export function RewardWheelPanel() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {list.map((prize) => {
-                const chance = chanceOf(prize, list);
-                return (
-                  <tr key={prize.id} className={cn(!prize.isActive && 'text-muted-foreground')}>
-                    <td className="px-6 py-4 font-semibold text-foreground">{prize.name}</td>
-                    <td className="whitespace-nowrap px-4 py-4">{prizeReward(prize)}</td>
-                    <td className="px-4 py-4">
-                      {prize.isActive ? (
-                        <div className="w-40 space-y-1">
-                          <span className="font-semibold tabular-nums text-foreground">{formatPercent(chance)}</span>
-                          <div className="h-2 w-full overflow-hidden rounded-full bg-muted" aria-hidden="true">
-                            <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, chance)}%` }} />
-                          </div>
+              {list.map((prize) => (
+                <tr key={prize.id} className={cn(!prize.isActive && 'text-muted-foreground')}>
+                  <td className="px-6 py-4 font-semibold text-foreground">{prize.name}</td>
+                  <td className="whitespace-nowrap px-4 py-4">{prizeReward(prize)}</td>
+                  <td className="px-4 py-4">
+                    {prize.isActive ? (
+                      <div className="w-36 space-y-1">
+                        <span className="font-semibold tabular-nums text-foreground">{formatChance(prize.weight ?? 0)}</span>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-muted" aria-hidden="true">
+                          <div className="h-full rounded-full bg-primary" style={{ width: `${Math.min(100, (prize.weight ?? 0) / 100)}%` }} />
                         </div>
-                      ) : (
-                        <span>Không trúng (đang tắt)</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-4">
-                      <PrizeSwitch prize={prize} disabled={busy} onToggle={() => void toggle(prize)} />
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right">
-                      <Button size="sm" variant="secondary" aria-label={`Sửa ${prize.name}`} onClick={() => setEditing(prize)} className="rounded-xl">
-                        Sửa
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        aria-label={`Xoá ${prize.name}`}
-                        onClick={() => setDeleting(prize)}
-                        className="ml-2 rounded-xl text-destructive hover:bg-destructive/10"
-                      >
-                        Xoá
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
+                      </div>
+                    ) : (
+                      <span>Không trúng (đang tắt)</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-4">
+                    <PrizeSwitch prize={prize} disabled={busy} onToggle={() => void toggle(prize)} />
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-right">
+                    <Button size="sm" variant="secondary" aria-label={`Sửa ${prize.name}`} onClick={() => setEditing(prize)} className="rounded-xl">
+                      Sửa
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      aria-label={`Xoá ${prize.name}`}
+                      onClick={() => askDelete(prize)}
+                      className="ml-2 rounded-xl text-destructive hover:bg-destructive/10"
+                    >
+                      Xoá
+                    </Button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -152,7 +181,14 @@ export function RewardWheelPanel() {
           prizes={list}
           onClose={() => setEditing(null)}
           onDone={prizes.reload}
+          onRebalance={() => {
+            setEditing(null);
+            setRebalance({});
+          }}
         />
+      )}
+      {rebalance && (
+        <RewardChancesModal prizes={list} preset={rebalance.preset} notice={rebalance.notice} onClose={() => setRebalance(null)} onDone={prizes.reload} />
       )}
       <ConfirmModal
         open={Boolean(deleting)}
@@ -160,12 +196,12 @@ export function RewardWheelPanel() {
         title="Xoá giải vĩnh viễn?"
         description={
           <>
-            Giải <strong className="text-foreground">{deleting?.name}</strong> sẽ bị xoá hẳn khỏi vòng quay và không khôi
-            phục được. Nếu chỉ muốn tạm ngừng, hãy tắt giải thay vì xoá.
+            Giải <strong className="text-foreground">{deleting?.name}</strong> bị xoá hẳn và không khôi phục được. Muốn tạm
+            ngừng thì tắt giải.
           </>
         }
         details={deleting ? [['Phần thưởng', prizeReward(deleting)]] : undefined}
-        consequence="Member đã trúng giải này vẫn giữ nguyên phần thưởng và lịch sử. Tỉ lệ trúng của các giải còn lại được tính lại."
+        consequence="Member đã trúng giải này vẫn giữ phần thưởng và lịch sử."
         confirmLabel="Xoá vĩnh viễn"
         busy={busy}
         onClose={() => setDeleting(null)}
