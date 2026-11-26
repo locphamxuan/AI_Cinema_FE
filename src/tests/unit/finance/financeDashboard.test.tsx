@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { RiskFlagsTab, scanSummary } from '@/features/finance/RiskFlagsTab';
 import { toast } from '@/components/ui/Toast';
 import { AppShell } from '@/components/shell/AppShell';
-import { FilmProfitTab, planCoverage } from '@/features/finance/FilmProfitTab';
+import { FilmProfitTab } from '@/features/finance/FilmProfitTab';
 import { day, roi, signTone, vnd } from '@/features/finance/financeFormat';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
@@ -40,30 +40,28 @@ describe('Financial Dashboard formatting', () => {
     expect(day('2026-10-31T18:00:00Z')).toBe('01/11/2026');
   });
 
-  it('says in plain words which months the monthly-plan column covers', () => {
-    expect(planCoverage({ currentPeriod: '2026-11', lastSharedPeriod: '2026-10' })).toMatch(/gần nhất là tháng 10\/2026.*Tháng 11\/2026 đang diễn ra/);
-    expect(planCoverage({ currentPeriod: '2026-11', lastSharedPeriod: null })).toMatch(/^Chưa có tháng nào/);
-  });
 });
 
 describe('Profit per film', () => {
-  it('reads /admin/finance/films and shows both revenue sources, the loss and a neutral state for a film without cost', async () => {
+  it('reads finance data and omits the Monthly-plan and ROI table columns', async () => {
     const calls = routeFetch({ '/admin/finance/films': FILMS });
     render(<FilmProfitTab />);
 
     expect(await screen.findByText('Studio Sen · tạo ngày 01/10/2026')).toBeInTheDocument();
     expect(calls[0].path).toBe('/admin/finance/films');
-    for (const name of ['Bán tập lẻ', 'Từ gói Tháng', 'Tổng doanh thu', 'Lợi nhuận', 'ROI']) {
+    for (const name of ['Bán tập lẻ', 'Tổng doanh thu', 'Lợi nhuận']) {
       expect(screen.getByRole('button', { name })).toBeInTheDocument();
     }
+    const table = screen.getByRole('table');
+    expect(within(table).queryByRole('button', { name: 'Từ gói Tháng' })).toBeNull();
+    expect(within(table).queryByRole('button', { name: 'ROI' })).toBeNull();
     expect(screen.getByText('đã trừ hoàn 2.000.000 VND')).toBeInTheDocument();
-    expect(screen.getByText(/gần nhất là tháng 10\/2026/)).toBeInTheDocument();
     const loss = screen.getAllByText('-30.000.000 VND');
     expect(loss.some((el) => el.className.includes('text-destructive'))).toBe(true);
 
     const noCost = screen.getByText('tạo ngày 05/11/2026').closest('tr')!;
     expect(within(noCost).getByText('Chưa có chi phí')).toBeInTheDocument();
-    expect(within(noCost).getByText('—')).toBeInTheDocument();
+    expect(within(noCost).queryByText('—')).toBeNull();
     expect(within(noCost).queryByText('Đã hoà vốn')).toBeNull();
     expect(screen.getByText('Chưa hoà vốn')).toBeInTheDocument();
   });

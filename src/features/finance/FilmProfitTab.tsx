@@ -7,22 +7,13 @@ import { DataPagination } from '@/components/data/DataPagination';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { useResource } from '@/hooks/useResource';
-import { financeService, periodLabel } from '@/services/financeService';
-import type { FilmFinanceReport } from '@/types/finance';
+import { financeService } from '@/services/financeService';
 import { COLUMNS, FilmProfitTable, compare, type Sort, type SortKey } from './FilmProfitTable';
 import { pageOf, roi, vnd } from './financeFormat';
 
 const PAGE_SIZE = 20;
 
-/** Plain words on which months the monthly-plan column covers: only months already shared, never the running one. */
-export function planCoverage(report: Pick<FilmFinanceReport, 'currentPeriod' | 'lastSharedPeriod'>): string {
-  const running = `Tháng ${periodLabel(report.currentPeriod)} đang diễn ra, phần gói Tháng của nó sẽ được chia tự động vào đầu tháng sau.`;
-  return report.lastSharedPeriod
-    ? `"Từ gói Tháng" gồm các tháng đã chia, gần nhất là tháng ${periodLabel(report.lastSharedPeriod)}. ${running}`
-    : `Chưa có tháng nào được chia tiền gói Tháng. ${running}`;
-}
-
-/** One profit view per film: production cost against revenue from selling episodes and from the monthly plan. */
+/** One profit view per film: production cost, total revenue and profit, with the break-even state. */
 export function FilmProfitTab() {
   const report = useResource('finance:films', financeService.films);
   const [search, setSearch] = useState('');
@@ -74,7 +65,7 @@ export function FilmProfitTab() {
           title="Lợi nhuận từng phim"
           description={
             <>
-              Tổng doanh thu = Bán tập lẻ + Từ gói Tháng. Lợi nhuận = Tổng doanh thu − Phí sản xuất. {planCoverage(data)}
+              Tổng doanh thu gồm doanh thu bán tập và phần phân bổ theo gói Tháng. Lợi nhuận = Tổng doanh thu − Phí sản xuất.
             </>
           }
           actions={
@@ -94,7 +85,7 @@ export function FilmProfitTab() {
           }
         >
           <dl className="mb-4 grid gap-x-6 gap-y-1 text-xs sm:grid-cols-2">
-            {COLUMNS.slice(1, 3).map((c) => (
+            {COLUMNS.filter((c) => c.key === 'episodeSalesVnd').map((c) => (
               <div key={c.key} className="flex gap-1.5">
                 <dt className="shrink-0 font-medium">{c.label}:</dt>
                 <dd className="text-muted-foreground">{c.hint}</dd>
