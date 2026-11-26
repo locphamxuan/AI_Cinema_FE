@@ -114,7 +114,7 @@ describe('FinalScriptReview', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Đồng ý Kịch bản bản cuối' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Kịch bản đang ở trạng thái Đã nộp (cần Reviewer đã duyệt).'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Kịch bản đang ở trạng thái Đã nộp (cần Reviewer đã duyệt). Màn hình đã được tải lại.'));
     expect(onDecided).not.toHaveBeenCalled();
   });
 });

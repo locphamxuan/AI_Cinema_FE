@@ -111,7 +111,7 @@ export const NAVIGATION: Record<Area, NavGroup[]> = {
 
 /**
  * The menu entry a location is under: the longest href matching the path (and its query, when the href has one),
- * so /admin/support/ai lights "Chatbox AI" and /reviewer/projects?filter=approved lights "Phim Final".
+ * so /admin/support/ai lights "Trợ lý AI" and /reviewer/projects?filter=approved lights "Phim Final".
  */
 export function activeNavHref(groups: NavGroup[], pathname: string, search = ''): string | null {
   const here = new URLSearchParams(search);

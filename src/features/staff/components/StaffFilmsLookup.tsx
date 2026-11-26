@@ -1,20 +1,18 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { movieService, type CatalogMovie } from '@/services/movieService';
-import { Panel, Empty, Loading } from '@/components/data/ui';
+import { useMemo, useState } from 'react';
+import { useResource } from '@/hooks/useResource';
+import { movieService } from '@/services/movieService';
+import { Panel, Empty, ErrorNote, Loading } from '@/components/data/ui';
 import { MetaPager } from '@/components/data/MetaPager';
 
 const PAGE_SIZE = 20;
 
 /** Read-only film lookup for Staff: released movies only, no sensitive fields. */
 export function StaffFilmsLookup() {
-  const [movies, setMovies] = useState<CatalogMovie[] | null>(null);
+  const list = useResource('staff:movies', movieService.getMovies);
+  const movies = list.data;
   const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    void movieService.getMovies().then((res) => setMovies(res.success ? res.data : []));
-  }, []);
 
   const total = movies?.length ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -28,7 +26,8 @@ export function StaffFilmsLookup() {
 
   return (
     <Panel title="Phim đang phát" description={`Danh sách phim đã phát hành (${total}). Chi tiết quản lý do Admin làm ở màn Quản lý phim.`}>
-      {movies === null && <Loading label="Đang tải danh sách phim…" />}
+      {list.error && <ErrorNote message={list.error} onRetry={list.reload} />}
+      {list.loading && !movies && <Loading label="Đang tải danh sách phim…" />}
       {movies && movies.length === 0 && <Empty>Chưa có phim nào phát hành.</Empty>}
       {movies && movies.length > 0 && (
         <>

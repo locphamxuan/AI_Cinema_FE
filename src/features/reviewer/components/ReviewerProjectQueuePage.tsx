@@ -1,7 +1,8 @@
 'use client';
 
 import { GreetingCard } from '@/components/data/GreetingCard';
-import { useMemo, useState } from 'react';
+import { StageBar } from '@/components/data/StageBar';
+import { useMemo, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { LayoutGrid, List, Search } from 'lucide-react';
@@ -13,14 +14,15 @@ import { useAppStore } from '@/store/useAppStore';
 import { FILTER_STAGE, filterQueue, toQueueItems, type QueueFilter, type QueueItem } from '../reviewQueue';
 import { ReviewerQueueCard, STAGE_STYLE, episodeText } from './ReviewerQueueCard';
 
-const CARD = 'rounded-3xl bg-card border border-border shadow-xs dark:shadow-xl';
+const CARD = 'rounded-2xl bg-card ring-1 ring-foreground/10 shadow-xs';
 
-const FILTERS: { key: QueueFilter; label: string; active: string }[] = [
-  { key: 'all', label: 'Tất cả', active: 'bg-primary text-primary-foreground' },
-  { key: 'script', label: 'Kịch bản chờ duyệt', active: 'bg-amber-600 text-white' },
-  { key: 'master', label: 'Phim cần duyệt', active: 'bg-primary text-primary-foreground' },
-  { key: 'revising', label: 'Studio đang sửa', active: 'bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900' },
-  { key: 'approved', label: 'Phim bản cuối', active: 'bg-emerald-600 text-white' },
+/** Each stage keeps its dashboard hue on the bar, the filter and the card chip. */
+const FILTERS: { key: QueueFilter; label: string; hue: string }[] = [
+  { key: 'all', label: 'Tất cả', hue: 'var(--foreground)' },
+  { key: 'script', label: 'Kịch bản chờ duyệt', hue: 'var(--viz-2)' },
+  { key: 'master', label: 'Phim cần duyệt', hue: 'var(--viz-1)' },
+  { key: 'revising', label: 'Studio đang sửa', hue: 'var(--viz-5)' },
+  { key: 'approved', label: 'Phim bản cuối', hue: 'var(--viz-3)' },
 ];
 
 const isFilter = (value: string | null): value is QueueFilter => FILTERS.some((f) => f.key === value);
@@ -96,8 +98,17 @@ export function ReviewerProjectQueuePage() {
           label="Hồ sơ Reviewer"
           name={user?.name ?? 'Reviewer'}
           summary="Dự án bạn phụ trách: kịch bản chờ duyệt, bản phim Studio vừa nộp và những tập cần sửa."
+          figures={
+            pipelines.data
+              ? [
+                  { label: 'Chờ bạn xử lý', value: pending },
+                  { label: 'Kịch bản chờ duyệt', value: countOf('script') },
+                  { label: 'Phim cần duyệt', value: countOf('master') },
+                ]
+              : undefined
+          }
           action={
-            <Link href="/reviewer" className="inline-flex h-10 items-center rounded-lg bg-white px-5 text-sm font-semibold text-[#121212] shadow-sm transition-colors hover:bg-white/90">
+            <Link href="/reviewer" className="inline-flex h-10 items-center rounded-lg bg-[#F5B83D] px-5 text-sm font-semibold text-[#1C1830] shadow-sm shadow-black/30 transition-colors hover:bg-[#FCD98A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
               Mở trang duyệt phim
             </Link>
           }
@@ -108,22 +119,11 @@ export function ReviewerProjectQueuePage() {
 
         {pipelines.data && (
           <>
-            <section aria-label="Thống kê duyệt" className={`${CARD} p-5 sm:p-6 space-y-3`}>
-              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                <h2 className="text-lg font-extrabold text-foreground tracking-tight">Tiến độ duyệt</h2>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-foreground tracking-tight tabular-nums">{pending}</span>
-                  <span className="text-xs sm:text-sm font-semibold text-muted-foreground">Hồ sơ đang chờ bạn xử lý</span>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-3 text-xs font-semibold text-secondary-foreground border-t border-border">
-                {FILTERS.slice(1).map((f) => (
-                  <span key={f.key}>
-                    <strong>{countOf(f.key)}</strong> {f.label}
-                  </span>
-                ))}
-              </div>
-            </section>
+            <StageBar
+              title="Tiến độ duyệt"
+              headline={{ value: items.length, label: 'hồ sơ bạn phụ trách' }}
+              segments={FILTERS.slice(1).map((f) => ({ label: f.label, value: countOf(f.key), color: f.hue }))}
+            />
 
             <section className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
               <div role="group" aria-label="Lọc theo giai đoạn" className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold">
@@ -133,8 +133,10 @@ export function ReviewerProjectQueuePage() {
                     type="button"
                     aria-pressed={filter === f.key}
                     onClick={() => handleFilter(f.key)}
-                    className={`px-3.5 py-2 rounded-2xl whitespace-nowrap transition-all cursor-pointer ${filter === f.key ? f.active : 'bg-card text-muted-foreground hover:bg-muted border border-border'}`}
+                    style={{ '--hue': f.hue } as CSSProperties}
+                    className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-2 whitespace-nowrap transition-colors cursor-pointer ${filter === f.key ? 'border-(--hue) bg-(--hue)/12 text-foreground' : 'border-border bg-card text-muted-foreground hover:bg-muted'}`}
                   >
+                    <span className="size-2 rounded-full bg-(--hue)" aria-hidden="true" />
                     {f.label} ({countOf(f.key)})
                   </button>
                 ))}
@@ -142,7 +144,7 @@ export function ReviewerProjectQueuePage() {
               <div className="flex items-center gap-2">
                 <div className="relative w-full sm:w-64">
                   <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                  <input type="search" value={search} onChange={(e) => handleSearch(e.target.value)} placeholder="Tìm phim, Studio, Creator…" aria-label="Tìm trong danh sách chờ duyệt" className="w-full pl-9 pr-3 py-2 rounded-2xl bg-card border border-border text-xs text-foreground focus:outline-none" />
+                  <input type="search" value={search} onChange={(e) => handleSearch(e.target.value)} placeholder="Tìm phim, Studio, Creator…" aria-label="Tìm trong danh sách chờ duyệt" className="w-full pl-9 pr-3 py-2 rounded-2xl bg-card border border-border text-xs text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-reel/40" />
                 </div>
                 <div className="flex items-center rounded-2xl bg-card border border-border p-1">
                   {([['grid', LayoutGrid, 'Xem dạng thẻ'], ['table', List, 'Xem dạng bảng']] as const).map(([mode, Icon, label]) => (

@@ -34,7 +34,14 @@ export function PriceAlertsPanel() {
   );
   const [asking, setAsking] = useState<PriceAlert | null>(null);
   const [accepting, setAccepting] = useState<PriceAlert | null>(null);
-  const { busy, run } = useAction();
+  // Another Admin may have handled the alert meanwhile (409): close the dialogs and show the list as it is now.
+  const { busy, run } = useAction({
+    onStale: () => {
+      setAsking(null);
+      setAccepting(null);
+      return alerts.reload();
+    },
+  });
 
   const requestChange = async (note: string) => {
     if (!asking) return;

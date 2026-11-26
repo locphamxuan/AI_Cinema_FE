@@ -4,31 +4,9 @@
 
 export const STORAGE_KEYS = {
   REMEMBERED_EMAIL: 'ai_cinema_remembered_email',
-  AUTH_TOKEN: 'ai_cinema_auth_token',
-  REFRESH_TOKEN: 'ai_cinema_refresh_token',
-  USER_DATA: 'ai_cinema_user_data',
 } as const;
 
 export const storage = {
-  get<T>(key: string, defaultValue: T): T {
-    if (typeof window === 'undefined') return defaultValue;
-    try {
-      const item = localStorage.getItem(key);
-      return item ? (JSON.parse(item) as T) : defaultValue;
-    } catch {
-      return defaultValue;
-    }
-  },
-
-  getString(key: string, defaultValue = ''): string {
-    if (typeof window === 'undefined') return defaultValue;
-    try {
-      return localStorage.getItem(key) ?? defaultValue;
-    } catch {
-      return defaultValue;
-    }
-  },
-
   set<T>(key: string, value: T): void {
     if (typeof window === 'undefined') return;
     try {

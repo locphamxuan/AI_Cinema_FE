@@ -69,7 +69,7 @@ export function AccountFormModal({
       subtitle={creating ? 'Tài khoản nội bộ: Creator, Reviewer, Staff hoặc Admin.' : account.email}
     >
       <form onSubmit={submit} className="space-y-4">
-        <FormField label="Họ tên">
+        <FormField label="Họ tên" required>
           <input
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
@@ -80,7 +80,7 @@ export function AccountFormModal({
             className={`${fieldInputClass} text-xs py-2 rounded-xl`}
           />
         </FormField>
-        <FormField label="Email">
+        <FormField label="Email" required>
           <input
             type="email"
             value={email}
@@ -124,7 +124,7 @@ export function AccountFormModal({
         </FormField>
         <div className="rounded-xl bg-muted/60 border border-border p-3">
           <p className={`text-[11px] leading-relaxed ${passwordOk ? 'text-muted-foreground' : 'text-rose-500 font-medium'}`}>
-            💡 {PASSWORD_HINT}
+            {PASSWORD_HINT}
             {!creating && ' Đặt mật khẩu mới sẽ đăng xuất tài khoản khỏi mọi thiết bị.'}
           </p>
         </div>

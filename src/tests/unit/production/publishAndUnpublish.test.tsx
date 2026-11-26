@@ -61,6 +61,29 @@ describe('PublishPanel - the Coin price (Reviewer)', () => {
     expect(toast.success).toHaveBeenCalledWith('Đã lưu giá - giá ngoài khoảng nên Admin được báo');
   });
 
+  it('refuses a price above the API limit', async () => {
+    routeFetch({ '/episodes/e1/publications': [], '/platform-settings': settings });
+    show(episode(), { canPrice: true });
+    const input = await screen.findByLabelText(/Giá Coin/);
+    await userEvent.clear(input);
+    await userEvent.type(input, '1000001');
+    expect(screen.getByText(/Giá Coin phải là số nguyên từ 0 đến 1/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Lưu giá' })).toBeDisabled();
+  });
+
+  it('makes a Guest-free episode free for Members too (BR-03/19)', async () => {
+    const calls = routeFetch({ '/episodes/e1/publications': [], '/platform-settings': settings, '/episodes/e1/access-flags': {} });
+    show(episode({ isFreeForGuest: false, isFreeForMember: false }), { canPrice: true });
+    await userEvent.click(await screen.findByLabelText('Miễn phí cho khách chưa đăng nhập'));
+
+    await waitFor(() =>
+      expect(bodyOf(calls, '/episodes/e1/access-flags', 'PATCH')).toEqual({ isFreeForGuest: true, isFreeForMember: true }),
+    );
+    const member = screen.getByLabelText('Miễn phí cho thành viên (Member)');
+    expect(member).toBeChecked();
+    expect(member).toBeDisabled();
+  });
+
   it('shows the price read-only once the project is no longer editable', async () => {
     routeFetch({ '/episodes/e1/publications': [], '/platform-settings': settings });
     show(episode(), { canPrice: true }, 'CANCELLED');
@@ -85,6 +108,9 @@ describe('PublishPanel - release (Admin)', () => {
     expect(schedule).toBeDisabled();
     await userEvent.type(screen.getByLabelText('Lên lịch lúc'), '2099-01-02T20:30');
     await userEvent.click(schedule);
+    const dialog = await screen.findByRole('dialog');
+    expect(calls.some((c) => c.method === 'POST')).toBe(false);
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Lên lịch' }));
 
     await waitFor(() => expect(bodyOf(calls, '/episodes/e1/publications')).toEqual({ scheduledAt: new Date('2099-01-02T20:30').toISOString() }));
   });
@@ -101,9 +127,13 @@ describe('PublishPanel - release (Admin)', () => {
     const onChanged = show(episode(), { canPublish: true });
 
     await userEvent.click(await screen.findByRole('button', { name: 'Phát hành ngay' }));
+    await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Phát hành' }));
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Reviewer chưa xác nhận Phim bản cuối này.'));
-    expect(onChanged).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Reviewer chưa xác nhận Phim bản cuối này. Màn hình đã được tải lại.'),
+    );
+    // A 409 means the episode changed meanwhile: the panel reloads it.
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
   });
 
   it('lists past releases with how they were taken down', async () => {

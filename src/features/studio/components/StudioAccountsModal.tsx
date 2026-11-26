@@ -23,7 +23,7 @@ export function StudioAccountsModal({ studio, onClose }: { studio: Studio; onClo
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: accounts.reload });
   const valid = fullName.trim().length >= 2 && EMAIL.test(email.trim()) && passwordValid(password);
 
   const create = async (e: React.FormEvent) => {
@@ -69,14 +69,14 @@ export function StudioAccountsModal({ studio, onClose }: { studio: Studio; onClo
         <form onSubmit={create} className="space-y-3 rounded-xl border border-border p-3">
           <p className="font-semibold text-foreground">Tạo tài khoản mới</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <FormField label="Họ tên người phụ trách">
+            <FormField label="Họ tên người phụ trách" error={fullName && fullName.trim().length < 2 ? 'Họ tên cần ít nhất 2 ký tự.' : null} required>
               <input value={fullName} onChange={(e) => setFullName(e.target.value)} minLength={2} maxLength={255} required className={fieldInputClass} />
             </FormField>
-            <FormField label="Email đăng nhập">
+            <FormField label="Email đăng nhập" error={email.trim() && !EMAIL.test(email.trim()) ? 'Email chưa đúng định dạng.' : null} required>
               <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} required className={fieldInputClass} />
             </FormField>
           </div>
-          <FormField label="Mật khẩu ban đầu" hint={PASSWORD_HINT}>
+          <FormField label="Mật khẩu ban đầu" hint={PASSWORD_HINT} error={password && !passwordValid(password) ? PASSWORD_HINT : null} required>
             <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" required className={fieldInputClass} />
           </FormField>
           <div className="flex justify-end gap-2">

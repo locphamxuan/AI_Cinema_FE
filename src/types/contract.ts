@@ -40,4 +40,6 @@ export interface Contract {
   handoff: { id: string; milestoneStatus: string } | null;
   createdBy: Person;
   adminSignedBy: Person | null;
+  /** The signed copies of the round the system rendered (metadata only); the download needs CONTRACT_DOCUMENT_READ. */
+  documents?: Omit<ContractDocument, 'uploadedById'>[];
 }

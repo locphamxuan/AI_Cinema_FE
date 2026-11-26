@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { resolveApiBaseUrl } from '@/constants/apiRoutes';
 import { apiClient } from '@/services/apiClient';
 import { scriptService } from '@/services/scriptService';
-import { STORAGE_KEYS } from '@/lib/storage';
+import { authSession } from '@/lib/authSession';
 import { fakeResponse } from '@/tests/support/fakeResponse';
 
 /** A 200 answer whose body is exactly `text`, with no Content-Length (as through a proxy that drops it). */
@@ -11,7 +11,10 @@ const rawAnswer = (text: string) => ({ ...fakeResponse(undefined), text: async (
 const headersOf = (call: unknown[]) => (call[1] as RequestInit).headers as Record<string, string>;
 
 describe('apiClient', () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    sessionStorage.clear();
+  });
   afterEach(() => vi.unstubAllGlobals());
 
   it('reads a JSON body', async () => {
@@ -53,7 +56,7 @@ describe('apiClient', () => {
 
   it('reports a network failure', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
-    await expect(apiClient.get('/projects')).resolves.toMatchObject({ success: false, message: 'Failed to fetch' });
+    await expect(apiClient.get('/projects')).resolves.toMatchObject({ success: false, message: 'Không kết nối được máy chủ. Hãy kiểm tra mạng rồi thử lại.' });
   });
 
   it('keeps the status and the reason of a refusal', async () => {
@@ -67,7 +70,7 @@ describe('apiClient', () => {
   });
 
   it('sends the bearer token and a JSON content type, but no content type for a multipart body', async () => {
-    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'jwt-1');
+    authSession.start({ accessToken: 'jwt-1', refreshToken: 'refresh-1' }, null);
     const fetchMock = vi.fn().mockResolvedValue(fakeResponse({}));
     vi.stubGlobal('fetch', fetchMock);
 
@@ -80,8 +83,7 @@ describe('apiClient', () => {
   });
 
   it('refreshes an expired token once and retries the request with the new one', async () => {
-    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'old');
-    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, 'refresh-1');
+    authSession.start({ accessToken: 'old', refreshToken: 'refresh-1' }, null);
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(fakeResponse({ message: 'Unauthorized' }, 401))
@@ -94,12 +96,27 @@ describe('apiClient', () => {
     expect(res).toMatchObject({ success: true, data: { id: 'm1' } });
     expect(fetchMock.mock.calls[1][0]).toContain('/auth/refresh');
     expect(headersOf(fetchMock.mock.calls[2]).Authorization).toBe('Bearer new');
-    expect(localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)).toBe('refresh-2');
+    expect(authSession.read()).toMatchObject({ accessToken: 'new', refreshToken: 'refresh-2' });
+  });
+
+  it('does not swap a refresh token that another tab of the same session already swapped', async () => {
+    authSession.start({ accessToken: 'old', refreshToken: 'refresh-1' }, null);
+    const fetchMock = vi.fn().mockImplementationOnce(async () => {
+      // While this request was on its way, a tab duplicated from this one renewed the shared session.
+      authSession.update({ accessToken: 'renewed', refreshToken: 'refresh-2' });
+      return fakeResponse({ message: 'Unauthorized' }, 401);
+    });
+    fetchMock.mockResolvedValueOnce(fakeResponse({ id: 'm1' }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(apiClient.get('/projects/m1')).resolves.toMatchObject({ success: true });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes('/auth/refresh'))).toBe(false);
+    expect(headersOf(fetchMock.mock.calls[1]).Authorization).toBe('Bearer renewed');
   });
 
   it('signs out locally when the refresh token is refused', async () => {
-    localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, 'old');
-    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, 'refresh-1');
+    authSession.start({ accessToken: 'old', refreshToken: 'refresh-1' }, null);
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValueOnce(fakeResponse({}, 401)).mockResolvedValueOnce(fakeResponse({}, 401)),
@@ -108,12 +125,11 @@ describe('apiClient', () => {
     const res = await apiClient.get('/projects');
 
     expect(res).toMatchObject({ success: false, statusCode: 401 });
-    expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBeNull();
-    expect(localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)).toBeNull();
+    expect(authSession.read()).toBeNull();
   });
 
   it('does not try to refresh after a failed sign-in', async () => {
-    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, 'refresh-1');
+    authSession.start({ accessToken: 'old', refreshToken: 'refresh-1' }, null);
     const fetchMock = vi.fn().mockResolvedValue(fakeResponse({ message: 'Invalid credentials' }, 401));
     vi.stubGlobal('fetch', fetchMock);
     await apiClient.post('/auth/login', { email: 'a@b.vn', password: 'x' });

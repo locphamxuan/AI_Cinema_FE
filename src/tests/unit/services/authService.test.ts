@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authService, redirectUrlFor, toUserProfile } from '@/services/authService';
-import { STORAGE_KEYS } from '@/lib/storage';
+import { authSession } from '@/lib/authSession';
 import { fakeResponse } from '@/tests/support/fakeResponse';
 
 const session = {
@@ -24,6 +24,7 @@ function mockFetch(body: unknown, ok = true, status = 200) {
 describe('authService', () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
     vi.unstubAllGlobals();
   });
 
@@ -46,8 +47,7 @@ describe('authService', () => {
 
     expect(res.success).toBe(true);
     expect(res.data.name).toBe('Le Quoc Bao');
-    expect(localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)).toBe('access-token');
-    expect(localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN)).toBe('refresh-token');
+    expect(authSession.read()).toMatchObject({ accessToken: 'access-token', refreshToken: 'refresh-token' });
 
     const [, init] = fetchMock.mock.calls[0];
     expect(JSON.parse(init.body as string).email).toBe('reviewer@aicinema.com');
@@ -67,9 +67,14 @@ describe('authService', () => {
     mockFetch(session);
     await authService.login({ email: 'reviewer@aicinema.com', password: 'secret123' });
 
+    const fetchMock = mockFetch(null, true, 204);
     authService.logout();
 
     expect(authService.hasSession()).toBe(false);
     expect(authService.getStoredUser()).toBeNull();
+    // The refresh token is revoked on the API too, not only forgotten here.
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(fetchMock.mock.calls[0][0]).toContain('/auth/logout');
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body as string)).toEqual({ refreshToken: 'refresh-token' });
   });
 });

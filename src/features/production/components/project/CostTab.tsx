@@ -10,6 +10,8 @@ import { useResource } from '@/hooks/useResource';
 import { OPEN_PROJECT, isIn } from '../../lib/capabilities';
 import { COST_ENTRY } from '../../lib/labels';
 import { formatDateTime, formatVnd } from '@/lib/format';
+import { MAX_CONTRACT_VND } from '@/services/contractService';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
 import { parseVnd } from '../shared/CostRequestCard';
 import { Empty, ErrorNote, Loading, Panel } from '@/components/data/ui';
 import { CostRequestPanel } from './CostRequestPanel';
@@ -117,21 +119,39 @@ function BudgetForm({
   const { project } = useProject();
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState('');
-  const { busy, run } = useAction();
+  const [confirming, setConfirming] = useState(false);
+  const { busy, run } = useAction({ onStale: onSaved });
   const value = parseVnd(amount);
   const next = budgetVnd + value;
-  const valid = funded
-    ? value !== 0 && !Number.isNaN(value) && next > 0 && next >= committedVnd && reason.trim().length > 0
-    : value > 0;
+  // Why the amount cannot be sent yet (BE AddCostEntryRequestDto and production-cost.service), or null.
+  const amountProblem = !amount.trim()
+    ? null
+    : Number.isNaN(value) || Math.abs(value) > MAX_CONTRACT_VND
+      ? `Số tiền là bội số 1.000 ₫, tối đa ${formatVnd(MAX_CONTRACT_VND)}.`
+      : !funded && value <= 0
+        ? 'Ngân sách phải lớn hơn 0 ₫.'
+        : funded && value === 0
+          ? 'Số tiền điều chỉnh phải khác 0.'
+          : funded && (next <= 0 || next < committedVnd)
+            ? `Ngân sách mới không được thấp hơn phần đã cam kết với Studio (${formatVnd(committedVnd)}).`
+            : next > MAX_CONTRACT_VND
+              ? `Ngân sách mới tối đa ${formatVnd(MAX_CONTRACT_VND)}.`
+              : null;
+  const valid = !!amount.trim() && !amountProblem && (!funded || reason.trim().length > 0);
 
-  const submit = async (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (valid) setConfirming(true);
+  };
+
+  const save = async () => {
     const entry = funded
       ? { entryType: 'CORRECTION' as const, amountVnd: value, reason: reason.trim() }
       : { entryType: 'BUDGET' as const, amountVnd: value, ...(reason.trim() ? { reason: reason.trim() } : {}) };
     if (await run(() => productionService.addCostEntry(project.id, entry), funded ? 'Đã điều chỉnh ngân sách' : 'Đã đặt ngân sách')) {
       setAmount('');
       setReason('');
+      setConfirming(false);
       await onSaved();
     }
   };
@@ -142,10 +162,10 @@ function BudgetForm({
       description={funded ? 'Số âm để giảm. Ngân sách không được thấp hơn phần đã cam kết với Studio.' : 'Bội số 1.000 ₫. Reviewer được báo ngay.'}
     >
       <form onSubmit={submit} className="space-y-3">
-        <FormField label={funded ? 'Số tiền điều chỉnh (₫)' : 'Ngân sách (₫)'}>
+        <FormField label={funded ? 'Số tiền điều chỉnh (₫)' : 'Ngân sách (₫)'} error={amountProblem} required>
           <input inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} required className={fieldInputClass} aria-label="Số tiền" />
         </FormField>
-        {funded && !Number.isNaN(value) && value !== 0 && <p className="text-[11px] text-muted-foreground">Ngân sách mới: {formatVnd(next)}</p>}
+        {funded && !amountProblem && !Number.isNaN(value) && value !== 0 && <p className="text-[11px] text-muted-foreground">Ngân sách mới: {formatVnd(next)}</p>}
         <FormField label={funded ? 'Lý do (bắt buộc)' : 'Ghi chú (không bắt buộc)'}>
           <textarea rows={3} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} className={fieldTextareaClass} />
         </FormField>
@@ -153,6 +173,21 @@ function BudgetForm({
           {funded ? 'Ghi điều chỉnh' : 'Đặt ngân sách'}
         </Button>
       </form>
+      <ConfirmModal
+        open={confirming}
+        tone="warning"
+        title={funded ? 'Điều chỉnh ngân sách sản xuất' : 'Đặt ngân sách sản xuất'}
+        description={project.title}
+        details={[
+          ...(funded ? [['Ngân sách hiện tại', formatVnd(budgetVnd)] as [string, string], ['Điều chỉnh', `${value > 0 ? '+' : ''}${formatVnd(value)}`] as [string, string]] : []),
+          ['Ngân sách mới', formatVnd(next)],
+        ]}
+        consequence="một dòng mới được ghi vào lịch sử ngân sách, không sửa hay xoá được."
+        confirmLabel={funded ? 'Ghi điều chỉnh' : 'Đặt ngân sách'}
+        busy={busy}
+        onClose={() => setConfirming(false)}
+        onConfirm={() => void save()}
+      />
     </Panel>
   );
 }

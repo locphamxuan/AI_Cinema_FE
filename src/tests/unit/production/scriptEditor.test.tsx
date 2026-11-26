@@ -77,7 +77,7 @@ describe('ScriptEditor', () => {
     await userEvent.type(content(), 'CẢNH 1');
     await userEvent.click(submit());
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Kịch bản đang ở trạng thái Đã nộp; hãy chờ duyệt.'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Kịch bản đang ở trạng thái Đã nộp; hãy chờ duyệt. Màn hình đã được tải lại.'));
     expect(onSubmitted).not.toHaveBeenCalled();
     expect(content()).toHaveValue('CẢNH 1');
   });

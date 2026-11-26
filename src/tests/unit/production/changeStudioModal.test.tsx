@@ -122,9 +122,10 @@ describe('ChangeStudioModal', () => {
     await fill();
     await userEvent.click(submitButton());
 
-    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Đợt giao việc này đã được chuyển cho Studio khác.'));
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('Không thực hiện được', 'Đợt giao việc này đã được chuyển cho Studio khác. Màn hình đã được tải lại.'));
     expect(onClose).not.toHaveBeenCalled();
-    expect(reload).not.toHaveBeenCalled();
+    // 409: the project changed meanwhile, so it is loaded again.
+    expect(reload).toHaveBeenCalled();
     expect(screen.getByLabelText('Email Studio')).toHaveValue('moi@studio.vn');
   });
 });

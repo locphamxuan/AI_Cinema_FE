@@ -100,7 +100,7 @@ function EditDetails({ account, onSaved }: { account: AccountDetails; onSaved: (
     <Panel title="Thông tin cá nhân" description="Tên hiển thị cho Reviewer, Creator và Admin trong các dự án.">
       <form onSubmit={submit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <FormField label="Họ và tên">
+          <FormField label="Họ và tên" required>
             <input value={fullName} onChange={(e) => setFullName(e.target.value)} maxLength={255} className={fieldInputClass} />
           </FormField>
           <FormField label="Số điện thoại">
@@ -144,14 +144,14 @@ function ChangePassword() {
     <Panel title="Đổi mật khẩu" description="Sau khi đổi, mọi thiết bị khác sẽ phải đăng nhập lại.">
       <form onSubmit={submit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <FormField label="Mật khẩu hiện tại">
-            <input type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} className={fieldInputClass} />
+          <FormField label="Mật khẩu hiện tại" required>
+            <input type="password" maxLength={72} autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} className={fieldInputClass} />
           </FormField>
-          <FormField label="Mật khẩu mới">
-            <input type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} className={fieldInputClass} />
+          <FormField label="Mật khẩu mới" required>
+            <input type="password" maxLength={72} autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} className={fieldInputClass} />
           </FormField>
-          <FormField label="Nhập lại mật khẩu mới">
-            <input type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className={fieldInputClass} />
+          <FormField label="Nhập lại mật khẩu mới" required>
+            <input type="password" maxLength={72} autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className={fieldInputClass} />
           </FormField>
         </div>
         {issues.length > 0 && <p className="text-xs text-amber-600">Cần sửa: {issues.join('; ')}.</p>}

@@ -16,16 +16,20 @@ import type { ChurnReport, ReportRange, RevenueReport } from '@/types/billing';
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return <StatCard label={label} value={value} unit={hint === 'Coin' ? 'Coin' : undefined} note={hint === 'Coin' ? undefined : hint} />;
+function Stat({ label, value, unit, note }: { label: string; value: string; unit?: string; note?: string }) {
+  return <StatCard label={label} value={value} unit={unit} note={note} />;
 }
 
-/** MF-2 reports over a date range: plan revenue (main and bonus Coins apart) and churn. */
+/** MF-2 reports over a date range: Monthly-plan revenue (main and bonus Coins apart) and who leaves the plan. */
 export function BillingReportsPanel() {
   const can = useCan();
   const [range, setRange] = useState({ from: addDays(today(), -30), to: today() });
-  // The end day is included: the BE reads `to` as an instant, so send the end of that day.
-  const query: ReportRange = { from: range.from, to: `${range.to}T23:59:59.999Z` };
+  // Date-only bounds: the BE reads each as a whole Vietnam business day, the end day included (report-range.ts).
+  const query: ReportRange = { from: range.from, to: range.to };
+  // A cleared box or a start after the end keeps the last valid range instead of sending a request the BE refuses.
+  const pick = (next: { from: string; to: string }) => {
+    if (next.from && next.to && next.from <= next.to) setRange(next);
+  };
   const key = `${range.from}:${range.to}`;
 
   return (
@@ -33,11 +37,11 @@ export function BillingReportsPanel() {
       <div className="flex flex-wrap items-end gap-3 text-xs">
         <label className="space-y-1">
           <span className="block text-muted-foreground">Từ ngày</span>
-          <input type="date" value={range.from} max={range.to} onChange={(e) => setRange({ ...range, from: e.target.value })} className={`${fieldInputClass} py-1`} />
+          <input type="date" value={range.from} max={range.to} onChange={(e) => pick({ ...range, from: e.target.value })} className={`${fieldInputClass} py-1`} />
         </label>
         <label className="space-y-1">
           <span className="block text-muted-foreground">Đến ngày</span>
-          <input type="date" value={range.to} min={range.from} onChange={(e) => setRange({ ...range, to: e.target.value })} className={`${fieldInputClass} py-1`} />
+          <input type="date" value={range.to} min={range.from} onChange={(e) => pick({ ...range, to: e.target.value })} className={`${fieldInputClass} py-1`} />
         </label>
       </div>
       {can(PERMISSION.ANALYTICS_REVENUE_READ) && <RevenueSection rangeKey={key} query={query} />}
@@ -50,21 +54,21 @@ function RevenueSection({ rangeKey, query }: { rangeKey: string; query: ReportRa
   const report = useResource<RevenueReport>(`report:revenue:${rangeKey}`, () => billingAdminService.revenue(query));
   const r = report.data;
   return (
-    <Panel title="Doanh thu gói" description="Chỉ tính các kỳ đã thu Coin; Coin thưởng là chi phí khuyến mãi, không phải doanh thu tiền mặt.">
+    <Panel title="Doanh thu gói Tháng" description="Chỉ tính các kỳ gói đã trả. Coin thưởng là khuyến mãi, không phải tiền thật.">
       {report.error && <ErrorNote message={report.error} onRetry={report.reload} />}
       {report.loading && !r && <Loading />}
       {r && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <Stat label="Kỳ đã thu" value={formatNumber(r.totals.paidCycles)} />
-            <Stat label="Tổng giá gói" value={formatNumber(r.totals.coins)} hint="Coin" />
-            <Stat label="Thu bằng Coin chính" value={formatNumber(r.totals.mainCoins)} hint="Coin" />
-            <Stat label="Thu bằng Coin thưởng" value={formatNumber(r.totals.bonusCoins)} hint="Coin" />
+            <Stat label="Kỳ gói đã trả" value={formatNumber(r.totals.paidCycles)} />
+            <Stat label="Tổng Coin thu" value={formatNumber(r.totals.coins)} unit="Coin" />
+            <Stat label="Trả bằng Coin chính" value={formatNumber(r.totals.mainCoins)} unit="Coin" />
+            <Stat label="Trả bằng Coin thưởng" value={formatNumber(r.totals.bonusCoins)} unit="Coin" />
           </div>
 
           {r.byPlan.length > 0 && (
             <div className="space-y-4 pt-2">
-              <h4 className="text-xs font-bold text-secondary-foreground">Biểu đồ doanh thu từng gói</h4>
+              <h4 className="text-xs font-bold text-secondary-foreground">Coin thu theo từng gói</h4>
               <BarChart
                 categories={r.byPlan.map((row) => row.plan.name)}
                 series={[
@@ -79,7 +83,7 @@ function RevenueSection({ rangeKey, query }: { rangeKey: string; query: ReportRa
                 <TableHeader>
                   <TableRow>
                     <TableHead>Gói</TableHead>
-                    <TableHead className="text-right">Kỳ</TableHead>
+                    <TableHead className="text-right">Kỳ đã trả</TableHead>
                     <TableHead className="text-right">Coin chính</TableHead>
                     <TableHead className="text-right">Coin thưởng</TableHead>
                   </TableRow>
@@ -107,46 +111,45 @@ function ChurnSection({ rangeKey, query }: { rangeKey: string; query: ReportRang
   const report = useResource<ChurnReport>(`report:churn:${rangeKey}`, () => billingAdminService.churn(query));
   const c = report.data;
   return (
-    <Panel title="Rời gói" description="Gói bắt đầu, gia hạn và kết thúc trong khoảng thời gian đã chọn.">
+    <Panel title="Đăng ký và rời gói Tháng" description="Số gói Tháng trong khoảng ngày đã chọn.">
       {report.error && <ErrorNote message={report.error} onRetry={report.reload} />}
       {report.loading && !c && <Loading />}
       {c && (
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat label="Gói mới" value={formatNumber(c.started)} />
+            <Stat label="Gói Tháng mới đăng ký" value={formatNumber(c.started)} />
             <Stat label="Lượt gia hạn" value={formatNumber(c.renewed)} />
-            <Stat label="Gói kết thúc" value={formatNumber(c.ended)} />
-            <Stat label="Tỉ lệ rời gói" value={`${(c.churnRate * 100).toFixed(1)}%`} hint="kết thúc / gói mới" />
+            <Stat label="Gói Tháng đã huỷ hoặc hết hạn" value={formatNumber(c.ended)} />
+            <Stat label="Tỉ lệ rời gói" value={`${(c.churnRate * 100).toFixed(1)}%`} note="= gói huỷ hoặc hết hạn ÷ gói mới đăng ký" />
           </div>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <section className="rounded-xl border p-5">
-              <h3 className="mb-4 text-sm font-semibold">Gói vào và ra</h3>
+              <h3 className="mb-4 text-sm font-semibold">Đăng ký mới, gia hạn và rời gói</h3>
               <BarChart
-                categories={['Gói mới', 'Gia hạn', 'Kết thúc', 'Gia hạn lỗi']}
-                series={[
-                  { name: 'Số gói', color: 'var(--chart-1)', values: [c.started, c.renewed, c.ended, c.failedRenewals] },
-                ]}
+                categories={['Đăng ký mới', 'Gia hạn', 'Huỷ hoặc hết hạn']}
+                series={[{ name: 'Gói Tháng', color: 'var(--chart-1)', values: [c.started, c.renewed, c.ended] }]}
                 valueUnit="gói"
                 height={220}
               />
             </section>
             <section className="rounded-xl border p-5">
-              <h3 className="mb-4 text-sm font-semibold">Vì sao gói kết thúc</h3>
+              <h3 className="mb-4 text-sm font-semibold">Lý do rời gói</h3>
               <DonutChart
                 data={[
                   { label: 'Member tự huỷ', value: c.cancelledByMember, color: 'var(--chart-1)' },
                   { label: 'Admin huỷ', value: c.cancelledByAdmin, color: 'var(--chart-4)' },
-                  { label: 'Hết hạn vì thiếu Coin', value: c.expiredForPayment, color: 'var(--chart-2)' },
-                  { label: 'Hết kỳ, không gia hạn', value: c.expiredUnused, color: 'var(--chart-3)' },
+                  { label: 'Không đủ Coin để gia hạn', value: c.expiredForPayment, color: 'var(--chart-2)' },
+                  { label: 'Hết hạn, không gia hạn', value: c.expiredUnused, color: 'var(--chart-3)' },
                 ]}
-                centerLabel="gói kết thúc"
+                centerLabel="gói rời đi"
                 valueUnit="gói"
                 size={170}
               />
             </section>
           </div>
           <p className="text-sm text-muted-foreground">
-            Đang chạy lúc này: <span className="font-medium text-foreground tabular-nums">{formatNumber(c.running)}</span> gói.
+            Gói Tháng đang hoạt động: <span className="font-medium text-foreground tabular-nums">{formatNumber(c.running)}</span> · Gia hạn
+            không thành công: <span className="font-medium text-foreground tabular-nums">{formatNumber(c.failedRenewals)}</span> lần
           </p>
         </div>
       )}

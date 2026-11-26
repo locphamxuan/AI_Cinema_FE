@@ -1,14 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { ConfirmModal } from '@/components/data/ConfirmModal';
+import { ErrorNote } from '@/components/data/ui';
 import { Button } from '@/components/ui/Button';
 import { fieldInputClass } from '@/components/ui/FormField';
 import { productionService } from '@/services/productionService';
 import type { PlatformSettings } from '@/types/production';
 import { useAction } from '@/hooks/useAction';
 import { useResource } from '@/hooks/useResource';
-import { formatDateTime } from '@/lib/format';
+import { formatDateTime, formatNumber } from '@/lib/format';
 import { ContractPartySettingsForm } from './ContractPartySettingsForm';
 
 type Key = { [K in keyof PlatformSettings]-?: PlatformSettings[K] extends number ? K : never }[keyof PlatformSettings];
@@ -19,13 +20,15 @@ interface SettingField {
   unit: string;
   hint: string;
   min: number;
+  /** The API's ceiling (UpdatePlatformSettingRequestDto), when it has one. */
+  max?: number;
 }
 
 const COIN_FIELDS: SettingField[] = [
   { key: 'coinRateVnd', label: 'Tỷ giá Coin', unit: '₫ / Coin', hint: 'Giá trị 1 Coin chính khi nạp tiền.', min: 1 },
   { key: 'coinTopUpMinVnd', label: 'Nạp tối thiểu mỗi lần', unit: '₫', hint: '', min: 1000 },
   { key: 'coinTopUpMaxVnd', label: 'Nạp tối đa mỗi lần', unit: '₫', hint: '', min: 1000 },
-  { key: 'newMemberBonusCoins', label: 'Coin thưởng tài khoản mới', unit: 'Coin', hint: '0 = không tặng.', min: 0 },
+  { key: 'newMemberBonusCoins', label: 'Coin thưởng tài khoản mới', unit: 'Coin', hint: '0 = không tặng.', min: 0, max: 1_000_000 },
 ];
 
 const PRODUCTION_FIELDS: SettingField[] = [
@@ -34,32 +37,41 @@ const PRODUCTION_FIELDS: SettingField[] = [
 ];
 
 const STREAMING_FIELDS: SettingField[] = [
-  { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Số tập đầu mà khách chưa đăng nhập và Member gói Thường được xem miễn phí.', min: 0 },
+  { key: 'freeStarterEpisodeCount', label: 'Số tập xem miễn phí', unit: 'tập', hint: 'Số tập đầu mà khách chưa đăng nhập và Member gói Thường được xem miễn phí.', min: 0, max: 20 },
   { key: 'playbackHeartbeatTimeoutSeconds', label: 'Tự ngắt khi mất tín hiệu', unit: 'giây', hint: 'Trình phát không gửi tín hiệu quá số giây này thì lượt xem bị ngắt.', min: 10 },
-  { key: 'subscriptionCancelWindowHours', label: 'Hạn tắt gia hạn', unit: 'giờ', hint: 'Member tắt tự gia hạn trước ngày gia hạn ít nhất ngần này giờ.', min: 0 },
-  { key: 'planRenewalGraceHours', label: 'Thời gian thử gia hạn lại', unit: 'giờ', hint: 'Gia hạn thiếu Coin được thử lại trong ngần này giờ, không có quyền xem; 0 = gói hết hạn ngay.', min: 0 },
+  { key: 'subscriptionCancelWindowHours', label: 'Hạn tắt gia hạn', unit: 'giờ', hint: 'Member tắt tự gia hạn trước ngày gia hạn ít nhất ngần này giờ.', min: 0, max: 720 },
+  { key: 'planRenewalGraceHours', label: 'Thời gian thử gia hạn lại', unit: 'giờ', hint: 'Gia hạn thiếu Coin được thử lại trong ngần này giờ, không có quyền xem; 0 = gói hết hạn ngay.', min: 0, max: 720 },
 ];
 
 const ALL_FIELDS = [...COIN_FIELDS, ...PRODUCTION_FIELDS, ...STREAMING_FIELDS];
 
-type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'rewards' | 'contract';
+/** Why a typed setting would be refused, or null; an emptied box never goes out as 0. */
+export function settingProblem(raw: string, { min, max }: Pick<SettingField, 'min' | 'max'>): string | null {
+  const n = Number(raw);
+  if (raw.trim() === '' || !Number.isInteger(n) || n < min || (max !== undefined && n > max)) {
+    return max === undefined ? `Nhập số nguyên từ ${formatNumber(min)} trở lên.` : `Nhập số nguyên từ ${formatNumber(min)} đến ${formatNumber(max)}.`;
+  }
+  return null;
+}
+
+type SettingsTab = 'all' | 'coin' | 'production' | 'streaming' | 'contract';
 
 const TABS: { key: SettingsTab; label: string }[] = [
   { key: 'all', label: 'Tất cả' },
   { key: 'coin', label: 'Coin & nạp tiền' },
   { key: 'production', label: 'Giá tập' },
   { key: 'streaming', label: 'Trình phát & gói' },
-  { key: 'rewards', label: 'Điểm danh & Vòng quay' },
   { key: 'contract', label: 'Hợp đồng (Bên A)' },
 ];
 
-/** Segmented platform policies: Coin, Production, Playback & Rewards */
+/** Segmented platform policies: Coin, Production, Playback and the contract's party A. */
 export function PlatformSettingsPanel() {
   const settings = useResource('settings', productionService.getPlatformSettings);
   const [activeTab, setActiveTab] = useState<SettingsTab>('all');
   const [draft, setDraft] = useState<Partial<Record<Key, string>>>({});
   const [refund, setRefund] = useState<boolean | null>(null);
-  const { busy, run } = useAction();
+  const [confirming, setConfirming] = useState(false);
+  const { busy, run } = useAction({ onStale: () => settings.reload() });
 
   if (settings.loading && !settings.data) {
     return (
@@ -69,22 +81,19 @@ export function PlatformSettingsPanel() {
       </div>
     );
   }
-  if (!settings.data) return <p className="text-xs text-rose-600">{settings.error ?? 'Không tải được cài đặt.'}</p>;
+  if (!settings.data) return <ErrorNote message={settings.error ?? 'Không tải được cài đặt.'} onRetry={settings.reload} />;
   const current = settings.data;
 
   const value = (k: Key) => draft[k] ?? String(current[k]);
   const changed = ALL_FIELDS.filter((f) => draft[f.key] !== undefined && Number(draft[f.key]) !== current[f.key]);
   const refundChanged = refund !== null && refund !== current.refundOnRemoval;
-  const invalid = ALL_FIELDS.some((f) => {
-    const n = Number(value(f.key));
-    return !Number.isInteger(n) || n < f.min;
-  });
+  const invalid = ALL_FIELDS.some((f) => settingProblem(value(f.key), f));
   const rangeInvalid = Number(value('episodeCoinPriceMin')) > Number(value('episodeCoinPriceMax'));
   const topUpInvalid = Number(value('coinTopUpMinVnd')) > Number(value('coinTopUpMaxVnd'));
   const changes = changed.length + (refundChanged ? 1 : 0);
 
-  const save = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const save = async () => {
+    setConfirming(false);
     const patch = Object.fromEntries(changed.map((f) => [f.key, Number(value(f.key))])) as Partial<PlatformSettings>;
     if (refundChanged) patch.refundOnRemoval = refund ?? current.refundOnRemoval;
     if (await run(() => productionService.updatePlatformSettings(patch), 'Đã lưu cài đặt')) {
@@ -109,13 +118,20 @@ export function PlatformSettingsPanel() {
             <input
               type="number"
               min={f.min}
+              max={f.max}
               step={1}
+              aria-label={f.label}
               value={value(f.key)}
               onChange={(e) => setDraft({ ...draft, [f.key]: e.target.value })}
               className={`${fieldInputClass} w-28 py-1.5 text-right tabular-nums`}
             />
             <span className="w-20 text-muted-foreground">{f.unit}</span>
           </span>
+          {settingProblem(value(f.key), f) && (
+            <span role="alert" className="sm:col-span-2 text-rose-600">
+              {settingProblem(value(f.key), f)}
+            </span>
+          )}
         </label>
       ))}
     </div>
@@ -174,7 +190,12 @@ export function PlatformSettingsPanel() {
 
       {activeTab === 'contract' && <ContractPartySettingsForm current={current} onSaved={settings.reload} />}
 
-      <form onSubmit={save} className={`space-y-5 text-xs ${activeTab === 'contract' ? 'hidden' : ''}`}>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setConfirming(true);
+        }}
+        className={`space-y-5 text-xs ${activeTab === 'contract' ? 'hidden' : ''}`}>
         {/* Tab All: show all sections grouped */}
         {activeTab === 'all' && (
           <div className="space-y-6">
@@ -207,7 +228,6 @@ export function PlatformSettingsPanel() {
           <div className="space-y-4">
             {renderFieldGroup(COIN_FIELDS)}
             {refundToggle}
-            {topUpInvalid && <p className="text-rose-600">Mức nạp tối thiểu không được lớn hơn mức tối đa.</p>}
           </div>
         )}
 
@@ -215,7 +235,6 @@ export function PlatformSettingsPanel() {
         {activeTab === 'production' && (
           <div className="space-y-4">
             {renderFieldGroup(PRODUCTION_FIELDS)}
-            {rangeInvalid && <p className="text-rose-600">Giá thấp nhất không được lớn hơn giá cao nhất.</p>}
           </div>
         )}
 
@@ -223,31 +242,6 @@ export function PlatformSettingsPanel() {
         {activeTab === 'streaming' && (
           <div className="space-y-4">
             {renderFieldGroup(STREAMING_FIELDS)}
-          </div>
-        )}
-
-        {/* Tab 4: Rewards Guide & Quick Link */}
-        {activeTab === 'rewards' && (
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 space-y-4">
-            <div className="flex items-center gap-3">
-              <div>
-                <h3 className="text-sm font-bold text-foreground">Quy tắc thưởng & vòng quay</h3>
-                <p className="text-xs text-muted-foreground">
-                  Cấu hình phần thưởng theo chuỗi ngày điểm danh và giải thưởng của vòng quay.
-                </p>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Mức thưởng theo ngày điểm danh và tỉ lệ trúng của vòng quay được chỉnh riêng ở trang Điểm danh & vòng quay.
-            </p>
-            <div className="pt-2">
-              <Link
-                href="/admin/rewards"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors shadow-md shadow-amber-500/20"
-              >
-                <span>Mở trang Điểm danh & vòng quay</span>
-              </Link>
-            </div>
           </div>
         )}
 
@@ -278,6 +272,20 @@ export function PlatformSettingsPanel() {
           </Button>
         </div>
       </form>
+      <ConfirmModal
+        open={confirming}
+        tone="warning"
+        title="Lưu cài đặt nền tảng"
+        description="Cài đặt áp dụng ngay cho toàn bộ nền tảng."
+        details={[
+          ...changed.map((f): [string, string] => [f.label, `${formatNumber(current[f.key])} → ${formatNumber(Number(value(f.key)))} ${f.unit}`]),
+          ...(refundChanged ? [['Hoàn Coin khi gỡ hẳn tập', refund ? 'Bật' : 'Tắt'] as [string, string]] : []),
+        ]}
+        confirmLabel="Lưu cài đặt"
+        busy={busy}
+        onClose={() => setConfirming(false)}
+        onConfirm={save}
+      />
     </section>
   );
 }

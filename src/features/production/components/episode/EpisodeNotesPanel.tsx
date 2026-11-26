@@ -29,7 +29,7 @@ export function EpisodeNotesPanel({
 }) {
   const notes = useResource(`episode-notes:${episodeId}`, () => productionService.listEpisodeNotes(episodeId));
   const [message, setMessage] = useState('');
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: notes.reload });
 
   const send = async () => {
     if (await run(() => productionService.sendEpisodeNote(episodeId, message.trim()), 'Đã gửi ghi chú')) {

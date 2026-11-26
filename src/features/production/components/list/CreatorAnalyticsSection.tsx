@@ -26,11 +26,12 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
     cancelled: projects.filter((p) => p.status === 'CANCELLED').length,
   };
 
+  // Same hue per status as the Admin overview.
   const donutData = [
-    { label: 'Đang sản xuất', value: statusCounts.production, color: 'var(--chart-1)' },
-    { label: 'Hoàn tất', value: statusCounts.done, color: 'var(--chart-3)' },
-    { label: 'Lên kế hoạch', value: statusCounts.plan, color: 'var(--chart-2)' },
-    { label: 'Đã huỷ', value: statusCounts.cancelled, color: 'var(--chart-4)' },
+    { label: 'Đang sản xuất', value: statusCounts.production, color: 'var(--viz-1)' },
+    { label: 'Lên kế hoạch', value: statusCounts.plan, color: 'var(--viz-2)' },
+    { label: 'Hoàn tất', value: statusCounts.done, color: 'var(--viz-3)' },
+    { label: 'Đã huỷ', value: statusCounts.cancelled, color: 'var(--viz-5)' },
   ];
 
   // Real-time active projects with episode counts (Top 6)
@@ -50,7 +51,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
   const barSeries = [
     {
       name: 'Số tập',
-      color: 'var(--chart-3)',
+      color: 'var(--viz-3)',
       values: recentProjects.map((p) => p._count?.episodes ?? 0),
     },
   ];
@@ -61,9 +62,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
     <Card className="mb-6 gap-0 py-0">
       <div className="flex items-center justify-between gap-3 border-b px-6 py-4">
         <div className="min-w-0">
-          <h2 className="flex items-center gap-2 font-heading text-base font-semibold">
-            Thống kê sản xuất
-          </h2>
+          <h2 className="font-display text-base font-semibold">Thống kê sản xuất</h2>
           <p className="text-sm text-muted-foreground">Trạng thái dự án và số tập đã làm của {roleTitle}.</p>
         </div>
         <Button variant="ghost" size="sm" aria-expanded={!collapsed} onClick={() => setCollapsed(!collapsed)}>
@@ -84,6 +83,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
             />
             <StatCard
               icon={Clapperboard}
+              accent={3}
               label="Tập đã có"
               value={totalEpisodes}
               unit="tập"
@@ -91,6 +91,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
             />
             <StatCard
               icon={CheckCircle2}
+              accent={2}
               label="Dự án đã hoàn tất"
               value={statusCounts.done}
               note={`${statusCounts.plan} đang lên kế hoạch`}
@@ -100,7 +101,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <section className="rounded-xl border p-5">
-              <h3 className="mb-4 text-sm font-semibold">Tỉ lệ trạng thái dự án</h3>
+              <h3 className="mb-4 font-display text-sm font-semibold">Tỉ lệ trạng thái dự án</h3>
               <DonutChart
                 data={donutData}
                 centerLabel="dự án"
@@ -110,7 +111,7 @@ export function CreatorAnalyticsSection({ projects, roleTitle = 'Creator', defau
               />
             </section>
             <section className="rounded-xl border p-5">
-              <h3 className="mb-4 text-sm font-semibold">Số tập theo dự án</h3>
+              <h3 className="mb-4 font-display text-sm font-semibold">Số tập theo dự án</h3>
               <BarChart categories={barCategories} series={barSeries} valueUnit="tập" height={200} />
             </section>
           </div>

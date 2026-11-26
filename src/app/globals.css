@@ -626,12 +626,52 @@ select:not(.sr-only) option {
   font-weight: 600;
 }
 
-/* The greeting of a dashboard: a black panel in both themes, with a faint grid and one soft violet light. */
-.hero-ink {
+/* ===== DASHBOARD PALETTE (role dashboards) =====
+   Five categorical hues in a fixed order, checked for colour-blind separation and contrast on the card surface
+   of each theme: Reel violet, Projector amber, teal, blue, pink. A figure keeps its hue on every dashboard. */
+:root {
+  --reel: #6646F0;
+  --projector: #F5B83D;
+  --viz-1: #6646F0;
+  --viz-2: #D97706;
+  --viz-3: #0E9F9A;
+  --viz-4: #2563EB;
+  --viz-5: #DB2777;
+}
+.dark {
+  --reel: #8B74FF;
+  --viz-1: #8B74FF;
+  --viz-2: #C98412;
+  --viz-3: #13A59B;
+  --viz-4: #4F86F7;
+  --viz-5: #E0508A;
+}
+@theme inline {
+  --color-reel: var(--reel);
+  --color-projector: var(--projector);
+  --color-viz-1: var(--viz-1);
+  --color-viz-2: var(--viz-2);
+  --color-viz-3: var(--viz-3);
+  --color-viz-4: var(--viz-4);
+  --color-viz-5: var(--viz-5);
+}
+
+/* The greeting of a dashboard: a dark screening room in both themes, lit by one projector beam
+   (amber at the lens, fading to violet on the screen). */
+.hero-booth {
+  position: relative;
+  isolation: isolate;
   background:
-    radial-gradient(60% 120% at 100% 0%, rgb(102 70 240 / 0.35), transparent 60%),
-    linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px) 0 0 / 28px 28px,
-    linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px) 0 0 / 28px 28px,
-    #121212;
+    radial-gradient(80% 140% at 100% 0%, rgb(102 70 240 / 0.55), transparent 62%),
+    radial-gradient(40% 60% at 0% 100%, rgb(219 39 119 / 0.18), transparent 70%),
+    linear-gradient(135deg, #1C1830 0%, #15121F 55%, #120F1B 100%);
   color: #fff;
+}
+.hero-booth::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: conic-gradient(from 200deg at 96% -10%, transparent 0deg, rgb(245 184 61 / 0.22) 14deg, rgb(245 184 61 / 0.06) 32deg, transparent 46deg);
+  pointer-events: none;
 }

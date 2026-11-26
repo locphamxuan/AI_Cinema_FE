@@ -1,37 +1,47 @@
 'use client';
 
 import { useState } from 'react';
-import { Wallet } from 'lucide-react';
-import { ConfirmModal } from '@/components/data/ConfirmModal';
+import Link from 'next/link';
 import { MetaPager } from '@/components/data/MetaPager';
 import { Empty, ErrorNote, Loading, Panel, StatusPill } from '@/components/data/ui';
 import { Button } from '@/components/ui/Button';
-import { FormField, fieldInputClass, fieldTextareaClass } from '@/components/ui/FormField';
+import { fieldInputClass } from '@/components/ui/FormField';
 import { toast } from '@/components/ui/Toast';
 import { useAction } from '@/hooks/useAction';
-import { useCan } from '@/hooks/useCan';
 import { useResource } from '@/hooks/useResource';
 import { COIN_ENTRY_LABEL } from '@/lib/coinEntry';
 import { formatDateTime, formatNumber } from '@/lib/format';
-import { PERMISSION } from '@/lib/permissions';
 import { financeService } from '@/services/financeService';
-import { WalletModal } from '@/features/billing-admin/components/CoinLedgerPanel';
+import { WalletModal } from '@/features/billing-admin/components/WalletModal';
 import type { Tone } from '@/features/production/lib/labels';
-import type { RiskFlag, RiskFlagStatus } from '@/types/finance';
+import type { RiskDecision, RiskFlag, RiskFlagStatus, RiskScanResult } from '@/types/finance';
 import type { CoinEntryType } from '@/types/billing';
+import { RiskFlagActionModal } from './RiskFlagActionModal';
 import { vnd } from './financeFormat';
 
 const STATUS: Record<RiskFlagStatus, { label: string; tone: Tone }> = {
   OPEN: { label: 'Chờ xử lý', tone: 'amber' },
-  CONFIRMED: { label: 'Đã xác nhận rủi ro', tone: 'rose' },
+  ACCOUNT_LOCKED: { label: 'Đã khoá tài khoản', tone: 'rose' },
   DISMISSED: { label: 'Đã bỏ qua', tone: 'neutral' },
+  CONFIRMED: { label: 'Đã xác nhận rủi ro', tone: 'rose' },
 };
 
-type Decision = 'CONFIRMED' | 'DISMISSED';
+/** Rules no longer run, still named on the flags they raised. */
+const RETIRED_RULES: Record<string, string> = { LARGE_ADJUSTMENT: 'Điều chỉnh Coin bằng tay (quy tắc đã bỏ)' };
 
-/** Coin transactions the risk rules flagged: the Admin confirms the risk or dismisses it, with a note. */
+const ACCOUNTS_PAGE = '/admin/permissions?tab=accounts';
+
+/** What the scan toast says: how many new risky transactions, and by which rule. */
+export function scanSummary(result: RiskScanResult): { title: string; description?: string } {
+  if (result.created === 0) return { title: 'Không có giao dịch rủi ro mới' };
+  return {
+    title: `Tìm thấy ${result.created} giao dịch rủi ro mới`,
+    description: result.rules.map((r) => `${r.description}: ${r.created}`).join('. '),
+  };
+}
+
+/** Coin transactions the risk rules flagged: the Admin locks the member account to stop it, or dismisses the flag. */
 export function RiskFlagsTab() {
-  const canAdjust = useCan()(PERMISSION.COIN_ADJUST);
   const [status, setStatus] = useState<RiskFlagStatus | ''>('OPEN');
   const [ruleCode, setRuleCode] = useState('');
   const [page, setPage] = useState(1);
@@ -39,35 +49,38 @@ export function RiskFlagsTab() {
   const flags = useResource(`finance:risk:flags:${status}:${ruleCode}:${page}`, () =>
     financeService.riskFlags(page, 20, status || undefined, ruleCode || undefined),
   );
-  const [reviewing, setReviewing] = useState<{ flag: RiskFlag; decision: Decision } | null>(null);
-  const [note, setNote] = useState('');
-  const [walletOf, setWalletOf] = useState<string | null>(null);
+  const [acting, setActing] = useState<{ flag: RiskFlag; decision: RiskDecision } | null>(null);
+  const [walletOf, setWalletOf] = useState<RiskFlag['coinTransaction']['wallet']['user'] | null>(null);
   const { busy, run } = useAction();
 
   const scan = async () => {
     const res = await run(() => financeService.scan());
-    if (res) {
-      toast.success(`Thêm ${res.created} giao dịch nghi vấn mới`);
-      await flags.reload();
-    }
+    if (!res) return;
+    const { title, description } = scanSummary(res);
+    if (res.created > 0) toast.warning(title, description);
+    else toast.success(title);
+    await flags.reload();
   };
 
-  const review = async () => {
-    if (!reviewing) return;
-    const { flag, decision } = reviewing;
-    await run(() => financeService.review(flag.id, decision, note), decision === 'CONFIRMED' ? 'Đã xác nhận rủi ro' : 'Đã bỏ dấu nghi vấn');
-    setReviewing(null);
-    setNote('');
+  const act = async (note: string) => {
+    if (!acting) return;
+    const { flag, decision } = acting;
+    const locking = decision === 'ACCOUNT_LOCKED';
+    await run(
+      () => financeService.review(flag.id, decision, note),
+      locking ? `Đã khoá tài khoản ${flag.coinTransaction.wallet.user.fullName}` : 'Đã bỏ qua giao dịch',
+    );
+    setActing(null);
     // A flag another Admin handled first answers 409 (shown as a toast): the list is reloaded either way.
     await flags.reload();
   };
 
-  const ruleText = (code: string) => rules.data?.find((r) => r.code === code)?.description ?? code;
+  const ruleText = (code: string) => rules.data?.find((r) => r.code === code)?.description ?? RETIRED_RULES[code] ?? code;
 
   return (
     <Panel
       title="Giao dịch rủi ro"
-      description="Giao dịch Coin bị các quy tắc rủi ro đánh dấu nghi vấn. Xác nhận khi cần theo dõi tiếp, bỏ qua khi là giao dịch bình thường."
+      description="Giao dịch Coin bất thường do hệ thống tự phát hiện (quét mỗi giờ). Khoá tài khoản để chặn, hoặc bỏ qua nếu bình thường."
       actions={
         <>
           <select
@@ -110,20 +123,22 @@ export function RiskFlagsTab() {
     >
       {flags.error && <ErrorNote message={flags.error} onRetry={flags.reload} />}
       {flags.loading && !flags.data && <Loading />}
-      {flags.data?.data.length === 0 && <Empty>Không có giao dịch nghi vấn nào theo bộ lọc này.</Empty>}
+      {flags.data?.data.length === 0 && <Empty>Không có giao dịch rủi ro nào theo bộ lọc này.</Empty>}
       {flags.data && flags.data.data.length > 0 && (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead className="text-left text-muted-foreground">
               <tr>
                 <th className="py-2 pr-3 font-medium">Thời điểm</th>
-                <th className="py-2 pr-3 font-medium">Member</th>
+                <th className="py-2 pr-3 font-medium">Tài khoản</th>
                 <th className="py-2 pr-3 font-medium">Giao dịch</th>
                 <th className="py-2 pr-3 text-right font-medium">Coin chính / thưởng</th>
-                <th className="py-2 pr-3 text-right font-medium">Quy đổi</th>
-                <th className="py-2 pr-3 font-medium">Quy tắc và lý do</th>
+                <th className="py-2 pr-3 text-right font-medium">Giá trị</th>
+                <th className="py-2 pr-3 font-medium">Lý do</th>
                 <th className="py-2 pr-3 font-medium">Trạng thái</th>
-                <th className="py-2 text-right font-medium">Thao tác</th>
+                <th className="py-2 text-right font-medium">
+                  <span className="sr-only">Thao tác</span>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border align-top">
@@ -136,6 +151,7 @@ export function RiskFlagsTab() {
                     <td className="py-2.5 pr-3">
                       <p className="font-medium">{member.fullName}</p>
                       <p className="text-muted-foreground">{member.email}</p>
+                      {!member.isActive && <p className="mt-0.5 font-medium text-destructive">Đang bị khoá</p>}
                     </td>
                     <td className="py-2.5 pr-3">{COIN_ENTRY_LABEL[tx.entryType as CoinEntryType] ?? tx.entryType}</td>
                     <td className="py-2.5 pr-3 text-right tabular-nums whitespace-nowrap">
@@ -149,22 +165,32 @@ export function RiskFlagsTab() {
                     </td>
                     <td className="py-2.5 pr-3">
                       <StatusPill {...STATUS[f.status]} />
-                      {f.reviewedBy && <p className="mt-1 text-muted-foreground">{f.reviewedBy.fullName}</p>}
+                      {f.reviewedBy && (
+                        <p className="mt-1 text-muted-foreground">
+                          {f.reviewedBy.fullName}
+                          {f.reviewedAt && ` · ${formatDateTime(f.reviewedAt)}`}
+                        </p>
+                      )}
                     </td>
                     <td className="py-2.5">
-                      <div className="flex justify-end gap-1.5">
-                        <Button size="sm" variant="ghost" aria-label={`Mở ví của ${member.fullName}`} onClick={() => setWalletOf(member.id)}>
-                          <Wallet className="size-3.5" aria-hidden="true" />
+                      <div className="flex flex-wrap justify-end gap-1.5">
+                        <Button size="sm" variant="ghost" aria-label={`Xem ví của ${member.fullName}`} onClick={() => setWalletOf(member)}>
+                          Xem ví
                         </Button>
                         {f.status === 'OPEN' && (
-                          <>
-                            <Button size="sm" variant="secondary" disabled={busy} onClick={() => setReviewing({ flag: f, decision: 'DISMISSED' })}>
-                              Bỏ qua
-                            </Button>
-                            <Button size="sm" variant="danger" disabled={busy} onClick={() => setReviewing({ flag: f, decision: 'CONFIRMED' })}>
-                              Xác nhận rủi ro
-                            </Button>
-                          </>
+                          <Button size="sm" variant="secondary" disabled={busy} onClick={() => setActing({ flag: f, decision: 'DISMISSED' })}>
+                            Bỏ qua
+                          </Button>
+                        )}
+                        {f.status === 'OPEN' && member.isActive && (
+                          <Button size="sm" variant="danger" disabled={busy} onClick={() => setActing({ flag: f, decision: 'ACCOUNT_LOCKED' })}>
+                            Khoá tài khoản
+                          </Button>
+                        )}
+                        {!member.isActive && (
+                          <Link href={ACCOUNTS_PAGE} className="self-center px-2 font-medium text-primary underline-offset-2 hover:underline">
+                            Mở khoá ở trang Tài khoản
+                          </Link>
                         )}
                       </div>
                     </td>
@@ -177,25 +203,10 @@ export function RiskFlagsTab() {
       )}
       {flags.data && <MetaPager meta={flags.data.meta} onPage={setPage} />}
 
-      <ConfirmModal
-        open={!!reviewing}
-        title={reviewing?.decision === 'CONFIRMED' ? 'Xác nhận giao dịch rủi ro?' : 'Bỏ dấu nghi vấn này?'}
-        description={reviewing ? `${reviewing.flag.coinTransaction.wallet.user.fullName}: ${reviewing.flag.reason}` : ''}
-        confirmLabel={reviewing?.decision === 'CONFIRMED' ? 'Xác nhận rủi ro' : 'Bỏ qua'}
-        danger={reviewing?.decision === 'CONFIRMED'}
-        busy={busy}
-        onClose={() => {
-          setReviewing(null);
-          setNote('');
-        }}
-        onConfirm={() => void review()}
-      >
-        <FormField label="Ghi chú (tuỳ chọn)">
-          <textarea rows={3} maxLength={2000} value={note} onChange={(e) => setNote(e.target.value)} className={fieldTextareaClass} />
-        </FormField>
-      </ConfirmModal>
-
-      {walletOf && <WalletModal userId={walletOf} canAdjust={canAdjust} onClose={() => setWalletOf(null)} onAdjusted={flags.reload} />}
+      {acting && (
+        <RiskFlagActionModal flag={acting.flag} decision={acting.decision} busy={busy} onClose={() => setActing(null)} onConfirm={(note) => void act(note)} />
+      )}
+      {walletOf && <WalletModal userId={walletOf.id} account={walletOf} onClose={() => setWalletOf(null)} />}
     </Panel>
   );
 }

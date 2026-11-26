@@ -1,198 +1,125 @@
 'use client';
 
 import { useState } from 'react';
-import { Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useResource } from '@/hooks/useResource';
 import { Empty, ErrorNote, Loading } from '@/components/data/ui';
+import { cn } from '@/lib/utils';
 import { billingAdminService } from '@/services/billingAdminService';
 import type { RewardRule } from '@/types/billing';
 import { LADDER_LENGTH, RewardRuleModal } from './RewardRuleModal';
 
-/** BR-05 / BR-09: what each streak day pays in bonus Coins, and which day also grants a spin. */
+const DAYS = Array.from({ length: LADDER_LENGTH }, (_, i) => i + 1);
+
+/**
+ * BR-05 / BR-09: the 7-day check-in schedule. One card per day shows the bonus Coins it pays and
+ * whether it also gives a spin; switched-off rewards are listed under it so they can be turned back on.
+ */
 export function RewardLadderPanel() {
   const rules = useResource('admin:reward-rules', billingAdminService.listRewardRules);
-  const [editing, setEditing] = useState<RewardRule | 'new' | null>(null);
+  const [editing, setEditing] = useState<{ rule: RewardRule | null; day?: number } | null>(null);
   const data = rules.data ?? [];
-  const takenDays = new Set(data.filter((r) => r.isActive).map((r) => r.streakDay));
+  const active = data.filter((r) => r.isActive);
+  const off = data.filter((r) => !r.isActive).sort((a, b) => a.streakDay - b.streakDay);
+  const byDay = new Map(active.map((r) => [r.streakDay, r]));
+  const takenDays = new Set(byDay.keys());
   const takenCodes = new Set(data.map((r) => r.code.toLowerCase()));
-
-  // Sort by streakDay ascending
-  const sortedRules = [...data].sort((a, b) => a.streakDay - b.streakDay);
-
-  // Total coins across full 7-day streak
-  const totalStreakCoins = sortedRules.reduce((sum, r) => sum + (r.isActive ? r.bonusCoins : 0), 0);
+  const weekCoins = active.reduce((sum, r) => sum + r.bonusCoins, 0);
+  const spinDays = active.filter((r) => r.grantsSpin).map((r) => r.streakDay);
 
   return (
-    <section className="bg-card rounded-3xl border border-sky-100 dark:border-white/10 overflow-hidden shadow-sm">
-      {/* ── Panel Header ── */}
-      <div className="p-6 border-b border-border space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2.5">
-              <div>
-                <h2 className="text-base font-bold text-foreground flex items-center gap-2">
-                  Điểm danh hằng ngày
-                  <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-                    Chuỗi 7 ngày
-                  </span>
-                </h2>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-              Bỏ lỡ một ngày thì chuỗi bắt đầu lại từ Ngày 1. Điểm danh đủ 7 ngày liên tục sẽ được nhận tổng cộng{' '}
-              <strong className="text-amber-600 dark:text-amber-400 tabular-nums font-bold">+{totalStreakCoins} Coin</strong> và tự động tặng thêm{' '}
-              <strong className="text-purple-600 dark:text-purple-400 font-semibold">1 lượt quay may mắn</strong>.
-            </p>
-          </div>
-
-          <div className="shrink-0">
-            <Button
-              size="sm"
-              onClick={() => setEditing('new')}
-              disabled={takenDays.size >= LADDER_LENGTH}
-              className="rounded-xl px-4 py-2 font-bold text-xs flex items-center gap-1.5 shadow-sm"
-            >
-              <span>Thêm ngày</span>
-            </Button>
-          </div>
+    <section className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+      <header className="flex flex-col gap-4 border-b border-border p-6 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1.5">
+          <h2 className="text-base font-bold text-foreground">Điểm danh hằng ngày</h2>
+          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Mỗi ngày Member điểm danh một lần để nhận Coin thưởng theo bảng dưới. Điểm danh liên tục thì tiến lên ngày
+            tiếp theo; bỏ một ngày thì quay lại Ngày 1; xong Ngày {LADDER_LENGTH} thì bắt đầu lại từ Ngày 1.
+          </p>
+          <p className="text-sm text-foreground">
+            Đủ {LADDER_LENGTH} ngày liên tục: tổng <strong className="tabular-nums">{weekCoins} Coin thưởng</strong>
+            {spinDays.length > 0 && <> và 1 lượt quay (vào Ngày {spinDays.join(', ')})</>}.
+          </p>
         </div>
+        <Button
+          size="sm"
+          onClick={() => setEditing({ rule: null })}
+          disabled={takenDays.size >= LADDER_LENGTH}
+          className="shrink-0 rounded-xl px-4"
+        >
+          Thêm ngày
+        </Button>
+      </header>
 
-        {/* ── Visual 7-Day Streak Preview Cards ── */}
-        {sortedRules.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 pt-2">
-            {sortedRules.map((r) => {
-              const isDay7 = r.streakDay === LADDER_LENGTH;
-              return (
-                <div
-                  key={r.id}
-                  className={`relative p-3 rounded-2xl border transition-all text-center flex flex-col justify-between ${
-                    isDay7
-                      ? 'bg-gradient-to-b from-purple-500/10 via-amber-500/5 to-transparent border-purple-500/30 shadow-xs'
-                      : 'bg-muted/60 border-border'
-                  }`}
-                >
-                  {isDay7 && (
-                    <span className="absolute -top-2 right-2 text-[9px] font-black text-purple-600 dark:text-purple-300 bg-purple-100 dark:bg-purple-500/20 px-1.5 py-0.2 rounded-full border border-purple-500/30">
-                      Đặc biệt
-                    </span>
-                  )}
-                  <p className="text-[11px] font-bold text-muted-foreground">
-                    Ngày {r.streakDay}
-                  </p>
-                  <div className="my-1.5">
-                    <span className="inline-flex items-center gap-1 text-sm font-black tabular-nums text-amber-600 dark:text-amber-400">
-                      +{r.bonusCoins}
-                    </span>
-                  </div>
-                  <div className="pt-1 border-t border-border">
-                    {isDay7 ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-600 dark:text-purple-300">
-                        +1 lượt quay
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-muted-foreground/70">
-                        Coin thưởng
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── Content States ── */}
       {rules.error && <ErrorNote message={rules.error} onRetry={rules.reload} />}
       {rules.loading && !rules.data && <Loading />}
-      {rules.data?.length === 0 && (
-        <Empty>Chưa cấu hình ngày nào: Member điểm danh sẽ không nhận được Coin thưởng.</Empty>
+      {rules.data?.length === 0 && <Empty>Chưa đặt thưởng cho ngày nào: Member điểm danh sẽ chưa nhận được Coin thưởng.</Empty>}
+
+      {rules.data && (
+        <ol className="grid grid-cols-2 gap-3 p-6 sm:grid-cols-4 lg:grid-cols-7">
+          {DAYS.map((day) => {
+            const rule = byDay.get(day);
+            return (
+              <li
+                key={day}
+                className={cn(
+                  'flex flex-col gap-2 rounded-2xl border p-3 text-center',
+                  rule?.grantsSpin ? 'border-primary/40 bg-primary/5' : 'border-border bg-muted/40',
+                  !rule && 'border-dashed',
+                )}
+              >
+                <p className="text-xs font-semibold text-muted-foreground">Ngày {day}</p>
+                {rule ? (
+                  <>
+                    <p className="text-lg font-bold tabular-nums text-foreground">+{rule.bonusCoins}</p>
+                    <p className="text-xs text-muted-foreground">Coin thưởng</p>
+                    {rule.grantsSpin && <p className="text-xs font-semibold text-primary">+1 lượt quay</p>}
+                    <Button size="sm" variant="secondary" aria-label={`Sửa ngày ${day}`} onClick={() => setEditing({ rule })} className="mt-auto rounded-xl">
+                      Sửa
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">Chưa có thưởng</p>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      aria-label={`Đặt thưởng ngày ${day}`}
+                      onClick={() => setEditing({ rule: null, day })}
+                      className="mt-auto rounded-xl"
+                    >
+                      Đặt thưởng
+                    </Button>
+                  </>
+                )}
+              </li>
+            );
+          })}
+        </ol>
       )}
 
-      {/* ── Detailed Table ── */}
-      {sortedRules.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="text-[11px] text-muted-foreground bg-muted/60 border-b border-border text-left">
-              <tr>
-                <th className="py-3 px-6 font-bold w-24">Ngày trong chuỗi</th>
-                <th className="py-3 px-4 font-bold">Tên hiển thị</th>
-                <th className="py-3 px-4 font-bold text-right">Coin thưởng</th>
-                <th className="py-3 px-4 font-bold text-center">Quà tặng kèm</th>
-                <th className="py-3 px-4 font-bold text-center">Trạng thái</th>
-                <th className="py-3 px-6 text-right w-20">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-white/5">
-              {sortedRules.map((rule) => {
-                const isDay7 = rule.streakDay === LADDER_LENGTH;
-                return (
-                  <tr
-                    key={rule.id}
-                    className="hover:bg-slate-50/60 dark:hover:bg-white/[0.02] transition-colors"
-                  >
-                    <td className="py-3 px-6 font-bold text-foreground whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-muted tabular-nums text-xs">
-                        Ngày {rule.streakDay}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-secondary-foreground font-medium">
-                      {rule.name}
-                    </td>
-                    <td className="py-3 px-4 text-right whitespace-nowrap">
-                      <span className="inline-flex items-center gap-1 tabular-nums font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 text-xs">
-                        +{rule.bonusCoins} Coin
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-center whitespace-nowrap">
-                      {isDay7 ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/25">
-                          <span>+1 lượt quay</span>
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground/70 tabular-nums">—</span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-center whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
-                          rule.isActive
-                            ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20'
-                            : 'bg-muted text-muted-foreground border-border'
-                        }`}
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            rule.isActive ? 'bg-emerald-500' : 'bg-slate-400'
-                          }`}
-                        />
-                        <span>{rule.isActive ? 'Đang dùng' : 'Đã tắt'}</span>
-                      </span>
-                    </td>
-                    <td className="py-3 px-6 text-right whitespace-nowrap">
-                      <button
-                        type="button"
-                        aria-label={`Sửa ngày ${rule.streakDay}`}
-                        onClick={() => setEditing(rule)}
-                        className="p-1.5 rounded-lg text-muted-foreground hover:text-sky-600 dark:hover:text-sky-400 hover:bg-muted transition-colors cursor-pointer"
-                        title="Chỉnh sửa cấu hình ngày này"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      {off.length > 0 && (
+        <div className="border-t border-border px-6 py-4">
+          <h3 className="mb-2 text-sm font-semibold text-foreground">Thưởng đang tắt</h3>
+          <ul className="divide-y divide-border text-sm">
+            {off.map((rule) => (
+              <li key={rule.id} className="flex items-center justify-between gap-3 py-2 text-muted-foreground">
+                <span>
+                  Ngày {rule.streakDay}: +{rule.bonusCoins} Coin thưởng{rule.grantsSpin ? ', +1 lượt quay' : ''}
+                </span>
+                <Button size="sm" variant="secondary" aria-label={`Sửa ngày ${rule.streakDay}`} onClick={() => setEditing({ rule })} className="rounded-xl">
+                  Sửa
+                </Button>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
-      {/* ── Edit / Create Modal ── */}
       {editing && (
         <RewardRuleModal
-          rule={editing === 'new' ? null : editing}
+          rule={editing.rule}
+          initialDay={editing.day}
           takenDays={takenDays}
           takenCodes={takenCodes}
           onClose={() => setEditing(null)}

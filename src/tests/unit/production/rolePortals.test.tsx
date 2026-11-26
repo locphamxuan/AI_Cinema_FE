@@ -10,7 +10,7 @@ import { filterQueue, toQueueItems } from '@/features/reviewer/reviewQueue';
 import { assignedProject, STUDIO } from '@/tests/support/projectContext';
 import { fakeResponse } from '@/tests/support/fakeResponse';
 import { routeFetch } from '@/tests/support/routeFetch';
-import { attachPdf, formOf } from '@/tests/support/pdf';
+import { attachSignature, formOf } from '@/tests/support/signature';
 import type { PipelineScript, ProjectPipeline } from '@/services/pipelineService';
 import { signInAs } from '@/tests/support/signIn';
 import type { Episode, ProjectDetail, ProjectScript } from '@/types/production';
@@ -155,8 +155,9 @@ describe('AdminExecutivePortal', () => {
     const dialog = await screen.findByRole('dialog');
     expect(dialog).toHaveTextContent('Mưa Sài Gòn');
     expect(dialog).toHaveTextContent('Giao đúng hạn');
-    const file = await attachPdf(dialog, /PDF AI Cinema đã ký/);
+    const file = await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     await userEvent.click(within(dialog).getByRole('button', { name: /Đồng ý/ }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Ký hợp đồng' }));
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/contracts/c1/sign' && c.method === 'POST');
       expect(formOf(sent!.body).get('file')).toBe(file);
@@ -176,8 +177,9 @@ describe('AdminExecutivePortal', () => {
     expect(send).toBeDisabled();
     await userEvent.clear(within(dialog).getByLabelText('Giá đề xuất mới'));
     await userEvent.type(within(dialog).getByLabelText('Giá đề xuất mới'), '120000000');
-    await attachPdf(dialog, /PDF AI Cinema đã ký/);
+    await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     await userEvent.click(send);
+    await userEvent.click(await screen.findByRole('button', { name: 'Ký và gửi giá' }));
     await waitFor(() => {
       const sent = calls.find((c) => c.path === '/contracts/c1/counter');
       expect(formOf(sent!.body).get('costVnd')).toBe('120000000');
@@ -217,7 +219,7 @@ describe('AdminExecutivePortal', () => {
     const dialog = await screen.findByRole('dialog');
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Chưa thể đề xuất giá khác');
     await userEvent.type(within(dialog).getByLabelText('Giá đề xuất mới'), '120000000');
-    await attachPdf(dialog, /PDF AI Cinema đã ký/);
+    await attachSignature(dialog, /Ảnh chữ ký AI Cinema/);
     expect(within(dialog).getByRole('button', { name: 'Gửi giá đề xuất' })).toBeDisabled();
     expect(within(dialog).getByRole('button', { name: /Đồng ý/ })).toBeEnabled();
   });

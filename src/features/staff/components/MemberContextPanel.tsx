@@ -115,7 +115,7 @@ export function MemberContextPanel({ caseId }: { caseId: string }) {
           </section>
         );
       })}
-      <p className="text-[11px] text-muted-foreground 2xl:col-span-2">Chỉ đọc. Điều chỉnh Coin, gói hay thiết bị do Admin làm ở màn quản trị tương ứng.</p>
+      <p className="text-[11px] text-muted-foreground 2xl:col-span-2">Chỉ đọc. Gói và thiết bị do Admin xử lý ở màn quản trị.</p>
     </div>
   );
 }

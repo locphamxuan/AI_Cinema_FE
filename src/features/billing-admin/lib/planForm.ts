@@ -8,7 +8,7 @@ export const PLAN_QUALITIES = ['360p', '720p', '1080p'] as const;
 const CODE_PATTERN = /^[A-Za-z0-9_-]+$/;
 
 /** What a new plan starts with: the Free plan's limits, so nothing is given away by accident. */
-const NEW_PLAN_FEATURES = { maxRegisteredDevices: 2, maxConcurrentStreams: 1, adFree: false, maxQuality: '720p' };
+const NEW_PLAN_FEATURES = { maxRegisteredDevices: 2, maxConcurrentStreams: 1, maxQuality: '720p' };
 
 export interface PlanForm {
   code: string;
@@ -20,7 +20,6 @@ export interface PlanForm {
   isFeatured: boolean;
   maxRegisteredDevices: string;
   maxConcurrentStreams: string;
-  adFree: boolean;
   maxQuality: string;
 }
 
@@ -40,7 +39,6 @@ export function planFormOf(plan: AdminPlan | null): PlanForm {
     isFeatured: plan?.isFeatured ?? false,
     maxRegisteredDevices: String(numberOf(features.maxRegisteredDevices, NEW_PLAN_FEATURES.maxRegisteredDevices)),
     maxConcurrentStreams: String(numberOf(features.maxConcurrentStreams, NEW_PLAN_FEATURES.maxConcurrentStreams)),
-    adFree: typeof features.adFree === 'boolean' ? features.adFree : NEW_PLAN_FEATURES.adFree,
     maxQuality: features.maxQuality ?? NEW_PLAN_FEATURES.maxQuality,
   };
 }
@@ -87,19 +85,17 @@ export function planInputOf(form: PlanForm, plan: AdminPlan | null): PlanInput {
     features: {
       maxRegisteredDevices: Number(form.maxRegisteredDevices),
       maxConcurrentStreams: Number(form.maxConcurrentStreams),
-      adFree: form.adFree,
       maxQuality: form.maxQuality,
     },
   };
 }
 
-/** "4 thiết bị · xem cùng lúc 2 · không quảng cáo · tối đa 1080p" for the plan table; empty when unset. */
+/** "4 thiết bị · xem cùng lúc 2 · tối đa 1080p" for the plan table; empty when unset. */
 export function featuresSummary(features: AdminPlan['features']): string {
   const f = (features ?? {}) as PlanFeatures;
   const parts = [
     f.maxRegisteredDevices ? `${f.maxRegisteredDevices} thiết bị` : null,
     f.maxConcurrentStreams ? `xem cùng lúc ${f.maxConcurrentStreams}` : null,
-    f.adFree === undefined ? null : f.adFree ? 'không quảng cáo' : 'có quảng cáo',
     f.maxQuality ? `tối đa ${f.maxQuality}` : null,
   ];
   return parts.filter(Boolean).join(' · ');

@@ -10,16 +10,17 @@ import type { ContractPartySettings, PlatformSettings } from '@/types/production
 type Field = keyof ContractPartySettings;
 
 /** The lines of Bên A on every production contract, in the order the contract prints them. */
-export const CONTRACT_PARTY_FIELDS: { key: Field; label: string; placeholder: string }[] = [
-  { key: 'contractCompanyName', label: 'Tên công ty', placeholder: 'Công ty TNHH Nền tảng Phim AI Cinema' },
-  { key: 'contractAddress', label: 'Địa chỉ trụ sở', placeholder: 'Số nhà, đường, phường, thành phố' },
-  { key: 'contractTaxCode', label: 'Mã số thuế', placeholder: '0312345678' },
-  { key: 'contractPhone', label: 'Điện thoại', placeholder: '028 0000 0001' },
-  { key: 'contractEmail', label: 'Email', placeholder: 'legal@aicinema.vn' },
-  { key: 'contractBankAccount', label: 'Tài khoản ngân hàng', placeholder: 'Số tài khoản - Ngân hàng, chi nhánh' },
-  { key: 'contractRepresentative', label: 'Người đại diện ký', placeholder: 'Nguyễn Văn An' },
-  { key: 'contractRepresentativeTitle', label: 'Chức vụ', placeholder: 'Giám đốc' },
-  { key: 'contractPlace', label: 'Nơi ký và giải quyết tranh chấp', placeholder: 'Thành phố Hồ Chí Minh' },
+/** `max` is the length ContractPartySettingsDto takes. */
+export const CONTRACT_PARTY_FIELDS: { key: Field; label: string; placeholder: string; max: number }[] = [
+  { key: 'contractCompanyName', label: 'Tên công ty', placeholder: 'Công ty TNHH Nền tảng Phim AI Cinema', max: 255 },
+  { key: 'contractAddress', label: 'Địa chỉ trụ sở', placeholder: 'Số nhà, đường, phường, thành phố', max: 500 },
+  { key: 'contractTaxCode', label: 'Mã số thuế', placeholder: '0312345678', max: 50 },
+  { key: 'contractPhone', label: 'Điện thoại', placeholder: '028 0000 0001', max: 30 },
+  { key: 'contractEmail', label: 'Email', placeholder: 'legal@aicinema.vn', max: 255 },
+  { key: 'contractBankAccount', label: 'Tài khoản ngân hàng', placeholder: 'Số tài khoản - Ngân hàng, chi nhánh', max: 255 },
+  { key: 'contractRepresentative', label: 'Người đại diện ký', placeholder: 'Nguyễn Văn An', max: 255 },
+  { key: 'contractRepresentativeTitle', label: 'Chức vụ', placeholder: 'Giám đốc', max: 100 },
+  { key: 'contractPlace', label: 'Nơi ký và giải quyết tranh chấp', placeholder: 'Thành phố Hồ Chí Minh', max: 255 },
 ];
 
 /**
@@ -48,13 +49,14 @@ export function ContractPartySettingsForm({ current, onSaved }: { current: Platf
         Kịch bản bản cuối. Bên B lấy từ hồ sơ của từng Studio.
       </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {CONTRACT_PARTY_FIELDS.map(({ key, label, placeholder }) => (
+        {CONTRACT_PARTY_FIELDS.map(({ key, label, placeholder, max }) => (
           <label key={key} className={`space-y-1 ${key === 'contractAddress' || key === 'contractCompanyName' ? 'sm:col-span-2' : ''}`}>
             <span className="block font-semibold">{label}</span>
             <input
               value={value(key)}
               onChange={(event) => setDraft({ ...draft, [key]: event.target.value })}
               placeholder={placeholder}
+              maxLength={max}
               type={key === 'contractEmail' ? 'email' : 'text'}
               className={fieldInputClass}
             />

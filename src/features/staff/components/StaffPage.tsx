@@ -1,7 +1,9 @@
 'use client';
 
+import { GreetingCard } from '@/components/data/GreetingCard';
 import { useCan } from '@/hooks/useCan';
 import { PERMISSION } from '@/lib/permissions';
+import { useAppStore } from '@/store/useAppStore';
 import { StaffSupportWorkspace } from './StaffSupportWorkspace';
 
 const CARD = 'rounded-xl bg-card ring-1 ring-foreground/10';
@@ -9,14 +11,15 @@ const CARD = 'rounded-xl bg-card ring-1 ring-foreground/10';
 /** MF-5 support desk of a Staff account; read-only lookups live on their own page (StaffLookup). */
 export function StaffPage() {
   const can = useCan();
+  const user = useAppStore((s) => s.user);
   return (
     <main className="mx-auto w-full max-w-7xl space-y-5 px-4 py-6 sm:px-6">
-      <div>
-        <h2 className="font-heading text-2xl font-semibold tracking-tight">Hỗ trợ khách hàng</h2>
-        <p className="mt-0.5 text-sm text-muted-foreground">
-          Yêu cầu hỗ trợ do Trợ lý AI chuyển sang: nhận yêu cầu, trả lời Member, báo đã giải quyết để Member xác nhận.
-        </p>
-      </div>
+      <GreetingCard
+        label="Hỗ trợ khách hàng"
+        name={user?.name ?? 'Nhân viên'}
+        summary="Yêu cầu hỗ trợ do Trợ lý AI chuyển sang: nhận yêu cầu, trả lời Member, báo đã giải quyết để Member xác nhận."
+        className="sm:p-7"
+      />
       {can(PERMISSION.SUPPORT_CASE_READ) ? (
         <StaffSupportWorkspace />
       ) : (

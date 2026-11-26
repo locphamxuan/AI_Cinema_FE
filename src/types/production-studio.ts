@@ -57,10 +57,14 @@ export interface Studio {
   contactName: string | null;
   phone: string | null;
   note: string | null;
-  /** Bên B of the production contract: contactName is the representative who signs. */
+  /**
+   * Legal profile, Bên B of the production contract: filled in by the studio itself on Studio Web, read-only here.
+   * contactName (kept by the Admin) is the representative who signs.
+   */
   address?: string | null;
   taxCode?: string | null;
   bankAccount?: string | null;
+  bankName?: string | null;
   representativeTitle?: string | null;
   isActive: boolean;
   createdAt: string;

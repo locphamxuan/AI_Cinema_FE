@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AccountsPanel } from '@/features/admin/components/AccountsPanel';
 import { AdminMoviesPanel } from '@/features/admin/components/AdminMoviesPanel';
@@ -103,6 +103,23 @@ describe('AccountsPanel', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Xoá Lê Minh Châu' }));
     await userEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Xoá tài khoản' }));
     expect(fetchMock.mock.calls.some(([url, init]) => (init as RequestInit | undefined)?.method === 'DELETE' && String(url).endsWith('/users/u1'))).toBe(true);
+  });
+});
+
+describe('AccountsPanel lock', () => {
+  it('asks before locking an account and sends isActive false only after the confirmation', async () => {
+    signInAs('admin');
+    const fetchMock = routeFetch({ 'GET /users': { body: page([account]) }, 'PATCH /users/u1': { body: { ...account, isActive: false } } });
+    render(<AccountsPanel />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /Khoá/ }));
+    const patched = () => fetchMock.mock.calls.filter(([, init]) => (init as RequestInit | undefined)?.method === 'PATCH');
+    expect(patched()).toHaveLength(0);
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/không đăng nhập được/)).toBeInTheDocument();
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Khoá tài khoản' }));
+    await waitFor(() => expect(patched()).toHaveLength(1));
+    expect(JSON.parse((patched()[0][1] as RequestInit).body as string)).toEqual({ isActive: false });
   });
 });
 

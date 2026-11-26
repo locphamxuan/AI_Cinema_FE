@@ -22,7 +22,7 @@ import { useProject } from './ProjectContext';
 export function AddSeasonModal({ firstNumber, nextSeason, onClose }: { firstNumber: number; nextSeason: number; onClose: () => void }) {
   const { project, reload } = useProject();
   const [season, setSeason] = useState<SeasonDraft>(emptySeason(nextSeason, firstNumber));
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +55,7 @@ export function EditSeasonModal({ season, onClose }: { season: Season; onClose: 
   const [title, setTitle] = useState(season.title ?? '');
   const [start, setStart] = useState(toDateInput(season.releaseStartDate));
   const [end, setEnd] = useState(toDateInput(season.releaseEndDate));
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const windowOk = !start || !end || start <= end;
 
   const submit = async (e: React.FormEvent) => {
@@ -82,7 +82,7 @@ export function EditSeasonModal({ season, onClose }: { season: Season; onClose: 
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={255} className={fieldInputClass} />
         </FormField>
         <div className="grid grid-cols-2 gap-3">
-          <FormField label="Phát hành từ ngày">
+          <FormField label="Phát hành từ ngày" error={windowOk ? null : 'Ngày bắt đầu phải trước ngày kết thúc.'}>
             <input type="date" value={start} onChange={(e) => setStart(e.target.value)} className={fieldInputClass} />
           </FormField>
           <FormField label="Đến ngày">
@@ -110,7 +110,7 @@ const windowOf = (season: Season): ReleaseWindowDraft => ({
 export function AddEpisodeModal({ season, onClose }: { season: Season; onClose: () => void }) {
   const { reload } = useProject();
   const [values, setValues] = useState({ title: '', minutes: 20, deadline: '', releaseDate: '', synopsis: '' });
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +155,7 @@ export function EditEpisodeModal({ episode, season, onClose }: { episode: Episod
     releaseDate: initialRelease,
     synopsis: episode.synopsis ?? '',
   });
-  const { busy, run } = useAction();
+  const { busy, run } = useAction({ onStale: reload });
   const moved = values.deadline !== initialDeadline;
 
   const submit = async (e: React.FormEvent) => {
@@ -223,17 +223,23 @@ function EpisodeForm(props: {
 
   return (
     <form onSubmit={props.onSubmit} className="space-y-4">
-      <FormField label="Tên tập">
+      <FormField label="Tên tập" required>
         <input value={values.title} onChange={(e) => set({ title: e.target.value })} maxLength={255} required className={fieldInputClass} />
       </FormField>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <FormField label="Thời lượng mục tiêu (phút)">
+        <FormField
+          label="Thời lượng mục tiêu (phút)"
+          error={values.minutes > 0 && values.minutes <= MAX_EPISODE_MINUTES ? null : `Từ 1 đến ${MAX_EPISODE_MINUTES} phút.`}
+        >
           <input type="number" min={1} max={MAX_EPISODE_MINUTES} value={values.minutes} onChange={(e) => set({ minutes: Number(e.target.value) })} className={fieldInputClass} />
         </FormField>
-        <FormField label="Hạn giao">
+        <FormField label="Hạn giao" error={values.deadline && !deadlineOk ? 'Hạn giao không được trước hôm nay.' : null}>
           <input type="date" min={getTodayDateString()} value={values.deadline} onChange={(e) => set({ deadline: e.target.value })} required={props.deadlineRequired !== false} className={fieldInputClass} />
         </FormField>
-        <FormField label="Ngày dự kiến phát hành">
+        <FormField
+          label="Ngày dự kiến phát hành"
+          error={releaseOk ? null : 'Phải nằm trong khoảng phát hành của mùa và không trước hạn giao.'}
+        >
           <input type="date" min={values.deadline || undefined} value={values.releaseDate} onChange={(e) => set({ releaseDate: e.target.value })} className={`${fieldInputClass} ${releaseOk ? '' : 'border-rose-500'}`} />
         </FormField>
       </div>

@@ -1,7 +1,8 @@
 'use client';
 
 import { GreetingCard } from '@/components/data/GreetingCard';
-import { useMemo, useState } from 'react';
+import { StageBar } from '@/components/data/StageBar';
+import { useMemo, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Pager, pageOf } from '@/components/data/Pager';
@@ -14,20 +15,8 @@ import { CinematicProjectTable } from './CinematicProjectTable';
 import { StudioFilterBar } from './StudioFilterBar';
 import { matchesFilter, toScriptItem, type ScriptFilterKey, type ScriptProjectItem } from './scriptItems';
 
-const CARD = 'rounded-3xl bg-card border border-border shadow-xs';
 const hrefOf = (p: ScriptProjectItem) => `/creator/projects/${p.id}${needsWriting(p) ? '?tab=script' : ''}`;
 const PAGE_SIZE = 6;
-
-function Dot({ tone, value, label }: { tone: string; value: number; label: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${tone}`} />
-      <span>
-        {value} {label}
-      </span>
-    </div>
-  );
-}
 
 /** The Creator's home: the projects the Admin assigned, where each script stands, and the way into each one. */
 export function CreatorStudioPortal() {
@@ -66,8 +55,17 @@ export function CreatorStudioPortal() {
           label="Hồ sơ biên kịch"
           name={user?.name ?? 'Creator'}
           summary="Kịch bản và dự án được giao cho bạn, với bước tiếp theo của từng dự án."
+          figures={
+            pipelines.data
+              ? [
+                  { label: 'Dự án được giao', value: items.length },
+                  { label: 'Cần viết hoặc sửa', value: count('DRAFT', 'REVISION') },
+                  { label: 'Đang chờ duyệt', value: count('IN_REVIEW', 'ADMIN_REVIEW') },
+                ]
+              : undefined
+          }
           action={
-            <Link href="/creator/profile" className="inline-flex h-10 items-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+            <Link href="/creator/profile" className="inline-flex h-10 items-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
               Hồ sơ cá nhân
             </Link>
           }
@@ -78,43 +76,37 @@ export function CreatorStudioPortal() {
 
         {pipelines.data && (
           <>
-            <section aria-label="Thống kê kịch bản" className={`${CARD} p-6 sm:p-7 space-y-4`}>
-              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                <h2 className="text-lg font-extrabold text-foreground tracking-tight">Tiến độ kịch bản</h2>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-foreground tracking-tight tabular-nums">{items.length}</span>
-                  <span className="text-xs sm:text-sm font-semibold text-muted-foreground">Dự án được giao</span>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2 pt-3 border-t border-border text-xs font-semibold text-muted-foreground">
-                <Dot tone="bg-slate-400 dark:bg-slate-600" value={count('DRAFT')} label="Chưa nộp" />
-                <Dot tone="bg-amber-400" value={count('IN_REVIEW', 'ADMIN_REVIEW')} label="Đang chờ duyệt" />
-                <Dot tone="bg-rose-400" value={count('REVISION')} label="Cần sửa" />
-                <Dot tone="bg-emerald-500" value={count('NEGOTIATING', 'HANDED_OFF')} label="Kịch bản bản cuối" />
-              </div>
-            </section>
+            <StageBar
+              title="Tiến độ kịch bản"
+              headline={{ value: items.length, label: 'dự án được giao' }}
+              segments={[
+                { label: 'Chưa nộp', value: count('DRAFT'), color: 'var(--viz-4)' },
+                { label: 'Đang chờ duyệt', value: count('IN_REVIEW', 'ADMIN_REVIEW'), color: 'var(--viz-2)' },
+                { label: 'Cần sửa', value: count('REVISION'), color: 'var(--viz-5)' },
+                { label: 'Kịch bản bản cuối', value: count('NEGOTIATING', 'HANDED_OFF'), color: 'var(--viz-3)' },
+              ]}
+            />
 
             {toWrite && (
               <section
                 aria-label="Kịch bản cần viết"
-                className="relative overflow-hidden rounded-3xl bg-[#0E1117] border border-slate-800 p-7 sm:p-9 text-white shadow-sm"
+                className="relative overflow-hidden rounded-2xl bg-card p-6 pl-8 shadow-xs ring-1 ring-foreground/10 before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-(--edge) sm:p-7 sm:pl-9"
+                style={{ '--edge': toWrite.stage === 'REVISION' ? 'var(--viz-5)' : 'var(--viz-2)' } as CSSProperties}
               >
-                <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-                  <div className="space-y-3 max-w-2xl">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-semibold text-slate-100">
-                      <span className={`w-2 h-2 rounded-full ${toWrite.stage === 'REVISION' ? 'bg-rose-400' : 'bg-amber-400'}`} aria-hidden="true" />
+                <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+                  <div className="max-w-2xl space-y-2">
+                    <p className="inline-flex items-center gap-2 rounded-full bg-(--edge)/12 px-3 py-1 text-xs font-semibold text-foreground">
+                      <span className="size-2 rounded-full bg-(--edge)" aria-hidden="true" />
                       {toWrite.stage === 'REVISION' ? 'Có kịch bản cần sửa theo góp ý' : 'Có kịch bản đang chờ bạn viết'}
-                    </span>
-                    <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                      {toWrite.title}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                      {(toWrite.genreTags.slice(0, 3).join(' · ') || 'Dự án phim')} • {toWrite.totalEpisodes} tập • Reviewer phụ trách: {toWrite.reviewerName}
+                    </p>
+                    <h3 className="font-display text-2xl font-semibold tracking-tight text-balance sm:text-3xl">{toWrite.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {toWrite.genreTags.slice(0, 3).join(', ') || 'Dự án phim'}, {toWrite.totalEpisodes} tập. Reviewer phụ trách: {toWrite.reviewerName}
                     </p>
                   </div>
                   <Link
                     href={hrefOf(toWrite)}
-                    className="shrink-0 inline-flex items-center gap-2 self-start md:self-auto px-5 py-3 rounded-full bg-white hover:bg-muted text-slate-900 text-xs sm:text-sm font-semibold shadow-sm transition-all"
+                    className="inline-flex h-10 shrink-0 items-center self-start rounded-lg bg-purple-600 px-5 text-sm font-semibold text-white shadow-sm shadow-purple-600/25 transition-colors hover:bg-purple-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-reel md:self-auto"
                   >
                     Mở trình soạn kịch bản
                   </Link>
@@ -134,7 +126,7 @@ export function CreatorStudioPortal() {
 
             <section aria-label="Danh sách dự án" className="space-y-6">
               {filtered.length === 0 ? (
-                <div className="rounded-3xl border border-dashed border-border p-12 text-center bg-card">
+                <div className="rounded-2xl border border-dashed border-border bg-card p-12 text-center">
                   <h3 className="text-base font-bold text-foreground">{items.length ? 'Không có dự án khớp bộ lọc' : 'Bạn chưa được giao dự án nào'}</h3>
                 </div>
               ) : viewMode === 'grid' ? (

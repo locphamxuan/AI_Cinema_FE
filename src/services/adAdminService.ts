@@ -2,9 +2,8 @@
 import type { AdInput, AdminAd, EpisodeAdSlotInput, EpisodeAdSlots } from '@/types/playback';
 import { apiClient, ApiResponse } from './apiClient';
 
-/** Bounds of the BE (ad-limits.ts): a longer video stops being a mid-roll, a heavier weight wins every draw. */
+/** Bound of the BE (ad-limits.ts): a longer video stops being a mid-roll. */
 export const MAX_AD_DURATION_SECONDS = 300;
-export const MAX_AD_WEIGHT = 1000;
 /** The BE (ad-media.service.ts) takes an MP4 of at most 100 MB. */
 export const MAX_AD_VIDEO_BYTES = 100 * 1024 * 1024;
 
@@ -47,8 +46,5 @@ export function adSlotProblem(slots: EpisodeAdSlotInput[], durationSeconds: numb
 export function adInputProblem(input: AdInput): string | null {
   if (!input.title.trim()) return 'Nhập tên quảng cáo.';
   if (!/^https?:\/\/\S+$/i.test(input.mediaUrl)) return 'Link video phải bắt đầu bằng http:// hoặc https://.';
-  if (input.clickUrl && !/^https?:\/\/\S+$/i.test(input.clickUrl)) return 'Link khi bấm phải bắt đầu bằng http:// hoặc https://.';
-  const weight = input.weight ?? 1;
-  if (!Number.isInteger(weight) || weight < 1 || weight > MAX_AD_WEIGHT) return `Mức ưu tiên từ 1 đến ${MAX_AD_WEIGHT}.`;
   return null;
 }

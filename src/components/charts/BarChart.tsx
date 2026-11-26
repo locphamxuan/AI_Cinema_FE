@@ -1,6 +1,5 @@
 'use client';
 
-import { useId } from 'react';
 import { Bar, BarChart as RechartsBarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/shadcn/chart';
 
@@ -31,7 +30,6 @@ export function BarChart({
   valueUnit = '',
   formatValue = (v) => v.toLocaleString('vi-VN'),
 }: BarChartProps) {
-  const gid = useId().replace(/:/g, '');
   const keys = series.map((_, i) => `s${i}`);
   const config = Object.fromEntries(
     series.map((s, i) => [keys[i], { label: s.name, color: s.color }]),
@@ -50,16 +48,8 @@ export function BarChart({
 
   const chart = (
     <ChartContainer config={config} className="aspect-auto w-full" style={{ height }}>
-      <RechartsBarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="24%">
-        <defs>
-          {keys.map((key) => (
-            <linearGradient key={key} id={`${gid}-${key}`} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={`var(--color-${key})`} stopOpacity={1} />
-              <stop offset="100%" stopColor={`var(--color-${key})`} stopOpacity={0.45} />
-            </linearGradient>
-          ))}
-        </defs>
-        <CartesianGrid vertical={false} strokeDasharray="3 3" />
+      <RechartsBarChart data={rows} margin={{ top: 8, right: 8, left: 0, bottom: 0 }} barCategoryGap="28%" barGap={2}>
+        <CartesianGrid vertical={false} strokeOpacity={0.5} />
         <XAxis
           dataKey="category"
           tickLine={false}
@@ -87,7 +77,7 @@ export function BarChart({
           }
         />
         {keys.map((key) => (
-          <Bar key={key} dataKey={key} fill={`url(#${gid}-${key})`} radius={[6, 6, 0, 0]} maxBarSize={44} />
+          <Bar key={key} dataKey={key} fill={`var(--color-${key})`} radius={[4, 4, 0, 0]} maxBarSize={40} />
         ))}
       </RechartsBarChart>
     </ChartContainer>

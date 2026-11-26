@@ -72,3 +72,18 @@ describe('PosterPanel – poster sent by the studio', () => {
     expect(calls[0].path).toBe('/projects/m1/studio-poster/content');
   });
 });
+
+describe('PosterPanel – upload', () => {
+  it('refuses a poster above 20 MB before sending it', async () => {
+    signInAs('reviewer');
+    const calls = routeFetch({});
+    const { container } = render(panel(null));
+    const big = new File(['x'], 'bia.png', { type: 'image/png' });
+    Object.defineProperty(big, 'size', { value: 21 * 1024 * 1024 });
+
+    await userEvent.upload(container.querySelector('input[type="file"]') as HTMLInputElement, big);
+
+    expect(toast.error).toHaveBeenCalledWith('Ảnh quá lớn', expect.stringContaining('tối đa 20 MB'));
+    expect(calls.some((c) => c.method === 'POST')).toBe(false);
+  });
+});
