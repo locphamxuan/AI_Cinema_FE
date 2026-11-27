@@ -5,7 +5,7 @@ import { RiskFlagsTab, scanSummary } from '@/features/finance/RiskFlagsTab';
 import { toast } from '@/components/ui/Toast';
 import { AppShell } from '@/components/shell/AppShell';
 import { FilmProfitTab } from '@/features/finance/FilmProfitTab';
-import { day, roi, signTone, vnd } from '@/features/finance/financeFormat';
+import { day, percent, signTone, vnd } from '@/features/finance/financeFormat';
 import { routeFetch } from '@/tests/support/routeFetch';
 import { signInAs } from '@/tests/support/signIn';
 
@@ -22,18 +22,18 @@ const page = <T,>(data: T[]) => ({ data, meta: { totalItems: data.length, curren
 const FILMS = {
   currentPeriod: '2026-11',
   lastSharedPeriod: '2026-10',
-  totals: { productionCostVnd: 150_000_000, episodeSalesVnd: 90_000_000, planShareVnd: 30_000_000, revenueVnd: 120_000_000, profitVnd: -30_000_000, roiPercent: -20, marginPercent: -25, costedMovies: 1, brokeEvenMovies: 0 },
+  totals: { productionCostVnd: 150_000_000, episodeSalesVnd: 90_000_000, planShareVnd: 30_000_000, revenueVnd: 120_000_000, profitVnd: -30_000_000, marginPercent: -25, costedMovies: 1, brokeEvenMovies: 0 },
   films: [
-    { movieId: 'm1', title: 'Mưa Sài Gòn', studioName: 'Studio Sen', createdAt: '2026-10-01T03:00:00Z', productionCostVnd: 150_000_000, episodeSalesVnd: 90_000_000, refundedVnd: 2_000_000, planShareVnd: 30_000_000, revenueVnd: 120_000_000, profitVnd: -30_000_000, roiPercent: -20, breakEven: 'NOT_YET' },
-    { movieId: 'm2', title: 'Mưa Sài Gòn', studioName: null, createdAt: '2026-11-05T03:00:00Z', productionCostVnd: 0, episodeSalesVnd: 0, refundedVnd: 0, planShareVnd: 0, revenueVnd: 0, profitVnd: 0, roiPercent: null, breakEven: 'NO_COST' },
+    { movieId: 'm1', title: 'Mưa Sài Gòn', studioName: 'Studio Sen', createdAt: '2026-10-01T03:00:00Z', productionCostVnd: 150_000_000, episodeSalesVnd: 90_000_000, refundedVnd: 2_000_000, planShareVnd: 30_000_000, revenueVnd: 120_000_000, profitVnd: -30_000_000, breakEven: 'NOT_YET' },
+    { movieId: 'm2', title: 'Mưa Sài Gòn', studioName: null, createdAt: '2026-11-05T03:00:00Z', productionCostVnd: 0, episodeSalesVnd: 0, refundedVnd: 0, planShareVnd: 0, revenueVnd: 0, profitVnd: 0, breakEven: 'NO_COST' },
   ],
 };
 
 describe('Financial Dashboard formatting', () => {
   it('spells VND, shows "—" when there is nothing to divide by, colours gains and losses', () => {
     expect(vnd(1_500_000)).toBe('1.500.000 VND');
-    expect(roi(null)).toBe('—');
-    expect(roi(-20)).toBe('-20%');
+    expect(percent(null)).toBe('—');
+    expect(percent(-20)).toBe('-20%');
     expect(signTone(5)).toBe('text-success');
     expect(signTone(-5)).toBe('text-destructive');
     expect(signTone(0)).toBe('');
@@ -43,7 +43,7 @@ describe('Financial Dashboard formatting', () => {
 });
 
 describe('Profit per film', () => {
-  it('reads finance data and omits the Monthly-plan and ROI table columns', async () => {
+  it('reads finance data and omits the Monthly-plan column and any ROI', async () => {
     const calls = routeFetch({ '/admin/finance/films': FILMS });
     render(<FilmProfitTab />);
 
@@ -55,6 +55,7 @@ describe('Profit per film', () => {
     const table = screen.getByRole('table');
     expect(within(table).queryByRole('button', { name: 'Từ gói Tháng' })).toBeNull();
     expect(within(table).queryByRole('button', { name: 'ROI' })).toBeNull();
+    expect(screen.queryByText(/ROI/)).toBeNull();
     expect(screen.getByText('đã trừ hoàn 2.000.000 VND')).toBeInTheDocument();
     const loss = screen.getAllByText('-30.000.000 VND');
     expect(loss.some((el) => el.className.includes('text-destructive'))).toBe(true);

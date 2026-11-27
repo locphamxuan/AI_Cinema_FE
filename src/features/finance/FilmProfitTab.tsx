@@ -9,7 +9,7 @@ import { fieldInputClass } from '@/components/ui/FormField';
 import { useResource } from '@/hooks/useResource';
 import { financeService } from '@/services/financeService';
 import { COLUMNS, FilmProfitTable, compare, type Sort, type SortKey } from './FilmProfitTable';
-import { pageOf, roi, vnd } from './financeFormat';
+import { pageOf, percent, vnd } from './financeFormat';
 
 const PAGE_SIZE = 20;
 
@@ -49,7 +49,7 @@ export function FilmProfitTab() {
             label="Lợi nhuận"
             value={vnd(t.profitVnd)}
             noteTone={t.profitVnd < 0 ? 'bad' : t.profitVnd > 0 ? 'good' : 'muted'}
-            note={`Biên lợi nhuận ${roi(t.marginPercent)} · ROI ${roi(t.roiPercent)}`}
+            note={`Biên lợi nhuận ${percent(t.marginPercent)}`}
           />
           <StatCard
             label="Phim đã hoà vốn"

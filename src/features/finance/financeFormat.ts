@@ -13,9 +13,9 @@ export function vnd(n: number | null | undefined): string {
   return n === null || n === undefined ? '—' : `${NUMBER.format(n)} VND`;
 }
 
-/** "-20%"; "—" while there is nothing to divide by (no production cost, no revenue). */
-export function roi(percent: number | null | undefined): string {
-  return percent === null || percent === undefined ? '—' : `${NUMBER.format(percent)}%`;
+/** "-20%"; "—" while there is nothing to divide by (no revenue). */
+export function percent(value: number | null | undefined): string {
+  return value === null || value === undefined ? '—' : `${NUMBER.format(value)}%`;
 }
 
 /** Green for a gain, red for a loss, plain for zero or nothing. */
