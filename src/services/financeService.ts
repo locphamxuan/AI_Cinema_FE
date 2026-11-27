@@ -1,4 +1,4 @@
-/** MF-5 Financial Dashboard of the Admin: profit / ROI per film (BR-48 monthly-plan share included), risk flags. */
+/** MF-5 Financial Dashboard of the Admin: profit per film (BR-48 monthly-plan share included), risk flags. */
 import { apiClient } from './apiClient';
 import { API_ROUTES } from '@/constants/apiRoutes';
 import type { Page } from '@/types/production';
